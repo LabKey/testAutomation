@@ -1,0 +1,56 @@
+1. Set the following environment variables:
+
+CC_HOME: The home directory of the cruisecontrol installation. (Do not include a trailing slash!)
+CC_PROJECT_HOME: The base directory of the project(s) that CC will build. (Do not include a trailing slash!)  We currently look for enlistments in two subdirectories, 'trunk' and 'branch'.
+CC_PORT: The web port that will be used for the CC web application.
+CC_SERVER: The name used to access the CC server over http. (For example, 'edi.fhcrc.org'.)
+CATALINA_HOME: The base directory of your tomcat installations.  We currently look for two subdirectories, 'branch' and 'trunk', which should each contain a complete and separate copy of tomcat.  'trunk' should accept http requests on port 8080, and 'branch' should accept http requests on 8085.
+JAVA_HOME: The location of your 1.5 (or later) JDK.
+ANT_HOME: the location of ant (used to build the project).
+
+2. install cruisecontrol as a service:
+
+[PROJECT_ROOT]\server\test\cruisecontrol\bin\instsrv.exe "CruiseControl" [PROJECT_ROOT]\server\test\cruisecontrol\bin\srvany.exe -u [username] -p [password]
+
+Run regedit.exe
+
+Navigate to:
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CruiseControl
+
+Under CruiseControl, create a new key called 'Parameters'.
+Under the new Parameters key, add a new string value with name 'Application' and value '[PROJECT_ROOT]\server\test\cruisecontrol\wrapper.bat'
+
+4. Under CC_HOME, create directory 'output'.
+
+5. Replace [CC_HOME]\webapps\cruisecontrol\xsl\errors.xsl with [CC_PROJECT_HOME]\server\test\cruisecontrol\xsl\errors.xsl
+
+6. Increase max heap size:
+ In [CC_HOME]\cruisecontrol.bat, replace:
+REM set CC_OPTS=-Xms128m -Xmx256m
+with
+set CC_OPTS=-Xms128m -Xmx512m
+
+7. If adding a new project to our existing servers, make sure there are no port collisions.  Here are the in-user ports on Hertz:
+trunk:
+	startup: 8080
+	shutdown: 8005
+	debug: 5555
+	
+branch:
+	startup: 8085
+	shutdown: 8006
+	debug: 5556
+	
+trunk-bvt:
+	startup: 8090
+	shutdown: 8007
+	debug: 5557
+	
+branch-bvt:
+	startup: 8095
+	shutdown: 8008
+	debug: 5558
+
+8. Assuming CruiseControl hasn't changed from 2.6.2, you will need to edit two JSP files to make CC generate the right links
+for JMX to invoke builds. Otherwise, CC will create links to hertz.fhcrc.org, which will not resolve correctly. The replacement files are in
+[CC_PROJECT_HOME]\server\test\cruisecontrol\jsp\ and should be copied to [CC_HOME]\webapps\cruisecontrol\.

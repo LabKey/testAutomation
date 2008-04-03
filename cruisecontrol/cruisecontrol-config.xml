@@ -1,0 +1,176 @@
+<cruisecontrol>
+    <system>
+        <configuration>
+            <threads count="5" />
+        </configuration>
+    </system>
+
+    <!-- Load environment variables -->
+    <property environment="env" toupper="true"/>
+
+    <property name="ccdir" value="${env.CC_HOME}"/>
+    <property name="ccport" value="${env.CC_PORT}"/>
+    <property name="servername" value="${env.CC_SERVER}"/>
+    <property name="reportdir" value="${ccdir}/reporting"/>
+    <property name="artifactsdir" value="${ccdir}/artifacts/${project.name}"/>
+    <property name="logdir" value="${ccdir}/logs/${project.name}"/>
+
+    <!-- Defaults for email -->
+    <property name="buildmaster.email" value="brittp@labkey.com"/>
+    <property name="buildmaster.name" value="Buildmaster"/>
+
+    <!-- Preconfigure our plugins -->
+    <plugin name="log"
+            dir="${logdir}"/>
+
+    <plugin name="currentbuildstatuslistener"
+            file="${logdir}/status.txt"/>
+
+    <plugin name="svn"
+            localworkingcopy="${projectdir}"
+            username="${svnuser}"
+            password="${svnpassword}"/>
+
+    <plugin name="svnbootstrapper"
+            username="${svnuser}"
+            password="${svnpassword}"
+            localWorkingCopy="${projectdir}"/>
+
+    <plugin name="ant"
+            antscript="${env.ANT_HOME}/bin/ant.bat"
+            antWorkingDir="${antworkingdir}"
+            buildfile="${antbuildfile}"
+            timeout="9000"
+            uselogger="true"
+            saveLogDir="${ccdir}/output" />
+
+    <plugin name="htmlemail"
+            defaultsuffix="@fhcrc.org"
+            buildresultsurl="http://${servername}:${ccport}/cruisecontrol/buildresults/${project.name}"
+            mailhost="localhost"
+            returnaddress="${buildmaster.email}"
+            returnname="${buildmaster.name}"
+            subjectprefix="[CC]"
+            xsldir="${ccdir}/webapps/cruisecontrol/xsl"
+            css="${ccdir}/webapps/cruisecontrol/css/cruisecontrol.css">
+        <!-- Special-case peterhus, since his SVN username doesn't include '@labkey.com' -->
+        <map alias="peterhus" address="peterhus@labkey.com" />
+        <map alias="e.ulberg" address="ulberge@labkey.com" />
+        <map alias="migra@fhcrc.org" address="marki@labkey.com" />
+        <map alias="arauch" address="adam@labkey.com" />
+        <map alias="e.nelson" address="eknelson@labkey.com" />
+        <map alias="b.connolly" address="bconn@labkey.com" />
+        <map alias="d.stearns" address="daves@labkey.com" />
+        <map alias="k.krouse" address="kevink@labkey.com" />
+        <map alias="j.garms" address="jgarms@labkey.com" />
+        <always address="${buildmaster.email}"/>
+        <failure reportWhenFixed="true" address="cpas-developers@lists.fhcrc.org"/>
+        <parameter name="lineCount" value="250" />
+    </plugin>
+
+    <plugin name="artifactspublisher"
+            dir="${testdir}/build/logs"
+            dest="${artifactsdir}" />
+
+    <plugin name="project.labkey" classname="net.sourceforge.cruisecontrol.ProjectConfig">
+        <listeners>
+            <currentbuildstatuslistener/>
+        </listeners>
+        <bootstrappers>
+            <svnbootstrapper username="cpas"
+                             password="cpas"/>
+        </bootstrappers>
+        <modificationset quietperiod="180">
+            <svn username="cpas"
+                password="cpas" />
+        </modificationset>
+        <schedule>
+            <ant target="cruisecontrol">
+                <property name="cc.tomcat.home" value="${env.CC_CATALINA_HOME}/${instance}"/>
+                <property name="cc.tomcat.port" value="${tomcatport}"/>
+                <property name="cc.suite" value="${suite}"/>
+                <property name="cc.debug.port" value="${debugport}"/>
+                <property name="cc.selenium.port" value="${seleniumport}"/>
+                <property name="cc.linkCheck" value="${linkCheck}"/>
+            </ant>
+        </schedule>
+        <publishers>
+            <htmlemail/>
+            <artifactspublisher/>
+        </publishers>
+    </plugin>
+
+    <project.labkey name="LabKey Trunk DRT" buildafterfailed="false">
+        <property name="instance" value="trunk"/>
+        <property name="tomcatport" value="8080"/>
+        <property name="debugport" value="5555"/>
+        <property name="seleniumport" value="4445"/>
+        <property name="suite" value="DRT"/>
+        <property name="linkCheck" value="false"/>
+
+        <!-- Common properties: these are the same for all LabKey CC projects. -->
+        <property name="projectdir" value="${env.CC_PROJECT_HOME}/${instance}"/>
+        <property name="testdir" value="${projectdir}/server/test"/>
+        <property name="antbuildfile" value="${projectdir}/server/build.xml"/>
+        <property name="antworkingdir" value="${projectdir}/server"/>
+    </project.labkey>
+
+
+    <project.labkey name="LabKey Branch DRT" buildafterfailed="false">
+        <property name="instance" value="branch"/>
+        <property name="tomcatport" value="8085"/>
+        <property name="debugport" value="5556"/>
+        <property name="seleniumport" value="4446"/>
+        <property name="suite" value="DRT"/>
+        <property name="linkCheck" value="false"/>
+
+        <property name="projectdir" value="${env.CC_PROJECT_HOME}/${instance}"/>
+        <property name="testdir" value="${projectdir}/server/test"/>
+        <property name="antbuildfile" value="${projectdir}/server/build.xml"/>
+        <property name="antworkingdir" value="${projectdir}/server"/>
+    </project.labkey>
+
+    <!--project.labkey name="LabKey Trunk Bootstrap DRT" buildafterfailed="false">
+        <property name="instance" value="trunk-bootstrap"/>
+        <property name="tomcatport" value="8100"/>
+        <property name="debugport" value="5559"/>
+        <property name="seleniumport" value="4449"/>
+        <property name="suite" value="DRT"/>
+        <property name="linkCheck" value="false"/>
+
+        <property name="projectdir" value="${env.CC_PROJECT_HOME}/${instance}"/>
+        <property name="testdir" value="${projectdir}/server/test"/>
+        <property name="antbuildfile" value="${projectdir}/server/build.xml"/>
+        <property name="antworkingdir" value="${projectdir}/server"/>
+    </project.labkey-->
+
+   <project name="msInspect" buildafterfailed="false">
+       <property name="projectdir" value="${env.CC_PROJECT_HOME}/msInspect-trunk"/>
+       <property name="testdir" value="${projectdir}/msinspect/test"/>
+       <property name="antbuildfile" 
+                 value="${projectdir}/msinspect/build.xml"/>
+        <!--New environment variables CC_MSINSPECT_SVN_USER and
+            CC_MSINSPECT_SVN_PASSWORD allow msInspect to auth differently -->
+        <property name="svnuser" value="${env.CC_MSINSPECT_SVN_USER}"/>
+        <property name="svnpassword" value="${env.CC_MSINSPECT_SVN_PASSWORD}"/>
+        <property name="antworkingdir" value="${projectdir}/msinspect"/>
+       <listeners>
+           <currentbuildstatuslistener/>
+       </listeners>
+       <bootstrappers>
+           <svnbootstrapper />
+       </bootstrappers>
+       <!-- note extensive exclusion list to keep msinspect from building when CPAS-only changes happen -->
+       <modificationset quietperiod="180" ignoreFiles="tools/**,build/**,test/**,shared/**,external/lib/web/**,external/bin/**,docs/cpas/**,archive/webapp/**,configs/**,flow/**,server/**">
+            <svn/>
+       </modificationset>
+       <schedule>
+           <ant target="cruisecontrol" />
+       </schedule>
+       <publishers>
+           <htmlemail/>
+           <artifactspublisher />
+       </publishers>
+   </project>
+
+</cruisecontrol>

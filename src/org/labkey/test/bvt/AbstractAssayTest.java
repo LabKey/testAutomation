@@ -1,0 +1,217 @@
+package org.labkey.test.bvt;
+
+import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+
+import java.io.File;
+
+/**
+ * User: jeckels
+ * Date: Nov 20, 2007
+ */
+public abstract class AbstractAssayTest extends BaseSeleniumWebTest
+{
+    protected final static int WAIT_FOR_GWT = 5000;
+
+    //constants added for security tests
+    private final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role
+    private final static String TEST_ASSAY_PERMS_EDITOR = "Editor";                 //name of built-in editor role
+    private final static String TEST_ASSAY_PERMS_NONE = "No Permissions";           //name of built-in no perms role
+    private final static String TEST_ASSAY_GRP_USERS = "Users";                     //name of built-in Users group
+    private final static String TEST_ASSAY_GRP_PIS = "PIs";                         //name of PI group to add
+    protected final static String TEST_ASSAY_USR_PI1 = "pi1@security.test";           //user within that group
+    protected final static String TEST_ASSAY_USR_TECH1 = "labtech1@security.test";    //a typical lab tech user
+    protected final static String TEST_ASSAY_PRJ_SECURITY = "Assay Security Test";    //test project (kept separate from previous tests)
+    protected final static String TEST_ASSAY_FLDR_LABS = "Labs";                      //sub-folder of test project
+    protected final static String TEST_ASSAY_FLDR_LAB1 = "Lab 1";                     //sub-folder of Labs
+    protected final static String TEST_ASSAY_FLDR_STUDIES = "Studies";                //sub-folder of test proj
+    protected final static String TEST_ASSAY_FLDR_STUDY1 = "Study 1";                 //sub-folder of Studies
+    protected final static String TEST_ASSAY_FLDR_STUDY2 = "Study 2";                 //another sub of Studies
+    protected final static String TEST_ASSAY_FLDR_STUDY3 = "Study 3";                 //another sub of Studies
+    private final static String TEST_ASSAY_LINK_PERMS = "Permissions";               //name of Permissions link
+    private final static String TEST_ASSAY_PERMS_STUDY_READALL = "READ";
+
+    /**
+     * Sets up the data pipeline for the specified project. This can be called from any page.
+     * @param project name of project for which the pipeline should be setup
+     */
+    protected void setupPipeline(String project)
+    {
+        log("Setting up data pipeline for project " + project);
+        clickLinkWithText(project);
+        addWebPart("Data Pipeline");
+        clickNavButton("Setup");
+        File dir = getTestTempDir();
+        dir.mkdirs();
+
+        setFormElement("path", dir.getAbsolutePath());
+        clickNavButton("Set");
+
+        //make sure it was set
+        assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath() + "'.");
+    } //setupPipeline
+
+    /**
+     * Sets up the users, groups, folders and permissions for the security tests.
+     * This creates the following:
+     *  - a new project
+     *  - a group called PIs in the project, with a user called pi1@security.test
+     *  - a user called labtech1@security.test in the Users group
+     *  - a folder structure like this:
+     *      project
+     *          Labs
+     *              Lab 1 (PIs and Users are editors here, but Users are only readers elsewhere)
+     *          Studies
+     *              Study 1 (PIs are editors here but nowhere else)
+     *              Study 2
+     *              Study 3 (no one has read permissions here)
+     *
+     * This allow us to test the following scenarios:
+     *  - an assay may be defined at the project level, and restricted users can upload data for it at a lower level (Lab 1)
+     *  - the labtech should be able to set the target study to any study in which the labtech is a reader.
+     *  - the PI may only publish to studies where the PI has editor permissions.
+     *  - if the target study was set to a folder where the PI does not have editor perms, the system will
+     *     warn the PI of this when publishing and force the PI to select one in which the PI does have editor perms.
+     */
+    protected void setupEnvironment()
+    {
+        //revert to admin to ensure we can create users and setup security
+        revertToAdmin();
+
+        //create a new project for the security tests
+        log("Creating security test project");
+        createProject(TEST_ASSAY_PRJ_SECURITY);
+
+        log("Setting up groups, users and initial permissions");
+
+        //we should now be sitting on the new project security page
+        //create a group in the project for PIs and make them readers by default
+        createPermissionsGroup(TEST_ASSAY_GRP_PIS);
+        setPermissions(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
+
+        //set Users group to be Readers by default
+        setPermissions(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
+
+        //add a PI user to that group
+        addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY,TEST_ASSAY_GRP_PIS);
+
+        //add a lab tech user to the Users group
+        addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);
+
+        //add folder structure
+        log("Setting up folder structure and folder permissions");
+        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, "None", null, true);
+        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, "None", null, true);
+        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, TEST_ASSAY_FLDR_LAB1, "None", null, true);
+        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY1, "Study", null, true);
+        clickNavButton("Create Study");
+        clickNavButton("Create Study");
+        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY2, "Study", null, true);
+        clickNavButton("Create Study");
+        clickNavButton("Create Study");
+        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY3, "Study", null, true);
+        clickNavButton("Create Study");
+        clickNavButton("Create Study");
+
+        //setup security on sub-folders:
+        // PIs should be Editors on Lab1 and Study1, but not Study2 or Study3
+        // Users should be Editors on Lab1, readers on Study2, and nothing on Study3
+        setSubfolderSecurity(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(TEST_ASSAY_FLDR_STUDY3, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_NONE);
+
+        //setup study-level security:
+        // TODO: due to bug 3625, the PIs group may not have study-level read permissions
+        // in the Study1 folder by default. This is required in order to publish, so
+        // we need to explicitly grant that permission for now. When this bug is fixed,
+        // this code should be altered accordingly.
+        // https://www.labkey.org/Issues/home/Developer/issues/details.view?issueId=3625
+        // NOTE: it turns out that because we created the group and granted it read permissions
+        // at the project level before creating the study folders, they did end up inheriting
+        // study-level read permissions. However, we'll still do this just to be safe and it
+        // ends up testing the study-level security anyway.
+        log("Setting study-level permissions");
+        setStudyPerms(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1,
+                        TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_STUDY_READALL);
+
+        //add the Assay List web part to the lab1 folder so we can upload data later as a labtech
+        log("Adding assay list web part to lab1 folder");
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        addWebPart("Assay List");
+    } //setupEnvironment()
+
+    /**
+     * Sets the permissions for an existing group on an existing subfolder
+     *
+     * @param subfolder name of the existing subfolder
+     * @param group     name of the existing group
+     * @param perms     permissions role to set (e.g., Editor, Reader, Author, No Permissions, etc.)
+     */
+    private void setSubfolderSecurity(String subfolder, String group, String perms)
+    {
+        log("Setting permissions for group '" + group + "' on subfolder '" + subfolder + "' to '" + perms + "'");
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickLinkWithText(subfolder);
+        clickLinkWithText(TEST_ASSAY_LINK_PERMS);
+        uncheckCheckbox("inheritPermissions");
+        setPermissions(group, perms);
+    } //setSubFolderSecurity()
+
+    /**
+     * Sets up study-level permissions on a given folder within a given project for a given group
+     *
+     * @param project   name of project
+     * @param folder    name of the sub-folder
+     * @param group     name of the group
+     * @param perms     read permissions to set (use TEST_STUDY_PERMS_STUDY_* constants)
+     */
+    private void setStudyPerms(String project, String folder, String group, String perms)
+    {
+        log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
+        clickLinkWithText(project);
+        clickLinkWithText(folder);
+        clickLinkWithText(TEST_ASSAY_LINK_PERMS);
+        clickNavButton("Study Security");
+
+        checkCheckbox("studySecurity");
+        clickNavButton("Update");
+        selenium.waitForPageToLoad("30000");
+
+        click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
+
+        clickNavButton("Save");
+    } //setStudyPerms
+
+    /**
+     * Reverts to the admin account after impersonating a different user.
+     * This will also work if the current user happens to be the admin,
+     * though it will go through a sign out and sign in, requiring re-selection
+     * of the project
+     */
+    protected void revertToAdmin()
+    {
+        log("reverting to admin");
+        signOut();
+        signIn();
+    } //revertToAdmin();
+
+    /**
+     * Adds a new or existing user to an existing group within an existing project
+     *
+     * @param userName new or existing user name
+     * @param projectName existing project name
+     * @param groupName existing group within the project to which we should add the user
+     */
+    private void addUserToProjGroup(String userName, String projectName, String groupName)
+    {
+        clickLinkWithText(projectName);
+        clickLinkWithText("Permissions");
+        clickLink("managegroup/" + projectName + "/" + groupName);
+
+        setFormElement("names", userName );
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership", "large");
+    } //addUserToProjGroup()
+}

@@ -1,0 +1,259 @@
+package org.labkey.test.drt;
+
+import org.labkey.test.BaseFlowTest;
+import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+
+public class FlowTest extends BaseFlowTest
+{
+    public static final String SELECT_CHECKBOX_NAME = ".select";
+    private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
+
+    protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
+    {
+        pushLocation();
+        beginAt("/query" + containerPath + "/internalNewView.view");
+        setFormElement("ff_schemaName", schema);
+        setFormElement("ff_queryName", query);
+        if (viewName != null)
+            setFormElement("ff_viewName", viewName);
+        submit();
+        StringBuilder strFields = new StringBuilder(fields[0]);
+        for (int i = 1; i < fields.length; i ++)
+        {
+            strFields.append("&");
+            strFields.append(fields[i]);
+        }
+        setFormElement("ff_columnList", strFields.toString());
+        submit();
+        popLocation();
+    }
+
+    private void clickButtonWithText(String text)
+    {
+        click(Locator.xpath("//input[@type='button' and @value='" + text + "']"));
+    }
+
+    public int countEnabledInputs(String name)
+    {
+        List<Locator> inputs = findAllMatches(Locator.xpath("//input[@name='" + name + "']"));
+        int ret = 0;
+        for (Locator l : inputs)
+        {
+            if (!selenium.isEditable(l.toString()))
+                continue;
+            ret ++;
+        }
+        return ret;
+    }
+
+    protected void doTestSteps()
+    {
+        init();
+        String containerPath = "/" + PROJECT_NAME + "/" + FOLDER_NAME;
+        beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
+        clickNavButton("Create New Query");
+        setFormElement("ff_newQueryName", "DRTQuery1");
+        setFormElement("ff_baseTableName", "FCSAnalyses");
+        submit();
+
+        beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
+        setFormElement("ff_queryText", "SELECT FCSAnalyses.RowId,\n" +
+                "FCSAnalyses.Statistic.\"Count\",\n" +
+                "FCSAnalyses.Run.FilePathRoot,\n" +
+                "FCSAnalyses.FCSFile.Run.WellCount\n" +
+                "FROM FCSAnalyses AS FCSAnalyses");
+        clickNavButton("Run Query");
+
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Set pipeline root");
+        setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
+        submit();
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Browse for FCS files to be loaded");
+//        clickNavButton("Upload Multiple Runs");
+//        assertTextPresent("No FCS files");
+//        clickNavButton("Browse for more runs");
+
+        clickLinkWithText("8color");
+        clickNavButton("Upload Multiple Runs");
+        // First, just upload the run "8colordata"
+        checkCheckbox("ff_path", "8color" + File.separator + "8colordata", false);
+        clickNavButton("Upload Selected Runs");
+        waitForPipeline(containerPath);
+        clickLinkWithText("Flow Dashboard");
+        // Drill into the run, and see that it was uploaded, and keywords were read.
+        clickLinkWithText("1 run");
+        setSelectedFields(containerPath, "flow", "Runs", null, new String[] { "Flag","Name","ProtocolStep","AnalysisScript","CompensationMatrix","WellCount","Created","RowId","FilePathRoot" } );
+
+        clickLinkWithText("details");
+        setSelectedFields(containerPath, "flow", "FCSFiles", null, new String[] { "Keyword/ExperimentName", "Keyword/Stim","Keyword/Comp","Keyword/PLATE NAME","Flag","Name","RowId"});
+        assertTextPresent("PerCP-Cy5.5 CD8");
+
+        assertLinkNotPresentWithImage("/flagFCSFile.gif");
+        pushLocation();
+        clickLinkWithText("91761.fcs");
+        //assertTextPresent("L02-060120-QUV-JS"); // "experiment name" keyword
+
+        clickNavButton("edit");
+        setFormElement("ff_name", "FlowTest New Name");
+        setFormElement("ff_comment", "FlowTest Comment");
+        Locator locPlateName = Locator.xpath("//td/input[@type='hidden' and @value='PLATE NAME']/../../td/input[@name='ff_keywordValue']");
+        setFormElement(locPlateName, "FlowTest Keyword Plate Name");
+        submit();
+        popLocation();
+        assertLinkPresentWithImage("/flagFCSFile.gif");
+        assertLinkNotPresentWithText("91761.fcs");
+        assertLinkPresentWithText("FlowTest New Name");
+        assertTextPresent("FlowTest Keyword Plate Name");
+        /*
+        clickLinkWithText("changes");
+        assertTextPresent("FlowTest Keyword Plate Name");
+        assertTextPresent("FlowTest Comment");
+        assertTextPresent(oldPlateNameValue);*/
+
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Create a new Analysis script");
+        setFormElement("ff_name", "FlowTestAnalysis");
+        submit();
+
+        clickLinkWithText("Define compensation calculation from scratch");
+        selectOptionByText("selectedRunId", "8colordata");
+        submit();
+
+        setFormElement("positiveKeywordName[3]", "Comp");
+        setFormElement("positiveKeywordValue[3]", "FITC CD4");
+        submit();
+        assertTextPresent("Missing data");
+        setFormElement("negativeKeywordName[0]", "WELL ID");
+        setFormElement("negativeKeywordValue[0]", "H01");
+        clickButtonWithText("Universal");
+        submit();
+        assertTextPresent("compensation calculation may be edited in a number");
+
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Create a new Analysis script");
+        setFormElement("ff_name", "QUV analysis");
+        submit();
+        clickLinkWithText("View Source");
+        setLongTextField("script", this.getFileContents(QUV_ANALYSIS_SCRIPT));
+        submit();
+
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Other settings");
+        clickLinkWithText("Edit FCS Analysis Filter");
+        selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "Keyword/Stim");
+        selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(0),  "isnonblank");
+        selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(1),  "eq");
+        selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(2),  "eq");
+        submit();
+
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("QUV analysis");
+        clickLinkWithText("Analyze some runs");
+
+        checkCheckbox(".toggle");
+        clickNavButton("Analyze selected runs");
+        setFormElement("ff_analysisName", "FlowExperiment2");
+        submit();
+        waitForPipeline(containerPath);
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("FlowExperiment2");
+        URL urlBase = getURL();
+        URL urlCompensation;
+        URL urlAnalysis;
+        try
+        {
+            urlCompensation = new URL(urlBase.getProtocol(), urlBase.getHost(), urlBase.getPort(), urlBase.getFile() + "&query.ProtocolStep~eq=Compensation");
+            urlAnalysis = new URL(urlBase.getProtocol(), urlBase.getHost(), urlBase.getPort(), urlBase.getFile() + "&query.ProtocolStep~eq=Analysis");
+        }
+        catch (MalformedURLException mue)
+        {
+            throw new RuntimeException(mue);
+        }
+
+        beginAt(urlCompensation.getFile());
+        clickLinkWithText("details");
+
+        setSelectedFields(containerPath, "flow", "CompensationControls", null, new String[] {"Name","Flag","Created","Run","FCSFile","RowId"});
+
+        assertLinkPresentWithText("PE Green laser-A+");
+        assertLinkNotPresentWithText("91918.fcs");
+        clickLinkWithText("PE Green laser-A+");
+        pushLocation();
+        clickLinkWithText("Keywords from the FCS file");
+        assertTextPresent("PE CD8");
+        popLocation();
+        clickLinkWithText("FlowExperiment2");
+        beginAt(urlAnalysis.getFile());
+
+
+        clickLinkWithText("details");
+
+
+        clickLinkWithText("details");
+        clickLinkWithText("More Graphs");
+        selectOptionByText("subset", "Singlets/L/Live/3+/4+");
+        selectOptionByText("xaxis", "comp-PE Cy7-A IFNg");
+        selectOptionByText("yaxis", "comp-PE Green laser-A IL2");
+        submit(Locator.dom("document.forms[1]"));
+
+        // Now, let's add another run:
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Browse for more FCS files to be loaded");
+
+        clickLinkWithText("8color");
+        clickNavButton("Upload Multiple Runs");
+        assertTextNotPresent("8colordata");
+        clickImgButtonNoNav("Select All");
+        clickNavButton("Upload Selected Runs");
+        waitForPipeline(containerPath);
+
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("QUV analysis");
+        clickLinkWithText("Analyze some runs");
+        selectOptionByText("ff_targetExperimentId", "<create new>");
+        waitForPageToLoad();
+        assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        selectOptionByText("ff_targetExperimentId", "FlowExperiment2");
+        waitForPageToLoad();
+
+        assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        selectOptionByText("ff_compensationMatrixOption", "Matrix: 8colordata comp matrix");
+        waitForPageToLoad();
+
+        checkCheckbox(".toggle");
+        clickNavButton("Analyze selected runs");
+        waitForPipeline(containerPath);
+
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("FlowExperiment2");
+        selectOptionByValue("query.queryName", "DRTQuery1");
+        waitForPageToLoad();
+        assertTextPresent("File Path Root");
+
+        setSelectedFields(containerPath, "flow", "DRTQuery1", "MostColumns", new String[] {"RowId", "Count","WellCount"});
+        setSelectedFields(containerPath, "flow", "DRTQuery1", "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
+        //setWorkingForm("view");
+        setFormElement("query.viewName", "MostColumns");
+        waitForPageToLoad();
+        assertTextNotPresent("File Path Root");
+        //setWorkingForm("view");
+        setFormElement("query.viewName", "AllColumns");
+        waitForPageToLoad();
+        assertTextPresent("File Path Root");
+
+        // bug 4625
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("QUV analysis");
+        clickLinkWithText("Make a copy of this analysis script");
+        setFormElement("name", "QUV analysis");
+        submit();
+        assertTextPresent("There is already a protocol named 'QUV analysis'");        
+    }
+}

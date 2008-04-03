@@ -1,0 +1,675 @@
+package org.labkey.test.testpicker;
+
+import org.labkey.test.TestConfig;
+import org.labkey.test.TestSet;
+import org.labkey.test.Runner;
+
+import javax.swing.*;
+import javax.swing.border.MatteBorder;
+import javax.swing.tree.*;
+import java.util.*;
+import java.util.List;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+/**
+ * User: ulberge
+ * Date: Aug 23, 2007
+ * Time: 3:51:11 PM
+ */
+
+public class TestHelper
+{
+    private static String _saveFileName = "savedConfigs.idx";
+    private File _saveFile;
+    private List<TestConfig> _savedConfigs;
+    private JFrame _window;
+    private CheckNode _treeRoot;
+    private CheckRenderer _renderer;
+    private String _rootName = "Test Suites";
+    private JCheckBox _clean;
+    private JCheckBox _linkCheck;
+    private JCheckBox _memCheck;
+    private JCheckBox _loop ;
+    private DependentCheckBox _cleanOnly ;
+    private JTextField _port;
+    private JTextField _contextPath;
+    private JTextField _server;
+    private JTextField _root;
+    private JComboBox _configDropDown;
+    private JTree _testTree;
+    public static final String DEFAULT_PORT = "8080";
+    public static final String DEFAULT_CONTEXT_PATH = "/labkey";
+    public static final String DEFAULT_SERVER = "http://localhost";
+    public static final String DEFAULT_ROOT = System.getProperty("labkey.root");
+
+    public TestHelper()
+    {
+        startTestHelper();
+    }
+
+    private void startTestHelper()
+    {
+        _saveFile = findSaveFile();
+        _savedConfigs = getSavedConfigs();
+        _window = new JFrame();
+        _renderer = new CheckRenderer();
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.white);
+
+        panel.add(createHeader(), BorderLayout.NORTH);
+        Box body = Box.createVerticalBox();
+        body.add(createTestOptions());
+        body.add(createBody());
+        panel.add(body, BorderLayout.CENTER);
+
+        _window.add(panel);
+        _window.setTitle("LabKey Automated Test Suite");
+        _window.pack();
+        _window.setVisible(true);
+    }
+
+    private Component createHeader()
+    {
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(Color.white);
+        header.setBorder(new MatteBorder(3, 10, 3, 10, Color.white));
+
+        Box headerTitle = Box.createHorizontalBox();
+        headerTitle.setBackground(Color.white);
+
+        JLabel headerImage = new JLabel(new ImageIcon("../internal/webapp/_images/defaultlogosmall.gif"));
+        headerTitle.add(headerImage);
+
+        JLabel title = new JLabel(" LabKey Automated Test Suite");
+        title.setFont(new Font("Arial", Font.PLAIN, 24));
+        title.setForeground(new Color(102, 102, 102));
+        headerTitle.add(title);
+
+        header.add(headerTitle, BorderLayout.WEST);
+        return header;
+    }
+
+    private Component createTestOptions()
+    {
+        Box options = Box.createVerticalBox();
+        options.setBorder(new MatteBorder(10, 10, 5, 10, new Color(176, 196, 222)));
+
+        JPanel debugHeader = new JPanel();
+        JLabel debugText = new JLabel("To debug this test, attach the debugger before clicking 'Run'");
+        debugHeader.add(debugText);
+        options.add(debugHeader);
+
+        GridBagConstraints gbcChecks = new GridBagConstraints();
+        gbcChecks.weightx = 1.0;
+
+        JPanel optionsChecks = new JPanel(new GridBagLayout());
+        _clean = new JCheckBox("Clean");
+        _clean.setBackground(Color.white);
+        _clean.setSelected(true);
+        _linkCheck = new JCheckBox("Link Check");
+        _linkCheck.setBackground(Color.white);
+        _memCheck = new JCheckBox("Mem Check");
+        _memCheck.setBackground(Color.white);
+        _loop = new JCheckBox("Loop");
+        _loop.setBackground(Color.white);
+        _cleanOnly = new DependentCheckBox("Clean Only", _clean);
+        _cleanOnly.setBackground(Color.white);
+        optionsChecks.add(_clean, gbcChecks);
+        optionsChecks.add(_linkCheck, gbcChecks);
+        optionsChecks.add(_memCheck, gbcChecks);
+        optionsChecks.add(_loop, gbcChecks);
+        optionsChecks.add(_cleanOnly, gbcChecks);
+        optionsChecks.setBackground(Color.white);
+        options.add(optionsChecks);
+
+        GridBagConstraints gbcShort = new GridBagConstraints();
+        gbcShort.anchor = GridBagConstraints.WEST;
+        gbcShort.insets = new Insets(0, 0, 0, 5);
+        GridBagConstraints gbcLong = new GridBagConstraints();
+        gbcLong.anchor = GridBagConstraints.WEST;
+        gbcLong.gridwidth = GridBagConstraints.REMAINDER;
+        gbcLong.weightx = 1.0;
+        gbcLong.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel optionsText = new JPanel(new GridBagLayout());
+        optionsText.setBorder(new MatteBorder(5, 5, 5, 5, Color.white));
+        JLabel labkeyContextPathName = new JLabel("Context Path:");
+        _contextPath = new JTextField(DEFAULT_CONTEXT_PATH, 6);
+        optionsText.add(labkeyContextPathName, gbcShort);
+        optionsText.add(_contextPath, gbcShort);
+        JLabel labkeyServerName = new JLabel("Target Server:");
+        _server = new JTextField(DEFAULT_SERVER);
+        optionsText.add(labkeyServerName, gbcShort);
+        optionsText.add(_server, gbcLong);
+        optionsText.setBackground(Color.white);
+        options.add(optionsText);
+
+        optionsText.setBorder(new MatteBorder(5, 5, 5, 5, Color.white));
+        JLabel portName = new JLabel("Port:");
+        _port = new JTextField(DEFAULT_PORT, 6);
+        optionsText.add(portName, gbcShort);
+        optionsText.add(_port, gbcShort);
+        JLabel labkeyRootName = new JLabel("LabKey Root:");
+        _root = new JTextField(DEFAULT_ROOT);
+        optionsText.add(labkeyRootName, gbcShort);
+        optionsText.add(_root, gbcLong);
+        optionsText.setBackground(Color.white);
+        options.add(optionsText);
+
+        return options;
+    }
+
+    private void createMainTree()
+    {
+        _treeRoot = new CheckNode(_rootName);
+        _testTree = new JTree(_treeRoot);
+
+        for (TestSet suite : TestSet.values())
+        {
+            if (suite.isSuite())
+            {
+                CheckNode suiteNode = new CheckNode(suite);
+                for (Class test : suite.tests)
+                {
+                    CheckNode testNode = new CheckNode(test.getSimpleName(), false, false);
+                    suiteNode.add(testNode);
+                }
+                _treeRoot.add(suiteNode);
+            }
+        }
+
+        _testTree.setCellRenderer(_renderer);
+        _testTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        _testTree.addMouseListener(new NodeSelectionListener(_testTree));
+        _testTree.expandRow(0);
+    }
+
+    private Component createConfigLoader()
+    {
+        JPanel loadPanel = new JPanel(new BorderLayout());
+        loadPanel.setBackground(Color.white);
+
+        JLabel saved = new JLabel("Saved Configurations:");
+        saved.setBorder(new MatteBorder(0, 0, 0, 10, Color.white));
+        loadPanel.add(saved, BorderLayout.WEST);
+
+        String[] loadConfigs = new String[_savedConfigs.size() + 1];
+        loadConfigs[0] = "";
+        for (int i = 0; i < _savedConfigs.size(); i++)
+        {
+            loadConfigs[i + 1] = _savedConfigs.get(i).getName();
+        }
+        _configDropDown = new JComboBox(loadConfigs);
+        _configDropDown.setBorder(new MatteBorder(0, 0, 0, 10, Color.white));
+        _configDropDown.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                loadTestConfig((String) _configDropDown.getSelectedItem());
+            }
+        });
+        loadPanel.add(_configDropDown, BorderLayout.CENTER);
+
+        return loadPanel;
+    }
+
+    private Component createButtonBar()
+    {
+        // Create top row with config loader and buttons
+        JPanel buttonBarTop = new JPanel(new BorderLayout());
+        buttonBarTop.add(createConfigLoader(), BorderLayout.CENTER);
+        buttonBarTop.setBorder(new MatteBorder(5, 10, 10, 10, Color.white));
+
+        JPanel buttonBarTopButtons = new JPanel();
+        buttonBarTopButtons.setBackground(Color.white);
+        buttonBarTopButtons.setLayout(new BoxLayout(buttonBarTopButtons, BoxLayout.LINE_AXIS));
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                String name = (String) _configDropDown.getSelectedItem();
+                if (!name.equals(""))
+                {
+                    deleteTestConfig(name);
+                    _configDropDown.removeItem(name);
+                }
+            }
+        });
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                String name = JOptionPane.showInputDialog(_window, "Enter a name:",
+                                    "Save Run", JOptionPane.PLAIN_MESSAGE);
+                if (validate(name))
+                {
+                    _configDropDown.removeItem(name);
+                    saveTestConfig(name);
+                    _configDropDown.addItem(name);
+                    _configDropDown.setSelectedItem(name);
+                }
+            }
+        });
+
+        buttonBarTopButtons.add(deleteButton);
+        buttonBarTopButtons.add(Box.createRigidArea(new Dimension(10, 0)));
+        buttonBarTopButtons.add(saveButton);
+
+        buttonBarTop.add(buttonBarTopButtons, BorderLayout.EAST);
+
+        // Create bottom row of buttons
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel buttonBarBottom = new JPanel(new GridBagLayout());
+        buttonBarBottom.setBackground(Color.white);
+        buttonBarBottom.setBorder(new MatteBorder(5, 10, 10, 10, Color.white));
+
+        JButton runButton = new JButton("Run");
+        runButton.addActionListener(new RunActionListener(_treeRoot));
+
+        JButton continueButton = new JButton("Continue");
+        continueButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                _window.dispose();
+                Runner.runTests(new ArrayList<String>(), TestSet.CONTINUE);
+            }
+        });
+
+        JButton quickButton = new JButton("Quick");
+        quickButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                _window.dispose();
+                System.setProperty("quick", "true");
+                Runner.runTests(new ArrayList<String>(), TestSet.DRT);
+            }
+        });
+
+        buttonBarBottom.add(runButton, gbc);
+        buttonBarBottom.add(Box.createRigidArea(new Dimension(10, 0)));
+        buttonBarBottom.add(continueButton, gbc);
+        buttonBarBottom.add(Box.createRigidArea(new Dimension(10, 0)));
+        buttonBarBottom.add(quickButton, gbc);
+
+        JPanel buttonBar = new JPanel(new BorderLayout());
+
+        buttonBar.add(buttonBarTop, BorderLayout.NORTH);
+        buttonBar.add(buttonBarBottom, BorderLayout.SOUTH);
+
+        return buttonBar;
+    }
+
+    private Component createBody()
+    {
+        createMainTree();
+        JPanel body = new JPanel(new BorderLayout());
+        body.setBorder(new MatteBorder(10, 10, 10, 10, new Color(176, 196, 222)));
+
+        JPanel testHeader = new JPanel();
+        JLabel testText = new JLabel("Select the tests you would like to run");
+        testHeader.add(testText);
+        body.add(testHeader, BorderLayout.NORTH);
+
+        JScrollPane bodyPane = new JScrollPane(_testTree);
+        bodyPane.setPreferredSize(new Dimension(400, 500));
+        body.add(bodyPane, BorderLayout.CENTER);
+
+        body.add(createButtonBar(), BorderLayout.SOUTH);
+
+        return body;
+    }
+
+    /**
+     * @return a list of only the selected tests in the tree
+     */
+    public List<String> getSelectedTests(CheckNode root)
+    {
+        List<String> selectedNodes = new ArrayList<String>();
+        selectedNodes.addAll(getChecked(root, true));
+        return selectedNodes;
+    }
+
+    /**
+     *  @return a list of paths to all the nodes in the tree that are checked in the form "root/node/.../node"
+      */
+    public List<String> getCheckedNodes(CheckNode root)
+    {
+        List<String> selectedNodes = new ArrayList<String>();
+        selectedNodes.addAll(getChecked(root, false));
+        return selectedNodes;
+    }
+
+    /**
+     *
+     * @param testsOnly: see return
+     * @return If testsOnly, returns a list of the names of the leaves that are checked, else, returns a list
+     * of the paths of all checked nodes in the form "node/node/.../node"
+     */
+    private List<String> getChecked(CheckNode node, boolean testsOnly)
+    {
+        List<String> selected = new ArrayList<String>();
+        if (node.isSelected())
+        {
+            if (testsOnly)
+            {
+                 if (node.isLeaf())
+                    selected.add(node.toString());
+            }
+            else
+            {
+                TreeNode[] path = node.getPath();
+                StringBuilder pathString = new StringBuilder();
+                for (int i = 0; i < path.length; i++)
+                {
+                    pathString.append(path[i].toString());
+                    if (i < path.length - 1)
+                        pathString.append("/");
+                }
+                selected.add(pathString.toString());
+            }
+        }
+
+        Enumeration<CheckNode> childNodes = node.children();
+        while (childNodes.hasMoreElements())
+        {
+            selected.addAll(getChecked(childNodes.nextElement(), testsOnly));
+        }
+        return selected;
+    }
+
+    private boolean validate(String name)
+    {
+        if (name == null || name.equals(""))
+        {
+            JOptionPane.showMessageDialog(_window, "You did not enter a name. The test configuration was not saved.");
+            return false;
+        }
+        return true;
+    }
+
+    private void saveTestConfig(String name)
+    {
+        TestConfig config = new TestConfig(name, _clean.isSelected(), _linkCheck.isSelected(), _memCheck.isSelected(), _loop.isSelected(), _cleanOnly.isSelected(),
+                _port.getText().trim(), _contextPath.getText().trim(), _server.getText().trim(), _root.getText().trim(), getCheckedNodes(_treeRoot));
+
+        _savedConfigs = deleteTestConfigFromList(name, _savedConfigs);
+        _savedConfigs.add(config);
+        writeConfigs(_savedConfigs);
+    }
+
+    /**
+     * @return returns the list with the item removed
+     */
+    private List<TestConfig> deleteTestConfigFromList(String name, List<TestConfig> list)
+    {
+        if (list.size() > 0)
+        {
+            for (TestConfig config : list)
+            {
+                if (config.getName().equals(name))
+                {
+                    list.remove(config);
+                    return list;
+                }
+            }
+        }
+        return list;
+    }
+
+    private void deleteTestConfig(String name)
+    {
+        _savedConfigs = deleteTestConfigFromList(name, _savedConfigs);
+        writeConfigs(_savedConfigs);
+    }
+
+    /**
+     * Writes the serialized form of the list configs to _saveFile
+     */
+    private void writeConfigs(List<TestConfig> configsToSave)
+    {
+        try
+        {
+            OutputStream out = new FileOutputStream(_saveFile);
+            ObjectOutputStream objectOut = new ObjectOutputStream(new BufferedOutputStream(out));
+            objectOut.writeObject(configsToSave);
+            objectOut.flush();
+            objectOut.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getStackTrace());
+        }
+    }
+
+    /**
+     * @param name, if name is provided, loads the default page, else loads the page with the settings
+     */
+    private void loadTestConfig(String name)
+    {
+        if (name == null || name.equals(""))
+        {
+            reloadPage(new TestConfig());
+        }
+        else
+        {
+            for (TestConfig config : _savedConfigs)
+            {
+                if (config.getName() != null && config.getName().equals(name))
+                {
+                    reloadPage(config);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * @return the list of configs in _saveFile, or returns an empty list if it doesn't find the file
+     */
+    private List<TestConfig> getSavedConfigs()
+    {
+        List<TestConfig> savedConfigs = new ArrayList<TestConfig>();
+        try
+        {
+            if (_saveFile.isFile())
+            {
+                InputStream in = new FileInputStream(_saveFile);
+                ObjectInputStream objectIn = new ObjectInputStream(new BufferedInputStream(in));
+                savedConfigs = (List<TestConfig>) objectIn.readObject();
+                objectIn.close();
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getStackTrace());
+        }
+        return savedConfigs;
+    }
+
+    /**
+     * Updates which config is being displayed
+     */
+    private void reloadPage(TestConfig config)
+    {
+        _clean.setSelected(config.isClean());
+        _clean.setEnabled(!config.isCleanOnly());
+        _linkCheck.setSelected(config.isLinkCheck());
+        _memCheck.setSelected(config.isMemCheck());
+        _loop.setSelected(config.isLoop());
+        _cleanOnly.setSelected(config.isCleanOnly());
+        _port.setText(config.getPort());
+        _contextPath.setText(config.getContextPath());
+        _server.setText(config.getServer());
+        _root.setText(config.getRoot());
+        checkNodes(config.getConfigCheckedNodes());
+    }
+
+    /**
+     * @param paths, checks all the nodes in the list paths using their paths and unchecks any that are not in the list
+     * Uses "/" as a delimiter between path node names
+     */
+    private void checkNodes(List<String> paths)
+    {
+        check(_treeRoot, paths);
+        _testTree.revalidate();
+        _testTree.repaint();
+    }
+
+    /**
+     * Recursive helper method for checkNodes, which determines if it should check or uncheck a node
+     */
+    private void check(CheckNode node, List<String> paths)
+    {
+        TreeNode[] path = node.getPath();
+        StringBuilder pathString = new StringBuilder();
+        for (int i = 0; i < path.length; i++)
+        {
+            pathString.append(path[i].toString());
+            if (i < path.length - 1)
+                pathString.append("/");
+        }
+        if (paths.contains(pathString.toString()))
+        {
+            node.setSelected(true);
+        }
+        else
+            node.setSelected(false);
+
+        Enumeration<CheckNode> childNodes = node.children();
+        while (childNodes.hasMoreElements())
+        {
+            check(childNodes.nextElement(), paths);
+        }
+    }
+
+    private static File verifyDir(String dirName)
+    {
+        if (dirName != null)
+        {
+            File dir = new File(dirName);
+            if (dir.exists())
+                return dir;
+        }
+        return null;
+    }
+
+    private static File findSaveFile()
+    {
+        File dir = verifyDir(System.getProperty("user.home"));
+        if (dir == null)
+        {
+            System.out.println("User home couldn't be found.  Using working directory instead.");
+            dir = verifyDir(System.getProperty("user.dir"));
+        }
+        if (dir == null)
+            throw new IllegalStateException("System property for user.home or user.dir must be set to enable configuration storage.");
+
+        return new File(dir, _saveFileName);
+    }
+
+    /**
+     * Determines whether the user clicked on the checkbox or the name of a CheckNode. Expands if name was
+     * clicked or clicks checkbox if checkbox was clicked
+     */
+    private class NodeSelectionListener extends MouseAdapter
+    {
+        JTree _tree;
+
+        NodeSelectionListener(JTree tree)
+        {
+          this._tree = tree;
+        }
+
+        public void mouseClicked(MouseEvent e)
+        {
+            int x = e.getX();
+            int y = e.getY();
+            int row = _tree.getRowForLocation(x, y);
+            TreePath path = _tree.getPathForRow(row);
+            if (path != null)
+            {
+                CheckNode node = (CheckNode)path.getLastPathComponent();
+                Rectangle bounds = _tree.getRowBounds(row);
+                if (x - bounds.getMinX() <= _renderer.getCheckboxWidth())
+                    node.setSelected(!node.isSelected());
+                else if (!node.isLeaf())
+                {
+                    boolean isExpanded = _tree.isExpanded(path);
+                    if (isExpanded)
+                        _tree.collapsePath(path);
+                    else
+                        _tree.expandPath(path);
+                }
+                ((DefaultTreeModel) _tree.getModel()).nodeChanged(node);
+                _tree.revalidate();
+                _tree.repaint();
+            }
+        }
+      }
+
+    /**
+     * Collects settings and runs Selenium test
+     */
+    class RunActionListener implements ActionListener
+    {
+        CheckNode _treeRoot;
+
+        RunActionListener(final CheckNode root)
+        {
+            _treeRoot = root;
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            List<String> selectedTests = getSelectedTests(_treeRoot);
+            System.setProperty("clean", String.valueOf(_clean.isSelected()));
+            System.setProperty("linkCheck", String.valueOf(_linkCheck.isSelected()));
+            System.setProperty("memCheck", String.valueOf(_memCheck.isSelected()));
+            System.setProperty("loop", String.valueOf(_loop.isSelected()));
+            System.setProperty("cleanonly", String.valueOf(_cleanOnly.isSelected()));
+            System.setProperty("labkey.port", _port.getText().trim());
+            System.setProperty("labkey.contextpath", _contextPath.getText().trim());
+            System.setProperty("labkey.server", _server.getText().trim());
+            System.setProperty("labkey.root", _root.getText().trim());
+
+            _window.dispose();
+            if (selectedTests.size() != 0 )
+                Runner.runTests(selectedTests, TestSet.TEST);
+        }
+    }
+
+    /**
+     * A checkbox that has another checkbox that must be selected if this checkbox is. Disables and checks
+     * dependent checkbox if selected.
+     */
+    private class DependentCheckBox extends JCheckBox
+    {
+        JCheckBox _dependentCheckBox;
+
+        public DependentCheckBox(String name, JCheckBox checkBox)
+        {
+            super(name);
+            _dependentCheckBox = checkBox;
+            addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e)
+                {
+                    if (isSelected())
+                    {
+                        _dependentCheckBox.setSelected(true);
+                        _dependentCheckBox.setEnabled(false);
+                    }
+                    if (!isSelected())
+                    {
+                        _dependentCheckBox.setEnabled(true);
+                    }
+                }
+            });
+        }
+    }
+}

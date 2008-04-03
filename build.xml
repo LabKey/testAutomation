@@ -1,0 +1,740 @@
+<project name="test" default="usage" basedir=".">
+
+    <property environment="env"/>
+    <property name="test.dir" value="${basedir}" />
+    <property name="test.build.home" value="${test.dir}/build"/>
+    <property name="test.src.home" value="${test.dir}/src"/>
+    <property name="project.root" value="${test.dir}/../.." />
+    <property name="test.lib.home" value="${test.dir}/lib"/>
+    <property name="external.lib.home" value="${project.root}/external/lib"/>
+    <property name="remoteAPI.build.dir" value="${project.root}/build/remoteAPI"/>
+    <property name="test.log.dir" value="${test.dir}/logs"/>
+    <property name="test.log.output.dir" value="${test.build.home}/logs" />
+
+    <property name="test.compile.debug" value="true"/>
+    <property name="test.compile.deprecation" value="false"/>
+    <property name="test.compile.optimize" value="true"/>
+
+    <target name="usage">
+        <echo message="Valid Test Targets:" />
+        <echo message="drt                run developer regression tests (short suite)" />
+        <echo message="quick              run developer regression tests only for modules that have been modified" />
+        <echo message="bvt                run build verification tests (long suite)" />
+        <echo message="continue           continue running a suite after a failure, starting with the test that failed" />
+        <echo message="drt-debug          run drt, but suspend until debugger attaches" />
+        <echo message="bvt-debug          run bvt, but suspend until debugger attaches" />
+        <echo message="drt-clean          clean up after drt tests"/>
+        <echo message="bvt-clean          clean up after bvt tests"/>
+        <echo message="setPassword        reset your stored password" />
+        <echo message="ms2t               run MS2 tests" />
+        <echo message="cluster            run MS2 cluster pipeline tests" />
+        <echo message="xtandem            run X! Tandem tests" />
+        <echo message="mascot             run Mascot tests" />
+        <echo message="sequest            run Sequest tests" />
+        <echo message="perf               run perf tests" />
+        <echo message="perf-debug         run perf, but suspend until debugger attaches" />
+		<echo message="test               runs UI for selecting and running specific tests" />
+
+        <echo message="usage              displays this message"/>
+        <echo message=""/>
+        <echo message="To specify individual tests to be run or cleaned, add:"/>
+        <echo message="    -Dtest=&quot;{name}[,{name}]&quot;"/>
+        <echo message="{name} is the name of any test class, optionally dropping a trailing"/>
+        <echo message="'Test' from the name.  For MS2Test.java, valid test names include"/>
+        <echo message="MS2, ms2, and MS2Test."/>
+        <echo message=""/>
+        <echo message="To run tests in an infinite loop, add:"/>
+        <echo message="    -Dloop=true"/>
+        <echo message=""/>
+        <echo message="By default, labkey is accessed at port 8080."/>
+        <echo message="To specify a different port, add:" />
+        <echo message="    -Dlabkey.port={portnumber}"/>
+        <echo message=""/>
+        <echo message="It is sometimes useful to skip post-test cleanup, leaving the test data on the site."/>
+        <echo message="To skip cleanup for all tests:"/>
+        <echo message="    -Dclean=false"/>
+        <echo message=""/>
+        <echo message="By default, labkey is accessed at context path '/labkey'."/>
+        <echo message="To specify a different context path, add:"/>
+        <echo message="    -Dlabkey.contextpath={contextpath}"/>
+        <echo message=""/>
+        <echo message="For extra coverage, the harness can crawl all new links after each test, checking for"/>
+        <echo message="404 and 500 errors.  This provides extra safely, but adds time.  The BVT checks links"/>
+        <echo message="by default. To enable link checking:"/>
+        <echo message="    -DlinkCheck=true"/>
+        <echo message=""/>
+        <echo message="The leak checker is run by default for DRT and BVT tests.  To disable mem checking:"/>
+        <echo message="    -DmemCheck=false"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${test.build.home}" />
+    </target>
+
+    <target name="prepare">
+        <mkdir dir="${test.build.home}/classes" />
+        <mkdir dir="${test.log.output.dir}" />
+    </target>
+
+    <path id="test.lib.classpath">
+        <fileset dir="${test.lib.home}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${external.lib.home}">
+            <include name="junit-4.1.jar"/>
+            <include name="web/commons-io-1.3.2.jar" />
+            <include name="commons-lang-2.3.jar" />
+            <include name="axis.jar" />
+            <include name="saaj.jar" />
+            <include name="wsdl4j-1.5.1.jar" />
+            <include name="jaxrpc.jar" />
+            <include name="commons-discovery-0.2.jar" />
+            <include name="log4j-1.2.8.jar" />
+        </fileset>
+        <fileset dir="${external.lib.home}/web">
+            <include name="commons-logging-1.1.jar" />
+        </fileset>
+    </path>
+
+    <path id="test.build.classpath">
+        <path refid="test.lib.classpath" />
+        <fileset dir="${remoteAPI.build.dir}">
+            <include name="client.jar"/>
+        </fileset>
+    </path>
+
+    <path id="test.run.classpath">
+        <path refid="test.build.classpath"/>
+        <pathelement location="${test.build.home}/classes" />
+    </path>
+
+    <target name="compile" depends="prepare" description="Compile Java sources">
+        <javac srcdir="${test.src.home}"
+               destdir="${test.build.home}/classes"
+               debug="${test.compile.debug}"
+               deprecation="${test.compile.deprecation}"
+               optimize="${test.compile.optimize}"
+               source="1.5"
+               classpathref="test.build.classpath">
+        </javac>
+        <copy todir="${test.build.home}/classes" >
+            <fileset dir="${test.src.home}">
+                <include name="**/*.js"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="setPassword" depends="compile">
+        <java classname="org.labkey.test.util.PasswordUtil">
+            <classpath refid="test.run.classpath"/>
+            <arg id="action" value="set"/>
+        </java>
+    </target>
+
+    <target name="setCruiseControlPassword" depends="compile">
+        <java classname="org.labkey.test.util.PasswordUtil">
+            <classpath refid="test.run.classpath"/>
+            <arg id="action" value="set"/>
+            <arg id="username" value="cruisecontrol@labkey.com"/>
+            <arg id="password" value="cruisecontrol"/>
+        </java>
+    </target>
+
+    <target name="ensurePassword" depends="compile">
+        <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
+            <classpath refid="test.run.classpath"/>
+            <arg id="action" value="ensure"/>
+        </java>
+    </target>
+
+    <target name="deletePassword" depends="compile">
+        <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
+            <classpath refid="test.run.classpath"/>
+            <arg id="action" value="delete"/>
+        </java>
+    </target>
+
+    <target name="continue" description="Continue running a stopped or failed test suite">
+        <property name="suite" value="CONTINUE"/>
+        <antcall inheritall="true" target="sub-selenium">
+            <param name="debug.suspend.selenium" value="n" />
+            <param name="skipModifiedFiles" value="true" />
+        </antcall>
+    </target>
+
+    <target name="study" description="Run Study Tests Only">
+        <property name="suite" value="Study"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="ms2t" description="Run all MS2 module tests only">
+        <property name="suite" value="MS2"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="ms2t-debug">
+        <property name="suite" value="MS2"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="cluster" description="Run MS2 module cluster pipeline tests only">
+        <property name="suite" value="Cluster"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="cluster-debug" description="Run MS2 module cluster pipeline tests only">
+        <property name="suite" value="Cluster"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="perf" description="Run Perf tests">
+        <property name="suite" value="Perf"/>
+        <antcall inheritall="true" target="runsuite-perf">
+            <param name="debug.suspend" value="n" />
+        </antcall>
+    </target>
+
+    <target name="perf-debug">
+        <property name="suite" value="Perf"/>
+        <antcall inheritall="true" target="runsuite-perf">
+            <param name="debug.suspend" value="y" />
+        </antcall>
+    </target>
+
+    <target name="init-selenium">
+        <condition property="sysprop.selenium.server" value="localhost">
+            <not>
+                <isset property="selenium.server"/>
+            </not>
+        </condition>
+        <condition property="sysprop.selenium.server" value="${selenium.server}">
+             <isset property="selenium.server"/>
+        </condition>
+
+        <condition property="sysprop.selenium.server.port" value="4444">
+            <not>
+                <isset property="selenium.server.port"/>
+            </not>
+        </condition>
+        <condition property="sysprop.selenium.server.port" value="${selenium.server.port}">
+             <isset property="selenium.server.port"/>
+        </condition>
+
+        <condition property="local.selenium.server">
+            <equals arg1="localhost" arg2="${sysprop.selenium.server}" />
+        </condition>
+        <echo message="Checking if Selenium server needs to be started..." />
+        <condition property="selenium.server.needs.starting">
+            <and>
+                <not>
+                    <socket server="${sysprop.selenium.server}" port="${sysprop.selenium.server.port}"/>
+                </not>
+                <isset property="local.selenium.server"/>
+            </and>
+        </condition>
+        <echo message="Selenium Server Properties" />
+        <echo message=" selenium.server: ${sysprop.selenium.server}"/>
+        <echo message=" selenium.server.port: ${sysprop.selenium.server.port}" />
+        <echo message=" selenium.server.needs.starting: ${selenium.server.needs.starting}" />
+    </target>
+
+    <target name="sub-selenium" depends="init-selenium">
+        <antcall target="startSeleniumServer" />
+
+        <condition property="no.selenium.server">
+            <not >
+                <socket server="${sysprop.selenium.server}" port="${sysprop.selenium.server.port}"/>
+            </not>
+        </condition>
+        <fail if="no.selenium.server" message="Could not find selenium server ${sysprop.selenium.server} port ${sysprop.selenium.server.port}"/>
+
+        <condition property="skipModifiedFiles" value="true">
+            <isset property="test"/>
+        </condition>
+
+        <antcall inheritall="true" target="runsuite">
+            <param name="debug.suspend" value="${debug.suspend.selenium}" />
+        </antcall>
+
+        <antcall target="stopSeleniumServer" />
+    </target>
+
+    <target name="runsuite-selenium-tomcat" depends="init-selenium,compile,ensurePassword,set-user-props">
+        <fail unless="tomcat.home" />
+        <echo message="Deleting log files from ${tomcat.home}/logs"/>
+        <delete failonerror="false" dir="${tomcat.home}/logs" />
+        <mkdir dir="${tomcat.home}/logs" />
+        <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
+
+        <antcall target="startSeleniumServer" />
+
+        <condition property="no.selenium.server">
+            <not >
+                <socket server="${sysprop.selenium.server}" port="${sysprop.selenium.server.port}"/>
+            </not>
+        </condition>
+        <fail if="no.selenium.server" message="Could not find selenium server ${sysprop.selenium.server} port ${sysprop.selenium.server.port}"/>
+
+        <condition property="sysprop.suiteToUse" value="${sysprop.moduleSuite}">
+            <isset property="sysprop.moduleSuite"/>
+        </condition>
+        <condition property="sysprop.suiteToUse" value="${sysprop.suite}">
+            <not><isset property="sysprop.moduleSuite"/></not>
+        </condition>
+
+        <java fork="true" failonerror="false" resultproperty="runsuite.result" classname="org.labkey.test.Runner">
+            <jvmarg value="-Xmx128m" />
+            <classpath refid="test.run.classpath"/>
+            <sysproperty key="suite" value="${sysprop.suiteToUse}"/>
+            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="test" value="${sysprop.test}"/>
+            <sysproperty key="clean" value="${sysprop.clean}"/>
+            <sysproperty key="quick" value="${sysprop.quick}"/>
+            <sysproperty key="loop" value="${sysprop.loop}"/>
+            <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
+            <sysproperty key="labkey.root" value="${project.root}"/>
+            <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
+            <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
+            <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
+            <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
+            <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
+        </java>
+        <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
+        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${servertype}/" />
+        <mkdir dir="${test.log.output.dir}/${servertype}" />
+        <copy todir="${test.log.output.dir}/${servertype}">
+            <fileset dir="${tomcat.home}/logs/">
+                <size value="0" units="k" when="more" />
+            </fileset>
+        </copy>
+
+        <antcall target="stopSeleniumServer" />
+        
+        <condition property="suite.failed">
+            <not><equals arg1="0" arg2="${runsuite.result}" /></not>
+        </condition>
+        <fail message="${sysprop.suiteToUse} FAILED" if="suite.failed" />
+    </target>
+
+
+    <target name="startSeleniumServer" if="selenium.server.needs.starting" depends="init-selenium">
+        <echo message="Starting selenium server on local server, port ${sysprop.selenium.server.port}."/>
+        <echo message="Server will stop after successful tests."/>
+        <echo message="Or use ant stopSeleniumServer to stop manually."/>
+        <java spawn="true" fork="true" classname="org.openqa.selenium.server.SeleniumServer">
+            <classpath refid="test.lib.classpath" />
+            <arg value="-port" />
+            <arg value="${sysprop.selenium.server.port}" />
+            <arg value="-Dcaching=true"/>
+        </java>
+        <echo message="Checking for Selenium Server on port ${sysprop.selenium.server.port}" />
+        <waitfor maxwait="20" maxwaitunit="second" checkevery="2" checkeveryunit="second" timeoutproperty="noSeleniumServer">
+            <socket server="localhost" port="${sysprop.selenium.server.port}"/>
+        </waitfor>
+
+        <antcall target="validateSeleniumStartup" />
+
+        <echo message="Selenium Server started successfully" />
+    </target>
+
+    <target name="validateSeleniumStartup" if="noSeleniumServer">
+        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
+        <fail message="Selenium server did not start." />
+    </target>
+
+    <target name="drt" description="run developer regression tests">
+        <property name="debug.suspend.selenium" value="n"/>
+        <property name="suite" value="DRT"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="quick" description="Run quick DRT">
+        <property name="quick" value="true"/>
+        <ant inheritall="true" target="drt"/>
+    </target>
+
+    <target name="selenium-tomcat">
+        <property name="debug.suspend.selenium" value="n"/>
+        <property name="sysprop.close.on.fail" value="true" />
+        <property name="suite" value="SELENIUM"/>
+        <antcall target="runsuite-selenium-tomcat"/>
+    </target>
+
+    <target name="drt-debug" description="run drt, suspend until debugger attaches">
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+    
+    <target name="stopSeleniumServer" depends="init-selenium">
+        <echo message="Stopping selenium server." />
+        <condition property="selenium.server.shut.down">
+            <http url="http://localhost:${sysprop.selenium.server.port}/selenium-server/driver/?cmd=shutDown"/>
+        </condition>
+    </target>
+
+    <target name="module" description="Run Module test only">
+        <property name="suite" value="Module"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium">
+            <param name="skipModifiedFiles" value="true"/>
+        </antcall>
+    </target>
+
+    <target name="module-debug">
+        <property name="suite" value="Module"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="xtandem" description="Run X! Tandem tests only">
+        <property name="suite" value="XTandem"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="xtandem-debug">
+        <property name="suite" value="XTandem"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="mascot" description="Run Mascot tests only">
+        <property name="suite" value="Mascot"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="mascot-debug">
+        <property name="suite" value="Mascot"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="sequest" description="Run Sequest tests only">
+        <property name="suite" value="Sequest"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="flow" description="Run Flow tests only">
+        <property name="suite" value="Flow"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="sequest-debug">
+        <property name="suite" value="Sequest"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+    
+    <target name="drt-clean">
+        <property name="suite" value="DRT"/>
+        <property name="cleanonly" value="true"/>
+        <antcall inheritall="true" target="runsuite">
+            <param name="debug.suspend" value="n" />
+        </antcall>
+    </target>
+
+    <target name="bvt" description="run build verification tests">
+        <property name="suite" value="BVT"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <property name="linkCheck" value="true"/>
+        <antcall target="sub-selenium"/>
+    </target>
+    
+    <target name="bvt-debug" description="run bvt, suspend until debugger attaches">
+        <property name="suite" value="BVT"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+        <property name="linkCheck" value="true"/>
+    </target>
+
+    <target name="bvt-clean">
+        <property name="suite" value="BVT"/>
+        <antcall inheritall="true" target="runsuite">
+            <param name="debug.suspend" value="n" />
+        </antcall>
+    </target>
+
+    <target name="test" description="runs UI for selecting and running specific tests">
+        <property name="suite" value="TEST"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="test-debug">
+        <property name="suite" value="TEST"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="runsuite-tomcat-sqlserver">
+        <property name="servertype" value="sqlserver"/>
+        <antcall inheritall="true" target="runsuite-selenium-tomcat"/>
+    </target>
+
+    <target name="runsuite-tomcat-postgres">
+        <property name="servertype" value="postgres"/>
+        <antcall inheritall="true" target="runsuite-selenium-tomcat"/>
+    </target>
+
+    <target name="set-user-props">
+        <!-- Set property sysprop.test: empty string if not provided, user string otherwise -->
+        <condition property="sysprop.test" value="">
+            <not><isset property="test"/></not>
+        </condition>
+        <condition property="sysprop.test" value="${test}">
+            <isset property="test"/>
+        </condition>
+
+        <!-- Set property sysprop.quick: empty string if not provided, user string otherwise -->
+        <condition property="sysprop.quick" value="">
+            <not>
+                <isset property="quick"/>
+            </not>
+        </condition>
+        <condition property="sysprop.quick" value="${quick}">
+            <isset property="quick"/>
+        </condition>
+
+        <!-- Set property sysprop.cleanonly: true or false -->
+        <condition property="sysprop.cleanonly" value="false">
+            <not><isset property="cleanonly"/></not>
+        </condition>
+        <condition property="sysprop.cleanonly" value="${cleanonly}">
+            <isset property="cleanonly"/>
+        </condition>
+
+        <!-- Set property sysprop.loop: true or false -->
+        <condition property="sysprop.loop" value="false">
+            <not>
+                <isset property="loop"/>
+            </not>
+        </condition>
+        <condition property="sysprop.loop" value="${loop}">
+            <isset property="loop"/>
+        </condition>
+
+        <!-- Set property sysprop.noclean: true or false -->
+        <condition property="sysprop.clean" value="true">
+            <not>
+                <isset property="clean"/>
+            </not>
+        </condition>
+        <condition property="sysprop.clean" value="${clean}">
+            <isset property="clean"/>
+        </condition>
+
+        <!-- Set property sysprop.linkCheck: true or false -->
+        <condition property="sysprop.linkCheck" value="false">
+            <not>
+                <isset property="linkCheck"/>
+            </not>
+        </condition>
+        <condition property="sysprop.linkCheck" value="${linkCheck}">
+            <isset property="linkCheck"/>
+        </condition>
+
+        <!-- Set property sysprop.memCheck: true or false -->
+        <condition property="sysprop.memCheck" value="true">
+            <not>
+                <isset property="memCheck"/>
+            </not>
+        </condition>
+        <condition property="sysprop.memCheck" value="${memCheck}">
+            <isset property="memCheck"/>
+        </condition>
+
+        <!-- Set property sysprop.labkey.port: user provided or empty -->
+        <condition property="sysprop.labkey.port" value="">
+            <not>
+                <isset property="labkey.port"/>
+            </not>
+        </condition>
+        <condition property="sysprop.labkey.port" value="${labkey.port}">
+            <isset property="labkey.port"/>
+        </condition>
+
+        <!-- Set property sysprop.labkey.server: user provided or empty -->
+        <condition property="sysprop.labkey.server" value="">
+            <not>
+                <isset property="labkey.server"/>
+            </not>
+        </condition>
+        <condition property="sysprop.labkey.server" value="${labkey.server}">
+            <isset property="labkey.server"/>
+        </condition>
+
+        <!-- Set property sysprop.cpas.contextpath: user provided or empty -->
+        <condition property="sysprop.labkey.contextpath" value="">
+            <not>
+                <isset property="labkey.contextpath"/>
+            </not>
+        </condition>
+        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}">
+            <isset property="labkey.contextpath"/>
+        </condition>
+
+        <!-- Set property sysprop.closeOnFail: true or false -->
+        <condition property="sysprop.close.on.fail" value="false">
+            <not>
+                <isset property="close.on.fail"/>
+            </not>
+        </condition>
+        <condition property="sysprop.close.on.fail" value="${close.on.fail}">
+            <isset property="close.on.fail"/>
+        </condition>
+
+        <!-- Set property sysprop.selnim.browser -->
+        <condition property="sysprop.selenium.browser" value="*firefox">
+            <not>
+                <isset property="selenium.browser"/>
+            </not>
+        </condition>
+        <condition property="sysprop.selenium.browser" value="${selenium.browser}">
+            <isset property="selenium.browser"/>
+        </condition>
+
+        <!-- Set property sysprop.selnim.browser -->
+        <condition property="sysprop.selenium.browser.path" value="">
+            <not>
+                <isset property="selenium.browser.path"/>
+            </not>
+        </condition>
+        <condition property="sysprop.selenium.browser.path" value="${selenium.browser.path}">
+            <isset property="selenium.browser.path"/>
+        </condition>
+
+
+
+        <!-- Set property sysprop.suite: user provided string or DRT by default -->
+        <condition property="sysprop.suite" value="DRT">
+            <not><isset property="suite"/></not>
+        </condition>
+        <condition property="sysprop.suite" value="${suite}">
+            <isset property="suite"/>
+        </condition>
+
+        <echo message="User property overrides:" />
+        <echo message="    suite: ${sysprop.suite}"/>
+        <echo message="    tests: ${sysprop.test}"/>
+        <echo message="    quick: ${sysprop.quick}"/>
+        <echo message="    clean up after test: ${sysprop.clean}"/>
+        <echo message="    clean up only: ${sysprop.cleanonly}"/>
+        <echo message="    loop forever: ${sysprop.loop}"/>
+        <echo message="    link check: ${sysprop.linkCheck}"/>
+        <echo message="    memory check: ${sysprop.memCheck}"/>
+        <echo message="    labkey.port: ${sysprop.labkey.port}"/>
+        <echo message="    target server ${sysprop.labkey.server}"/>
+        <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
+    </target>
+
+    <target name="runsuite" depends="clean,compile,ensurePassword,set-user-props,modifiedFiles">
+        <java fork="true" failonerror="true" classname="org.labkey.test.Runner">
+            <jvmarg value="-Xdebug" />
+            <jvmarg value="-Xmx128m"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
+            <jvmarg value="-Djava.compiler=NONE" />
+            <classpath refid="test.run.classpath" />
+            <sysproperty key="suite" value="${sysprop.suite}"/>
+            <sysproperty key="remoteAPI.skipSetup" value="${remoteAPI.skipSetup}"/>
+            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="test" value="${sysprop.test}"/>
+            <sysproperty key="clean" value="${sysprop.clean}"/>
+            <sysproperty key="quick" value="${sysprop.quick}"/>
+            <sysproperty key="loop" value="${sysprop.loop}"/>
+            <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
+            <sysproperty key="labkey.root" value="${project.root}"/>
+            <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
+            <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
+            <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
+            <sysproperty key="close.on.fail" value="${sysprop.close.on.fail}"/>
+            <sysproperty key="selenium.browser" value="${sysprop.selenium.browser}"/>
+            <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
+            <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
+            <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
+        </java>
+    </target>
+
+    <target name="modifiedFiles" unless="skipModifiedFiles">
+        <echo>Using SVN to determine modified files</echo>
+        <!-- Generate list of modified files in the project.  This will be used to order the tests and/or run only a subset of tests. -->
+        <property name="svnModifiedFiles" value="${test.build.home}/svnModified.txt"/>
+        <exec executable="svn" dir="${project.root}" output="${svnModifiedFiles}" failifexecutionfails="false">
+            <arg value="status"/>
+        </exec>
+        <!-- Make sure there's actually a file - it won't be created if we can't run the SVN client -->
+        <touch file="${svnModifiedFiles}" />
+    </target>
+
+    <target name="runsuite-perf" depends="clean,compile,ensurePassword,set-user-props">
+        <java fork="true" failonerror="true" classname="org.labkey.test.Runner">
+            <jvmarg value="-Xdebug" />
+            <jvmarg value="-Xms256m"/>
+            <jvmarg value="-Xmx256m"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
+            <jvmarg value="-Djava.compiler=NONE" />
+            <classpath refid="test.run.classpath" />
+            <sysproperty key="suite" value="${sysprop.suite}"/>
+            <sysproperty key="remoteAPI.skipSetup" value="${remoteAPI.skipSetup}"/>
+            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="test" value="${sysprop.test}"/>
+            <sysproperty key="clean" value="${sysprop.clean}"/>
+            <sysproperty key="quick" value="${sysprop.quick}"/>
+            <sysproperty key="loop" value="${sysprop.loop}"/>
+            <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
+            <sysproperty key="labkey.root" value="${project.root}"/>
+            <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
+            <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
+            <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
+        </java>
+    </target>
+
+    <target name="runsuite-tomcat" depends="compile,ensurePassword,set-user-props">
+        <echo message="Deleting log files from ${tomcat.home}/logs"/>
+        <delete failonerror="false" dir="${tomcat.home}/logs" />
+        <mkdir dir="${tomcat.home}/logs" />
+        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
+        <java fork="true" failonerror="false" resultproperty="runsuite.result" classname="org.labkey.test.Runner">
+            <jvmarg value="-Xmx128m" />
+            <classpath refid="test.run.classpath"/>
+            <sysproperty key="suite" value="${sysprop.suite}"/>
+            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="test" value="${sysprop.test}"/>
+            <sysproperty key="clean" value="${sysprop.clean}"/>
+            <sysproperty key="quick" value="${sysprop.quick}"/>
+            <sysproperty key="loop" value="${sysprop.loop}"/>
+            <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
+            <sysproperty key="labkey.root" value="${project.root}"/>
+            <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
+            <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
+            <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
+        </java>
+        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
+        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${servertype}/" />
+        <mkdir dir="${test.log.output.dir}/${servertype}" />
+        <copy todir="${test.log.output.dir}/${servertype}">
+            <fileset dir="${tomcat.home}/logs/">
+                <size value="0" units="k" when="more" />
+            </fileset>
+        </copy>
+        <condition property="suite.failed">
+            <not><equals arg1="0" arg2="${runsuite.result}" /></not>
+        </condition>
+        <fail message="${sysprop.suite} FAILED" if="suite.failed" />
+    </target>
+</project>
