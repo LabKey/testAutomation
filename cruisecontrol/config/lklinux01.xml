@@ -57,8 +57,7 @@
             returnname="${buildmaster.name}"
             subjectprefix="[CC] Linux/Postgres"
             xsldir="${ccdir}/webapps/cruisecontrol/xsl"
-            css="${ccdir}/webapps/cruisecontrol/css/cruisecontrol.css"
-            skipusers="true">
+            css="${ccdir}/webapps/cruisecontrol/css/cruisecontrol.css">
         <!-- Special-case peterhus, since his SVN username doesn't include '@labkey.com' -->
         <map alias="peterhus" address="peterhus@labkey.com" />
         <map alias="e.ulberg" address="ulberge@labkey.com" />
