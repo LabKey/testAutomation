@@ -82,7 +82,7 @@ public class IssuesBvtTest extends IssuesTest
     {
         setFilter("Issues", "Status", "<has any value>");
         clickCheckbox(".toggle", false);
-        clickNavButton("View Selected Details");
+        clickNavButton("View Details");
         assertTextPresent("a bright flash of light");
         assertTextPresent("don't believe the hype");
         clickLinkWithText("view grid");

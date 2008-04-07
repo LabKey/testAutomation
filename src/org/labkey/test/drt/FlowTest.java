@@ -83,7 +83,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("8color");
         clickNavButton("Upload Multiple Runs");
         // First, just upload the run "8colordata"
-        checkCheckbox("ff_path", "8color" + File.separator + "8colordata", false);
+        checkCheckbox("ff_path", "8color/8colordata/", false);
         clickNavButton("Upload Selected Runs");
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
