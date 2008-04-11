@@ -108,7 +108,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
             sleep(1000);
 
         clickAndWait(Locator.imageWithSrc("Folder.button", true));
-        setFormElement("beginDateStr", "2007-01-01");
+        setFormElement("beginDate", "2007-01-01");
         clickNavButton("Next");
         String cohorts = "SubjectId\tCohort\tStartDate\n" +
                 "V1\tVaccine\t2007-01-01\n" +
