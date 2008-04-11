@@ -369,7 +369,7 @@ public class Runner extends TestSuite
 
     private static void writeTimeReport()
     {
-        long width = 60;
+        int width = 60;
         long total = 0;
         System.out.println("======================= Time Report ========================");
 
