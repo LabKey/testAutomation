@@ -15,8 +15,14 @@
     <property name="artifactsdir" value="${ccdir}/artifacts/${project.name}"/>
     <property name="logdir" value="${ccdir}/logs/${project.name}"/>
 
+    <!-- Common properties: these are the same for all LabKey CC projects. -->
+    <property name="projectdir" value="${env.CC_PROJECT_HOME}/${instance}"/>
+    <property name="testdir" value="${projectdir}/server/test"/>
+    <property name="antbuildfile" value="${projectdir}/server/build.xml"/>
+    <property name="antworkingdir" value="${projectdir}/server"/>
+
     <!-- Defaults for email -->
-    <property name="buildmaster.email" value="brittp@labkey.com"/>
+    <property name="buildmaster.email" value="kevink@labkey.com"/>
     <property name="buildmaster.name" value="Buildmaster"/>
 
     <!-- Preconfigure our plugins -->
@@ -52,7 +58,8 @@
             returnname="${buildmaster.name}"
             subjectprefix="[CC]"
             xsldir="${ccdir}/webapps/cruisecontrol/xsl"
-            css="${ccdir}/webapps/cruisecontrol/css/cruisecontrol.css">
+            css="${ccdir}/webapps/cruisecontrol/css/cruisecontrol.css"
+            skipusers="true">
         <!-- Special-case peterhus, since his SVN username doesn't include '@labkey.com' -->
         <map alias="peterhus" address="peterhus@labkey.com" />
         <map alias="e.ulberg" address="ulberge@labkey.com" />
@@ -64,7 +71,9 @@
         <map alias="k.krouse" address="kevink@labkey.com" />
         <map alias="j.garms" address="jgarms@labkey.com" />
         <always address="${buildmaster.email}"/>
+        <!--
         <failure reportWhenFixed="true" address="cpas-developers@lists.fhcrc.org"/>
+        -->
         <parameter name="lineCount" value="250" />
     </plugin>
 
@@ -92,8 +101,12 @@
                 <property name="cc.debug.port" value="${debugport}"/>
                 <property name="cc.selenium.port" value="${seleniumport}"/>
                 <property name="cc.linkCheck" value="${linkCheck}"/>
+                <property name="cc.database" value="${database}"/>
             </ant>
         </schedule>
+        <log>
+          <merge dir="${testdir}/build/logs"/>
+        </log>
         <publishers>
             <htmlemail/>
             <artifactspublisher/>
@@ -107,12 +120,7 @@
         <property name="seleniumport" value="4445"/>
         <property name="suite" value="DRT"/>
         <property name="linkCheck" value="false"/>
-
-        <!-- Common properties: these are the same for all LabKey CC projects. -->
-        <property name="projectdir" value="${env.CC_PROJECT_HOME}/${instance}"/>
-        <property name="testdir" value="${projectdir}/server/test"/>
-        <property name="antbuildfile" value="${projectdir}/server/build.xml"/>
-        <property name="antworkingdir" value="${projectdir}/server"/>
+        <property name="database" value="postgres"/>
     </project.labkey>
 
 
@@ -123,11 +131,7 @@
         <property name="seleniumport" value="4446"/>
         <property name="suite" value="DRT"/>
         <property name="linkCheck" value="false"/>
-
-        <property name="projectdir" value="${env.CC_PROJECT_HOME}/${instance}"/>
-        <property name="testdir" value="${projectdir}/server/test"/>
-        <property name="antbuildfile" value="${projectdir}/server/build.xml"/>
-        <property name="antworkingdir" value="${projectdir}/server"/>
+        <property name="database" value="postgres"/>
     </project.labkey>
 
     <!--project.labkey name="LabKey Trunk Bootstrap DRT" buildafterfailed="false">
