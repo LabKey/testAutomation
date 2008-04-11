@@ -20,13 +20,16 @@ import java.util.*;
 public class Runner extends TestSuite
 {
     private static final TestSet DEFAULT_TEST_SET = TestSet.DRT;
-    private Set<TestFailure> _failures = new HashSet<TestFailure>();
-    private boolean _cleanOnly;
-    private File _failureDumpDir;
     private static WebTest _currentWebTest;
     private static Map<Test, Long> _testStats = new LinkedHashMap<Test, Long>();
     private static int _testCount;
-    private static List<Class> _testClasses;
+    private static List<Class> _remainingTests;
+    private static List<String> _passedTests = new ArrayList<String>();
+    private static List<String> _failedTests = new ArrayList<String>();
+
+    private Set<TestFailure> _failures = new HashSet<TestFailure>();
+    private boolean _cleanOnly;
+    private File _failureDumpDir;
 
     private Runner(File failureDumpDir, boolean cleanOnly)
     {
@@ -39,23 +42,35 @@ public class Runner extends TestSuite
         _currentWebTest = currentWebTest;
     }
 
-    private void updateRemainingTests(Test test)
+    private void updateRemainingTests(Test test, boolean failed)
     {
         Class testClass = getTestClass(test);
-        _testClasses.remove(testClass);
+        _remainingTests.remove(testClass);
+        if (failed)
+            _failedTests.add(test.toString());
+        else
+            _passedTests.add(test.toString());
     }
 
-    private static void writeClasses(List<Class> testClasses)
+    private static void writeRemainingTests()
+    {
+        ArrayList<String> failedAndRemaining = new ArrayList<String>();
+        failedAndRemaining.addAll(_failedTests);
+        for (Class clazz : _remainingTests)
+            failedAndRemaining.add(clazz.getName());
+        writeClasses(failedAndRemaining, getRemainingTestsFile());
+    }
+
+    private static void writeClasses(List<String> tests, File file)
     {
         PrintWriter pw = null;
-        File file = getRemainingTestsFile();
 
         try
         {
             pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 
-            for (Class clazz : testClasses)
-                pw.println(clazz.getName());
+            for (String test : tests)
+                pw.println(test);
         }
         catch(IOException e)
         {
@@ -69,10 +84,9 @@ public class Runner extends TestSuite
         }
    }
 
-    private static Class[] readClasses()
+    private static Class[] readClasses(File file)
     {
         List<Class> testClasses = new ArrayList<Class>(20);
-        File file = getRemainingTestsFile();
 
         if (file.exists())
         {
@@ -122,7 +136,7 @@ public class Runner extends TestSuite
 
     public static String getProgress()
     {
-        int completed = _testCount -_testClasses.size() + 1;
+        int completed = _testCount -_remainingTests.size() + 1;
         return " (" + completed + " of " + _testCount + ")";
     }
 
@@ -168,22 +182,32 @@ public class Runner extends TestSuite
                 // fall through
             }
         }
-        else if (_failures.isEmpty())
+        else
         {
-            writeClasses(_testClasses);
+            int failCount = testResult.failureCount();
+            int errorCount = testResult.errorCount();
             super.runTest(test, testResult);
-            if (testResult.failureCount() > 0 || testResult.errorCount() > 0)
+            boolean failed = testResult.failureCount() > failCount || testResult.errorCount() > errorCount;
+            if (failed)
             {
                 dumpFailures(testResult.errors());
                 dumpFailures(testResult.failures());
             }
-            else
-            {
-                updateRemainingTests(test);
-            }
+            updateRemainingTests(test, failed);
+            writeRemainingTests();
         }
+
         long testTimeMs = System.currentTimeMillis() - startTimeMs;
         saveTestDuration(test, testTimeMs);
+
+        if (_remainingTests.isEmpty())
+        {
+            writeTimeReport();
+            if (_failedTests.isEmpty())
+            {
+                getRemainingTestsFile().delete();
+            }
+        }
     }
 
     private void dumpFailures(Enumeration failures)
@@ -345,8 +369,9 @@ public class Runner extends TestSuite
 
     private static void writeTimeReport()
     {
+        long width = 60;
         long total = 0;
-        System.out.println("============= Time Report ==============");
+        System.out.println("======================= Time Report ========================");
 
         int totalCrawlTime = 0;
         int totalUniquePages = 0;
@@ -359,17 +384,24 @@ public class Runner extends TestSuite
         }
         for (Map.Entry<Test, Long> entry : _testStats.entrySet())
         {
-            long percent = Math.round(100.0 * (entry.getValue() / (double) total));
-            String percentStr = (percent < 10 ? " " : "") + percent + "%";
-            String durationAndPercent = formatDuration(entry.getValue()) + " " + percentStr;
             String testName = entry.getKey().toString();
+            long duration = entry.getValue();
+
+            long percent = Math.round(100.0 * (duration / (double) total));
+            String percentStr = (percent < 10 ? " " : "") + percent + "%";
+            String durationAndPercent =
+                (_passedTests.contains(testName) ? "passed" :
+                    (_failedTests.contains(testName) ? "FAILED" : "not run")) +
+                " - " +
+                formatDuration(duration) + " " + percentStr;
             testName = testName.substring(testName.lastIndexOf('.') + 1);
-            System.out.println(getFixedWidthString(testName, durationAndPercent, 40));
+
+            System.out.println(getFixedWidthString(testName, durationAndPercent, width));
             if (Crawler.getCrawlStats().containsKey(testName))
             {
                 crawl = true;
                 Crawler.CrawlStats crawlStats = Crawler.getCrawlStats().get(testName);
-                System.out.println(getFixedWidthString("Crawler Statistics: ", "", 40));
+                System.out.println(getFixedWidthString("Crawler Statistics: ", "", width));
 
                 String[] statTitles = {"MaxDepth", "CrawlTime", "NewPages", "NewActions"};
                 int crawlTestLengthSeconds = ((crawlStats.getCrawlTestLength() / 1000) % 60);
@@ -389,7 +421,7 @@ public class Runner extends TestSuite
         }
         if (crawl)
         {
-            System.out.println(getFixedWidthString("Total Crawler Statistics: ", "", 40));
+            System.out.println(getFixedWidthString("Total Crawler Statistics: ", "", width));
 
             String[] statTitles = {"TotCrawlTime", "TotPages", "TotActions"};
             int totalCrawlTimeSeconds = ((totalCrawlTime / 1000) % 60);
@@ -400,8 +432,8 @@ public class Runner extends TestSuite
             System.out.println(getRowString(statTitles, columnWidth));
             System.out.println(getRowString(stats, columnWidth));
         }
-        System.out.println("----------------------------------------");
-        System.out.println(getFixedWidthString("Total duration:", formatDuration(total), 40) + "\n");
+        System.out.println("------------------------------------------------------------");
+        System.out.println(getFixedWidthString("Total duration:", formatDuration(total), width) + "\n");
         System.out.println("Completed " + FastDateFormat.getInstance("yyyy-MM-dd HH:mm").format(new Date()));
     }
 
@@ -515,16 +547,14 @@ public class Runner extends TestSuite
         return tests.toArray(new Class[tests.size()]);
     }
 
-    public static void main(String args[])
+    protected static TestSet getTestSet()
     {
-        TestSet set = null;
         String suiteName = System.getProperty("suite");
-
         if (suiteName != null)
         {
             try
             {
-                set = TestSet.valueOf(suiteName);
+                return TestSet.valueOf(suiteName);
             }
             catch (Exception e)
             {
@@ -533,51 +563,54 @@ public class Runner extends TestSuite
                     System.out.println("   " + s.name());
             }
         }
-        else
-            set = DEFAULT_TEST_SET;
-
-        if (set != null)
-        {
-            boolean cleanOnly = "true".equals(System.getProperty("cleanonly"));
-            boolean skipClean = "false".equals(System.getProperty("clean"));
-
-            if (cleanOnly && skipClean)
-            {
-                System.err.print("Invalid parameters: cannot specify both 'cleanonly=true' and 'clean=false'.");
-                System.exit(1);
-            }
-
-            String testNames = System.getProperty("test");
-            if ((TestSet.TEST == set) && ((testNames == null) || testNames.length() == 0))
-            {
-                new TestHelper();
-            }
-            else
-            {
-                List<String> tests = new ArrayList<String>();
-                if (testNames != null && testNames.length() > 0)
-                {
-                    String[] testNameArray = testNames.split(",");
-                    tests.addAll(Arrays.asList(testNameArray));
-                }
-                runTests(tests, set);
-            }
-        }
+        return DEFAULT_TEST_SET;
     }
 
+    protected static List<String> getTestNames()
+    {
+        String testNames = System.getProperty("test");
+        List<String> tests = new ArrayList<String>();
+        if (testNames != null && testNames.length() > 0)
+        {
+            String[] testNameArray = testNames.split(",");
+            tests.addAll(Arrays.asList(testNameArray));
+        }
+        return tests;
+    }
+
+    /** Used by TestHelper */
     public static void runTests(List<String> testNames, TestSet set)
     {
+        junit.textui.TestRunner.run(suite(testNames, set));
+    }
+
+    public static TestSuite suite()
+    {
+        TestSet set = getTestSet();
+        List<String> testNames = getTestNames();
+
+        return suite(getTestNames(), getTestSet());
+    }
+
+    public static TestSuite suite(List<String> testNames, TestSet set)
+    {
+        boolean cleanOnly = "true".equals(System.getProperty("cleanonly"));
+        boolean skipClean = "false".equals(System.getProperty("clean"));
+
+        if (cleanOnly && skipClean)
+        {
+            System.err.print("Invalid parameters: cannot specify both 'cleanonly=true' and 'clean=false'.");
+            System.exit(1);
+        }
 
         if (TestSet.CONTINUE == set)
         {
-            set.setTests(readClasses());
+            set.setTests(readClasses(getRemainingTestsFile()));
         }
         else if (TestSet.TEST == set)
         {
             set.setTests(getAllTests());
         }
-
-        boolean cleanOnly = "true".equals(System.getProperty("cleanonly"));
 
         File dumpDir = null;
         String outputDir = System.getProperty("failure.output.dir");
@@ -592,38 +625,25 @@ public class Runner extends TestSuite
             System.exit(1);
         }
 
-        boolean loop = "true".equals(System.getProperty("loop"));
         boolean modifiedOnly = "true".equals(System.getProperty("quick"));
 
-        int count = 0;
-        while (count++ == 0 || loop)
+        List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
+        TestSuite suite = getSuite(testClasses, dumpDir, cleanOnly, modifiedOnly);
+
+        _remainingTests = new ArrayList<Class>(suite.testCount());
+
+        System.out.println("Running the following tests:");
+        for (Enumeration<Test> e = suite.tests(); e.hasMoreElements(); )
         {
-            if (loop)
-                System.out.println("Starting test iteration " + count);
-
-            List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
-            TestSuite suite = getSuite(testClasses, dumpDir, cleanOnly, modifiedOnly);
-
-            _testClasses = new ArrayList<Class>(suite.testCount());
-
-            System.out.println("Running the following tests:");
-            for (Enumeration<Test> e = suite.tests(); e.hasMoreElements(); )
-            {
-                Test test = e.nextElement();
-                Class testClass = getTestClass(test);
-                _testClasses.add(testClass);
-                System.out.println("  " + testClass.getSimpleName());
-            }
-            _testCount = _testClasses.size();
-            TestResult result = junit.textui.TestRunner.run(suite);
-
-            writeTimeReport();
-
-            if (result.errorCount() > 0 || result.failureCount() > 0)
-                System.exit(result.errorCount() + result.failureCount());
-            else
-                getRemainingTestsFile().delete();
+            Test test = e.nextElement();
+            Class testClass = getTestClass(test);
+            _remainingTests.add(testClass);
+            System.out.println("  " + testClass.getSimpleName());
         }
+        _testCount = _remainingTests.size();
+        writeRemainingTests();
+
+        return suite;
     }
 
     private static Class getTestClass(Test test)

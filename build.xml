@@ -287,8 +287,9 @@
             <not><isset property="sysprop.moduleSuite"/></not>
         </condition>
 
-        <java fork="true" failonerror="false" resultproperty="runsuite.result" classname="org.labkey.test.Runner">
-            <jvmarg value="-Xmx128m" />
+        <junit fork="true" forkmode="once" maxmemory="128m"
+                errorproperty="suite.failed" failureproperty="suite.failed"
+                haltonfailure="false" haltonerror="false" showoutput="true">
             <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suiteToUse}"/>
             <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
@@ -305,7 +306,13 @@
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
             <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
             <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
-        </java>
+
+            <formatter type="brief"/>
+            <formatter type="xml"/>
+
+            <test name="org.labkey.test.Runner"
+                todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
+        </junit>
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
         <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${servertype}/" />
         <mkdir dir="${test.log.output.dir}/${servertype}" />
@@ -317,9 +324,6 @@
 
         <antcall target="stopSeleniumServer" />
         
-        <condition property="suite.failed">
-            <not><equals arg1="0" arg2="${runsuite.result}" /></not>
-        </condition>
         <fail message="${sysprop.suiteToUse} FAILED" if="suite.failed" />
     </target>
 
@@ -638,9 +642,10 @@
     </target>
 
     <target name="runsuite" depends="clean,compile,ensurePassword,set-user-props,modifiedFiles">
-        <java fork="true" failonerror="true" classname="org.labkey.test.Runner">
+        <junit fork="true" forkmode="once" maxmemory="128m"
+                errorproperty="suite.failed" failureproperty="suite.failed"
+                haltonfailure="true" haltonerror="true" showoutput="true">
             <jvmarg value="-Xdebug" />
-            <jvmarg value="-Xmx128m"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
             <jvmarg value="-Djava.compiler=NONE" />
             <classpath refid="test.run.classpath" />
@@ -663,7 +668,13 @@
             <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
             <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
             <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
-        </java>
+
+            <formatter type="brief"/>
+            <formatter type="xml"/>
+
+            <test name="org.labkey.test.Runner"
+                todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
+        </junit>
     </target>
 
     <target name="modifiedFiles" unless="skipModifiedFiles">
@@ -678,10 +689,11 @@
     </target>
 
     <target name="runsuite-perf" depends="clean,compile,ensurePassword,set-user-props">
-        <java fork="true" failonerror="true" classname="org.labkey.test.Runner">
+        <junit fork="true" forkmode="once" maxmemory="256m"
+                errorproperty="suite.failed" failureproperty="suite.failed"
+                haltonfailure="true" showoutput="false">
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xms256m"/>
-            <jvmarg value="-Xmx256m"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
             <jvmarg value="-Djava.compiler=NONE" />
             <classpath refid="test.run.classpath" />
@@ -699,7 +711,12 @@
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
             <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
-        </java>
+
+            <formatter type="plain"/>
+
+            <test name="org.labkey.test.Runner"
+                todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
+        </junit>
     </target>
 
     <target name="runsuite-tomcat" depends="compile,ensurePassword,set-user-props">
@@ -707,8 +724,9 @@
         <delete failonerror="false" dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/logs" />
         <ant inheritall="true" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
-        <java fork="true" failonerror="false" resultproperty="runsuite.result" classname="org.labkey.test.Runner">
-            <jvmarg value="-Xmx128m" />
+        <junit fork="true" forkmode="once" maxmemory="128m"
+                errorproperty="suite.failed" failureproperty="suite.failed"
+                haltonfailure="false" showoutput="true">
             <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suite}"/>
             <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
@@ -723,7 +741,13 @@
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
             <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
-        </java>
+
+            <formatter type="brief"/>
+            <formatter type="xml"/>
+
+            <test name="org.labkey.test.Runner"
+                todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
+        </junit>
         <ant inheritall="true" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
         <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${servertype}/" />
         <mkdir dir="${test.log.output.dir}/${servertype}" />
@@ -732,9 +756,6 @@
                 <size value="0" units="k" when="more" />
             </fileset>
         </copy>
-        <condition property="suite.failed">
-            <not><equals arg1="0" arg2="${runsuite.result}" /></not>
-        </condition>
         <fail message="${sysprop.suite} FAILED" if="suite.failed" />
     </target>
 </project>
