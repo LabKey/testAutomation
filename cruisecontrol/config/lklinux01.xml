@@ -101,6 +101,9 @@
                 <property name="cc.database" value="${database}"/>
             </ant>
         </schedule>
+        <log>
+          <merge dir="${testdir}/build/logs"/>
+        </log>
         <publishers>
             <htmlemail/>
             <artifactspublisher/>
