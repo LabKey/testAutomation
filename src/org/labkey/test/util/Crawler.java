@@ -18,7 +18,7 @@ public class Crawler
             new ControllerActionId("admin", "dbChecker"),
             new ControllerActionId("admin", "runSystemMaintenance"),
             new ControllerActionId("admin", "deleteFolder"),
-            new ControllerActionId("admin", "showDefineWebThemes"),
+            new ControllerActionId("admin", "defineWebThemes"),
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("Experiment", "showFile"),
             new ControllerActionId("flow-run", "download"),

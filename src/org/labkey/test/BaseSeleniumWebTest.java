@@ -570,16 +570,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 // fall through
             }
 
-            if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
-                checkLeaks();
+            checkLeaksAndErrors();
 
             doTestSteps();
+
+            checkLeaksAndErrors();
 
             if (enableLinkCheck())
             {
                 Crawler crawler = new Crawler(this);
                 crawler.crawlAllLinks();
             }
+
+            checkLeaksAndErrors();
             _testFailed = false;
 
             try
@@ -595,11 +598,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 // fall through
             }
 
-            if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
-            {
-                checkErrors();
-                checkLeaks();
-            }
+            checkLeaksAndErrors();
+
             try
             {
                 signOut();
@@ -660,6 +660,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public boolean skipLeakCheck()
     {
         return "false".equals(System.getProperty("memCheck"));
+    }
+
+    public void checkLeaksAndErrors()
+    {
+        if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
+        {
+            checkErrors();
+            checkLeaks();
+        }
     }
 
     public void checkLeaks()
