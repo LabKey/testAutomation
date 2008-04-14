@@ -67,6 +67,7 @@ public class ListTest extends BaseSeleniumWebTest
             LIST2_FOREIGN_KEY4;
     private final String LIST3_DATA = LIST3_KEY_NAME + "\t" + _list3Col2.getName() + "\n" + LIST2_FOREIGN_KEY_OUTSIDE + "\t" +
             LIST3_COL2;
+    public static final String LIST_AUDIT_EVENT = "List events";
 
     public String getAssociatedModuleDirectory()
     {
@@ -351,5 +352,10 @@ public class ListTest extends BaseSeleniumWebTest
         selenium.open(WebTestHelper.getBaseURL() + "/query/" + PROJECT_NAME + "/exportRowsTsv.view?schemaName=lists&query.queryName=" + LIST_NAME);
         assertEquals(getResponseCode(), 404);
         assertTextPresent("Query '" + LIST_NAME + "' in schema 'lists' doesn't exist.");
+
+        clickNavButton("Folder");
+        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain Colors was deleted", 5);
+        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
+        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
     }
 }
