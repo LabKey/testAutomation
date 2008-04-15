@@ -33,7 +33,7 @@
         <echo message="sequest            run Sequest tests" />
         <echo message="perf               run perf tests" />
         <echo message="perf-debug         run perf, but suspend until debugger attaches" />
-		<echo message="test               runs UI for selecting and running specific tests" />
+        <echo message="test               runs UI for selecting and running specific tests" />
 
         <echo message="usage              displays this message"/>
         <echo message=""/>
@@ -42,6 +42,9 @@
         <echo message="{name} is the name of any test class, optionally dropping a trailing"/>
         <echo message="'Test' from the name.  For MS2Test.java, valid test names include"/>
         <echo message="MS2, ms2, and MS2Test."/>
+        <echo message=""/>
+        <echo message="To continue to run all tests even if there is a failure, add:"/>
+        <echo message="    -Dhaltonerror=false"/>
         <echo message=""/>
         <echo message="To run tests in an infinite loop, add:"/>
         <echo message="    -Dloop=true"/>
@@ -517,6 +520,16 @@
             <isset property="cleanonly"/>
         </condition>
 
+        <!-- Set property sysprop.haltonerror: true or false -->
+        <condition property="sysprop.haltonerror" value="true">
+            <not>
+                <isset property="haltonerror"/>
+            </not>
+        </condition>
+        <condition property="sysprop.haltonerror" value="${haltonerror}">
+            <isset property="haltonerror"/>
+        </condition>
+
         <!-- Set property sysprop.loop: true or false -->
         <condition property="sysprop.loop" value="false">
             <not>
@@ -633,6 +646,7 @@
         <echo message="    quick: ${sysprop.quick}"/>
         <echo message="    clean up after test: ${sysprop.clean}"/>
         <echo message="    clean up only: ${sysprop.cleanonly}"/>
+        <echo message="    halt on error: ${sysprop.haltonerror}"/>
         <echo message="    loop forever: ${sysprop.loop}"/>
         <echo message="    link check: ${sysprop.linkCheck}"/>
         <echo message="    memory check: ${sysprop.memCheck}"/>
@@ -642,9 +656,10 @@
     </target>
 
     <target name="runsuite" depends="clean,compile,ensurePassword,set-user-props,modifiedFiles">
-        <junit fork="true" forkmode="once" maxmemory="128m"
+        <junit fork="true" forkmode="once" maxmemory="128m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
-                haltonfailure="true" haltonerror="true" showoutput="true">
+                haltonfailure="${sysprop.haltonerror}"
+                haltonerror="${sysprop.haltonerror}">
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
             <jvmarg value="-Djava.compiler=NONE" />
@@ -758,4 +773,12 @@
         </copy>
         <fail message="${sysprop.suite} FAILED" if="suite.failed" />
     </target>
+
+    <!-- for testing the TestHelper ui -->
+    <target name="testhelper-test" depends="compile,set-user-props">
+        <java classname="org.labkey.test.testpicker.TestHelper" fork="true">
+            <classpath refid="test.run.classpath"/>
+        </java>
+    </target>
+
 </project>

@@ -21,7 +21,14 @@ import java.io.*;
 
 public class TestHelper
 {
+    public static final String DEFAULT_PORT = "8080";
+    public static final String DEFAULT_CONTEXT_PATH = "/labkey";
+    public static final String DEFAULT_SERVER = "http://localhost";
+    public static final String DEFAULT_ROOT = System.getProperty("labkey.root");
+
+    private static Thread awtThread = null;
     private static String _saveFileName = "savedConfigs.idx";
+
     private File _saveFile;
     private List<TestConfig> _savedConfigs;
     private JFrame _window;
@@ -39,14 +46,39 @@ public class TestHelper
     private JTextField _root;
     private JComboBox _configDropDown;
     private JTree _testTree;
-    public static final String DEFAULT_PORT = "8080";
-    public static final String DEFAULT_CONTEXT_PATH = "/labkey";
-    public static final String DEFAULT_SERVER = "http://localhost";
-    public static final String DEFAULT_ROOT = System.getProperty("labkey.root");
+
+    private ResultPair _result;
+
+    /** Displays test picker UI and blocks until closed. */
+    public static ResultPair run()
+    {
+        TestHelper ui = new TestHelper();
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    awtThread = Thread.currentThread();
+                }
+            });
+            awtThread.join();
+        }
+        catch (java.lang.reflect.InvocationTargetException ite) {
+            System.err.println("invocation exception: " + ite.getMessage());
+        }
+        catch (InterruptedException ie) {
+            System.err.println("interrupted: " + ie.getMessage());
+        }
+
+        return ui._result;
+    }
 
     public TestHelper()
     {
         startTestHelper();
+    }
+
+    private void setResult(TestSet set, List<String> testNames)
+    {
+        _result = new ResultPair(set, testNames);
     }
 
     private void startTestHelper()
@@ -65,6 +97,7 @@ public class TestHelper
         body.add(createBody());
         panel.add(body, BorderLayout.CENTER);
 
+        _window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         _window.add(panel);
         _window.setTitle("LabKey Automated Test Suite");
         _window.pack();
@@ -276,8 +309,8 @@ public class TestHelper
         continueButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
+                setResult(TestSet.CONTINUE, new ArrayList<String>());
                 _window.dispose();
-                Runner.runTests(new ArrayList<String>(), TestSet.CONTINUE);
             }
         });
 
@@ -285,9 +318,9 @@ public class TestHelper
         quickButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
-                _window.dispose();
                 System.setProperty("quick", "true");
-                Runner.runTests(new ArrayList<String>(), TestSet.DRT);
+                setResult(TestSet.DRT, new ArrayList<String>());
+                _window.dispose();
             }
         });
 
@@ -638,9 +671,11 @@ public class TestHelper
             System.setProperty("labkey.server", _server.getText().trim());
             System.setProperty("labkey.root", _root.getText().trim());
 
-            _window.dispose();
             if (selectedTests.size() != 0 )
-                Runner.runTests(selectedTests, TestSet.TEST);
+            {
+                setResult(TestSet.TEST, selectedTests);
+            }
+            _window.dispose();
         }
     }
 
@@ -670,6 +705,33 @@ public class TestHelper
                     }
                 }
             });
+        }
+    }
+
+    public static class ResultPair
+    {
+        public TestSet set;
+        public List<String> testNames;
+
+        public ResultPair(TestSet set, List<String> testNames)
+        {
+            this.set = set;
+            this.testNames = testNames;
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        ResultPair pair = TestHelper.run();
+        if (pair == null)
+        {
+            System.out.println("pair is null");
+        }
+        else
+        {
+            System.out.println("pair.set = " + pair.set);
+            for (String test : pair.testNames)
+                System.out.println("pair.test = " + test);
         }
     }
 }

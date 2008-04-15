@@ -578,18 +578,39 @@ public class Runner extends TestSuite
         return tests;
     }
 
-    /** Used by TestHelper */
-    public static void runTests(List<String> testNames, TestSet set)
+    protected static File getDumpDir()
     {
-        junit.textui.TestRunner.run(suite(testNames, set));
+        File dumpDir = null;
+        String outputDir = System.getProperty("failure.output.dir");
+        if (outputDir != null)
+            dumpDir = new File(outputDir);
+        if (dumpDir == null || !dumpDir.exists())
+            dumpDir = new File(System.getProperty("java.io.tmpdir"));
+        if (!dumpDir.exists())
+        {
+            throw new RuntimeException("Couldn't determine directory for placement of output files. " +
+                    "Tried system properties failure.output.dir and java.io.tmpdir");
+        }
+        return dumpDir;
     }
 
+    /** Entry point for Ant JUnit runner. */
     public static TestSuite suite()
     {
         TestSet set = getTestSet();
         List<String> testNames = getTestNames();
 
-        return suite(getTestNames(), getTestSet());
+        if (TestSet.TEST == set && testNames.isEmpty())
+        {
+            TestHelper.ResultPair pair = TestHelper.run();
+            if (pair != null)
+            {
+                set = pair.set;
+                testNames = pair.testNames;
+            }
+        }
+
+        return suite(testNames, set);
     }
 
     public static TestSuite suite(List<String> testNames, TestSet set)
@@ -599,49 +620,43 @@ public class Runner extends TestSuite
 
         if (cleanOnly && skipClean)
         {
-            System.err.print("Invalid parameters: cannot specify both 'cleanonly=true' and 'clean=false'.");
-            System.exit(1);
+            throw new RuntimeException("Invalid parameters: cannot specify both 'cleanonly=true' and 'clean=false'.");
         }
 
         if (TestSet.CONTINUE == set)
         {
             set.setTests(readClasses(getRemainingTestsFile()));
         }
-        else if (TestSet.TEST == set)
+        else if (TestSet.TEST == set && !testNames.isEmpty())
         {
             set.setTests(getAllTests());
         }
 
-        File dumpDir = null;
-        String outputDir = System.getProperty("failure.output.dir");
-        if (outputDir != null)
-            dumpDir = new File(outputDir);
-        if (dumpDir == null || !dumpDir.exists())
-            dumpDir = new File(System.getProperty("java.io.tmpdir"));
-        if (!dumpDir.exists())
-        {
-            System.err.println("Couldn't determine directory for placement of output files. " +
-                    "Tried system properties failure.output.dir and java.io.tmpdir");
-            System.exit(1);
-        }
-
+        File dumpDir = getDumpDir();
         boolean modifiedOnly = "true".equals(System.getProperty("quick"));
 
         List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
         TestSuite suite = getSuite(testClasses, dumpDir, cleanOnly, modifiedOnly);
 
-        _remainingTests = new ArrayList<Class>(suite.testCount());
-
-        System.out.println("Running the following tests:");
-        for (Enumeration<Test> e = suite.tests(); e.hasMoreElements(); )
+        if (suite.testCount() == 0)
         {
-            Test test = e.nextElement();
-            Class testClass = getTestClass(test);
-            _remainingTests.add(testClass);
-            System.out.println("  " + testClass.getSimpleName());
+            System.out.println("No tests to run.");
         }
-        _testCount = _remainingTests.size();
-        writeRemainingTests();
+        else
+        {
+            _remainingTests = new ArrayList<Class>(suite.testCount());
+
+            System.out.println("Running the following tests:");
+            for (Enumeration<Test> e = suite.tests(); e.hasMoreElements(); )
+            {
+                Test test = e.nextElement();
+                Class testClass = getTestClass(test);
+                _remainingTests.add(testClass);
+                System.out.println("  " + testClass.getSimpleName());
+            }
+            _testCount = _remainingTests.size();
+            writeRemainingTests();
+        }
 
         return suite;
     }
@@ -653,4 +668,5 @@ public class Runner extends TestSuite
         else
             return test.getClass();
     }
+
 }
