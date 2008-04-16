@@ -1,6 +1,7 @@
 package org.labkey.test;
 
 import junit.framework.*;
+import junit.runner.BaseTestRunner;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang.time.FastDateFormat;
@@ -226,6 +227,9 @@ public class Runner extends TestSuite
                         message += "  Page html dumped to:\n    " + f.getPath();
                     System.out.println(message);
                 }
+                System.out.println();
+                System.out.println(failure.failedTest());
+                System.out.println(BaseTestRunner.getFilteredTrace(failure.trace()));
             }
         }
     }
