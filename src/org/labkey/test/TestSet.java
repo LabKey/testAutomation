@@ -98,6 +98,7 @@ public enum TestSet
     }),
 
     Flow(new Class[] {
+        FlowTest.class,
         FlowJoQueryTest.class
     }),
 
