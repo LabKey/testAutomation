@@ -247,7 +247,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Day 320");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Timepoints");
-        setFormElement("startDateString", "2007-11-01");
+        setFormElement("startDate", "2007-11-01");
         submit();
         clickLinkWithText("VaccineStudy Study");
         clickLinkWithText("Study Navigator");

@@ -700,10 +700,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void checkErrors()
     {
+        // Need to remember our location or the next test could start with a blank page
+        pushLocation();
         beginAt("/admin/showErrorsSinceMark.view");
 
         assertTrue("There were errors during the test run", isPageEmpty());
         log("No new errors found.");
+        popLocation();
     }
 
 
