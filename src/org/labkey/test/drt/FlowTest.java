@@ -4,7 +4,6 @@ import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -195,13 +194,25 @@ public class FlowTest extends BaseFlowTest
 
         clickLinkWithText("details");
 
-
-        clickLinkWithText("details");
+        clickLinkWithText("91918.fcs");
         clickLinkWithText("More Graphs");
         selectOptionByText("subset", "Singlets/L/Live/3+/4+");
         selectOptionByText("xaxis", "comp-PE Cy7-A IFNg");
         selectOptionByText("yaxis", "comp-PE Green laser-A IL2");
         submit(Locator.dom("document.forms[1]"));
+
+        // change the name of an analysis
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Other settings");
+        clickLinkWithText("Change FCS Analyses Names");
+        selectOptionByValue(Locator.xpath("//select[@name='ff_keyword']").index(1), "Keyword/EXPERIMENT NAME");
+        submit();
+
+        beginAt(urlAnalysis.getFile());
+        clickLinkWithText("details");
+        clickLinkWithText("91918.fcs-L02-060120-QUV-JS");
+        assertTextPresent("91918.fcs-L02-060120-QUV-JS");
+
 
         // Now, let's add another run:
         clickLinkWithText("Flow Dashboard");
@@ -247,6 +258,20 @@ public class FlowTest extends BaseFlowTest
         setFormElement("query.viewName", "AllColumns");
         waitForPageToLoad();
         assertTextPresent("File Path Root");
+
+        // upload sample set
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Upload Sample Descriptions");
+        setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
+        selectOptionByText("idColumn1", "Exp Name");
+        selectOptionByText("idColumn2", "Well Id");
+        submit();
+
+        // join with FCSFile keywords
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Define sample description join fields");
+        selectOptionByText("ff_dataField", "EXPERIMENT NAME");
+        selectOptionByText("ff_dataField", "WELL ID");
 
         // bug 4625
         clickLinkWithText("Flow Dashboard");
