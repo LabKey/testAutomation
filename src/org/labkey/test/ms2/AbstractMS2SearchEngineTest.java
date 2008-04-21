@@ -64,6 +64,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
         setupEngine();
 
+        waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_GWT);
         log("Set analysis parameters.");
         setFormElement("protocolName", "test2");
         setFormElement("protocolDescription", "This is a test protocol for Verify.");
@@ -71,9 +72,15 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("configureXml", "");
         setFormElement("configureXml", INPUT_XML);
         submit();
-
         log("View the analysis log.");
-        assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
+       sleep(WAIT_FOR_GWT);
+//        waitFor(new Checker(){
+//            public boolean check()
+//            {
+//                return isTextPresent(SAMPLE_BASE_NAME + " (test2)");
+//            }
+//        },"Text '" + SAMPLE_BASE_NAME + " (test2)' was not present",GWT_WAIT);
+         assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
         if (isLinkPresentWithText("WAITING"))
             clickLinkWithText("WAITING");
         else if (isLinkPresentWithText("CHECK FASTA RUNNING", 0))
@@ -120,8 +127,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setupEngine();
 
         log("Make sure new protocol is listed.");
-        // selectOptionByText("protocol", "test2");  should have been save and reloaded
-        waitForPageToLoad();
+        waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_GWT);
+        assertEquals("test2",getSelectedOptionText("protocol"));
+
+  //      waitForPageToLoad();
         if (!isLinkPresentWithText("running") && isLinkPresentWithText("completed"))
             assertTextPresent("running");
 

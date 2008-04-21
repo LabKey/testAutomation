@@ -68,8 +68,8 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         }
 
         String mascotServerURL = getAttribute(Locator.name("mascotServer"), "value");
-        String mascotUserAccount = "mascotUserAccount";
-        String mascotUserPassword = "mascotUserPassword";
+        String mascotUserAccount = "";
+        String mascotUserPassword = "";
         String mascotHTTPProxyURL = "mascotHTTPProxy";
 
         boolean testAuthentication = !("".equals(mascotUserAccount) && "".equals(mascotUserPassword));
