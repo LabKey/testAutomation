@@ -5,7 +5,6 @@ import junit.runner.BaseTestRunner;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang.time.FastDateFormat;
-import org.labkey.test.bvt.RemoteAPITest;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.util.Crawler;
 
@@ -291,30 +290,22 @@ public class Runner extends TestSuite
             {
                 try
                 {
-                    // TODO: Remove special handling (add interface or make RemoteAPITest extend WebTest)
-                    if (testClass.equals(RemoteAPITest.class))
-                    {
-                        tm.put("experiment", testClass);
-                    }
-                    else
-                    {
-                        Constructor<WebTest> c = testClass.getConstructor();
-                        WebTest test = c.newInstance();
-                        String directory = test.getAssociatedModuleDirectory();
+                    Constructor<WebTest> c = testClass.getConstructor();
+                    WebTest test = c.newInstance();
+                    String directory = test.getAssociatedModuleDirectory();
 
-                        if (!"none".equals(directory))
+                    if (!"none".equals(directory))
+                    {
+                        File testDir = new File(WebTestHelper.getLabKeyRoot(), "/server/modules/" + directory);
+
+                        if (!testDir.exists())
                         {
-                            File testDir = new File(WebTestHelper.getLabKeyRoot(), "/server/modules/" + directory);
-
-                            if (!testDir.exists())
-                            {
-                                System.out.println("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
-                                System.exit(1);
-                            }
+                            System.out.println("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
+                            System.exit(1);
                         }
-
-                        tm.put(directory, testClass);
                     }
+
+                    tm.put(directory, testClass);
                 }
                 catch(Exception e)
                 {

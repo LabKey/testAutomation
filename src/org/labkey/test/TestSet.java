@@ -27,7 +27,6 @@ public enum TestSet
         IssuesBvtTest.class,
         UserBvtTest.class,
         UserPermissionsTest.class,
-        RemoteAPITest.class,
         SpecimenTest.class,
         MS2BvtTest.class,
         SampleSetTest.class,

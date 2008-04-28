@@ -56,8 +56,6 @@ src/org/labkey/test/bvt/LuminexTest.java -text
 src/org/labkey/test/bvt/MS1Bvt.java -text
 src/org/labkey/test/bvt/MS2BvtTest.java -text
 src/org/labkey/test/bvt/MouseTest.java -text
-src/org/labkey/test/bvt/RemoteAPIExperimentLoader.java -text
-src/org/labkey/test/bvt/RemoteAPITest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text
 src/org/labkey/test/bvt/StudyBvtTest.java -text

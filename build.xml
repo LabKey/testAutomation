@@ -7,7 +7,6 @@
     <property name="project.root" value="${test.dir}/../.." />
     <property name="test.lib.home" value="${test.dir}/lib"/>
     <property name="external.lib.home" value="${project.root}/external/lib"/>
-    <property name="remoteAPI.build.dir" value="${project.root}/build/remoteAPI"/>
     <property name="test.log.dir" value="${test.dir}/logs"/>
     <property name="test.log.output.dir" value="${test.build.home}/logs" />
 
@@ -101,9 +100,6 @@
 
     <path id="test.build.classpath">
         <path refid="test.lib.classpath" />
-        <fileset dir="${remoteAPI.build.dir}">
-            <include name="client.jar"/>
-        </fileset>
     </path>
 
     <path id="test.run.classpath">
@@ -665,7 +661,6 @@
             <jvmarg value="-Djava.compiler=NONE" />
             <classpath refid="test.run.classpath" />
             <sysproperty key="suite" value="${sysprop.suite}"/>
-            <sysproperty key="remoteAPI.skipSetup" value="${remoteAPI.skipSetup}"/>
             <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
@@ -713,7 +708,6 @@
             <jvmarg value="-Djava.compiler=NONE" />
             <classpath refid="test.run.classpath" />
             <sysproperty key="suite" value="${sysprop.suite}"/>
-            <sysproperty key="remoteAPI.skipSetup" value="${remoteAPI.skipSetup}"/>
             <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
