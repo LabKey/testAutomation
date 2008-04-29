@@ -34,6 +34,7 @@ public class Crawler
             new ControllerActionId("Study", "template"),
             new ControllerActionId("Study", "downloadTsv"),
             new ControllerActionId("Study", "deleteDatasetReport"),
+            new ControllerActionId("Study", "deleteDataset"),
             new ControllerActionId("Study-Reports", "deleteReports"),
             new ControllerActionId("Study-Reports", "deleteReport"),
             new ControllerActionId("Study-Reports", "deleteCustomQuery"),
