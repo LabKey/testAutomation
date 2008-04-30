@@ -438,10 +438,6 @@ public class StudyTest extends BaseSeleniumWebTest
         waitForPageToLoad();
         selectOptionByText("participantCohortProperty", "2. Enrollment group");
         clickNavButton("Update Assignments");
-        String confirmation = selenium.getConfirmation();
-        System.out.println("Confirmation: " + confirmation);
-       // this.;
-
 
         // hide visits:
         clickLinkWithText("Manage Study");
