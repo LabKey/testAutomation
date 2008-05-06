@@ -19,6 +19,8 @@ public class FlowJoQueryTest extends BaseFlowTest
     protected void doTestSteps()
     {
         init();
+        String containerPath = "/" + PROJECT_NAME + "/" + FOLDER_NAME;
+
         clickLinkWithText("Set pipeline root");
         setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
         submit();
@@ -31,7 +33,8 @@ public class FlowJoQueryTest extends BaseFlowTest
         checkCheckbox("file", "flowjoquery" + File.separator + "Workspaces" + File.separator + "PV1-public.xml", true);
         clickButtonWithImgSrc("Upload%20Workspace");
         setFormElement("ff_newAnalysisName", "FlowJoAnalysis");
-        clickButtonWithImgSrc("Upload%20Results", longWaitForPage);
+        clickButtonWithImgSrc("Upload%20Results");
+        waitForPipeline(containerPath);
         clickLinkWithText("Customize View");
         clearCustomizeViewColumns();
         addCustomizeViewColumn("Name");
@@ -43,7 +46,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         click(Locator.raw("expand_Statistic"));
         addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
         addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
-        clickNavButton("Save");
+        clickNavButton("Save", longWaitForPage);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Customize Folder");
         toggleCheckboxByTitle("Query", false);
@@ -72,7 +75,8 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickLinkWithText("miniFCS");
         checkCheckbox("file", "flowjoquery" + File.separator + "miniFCS" + File.separator + "mini-fcs.xml", true);
         clickButtonWithImgSrc("Upload%20Workspace");
-        clickButtonWithImgSrc("Upload%20Results", longWaitForPage);
+        clickButtonWithImgSrc("Upload%20Results");
+        waitForPipeline(containerPath);
         clickLinkWithText("workspaceScript1");
         clickLinkWithText("Make a copy of this analysis script");
         setFormElement("name", "LabKeyScript");
@@ -85,7 +89,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickButtonWithImgSrc("Analyze%20selected%20runs");
         setFormElement("ff_analysisName", "LabKeyAnalysis");
         clickButtonWithImgSrc("Analyze%20runs");
-        waitForPipeline("/" + PROJECT_NAME + "/" + FOLDER_NAME);
+        waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("LabKeyAnalysis");
         setFormElement("query.queryName", "Comparison");
