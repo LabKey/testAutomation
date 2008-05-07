@@ -80,10 +80,10 @@ public class FlowTest extends BaseFlowTest
 //        clickNavButton("Browse for more runs");
 
         clickLinkWithText("8color");
-        clickNavButton("Upload Multiple Runs");
+        clickNavButton("Import Multiple Runs");
         // First, just upload the run "8colordata"
         checkCheckbox("ff_path", "8color/8colordata/", false);
-        clickNavButton("Upload Selected Runs");
+        clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
         // Drill into the run, and see that it was uploaded, and keywords were read.
@@ -219,10 +219,10 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for more FCS files to be loaded");
 
         clickLinkWithText("8color");
-        clickNavButton("Upload Multiple Runs");
+        clickNavButton("Import Multiple Runs");
         assertTextNotPresent("8colordata");
         clickImgButtonNoNav("Select All");
-        clickNavButton("Upload Selected Runs");
+        clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
 
         clickLinkWithText("Flow Dashboard");
