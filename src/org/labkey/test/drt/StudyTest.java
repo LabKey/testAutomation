@@ -217,7 +217,7 @@ public class StudyTest extends BaseSeleniumWebTest
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t1.2\ttext\t\n";
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";
         setFormElement("tsv", tsv + "\n" + errorRow);
-        clickNavButton("Submit", "large");
+        clickNavButton("Submit");
         assertTextPresent("Row 3 does not contain required field participantid.");
         assertTextPresent("Row 3 data type error for field SequenceNum.");
         assertTextPresent("Row 3 does not contain required field SampleId.");
@@ -232,14 +232,14 @@ public class StudyTest extends BaseSeleniumWebTest
         //Import same data again
         clickNavButton("Import Data");
         setFormElement("tsv", tsv);
-        clickNavButton("Submit", "large");
+        clickNavButton("Submit");
         assertTextPresent("Duplicates were found");
         //Now explicitly replace
         tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
         setFormElement("tsv", tsv);
-        clickNavButton("Submit", "large");
+        clickNavButton("Submit");
         assertTextPresent("5000.0");
         assertTextPresent("new text");
         // upload specimen data and verify import
