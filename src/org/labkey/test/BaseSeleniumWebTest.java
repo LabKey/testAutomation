@@ -2084,6 +2084,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Save", 0);
         log("Waiting for AJAX save return...");
         waitForText("Saved.", 10000);
+        sleep(100);
         log("Navigating to " + redirUrl);
         selenium.open(redirUrl);
     }

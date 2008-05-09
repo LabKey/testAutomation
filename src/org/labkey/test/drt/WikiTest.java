@@ -183,7 +183,7 @@ public class WikiTest extends BaseSeleniumWebTest
         changeFormat("TEXT_WITH_LINKS");
         saveWikiPage();
 
-        assertTextPresent("<strong>");
+        assertTextPresent("<b>");
         clickLinkWithText("edit");
         changeFormat("HTML");
         saveWikiPage();
