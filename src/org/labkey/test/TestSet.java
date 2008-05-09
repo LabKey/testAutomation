@@ -3,8 +3,6 @@ package org.labkey.test;
 import org.labkey.test.bvt.*;
 import org.labkey.test.daily.UniprotAnnotationTest;
 import org.labkey.test.drt.*;
-import org.labkey.test.httpunit.MS2AnalyzePerfTest;
-import org.labkey.test.httpunit.MS2LoadPerfTest;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
@@ -88,12 +86,6 @@ public enum TestSet
     Module(new Class[]
     {
         ModuleTest.class
-    }),
-
-    Perf(new Class[]
-    {
-        MS2LoadPerfTest.class,
-        MS2AnalyzePerfTest.class
     }),
 
     Flow(new Class[] {
