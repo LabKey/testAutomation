@@ -181,7 +181,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         pushLocation();
         clickLinkWithText("Test Mascot settings");
         assertTextPresent("Test failed.");
-        assertTextPresent("Fail to interact with Mascot Server");
+        assertTextPresent("Failed to interact with Mascot Server");
         log("Return to customize page.");
         popLocation();
 
