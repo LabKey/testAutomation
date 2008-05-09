@@ -264,11 +264,11 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         clickLinkWithText(FOLDER_NAME);
         addWebPart("Wiki");
-        clickLinkWithText("Create a new wiki page");
+        createNewWikiPage("HTML");
         setFormElement("name", WIKIPAGE_NAME);
         setFormElement("title", WIKIPAGE_NAME);
-        setFormElement("body", "placeholder text");
-        clickNavButton("Submit");
+        setWikiBody("placeholder text");
+        saveWikiPage();
 
         createList();
 
@@ -291,8 +291,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         if (!isTextPresent(WIKIPAGE_NAME))
             clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("edit");
-        setLongTextField("body", "<p>Test Complete.</p>");
-        clickNavButton("Finished");
+        setWikiBody("<p>Test Complete.</p>");
+        saveWikiPage();
     }
 
     private void createList()
@@ -488,11 +488,12 @@ public class ClientAPITest extends BaseSeleniumWebTest
         if (!isTextPresent(WIKIPAGE_NAME))
             clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("edit");
+
         String fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
         log(fullSource);
-        setLongTextField("body", fullSource);
-        clickNavButton("Finished");
+        setWikiBody(fullSource);
+        saveWikiPage();
         return waitForDivPopulation();
     }
 

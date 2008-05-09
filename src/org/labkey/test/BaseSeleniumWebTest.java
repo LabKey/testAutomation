@@ -11,6 +11,7 @@ import org.labkey.test.util.PasswordUtil;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -2055,6 +2056,126 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickNavButton("Delete");
         }
     }
+
+    /**
+     * Saves a wiki page that is currently being created or edited. Because
+     * the wiki edit page now uses AJAX to save the page, use this function to
+     * reliably save the page and wait for the browser to redirect to where it would
+     * normally go next.
+     */
+    public void saveWikiPage()
+    {
+        String curUrl = selenium.getLocation();
+
+        //get the redir parameter
+        String redirUrl = getUrlParam(curUrl, "redirect", true);
+        if(null == redirUrl || redirUrl.length() == 0)
+        {
+            String pageName = getUrlParam(curUrl, "name", true);
+            if(null == pageName)
+                pageName = selenium.getValue("wiki-input-name");
+            assert null != pageName && pageName.length() > 0;
+            int idxStart = curUrl.indexOf("/wiki/");
+            int idxEnd = curUrl.indexOf("/editWiki.view?", idxStart);
+            redirUrl = getContextPath() + curUrl.substring(idxStart, idxEnd) + "/page.view?name=" + pageName;
+        }
+
+        log("Saving wiki...");
+        clickNavButton("Save", 0);
+        log("Waiting for AJAX save return...");
+        waitForText("Saved.", 10000);
+        log("Navigating to " + redirUrl);
+        selenium.open(redirUrl);
+    }
+
+    public String getUrlParam(String url, String paramName, boolean decode)
+    {
+        String paramStart = paramName + "=";
+        int idxStart = url.indexOf(paramStart);
+        if(idxStart > 0)
+        {
+            idxStart += paramStart.length();
+            int idxEnd = url.indexOf("&", idxStart);
+            if(idxEnd < 0)
+                idxEnd = url.length();
+            String ret = url.substring(idxStart, idxEnd);
+            if(decode)
+            {
+                ret = ret.replace("+", "%20");
+                try {ret = URLDecoder.decode(ret, "UTF-8");} catch(UnsupportedEncodingException e) {}
+            }
+            return ret.trim();
+        }
+        else
+            return null;
+    }
+
+    public class WikiSaveChecker implements Checker
+    {
+        private String _curUrl;
+        public WikiSaveChecker(String curUrl) {_curUrl = curUrl;}
+        public boolean check()
+        {
+            return (0 != _curUrl.compareToIgnoreCase(selenium.getLocation()));
+        }
+    }
+
+    /**
+     * Creates a new wiki page, assuming that the [new page] link is available
+     * somewhere on the current page. This link is typically displayed above
+     * the Wiki table of contents, which is shown on collaboration portal pages,
+     * the wiki module home page, as well as any wiki page.
+     * @param format The format for the new page. Allowed values are "RADEOX" (for wiki),
+     * "HTML", and "TEXT_WITH_LINKS". Note that these are the string names for the
+     * WikiRendererType enum values.
+     */
+    public void createNewWikiPage(String format)
+    {
+        if(isLinkPresentWithText("new page"))
+            clickLinkWithText("new page");
+        else if(isLinkPresentWithText("Create a new wiki page"))
+            clickLinkWithText("Create a new wiki page");
+        else if(isLinkPresentWithText("add content"))
+            clickLinkWithText("add content");
+        else
+            fail("Could not find a link on the current page to create a new wiki page." + 
+                    " Ensure that you navigate to the wiki controller home page or an existing wiki page" + 
+                    " before calling this method.");
+
+        checkCheckbox("format", format, true);
+        clickNavButton("Create Page");
+    }
+
+    /**
+     * Creates a new wiki page using HTML as the format. See {@link #createNewWikiPage(String)}
+     * for more details.
+     */
+    public void createNewWikiPage()
+    {
+        createNewWikiPage("HTML");
+    }
+
+    /**
+     * Sets the wiki page body, automatically switching to source view if necessary
+     * @param body The body text to set
+     */
+    public void setWikiBody(String body)
+    {
+        switchWikiToSourceView();
+        setLongTextField("body", body);
+    }
+
+    /**
+     * Switches the wiki edit page to source view when the format type is HTML.
+     */
+    public void switchWikiToSourceView()
+    {
+        if(isLinkPresentWithText("Source"))
+            clickLinkWithText("Source", false);
+    }
+
+
+
 
     public void goToPipelineItem(String item)
     {

@@ -101,11 +101,13 @@ public class WikiTest extends BaseSeleniumWebTest
 
         log("Test new wiki page");
         clickLinkWithText("Create a new wiki page");
-        selectRenderType("Wiki Page");
+        checkCheckbox("format", "RADEOX", true);
+        clickNavButton("Create Page");
+
         setFormElement("name", WIKI_PAGE1_NAME);
         setFormElement("title", WIKI_PAGE1_TITLE);
         setFormElement("body", WIKI_PAGE1_CONTENT);
-        clickNavButton("Submit");
+        saveWikiPage();
 
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
 
@@ -114,34 +116,37 @@ public class WikiTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE2_NAME);
         assertTextPresent("page has no content");
         clickLinkWithText("add content");
-        selectRenderType("Wiki Page");
+        checkCheckbox("format", "RADEOX", true);
+        clickNavButton("Create Page");
+
         setFormElement("title", WIKI_PAGE2_TITLE);
         setFormElement("body", WIKI_PAGE2_CONTENT);
-        clickNavButton("Submit");
+        saveWikiPage();
+
         clickLinkWithText("Welcome");
-        //Add once update wiki title bug is fixed
-        //assertLinkNotPresentWithText(WIKI_PAGE2_NAME);
+        assertLinkNotPresentWithText(WIKI_PAGE2_NAME);
 
         searchFor(PROJECT_NAME, "Page AAA", 1, WIKI_PAGE2_TITLE);
 
         log("test create new html page with a webpart");
-        clickLinkWithText("new page");
-        selectRenderType("HTML");
+        createNewWikiPage("HTML");
+
         setFormElement("name", WIKI_PAGE3_NAME_TITLE);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         selectOptionByText("parent", WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
+        switchWikiToSourceView();
         setFormElement("body", WIKI_PAGE3_CONTENT);
 
         log("test attachments.");
         if (isFileUploadAvailable())
         {
-            clickLinkWithText("Attach a file", false);
             File file = new File(getLabKeyRoot() + "/common.properties");
             setFormElement("formFiles[0]", file);
         }
         else
             log("File upload skipped.");
-        clickNavButton("Submit");
+        saveWikiPage();
+
         if (isFileUploadAvailable())
             assertTextPresent("common.properties");
         assertTextPresent(WIKI_PAGE3_WEBPART_TEST);
@@ -151,19 +156,21 @@ public class WikiTest extends BaseSeleniumWebTest
 
         log("test edit");
         clickLinkWithText("edit");
-        selectRenderType("HTML");
         setFormElement("title", WIKI_PAGE3_ALTTITLE);
         String wikiPage3ContentEdited =
             "<b>Some HTML content</b><br>\n" +
             "<b>More HTML content</b><br>\n" +
             "<a href='" + getContextPath() + "/wiki/" + PROJECT_NAME + "/page.view?name=PageAAA'>Page AAA</a><br>\n";
+        switchWikiToSourceView();
         setFormElement("body", wikiPage3ContentEdited);
-        clickNavButton("Finished");
+        saveWikiPage();
+
         assertTextPresent("More HTML content");
         clickLinkWithText("edit");
+        switchWikiToSourceView();
         setFormElement("body", WIKI_PAGE3_CONTENT_NO_QUERY);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
-        clickNavButton("Finished");
+        saveWikiPage();
 
         pushLocation();
         //because we replace the body with the content
@@ -173,12 +180,15 @@ public class WikiTest extends BaseSeleniumWebTest
         log("test change renderer type");
         assertTextPresent("Some HTML content");
         clickLinkWithText("edit");
-        selectRenderType("Plain Text");
-        clickNavButton("Finished");
-        assertTextPresent("<b>");
+        changeFormat("TEXT_WITH_LINKS");
+        saveWikiPage();
+
+        assertTextPresent("<strong>");
         clickLinkWithText("edit");
-        selectRenderType("HTML");
-        clickNavButton("Finished");
+        changeFormat("HTML");
+        saveWikiPage();
+
+
         //bvt
         log("Check Start Page series works");
         searchFor(PROJECT_NAME, "Some HTML", 1, WIKI_PAGE3_NAME_TITLE);
@@ -239,37 +249,41 @@ public class WikiTest extends BaseSeleniumWebTest
         clickNavButton("Delete");
         assertTextNotPresent(DISC1_TITLE);
         assertTextNotPresent(DISC1_BODY);
+
         //bvt
         log("test navTree and header");
         clickLinkWithText("new page");
-        selectRenderType("Wiki Page");
+        checkCheckbox("format", "RADEOX", true);
+        clickNavButton("Create Page");
         setFormElement("name", "_navTree");
         setFormElement("title", "NavTree");
         setFormElement("body", NAVBAR1_CONTENT);
-        clickNavButton("Submit");
+        saveWikiPage();
 
         assertTextNotPresent("Home");
         assertLinkPresentWithText(PROJECT_NAME);
 
         clickLinkWithText("edit");
         setFormElement("body", NAVBAR2_CONTENT);
-        clickNavButton("Save");
+        saveWikiPage();
         assertTextPresent("Projects");
         assertTextPresent("Manage Project");
         assertTextPresent("Manage Site");
 
-        clickNavButton("Finished");
-        clickLinkWithText("manage", 0);
+        //test deleting via edit page
+        clickLinkWithText("edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete", "large");
         assertLinkPresentWithText("Home");
 
         clickLinkWithText("new page");
-        selectRenderType("HTML");
+        checkCheckbox("format", "HTML", true);
+        clickNavButton("Create Page");
         setFormElement("name", "_header");
         setFormElement("title", "Header");
+        switchWikiToSourceView();
         setFormElement("body", HEADER_CONTENT);
-        clickNavButton("Submit");
+        saveWikiPage();
 
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         assertTextPresent(HEADER_CONTENT);
@@ -296,11 +310,12 @@ public class WikiTest extends BaseSeleniumWebTest
 
         log("test terms of use");
         clickLinkWithText("new page");
-        selectRenderType("Wiki Page");
+        checkCheckbox("format", "RADEOX", true);
+        clickNavButton("Create Page");
         setFormElement("name", "_termsOfUse");
         setFormElement("title", "Terms of Use");
         setFormElement("body", "The first rule of fight club is do not talk about fight club.");
-        clickNavButton("Submit");
+        saveWikiPage();
 
         log("Terms don't come into play until you log out");
         signOut();
@@ -472,9 +487,12 @@ public class WikiTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Portal");
         clickLinkWithText("new page");
+        checkCheckbox("format", "RADEOX", true);
+        clickNavButton("Create Page");
+
         setFormElement("name", WIKI_PAGE4_TITLE);
         setFormElement("body", WIKI_PAGE4_CONTENT);
-        clickNavButton("Submit");
+        saveWikiPage();
         clickLinkWithText(PROJECT_NAME);
         clickTab("Wiki");
         assertTextPresent(WIKI_PAGE4_TITLE);
@@ -515,6 +533,15 @@ public class WikiTest extends BaseSeleniumWebTest
 //        }
     }
 
+    private void changeFormat(String format)
+    {
+        clickNavButton("Convert To...", 0);
+        sleep(500);
+        selectOptionByValue("wiki-input-window-change-format-to", format);
+        clickNavButton("Convert", 0);
+        sleep(500);
+    }
+
     protected void selectRenderType(String renderType)
     {
         if (!renderType.equals(getSelectedOptionText("rendererType")))
@@ -525,7 +552,7 @@ public class WikiTest extends BaseSeleniumWebTest
         if ("HTML".equals(renderType) && isNavButtonPresent("Use HTML Source Editor"))
             clickNavButton("Use HTML Source Editor");
     }
-    
+
     protected void doCleanup()
         {
             deleteUser(USER1);
