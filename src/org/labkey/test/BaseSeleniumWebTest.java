@@ -2083,8 +2083,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Saving wiki...");
         clickNavButton("Save", 0);
         log("Waiting for AJAX save return...");
-        waitForText("Saved.", 10000);
-        sleep(100);
+        //waitForText("Saved.", 10000);
+        waitFor(new WikiSaveChecker(), "Wiki page failed to save!", 10000);
+        //sleep(100);
         log("Navigating to " + redirUrl);
         selenium.open(redirUrl);
     }
@@ -2113,11 +2114,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public class WikiSaveChecker implements Checker
     {
-        private String _curUrl;
-        public WikiSaveChecker(String curUrl) {_curUrl = curUrl;}
+        private Locator _locator = Locator.id("status");
         public boolean check()
         {
-            return (0 != _curUrl.compareToIgnoreCase(selenium.getLocation()));
+            return "Saved.".equals(getText(_locator));
         }
     }
 

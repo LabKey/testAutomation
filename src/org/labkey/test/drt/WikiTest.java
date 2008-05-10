@@ -487,7 +487,7 @@ public class WikiTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Portal");
         clickLinkWithText("new page");
-        checkCheckbox("format", "RADEOX", true);
+        checkCheckbox("format", "HTML", true);
         clickNavButton("Create Page");
 
         setFormElement("name", WIKI_PAGE4_TITLE);
