@@ -253,7 +253,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.type("ff_name0", "Value");
         selenium.click("button_Save");
         selenium.waitForPageToLoad("30000");
-        clickNavButton("Upload Data");
+        clickNavButton("Import Data");
         selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
         submit();
         assertTextPresent("-120");

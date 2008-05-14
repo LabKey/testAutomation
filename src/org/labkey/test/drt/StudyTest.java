@@ -225,15 +225,15 @@ public class StudyTest extends BaseSeleniumWebTest
                 "TextField\tTextField\txsd:string\tfalse\tThis is a text field");
 
         click(Locator.id("button_Save"));
-        waitForElement(Locator.xpath("//img[@alt='Upload Data']"), WAIT_FOR_GWT);
-        clickNavButton("Upload Data");
+        waitForElement(Locator.xpath("//img[@alt='Import Data']"), WAIT_FOR_GWT);
+        clickNavButton("Import Data");
 
         String tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t1.2\ttext\t\n";
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";
         setFormElement("tsv", tsv + "\n" + errorRow);
-        clickNavButton("Submit");
+        clickNavButton("Import Data");
         assertTextPresent("Row 3 does not contain required field participantid.");
         assertTextPresent("Row 3 data type error for field SequenceNum.");
         assertTextPresent("Row 3 does not contain required field SampleId.");
@@ -241,21 +241,21 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("Row 3 does not contain required field NumberField.");
 
         setFormElement("tsv", tsv);
-        clickButtonWithImgSrc("Submit", longWaitForPage);
+        clickNavButton("Import Data", longWaitForPage);
         assertTextPresent("1234");
         assertTextPresent("2006-02-01");
         assertTextPresent("1.2");
         //Import same data again
         clickNavButton("Import Data");
         setFormElement("tsv", tsv);
-        clickNavButton("Submit");
+        clickNavButton("Import Data");
         assertTextPresent("Duplicates were found");
         //Now explicitly replace
         tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
         setFormElement("tsv", tsv);
-        clickNavButton("Submit");
+        clickNavButton("Import Data");
         assertTextPresent("5000.0");
         assertTextPresent("new text");
         // upload specimen data and verify import
