@@ -109,8 +109,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
             clickLinkWithText("LOAD EXPERIMENT RUNNING");
         else if (isLinkPresentWithText("CHECK FASTA COMPLETE"))
             clickLinkWithText("CHECK FASTA COMPLETE");
+        else if (isLinkPresentWithText("SEARCH WAITING"))
+            clickLinkWithText("SEARCH WAITING");
         else
-            fail("Couldn't find 'WAITING', 'CHECK FASTA RUNNING', 'SEARCHING RUNNING', 'ANALYSIS RUNNING', 'CHECK FASTA COMPLETE', or 'LOAD EXPERIMENT RUNNING'.");
+            fail("Couldn't find 'WAITING', 'SEARCH WAITING', 'CHECK FASTA RUNNING', 'SEARCHING RUNNING', 'ANALYSIS RUNNING', 'CHECK FASTA COMPLETE', or 'LOAD EXPERIMENT RUNNING'.");
 
         log("View log file.");
 
