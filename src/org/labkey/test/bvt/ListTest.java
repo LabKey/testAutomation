@@ -141,12 +141,12 @@ public class ListTest extends BaseSeleniumWebTest
         _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
         setFormElement(Locator.id("ff_name0"), _listCol1.getName());
         setFormElement(Locator.id("ff_label0"), _listCol1.getLabel());
-        click(Locator.id("button_Add Field"));
+        clickNavButton("Add Field", 0);
         setFormElement(Locator.id("ff_name2"), _listCol3.getName());
         setFormElement(Locator.id("ff_label2"), _listCol3.getLabel());
         selectOptionByText("ff_type2", _listCol3.getType().toString());
         setFormElement(Locator.id("propertyDescription"), _listCol3.getDescription());
-        click(Locator.id("button_Save"));
+        clickNavButton("Save", 0);
         waitForPageToLoad();
 
         log("Check new field was added correctly");

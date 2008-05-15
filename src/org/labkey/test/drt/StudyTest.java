@@ -224,7 +224,7 @@ public class StudyTest extends BaseSeleniumWebTest
                 "NumberField\tNumberField\txsd:double\ttrue\tThis is a number\n" +
                 "TextField\tTextField\txsd:string\tfalse\tThis is a text field");
 
-        click(Locator.id("button_Save"));
+        clickNavButton("Save");
         waitForElement(Locator.xpath("//img[@alt='Import Data']"), WAIT_FOR_GWT);
         clickNavButton("Import Data");
 

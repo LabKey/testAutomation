@@ -92,7 +92,7 @@ public class LuminexTest extends AbstractAssayTest
         selenium.type("//textarea", TEST_ASSAY_LUM_DESC);
 
         sleep(1000);
-        click(Locator.id("button_Save Changes"));
+        clickNavButton("Save Changes", 0);
         waitForText("Save successful.", 20000);
 
         ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListHelper.ListColumnType.String, "Participant ID");
@@ -161,10 +161,10 @@ public class LuminexTest extends AbstractAssayTest
         assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
         setFormElement("ThawListType", "List");
         waitForElement(Locator.id("button_Choose list..."), BaseSeleniumWebTest.WAIT_FOR_GWT);
-        click(Locator.id("button_Choose list..."));
+        clickNavButton("Choose list...", 0);
         setFormElement("schema", "lists");
         setFormElement("table", THAW_LIST_NAME);
-        click(Locator.id("button_Close"));
+        clickNavButton("Close", 0);
         clickNavButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
         setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));

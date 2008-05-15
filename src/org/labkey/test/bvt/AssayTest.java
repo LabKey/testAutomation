@@ -157,7 +157,9 @@ public class AssayTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
-            selenium.click(getPropertyXPath("Upload Set Fields") + "//img[@id='button_Add Field']");
+            selenium.mouseOver(getPropertyXPath("Upload Set Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseDown(getPropertyXPath("Upload Set Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseUp(getPropertyXPath("Upload Set Fields") + "//img[contains(@src, 'Add+Field.button')]");
             selenium.type(getPropertyXPath("Upload Set Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_SET_PROP_NAME + i);
             selenium.type(getPropertyXPath("Upload Set Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_SET_PROP_NAME + i);
             selenium.select(getPropertyXPath("Upload Set Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
@@ -165,7 +167,9 @@ public class AssayTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
         {
-            selenium.click(getPropertyXPath("Run Fields") + "//img[@id='button_Add Field']");
+            selenium.mouseOver(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseDown(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseUp(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
             selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_RUN_PROP_NAME + i);
             selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_RUN_PROP_NAME + i);
             selenium.select(getPropertyXPath("Run Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
@@ -173,7 +177,9 @@ public class AssayTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            selenium.click(getPropertyXPath("Data Fields") + "//img[@id='button_Add Field']");
+            selenium.mouseOver(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseDown(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseUp(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_DATA_PROP_NAME + i);
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_DATA_PROP_NAME + i);
             selenium.select(getPropertyXPath("Data Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
@@ -196,7 +202,7 @@ public class AssayTest extends AbstractAssayTest
         selenium.click(getPropertyXPath("Data Fields") + "//input[@type='checkbox']");
 
         sleep(1000);
-        click(Locator.id("button_Save Changes"));
+        clickNavButton("Save Changes", 0);
         waitForText("Save successful.", 20000);
 
     } //defineAssay()
@@ -407,7 +413,7 @@ public class AssayTest extends AbstractAssayTest
         selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
         click(Locator.raw(getPropertyXPath("Data Fields") + "//img[@id='partdelete_4']"));
         waitForElement(Locator.raw("//img[@id='partdeleted_4']"), WAIT_FOR_GWT);
-        click(Locator.id("button_Save Changes"));
+        clickNavButton("Save Changes", 0);
         waitForText("Save successful.", WAIT_FOR_GWT);
 
         //ensure that label has changed in run data in Lab 1 folder

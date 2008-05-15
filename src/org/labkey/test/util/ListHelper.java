@@ -177,7 +177,7 @@ public class ListHelper
         {
             ListColumn col = cols[i];
             test.waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_GWT);
-            test.click(Locator.id("button_Add Field"));
+            test.clickNavButton("Add Field", 0);
             test.setFormElement(Locator.id("ff_name" + i),  col.getName());
             test.setFormElement(Locator.id("ff_label" + i), col.getLabel());
             test.selectOptionByText("ff_type" + i, col.getType().toString());
@@ -196,11 +196,10 @@ public class ListHelper
                 }
                 test.setFormElement("schema", lookup.getSchema());
                 test.setFormElement("table", lookup.getTable());
-                test.click(Locator.id("button_Close"));
+                test.clickNavButton("Close", 0);
             }
         }
-        test.click(Locator.id("button_Save"));
-        test.waitForPageToLoad();
+        test.clickNavButton("Save");
 
         test.log("Check that they were added");
         if (cols.length > 0)

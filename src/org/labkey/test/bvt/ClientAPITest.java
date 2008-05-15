@@ -463,13 +463,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         selenium.type("//input[@type='text']", TEST_ASSAY);
         selenium.type("//textarea", TEST_ASSAY_DESC);
-        selenium.click(getPropertyXPath("Run Fields") + "//img[@id='button_Add Field']");
+        selenium.mouseOver(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
+        selenium.mouseDown(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
+        selenium.mouseUp(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
         selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_name0']", "RunDate");
         selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_label0']", "Run Date");
         selenium.select(getPropertyXPath("Run Fields") + "//select[@id='ff_type0']", "DateTime");
 
         sleep(1000);
-        click(Locator.id("button_Save Changes"));
+        clickNavButton("Save Changes", 0);
         waitForText("Save successful.", 20000);
         
         setSource(ASSAYTEST_SRC);

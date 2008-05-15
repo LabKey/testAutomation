@@ -1359,6 +1359,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertEquals("Link with text '" + text + "' was not present " + count + " times", countLinksWithText(text), count);
     }
 
+    public boolean isGWTButtonPresentWithImage(String imageName)
+    {
+        return isElementPresent(Locator.gwtButton(imageName));
+    }
+
     public boolean isLinkPresentWithImage(String imageName)
     {
         return isElementPresent(Locator.linkWithImage(imageName));
@@ -1434,6 +1439,28 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickButtonWithImgSrc(String src)
     {
         clickButtonWithImgSrc(src, defaultWaitForPage);
+    }
+
+    public void clickGWTButtonWithImgSrc(String src, int millis)
+    {
+        log("Clicking GWT button with image src " + src);
+        Locator l = Locator.gwtButton(src);
+        assertElementPresent(l);
+        selenium.mouseOver(l.toString());
+        selenium.mouseDown(l.toString());
+        selenium.mouseUp(l.toString());
+        if (millis > 0)
+            waitForPageToLoad(millis);
+    }
+
+    public void clickGWTButtonWithImgSrcByIndex(String src, int index)
+    {
+        log("Clicking GWT button with image src " + src);
+        Locator l = Locator.gwtButton(src, index);
+        assertElementPresent(l);
+        selenium.mouseOver(l.toString());
+        selenium.mouseDown(l.toString());
+        selenium.mouseUp(l.toString());
     }
 
     public void clickButtonWithImgSrc(String src, int millis)
@@ -1546,20 +1573,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickNavButton(String buttonText, int waitMillis)
     {
-        String imgName = buildNavButtonImagePath(buttonText);
-        if (isLinkPresentWithImage(imgName))
-            clickLinkWithImage(imgName, waitMillis);
+        if (isLinkPresentWithImage(buildNavButtonImagePath(buttonText)))
+            clickLinkWithImage(buildNavButtonImagePath(buttonText), waitMillis);
+        else if (isGWTButtonPresentWithImage(buildGWTNavButtonImagePath(buttonText, null)))
+            clickGWTButtonWithImgSrc(buildGWTNavButtonImagePath(buttonText, null), waitMillis);
         else
-            clickButtonWithImgSrc(imgName, waitMillis);
+            clickButtonWithImgSrc(buildNavButtonImagePath(buttonText), waitMillis);
     }
 
     public void clickNavButtonByIndex(String buttonText, int index)
     {
-        String imgName = buildNavButtonImagePath(buttonText);
-        if (isLinkPresentWithImage(imgName))
-            clickLinkWithImageByIndex(imgName, index);
+        if (isLinkPresentWithImage(buildNavButtonImagePath(buttonText)))
+            clickLinkWithImageByIndex(buildNavButtonImagePath(buttonText), index);
+        else if (isGWTButtonPresentWithImage(buildGWTNavButtonImagePath(buttonText, null)))
+            clickGWTButtonWithImgSrcByIndex(buildGWTNavButtonImagePath(buttonText, null), index);
         else
-            clickButtonWithImgSrcByIndex(imgName, index);
+            clickButtonWithImgSrcByIndex(buildNavButtonImagePath(buttonText), index);
     }
 
 

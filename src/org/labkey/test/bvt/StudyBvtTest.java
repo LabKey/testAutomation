@@ -562,11 +562,11 @@ public class StudyBvtTest extends StudyTest
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
         checkCheckbox("participantChart");
-        click(Locator.id("button_Save"));
+        clickNavButton("Save", 0);
         sleep(2000);
 
         setFormElement("reportName", "participant chart");
-        click(Locator.id("button_OK"));
+        clickNavButton("OK", 0);
 
         waitForElement(Locator.xpath("//input[@name='datasetId']"), WAIT_FOR_GWT);
 
@@ -579,13 +579,13 @@ public class StudyBvtTest extends StudyTest
         // create a non-participant chart
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
-        click(Locator.id("button_Save"));
+        clickNavButton("Save", 0);
         sleep(2000);
 
         setFormElement("reportName", "non participant chart");
         setFormElement("description", "a private chart");
         checkCheckbox("shareReport");
-        click(Locator.id("button_OK"));
+        clickNavButton("OK", 0);
 
         waitForElement(Locator.xpath("//input[@name='datasetId']"), WAIT_FOR_GWT);
     }

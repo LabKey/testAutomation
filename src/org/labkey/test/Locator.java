@@ -133,6 +133,16 @@ public class Locator
         return xpath("//a/img[contains(@src, " + xq(image) + ")]");
     }
 
+    public static XPathLocator gwtButton(String image)
+    {
+        return xpath("//img[contains(@src, " + xq(image) + ")]");
+    }
+
+    public static XPathLocator gwtButton(String image, int index)
+    {
+        return xpath("(//img[contains(@src, " + xq(image) + ")])[" + (index + 1) + "]");
+    }
+
     public static XPathLocator linkWithImage(String image, int index)
     {
         return xpath("(//a/img[contains(@src, " + xq(image) + ")])[" + (index + 1) + "]");

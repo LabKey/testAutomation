@@ -56,7 +56,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         //selenium.mouseDown("//div[contains(text(), 'Click to edit description')]");
         setFormElement("protocolDescription", "This is a very important protocol");
 
-        click(Locator.imageWithSrc("Save.button",true));
+        clickNavButton("Save", 0);
         //This is done async so need to sleep a bit...
         int n = 1;
         while (!isTextPresent("Revision 1 saved successfully") && n++ < 5)
@@ -90,7 +90,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.type("timepointName", "Pre-immunization");
         click(Locator.tagWithText("button", "OK"));
         selenium.click("check12");
-        click(Locator.imageWithSrc("Finished.button", true));
+        clickNavButton("Finished", 0);
 
         //Can't simply wait for page load here cause also need to wait for
         //GWT to do its thing.
@@ -104,7 +104,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Immunogen3|Adjuvant1");
         assertTextPresent("Pre-immunization");
 
-        click(Locator.imageWithSrc("Edit.button", true));
+        clickNavButton("Edit", 0);
         waitForPageToLoad(30000);
         n = 1;
         while (!isTextPresent("This is a very important protocol") && n++ < 10)
@@ -114,7 +114,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		selenium.type("timepointCount", "8");
         click(Locator.tagWithText("button", "OK"));
 		selenium.click("check8");
-        click(Locator.imageWithSrc("Finished.button", true));
+        clickNavButton("Finished", 0);
 
         //Can't simply wait for page load here cause also need to wait for
         //GWT to do its thing.
@@ -123,7 +123,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         while (!isTextPresent("This is a very important protocol") && n++ < 10)
             sleep(1000);
 
-        clickAndWait(Locator.imageWithSrc("Folder.button", true));
+        clickNavButton("Create Study Folder");
         setFormElement("beginDate", "2007-01-01");
         clickNavButton("Next");
         String cohorts = "SubjectId\tCohort\tStartDate\n" +
@@ -163,9 +163,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		clickNavButton("Create List");
         clickLinkWithText("edit fields");
         waitForElement(Locator.imageWithSrc("Field.button", true),30000);
-        click(Locator.imageWithSrc("Field.button", true));
+        clickNavButton("Add Field", 0);
 		selenium.type("ff_name0", "Value");
-        clickAndWait(Locator.imageWithSrc("Save.button", true));
+        clickNavButton("Save");
         waitForElement(Locator.linkWithText("view data"), 30000);
         clickLinkWithText("view data");
         clickNavButton("Insert New");
@@ -251,7 +251,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Next");
         waitForElement(Locator.raw("ff_name0"), WAIT_FOR_GWT);
         selenium.type("ff_name0", "Value");
-        selenium.click("button_Save");
+        clickNavButton("Save", 0);
         selenium.waitForPageToLoad("30000");
         clickNavButton("Import Data");
         selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
@@ -344,14 +344,16 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            selenium.click(getPropertyXPath("Data Fields") + "//img[@id='button_Add Field']");
+            selenium.mouseOver(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseDown(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseUp(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
             selenium.select(getPropertyXPath("Data Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
         }
 
         sleep(1000);
-        click(Locator.id("button_Save Changes"));
+        clickNavButton("Save Changes", 0);
         waitForText("Save successful.", 20000);
 
     } //defineAssay()
