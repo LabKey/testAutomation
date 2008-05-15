@@ -63,7 +63,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             sleep(2000);
             refresh();
         }
-        popLocation();
+        popLocation(longWaitForPage);
     }
 
     protected void doCleanup() throws Exception

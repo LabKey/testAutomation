@@ -286,9 +286,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void popLocation()
     {
+        popLocation(defaultWaitForPage);
+    }
+
+    public void popLocation(int millis)
+    {
         String location = _locationStack.pop();
         assertNotNull("Cannot pop without a push.", location);
-        beginAt(location);
+        beginAt(location, millis);
     }
 
     public void refresh()
@@ -759,6 +764,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void beginAt(String relativeURL)
     {
+        beginAt(relativeURL, defaultWaitForPage);
+    }
+
+    public void beginAt(String relativeURL, int millis)
+    {
         if (relativeURL.indexOf(getContextPath() + "/") == 0)
             relativeURL = relativeURL.substring(getContextPath().length() + 1);
         if (relativeURL.length() == 0)
@@ -771,7 +781,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 relativeURL = "/" + relativeURL;
             }
         }
-        selenium.open(getBaseURL() + relativeURL);
+        selenium.open(getBaseURL() + relativeURL, millis);
     }
 
     public void assertAlert(String msg)
@@ -2494,7 +2504,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         @Override
         public void open(String url)
         {
-            setTimeout("" + BaseSeleniumWebTest.this.defaultWaitForPage);
+            open(url, BaseSeleniumWebTest.this.defaultWaitForPage);
+        }
+
+        public void open(String url, int millis)
+        {
+            setTimeout("" + millis);
             super.open(url);
         }
 

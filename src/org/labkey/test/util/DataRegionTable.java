@@ -99,7 +99,7 @@ public class DataRegionTable
 
     public void clickLink(int row, int col)
     {
-        _test.clickAndWait(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+2) + "]/td[" + (col+1) + "]/a[1]"));
+        _test.clickAndWait(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+1) + "]/td[" + (col+1) + "]/a[1]"));
     }
 
     public int getColumn(String name)
@@ -108,7 +108,7 @@ public class DataRegionTable
         {
             for (int col = 0; getDataAsText(0, col-1) != null; col++)
             {
-                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[1]/th[" + (col+1) + "]"));
+                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+1) + "]"));
                 if (header.equals(name))
                     return col;
             }
