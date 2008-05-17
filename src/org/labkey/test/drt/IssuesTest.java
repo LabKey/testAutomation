@@ -70,7 +70,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertNavButtonPresent("New Issue");
 
         // AdminAction
-        clickNavButton("Admin");
+        clickNavButtonByIndex("Admin", 1);
 
         // AddKeywordAction
         setFormElement(Locator.formElement("addArea", "keyword"), "Area51");

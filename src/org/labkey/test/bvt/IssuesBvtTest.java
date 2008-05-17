@@ -42,7 +42,7 @@ public class IssuesBvtTest extends IssuesTest
 
     private void requiredFieldsTest()
     {
-        clickNavButton("Admin");
+        clickNavButtonByIndex("Admin", 1);
         setFormElement("int1", "Contract Number");
         setFormElement("string1", "Customer Name");
         clickNavButton("Update Custom Fields");
@@ -53,7 +53,7 @@ public class IssuesBvtTest extends IssuesTest
 
         clickNavButton("Update Required Fields");
         clickNavButton("Back to Issues");
-        clickNavButton("Admin");
+        clickNavButtonByIndex("Admin", 1);
 
         //setWorkingForm("requiredFieldsForm");
         for (String field : REQUIRED_FIELDS)
