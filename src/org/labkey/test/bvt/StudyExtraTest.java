@@ -180,8 +180,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Create Snapshot");
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
-		selenium.mouseDown("adminMenu");
+		clickNavButton("Admin", 0);
         selenium.mouseOver("//a[contains(text(),'Go To Module')]");
+        waitForElement(Locator.xpath("//a[contains(text(),'Query')]"), 2000);
         selenium.click("//a[contains(text(),'Query')]");
 		selenium.waitForPageToLoad("30000");
         clickLinkWithText("Schema Administration");
@@ -220,8 +221,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER +" Study");
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
-        selenium.mouseDown("adminMenu");
+        clickNavButton("Admin", 0);
         selenium.mouseOver("//a[contains(text(),'Go To Module')]");
+        waitForElement(Locator.xpath("//a[contains(text(),'Query')]"), 2000);
         selenium.click("//a[contains(text(),'Query')]");
         selenium.waitForPageToLoad("30000");
 

@@ -406,7 +406,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
 
         clickLinkWithText(TEST_ASSAY);
-        selenium.mouseDown(Locator.linkWithText("manage assay design >>").toString());
+        click(Locator.linkWithText("manage assay design >>"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//input[@id='ff_name5']"), WAIT_FOR_GWT);
         selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name5']", TEST_ASSAY_DATA_PROP_NAME + "edit");

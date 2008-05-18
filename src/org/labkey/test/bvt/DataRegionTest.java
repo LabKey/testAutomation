@@ -120,6 +120,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         table.setMaxRows(3);
         assertMenuButtonPresent("3 per page");
         assertMenuButtonNotPresent("All Rows");
+        clickNavButton("3 per page", 0);
         assertLinkPresentWithText("3 per page");
         assertLinkPresentWithText("40 per page");
         assertLinkPresentWithText("100 per page");
@@ -176,7 +177,8 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertEquals("black", table.getDataAsText(0, 3));
         
         log("Show All");
-        table.showAll();
+        clickNavButton("5 per page", 0);
+        clickLinkWithText("Show All");
         assertEquals(15, table.getDataRowCount());
         assertMenuButtonNotPresent("per page");
         assertMenuButtonPresent("All Rows");
@@ -186,7 +188,8 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithTitle(LAST_LINK);
 
         log("Test 1000 per page");
-        table.setPageSize(1000);
+        clickNavButton("All Rows", 0);
+        clickLinkWithText("1000 per page");
         assertMenuButtonPresent("1000 per page");
         assertMenuButtonNotPresent("All Rows");
         assertLinkNotPresentWithTitle(FIRST_LINK);

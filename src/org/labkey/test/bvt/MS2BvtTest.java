@@ -145,7 +145,7 @@ public class MS2BvtTest extends MS2TestBase
         pushLocation();
         peptidesTable.checkCheckbox(0);
         clickNavButton("Export Selected", 0);
-        clickLinkWithText("TSV", 1);
+        clickLinkWithText("TSV");
         assertTextPresent("K.LLASMLAK.A");
         assertTextNotPresent("R.Q^YALHVDGVGTK.A");
         assertTextPresent("\n", 2, true);
@@ -153,7 +153,7 @@ public class MS2BvtTest extends MS2TestBase
         pushLocation();
         peptidesTable.checkAllOnPage();
         clickNavButton("Export Selected", 0);
-        clickLinkWithText("AMT", 1);
+        clickLinkWithText("AMT");
         assertTextPresent("\n", 60, true);
         assertTextPresent("Run");
         assertTextPresent("CalcMHPlus");
@@ -170,7 +170,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test export selected expects at least one selected");
         peptidesTable.uncheckAllOnPage();
         clickNavButton("Export Selected", 0);
-        click(Locator.linkWithText("AMT", 1));
+        click(Locator.linkWithText("AMT"));
         assertAlert("Please select one or more peptides.");
 
         log("Test sort");
@@ -476,7 +476,7 @@ public class MS2BvtTest extends MS2TestBase
         pushLocation();
         checkCheckbox(Locator.raw("document.forms['ProteinGroupsWithQuantitation'].elements['.select'][0]"));
         clickNavButton("Export Selected", 0);
-        clickLinkWithText("TSV", 1);
+        clickLinkWithText("TSV");
         assertTextPresent("Group");
         assertTextPresent("PP Unique");
         assertTextPresent("Run Description");
@@ -621,7 +621,7 @@ public class MS2BvtTest extends MS2TestBase
         peptidesTable.checkCheckbox(0);
         peptidesTable.checkCheckbox(1);
         clickNavButton("Export Selected", 0);
-        clickLinkWithText("TSV", 1);
+        clickLinkWithText("TSV");
         assertTextNotPresent("Expect");
         assertTextNotPresent("SeqHits");
         assertTextPresent("Next AA");
@@ -636,7 +636,7 @@ public class MS2BvtTest extends MS2TestBase
         peptidesTable.checkCheckbox(0);
         peptidesTable.checkCheckbox(1);
         clickNavButton("Export Selected", 0);
-        clickLinkWithText("AMT", 1);
+        clickLinkWithText("AMT");
         assertTextPresent("Peptide");
         assertTextNotPresent("Next AA");
         assertTextBefore("K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
@@ -811,7 +811,7 @@ public class MS2BvtTest extends MS2TestBase
         proteinGroupsTable.checkCheckbox(0);
         proteinGroupsTable.checkCheckbox(1);
         clickNavButton("Export Selected", 0);
-        clickLinkWithText("TSV", 1);
+        clickLinkWithText("TSV");
         assertTextBefore("0.74", "0.78");
         assertTextPresent("\n", 3);
         popLocation();
