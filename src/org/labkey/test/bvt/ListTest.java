@@ -167,6 +167,8 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test inserting new row");
         clickNavButton("Insert New");
+        assertTextPresent(_listCol1.getDescription(), 1, true);     // Field descriptions appear pop-ups -- need to check HTML source
+        assertTextPresent(_listCol3.getDescription(), 1, true);
         setFormElement("quf_" + _listCol1.getName(), TEST_DATA[1][3]);
         setFormElement("quf_" + _listCol2.getName(), "wrong type");
         setFormElement("quf_" + _listCol3.getName(), TEST_DATA[3][3]);
