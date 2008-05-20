@@ -17,7 +17,6 @@
 package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
-import org.labkey.test.BaseSeleniumWebTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +74,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             beginAt("/admin/begin.view");
             clickLinkWithText("flow cytometry");
-            setFormElement("ff_workingDirectory", "");
+            setFormElement("workingDirectory", "");
             clickNavButton("update");
         }
         catch (Throwable t) {}
@@ -86,11 +85,11 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         beginAt("/admin/begin.view");
         clickLinkWithText("flow cytometry");
         deletePipelineWorkDirectory();
-        setFormElement("ff_workingDirectory", getPipelineWorkDirectory().toString());
+        setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
         clickNavButton("update");
         assertTextPresent("Path does not exist");
         getPipelineWorkDirectory().mkdir();
-        setFormElement("ff_workingDirectory", getPipelineWorkDirectory().toString());
+        setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
         clickNavButton("update");
         assertTextNotPresent("Path does not exist");
         createProject(PROJECT_NAME);
