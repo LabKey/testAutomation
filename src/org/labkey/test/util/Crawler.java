@@ -347,10 +347,12 @@ public class Crawler
 
             // Make sure it is correctly formatted
             String relativeURL;
-            if (!urlText.startsWith("/"))
-                relativeURL = getURLBase(_urlToCheck.getOrigin()) + urlText;
-            else
+            if (urlText.startsWith("/"))
                 relativeURL = urlText;
+            else if (urlText.startsWith("?"))
+                relativeURL = stripQueryParams(_urlToCheck.getOrigin().toString()) + urlText;
+            else
+                relativeURL = getURLBase(_urlToCheck.getOrigin()) + urlText;
 
             // Check if it should be visited, if so, visit it
             int depth = _urlToCheck.getDepth();
