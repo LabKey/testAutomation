@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2007-2008 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+ */
+/*
  * This file contains a set of helper functions that are injected into
  * the selenium frame at test startup. These make it somewhat easier
  * to run old LabKey tests and write new ones.
