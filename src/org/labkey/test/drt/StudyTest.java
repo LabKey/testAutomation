@@ -216,13 +216,22 @@ public class StudyTest extends BaseSeleniumWebTest
 
         waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);
 
-        setFormElement("dsKeyField", "SampleId");
-        checkCheckbox("noscript");
-        setFormElement("tsv", "Property\tLabel\tRangeURI\tNotNull\tDescription\n" +
+        checkCheckbox("additionalKey", 1, true);
+
+        clickNavButton("Import Schema", 0);
+        waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_GWT);
+
+        setFormElement("schemaImportBox", "Property\tLabel\tRangeURI\tNotNull\tDescription\n" +
                 "SampleId\tSample Id\txsd:string\ttrue\tstring\n" +
                 "DateField\tDateField\txsd:dateTime\tfalse\tThis is a date field\n" +
                 "NumberField\tNumberField\txsd:double\ttrue\tThis is a number\n" +
                 "TextField\tTextField\txsd:string\tfalse\tThis is a text field");
+
+        clickNavButton("Import", 0);
+        waitForElement(Locator.xpath("//input[@id='ff_label3']"), WAIT_FOR_GWT);
+
+        click(Locator.xpath("//span[@id='button_dataField']"));
+        selenium.select("list_dataField", "label=Sample Id");
 
         clickNavButton("Save");
         waitForElement(Locator.xpath("//img[@alt='Import Data']"), WAIT_FOR_GWT);
