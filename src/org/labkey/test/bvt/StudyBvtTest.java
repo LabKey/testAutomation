@@ -355,8 +355,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(DATA_SET);
-        clickNavButton("Create Views", 0);
-        clickLinkWithText(CREATE_R_MENU);
+        clickMenuButton("Views", "Create", CREATE_R_MENU);
 
         log("Execute bad scripts");
         clickNavButton("Execute Script");
@@ -386,7 +385,7 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Save");
 
         log("Create view");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", null, "Customize View");
         removeCustomizeViewColumn(R_REMCOL);
         addCustomizeViewFilter(R_FILTER, "3.Latino/a or Hispanic?", "Does Not Equal", "Yes");
         addCustomizeViewSort(R_SORT, "2.What is your sex?", "DESC");
@@ -400,8 +399,7 @@ public class StudyBvtTest extends StudyTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        clickNavButton("Create Views", 0);
-        clickLinkWithText(CREATE_R_MENU);
+        clickMenuButton("Views", "Create", CREATE_R_MENU);
         setFormElement(Locator.id("script"), "labkey.data");
         clickNavButton("Execute Script");
         assertTextNotPresent(R_REMCOL);
@@ -418,12 +416,12 @@ public class StudyBvtTest extends StudyTest
 */
 
         log("Check saved R script");
-        selectOptionByText("Dataset.viewName", "Default Grid View");
+        clickMenuButton("Views", null, "default");
         waitForPageToLoad();
         pushLocation();
         //clickNavButton("Reports >>", 0);
         //clickLinkWithText(R_SCRIPTS[0]);
-        selectOptionByText("Dataset.viewName", R_SCRIPTS[0]);
+        clickMenuButton("Views", null, R_SCRIPTS[0]);
         waitForPageToLoad();
         assertTextPresent("null device");
         assertTextNotPresent("Error 1 executing command");
@@ -434,8 +432,7 @@ public class StudyBvtTest extends StudyTest
         popLocation();
 
         log("Create second R script");
-        clickNavButton("Create Views", 0);
-        clickLinkWithText(CREATE_R_MENU);
+        clickMenuButton("Views", "Create", CREATE_R_MENU);
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
             if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
@@ -483,8 +480,7 @@ public class StudyBvtTest extends StudyTest
         //assertTextNotPresent(R_SCRIPTS[0]);
         assertElementNotPresent(Locator.raw("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
 
-        //clickLinkWithText(R_SCRIPTS[1]);
-        selectOptionByText("Dataset.viewName", R_SCRIPTS[1]);
+        clickMenuButton("Views", null, R_SCRIPTS[1]);
         waitForPageToLoad();
         //goToPipelineItem(R_SCRIPTS[1]);
         //assertTextPresent(R_SCRIPT2_TEXT1);
@@ -509,8 +505,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(DATA_SET);
-        clickNavButton("Create Views", 0);
-        clickLinkWithText(CREATE_R_MENU);
+        clickMenuButton("Views", "Create", CREATE_R_MENU);
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
@@ -535,6 +530,9 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Save View");
 
         log("Check that edit worked");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Manage Reports and Views");
         click(Locator.raw("//a[contains(text(),'" + R_SCRIPTS[1] + "')]/../..//a[.='edit']"));
         waitForPageToLoad();
         checkCheckbox(Locator.name("includedReports"));
@@ -555,8 +553,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(FOLDER_NAME);
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        clickNavButton("Create Views", 0);
-        clickLinkWithText(CREATE_CHART_MENU);
+        clickMenuButton("Views", "Create", CREATE_CHART_MENU);
 
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
         selectOptionByText("columnsX", "1. Weight");
@@ -572,8 +569,8 @@ public class StudyBvtTest extends StudyTest
 
         selenium.select("Dataset.viewName", "label=Default Grid View");
         selenium.waitForPageToLoad("30000");
-        clickNavButton("Create Views", 0);
-        clickLinkWithText(CREATE_CHART_MENU);
+
+        clickMenuButton("Views", "Create", CREATE_CHART_MENU);
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
 
         // create a non-participant chart

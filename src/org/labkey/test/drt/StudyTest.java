@@ -82,6 +82,16 @@ public class StudyTest extends BaseSeleniumWebTest
         try { deleteProject(PROJECT_NAME); } catch (Throwable e) {}
     }
 
+    protected void clickMenuButton(String buttonName, String subMenu, String itemName)
+    {
+        clickNavButton(buttonName, 0);
+        if (subMenu != null)
+        {
+            selenium.mouseOver("//a[@class='x-menu-item x-menu-item-arrow' and contains(text(),'" + subMenu + "')]");
+        }
+        waitForElement(Locator.xpath("//a[contains(text(),'" + itemName + "')]"), 5000);
+        clickLinkWithText(itemName);
+    }
 
     protected void doTestSteps()
     {
@@ -109,12 +119,12 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("999320016");
         assertTextPresent("999320518");
 
-        selectOptionByText("cohortId", "Group 1");
+        clickMenuButton("Cohorts", null, "Group 1");
         waitForPageToLoad();
         assertTextPresent("999320016");
         assertTextNotPresent("999320518");
 
-        selectOptionByText("cohortId", "Group 2");
+        clickMenuButton("Cohorts", null, "Group 2");
         waitForPageToLoad();
         assertTextNotPresent("999320016");
         assertTextPresent("999320518");
@@ -133,8 +143,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Dataset: DEM-1: Demographics, All Visits");
 
-        clickNavButton("Create Views", 0);
-        clickLinkWithText("Crosstab View");
+        clickMenuButton("Views", "Create", "Crosstab View");
         selectOptionByValue("rowField",  "DEMsex");
         selectOptionByValue("colField", "DEMsexor");
         selectOptionByValue("statField", "SequenceNum");
@@ -189,8 +198,7 @@ public class StudyTest extends BaseSeleniumWebTest
         // create new external report
         clickLinkWithText("Study 001");
         clickLinkWithText("DEM-1: Demographics");
-        clickNavButton("Create Views", 0);
-        clickLinkWithText("Advanced View");
+        clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
