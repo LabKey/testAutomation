@@ -16,9 +16,10 @@
 
 package org.labkey.test.bvt;
 
-import org.labkey.test.drt.StudyTest;
-import org.labkey.test.Locator;
 import com.thoughtworks.selenium.SeleniumException;
+import org.labkey.test.Locator;
+import static org.labkey.test.WebTestHelper.buildNavButtonImagePath;
+import org.labkey.test.drt.StudyTest;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -106,7 +107,6 @@ public class StudyBvtTest extends StudyTest
     @Override
     protected void doTestSteps()
     {
-
         super.doTestSteps();
 
         clickLinkWithText(PROJECT_NAME);
@@ -565,11 +565,9 @@ public class StudyBvtTest extends StudyTest
         setFormElement("reportName", "participant chart");
         clickNavButton("OK", 0);
 
-        waitForElement(Locator.xpath("//input[@name='datasetId']"), WAIT_FOR_GWT);
+        waitForElement(Locator.linkWithImage(buildNavButtonImagePath("Views")), 5000);
 
-        selenium.select("Dataset.viewName", "label=Default Grid View");
-        selenium.waitForPageToLoad("30000");
-
+        clickMenuButton("Views", null, "default");
         clickMenuButton("Views", "Create", CREATE_CHART_MENU);
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
 
@@ -584,7 +582,7 @@ public class StudyBvtTest extends StudyTest
         checkCheckbox("shareReport");
         clickNavButton("OK", 0);
 
-        waitForElement(Locator.xpath("//input[@name='datasetId']"), WAIT_FOR_GWT);
+        waitForElement(Locator.linkWithImage(buildNavButtonImagePath("Views")), 5000);
     }
 
     protected void doTestSecurity()
