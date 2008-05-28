@@ -173,7 +173,7 @@ public class ListTest extends BaseSeleniumWebTest
         setFormElement("quf_" + _listCol2.getName(), "wrong type");
         setFormElement("quf_" + _listCol3.getName(), TEST_DATA[3][3]);
         submit();
-        assertTextPresent("cannot be null");
+        assertTextPresent("This field is required");
         setFormElement("quf_" + LIST_KEY_NAME2, TEST_DATA[0][3]);
         submit();
         assertTextPresent("Could not convert");
