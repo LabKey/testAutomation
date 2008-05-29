@@ -109,7 +109,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         //Put in once bug with filters in postgres is fixed
         //assertTextNotPresent(PEPTIDE);
 
-        setSort("query", "SeqId", SortDirection.ASC);
+        setSort("MS2Compare", "Peptide", SortDirection.DESC);
         assertTextBefore(PEPTIDE5, PEPTIDE4);
 
         log("Navigate to folder Portal");
