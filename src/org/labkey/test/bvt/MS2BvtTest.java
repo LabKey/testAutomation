@@ -871,8 +871,9 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("0.78");
         setSort("MS2Compare", "Protein", SortDirection.ASC);
         assertTextBefore("gi|13442951|dbj|BAB39767.1|", "gi|13470573|ref|NP_102142.1|");
-        setSort("MS2Compare", "Run1GroupProbability", SortDirection.DESC);
-        setSort("MS2Compare", "Run0GroupProbability", SortDirection.ASC);
+        setSort("MS2Compare", "Run0GroupProbability", SortDirection.DESC);
+        if (!isTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|"))
+            setSort("MS2Compare", "Run0GroupProbability", SortDirection.ASC);
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|");
 
         log("Test adding columns");
@@ -921,6 +922,8 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("R.SVAHITK.L");
         assertTextPresent("Pattern");
         setSort("MS2Compare", "Peptide", SortDirection.DESC);
+        if (!isTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G"))
+            setSort("MS2Compare", "Peptide", SortDirection.ASC);
         assertTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G");
 
         log("Test Compare Runs using Query");
