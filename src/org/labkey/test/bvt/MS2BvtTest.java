@@ -872,6 +872,7 @@ public class MS2BvtTest extends MS2TestBase
         setSort("MS2Compare", "Protein", SortDirection.ASC);
         assertTextBefore("gi|13442951|dbj|BAB39767.1|", "gi|13470573|ref|NP_102142.1|");
         setSort("MS2Compare", "Run0GroupProbability", SortDirection.ASC);
+        setSort("MS2Compare", "Run1GroupProbability", SortDirection.DESC);
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|");
 
         log("Test adding columns");
