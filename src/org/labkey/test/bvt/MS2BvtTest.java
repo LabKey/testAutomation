@@ -47,10 +47,7 @@ public class MS2BvtTest extends MS2TestBase
 
     protected void doCleanup() throws IOException
     {
-        deleteView(VIEW);
-        deleteView(VIEW2);
-        deleteView(VIEW3);
-        deleteView(VIEW4);
+        deleteViews(VIEW, VIEW2, VIEW3, VIEW4);
         deleteRuns();
 
         cleanPipe(SEARCH_TYPE);
@@ -102,6 +99,11 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Verify run view.");
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
+
+        // Make sure we're not using a custom default view for the current user
+        selectOptionByText("viewParams", "Choose A View");
+        clickNavButton("Go");
+
         assertTextPresent(SEARCH_NAME3);
         assertTextPresent("databases");
         //Different cases used with different search engines.
@@ -141,6 +143,10 @@ public class MS2BvtTest extends MS2TestBase
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Sensitivity Plot"));
         popLocation();
 
+        // Make sure we're not using a custom default view for the current user
+        selectOptionByText("viewParams", "Choose A View");
+        clickNavButton("Go");
+        
         log("Test export selected");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();

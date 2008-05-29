@@ -1700,6 +1700,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Clear Filter");
     }
 
+    /**
+     * @param columnName only used to find something to click on, as all the filters on all the columns will be cleared
+     */
     public void clearAllFilters(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);

@@ -179,6 +179,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
+        // Make sure we're not using a custom default view for the current user
+        selectOptionByText("viewParams", "Choose A View");
+        clickNavButton("Go");
+
         log("Test adding columns");
         clickNavButton("Pick Peptide Columns");
         clickNavButton("Pick", 0);

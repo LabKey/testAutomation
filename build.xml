@@ -20,6 +20,7 @@
     <property environment="env"/>
     <property name="test.dir" value="${basedir}" />
     <property name="test.build.home" value="${test.dir}/build"/>
+    <property name="test.build.uptodate" value="${test.build.home}/uptodate"/>
     <property name="test.src.home" value="${test.dir}/src"/>
     <property name="project.root" value="${test.dir}/../.." />
     <property name="test.lib.home" value="${test.dir}/lib"/>
@@ -125,6 +126,15 @@
     </path>
 
     <target name="compile" depends="prepare" description="Compile Java sources">
+        <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
+            <srcfiles dir="${test.src.home}" />
+        </uptodate>
+        <antcall target="compileIfDirty" />
+    </target>
+
+    <target name="compileIfDirty" unless="testClassesUpToDate">
+        <antcall target="clean" />
+        <antcall target="prepare" />
         <javac srcdir="${test.src.home}"
                destdir="${test.build.home}/classes"
                debug="${test.compile.debug}"
@@ -138,6 +148,7 @@
                 <include name="**/*.js"/>
             </fileset>
         </copy>
+        <touch file="${test.build.uptodate}" />
     </target>
 
     <target name="setPassword" depends="compile">
@@ -668,7 +679,7 @@
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
     </target>
 
-    <target name="runsuite" depends="clean,compile,ensurePassword,set-user-props,modifiedFiles">
+    <target name="runsuite" depends="compile,ensurePassword,set-user-props,modifiedFiles">
         <junit fork="true" forkmode="once" maxmemory="128m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltonerror}"
@@ -715,7 +726,7 @@
         <touch file="${svnModifiedFiles}" />
     </target>
 
-    <target name="runsuite-perf" depends="clean,compile,ensurePassword,set-user-props">
+    <target name="runsuite-perf" depends="compile,ensurePassword,set-user-props">
         <junit fork="true" forkmode="once" maxmemory="256m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="true" showoutput="false">

@@ -41,7 +41,8 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
 
     protected void doCleanup() throws IOException
     {
-        try {deleteView(VIEW); } catch (Throwable t) {}
+        try {
+            deleteViews(VIEW); } catch (Throwable t) {}
         try {deleteRuns(); } catch (Throwable t) {}
         cleanPipe(SEARCH_TYPE);
         try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
@@ -68,6 +69,10 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
     {
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
+
+        // Make sure we're not using a custom default view for the current user
+        selectOptionByText("viewParams", "Choose A View");
+        clickNavButton("Go");
 
         log("Test filtering and sorting");
         setFilter("MS2Peptides", "Mass", "Is Greater Than", "1000");

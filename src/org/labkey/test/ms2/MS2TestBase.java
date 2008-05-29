@@ -81,21 +81,23 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         submit();
     }
 
-    protected void deleteView(String viewName)
+    protected void deleteViews(String... viewNames)
     {
-        log("Deleting View " + viewName);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         if (isLinkPresentWithImage(getContextPath() + "/MS2/images/runIcon.gif"))
         {
             clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
             clickNavButton("Manage Views");
-            if (isTextPresent(viewName))
+            for (String viewName : viewNames)
             {
-                selectOptionByText("viewParams", viewName);
-                clickNavButton("Delete");
+                log("Deleting View " + viewName);
+                if (isTextPresent(viewName))
+                {
+                    checkCheckbox("viewsToDelete", viewName, false);
+                }
             }
-            assertTextNotPresent(viewName);
+            clickNavButton("OK");
         }
     }
 
