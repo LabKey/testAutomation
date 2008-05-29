@@ -17,6 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.ms2.MS2TestBase;
 import org.labkey.test.util.DataRegionTable;
 
@@ -175,23 +176,17 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test sort");
         pushLocation();
-        clickLinkWithText("Hyper");
-        if (!isTextPresent("Hyper DESC"))
-            clickLinkWithText("Hyper");
+        setSort("MS2Peptides", "Hyper", SortDirection.DESC);
         assertTextPresent("Hyper DESC");
         assertTextBefore("R.Q^YALHVDGVGTK.A", "K.LLASMLAK.A");
         assertTextBefore("14.9", "13.0");
-        clickLinkWithText("Z");
-        if (!isTextPresent("Charge ASC, Hyper DESC"))
-            clickLinkWithText("Z");
+        setSort("MS2Peptides", "Charge", SortDirection.ASC);
         assertTextPresent("Charge ASC, Hyper DESC");
         assertTextBefore("K.KLHQK.L", "R.GGNEESTK.T");
         assertTextBefore("1272.5700", "1425.6860");
-        clickLinkWithText("Z");
+        setSort("MS2Peptides", "Charge", SortDirection.DESC);
         assertTextPresent("Charge DESC, Hyper DESC");
-        clickLinkWithText("Scan");
-        if (!isTextPresent("Scan ASC, Charge DESC, Hyper DESC"))
-            clickLinkWithText("Scan");
+        setSort("MS2Peptides", "Scan", SortDirection.ASC);
         assertTextPresent("Scan ASC, Charge DESC, Hyper DESC");
         assertTextBefore("R.Q^YALHVDGVGTK.A", "K.LLASMLAK.A");
         assertTextBefore("R.SLADVARR.R", "-.MELFSNELLYK.T");
@@ -226,10 +221,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("R.EADKVLVQMPSGK.Q");
 
         log("Test sort with filters");
-        clickLinkWithText("Scan");
-        clickLinkWithText("Scan");
-        if (!isTextPresent("Scan DESC"))
-            clickLinkWithText("Scan");
+        setSort("MS2Peptides", "Scan", SortDirection.DESC);
         assertTextPresent("Scan DESC");
 
         log("Save view for later");
@@ -365,9 +357,7 @@ public class MS2BvtTest extends MS2TestBase
         popLocation();
 
         log("Test sorting in Protein View");
-        clickLinkWithText("Sequence Mass");
-        if (!isTextPresent("SequenceMass ASC"))
-            clickLinkWithText("Sequence Mass");
+        setSort("MS2Proteins", "SequenceMass", SortDirection.ASC);
         assertTextPresent("SequenceMass ASC");
         assertTextBefore("gi|15668549|LSU_ribosomal_pro", "gi|14318169|AF379640_1_riboso");
 
@@ -459,9 +449,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test export selected in expanded view with different protein and peptide columns and sorting");
         popLocation();
         log("Test sorting in Protein Prophet");
-        clickLinkWithText("Prob");
-        if (!isTextPresent("GroupProbability ASC"))
-            clickLinkWithText("Prob");
+        setSort("ProteinGroupsWithQuantitation", "GroupProbability", SortDirection.ASC);
         assertTextPresent("GroupProbability ASC");
         assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
         clickNavButton("Pick Peptide Columns");
@@ -516,9 +504,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test adding a sort and a filter");
         setFilter("MS2Peptides", "Hyper", "Is Greater Than", "10.6");
         assertTextNotPresent("K.RFSGTVKLK.Y");
-        clickLinkWithText("Next");
-        if (!isTextBefore("K.ERQPPPR.L", "K.KLHQK.L"))
-            clickLinkWithText("Next");
+        setSort("MS2Peptides", "Next", SortDirection.ASC);
         assertTextBefore("K.ERQPPPR.L", "K.KLHQK.L");
 
         log("Test customize view");
@@ -883,13 +869,9 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("gi|30089158|emb|CAD89505.1|");
         assertTextPresent("GroupNumber");
         assertTextPresent("0.78");
-        clickLinkWithText("Protein");
-        if (!isTextBefore("gi|13442951|dbj|BAB39767.1|", "gi|13470573|ref|NP_102142.1|"))
-            clickLinkWithText("Protein");
+        setSort("MS2Compare", "Protein", SortDirection.ASC);
         assertTextBefore("gi|13442951|dbj|BAB39767.1|", "gi|13470573|ref|NP_102142.1|");
-        clickLinkWithText("GroupProbability");
-        if (!isTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|"))
-            clickLinkWithText("GroupProbability");
+        setSort("MS2Compare", "Run0GroupProbability", SortDirection.ASC);
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|");
 
         log("Test adding columns");
@@ -920,9 +902,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("gi|136348|TRPF_YEAST_N-(5'-ph");
         assertTextPresent("gi|33241155|ref|NP_876097.1|");
         assertTextPresent("Pattern");
-        clickLinkWithText("Protein");
-        if (!isTextBefore("gi|11499506|ref|NP_070747.1|", "gi|13507919|"))
-            clickLinkWithText("Protein");
+        setSort("MS2Compare", "Protein", SortDirection.ASC);
         assertTextBefore("gi|11499506|ref|NP_070747.1|", "gi|13507919|");
 
         log("Test Compare Peptides");
@@ -939,9 +919,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
         assertTextPresent("R.SVAHITK.L");
         assertTextPresent("Pattern");
-        clickLinkWithText("Peptide");
-        if (!isTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G"))
-            clickLinkWithText("Peptide");
+        setSort("MS2Compare", "Peptide", SortDirection.DESC);
         assertTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G");
 
         log("Test Compare Runs using Query");
@@ -961,21 +939,19 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Save");
 
         log("Make sure the filtering and new columns worked");
-        assertElementPresent(Locator.id("query:SeqId/Mass:filter"));
+        assertElementPresent(Locator.id("query:SeqId/Mass:header"));
         assertTextNotPresent("gi|34849400|gb|AAP58899.1|");
 
         log("Check default view works");
         selectOptionByText("query.viewName", "<default>");
         waitForPageToLoad();
-        assertElementNotPresent(Locator.id("query:SeqId/Mass:filter"));
+        assertElementNotPresent(Locator.id("query:SeqId/Mass:header"));
         assertTextPresent("gi|34849400|");
 
         log("Check sorting");
         selectOptionByText("query.viewName", VIEW5);
         waitForPageToLoad();
-        clickLinkWithText("Protein");
-        if (!isTextBefore("gi|13470573|ref|NP_102142.1|", "gi|15828808|ref|NP_326168.1|"))
-            clickLinkWithText("Protein");
+        setSort("query", "SeqId", SortDirection.ASC);
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|15828808|ref|NP_326168.1|");
 
         log("Test exporting Compare Runs in Query");
@@ -1031,9 +1007,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("K.EIRQRQGDDLDGLSFAELR.G");
 
         log("Check sorting");
-        clickLinkWithText("Ion%");
-        if (!isTextBefore("K.KHGGPKDEER.H", "K.QGTTRYR.V"))
-            clickLinkWithText("Ion%");
+        setSort("MS2Compare", "Ion%", SortDirection.ASC);
         assertTextBefore("K.KHGGPKDEER.H", "K.QGTTRYR.V");
 
         log("Test exporting in Query Peptides Comparision");

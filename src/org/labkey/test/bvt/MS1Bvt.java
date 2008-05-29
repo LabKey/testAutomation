@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 
 /**
  * MS1 BVT
@@ -361,8 +362,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         //test sort
         log("Testing sort...");
-        clickLinkWithText("Intensity");
-        clickLinkWithText("Intensity");
+        setSort(DATAREGION_FEATURES, "Intensity", SortDirection.DESC);
         assertTextBefore("66,204.2900", "49,012.0600");
 
         //test customize view

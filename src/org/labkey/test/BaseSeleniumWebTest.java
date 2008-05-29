@@ -1649,10 +1649,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             setFormElement(Locator.dom("document.forms[0][\"" + formElementName + "\"][" + i + "]"), values[i]);
     }
 
+    public void setSort(String regionName, String columnName, SortDirection direction)
+    {
+        log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
+        if (clickMenuItem(regionName + ":" + columnName + ":" + direction.toString().toLowerCase()))
+            waitForPageToLoad(defaultWaitForPage);
+    }
+
     public void setFilter(String regionName, String columnName, String filterType)
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filterType.toLowerCase());
-        click(Locator.id(regionName + ":" + columnName + ":filter"));
+        clickMenuItem(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filterType);
         clickNavButton("OK");
     }
@@ -1660,7 +1667,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilter(String regionName, String columnName, String filterType, String filter)
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
-        click(Locator.id(regionName + ":" + columnName + ":filter"));
+        clickMenuItem(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filterType);
         setFormElement("value_1", filter);
         clickNavButton("OK");
@@ -1669,7 +1676,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
-        click(Locator.id(regionName + ":" + columnName + ":filter"));
+        clickMenuItem(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filterType);
         setFormElement("value_1", filter);
         clickNavButton("OK", milliSeconds);
@@ -1678,7 +1685,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + " " + filter1 + " and " + filter2Type.toLowerCase() + " " + filter2);
-        click(Locator.id(regionName + ":" + columnName + ":filter"));
+        clickMenuItem(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filter1Type);
         setFormElement("value_1", filter1);
         selenium.select("compare_2", "label=" + filter2Type);
@@ -1689,14 +1696,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearFilter(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        click(Locator.id(regionName + ":" + columnName + ":filter"));
+        clickMenuItem(regionName + ":" + columnName + ":filter");
         clickNavButton("Clear Filter");
     }
 
     public void clearAllFilters(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        click(Locator.id(regionName + ":" + columnName + ":filter"));
+        clickMenuItem(regionName + ":" + columnName + ":filter");
         clickNavButton("Clear All Filters");
     }
 
@@ -1756,6 +1763,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertMenuButtonNotPresent(String buttonText)
     {
         assertFalse("Menu button '" + buttonText + "' was present", isMenuButtonPresent(buttonText));
+    }
+
+    /**
+     * Executes an Ext.menu.Item's handler.
+     */
+    public boolean clickMenuItem(String id)
+    {
+        log("Clicking Ext menu item '" + id + "'");
+        //selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "').handler();");
+        String result = selenium.getEval("clickExtComponent('" + id + "');");
+        if (result != null)
+            return Boolean.parseBoolean(result);
+        return false;
     }
 
     public void dataRegionPageFirst(String dataRegionName)

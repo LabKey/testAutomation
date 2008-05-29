@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.ms2.AbstractMS2SearchEngineTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,9 +72,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         log("Test filtering and sorting");
         setFilter("MS2Peptides", "Mass", "Is Greater Than", "1000");
         assertTextNotPresent(PEPTIDE);
-        clickLinkWithText("Scan");
-        if (isTextPresent("Scan ASC"))
-            clickLinkWithText("Scan");
+        setSort("MS2Peptides", "Scan", SortDirection.DESC);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
         log("Test Save View");
@@ -110,9 +109,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         //Put in once bug with filters in postgres is fixed
         //assertTextNotPresent(PEPTIDE);
 
-        clickLinkWithText("Peptide");
-        if (isTextBefore(PEPTIDE4, PEPTIDE5))
-            clickLinkWithText("Peptide");
+        setSort("query", "SeqId", SortDirection.ASC);
         assertTextBefore(PEPTIDE5, PEPTIDE4);
 
         log("Navigate to folder Portal");

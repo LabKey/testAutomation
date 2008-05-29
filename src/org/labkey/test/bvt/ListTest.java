@@ -19,6 +19,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.SortDirection;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
@@ -187,9 +188,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[3][3]);
 
         log("Test Sort and Filter in Data View");
-        clickLinkWithText(_listCol1.getLabel());
-        if (!isTextBefore(TEST_DATA[0][1], TEST_DATA[0][0]))
-            clickLinkWithText(_listCol1.getLabel());
+        setSort("query", _listCol1.getName(), SortDirection.ASC);
         assertTextBefore(TEST_DATA[0][1], TEST_DATA[0][0]);
         setFilter("query", _listCol3.getName(), "Is Greater Than", "7");
         assertTextNotPresent(TEST_DATA[0][3]);
@@ -248,9 +247,10 @@ public class ListTest extends BaseSeleniumWebTest
         submit();
 
         log("Test that the right filters are present for each type");
-        click(Locator.id("qwp3:" + _listCol3.getName() + ":filter"));
+        clickMenuItem("qwp3:" + _listCol3.getName() + ":filter");
         assertTrue(!isElementPresent(Locator.raw("//option[@value='startswith']")));
         assertTrue(isElementPresent(Locator.raw("//option[@value='isblank']")));
+        clickImgButtonNoNav("Cancel ");
 
         log("Test that filters don't affect multiple web parts");
         assertTextPresent(TEST_DATA[1][0], 2);
@@ -258,7 +258,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[1][0], 1);
 
         log("Test that sort only affects one web part");
-        clickLinkWithText(_listCol3.getLabel());
+        setSort("qwp2", _listCol3.getName(), SortDirection.ASC);
         String source = selenium.getHtmlSource();
         int index;
         assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&

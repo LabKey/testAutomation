@@ -38,6 +38,7 @@ src/org/labkey/test/BaseSeleniumWebTest.java -text
 src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/Locator.java -text
 src/org/labkey/test/Runner.java -text
+src/org/labkey/test/SortDirection.java -text
 src/org/labkey/test/TestConfig.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/WebTest.java -text

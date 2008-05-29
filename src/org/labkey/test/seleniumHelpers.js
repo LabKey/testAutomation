@@ -36,5 +36,13 @@ window.appendToFormField = function (fieldName, txt) {
     doc.forms[0][fieldName].value = doc.forms[0][fieldName].value + txt;
     return "OK";
 }
+
+window.clickExtComponent = function (id) {
+    var ext = selenium.browserbot.getCurrentWindow().Ext;
+    //if (!ext) return false;
+    var cmp = ext.getCmp(id);
+    //if (!cmp) return false;
+    return cmp.fireEvent("click");
+}
 "OK";
 

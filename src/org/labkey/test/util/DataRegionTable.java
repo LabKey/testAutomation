@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -108,7 +109,7 @@ public class DataRegionTable
         {
             for (int col = 0; getDataAsText(0, col-1) != null; col++)
             {
-                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+1) + "]"));
+                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+1) + "]/div"));
                 if (header.equals(name))
                     return col;
             }
@@ -117,12 +118,18 @@ public class DataRegionTable
         {
         }
 
+        _test.log("Column '" + name + "' not found");
         return -1;
     }
 
     public String getDataAsText(int row, int column)
     {
         return _test.getTableCellText(getHtmlName(), row + 1, column + 1);
+    }
+
+    public void setSort(String columnName, SortDirection direction)
+    {
+        _test.setSort(_tableName, columnName, direction);
     }
 
     public void setFilter(String columnName, String filterType, String filter)
