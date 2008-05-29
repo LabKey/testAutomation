@@ -2249,8 +2249,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void switchWikiToSourceView()
     {
-        if(isLinkPresentWithText("Source"))
-            clickLinkWithText("Source", false);
+        Locator sourceTab = Locator.tagContainingText("td", "Source");
+        if(null != sourceTab)
+            click(sourceTab);
     }
 
 
