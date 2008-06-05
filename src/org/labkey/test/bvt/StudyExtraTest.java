@@ -17,11 +17,10 @@
 package org.labkey.test.bvt;
 
 import junit.framework.AssertionFailedError;
-
-import java.io.File;
-
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.
@@ -355,7 +354,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         }
 
         sleep(1000);
-        clickNavButton("Save Changes", 0);
+        clickNavButton("    Save    ", 0);
         waitForText("Save successful.", 20000);
 
     } //defineAssay()
