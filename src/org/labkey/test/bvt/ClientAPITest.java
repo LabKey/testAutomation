@@ -471,7 +471,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.select(getPropertyXPath("Run Fields") + "//select[@id='ff_type0']", "DateTime");
 
         sleep(1000);
-        clickNavButton("Save Changes", 0);
+        clickNavButton("    Save    ", 0);
         waitForText("Save successful.", 20000);
         
         setSource(ASSAYTEST_SRC);
