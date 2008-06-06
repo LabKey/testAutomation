@@ -34,12 +34,14 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
     protected static final String VIEW = "filterView";
     protected static final String LOG_BASE_NAME = "CAexample_mini";
     protected static final String DATABASE = "Bovine_mini.fasta";
-    protected static final String INPUT_XML =
+       protected static final String INPUT_XML =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" ?> \n" +
         "<bioml>\n" +
             "  <note label=\"pipeline, protocol name\" type=\"input\">test2</note> \n" +
             "  <note label=\"pipeline, protocol description\" type=\"input\">This is a test protocol using the defaults.</note> \n" +
             "  <note label=\"pipeline prophet, min probability\" type=\"input\">0</note> \n" +
+            "  <note label=\"spectrum, minimum peaks\" type=\"input\">10</note> \n" +
+            "  <note label=\"mzxml2search, charge\" type=\"input\">1,3</note> \n" +
         "  </bioml>";
     protected static final int MAX_WAIT_SECONDS = 60*5;
 

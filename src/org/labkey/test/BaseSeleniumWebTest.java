@@ -2159,7 +2159,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
 
         log("Saving wiki...");
-        clickNavButton("Save", 0);
+        clickNavButton("    Save    ", 0);
         log("Waiting for AJAX save return...");
         //waitForText("Saved.", 10000);
         waitFor(new WikiSaveChecker(), "Wiki page failed to save!", 10000);
