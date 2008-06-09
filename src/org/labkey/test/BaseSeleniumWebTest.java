@@ -2221,8 +2221,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                     " Ensure that you navigate to the wiki controller home page or an existing wiki page" + 
                     " before calling this method.");
 
-        checkCheckbox("format", format, true);
-        clickNavButton("Create Page");
+        convertWikiFormat(format);
+    }
+
+    /**
+     * Converts the current wiki page being edited to the specified format.
+     * If the page is already in that format, it will no-op.
+     * @param format The desired format ("RADEOX", "HTML", or "TEXT_WITH_LINKS")
+     */
+    public void convertWikiFormat(String format)
+    {
+        String curFormat = selenium.getEval("this.browserbot.getCurrentWindow()._wikiProps.rendererType");
+        if(curFormat.equalsIgnoreCase(format))
+            return;
+
+
+        clickNavButton("Convert To...", 0);
+        sleep(500);
+        selectOptionByValue("wiki-input-window-change-format-to", format);
+        clickNavButton("Convert", 0);
+        sleep(500);
     }
 
     /**

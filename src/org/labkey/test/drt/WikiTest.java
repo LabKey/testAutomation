@@ -116,9 +116,7 @@ public class WikiTest extends BaseSeleniumWebTest
         addWebPart("Search");
 
         log("Test new wiki page");
-        clickLinkWithText("Create a new wiki page");
-        checkCheckbox("format", "RADEOX", true);
-        clickNavButton("Create Page");
+        createNewWikiPage("RADEOX");
 
         setFormElement("name", WIKI_PAGE1_NAME);
         setFormElement("title", WIKI_PAGE1_TITLE);
@@ -132,8 +130,7 @@ public class WikiTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE2_NAME);
         assertTextPresent("page has no content");
         clickLinkWithText("add content");
-        checkCheckbox("format", "RADEOX", true);
-        clickNavButton("Create Page");
+        convertWikiFormat("RADEOX");
 
         setFormElement("title", WIKI_PAGE2_TITLE);
         setFormElement("body", WIKI_PAGE2_CONTENT);
@@ -150,8 +147,7 @@ public class WikiTest extends BaseSeleniumWebTest
         setFormElement("name", WIKI_PAGE3_NAME_TITLE);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         selectOptionByText("parent", WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
-        switchWikiToSourceView();
-        setFormElement("body", WIKI_PAGE3_CONTENT);
+        setWikiBody(WIKI_PAGE3_CONTENT);
 
         log("test attachments.");
         if (isFileUploadAvailable())
@@ -177,14 +173,12 @@ public class WikiTest extends BaseSeleniumWebTest
             "<b>Some HTML content</b><br>\n" +
             "<b>More HTML content</b><br>\n" +
             "<a href='" + getContextPath() + "/wiki/" + PROJECT_NAME + "/page.view?name=PageAAA'>Page AAA</a><br>\n";
-        switchWikiToSourceView();
-        setFormElement("body", wikiPage3ContentEdited);
+        setWikiBody(wikiPage3ContentEdited);
         saveWikiPage();
 
         assertTextPresent("More HTML content");
         clickLinkWithText("edit");
-        switchWikiToSourceView();
-        setFormElement("body", WIKI_PAGE3_CONTENT_NO_QUERY);
+        setWikiBody(WIKI_PAGE3_CONTENT_NO_QUERY);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         saveWikiPage();
 
@@ -268,19 +262,17 @@ public class WikiTest extends BaseSeleniumWebTest
 
         //bvt
         log("test navTree and header");
-        clickLinkWithText("new page");
-        checkCheckbox("format", "RADEOX", true);
-        clickNavButton("Create Page");
+        createNewWikiPage("RADEOX");
         setFormElement("name", "_navTree");
         setFormElement("title", "NavTree");
-        setFormElement("body", NAVBAR1_CONTENT);
+        setWikiBody(NAVBAR1_CONTENT);
         saveWikiPage();
 
         assertTextNotPresent("Home");
         assertLinkPresentWithText(PROJECT_NAME);
 
         clickLinkWithText("edit");
-        setFormElement("body", NAVBAR2_CONTENT);
+        setWikiBody(NAVBAR2_CONTENT);
         saveWikiPage();
         assertTextPresent("Projects");
         assertTextPresent("Manage Project");
@@ -292,13 +284,10 @@ public class WikiTest extends BaseSeleniumWebTest
         clickNavButton("Delete", "large");
         assertLinkPresentWithText("Home");
 
-        clickLinkWithText("new page");
-        checkCheckbox("format", "HTML", true);
-        clickNavButton("Create Page");
+        createNewWikiPage("HTML");
         setFormElement("name", "_header");
         setFormElement("title", "Header");
-        switchWikiToSourceView();
-        setFormElement("body", HEADER_CONTENT);
+        setWikiBody(HEADER_CONTENT);
         saveWikiPage();
 
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
@@ -325,9 +314,7 @@ public class WikiTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE3_ALTTITLE);
 
         log("test terms of use");
-        clickLinkWithText("new page");
-        checkCheckbox("format", "RADEOX", true);
-        clickNavButton("Create Page");
+        createNewWikiPage("RADEOX");
         setFormElement("name", "_termsOfUse");
         setFormElement("title", "Terms of Use");
         setFormElement("body", "The first rule of fight club is do not talk about fight club.");
@@ -502,12 +489,10 @@ public class WikiTest extends BaseSeleniumWebTest
         log("Check that 'New Page' works");
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Portal");
-        clickLinkWithText("new page");
-        checkCheckbox("format", "HTML", true);
-        clickNavButton("Create Page");
+        createNewWikiPage("HTML");
 
         setFormElement("name", WIKI_PAGE4_TITLE);
-        setFormElement("body", WIKI_PAGE4_CONTENT);
+        setWikiBody(WIKI_PAGE4_CONTENT);
         saveWikiPage();
         clickLinkWithText(PROJECT_NAME);
         clickTab("Wiki");
