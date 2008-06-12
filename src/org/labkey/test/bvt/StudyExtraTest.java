@@ -190,7 +190,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		setFormElement("dbSchemaName", "verifysnapshot");
         clickNavButton("Create");
 		assertTextPresent("VerifySnapshot");
-        clickLinkWithText("Query");
+        clickLinkWithText("Query start page");
         clickLinkWithText("VerifySnapshot");
 		assertTrue(isTextPresent("List1") || isTextPresent("list1"));
         if (isLinkPresentWithText("Subjects"))
@@ -229,7 +229,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Schema Administration");
         clickLinkWithText("Reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
-        clickLinkWithText("Query");
+        clickLinkWithText("Query start page");
         clickLinkWithText("VerifySnapshot");
         if (isTextPresent("TestAssay1"))
             clickLinkWithText("TestAssay1");
