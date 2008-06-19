@@ -44,6 +44,7 @@ public class TestHelper
 
     private static Thread awtThread = null;
     private static String _saveFileName = "savedConfigs.idx";
+    private static String _prevTestConfig = "previous_config";
 
     private File _saveFile;
     private List<TestConfig> _savedConfigs;
@@ -90,6 +91,7 @@ public class TestHelper
     public TestHelper()
     {
         startTestHelper();
+        loadTestConfig(_prevTestConfig);
     }
 
     private void setResult(TestSet set, List<String> testNames)
@@ -361,6 +363,17 @@ public class TestHelper
         body.setBorder(new MatteBorder(10, 10, 10, 10, new Color(176, 196, 222)));
 
         JPanel testHeader = new JPanel();
+
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                reloadPage(new TestConfig());
+            }
+        });
+
+        testHeader.add(clearButton);
+
         JLabel testText = new JLabel("Select the tests you would like to run");
         testHeader.add(testText);
         body.add(testHeader, BorderLayout.NORTH);
@@ -686,6 +699,7 @@ public class TestHelper
             System.setProperty("labkey.contextpath", _contextPath.getText().trim());
             System.setProperty("labkey.server", _server.getText().trim());
             System.setProperty("labkey.root", _root.getText().trim());
+            saveTestConfig(_prevTestConfig);
 
             if (selectedTests.size() != 0 )
             {

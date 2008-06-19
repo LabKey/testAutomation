@@ -56,6 +56,7 @@ src/org/labkey/test/bvt/ListTest.java -text
 src/org/labkey/test/bvt/LuminexTest.java -text
 src/org/labkey/test/bvt/MS1Bvt.java -text
 src/org/labkey/test/bvt/MS2BvtTest.java -text
+src/org/labkey/test/bvt/MessagesBvtTest.java -text
 src/org/labkey/test/bvt/MouseTest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text
@@ -63,6 +64,7 @@ src/org/labkey/test/bvt/StudyBvtTest.java -text
 src/org/labkey/test/bvt/StudyExtraTest.java -text
 src/org/labkey/test/bvt/UserBvtTest.java -text
 src/org/labkey/test/bvt/UserPermissionsTest.java -text
+src/org/labkey/test/bvt/WikiBvtTest.java -text
 src/org/labkey/test/daily/UniprotAnnotationTest.java -text
 src/org/labkey/test/drt/BasicTest.java -text
 src/org/labkey/test/drt/ExpTest.java -text

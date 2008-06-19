@@ -49,6 +49,8 @@ public enum TestSet
         FileContentTest.class,
         DataRegionTest.class,
         ClientAPITest.class,
+        WikiBvtTest.class,
+        MessagesBvtTest.class,
         AuditLogTest.class
     }),
 
