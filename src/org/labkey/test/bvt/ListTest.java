@@ -194,7 +194,8 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(TEST_DATA[0][3]);
 
         log("Test Customize View");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+
         removeCustomizeViewColumn(_listCol3.getLabel());
         removeCustomizeViewFilter(_listCol3.getLabel());
         addCustomizeViewFilter(_listCol3.getName(), _listCol3.getLabel(), "Is Less Than", "10");
@@ -212,7 +213,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("4725: Check Customize View can't remove all fields");
         pushLocation();
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         removeCustomizeViewColumn(LIST_KEY_NAME2);
         removeCustomizeViewColumn(_listCol1.getLabel());
         removeCustomizeViewColumn(_listCol2.getLabel());
@@ -247,7 +248,7 @@ public class ListTest extends BaseSeleniumWebTest
         submit();
 
         log("Test that the right filters are present for each type");
-        clickMenuItem("qwp3:" + _listCol3.getName() + ":filter");
+        runMenuItemHandler("qwp3:" + _listCol3.getName() + ":filter");
         assertTrue(!isElementPresent(Locator.raw("//option[@value='startswith']")));
         assertTrue(isElementPresent(Locator.raw("//option[@value='isblank']")));
         clickImgButtonNoNav("Cancel ");
@@ -287,7 +288,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(LIST2_KEY4);
 
         log("Check that reference worked");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         click(Locator.id("expand_Color"));
         addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol1.getName(), _list2Col1.getLabel() + " " +  _listCol1.getLabel());
         addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol2.getName(), _list2Col1.getLabel() + " " +  _listCol2.getLabel());
@@ -335,7 +336,7 @@ public class ListTest extends BaseSeleniumWebTest
         setFormElement("quf_Owner", LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
 
-        selectOptionByValue("query.viewName", "");
+        clickMenuButton("Views", "Views:default");
         waitForPageToLoad();
         assertTextPresent(TEST_DATA[1][1], 2);
 
@@ -359,7 +360,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(LIST_NAME);
         clickLinkWithText("view data");
         pushLocation();
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         assertElementNotPresent(Locator.id("expand_" + LIST_KEY_NAME2));
         assertElementPresent(Locator.id("expand_" + LIST3_KEY_NAME));
         popLocation();

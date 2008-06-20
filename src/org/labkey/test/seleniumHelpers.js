@@ -42,7 +42,25 @@ window.clickExtComponent = function (id) {
     //if (!ext) return false;
     var cmp = ext.getCmp(id);
     //if (!cmp) return false;
-    return cmp.fireEvent("click");
+    if (cmp.handler)
+        return cmp.fireEvent("click");
+    else if (cmp.href)
+    {
+        //window.location = cmp.href;
+        cmp.show();
+        return true;
+    }
+    return false;
 }
+
+window.getExtElementId = function (id) {
+    var ext = selenium.browserbot.getCurrentWindow().Ext;
+    //if (!ext) return false;
+    var cmp = ext.getCmp(id);
+    //if (!cmp) return false;
+
+    return cmp.getEl().id;
+}
+
 "OK";
 

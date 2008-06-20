@@ -43,8 +43,8 @@ public class StudyBvtTest extends StudyTest
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
     private final static String R_SCRIPT1_EDIT_FUNC = "length(x) * 2";
 
-    private static final String CREATE_CHART_MENU = "Chart View";
-    private static final String CREATE_R_MENU = "R View";
+    private static final String CREATE_CHART_MENU = "Views:Create:Chart View";
+    private static final String CREATE_R_MENU = "Views:Create:R View";
 
     // mssql and postgres
     private String R_SCRIPT1(String function, String database)
@@ -355,7 +355,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(DATA_SET);
-        clickMenuButton("Views", "Create", CREATE_R_MENU);
+        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
 
         log("Execute bad scripts");
         clickNavButton("Execute Script");
@@ -385,7 +385,7 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Save");
 
         log("Create view");
-        clickMenuButton("Views", null, "Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         removeCustomizeViewColumn(R_REMCOL);
         addCustomizeViewFilter(R_FILTER, "3.Latino/a or Hispanic?", "Does Not Equal", "Yes");
         addCustomizeViewSort(R_SORT, "2.What is your sex?", "DESC");
@@ -399,7 +399,7 @@ public class StudyBvtTest extends StudyTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        clickMenuButton("Views", "Create", CREATE_R_MENU);
+        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
         setFormElement(Locator.id("script"), "labkey.data");
         clickNavButton("Execute Script");
         assertTextNotPresent(R_REMCOL);
@@ -416,13 +416,11 @@ public class StudyBvtTest extends StudyTest
 */
 
         log("Check saved R script");
-        clickMenuButton("Views", null, "default");
-        waitForPageToLoad();
+        clickMenuButton("Views", "Views:default");
         pushLocation();
         //clickNavButton("Reports >>", 0);
         //clickLinkWithText(R_SCRIPTS[0]);
-        clickMenuButton("Views", null, R_SCRIPTS[0]);
-        waitForPageToLoad();
+        clickMenuButton("Views", "Views:" + R_SCRIPTS[0]);
         assertTextPresent("null device");
         assertTextNotPresent("Error 1 executing command");
         assertTextPresent(R_SCRIPT1_TEXT1);
@@ -432,7 +430,7 @@ public class StudyBvtTest extends StudyTest
         popLocation();
 
         log("Create second R script");
-        clickMenuButton("Views", "Create", CREATE_R_MENU);
+        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
             if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
@@ -480,8 +478,7 @@ public class StudyBvtTest extends StudyTest
         //assertTextNotPresent(R_SCRIPTS[0]);
         assertElementNotPresent(Locator.raw("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
 
-        clickMenuButton("Views", null, R_SCRIPTS[1]);
-        waitForPageToLoad();
+        clickMenuButton("Views", "Views:" + R_SCRIPTS[1]);
         //goToPipelineItem(R_SCRIPTS[1]);
         //assertTextPresent(R_SCRIPT2_TEXT1);
         popLocation();
@@ -505,7 +502,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(DATA_SET);
-        clickMenuButton("Views", "Create", CREATE_R_MENU);
+        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
@@ -553,8 +550,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(FOLDER_NAME);
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        clickMenuButton("Views", "Create", CREATE_CHART_MENU);
-
+        clickMenuButton("Views", "Views:Create", CREATE_CHART_MENU);
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
@@ -567,8 +563,8 @@ public class StudyBvtTest extends StudyTest
 
         waitForElement(Locator.linkWithImage(buildNavButtonImagePath("Views")), 5000);
 
-        clickMenuButton("Views", null, "default");
-        clickMenuButton("Views", "Create", CREATE_CHART_MENU);
+        clickMenuButton("Views", "Views:default");
+        clickMenuButton("Views", "Views:Create", CREATE_CHART_MENU);
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
 
         // create a non-participant chart

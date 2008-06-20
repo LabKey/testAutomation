@@ -64,6 +64,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
     private final static String IE_BROWSER = "*iexplore";
     //protected final static String IE_UPLOAD_BROWSER = "*iehta";
+    public static final String CUSTOMIZE_VIEW_ID = "Views:Customize View";
 
     public BaseSeleniumWebTest()
     {
@@ -1652,14 +1653,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setSort(String regionName, String columnName, SortDirection direction)
     {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
-        if (clickMenuItem(regionName + ":" + columnName + ":" + direction.toString().toLowerCase()))
+        if (runMenuItemHandler(regionName + ":" + columnName + ":" + direction.toString().toLowerCase()))
             waitForPageToLoad(defaultWaitForPage);
     }
 
     public void setFilter(String regionName, String columnName, String filterType)
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filterType.toLowerCase());
-        clickMenuItem(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filterType);
         clickNavButton("OK");
     }
@@ -1667,7 +1668,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilter(String regionName, String columnName, String filterType, String filter)
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
-        clickMenuItem(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filterType);
         setFormElement("value_1", filter);
         clickNavButton("OK");
@@ -1676,7 +1677,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
-        clickMenuItem(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filterType);
         setFormElement("value_1", filter);
         clickNavButton("OK", milliSeconds);
@@ -1685,7 +1686,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + " " + filter1 + " and " + filter2Type.toLowerCase() + " " + filter2);
-        clickMenuItem(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(regionName + ":" + columnName + ":filter");
         selenium.select("compare_1", "label=" + filter1Type);
         setFormElement("value_1", filter1);
         selenium.select("compare_2", "label=" + filter2Type);
@@ -1696,7 +1697,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearFilter(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        clickMenuItem(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(regionName + ":" + columnName + ":filter");
         clickNavButton("Clear Filter");
     }
 
@@ -1706,7 +1707,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearAllFilters(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        clickMenuItem(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(regionName + ":" + columnName + ":filter");
         clickNavButton("Clear All Filters");
     }
 
@@ -1771,14 +1772,57 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     /**
      * Executes an Ext.menu.Item's handler.
      */
-    public boolean clickMenuItem(String id)
+    public boolean runMenuItemHandler(String id)
     {
-        log("Clicking Ext menu item '" + id + "'");
+        log("Invoking Ext menu item handler '" + id + "'");
         //selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "').handler();");
         String result = selenium.getEval("clickExtComponent('" + id + "');");
         if (result != null)
             return Boolean.parseBoolean(result);
         return false;
+    }
+
+    /**
+     * Clicks the ext menu item specified by the ext object id
+     */
+    public void clickMenuButton(String buttonName, String extId)
+    {
+        clickMenuButton(buttonName, null, extId);
+    }
+
+    /**
+     * Clicks the ext menu item from the submenu specified by the ext object id
+     */
+    public void clickMenuButton(String buttonName, String subMenuId, String itemId)
+    {
+        clickNavButton(buttonName, 0);
+        // allow the DOM to be updated
+        sleep(1000);
+        if (subMenuId != null)
+        {
+            String id = getExtElementId(subMenuId);
+            if (id != null)
+            {
+                // render the submenu
+                selenium.mouseOver("//a[@id='" + id + "']");
+                sleep(1000);
+            }
+        }
+        String menuItemId = getExtElementId(itemId);
+        if (menuItemId != null)
+            clickLink(menuItemId);
+    }
+
+    /**
+     * Returns a DOM Element id from an ext object id. Assumes that the ext component
+     * has already been rendered.
+     */
+    protected String getExtElementId(String extId)
+    {
+        String id = selenium.getEval("getExtElementId('" + extId + "');");
+        log("Element id for ext component id: " + extId + " is: " + id);
+
+        return id;
     }
 
     public void dataRegionPageFirst(String dataRegionName)

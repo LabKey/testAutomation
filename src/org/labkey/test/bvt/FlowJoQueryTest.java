@@ -51,7 +51,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         setFormElement("ff_newAnalysisName", "FlowJoAnalysis");
         clickButtonWithImgSrc("Upload%20Results");
         waitForPipeline(containerPath);
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         clearCustomizeViewColumns();
         addCustomizeViewColumn("Name");
         addCustomizeViewColumn("AnalysisScript", "Analysis Script");
@@ -74,7 +74,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), "", true);
         clickLinkWithText("flowFolder");
         clickLinkWithText("1 run");
-        setFormElement("query.queryName", "PassFail");
+        clickMenuButton("Query", "Query:PassFail");
         waitForPageToLoad();
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
@@ -108,7 +108,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("LabKeyAnalysis");
-        setFormElement("query.queryName", "Comparison");
+        clickMenuButton("Query", "Query:Comparison");
         waitForPageToLoad(longWaitForPage);
         assertTextNotPresent("No data to show");
         setFilterAndWait("query", "AbsDifference", "Is Greater Than or Equal To", "25", longWaitForPage);

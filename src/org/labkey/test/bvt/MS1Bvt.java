@@ -247,7 +247,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         popLocation();
 
         //test measure filtering
-        clickNavButton("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         addCustomizeViewFilter("CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
         clickNavButton("Save");
         assertLinkNotPresentWithText("1");
@@ -260,7 +260,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         popLocation();
 
         //test fk table column filtering
-        clickNavButton("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         click(Locator.raw("expand_CTAGG_MIN_FeatureId"));
         addCustomizeViewFilter("CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
         clickNavButton("Save");
@@ -367,7 +367,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         //test customize view
         log("Testing customize view...");
-        clickNavButton("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         removeCustomizeViewColumn("Related Peptide");
         addCustomizeViewColumn("KL");
         clickNavButton("Save");
@@ -377,12 +377,12 @@ public class MS1Bvt extends BaseSeleniumWebTest
         assertTextNotPresent("K.AVVQDPALKPLALVYGEATSR.R");
 
         //reset view
-        clickNavButton("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         clickNavButton("Reset my default grid view");
 
         //add other columns from peptide data
         //and test saving under a name
-        clickNavButton("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         click(Locator.raw("expand_RelatedPeptide"));
         addCustomizeViewColumn("RelatedPeptide/PeptideProphet", "Related Peptide PepProphet");
         addCustomizeViewColumn("RelatedPeptide/Protein", "Related Peptide Protein");
@@ -397,7 +397,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         assertTextBefore("0.9956", "0.9862");
 
         //switch back to default view
-        selectOptionByValue(DATAREGION_FEATURES + ".viewName", "");
+        clickMenuButton("Views", "Views:default");
         waitForPageToLoad();
         assertTextNotPresent("Related Peptide PepProphet");
         assertTextNotPresent("Related Peptide Protein");

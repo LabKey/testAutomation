@@ -354,7 +354,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         waitForDivPopulation();
         assertTextPresent("Webpart Title");
-        assertLinkPresentWithText("Customize View");
         for (ListHelper.ListColumn column : LIST_COLUMNS)
             assertTextPresent(column.getLabel());
     }

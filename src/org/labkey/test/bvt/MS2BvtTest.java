@@ -514,7 +514,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextBefore("K.ERQPPPR.L", "K.KLHQK.L");
 
         log("Test customize view");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         addCustomizeViewSort("Charge", "Z", "DESC");
         addCustomizeViewSort("Mass", "CalcMH+", "DESC");
         removeCustomizeViewSort("Next");
@@ -544,19 +544,19 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("gi|27805893|guanine_nucleotid");
 
         log("Test changing order of sorts and columns");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         moveCustomizeViewSort("Z", false);
         moveCustomizeViewColumn("Peptide", false);
         clickNavButton("Save");
         assertTextBefore("K.TESGYGSESSLR.R", "K.HVSGKIIGFFY.-");
         assertTextBefore("gi|30519530|A38R_protein", "K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         moveCustomizeViewSort("Z", true);
         moveCustomizeViewColumn("Peptide", true);
         clickNavButton("Save");
 
         log("Test Ignore View Filter");
-        clickLinkWithText("Ignore View Filter");
+        clickMenuButton("Views", "Views:Apply View Filter");
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextPresent("Next AA");
@@ -564,7 +564,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextBefore(PEPTIDE4, PEPTIDE3);
 
         log("Test Apply View Filter");
-        clickLinkWithText("Apply View Filter");
+        clickMenuButton("Views", "Views:Apply View Filter");
         assertTextNotPresent("K.LLASMLAK.A");
         assertTextNotPresent("R.GGNEESTK.T");
         assertTextPresent("Next AA");
@@ -636,7 +636,7 @@ public class MS2BvtTest extends MS2TestBase
         popLocation();
 
         log("Test default view");
-        selectOptionByText("MS2Peptides.viewName", "<default>");
+        clickMenuButton("Views", "Views:default");
         waitForPageToLoad();
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
@@ -647,7 +647,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("SeqHits");
 
         log("Test load saved view");
-        selectOptionByText("MS2Peptides.viewName", VIEW4);
+        clickMenuButton("Views", "Views:" + VIEW4);
         waitForPageToLoad();
         assertTextNotPresent("R.GGNEESTK.T");
         assertTextBefore(PEPTIDE1, PEPTIDE2);
@@ -656,7 +656,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("SeqHits");
 
         log("Test changing default view");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         clearCustomizeViewFilters();
         clearCustomizeViewSorts();
         addCustomizeViewSort("DeltaMass", "dMass", "ASC");
@@ -665,14 +665,14 @@ public class MS2BvtTest extends MS2TestBase
         removeCustomizeViewColumn("Ion%");
         setFormElement("ff_columnListName", "");
         clickNavButton("Save");
-        selectOptionByText("MS2Peptides.viewName", "<default>");
+        clickMenuButton("Views", "Views:default");
         assertTextNotPresent("K.LLASMLAK.A");
         assertTextPresent("Fraction");
         assertTextBefore("K.TKDYEGMQVPVK.V", "R.LGARRVSPVR.A");
         assertTextNotPresent("Ion%");
 
         log("Test restoring default view");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         clickNavButton("Reset my default grid view");
         assertTextPresent("K.LLASMLAK.A");
         assertTextNotPresent("Fraction");
@@ -680,9 +680,9 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("Ion%");
 
         log("Test delete view");
-        selectOptionByText("MS2Peptides.viewName", VIEW4);
+        clickMenuButton("Views", "Views:" + VIEW4);
         waitForPageToLoad();
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         clickNavButton("Delete my grid view %27" + VIEW4 + "%27");
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
@@ -693,7 +693,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("SeqHits");
 
         log("Test Protein Prophet view in Query - Peptides grouping");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         click(Locator.raw("expand_ProteinProphetData"));
         click(Locator.raw("expand_ProteinProphetData/ProteinGroupId"));
         addCustomizeViewColumn("ProteinProphetData/ProteinGroupId/Group", "Group");
@@ -765,7 +765,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("gi|4883902|APETALA3_homolog_R");
 
         log("Test customize view");
-        clickLinkWithText("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         removeCustomizeViewColumn("Unique");
         selenium.click("expand_Proteins");
         selenium.click("expand_Proteins/Protein");
@@ -941,7 +941,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Go");
 
         log("Test Customize View");
-        clickNavButton("Customize View");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         click(Locator.raw("expand_SeqId"));
         addCustomizeViewColumn("SeqId/Mass", "Protein Mass");
         addCustomizeViewFilter("SeqId/Mass", "Protein Mass", "Is Less Than", "30000");
@@ -953,13 +953,13 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("gi|34849400|gb|AAP58899.1|");
 
         log("Check default view works");
-        selectOptionByText("query.viewName", "<default>");
+        clickMenuButton("Views", "Views:default");
         waitForPageToLoad();
         assertElementNotPresent(Locator.id("query:SeqId/Mass:header"));
         assertTextPresent("gi|34849400|");
 
         log("Check sorting");
-        selectOptionByText("query.viewName", VIEW5);
+        clickMenuButton("Views", "Views:" + VIEW5);
         waitForPageToLoad();
         setSort("query", "SeqId", SortDirection.ASC);
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|15828808|ref|NP_326168.1|");
