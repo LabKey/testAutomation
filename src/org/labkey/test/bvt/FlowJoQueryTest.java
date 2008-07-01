@@ -99,7 +99,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         checkCheckbox("copyAnalysis");
         submit();
         clickLinkWithText("Analyze some runs");
-        setFormElement("ff_targetExperimentId", "");
+        selectOptionByValue("ff_targetExperimentId", "");
         waitForPageToLoad();
         checkCheckbox(".toggle");
         clickButtonWithImgSrc("Analyze%20selected%20runs");

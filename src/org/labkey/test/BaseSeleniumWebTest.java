@@ -60,9 +60,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     
-    private final static String FIREFOX_BROWSER = "*firefox";
+    public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
-    private final static String IE_BROWSER = "*iexplore";
+    public final static String IE_BROWSER = "*iexplore";
     //protected final static String IE_UPLOAD_BROWSER = "*iehta";
     public static final String CUSTOMIZE_VIEW_ID = "Views:Customize View";
 
@@ -117,6 +117,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return _fileUploadAvailable;
     }
 
+    public String getBrowserType()
+    {
+        return System.getProperty("selenium.browser", FIREFOX_BROWSER);
+    }
+
     public String getBrowser()
     {
         String browser = System.getProperty("selenium.browser", FIREFOX_BROWSER);
@@ -124,13 +129,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (browserPath.length() > 0)
             browserPath = " " + browserPath;
 
-        if (!FIREFOX_BROWSER.equals(browser))
-                fail("Due to XPATH problems on IE, only firefox is currently supported");
-        
         //File upload is "experimental" in selenium, so only use it when
         //necessary
         if (isFileUploadTest())
         {
+            // IE is currently unable to do a file upload
+
+            if(IE_BROWSER.equals(browser))
+            {
+                log("Warning: Internet Explorer cannot do file uploads!");
+                //browser = IE_UPLOAD_BROWSER;
+                //_fileUploadAvailable = true;
+            }
             if(FIREFOX_BROWSER.equals(browser))
             {
                 browser = FIREFOX_UPLOAD_BROWSER;
@@ -247,7 +257,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public String[] getLinkAddresses()
     {
-        String js = "getLinkAddresses();";
+        String js = "selenium.getLinkAddresses();";
         String linkStr = selenium.getEval(js);
         String[] linkArray = linkStr.split("\\\\n");
         ArrayList<String> links = new ArrayList<String>(linkArray.length);
@@ -770,8 +780,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void beginAt(String relativeURL, int millis)
     {
-        if (relativeURL.indexOf(getContextPath() + "/") == 0)
-            relativeURL = relativeURL.substring(getContextPath().length() + 1);
+        String root = getContextPath() + "/";
+        int rootLoc = relativeURL.indexOf(root);
+        int endOfAction = relativeURL.indexOf("?");
+        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
+            relativeURL = relativeURL.substring(rootLoc + root.length());
         if (relativeURL.length() == 0)
             log("Navigating to root");
         else
@@ -959,6 +972,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         clickLinkWithText("Manage Folders");
         clickNavButton("Delete");
+        // in case there are sub-folders
+        if (isNavButtonPresent("Delete All Folders"))
+        {
+            clickNavButton("Delete All Folders");
+        }
         // confirm delete:
         clickNavButton("Delete");
         // verify that we're not on an error page with a check for a project link:
@@ -967,7 +985,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void addWebPart(String webPartName)
     {
-        Locator.XPathLocator selects = Locator.xpath("//form[@action='addWebPart.view']//select[@name='name']");
+        Locator.XPathLocator selects = Locator.xpath("//form[@action='addWebPart.view']//tr/td/select[@name='name']");
 
         for (int i = 0; i <= 1; i++)
         {
@@ -1037,6 +1055,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTextPresent(String text, int amount, boolean browserDependent)
     {
+        // IE doesn't getHtmlSource the same as Firefox, it replaces \t and \n with spaces, so skip if IE
+        if (getBrowserType() != IE_BROWSER)
+        {
+            int count = countText(text);
+
+            if (browserDependent)
+            {
+                if (count == 0)
+                    log("Your browser is probably out of date");
+                else
+                    assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+            }
+            else
+                assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+        }
+    }
+
+    public int countText(String text)
+    {
         text = text.replace("&nbsp;", " ");
         String source = selenium.getHtmlSource();
         int current_index = 0;
@@ -1044,16 +1081,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         while ((current_index = source.indexOf(text, current_index + 1)) != -1)
             count++;
-
-        if (browserDependent)
-        {
-            if (count == 0)
-                log("Your browser is probably out of date");
-            else
-                assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
-        }
-        else
-            assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+        return count;
     }
 
     public void assertTextNotPresent(String text)
@@ -1350,7 +1378,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public int countLinksWithText(String text)
     {
         //TODO: Figure out how to count with a locator. For now still need to escape javascript string...
-        String js = "countLinksWithText('" + text + "');";
+        String js = "selenium.countLinksWithText('" + text + "');";
         String count = selenium.getEval(js);
         return Integer.parseInt(count);
     }
@@ -1599,8 +1627,28 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String imgName = buildNavButtonImagePath(buttonText);
         Locator navButton = Locator.linkWithImage(imgName);
         Locator navButtonLink = Locator.raw(navButton.toString().concat("/.."));
-        String localAddress = getAttribute(navButtonLink, "href");
+        String localAddress = getButtonHref(navButtonLink);
+        // IE puts the entire link in href, not just the local address
+        if (localAddress.contains("/"))
+        {
+            int location = localAddress.lastIndexOf("/");
+            if (location < localAddress.length() - 1)
+                localAddress = localAddress.substring(location + 1);
+        }
         return (getContextPath() + "/" + controller + folderPath + "/" + localAddress);
+    }
+
+    public String getButtonHref(Locator buttonLoc)
+    {
+        String address = getAttribute(buttonLoc, "href");
+        // IE puts the entire link in href, not just the local address
+        if (address.contains("/"))
+        {
+            int location = address.lastIndexOf("/");
+            if (location < address.length() - 1)
+                address = address.substring(location + 1);
+        }
+        return address;
     }
 
     public void clickImgButtonNoNav(String buttonText)
@@ -1630,7 +1678,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFormElement(String elementName, String text)
     {
-        selenium.type(elementName, text);
+        try
+        {
+            selenium.type(elementName, text);
+        }
+        catch (SeleniumException e)
+        {
+             fail("'setFormElement()' is not supported for Combo Boxes in IE");
+        }
     }
 
     public void setFormElement(String elementName, File file)
@@ -1713,6 +1768,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     final static int MAX_TEXT_LENGTH = 2000;
 
+    public String getPropertyXPath(String propertyHeading)
+    {
+        return "//td[contains(text(), '" + propertyHeading + "')]/../..";
+    }
+
+    public void addField(String areaTitle, int index, String name, String label, String type)
+    {
+        String xpath = getPropertyXPath(areaTitle) + "//div/img[contains(@src, 'Add+Field.button')]";
+        selenium.mouseOver(xpath);
+        selenium.mouseDown(xpath);
+        selenium.mouseUp(xpath);
+        setFormElement(getPropertyXPath(areaTitle) + "//td/input[@id='ff_name" + index + "']", name);
+        setFormElement(getPropertyXPath(areaTitle) + "//td/input[@id='ff_label" + index + "']", label);
+        selectOptionByText(getPropertyXPath(areaTitle) + "//td/select[@id='ff_type" + index + "']", type);
+    }
+
     public void setLongTextField(String elementName, String text)
     {
         setFormElement(elementName, "");
@@ -1725,7 +1796,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if (postString.length() > 1 && postString.charAt(postString.length() - 1) == '\\' && postString.charAt(postString.length() - 2) != '\\')
                 postString = postString.substring(0, postString.length() -1);
 
-            String evalString = "appendToFormField('" + elementName + "', '" + postString + "')";
+            String evalString = "selenium.appendToFormField('" + elementName + "', '" + postString + "')";
             selenium.getEval(evalString);
             offset += postString.length();
         }
@@ -1776,7 +1847,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Invoking Ext menu item handler '" + id + "'");
         //selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "').handler();");
-        String result = selenium.getEval("clickExtComponent('" + id + "');");
+        String result = selenium.getEval("selenium.clickExtComponent('" + id + "');");
         if (result != null)
             return Boolean.parseBoolean(result);
         return false;
@@ -1819,7 +1890,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     protected String getExtElementId(String extId)
     {
-        String id = selenium.getEval("getExtElementId('" + extId + "');");
+        String id = selenium.getEval("selenium.getExtElementId('" + extId + "');");
         log("Element id for ext component id: " + extId + " is: " + id);
 
         return id;
@@ -1851,7 +1922,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private void clickDataRegionPageLink(String dataRegionName, String title)
     {
-        clickAndWait(Locator.xpath("//table[@id='dataregion_header_" + dataRegionName + "']//a[@title='" + title + "']"));
+        clickAndWait(Locator.xpath("//table[@id='dataregion_header_" + dataRegionName + "']//div/a[@title='" + title + "']"));
     }
 
     /** Sets selection state for rows of the data region on the current page. */
@@ -1903,7 +1974,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         checkCheckbox(Locator.name(name));
     }
-    
+
+    public void checkCheckboxByNameInDataRegion(String name)
+    {
+        checkCheckbox(Locator.raw("//a[contains(text(), '" + name + "')]/../..//td/input"));
+    }
+
     public void checkCheckbox(Locator checkBoxLocator)
     {
         log("Checking checkbox " + checkBoxLocator);
@@ -1966,7 +2042,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.click("column_" + column_id);
         clickNavButton("Add >>", 0);
         int millis = 0;
-        while(!selenium.isElementPresent("//div[@id='" + tab + ".list.div']//td[text()='" + column_name + "']") && millis < defaultWaitForPage)
+        while(!selenium.isElementPresent("//div[@id='" + tab + ".list.div']//tr/td[text()='" + column_name + "']") && millis < defaultWaitForPage)
         {
             log("If this message is appearing multiple times, you probably need to specify the column_id");
             millis = millis + 100;
@@ -2011,17 +2087,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else
             log("Adding " + column_name + " filter of " + filter_type + " " + filter);
 
-        if (selenium.isElementPresent("//div[@id='filter.list.div']//td[text()='" + column_name + "'][1]"))
+        if (selenium.isElementPresent("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "'][1]"))
             log("This test method does not support adding multiple filters of the same type");
 
         addCustomizeViewOption("filter", column_id, column_name);
-        selenium.click("//div[@id='filter.list.div']//td[text()='" + column_name + "']/../td[2]/select");
-        selenium.select("//div[@id='filter.list.div']//td[text()='" + column_name + "']/../td[2]/select", filter_type);
+        selenium.click("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select");
+        selenium.select("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select", filter_type);
 
         if (filter.compareTo("") != 0)
         {
-            selenium.type("//div[@id='filter.list.div']//td[text()='" + column_name + "']/../td[3]/input", filter);
-            selenium.fireEvent("//div[@id='filter.list.div']//td[text()='" + column_name + "']/../td[3]/input", "blur");
+            selenium.type("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[3]/input", filter);
+            selenium.fireEvent("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[3]/input", "blur");
         }
     }
 
@@ -2037,14 +2113,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         log("Adding " + column_name + " sort");
         addCustomizeViewOption("sort", column_id, column_name);
-        selenium.click("//div[@id='sort.list.div']//td[text()='" + column_name + "']/../td[2]/select");
-        selenium.select("//div[@id='sort.list.div']//td[text()='" + column_name + "']/../td[2]/select", "label=" + order);
+        selenium.click("//div[@id='sort.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select");
+        selenium.select("//div[@id='sort.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select", "label=" + order);
     }
 
     public void removeCustomizeViewOption(String tab, String column_name)
     {
         selenium.click(tab + ".tab");
-        selenium.click("//div[@id='" + tab + ".list.div']//td[text()='" + column_name + "']");
+        selenium.click("//div[@id='" + tab + ".list.div']//tr/td[text()='" + column_name + "']");
         selenium.click("//img[@alt='Delete']");
     }
 
@@ -2059,7 +2135,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Removing " + column_name + " filter");
         selenium.click("filter.tab");
 
-        selenium.click("//div[@id='filter.list.div']//td[text()='" + column_name + "']");
+        selenium.click("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']");
         selenium.click("//img[@alt='Delete']");
     }
 
@@ -2116,8 +2192,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void moveCustomizeViewOption(String tab, String column_name, boolean moveUp)
     {
         selenium.click(tab + ".tab");
-        selenium.click("//div[@id='" + tab + ".list.div']//td[text()='" + column_name + "']");
-        selenium.click("//td[@id='" + tab + ".controls']//img[@alt='Move " + (moveUp ? "Up" : "Down") + "']");
+        selenium.click("//div[@id='" + tab + ".list.div']//tr/td[text()='" + column_name + "']");
+        selenium.click("//td[@id='" + tab + ".controls']//a/img[@alt='Move " + (moveUp ? "Up" : "Down") + "']");
     }
 
     public void addUrlParameter(String parameter)
@@ -2127,6 +2203,35 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 beginAt(getCurrentRelativeURL().concat("&" + parameter));
             else
                 beginAt(getCurrentRelativeURL().concat("?" + parameter));
+    }
+
+        /**
+     * Once you have impersonatned a user you can't go back and impersonate another until you sign in.
+     * So to be safe, always sign out as the Admin User and Sign back in
+     *
+     * @param userEmailAddress user email address to impersonate
+     */
+    public void impersonateUser(String userEmailAddress)
+    {
+        log("impersonating user : " + userEmailAddress);
+        signOut();
+        signIn();
+        ensureAdminMode();
+        clickLinkWithText("Admin Console");
+        selectOptionByText("email", userEmailAddress);
+        clickNavButton("Impersonate");
+    } //impersonateUser(email)
+
+    /**
+     * Impersonates another user, and selects a particular project
+     *
+     * @param userEmailAddress user to impersonate
+     * @param project project to select after impersonation
+     */
+    public void impersonateUser(String userEmailAddress, String project)
+    {
+        impersonateUser(userEmailAddress);
+        clickLinkWithText(project);
     }
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
@@ -2147,7 +2252,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void impersonate(String fakeUser)
     {
         clickLinkWithText("Admin Console");
-        setFormElement("email", fakeUser);
+        selectOptionByText(Locator.id("email").toString(), fakeUser);
         clickNavButton("Impersonate");
     }
 
@@ -2171,7 +2276,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         ensureAdminMode();
         clickLinkWithText("Site Users");
-        String userXPath = "//table[@id=\"dataregion_Users\"]//td[text()=\"" + userEmail + "\"]";
+        String userXPath = "//a[text()=\"[Details]\"]/../../td[text()=\"" + userEmail + "\"]";
         if (isElementPresent(new Locator(userXPath)))
         {
             checkCheckbox(new Locator(userXPath + "/../td[1]/input"));
@@ -2701,20 +2806,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             log("dragAndDrop element " + locatorOfObjectToBeDragged + " to element " + locatorOfDragDestinationObject);
             super.dragAndDropToObject(locatorOfObjectToBeDragged, locatorOfDragDestinationObject);
-        }
-
-        @Override
-        public void windowFocus(String windowName)
-        {
-            log("windowFocus: " + windowName);
-            super.windowFocus(windowName);
-        }
-
-        @Override
-        public void windowMaximize(String windowName)
-        {
-            log("windowMaximize: " + windowName);
-            super.windowMaximize(windowName);
         }
 
         @Override

@@ -67,7 +67,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-        try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
         deletePipelineWorkDirectory();
         try
@@ -115,7 +114,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             beginAt(queryURL);
             clickImageWithAltText("Properties " + name);
-            setFormElement("ff_inheritable", "true");
+            selectOptionByValue("ff_inheritable", "true");
             submit();
         }
         beginAt(queryURL);

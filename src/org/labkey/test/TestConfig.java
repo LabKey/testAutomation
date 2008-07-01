@@ -39,6 +39,8 @@ public class TestConfig implements Serializable
     boolean _memCheck;
     boolean _loop;
     boolean _cleanOnly;
+    boolean _firefox;
+    boolean _ie;
     String _port;
     String _contextPath;
     String _server;
@@ -46,7 +48,7 @@ public class TestConfig implements Serializable
     List<String> _checkedNodes;
 
 
-    public TestConfig(String name, boolean clean, boolean linkCheck, boolean memCheck, boolean loop, boolean cleanOnly, String port, String contextPath, String server, String labkeyRoot, List<String> checkedNodes)
+    public TestConfig(String name, boolean clean, boolean linkCheck, boolean memCheck, boolean loop, boolean cleanOnly, boolean firefox, boolean ie, String port, String contextPath, String server, String labkeyRoot, List<String> checkedNodes)
     {
         _name = name;
         _clean = clean;
@@ -54,6 +56,8 @@ public class TestConfig implements Serializable
         _memCheck = memCheck;
         _loop = loop;
         _cleanOnly = cleanOnly;
+        _firefox = firefox;
+        _ie = ie;
         _port = port;
         _contextPath = contextPath;
         _server = server;
@@ -69,6 +73,8 @@ public class TestConfig implements Serializable
         _memCheck = false;
         _loop = false;
         _cleanOnly = false;
+        _firefox = true;
+        _ie = false;
         _port = TestHelper.DEFAULT_PORT;
         _contextPath = TestHelper.DEFAULT_CONTEXT_PATH;
         _server = TestHelper.DEFAULT_SERVER;
@@ -104,6 +110,26 @@ public class TestConfig implements Serializable
     public boolean isCleanOnly()
     {
         return _cleanOnly;
+    }
+
+    public boolean isFirefox()
+    {
+        return _firefox;
+    }
+
+    public void setFirefox(boolean firefox)
+    {
+        _firefox = firefox;
+    }
+
+    public boolean isIe()
+    {
+        return _ie;
+    }
+
+    public void setIe(boolean ie)
+    {
+        _ie = ie;
     }
 
     public String getPort()

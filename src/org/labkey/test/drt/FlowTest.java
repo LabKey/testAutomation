@@ -73,8 +73,8 @@ public class FlowTest extends BaseFlowTest
         String containerPath = "/" + PROJECT_NAME + "/" + FOLDER_NAME;
         beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
         clickNavButton("Create New Query");
-        setFormElement("ff_newQueryName", "DRTQuery1");
-        setFormElement("ff_baseTableName", "FCSAnalyses");
+        setFormElement(Locator.nameOrId("ff_newQueryName"), "DRTQuery1");
+        selectOptionByText("identifier=ff_baseTableName", "FCSAnalyses");
         submit();
 
         beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
@@ -141,12 +141,12 @@ public class FlowTest extends BaseFlowTest
         selectOptionByText("selectedRunId", "8colordata");
         submit();
 
-        setFormElement("positiveKeywordName[3]", "Comp");
-        setFormElement("positiveKeywordValue[3]", "FITC CD4");
+        selectOptionByText("identifier=positiveKeywordName[3]", "Comp");
+        selectOptionByText("identifier=positiveKeywordValue[3]", "FITC CD4");
         submit();
         assertTextPresent("Missing data");
-        setFormElement("negativeKeywordName[0]", "WELL ID");
-        setFormElement("negativeKeywordValue[0]", "H01");
+        selectOptionByText("identifier=negativeKeywordName[0]", "WELL ID");
+        selectOptionByText("identifier=negativeKeywordValue[0]", "H01");
         clickButtonWithText("Universal");
         submit();
         assertTextPresent("compensation calculation may be edited in a number");

@@ -51,7 +51,8 @@ public enum TestSet
         ClientAPITest.class,
         WikiBvtTest.class,
         MessagesBvtTest.class,
-        AuditLogTest.class
+        AuditLogTest.class,
+        MicroarrayTest.class
     }),
 
     DRT(new Class[]

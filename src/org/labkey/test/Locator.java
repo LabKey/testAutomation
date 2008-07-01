@@ -243,7 +243,7 @@ public class Locator
     public static XPathLocator elementByLabel(String label, int labelColumn, String elementType, int elementColumn)
     {
         //TODO: Escape Label. What is XPATH escaping?
-        return xpath("//table//td[" + (labelColumn + 1) + " and contains(text(), " + xq(label) + ")]/../td[" + (elementColumn + 1) +"]/" + elementType);
+        return xpath("//td[" + (labelColumn + 1) + " and contains(text(), " + xq(label) + ")]/../td[" + (elementColumn + 1) +"]/" + elementType);
     }
 
     public static XPathLocator inputByLabel(String label, int inputColumn)

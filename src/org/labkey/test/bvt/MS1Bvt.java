@@ -317,14 +317,14 @@ public class MS1Bvt extends BaseSeleniumWebTest
         assertTextPresent("1904");
 
         setFormElement("mzOffset", "100");
-        setFormElement("mzUnits", "mz");
+        selectOptionByValue("mzUnits", "mz");
         clickNavButton("Search");
 
         assertTextPresent("1888");
         assertTextPresent("1921");
         assertTextPresent("1976");
 
-        setFormElement("timeUnits", "scans");
+        selectOptionByValue("timeUnits", "scans");
         assertFormElementEquals("timeSource", "1948");
         setFormElement("timeOffset", "2");
         clickNavButton("Search");

@@ -73,7 +73,15 @@ public class SecurityTest extends BaseSeleniumWebTest
         String userName = PasswordUtil.getUsername();
         assertTextPresent(userName);
         clickNavButton("Edit");
-        String displayName = userName.substring(0, userName.indexOf("@"));
+        String displayName;
+        if (userName.contains("@"))
+        {
+            displayName = userName.substring(0, userName.indexOf("@"));
+        }
+        else
+        {
+            displayName = userName;
+        }
         setFormElement("displayName", displayName);
         clickNavButton("Submit");
 
@@ -119,7 +127,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     {
         clickLinkWithText("Site Users");
 
-        Locator userAccessLink = Locator.xpath("//table[@id='dataregion_Users']//td[text()='" + userName + "']/..//td/a[contains(@href,'userAccess.view')]");
+        Locator userAccessLink = Locator.xpath("//td[text()='" + userName + "']/..//td/a[contains(@href,'userAccess.view')]");
         if (isElementPresent(userAccessLink))
         {
             clickLink(userAccessLink);
@@ -151,7 +159,18 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         Map<String, String> params = getUrlParameters();
         String email = params.get("labkeyEmail");
-        assertTrue(email.equals(PasswordUtil.getUsername()));
+        String emailName;
+        String userName = PasswordUtil.getUsername();
+        // If we are using IE, then the email will be stripped of its @etc.
+        if (!userName.contains("@"))
+        {
+            emailName = email.substring(0, email.indexOf("@"));
+        }
+        else
+        {
+            emailName = email;
+        }
+        assertTrue(emailName.equals(userName));
         String token = params.get("labkeyToken");
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 65535);
@@ -258,13 +277,16 @@ public class SecurityTest extends BaseSeleniumWebTest
             fail();
         }
 
-        String[] params = queryString.split("&");
         Map<String, String> map = new HashMap<String, String>();
-
-        for (String param : params)
+        if (queryString != null)
         {
-            int index = param.indexOf('=');
-            map.put(param.substring(0, index), param.substring(index + 1));
+            String[] params = queryString.split("&");
+
+            for (String param : params)
+            {
+                int index = param.indexOf('=');
+                map.put(param.substring(0, index), param.substring(index + 1));
+            }
         }
 
         return map;

@@ -124,7 +124,7 @@ public class UserBvtTest extends SecurityTest
 
     private void navigateToUserDetails(String userName)
     {
-        selenium.click("//td[.='" + userName + "']/..//a[.='[Details]']");
+        selenium.click("//td[.='" + userName + "']/..//td/a[.='[Details]']");
         selenium.waitForPageToLoad("30000");
     }
 }

@@ -45,14 +45,13 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         while(isTextPresent("Loading"))
             sleep(500);
-        
+
+        waitForElement(Locator.inputByLabel("Protocol Name", 1), defaultWaitForPage);
         setFormElement(Locator.inputByLabel("Protocol Name", 1), STUDY_FOLDER);
         setFormElement(Locator.inputByLabel("Investigator", 3), "My Investigator");
         setFormElement(Locator.inputByLabel("Grant", 1), "My Grant");
         setFormElement(Locator.inputByLabel("Species", 3), "Rabbit");
-        //Only listening to focus events for "Activating Label"
-        selenium.fireEvent(Locator.tagWithAttribute("div", "tabindex", "0").toString(), "focus");
-        //selenium.mouseDown("//div[contains(text(), 'Click to edit description')]");
+        selenium.fireEvent(Locator.raw("//div[contains(text(), 'Click to edit description')]/..").toString(), "focus");
         setFormElement("protocolDescription", "This is a very important protocol");
 
         clickNavButton("Save", 0);
@@ -296,11 +295,6 @@ public class StudyExtraTest extends BaseSeleniumWebTest
     protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = {"Integer" };
     protected final static int WAIT_FOR_GWT = 5000;
 
-    protected String getPropertyXPath(String propertyHeading)
-    {
-        return "//td[contains(text(), '" + propertyHeading + "')]/../..";
-    }
-
     /**
      * Sets up the data pipeline for the specified project. This can be called from any page.
      * @param project name of project for which the pipeline should be setup
@@ -335,7 +329,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        setFormElement("providerName", "General");
+        selectOptionByText("providerName", "General");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);
@@ -404,22 +398,6 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-        try
-        {
-            deleteFolder(PROJECT_NAME, STUDY_FOLDER);
-        }
-        catch (AssertionFailedError e)
-        {
-            log("Failed to delete folder " + STUDY_FOLDER + ", which is fine if it doesn't actually exist, usually the case");
-        }
-        try
-        {
-            deleteFolder(PROJECT_NAME, FOLDER_NAME);
-        }
-        catch (AssertionFailedError e)
-        {
-            log("Failed to delete folder " + FOLDER_NAME + ", which is fine if it doesn't actually exist, usually the case");
-        }
         deleteProject(PROJECT_NAME);
     }
 

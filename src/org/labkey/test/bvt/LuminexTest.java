@@ -82,7 +82,7 @@ public class LuminexTest extends AbstractAssayTest
         //create a new luminex assay
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        setFormElement("providerName", "Luminex");
+        selectOptionByText("providerName", "Luminex");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);
@@ -108,119 +108,122 @@ public class LuminexTest extends AbstractAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY_LUM);
 
-        log("Uploading Luminex Runs");
-        clickNavButton("Upload Runs");
-        setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
-        clickNavButton("Next");
-        setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
-        File file1 = new File(TEST_ASSAY_LUM_FILE1);
-        setFormElement("uploadedFile", file1);
-        clickNavButton("Next", 60000);
-        clickNavButton("Save and Upload Another Run");
-        clickLinkWithText(TEST_ASSAY_LUM);
+        if(isFileUploadAvailable())
+        {
+            log("Uploading Luminex Runs");
+            clickNavButton("Upload Runs");
+            setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
+            clickNavButton("Next");
+            setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
+            File file1 = new File(TEST_ASSAY_LUM_FILE1);
+            setFormElement("uploadedFile", file1);
+            clickNavButton("Next", 60000);
+            clickNavButton("Save and Upload Another Run");
+            clickLinkWithText(TEST_ASSAY_LUM);
 
-        clickNavButton("Upload Runs");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
-        setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
-        clickNavButton("Next");
-        setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
-        setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE2));
-        clickNavButton("Next", 60000);
-        selenium.type("//input[@type='text'][1]", "StandardName1b");
-        selenium.type("//input[@type='text'][1]/../../../tr[4]//input[@type='text']", "StandardName2");
-        selenium.type("//input[@type='text'][1]/../../../tr[5]//input[@type='text']", "StandardName4");
-        selenium.click("//input[contains(@name,'unitsofConcentrationCheckBox')]");
-        selenium.type("//input[@type='text' and contains(@name, 'unitsofConcentration')]", "10 g/ml");
-        clickNavButton("Save and Finish");
+            clickNavButton("Upload Runs");
+            assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
+            setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
+            clickNavButton("Next");
+            setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
+            setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE2));
+            clickNavButton("Next", 60000);
+            selenium.type("//input[@type='text'][1]", "StandardName1b");
+            selenium.type("//input[@type='text'][1]/../../../tr[4]//input[@type='text']", "StandardName2");
+            selenium.type("//input[@type='text'][1]/../../../tr[5]//input[@type='text']", "StandardName4");
+            selenium.click("//input[contains(@name,'unitsofConcentrationCheckBox')]");
+            selenium.type("//input[@type='text' and contains(@name, 'unitsofConcentration')]", "10 g/ml");
+            clickNavButton("Save and Finish");
 
-        // Upload another run using a thaw list pasted in as a TSV
-        clickNavButton("Upload Runs");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
-        setFormElement("participantVisitResolver", "Lookup");
-        setFormElement("ThawListType", "Text");
-        setFormElement("ThawListTextArea", "Index\tSpecimenID\tParticipantID\tVisitID\n" +
-                "1\tSpecimenID1\tParticipantID1\t1.1\n" +
-                "2\tSpecimenID2\tParticipantID2\t1.2\n" +
-                "3\tSpecimenID3\tParticipantID3\t1.3\n" +
-                "4\tSpecimenID4\tParticipantID4\t1.4");
-        clickNavButton("Next");
-        setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
-        clickNavButton("Next", 60000);
-        assertEquals("StandardName1b", selenium.getValue("//input[@type='text'][1]"));
-        assertEquals("StandardName4", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text'][1]"));
-        assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
-        assertEquals("10 g/ml", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
-        clickNavButton("Save and Finish");
+            // Upload another run using a thaw list pasted in as a TSV
+            clickNavButton("Upload Runs");
+            assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
+            setFormElement("participantVisitResolver", "Lookup");
+            setFormElement("ThawListType", "Text");
+            setFormElement("ThawListTextArea", "Index\tSpecimenID\tParticipantID\tVisitID\n" +
+                    "1\tSpecimenID1\tParticipantID1\t1.1\n" +
+                    "2\tSpecimenID2\tParticipantID2\t1.2\n" +
+                    "3\tSpecimenID3\tParticipantID3\t1.3\n" +
+                    "4\tSpecimenID4\tParticipantID4\t1.4");
+            clickNavButton("Next");
+            setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
+            clickNavButton("Next", 60000);
+            assertEquals("StandardName1b", selenium.getValue("//input[@type='text'][1]"));
+            assertEquals("StandardName4", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text'][1]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
+            clickNavButton("Save and Finish");
 
-        // Upload another run using a thaw list that pointed at the list we uploaded earlier
-        clickNavButton("Upload Runs");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
-        assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
-        assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));
-        assertEquals("on", selenium.getValue("//input[@name='ThawListType' and @value='Text']"));
-        assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
-        setFormElement("ThawListType", "List");
-        waitForElement(Locator.id("button_Choose list..."), BaseSeleniumWebTest.WAIT_FOR_GWT);
-        clickNavButton("Choose list...", 0);
-        setFormElement("schema", "lists");
-        setFormElement("table", THAW_LIST_NAME);
-        clickNavButton("Close", 0);
-        clickNavButton("Next");
-        setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
-        setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
-        clickNavButton("Next", 60000);
-        assertEquals("StandardName1b", selenium.getValue("//input[@type='text'][1]"));
-        assertEquals("StandardName4", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text'][1]"));
-        assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
-        assertEquals("10 g/ml", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
-        clickNavButton("Save and Finish");
+            // Upload another run using a thaw list that pointed at the list we uploaded earlier
+            clickNavButton("Upload Runs");
+            assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
+            assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
+            assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));
+            assertEquals("on", selenium.getValue("//input[@name='ThawListType' and @value='Text']"));
+            assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
+            setFormElement("ThawListType", "List");
+            waitForElement(Locator.id("button_Choose list..."), BaseSeleniumWebTest.WAIT_FOR_GWT);
+            clickNavButton("Choose list...", 0);
+            setFormElement("schema", "lists");
+            setFormElement("table", THAW_LIST_NAME);
+            clickNavButton("Close", 0);
+            clickNavButton("Next");
+            setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
+            setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
+            clickNavButton("Next", 60000);
+            assertEquals("StandardName1b", selenium.getValue("//input[@type='text'][1]"));
+            assertEquals("StandardName4", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text'][1]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
+            clickNavButton("Save and Finish");
 
-        log("Check that upload worked");
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME);
-        assertTextPresent("Hu IL-1b (32)");
+            log("Check that upload worked");
+            clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME);
+            assertTextPresent("Hu IL-1b (32)");
 
-        clickLinkWithText(TEST_ASSAY_LUM);
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME3);
-        assertTextPresent("IL-1b (1)");
-        assertTextPresent("ParticipantID1");
-        assertTextPresent("ParticipantID2");
-        assertTextPresent("ParticipantID3");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ParticipantID1");
-        assertTextPresent("1.1");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ParticipantID2");
-        assertTextPresent("1.2");
+            clickLinkWithText(TEST_ASSAY_LUM);
+            clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME3);
+            assertTextPresent("IL-1b (1)");
+            assertTextPresent("ParticipantID1");
+            assertTextPresent("ParticipantID2");
+            assertTextPresent("ParticipantID3");
+            setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ParticipantID1");
+            assertTextPresent("1.1");
+            setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ParticipantID2");
+            assertTextPresent("1.2");
 
-        clickLinkWithText(TEST_ASSAY_LUM);
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME4);
-        assertTextPresent("IL-1b (1)");
-        assertTextPresent("ListParticipant1");
-        assertTextPresent("ListParticipant2");
-        assertTextPresent("ListParticipant3");
-        assertTextPresent("ListParticipant4");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ListParticipant1");
-        assertTextPresent("1001.1");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ListParticipant2");
-        assertTextPresent("1001.2");
+            clickLinkWithText(TEST_ASSAY_LUM);
+            clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME4);
+            assertTextPresent("IL-1b (1)");
+            assertTextPresent("ListParticipant1");
+            assertTextPresent("ListParticipant2");
+            assertTextPresent("ListParticipant3");
+            assertTextPresent("ListParticipant4");
+            setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ListParticipant1");
+            assertTextPresent("1001.1");
+            setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ListParticipant2");
+            assertTextPresent("1001.2");
 
-        clickLinkWithText(TEST_ASSAY_LUM);
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME2);
-        assertTextPresent("IL-1b (1)");
-        assertTextPresent("9011-04");
+            clickLinkWithText(TEST_ASSAY_LUM);
+            clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME2);
+            assertTextPresent("IL-1b (1)");
+            assertTextPresent("9011-04");
 
-        setFilter(TEST_ASSAY_LUM + " Data", "FI", "Equals", "20");
-        selenium.click(".toggle");
-        clickNavButton("Copy Selected to Study");
-        selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
-        clickNavButton("Next");
-        setFormElement("participantId", "ParticipantID");
-        setFormElement("visitId", "100.1");
-        clickNavButton("Copy to Study");
+            setFilter(TEST_ASSAY_LUM + " Data", "FI", "Equals", "20");
+            selenium.click(".toggle");
+            clickNavButton("Copy Selected to Study");
+            selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
+            clickNavButton("Next");
+            setFormElement("participantId", "ParticipantID");
+            setFormElement("visitId", "100.1");
+            clickNavButton("Copy to Study");
 
-        log("Verify that the data was published");
-        assertTextPresent("ParticipantID");
-        assertTextPresent("100.1");
-        assertTextPresent(TEST_ASSAY_LUM_RUN_NAME2);
-        assertTextPresent("LX10005314302");
+            log("Verify that the data was published");
+            assertTextPresent("ParticipantID");
+            assertTextPresent("100.1");
+            assertTextPresent(TEST_ASSAY_LUM_RUN_NAME2);
+            assertTextPresent("LX10005314302");
+        }
     } //doTestSteps()
 
 

@@ -44,14 +44,18 @@ public class MS2BvtTest extends MS2TestBase
     protected static final String RAW_PEP_XML = ".pep.xml";
     protected static final String ENZYME = "trypsin";
     protected static final String MASS_SPEC = "ThermoFinnigan";
+    protected static final String RUN_GROUP1_NAME1 = "Test Run Group 1";
+    protected static final String RUN_GROUP1_NAME2 = "Test Run Group 1 New Name";
+    protected static final String RUN_GROUP1_CONTACT = "Test Contact";
+    protected static final String RUN_GROUP1_DESCRIPTION = "This is a description";
+    protected static final String RUN_GROUP1_HYPOTHESIS = "I think this is happening";
+    protected static final String RUN_GROUP1_COMMENTS = "Here are comments.";
+    protected static final String RUN_GROUP2_NAME = "Test Run Group 2";
+    protected static final String RUN_GROUP3_NAME = "Test Run Group 3";
 
     protected void doCleanup() throws IOException
     {
-        deleteViews(VIEW, VIEW2, VIEW3, VIEW4);
-        deleteRuns();
-
         cleanPipe(SEARCH_TYPE);
-        try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
@@ -60,7 +64,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");       
+            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         super.doTestSteps();
         
@@ -82,7 +86,6 @@ public class MS2BvtTest extends MS2TestBase
         log("Verify upload started.");
         assertTextPresent(SAMPLE_BASE_NAME + ".search.xar.xml");
         int seconds = 0;
-//        clickLinkWithText(FOLDER_NAME);
         while (countLinksWithText("COMPLETE") < 1 && seconds++ < MAX_WAIT_SECONDS)
         {
             log("Waiting upload to complete");
@@ -146,7 +149,7 @@ public class MS2BvtTest extends MS2TestBase
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "Choose A View");
         clickNavButton("Go");
-        
+
         log("Test export selected");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
@@ -935,10 +938,90 @@ public class MS2BvtTest extends MS2TestBase
         log("Test Compare Runs using Query");
         clickLinkWithText("MS2 Dashboard");
 
+        log("Test creating run groups");
+        clickLinkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif");
+        clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
+        clickNavButton("Create new group");
+        setFormElement("name", RUN_GROUP1_NAME1);
+        setFormElement("contactId", RUN_GROUP1_CONTACT);
+        setFormElement("experimentDescriptionURL", RUN_GROUP1_DESCRIPTION);
+        setFormElement("hypothesis", RUN_GROUP1_HYPOTHESIS);
+        setFormElement("comments", RUN_GROUP1_COMMENTS);
+        clickNavButton("Submit");
+        clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
+        assertTextPresent(RUN_GROUP1_NAME1);
+        assertTextPresent(RUN_GROUP1_HYPOTHESIS);
+        assertTextPresent(RUN_GROUP1_COMMENTS);
+        clickLinkWithText("MS2 Dashboard");
+        assertTextPresent(RUN_GROUP1_NAME1);
+        
+        clickNavButton("Add to run group", 0);
+        clickLinkWithText("Create new run group...");
+        clickNavButton("Submit");
+        setFormElement("name", RUN_GROUP3_NAME);
+        clickNavButton("Submit");
+
+        clickLinkWithText("Run Groups");
+        clickNavButton("Create Run Group");
+        setFormElement("name", RUN_GROUP2_NAME);
+        clickNavButton("Submit");
+
+        log("Test editing run group info");
+        clickLinkWithText(RUN_GROUP1_NAME1);
+        assertTextPresent(RUN_GROUP1_NAME1);
+        assertTextPresent(RUN_GROUP1_CONTACT);
+        assertTextPresent(RUN_GROUP1_DESCRIPTION);
+        assertTextPresent(RUN_GROUP1_HYPOTHESIS);
+        assertTextPresent(RUN_GROUP1_COMMENTS);
+        clickNavButton("Edit");
+        setFormElement("name", RUN_GROUP1_NAME2);
+        clickNavButton("Submit");
+
+        log("Test customizing view to include the run groups");
+        clickLinkWithText("MS2 Dashboard");
+        clickLinkWithText("MS2 Runs");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        click(Locator.raw("expand_RunGroups"));
+        addCustomizeViewColumn("RunGroups/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
+        addCustomizeViewColumn("RunGroups/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
+        addCustomizeViewColumn("RunGroups/Default Experiment", "Run Groups Default Experiment");
+        clickNavButton("Save");
+
+        assertTextPresent("Run Groups " + RUN_GROUP1_NAME2);
+        assertTextPresent("Run Groups " + RUN_GROUP2_NAME);
+        assertTextPresent("Run Groups Default Experiment");
+
+        checkCheckbox("experimentMembership", 0, false);
+        checkCheckbox("experimentMembership", 1, false);
+        checkCheckbox("experimentMembership", 2, false);
+        checkCheckbox("experimentMembership", 3, false);
+        checkCheckbox("experimentMembership", 4, false);
+        checkCheckbox("experimentMembership", 5, false);
+
+        log("Test editing a run group's runs");
+        clickLinkWithText("MS2 Dashboard");
+        clickLinkWithText("Run Groups");
+        clickLinkWithText(RUN_GROUP2_NAME);
+        assertTextPresent(RUN_GROUP1_NAME2);
+        assertTextPresent(RUN_GROUP2_NAME);
+        assertTextPresent("Default Experiment");
+        checkDataRegionCheckbox("XTandemSearchRuns", 1);
+        clickNavButton("Remove");
+        assert(!isTextPresent(TEST) || !isTextPresent(TEST2));
+        clickLinkWithText("MS2 Dashboard");
+
+        log("Test that the compare run groups works");
         searchRunsTable.checkAllOnPage();
         clickNavButton("Compare", 0);
         clickLinkWithText("ProteinProphet (Query)");
         clickNavButton("Go");
+
+        clickLinkWithText("Comparison Overview", false);
+        waitForText(RUN_GROUP1_NAME2, 1000);
+        assertTextPresent(RUN_GROUP1_NAME2);
+        assertTextPresent(RUN_GROUP2_NAME);
+        assertTextPresent("Default Experiment");
+        selectOptionByValue("//div[contains(text(), 'Chart:')]/../../td/select", "group1");
 
         log("Test Customize View");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
@@ -974,6 +1057,20 @@ public class MS2BvtTest extends MS2TestBase
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|15828808|ref|NP_326168.1|");
         assertTextPresent("0.89");
         popLocation();
+
+        log("Test delete run groups");
+        clickLinkWithText("MS2 Dashboard");
+        clickLinkWithText("Run Groups");
+        checkAllOnPage("RunGroupWide");
+        clickNavButton("Delete Selected");
+        clickNavButton("Confirm Delete");
+        assertTextNotPresent(RUN_GROUP1_NAME2);
+        assertTextNotPresent(RUN_GROUP2_NAME);
+        assertTextNotPresent("Default Experiment");
+        clickLinkWithText("MS2 Dashboard");
+        assertTextNotPresent(RUN_GROUP1_NAME2);
+
+
 
         // Try to put this in once GWT components are testable
 //        log("Test the cross comparison feature at top of query comparison");

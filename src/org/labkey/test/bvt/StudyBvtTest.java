@@ -32,8 +32,8 @@ import java.io.FilenameFilter;
 public class StudyBvtTest extends StudyTest
 {
     private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/sample_b.specimens";
-    protected static final String TEST_GROUP = "testGroup";
-    protected static final String TEST_USER = "user@test.com";
+    protected static final String TEST_GROUP = "firstGroup";
+    protected static final String TEST_USER = "user1@test.com";
 
     private final static String[] R_SCRIPTS = { "rScript1", "rScript2", "rScript3" };
     private final static String DATA_SET = "DEM-1: Demographics";
@@ -45,6 +45,7 @@ public class StudyBvtTest extends StudyTest
 
     private static final String CREATE_CHART_MENU = "Views:Create:Chart View";
     private static final String CREATE_R_MENU = "Views:Create:R View";
+    private static final String TEST_GRID_VIEW = "Test Grid View";
 
     // mssql and postgres
     private String R_SCRIPT1(String function, String database)
@@ -63,6 +64,7 @@ public class StudyBvtTest extends StudyTest
             "plot(sex, sexor)\n" +
             "dev.off()";
     }
+    private final static String TEST_ADD_ENTRY = "999000000";
     private final static String R_SCRIPT1_TEXT1 = "1965-03-06";
     private final static String R_SCRIPT1_TEXT2 = "1980-08-01";
     private final static String R_SCRIPT1_IMG = "resultImage";
@@ -100,7 +102,6 @@ public class StudyBvtTest extends StudyTest
     {
         deleteUser(TEST_USER);
         deleteUser(USER1);
-        try { deleteRReports(); } catch (Throwable e) {}
         super.doCleanup();
     }
 
@@ -151,9 +152,9 @@ public class StudyBvtTest extends StudyTest
         */
 
         // Hard-code the element names, since code above is unpredictable
-        setFormElement("searchParams[0].compareType", "CONTAINS");
+        selectOptionByValue("searchParams[0].compareType", "CONTAINS");
         setFormElement("searchParams[0].value", "1416");
-        setFormElement("searchParams[1].value", "999320528");
+        selectOptionByValue("searchParams[1].value", "999320528");
 
         clickNavButton("Search");
         assertTextPresent("350V06001416");
@@ -183,6 +184,37 @@ public class StudyBvtTest extends StudyTest
         assertTextNotPresent("BAQ00051-10");
         assertTextPresent("BAQ00051-11");
 
+        log("Test editing rows in a dataset");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Change Properties");
+        checkCheckbox("datasetRowsEditable");
+        clickNavButton("Save");
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("DEM-1: Demographics");
+
+        clickLinkWithText("edit");
+        setFormElement("quf_DEMbdt", "2001-11-11");
+        clickNavButton("Submit");
+        assertTextPresent("2001-11-11");
+
+        log("Test adding a row to a dataset");
+        clickNavButton("Insert New");
+        clickNavButton("Submit");
+        assertTextPresent("This field is required");
+        setFormElement("quf_participantid", TEST_ADD_ENTRY);
+        setFormElement("quf_SequenceNum", "123");
+        clickNavButton("Submit");
+        assertTextPresent(TEST_ADD_ENTRY);
+
+        log("Test deleting rows in a dataset");
+        checkCheckbox(Locator.raw("//input[contains(@value, '999320529')]"));
+        clickNavButton("Delete Selected");
+        selenium.getConfirmation();
+        assertTextNotPresent("999320529");
+
         // additional report and security tests
         setupDatasetSecurity();
         createCharts();
@@ -202,14 +234,15 @@ public class StudyBvtTest extends StudyTest
         setFormElement("name", TEST_GROUP);
         clickAndWait(Locator.xpath("//input[@value='Create']"));
 
-        selenium.click("managegroup/StudyVerifyProject/testGroup");
+        // add user to the first test group
+        selenium.click("managegroup/StudyVerifyProject/" + TEST_GROUP);
         selenium.waitForPageToLoad("30000");
         setFormElement("names", TEST_USER);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership", "large");
         clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/security/StudyVerifyProject/container.view?')]"));
 
-        selenium.select("//form[@name='updatePermissions']//td[.='" + TEST_GROUP + "']/..//select", "label=Reader");
+        selectOptionByText("//td[contains(text(), '" + TEST_GROUP + "')]/..//td/select", "Reader");
         clickNavButton("Update");
 
         // give the test group read access to only the DEM-1 dataset
@@ -222,11 +255,11 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Update");
         selenium.waitForPageToLoad("30000");
 
-        click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//input[@value='READOWN']"));
+        click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.xpath("//input[@value='Save']"));
         selenium.click("dataset.1");
 
-        clickAndWait(Locator.xpath("//td[3]/input"));
+        clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//td/input[contains(@src, 'Update')]"));
     }
 
     protected void cleanPipelineItem(String item)
@@ -236,7 +269,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Data Pipeline");
         if (isTextPresent(item))
         {
-            click(Locator.raw("//td[contains(text(), '" + item + "')]/../td/input"));
+            click(Locator.raw("//td[contains(text(), '" + item + "')]/../td/input" + buildNavButtonImagePath("Update")));
             clickNavButton("Delete");
             assertTextNotPresent(item);
         }
@@ -579,6 +612,14 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("OK", 0);
 
         waitForElement(Locator.linkWithImage(buildNavButtonImagePath("Views")), 5000);
+
+        // create grid view
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Manage Reports and Views");
+        clickLinkWithText("new grid view");
+        setFormElement("label", TEST_GRID_VIEW);
+        selectOptionByText("datasetSelection", "APX-1: Abbreviated Physical Exam");
+        clickNavButton("Create View");
     }
 
     protected void doTestSecurity()
@@ -589,12 +630,19 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("My Study");
 
         clickLinkWithText("Manage Reports and Views");
-        clickAndWait(Locator.xpath("//a[.='participant chart']/../..//a[.='permissions']"));
+        clickAndWait(Locator.xpath("//a[.='participant chart']/../..//td/a[.='permissions']"));
 
         selenium.click("useExplicit");
-        checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//input[@type='checkbox']"));
-
+        checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickAndWait(Locator.xpath("//input[@type='image']"));
+
+        clickLinkWithText("Manage Reports and Views");
+        clickAndWait(Locator.xpath("//a[.='" + TEST_GRID_VIEW + "']/../..//td/a[.='permissions']"));
+
+        selenium.click("useExplicit");
+        checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
+        clickAndWait(Locator.xpath("//input[@type='image']"));
+
         click(Locator.linkWithText("Manage Site"));
         sleep(3000);
         clickLinkWithText("Admin Console");
@@ -605,6 +653,16 @@ public class StudyBvtTest extends StudyTest
 
         assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");
         clickLinkWithText("participant chart");
+
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(TEST_GRID_VIEW);
+        assertTextPresent("999320016");
+        pushLocation();
+        clickMenuButton("Views", "Views:default");
+        assertTextPresent("User does not have read permission on this dataset.");
+        popLocation();
+        clickMenuButton("Query", "Query:APX-1: Abbreviated Physical Exam");
+        assertTextPresent("User does not have read permission on this dataset.");
 
         signOut();
         signIn();
@@ -619,9 +677,9 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("StudyVerifyProject");
         clickLinkWithText("My Study");
         clickLinkWithText("Manage Reports and Views");
-        click(Locator.xpath("//a[.='participant chart']/../..//a[.='delete']"));
+        click(Locator.xpath("//a[.='participant chart']/../..//td/a[.='delete']"));
 		assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
-        click(Locator.xpath("//a[.='non participant chart']/../..//a[.='delete']"));
+        click(Locator.xpath("//a[.='non participant chart']/../..//td/a[.='delete']"));
 		assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
     }
 }

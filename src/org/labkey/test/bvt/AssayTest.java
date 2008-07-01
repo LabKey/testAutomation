@@ -78,11 +78,6 @@ public class AssayTest extends AbstractAssayTest
     private final static String TEST_ASSAY_PERMS_STUDY_READSOME = "READOWN";
     private final static String TEST_ASSAY_PERMS_STUDY_READNONE = "NONE";
 
-    private String getPropertyXPath(String propertyHeading)
-    {
-        return "//td[contains(text(), '" + propertyHeading + "')]/../..";
-    }
-
     public String getAssociatedModuleDirectory()
     {
         return "study";
@@ -96,16 +91,6 @@ public class AssayTest extends AbstractAssayTest
         revertToAdmin();
         try
         {
-            //delete all folders and then finally the project
-            //the UI currently does not allow deleting a folder that
-            //contains other folders, so we need to delete them from
-            //the bottom up
-            deleteFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1);
-            deleteFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1);
-            deleteFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY2);
-            deleteFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY3);
-            deleteFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES);
-            deleteFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS);
             deleteProject(TEST_ASSAY_PRJ_SECURITY); //should also delete the groups
 
             //delete user accounts
@@ -147,7 +132,7 @@ public class AssayTest extends AbstractAssayTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        setFormElement("providerName", "General");
+        selectOptionByText("providerName", "General");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);
@@ -157,49 +142,34 @@ public class AssayTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
-            selenium.mouseOver(getPropertyXPath("Upload Set Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseDown(getPropertyXPath("Upload Set Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseUp(getPropertyXPath("Upload Set Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.type(getPropertyXPath("Upload Set Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_SET_PROP_NAME + i);
-            selenium.type(getPropertyXPath("Upload Set Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_SET_PROP_NAME + i);
-            selenium.select(getPropertyXPath("Upload Set Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
+            addField("Upload Set Fields", i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
         }
 
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
         {
-            selenium.mouseOver(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseDown(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseUp(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_RUN_PROP_NAME + i);
-            selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_RUN_PROP_NAME + i);
-            selenium.select(getPropertyXPath("Run Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
+            addField("Run Fields", i, TEST_ASSAY_RUN_PROP_NAME + i, TEST_ASSAY_RUN_PROP_NAME + i, TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
         }
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            selenium.mouseOver(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseDown(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseUp(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_DATA_PROP_NAME + i);
-            selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_DATA_PROP_NAME + i);
-            selenium.select(getPropertyXPath("Data Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
         }
 
         // Set some to required
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Upload Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
+        selenium.click(getPropertyXPath("Upload Set Fields") + "//span/input[@type='checkbox']");
 
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Upload Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
+        selenium.click(getPropertyXPath("Upload Set Fields") + "//span/input[@type='checkbox']");
 
-        selenium.click(getPropertyXPath("Run Fields") + "//input[@id='ff_name0']");
-        selenium.click(getPropertyXPath("Run Fields") + "//input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Run Fields") + "//td/input[@id='ff_name0']");
+        selenium.click(getPropertyXPath("Run Fields") + "//span/input[@type='checkbox']");
 
-        selenium.click(getPropertyXPath("Data Fields") + "//input[@id='ff_name0']");
-        selenium.click(getPropertyXPath("Data Fields") + "//input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name0']");
+        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@type='checkbox']");
 
-        selenium.click(getPropertyXPath("Data Fields") + "//input[@id='ff_name" + (TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2) + "']");
-        selenium.click(getPropertyXPath("Data Fields") + "//input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2) + "']");
+        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@type='checkbox']");
 
         sleep(1000);
         clickNavButton("    Save    ", 0);
@@ -408,11 +378,11 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY);
         click(Locator.linkWithText("manage assay design >>"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//input[@id='ff_name5']"), WAIT_FOR_GWT);
-        selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
-        selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
-        click(Locator.raw(getPropertyXPath("Data Fields") + "//img[@id='partdelete_4']"));
-        waitForElement(Locator.raw("//img[@id='partdeleted_4']"), WAIT_FOR_GWT);
+        waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']"), WAIT_FOR_GWT);
+        selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
+        selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_label5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
+        click(Locator.raw(getPropertyXPath("Data Fields") + "//td/img[@id='partdelete_4']"));
+        waitForElement(Locator.raw("//td/img[@id='partdeleted_4']"), WAIT_FOR_GWT);
         clickNavButton("    Save    ", 0);
         waitForText("Save successful.", WAIT_FOR_GWT);
 
@@ -436,37 +406,6 @@ public class AssayTest extends AbstractAssayTest
         revertToAdmin();
         clickLinkWithText(project);
     }
-
-    /**
-     * Copied from SeleniumUserPermissionsTest - Consider moving this to BaseWebTest?
-     *
-     * Once you have impersonatned a user you can't go back and impersonate another until you sign in.
-     * So to be safe, always sign out as the Admin User and Sign back in
-     *
-     * @param userEmailAddress user email address to impersonate
-     */
-    private void impersonateUser(String userEmailAddress)
-    {
-        log("impersonating user : " + userEmailAddress);
-        signOut();
-        signIn();
-        ensureAdminMode();
-        clickLinkWithText("Admin Console");
-        setFormElement("email", userEmailAddress);
-        clickNavButton("Impersonate");
-    } //impersonateUser(email)
-
-    /**
-     * Impersonates another user, and selects a particular project
-     *
-     * @param userEmailAddress user to impersonate
-     * @param project project to select after impersonation
-     */
-    private void impersonateUser(String userEmailAddress, String project)
-    {
-        impersonateUser(userEmailAddress);
-        clickLinkWithText(project);
-    } //impersonateUser(email, project)
 
     protected boolean isFileUploadTest()
     {

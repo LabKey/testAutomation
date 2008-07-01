@@ -64,41 +64,43 @@ public class FileContentTest extends BaseSeleniumWebTest
         dir.mkdirs();
         setFormElement("rootPath", dir.getAbsolutePath());
         clickNavButton("Submit");
+        if (isFileUploadAvailable())
+        {
+            clickLinkWithText("Manage Files");
 
-        clickLinkWithText("Manage Files");
+            clickLinkWithText("Upload File", false);
+            selenium.waitForPopUp("uploadFiles", "30000");
+            selenium.selectWindow("uploadFiles");
 
-        clickLinkWithText("Upload File", false);
-        selenium.waitForPopUp("uploadFiles", "30000");
-        selenium.selectWindow("uploadFiles");
+            String filename = "InlineFile.html";
+            String sampleRoot = getLabKeyRoot() + "/sampledata/security";
+            File f = new File(sampleRoot, filename);
+            setFormElement("formFiles[0]", f);
+            clickNavButton("Submit");
 
-        String filename = "InlineFile.html";
-        String sampleRoot = getLabKeyRoot() + "/sampledata/security";
-        File f = new File(sampleRoot, filename);
-        setFormElement("formFiles[0]", f);
-        clickNavButton("Submit");
+            selenium.selectWindow("null");
+            assertTextPresent("Sign out");
 
-        selenium.selectWindow("null");
-        assertTextPresent("Sign out");
+            signOut();
 
-        signOut();
+            // Test that renderAs can be observed through a login
+            beginAt("files/" + encode(PROJECT_NAME) + "/" + filename + "?renderAs=INLINE");
+            assertTitleEquals("Sign In");
+            assertFormPresent("login");
+            setText("email", PasswordUtil.getUsername());
+            setText("password", PasswordUtil.getPassword());
+            submit("SUBMIT");
 
-        // Test that renderAs can be observed through a login
-        beginAt("files/" + encode(PROJECT_NAME) + "/" + filename + "?renderAs=INLINE");
-        assertTitleEquals("Sign In");
-        assertFormPresent("login");
-        setText("email", PasswordUtil.getUsername());
-        setText("password", PasswordUtil.getPassword());
-        submit("SUBMIT");
+            if (isTextPresent("Type in your email address and password"))
+                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
 
-        if (isTextPresent("Type in your email address and password"))
-            fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+            log("Test that page was rendered inside of server UI");
 
-        log("Test that page was rendered inside of server UI");
-        
-        assertTextPresent("Sign out");
-        assertTextPresent("My Account");
+            assertTextPresent("Sign out");
+            assertTextPresent("My Account");
 
-        assertTextPresent("antidisestablishmentarianism");
+            assertTextPresent("antidisestablishmentarianism");
+        }
     }
 
     private static String encode(String data) throws UnsupportedEncodingException

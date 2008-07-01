@@ -266,10 +266,10 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent("This user doesn't have permission");
         setFormElement("emailList", USER1);
-        setFormElement("assignedTo", USER3);
+        selectOptionByText("assignedTo", USER3);
         submit();
         assertTextPresent("Members: "+USER1);
-        assertTextNotPresent("Assigned To: "+USER3);
+        assertTextPresent("Assigned To: "+USER3);
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent(MSG3_TITLE);

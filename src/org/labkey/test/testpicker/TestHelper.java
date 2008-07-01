@@ -18,7 +18,7 @@ package org.labkey.test.testpicker;
 
 import org.labkey.test.TestConfig;
 import org.labkey.test.TestSet;
-import org.labkey.test.Runner;
+import org.labkey.test.BaseSeleniumWebTest;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -61,6 +61,8 @@ public class TestHelper
     private JTextField _contextPath;
     private JTextField _server;
     private JTextField _root;
+    private JRadioButton _firefoxButton;
+    private JRadioButton _ieButton;
     private JComboBox _configDropDown;
     private JTree _testTree;
 
@@ -208,6 +210,18 @@ public class TestHelper
         optionsText.add(labkeyRootName, gbcShort);
         optionsText.add(_root, gbcLong);
         optionsText.setBackground(Color.white);
+
+        JLabel browserName = new JLabel("Browser:");
+        optionsText.add(browserName);
+        _firefoxButton = new JRadioButton("Firefox", true);
+        _firefoxButton.setBackground(Color.white);
+        _ieButton = new JRadioButton("Internet Explorer", false);
+        _ieButton.setBackground(Color.white);
+        ButtonGroup browser = new ButtonGroup();
+        browser.add(_firefoxButton);
+        browser.add(_ieButton);
+        optionsText.add(_firefoxButton);
+        optionsText.add(_ieButton);
         options.add(optionsText);
 
         return options;
@@ -364,6 +378,16 @@ public class TestHelper
 
         JPanel testHeader = new JPanel();
 
+        JButton userPropsButton = new JButton("User Props");
+        userPropsButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                loadUserProps();
+            }
+        });
+
+        testHeader.add(userPropsButton);
+
         JButton clearButton = new JButton("Clear");
         clearButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e)
@@ -457,8 +481,8 @@ public class TestHelper
 
     private void saveTestConfig(String name)
     {
-        TestConfig config = new TestConfig(name, _clean.isSelected(), _linkCheck.isSelected(), _memCheck.isSelected(), _loop.isSelected(), _cleanOnly.isSelected(),
-                _port.getText().trim(), _contextPath.getText().trim(), _server.getText().trim(), _root.getText().trim(), getCheckedNodes(_treeRoot));
+        TestConfig config = new TestConfig(name, _clean.isSelected(), _linkCheck.isSelected(), _memCheck.isSelected(), _loop.isSelected(), _cleanOnly.isSelected(), _firefoxButton.isSelected(),
+                _ieButton.isSelected(), _port.getText().trim(), _contextPath.getText().trim(), _server.getText().trim(), _root.getText().trim(), getCheckedNodes(_treeRoot));
 
         _savedConfigs = deleteTestConfigFromList(name, _savedConfigs);
         _savedConfigs.add(config);
@@ -565,11 +589,35 @@ public class TestHelper
         _memCheck.setSelected(config.isMemCheck());
         _loop.setSelected(config.isLoop());
         _cleanOnly.setSelected(config.isCleanOnly());
+        _firefoxButton.setSelected(config.isFirefox());
+        _ieButton.setSelected(config.isIe());
         _port.setText(config.getPort());
         _contextPath.setText(config.getContextPath());
         _server.setText(config.getServer());
         _root.setText(config.getRoot());
         checkNodes(config.getConfigCheckedNodes());
+    }
+
+    /**
+     * Loads the applicable user props to the UI, if they are set
+     */
+    private void loadUserProps()
+    {
+        _clean.setSelected(Boolean.valueOf(System.getProperty("clean")));
+        _clean.setEnabled(!Boolean.valueOf(System.getProperty("cleanonly")));
+        _cleanOnly.setSelected(Boolean.valueOf(System.getProperty("cleanonly")));
+        _loop.setSelected(Boolean.valueOf(System.getProperty("loop")));
+        _linkCheck.setSelected(Boolean.valueOf(System.getProperty("linkCheck")));
+        _memCheck.setSelected(Boolean.valueOf(System.getProperty("memCheck")));
+        String port = System.getProperty("labkey.port");
+        if (port != null && !port.equals(""))
+            _port.setText(port);
+        String contextPath = System.getProperty("labkey.contextpath");
+        if (contextPath != null && !contextPath.equals(""))
+            _contextPath.setText(contextPath);
+        String server = System.getProperty("labkey.server");
+        if (server != null && !server.equals(""))
+            _server.setText(server);
     }
 
     /**
@@ -599,6 +647,7 @@ public class TestHelper
         if (paths.contains(pathString.toString()))
         {
             node.setSelected(true);
+            expandNode(path);
         }
         else
             node.setSelected(false);
@@ -608,6 +657,17 @@ public class TestHelper
         {
             check(childNodes.nextElement(), paths);
         }
+    }
+
+    /**
+     * Expands the path of a node.
+     * @param path
+     */
+    private void expandNode(TreeNode[] path)
+    {
+        TreeNode[] parentPath = new TreeNode[path.length-1];
+        System.arraycopy(path, 0, parentPath, 0, path.length - 1);
+        _testTree.expandPath(new TreePath(parentPath));
     }
 
     private static File verifyDir(String dirName)
@@ -699,6 +759,14 @@ public class TestHelper
             System.setProperty("labkey.contextpath", _contextPath.getText().trim());
             System.setProperty("labkey.server", _server.getText().trim());
             System.setProperty("labkey.root", _root.getText().trim());
+            if (_firefoxButton.isSelected())
+            {
+                System.setProperty("selenium.browser", BaseSeleniumWebTest.FIREFOX_BROWSER);
+            }
+            else if (_ieButton.isSelected())
+            {
+                System.setProperty("selenium.browser", BaseSeleniumWebTest.IE_BROWSER);
+            }
             saveTestConfig(_prevTestConfig);
 
             if (selectedTests.size() != 0 )

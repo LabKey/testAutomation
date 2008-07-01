@@ -64,7 +64,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
                         "    editable : true,\n" +
                         "    gridPanelConfig : {\n" +
                         "        title :'" + GRIDTEST_GRIDTITLE + "',\n" +
-                        "        autoHeight : true,\n" +
+                        "        autoHeight : true\n" +
                         "    }\n" +
                         "});\n" +
                 "// place editable grid in 'grid-example':\n" +
@@ -253,7 +253,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-        try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
@@ -361,7 +360,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private void chartTest()
     {
         String chartHtml = setSource(CHARTTEST_SRC);
-        if (chartHtml.indexOf("<img") < 0)
+        if (chartHtml.indexOf("<img") < 0 && chartHtml.indexOf("<IMG") < 0)
             fail("Test div does not contain an image:\n" + chartHtml);
     }
 
@@ -388,6 +387,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         String activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
         selenium.type(Locator.id(activeCellId).toString(), "Fred");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
         // enter a new last name
         prevActiveCellId = activeCellId;
@@ -396,6 +397,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Fredson");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
         // enter a new age
         prevActiveCellId = activeCellId;
@@ -404,6 +407,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "51");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
         // on the next row, change 'John' to 'Jonny'
         prevActiveCellId = activeCellId;
@@ -412,6 +417,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Jonny");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
         prevActiveCellId = activeCellId;
         activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
@@ -419,12 +426,16 @@ public class ClientAPITest extends BaseSeleniumWebTest
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Jonnyson");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
         prevActiveCellId = activeCellId;
         activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
+        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
 
         // delete the row below Jonny (which should contain Bill)
@@ -443,11 +454,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextNotPresent("Bill");
     }
 
-    private String getPropertyXPath(String propertyHeading)
-    {
-        return "//td[contains(text(), '" + propertyHeading + "')]/../..";
-    }
-
     private void assayTest()
     {
         addWebPart("Assay List");
@@ -455,7 +461,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        setFormElement("providerName", "General");
+        selectOptionByText("providerName", "General");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);

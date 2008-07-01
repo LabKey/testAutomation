@@ -239,12 +239,10 @@ public class ListTest extends BaseSeleniumWebTest
         addWebPart("Query");
         selectOptionByText("schemaName", "lists");
         selenium.click("document.frmCustomize.selectQuery[1]");
-        setFormElement("queryName", LIST_NAME);
         submit();
         addWebPart("Query");
         selectOptionByText("schemaName", "lists");
         selenium.click("document.frmCustomize.selectQuery[1]");
-        setFormElement("queryName", LIST_NAME);
         submit();
 
         log("Test that the right filters are present for each type");
@@ -333,7 +331,7 @@ public class ListTest extends BaseSeleniumWebTest
             clickLinkWithText(LIST2_KEY_NAME);
         clickLinkWithText("edit");
         selectOptionByText("quf_Color", TEST_DATA[1][1]);
-        setFormElement("quf_Owner", LIST2_FOREIGN_KEY_OUTSIDE);
+        selectOptionByText("quf_Owner", LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
 
         clickMenuButton("Views", "Views:default");

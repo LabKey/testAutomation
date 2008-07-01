@@ -127,7 +127,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickLinkContainingText("16");
         clickLinkContainingText("derive samples from this sample");
 
-        setFormElement("inputRole0", "FirstRole");
+        selectOptionByText("inputRole0", "FirstRole");
         selenium.select("targetSampleSetId", "label=ProjectSampleSet in /SampleSetTestProject");
         clickNavButton("Next");
 

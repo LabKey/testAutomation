@@ -13,7 +13,7 @@
  * Return hrefs for all links on the current page as \n delimited string
  */
 
-window.getLinkAddresses = function () {
+selenium.getLinkAddresses = function () {
         var links = selenium.browserbot.getCurrentWindow().document.links;
         var addresses = new Array();
         for (var i = 0; i < links.length; i++)
@@ -21,7 +21,7 @@ window.getLinkAddresses = function () {
         return addresses.join('\\n')
 };
 
-window.countLinksWithText = function (txt) {
+selenium.countLinksWithText = function (txt) {
     var doc = selenium.browserbot.getCurrentWindow().document;
     var count = 0;
     for (var i = 0; i < doc.links.length; i++) {
@@ -31,13 +31,13 @@ window.countLinksWithText = function (txt) {
     return count;
 }
 
-window.appendToFormField = function (fieldName, txt) {
+selenium.appendToFormField = function (fieldName, txt) {
     var doc = selenium.browserbot.getCurrentWindow().document;
     doc.forms[0][fieldName].value = doc.forms[0][fieldName].value + txt;
     return "OK";
 }
 
-window.clickExtComponent = function (id) {
+selenium.clickExtComponent = function (id) {
     var ext = selenium.browserbot.getCurrentWindow().Ext;
     //if (!ext) return false;
     var cmp = ext.getCmp(id);
@@ -53,7 +53,7 @@ window.clickExtComponent = function (id) {
     return false;
 }
 
-window.getExtElementId = function (id) {
+selenium.getExtElementId = function (id) {
     var ext = selenium.browserbot.getCurrentWindow().Ext;
     //if (!ext) return false;
     var cmp = ext.getCmp(id);
