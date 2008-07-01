@@ -58,6 +58,11 @@ public class Crawler
             new ControllerActionId("Study-Samples", "emailLabSpecimenLists"),
             new ControllerActionId("Study-Samples", "getSpecimenExcel"),
             new ControllerActionId("Study-Samples", "download"),
+            new ControllerActionId("admin", "setAdminMode"),
+            new ControllerActionId("project", "deleteWebPart"),
+            new ControllerActionId("project", "customizeWebPart"),
+            new ControllerActionId("project", "moveWebPart"),
+            new ControllerActionId("Experiment", "protocolPredecessors"),
             new ControllerActionId("reports", "downloadInputData")
     };
     private static final String[] ADMIN_CONTROLLERS = new String[]

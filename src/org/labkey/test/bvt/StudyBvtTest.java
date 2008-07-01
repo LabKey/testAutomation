@@ -269,7 +269,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Data Pipeline");
         if (isTextPresent(item))
         {
-            click(Locator.raw("//td[contains(text(), '" + item + "')]/../td/input" + buildNavButtonImagePath("Update")));
+            checkCheckbox(Locator.raw("//td[contains(text(), '" + item + "')]/../td/input"));
             clickNavButton("Delete");
             assertTextNotPresent(item);
         }
