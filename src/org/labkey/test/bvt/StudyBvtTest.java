@@ -660,9 +660,12 @@ public class StudyBvtTest extends StudyTest
         pushLocation();
         clickMenuButton("Views", "Views:default");
         assertTextPresent("User does not have read permission on this dataset.");
+/*
+        no longer showing the query button by default.
         popLocation();
         clickMenuButton("Query", "Query:APX-1: Abbreviated Physical Exam");
         assertTextPresent("User does not have read permission on this dataset.");
+*/
 
         signOut();
         signIn();
