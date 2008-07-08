@@ -507,8 +507,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
                 catch (SeleniumException e)
                 {
-                    log("Ignoring Selenium Error");
-                    log(e.getMessage());
+                    // Do nothing -- this page will sometimes auto-navigate out from under selenium
                 }
             }
 
