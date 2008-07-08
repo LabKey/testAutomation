@@ -239,11 +239,9 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         // assert .lastFilter is applied
         clickLinkWithText("view grid");
-        assertTrue(getLastPageURL().toString().endsWith(".lastFilter=true"));
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent(ISSUE_TITLE_1);
 
         clearAllFilters("Issues", "IssueId");
     }
-
 }
