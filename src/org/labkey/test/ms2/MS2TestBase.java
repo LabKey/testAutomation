@@ -64,7 +64,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         log("Set cluster checkbox");
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
-        uncheckCheckbox("pipelineCluster");
+        uncheckCheckbox("perlPipelineEnabled");
         clickNavButton("Save");
 
         createProject(PROJECT_NAME);

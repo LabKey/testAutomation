@@ -19,7 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.ms2.cluster.MS2TestParams;
 import org.labkey.test.ms2.cluster.MS2TestsBase;
-import org.labkey.test.ms2.cluster.MS2Tests_20070101__3_0_2a;
+import org.labkey.test.ms2.cluster.MS2TestsBaseline;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -35,13 +35,13 @@ import java.util.List;
  */
 public class MS2ClusterTest extends BaseSeleniumWebTest
 {
-    public static final String PROTOCOL_MODIFIER = "_20070101__3_0_2";
+    public static final String PROTOCOL_MODIFIER = "";
     public static final String PROTOCOL_MODIFIER_SEARCH = "";
 
-    private static boolean CLEAN_DATA = false;
-    private static boolean NEW_DATA = false;
-    private static boolean NEW_SEARCH = false;
-    private static boolean REMOVE_DATA = true;
+    private static boolean CLEAN_DATA = true;
+    private static boolean NEW_DATA = true;
+    private static boolean NEW_SEARCH = true;
+    private static boolean REMOVE_DATA = false;
 
     protected static final String PROJECT_NAME = "MS2ClusterProject";
     protected static final String FOLDER_NAME = "Pipeline";
@@ -53,12 +53,12 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
 
     public MS2ClusterTest()
     {
-        testSet = new MS2Tests_20070101__3_0_2a(this);
+        testSet = new MS2TestsBaseline(this);
 //        testSet.addTestsScoringMix();
 //        testSet.addTestsQuant();
-        testSet.addTestsScoringOrganisms();
+//        testSet.addTestsScoringOrganisms();
 //        testSet.addTestsISBMix();
-//        testSet.addTestsIPAS();
+        testSet.addTestsIPAS();
     }
 
     // Return the directory of the module whose functionality this class tests, or "none" if multiple/all modules are tested
@@ -177,7 +177,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         log("Set cluster checkbox");
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
-        checkCheckbox("pipelineCluster");
+        checkCheckbox("perlPipelineEnabled");
         clickNavButton("Save");
 
         createProject(PROJECT_NAME);
