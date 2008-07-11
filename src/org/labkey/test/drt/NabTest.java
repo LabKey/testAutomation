@@ -96,11 +96,11 @@ public class NabTest extends BaseSeleniumWebTest
 
         log("Verify EC50 Values");
         assertTextPresent("1546.78");
-        assertTextPresent("1353.14");
+        assertTextPresent("1353.1");
 
         log("Verify EC80 Values");
         assertTextPresent("357.04");
-        assertTextPresent("353.65");
+        assertTextPresent("353.6");
 
         clickLinkWithText("details");
         assertTextPresent(TEST_FILE_NAME);
