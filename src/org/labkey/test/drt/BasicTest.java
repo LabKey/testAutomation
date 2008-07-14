@@ -74,6 +74,27 @@ public class BasicTest extends BaseSeleniumWebTest
         clickLinkWithText("credits");
         assertTextNotPresent("WARNING:");
 
+        log("Test hide admin");
+        ensureAdminMode();
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Hide Admin");
+        assertTextNotPresent("Manage Site");
+        assertTextNotPresent("Manage Project");
+        assertElementNotPresent(Locator.raw("//img[@title='Remove From Page']"));
+        assertElementNotPresent(Locator.raw("//img[@title='Move Up']"));
+        clickLinkWithText("Show Admin");
+        
+        log("Test webpart buttons");
+        clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));
+        assertTextPresent("Customize");
+        clickNavButton("Cancel");
+        clickAndWait(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"));
+        assertTrue(isTextBefore("No data to show", "No recent messages"));
+        clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']"));
+        assertElementNotPresent(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']"));
+        isElementPresent(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"));
+
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
         checkCheckbox("usageReportingLevel", "MEDIUM", true);     // Force devs to report full usage info

@@ -59,7 +59,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private boolean _fileUploadAvailable;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
-    
+
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
     public final static String IE_BROWSER = "*iexplore";
@@ -147,7 +147,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 _fileUploadAvailable = true;
             }
         }
-
+        //browserPath = " c:\\program files\\mozilla firefox\\Firefox3\\firefox.exe";
         return browser + browserPath;
     }
 
@@ -262,8 +262,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String[] linkArray = linkStr.split("\\\\n");
         ArrayList<String> links = new ArrayList<String>(linkArray.length);
         for (String link : linkArray)
-            if (link != null && link.trim().length() > 0 && !link.startsWith("#"))
+        {
+            if (link.contains("#"))
+            {
+                link = link.substring(0, link.indexOf("#"));
+            }
+            if (link != null && link.trim().length() > 0)
+            {
                 links.add(link);
+            }
+        }
 
         return links.toArray(new String[links.size()]);
     }
@@ -329,7 +337,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
         }
     }
-    
+
     public void signIn()
     {
         try
@@ -368,7 +376,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickLinkWithText("Show Admin");
         }
     }
-    
+
     private void waitForStartup()
     {
         boolean hitFirstPage = false;
@@ -707,7 +715,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if (skipLeakCheck())
             return;
-        
+
         log("Starting memory leak check...");
         int leakCount = MAX_LEAK_LIMIT + 1;
         for (int attempt = 0; attempt < GC_ATTEMPT_LIMIT && leakCount > MAX_LEAK_LIMIT; attempt++)
@@ -771,6 +779,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    public String getBaseURL()
+    {
+        return WebTestHelper.getBaseURL();
+    }
+
+    public static String stripContextPath(String url)
+    {
+        String root = WebTestHelper.getContextPath() + "/";
+        int rootLoc = url.indexOf(root);
+        int endOfAction = url.indexOf("?");
+        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
+            url = url.substring(rootLoc + root.length());
+        else if (url.indexOf("/") == 0)
+            url = url.substring(1);
+        return url;
+    }
 
     public void beginAt(String relativeURL)
     {
@@ -779,11 +803,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void beginAt(String relativeURL, int millis)
     {
-        String root = getContextPath() + "/";
-        int rootLoc = relativeURL.indexOf(root);
-        int endOfAction = relativeURL.indexOf("?");
-        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
-            relativeURL = relativeURL.substring(rootLoc + root.length());
+        relativeURL = stripContextPath(relativeURL);
         if (relativeURL.length() == 0)
             log("Navigating to root");
         else
@@ -847,7 +867,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         submit(Locator.formWithAction("newGroup.post"));
     }
 
-    
+
 
     public void createSubfolder(String project, String child, String[] tabsToAdd)
     {
@@ -1004,7 +1024,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         throw new RuntimeException("Could not find webpart with name: " + webPartName);
     }
 
-    
+
     public boolean isTitleEqual(String match)
     {
         return match.equals(selenium.getTitle());
@@ -1197,7 +1217,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.submit(formLocator.toString());
         waitForPageToLoad();
     }
-    
+
     public void submit(String buttonName)
     {
         Locator l = findButton(buttonName);
@@ -1222,7 +1242,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertElementPresent(Locator loc)
     {
-        assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));   
+        assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
     }
 
     public void assertFormElementEquals(String elementName, String value)
@@ -1316,7 +1336,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         assertTrue("Could not find link containing text '" + text + "'", isLinkPresentContainingText(text));
     }
-    
+
     public void assertLinkPresentWithText(String text)
     {
         assertTrue("Could not find link with text '" + text + "'", isLinkPresentWithText(text));
@@ -1355,7 +1375,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertElementPresent(l);
         clickAndWait(l, defaultWaitForPage);
     }
-    
+
     public void clickLinkWithText(String text, boolean wait)
     {
         log("Clicking link with text '" + text + "'");
@@ -1671,7 +1691,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Setting text of " + elementName + " to ******");
         else
             log("Setting text of " + elementName + " to " + text);
-        
+
         selenium.typeSilent(elementName, text);
     }
 
@@ -1683,7 +1703,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (SeleniumException e)
         {
-             fail("'setFormElement()' is not supported for Combo Boxes in IE");
+             fail(e.getMessage() + "\nWarning: 'setFormElement()' is not supported for Combo Boxes in IE");
         }
     }
 
@@ -1804,7 +1824,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setLongTextField(Locator loc, String text)
     {
             setLongTextField(loc.toString(), text);
-    }    
+    }
 
 
     public boolean isNavButtonPresent(String buttonText)
@@ -2365,8 +2385,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else if(isLinkPresentWithText("add content"))
             clickLinkWithText("add content");
         else
-            fail("Could not find a link on the current page to create a new wiki page." + 
-                    " Ensure that you navigate to the wiki controller home page or an existing wiki page" + 
+            fail("Could not find a link on the current page to create a new wiki page." +
+                    " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
                     " before calling this method.");
 
         convertWikiFormat(format);
@@ -2670,7 +2690,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             super.type(locator, value);
         }
-        
+
         @Override
         public void type(String locator, String value)
         {

@@ -149,18 +149,5 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickLinkWithText("Assay List");
         clickLinkWithText(ASSAY_NAME);
         assertTextPresent("Agilent Feature Extraction Software");
-
-        log("Test delete run");
-        clickLinkWithText("Microarray Dashboard");
-        clickLinkWithText("Microarray Runs");
-        checkCheckboxByNameInDataRegion(MAGEML_FILE2);
-        clickNavButton("Delete");
-        clickNavButton("Confirm Delete");
-        
-        log("Test delete sample sets");
-        clickLinkWithText("Microarray Dashboard");
-        checkCheckboxByNameInDataRegion(SAMPLE_SET);
-        clickNavButton("Delete Selected");
-        clickNavButton("Confirm Delete");
     }
 }

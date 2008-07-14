@@ -37,6 +37,7 @@ public class Crawler
             new ControllerActionId("admin", "defineWebThemes"),
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("Experiment", "showFile"),
+            new ControllerActionId("Experiment", "protocolPredecessors"),
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("MS2", "showParamsFile"),
@@ -60,9 +61,7 @@ public class Crawler
             new ControllerActionId("Study-Samples", "download"),
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("project", "deleteWebPart"),
-            new ControllerActionId("project", "customizeWebPart"),
             new ControllerActionId("project", "moveWebPart"),
-            new ControllerActionId("Experiment", "protocolPredecessors"),
             new ControllerActionId("reports", "downloadInputData")
     };
     private static final String[] ADMIN_CONTROLLERS = new String[]
@@ -214,9 +213,10 @@ public class Crawler
             _action = rootRelativeURL.substring(actionIdx + 1);
             if (_action.endsWith(".view"))
                 _action = _action.substring(0, _action.length() - 5);
-            int prefixLength = WebTestHelper.getContextPath().length() + 1;
-            int postControllerSlashIdx = rootRelativeURL.indexOf('/', prefixLength + 1);
-            _controller = rootRelativeURL.substring(prefixLength, postControllerSlashIdx);
+
+            rootRelativeURL = BaseSeleniumWebTest.stripContextPath(rootRelativeURL);
+            int postControllerSlashIdx = rootRelativeURL.indexOf('/');
+            _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
         }
 
         public String getAction()
@@ -292,8 +292,8 @@ public class Crawler
 
     private boolean underCreatedProject(String relativeURL)
     {
+        relativeURL = BaseSeleniumWebTest.stripContextPath(relativeURL);
         StringTokenizer st = new StringTokenizer(relativeURL, "/");
-        st.nextToken(); // context path
         st.nextToken(); // controller
         String currentProject = st.nextToken();
         for (String createdProject :_test.getCreatedProjects())
