@@ -97,30 +97,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 //            }
 //        },"Text '" + SAMPLE_BASE_NAME + " (test2)' was not present",GWT_WAIT);
          assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
-        if (isLinkPresentWithText("WAITING"))
-            clickLinkWithText("WAITING");
-        else if (isLinkPresentWithText("CHECK FASTA WAITING", 0))
-            clickLinkWithText("CHECK FASTA WAITING", 0);
-        else if (isLinkPresentWithText("CHECK FASTA RUNNING", 0))
-            clickLinkWithText("CHECK FASTA RUNNING", 0);
-        else if (isLinkPresentWithText("CHECK FASTA COMPLETE"))
-            clickLinkWithText("CHECK FASTA COMPLETE");
-        else if (isLinkPresentWithText("SEARCH WAITING"))
-            clickLinkWithText("SEARCH WAITING");
-        else if (isLinkPresentWithText("SEARCH RUNNING", 0))
-            clickLinkWithText("SEARCH RUNNING", 0);
-        else if (isLinkPresentWithText("SEARCH COMPLETE", 0))
-            clickLinkWithText("SEARCH COMPLETE", 0);
-        else if (isLinkPresentWithText("ANALYSIS WAITING", 0))
-            clickLinkWithText("ANALYSIS WAITING", 0);
-        else if (isLinkPresentWithText("ANALYSIS RUNNING", 0))
-            clickLinkWithText("ANALYSIS RUNNING", 0);
-        else if (isLinkPresentWithText("ANALYSIS COMPLETE", 0))
-            clickLinkWithText("ANALYSIS COMPLETE", 0);
-        else if (isLinkPresentWithText("LOAD EXPERIMENT RUNNING"))
-            clickLinkWithText("LOAD EXPERIMENT RUNNING");
-        else
-            fail("Couldn't find 'WAITING', 'SEARCH...', 'CHECK FASTA...', 'ANALYSIS...', or 'LOAD EXPERIMENT RUNNING'.");
+        clickLinkWithText("Data Pipeline");
+        waitForText("COMPLETE", defaultWaitForPage);
+        clickAndWait(Locator.raw("//td[contains(text(), 'test2')]/../td/a"));
 
         log("View log file.");
 
