@@ -40,7 +40,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {/* */}
     }
 
-    protected void doTestSteps()
+    protected void initProject()
     {
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
@@ -53,7 +53,12 @@ public class IssuesTest extends BaseSeleniumWebTest
         addWebPart("Issues");
         addWebPart("Search");
         assertTextPresent("Open");
+    }
 
+    protected void doTestSteps()
+    {
+        initProject();
+        
         clickLinkWithText("view open issues");
         assertNavButtonPresent("New Issue");
 
@@ -199,6 +204,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         // SearchWebPart
         searchFor(PROJECT_NAME, "2012", 1, ISSUE_TITLE_0);
 
+        queryTest();
 
         // UNDONE test these actions
         // CompleteUserAction
@@ -243,5 +249,22 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextNotPresent(ISSUE_TITLE_1);
 
         clearAllFilters("Issues", "IssueId");
+    }
+
+    protected void queryTest()
+    {
+        clickLinkWithText(PROJECT_NAME);
+        addWebPart("Query");
+        setFormElement("schemaName", "issues");
+        submit();
+        clickLinkWithText("issues Queries");
+        clickNavButton("Create New Query");
+        setFormElement("ff_newQueryName", "xxyzzy");
+        clickNavButton("Create and edit SQL");
+        clickNavButton("Run Query");
+        clickLinkWithText("issues");
+        clickNavButton("Delete");
+        clickNavButton("OK");
+        clickLinkWithText(PROJECT_NAME);
     }
 }

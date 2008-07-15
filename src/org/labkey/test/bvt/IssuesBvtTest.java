@@ -34,7 +34,7 @@ public class IssuesBvtTest extends IssuesTest
         super.doTestSteps();
 
         // back to grid view
-        clickLinkWithText("view grid");
+        clickLinkWithText("Issues Summary");
 
         requiredFieldsTest();
         viewSelectedDetailsTest();
