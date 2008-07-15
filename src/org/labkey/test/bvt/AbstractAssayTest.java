@@ -191,7 +191,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         clickLinkWithText(TEST_ASSAY_LINK_PERMS);
         clickNavButton("Study Security");
 
-        checkCheckbox("studySecurity");
+        selectOptionByValue("securityString", "ADVANCED");
         clickNavButton("Update");
         selenium.waitForPageToLoad("30000");
 

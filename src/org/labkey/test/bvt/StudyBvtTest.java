@@ -115,8 +115,8 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Permissions");
         clickImageWithAltText("Study Security");
 
-        // enable study security
-        checkCheckbox("studySecurity");
+        // enable advanced study security
+        selectOptionByValue("securityString", "ADVANCED");
         clickNavButton("Update");
         selenium.waitForPageToLoad("30000");
 
@@ -188,10 +188,13 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
 
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Change Properties");
-        checkCheckbox("datasetRowsEditable");
-        clickNavButton("Save");
+        clickLinkWithText("Permissions");
+        clickImageWithAltText("Study Security");
+
+        selectOptionByValue("securityString", "EDITABLE_DATASETS");
+        clickNavButton("Update");
+        selenium.waitForPageToLoad("30000");
+        
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("DEM-1: Demographics");
 
@@ -250,8 +253,8 @@ public class StudyBvtTest extends StudyTest
         selenium.waitForPageToLoad("30000");
         clickImageWithAltText("Study Security");
 
-        // enable study security
-        checkCheckbox("studySecurity");
+        // enable advanced study security
+        selectOptionByValue("securityString", "ADVANCED");
         clickNavButton("Update");
         selenium.waitForPageToLoad("30000");
 
