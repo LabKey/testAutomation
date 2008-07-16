@@ -121,7 +121,7 @@ public class StudyBvtTest extends StudyTest
         selenium.waitForPageToLoad("30000");
 
         click(Locator.xpath("//td[.='Users']/..//input[@value='READ']"));
-        clickAndWait(Locator.xpath("//input[@value='Update']"));
+        clickAndWait(Locator.id("groupUpdateButton"));
 
         if (checkRSetup())
             RReportTest();
