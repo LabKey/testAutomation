@@ -121,7 +121,7 @@ public class StudyBvtTest extends StudyTest
         selenium.waitForPageToLoad("30000");
 
         click(Locator.xpath("//td[.='Users']/..//input[@value='READ']"));
-        clickAndWait(Locator.xpath("//input[@value='Save']"));
+        clickAndWait(Locator.xpath("//input[@value='Update']"));
 
         if (checkRSetup())
             RReportTest();
@@ -259,9 +259,9 @@ public class StudyBvtTest extends StudyTest
         selenium.waitForPageToLoad("30000");
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
-        clickAndWait(Locator.xpath("//input[@value='Save']"));
-        selenium.click("dataset.1");
+        clickAndWait(Locator.id("groupUpdateButton"));
 
+        selectOptionByText("dataset.1", "READ");
         clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//td/input[contains(@src, 'Update')]"));
     }
 

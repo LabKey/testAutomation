@@ -197,7 +197,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 
-        clickNavButton("Save");
+        clickAndWait(Locator.id("groupUpdateButton"));
     } //setStudyPerms
 
     /**
