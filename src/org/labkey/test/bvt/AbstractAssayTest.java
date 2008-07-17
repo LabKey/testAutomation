@@ -91,9 +91,6 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
      */
     protected void setupEnvironment()
     {
-        //revert to admin to ensure we can create users and setup security
-        revertToAdmin();
-
         //create a new project for the security tests
         log("Creating security test project");
         createProject(TEST_ASSAY_PRJ_SECURITY);

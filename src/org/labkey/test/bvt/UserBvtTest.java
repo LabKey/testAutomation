@@ -62,7 +62,7 @@ public class UserBvtTest extends SecurityTest
         assertTextNotPresent("User Id");
         assertTextNotPresent("Last Login");
 
-        signIn();
+        stopImpersonating();
     }
 
     /**

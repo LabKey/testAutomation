@@ -59,8 +59,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
             assertTextPresent(MSG1_BODY);
         else
             assertTextNotPresent(MSG1_BODY);
-        signOut();
-        signIn();
+        stopImpersonating();
     }
 
     protected void doCleanup()
@@ -240,8 +239,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
         assertTextNotPresent(MSG2_TITLE);
-        signOut();
-        signIn();
+        stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
 
         log("Test member list");
@@ -273,13 +271,11 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent(MSG3_TITLE);
-        signOut();
-        signIn();
+        stopImpersonating();
         impersonate(USER2);
         clickLinkWithText(PROJECT_NAME);
         assertTextNotPresent(MSG3_TITLE);
-        signOut();
-        signIn();
+        stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("customize");
         checkCheckbox("secure", 0, true);

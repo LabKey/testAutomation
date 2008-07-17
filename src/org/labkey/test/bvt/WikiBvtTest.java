@@ -372,16 +372,14 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE2_TITLE);
         clickTab("Wiki");
         assertTextNotPresent("copy pages");
-        signOut();
-        signIn();
+        stopImpersonating();
         clickLinkWithText(PROJECT2_NAME);
         clickLinkWithText("Permissions");
         setPermissions("User", "No Permissions");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextNotPresent(WIKI_PAGE2_TITLE);
-        signOut();
-        signIn();
+        stopImpersonating();
 
         log("Check if readers can read from other projects");
         clickLinkWithText(PROJECT2_NAME);
@@ -411,14 +409,14 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickTab("Wiki");
         clickLinkWithText("copy pages");
         assertTextNotPresent(PROJECT_NAME);
-        signOut();
-        signIn();
+        stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Permissions");
         clickLink("managegroup/" + PROJECT_NAME + "/Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
+
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextPresent(WIKI_PAGE2_TITLE);
@@ -426,21 +424,18 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickTab("Wiki");
         clickLinkWithText("copy pages");
         assertTextNotPresent(PROJECT_NAME);
-        signOut();
-        signIn();
+        stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Permissions");
         setPermissions("User", "Admin (all permissions)");
+
         log("make sure the changes went through");
-        signOut();
-        signIn();
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Wiki");
         clickLinkWithText("copy pages");
         assertTextPresent(PROJECT_NAME);
-        signOut();
-        signIn();
+        stopImpersonating();
 
         log("delete wiki web part");
         clickLinkWithText(PROJECT2_NAME);

@@ -88,7 +88,6 @@ public class AssayTest extends AbstractAssayTest
      */
     protected void doCleanup()
     {
-        revertToAdmin();
         try
         {
             deleteProject(TEST_ASSAY_PRJ_SECURITY); //should also delete the groups
@@ -198,7 +197,7 @@ public class AssayTest extends AbstractAssayTest
     private void uploadRuns(String folder, String asUser)
     {
         log("Uploading runs into folder " + folder + " as user " + asUser);
-        impersonateUser(asUser);
+        impersonate(asUser);
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         clickLinkWithText(folder);
 
@@ -302,7 +301,8 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("7.0");
         assertTextPresent("18");
 
-        revertToAdmin(TEST_ASSAY_PRJ_SECURITY);
+        stopImpersonating();
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
     } //uploadRuns()
 
     /**
@@ -315,7 +315,8 @@ public class AssayTest extends AbstractAssayTest
         log("Publishing the data as the PI");
 
         //impersonate the PI
-        impersonateUser(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY);
+        impersonate(TEST_ASSAY_USR_PI1);
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
 
         //select the Lab1 folder and view all the data for the test assay
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
@@ -363,6 +364,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_ASSAY_RUN_PROP1);
         assertTextPresent("18");
 
+        stopImpersonating();
     } //publishData()
 
     /**
@@ -371,7 +373,6 @@ public class AssayTest extends AbstractAssayTest
     private void editAssay()
     {
         log("Testing edit and delete and assay definition");
-        revertToAdmin(); //need to be admin to edit assay at project root
 
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
 
@@ -396,7 +397,7 @@ public class AssayTest extends AbstractAssayTest
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.ASSAY_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "were copied to a study from the assay: " + TEST_ASSAY, 5);
     } //editAssay()
 
-    /**
+    /**   TODO: DELETE  
      * Reverts to the admin account, and then selects a particular project
      *
      * @param project project to select.

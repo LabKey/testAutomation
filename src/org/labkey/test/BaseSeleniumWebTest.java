@@ -50,6 +50,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private URL _lastPageURL = null;
     private String _lastPageText = null;
     private Stack<String> _locationStack = new Stack<String>();
+    private Stack<String> _impersonationStack = new Stack<String>();
     private List<String> _createdProjects = new ArrayList<String>();
     private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
     protected boolean _testFailed = true;
@@ -2224,35 +2225,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 beginAt(getCurrentRelativeURL().concat("?" + parameter));
     }
 
-        /**
-     * Once you have impersonatned a user you can't go back and impersonate another until you sign in.
-     * So to be safe, always sign out as the Admin User and Sign back in
-     *
-     * @param userEmailAddress user email address to impersonate
-     */
-    public void impersonateUser(String userEmailAddress)
-    {
-        log("impersonating user : " + userEmailAddress);
-        signOut();
-        signIn();
-        ensureAdminMode();
-        clickLinkWithText("Admin Console");
-        selectOptionByText("email", userEmailAddress);
-        clickNavButton("Impersonate");
-    } //impersonateUser(email)
-
-    /**
-     * Impersonates another user, and selects a particular project
-     *
-     * @param userEmailAddress user to impersonate
-     * @param project project to select after impersonation
-     */
-    public void impersonateUser(String userEmailAddress, String project)
-    {
-        impersonateUser(userEmailAddress);
-        clickLinkWithText(project);
-    }
-
     public void assertPermissionSetting(String groupName, String permissionSetting)
     {
         log("Checking permission setting for group " + groupName + " equals " + permissionSetting);
@@ -2268,11 +2240,50 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertPermissionSetting(groupName, permissionString);
     }
 
+
+    private static class Impersonation
+    {
+        String _adminEmail;
+        String _userEmail;
+
+        Impersonation(String userEmail, String adminEmail)
+        {
+            _adminEmail = adminEmail;
+            _userEmail = userEmail;
+        }
+
+        public String getAdminEmail()
+        {
+            return _adminEmail;
+        }
+
+        public String getUserEmail()
+        {
+            return _userEmail;
+        }
+    }
+
+
     public void impersonate(String fakeUser)
     {
+        log("impersonating user : " + fakeUser);
+        assertTextNotPresent("Stop Impersonating");
+        ensureAdminMode();
         clickLinkWithText("Admin Console");
         selectOptionByText(Locator.id("email").toString(), fakeUser);
         clickNavButton("Impersonate");
+        _impersonationStack.push(fakeUser);
+    }
+
+
+    public void stopImpersonating()
+    {
+        String fakeUser = _impersonationStack.pop();
+        log("Ending impersonation");
+        assertTextPresent(fakeUser);
+        clickLinkWithText("Stop Impersonating");
+        assertTextPresent("Sign out");
+        assertTextNotPresent(fakeUser);
     }
 
     public void createUser(String userName, String cloneUserName)

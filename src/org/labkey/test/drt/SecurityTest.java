@@ -195,12 +195,12 @@ public class SecurityTest extends BaseSeleniumWebTest
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 223);
 
+        // Back to the admin user
+        stopImpersonating();
+
         // Test that LabKey Server sign out invalidates the token
-        signOut();
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
-
-        signIn(); // Leave admin logged in for clean up
     }
 
 

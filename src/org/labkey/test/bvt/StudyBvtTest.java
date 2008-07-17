@@ -526,8 +526,7 @@ public class StudyBvtTest extends StudyTest
 //        clickNavButton("Home");
 
         log("Change user permission");
-        signOut();
-        signIn();
+        stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         if (isTextPresent("Enable Admin"))
             clickLinkWithText("Enable Admin");
@@ -649,8 +648,7 @@ public class StudyBvtTest extends StudyTest
         click(Locator.linkWithText("Manage Site"));
         sleep(3000);
         clickLinkWithText("Admin Console");
-        selenium.select("email", "label=" + TEST_USER);
-        clickAndWait(Locator.xpath("//input[@type='image']"));
+        impersonate(TEST_USER);
         clickLinkWithText("StudyVerifyProject");
         clickLinkWithText("My Study");
 
@@ -669,10 +667,7 @@ public class StudyBvtTest extends StudyTest
         clickMenuButton("Query", "Query:APX-1: Abbreviated Physical Exam");
         assertTextPresent("User does not have read permission on this dataset.");
 */
-
-        signOut();
-        signIn();
-
+        stopImpersonating();
         deleteCharts();
     }
 
