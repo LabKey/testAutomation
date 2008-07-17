@@ -680,7 +680,9 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Manage Reports and Views");
         click(Locator.xpath("//a[.='participant chart']/../..//td/a[.='delete']"));
 		assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
+        waitForPageToLoad();
         click(Locator.xpath("//a[.='non participant chart']/../..//td/a[.='delete']"));
 		assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
+        waitForPageToLoad();
     }
 }
