@@ -171,7 +171,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "    function()\n" +
             "    {\n" +
             "        LABKEY.Query.executeSql({schemaName: 'lists', " +
-                    "sql: 'select AVG(People.age) as AverageAge from People', " +
+                    "sql: 'select People.age from People', " +
                     "successCallback: successHandler, errorCallback: failureHandler});\n" +
             "    },\n" +
             "\n" +
@@ -209,10 +209,10 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        else\n" +
             "            html += 'FAILURE: bad query did not generate expected exception.<br>';\n" +
             "\n" +
-            "        if (testResults[6].rowCount == 1)\n" +
-            "            html += 'SUCCESS: executeSql returned 1 rows<br>';\n" +
+            "        if (testResults[6].rowCount == 3)\n" +
+            "            html += 'SUCCESS: executeSql returned 3 rows<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: executeSql returned ' + testResults[6].rowCount + ' rows, expected 1. Error value = ' + testResults[6].exception + '<br>';\n" +
+            "            html += 'FAILURE: executeSql returned ' + testResults[6].rowCount + ' rows, expected 3. Error value = ' + testResults[6].exception + '<br>';\n" +
             "\n" +
             "        document.getElementById('testDiv').innerHTML = html;        \n" +
             "    }\n" +
