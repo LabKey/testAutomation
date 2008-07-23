@@ -2241,29 +2241,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-    private static class Impersonation
-    {
-        String _adminEmail;
-        String _userEmail;
-
-        Impersonation(String userEmail, String adminEmail)
-        {
-            _adminEmail = adminEmail;
-            _userEmail = userEmail;
-        }
-
-        public String getAdminEmail()
-        {
-            return _adminEmail;
-        }
-
-        public String getUserEmail()
-        {
-            return _userEmail;
-        }
-    }
-
-
     public void impersonate(String fakeUser)
     {
         log("impersonating user : " + fakeUser);
@@ -2571,6 +2548,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setDefaultWaitForPage(int defaultWaitForPage)
     {
         this.defaultWaitForPage = defaultWaitForPage;
+    }
+
+    // Return display name that's currently shown in the header
+    public String getDisplayName()
+    {
+        String cellText = getText(Locator.xpath("//table[@id='header']/tbody/tr/td[3]"));
+        return cellText.split("\\n")[0];
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium

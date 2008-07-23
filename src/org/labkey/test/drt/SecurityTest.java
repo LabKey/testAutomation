@@ -16,10 +16,10 @@
 
 package org.labkey.test.drt;
 
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected static final String ADMIN_USER_TEMPLATE = "_admin.template@security.test";
     protected static final String NORMAL_USER_TEMPLATE = "_user.template@security.test";
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
-    protected static final String ADMIN_USER = "admin@security.test";
+    protected static final String PROJECT_ADMIN_USER = "admin@security.test";
     protected static final String NORMAL_USER = "user@security.test";
 
     public String getAssociatedModuleDirectory()
@@ -55,7 +55,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         deleteUser(ADMIN_USER_TEMPLATE);
         deleteUser(NORMAL_USER_TEMPLATE);
-        deleteUser(ADMIN_USER);
+        deleteUser(PROJECT_ADMIN_USER);
         deleteUser(NORMAL_USER);
     }
 
@@ -64,30 +64,32 @@ public class SecurityTest extends BaseSeleniumWebTest
         displayNameTest();
         clonePermissionsTest();
         tokenAuthenticationTest();
+        impersonationTest();
     }
 
     private void displayNameTest()
     {
         //set display name to user's email minus domain
+        String oldDisplayName = getDisplayName();
         clickLinkWithText("My Account");
-        String userName = PasswordUtil.getUsername();
-        assertTextPresent(userName);
         clickNavButton("Edit");
+
+        String email = PasswordUtil.getUsername();
         String displayName;
-        if (userName.contains("@"))
+        if (email.contains("@"))
         {
-            displayName = userName.substring(0, userName.indexOf("@"));
+            displayName = email.substring(0, email.indexOf("@"));
         }
         else
         {
-            displayName = userName;
+            displayName = email;
         }
         setFormElement("displayName", displayName);
         clickNavButton("Submit");
 
         //now set it back
         clickNavButton("Edit");
-        setFormElement("displayName", userName);
+        setFormElement("displayName", oldDisplayName);
         clickNavButton("Submit");
     }
 
@@ -115,11 +117,11 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickNavButton("Update Group Membership", "large");
 
         // create users and verify permissions
-        createUser(ADMIN_USER, ADMIN_USER_TEMPLATE);
+        createUser(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
         createUser(NORMAL_USER, NORMAL_USER_TEMPLATE);
 
         // verify permissions
-        checkGroupMembership(ADMIN_USER, "SecurityVerifyProject/Administrators");
+        checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators");
         checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers");
     }
 
@@ -301,5 +303,55 @@ public class SecurityTest extends BaseSeleniumWebTest
             return url;
         else
             return url.substring(0, index);
+    }
+
+
+    private void impersonationTest()
+    {
+        impersonate(NORMAL_USER);
+
+        String userDisplayName = getDisplayName();
+        assertTextNotPresent("Admin Console");
+        assertTextNotPresent("Hide Admin");
+        assertTextNotPresent("Show Admin");
+
+        stopImpersonating();
+
+        String adminDisplayName = getDisplayName();
+        ensureAdminMode();
+        clickLinkWithText("Site Admins");
+        setFormElement("names", PROJECT_ADMIN_USER);
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership", "large");
+
+        impersonate(PROJECT_ADMIN_USER);
+
+        String projectAdminDisplayName = getDisplayName();
+        ensureAdminMode();
+        clickLinkWithText("Admin Console");
+        assertTextPresent("Already impersonating; click here to change back to " + adminDisplayName);
+
+        deleteUser(NORMAL_USER);
+
+        stopImpersonating();
+
+        ensureAdminMode();
+        clickLinkWithText("Admin Console");
+        clickLinkWithText("audit log");
+
+        selectOptionByText("view", "User events");
+        waitForPageToLoad();
+
+        String createdBy = getTableCellText("dataregion_audit", 3, 1);
+        String impersonatedBy = getTableCellText("dataregion_audit", 3, 2);
+        String user = getTableCellText("dataregion_audit", 3, 3);
+        String comment = getTableCellText("dataregion_audit", 3, 4);
+
+        assertTrue("Incorrect display for deleted user -- expected <nnnn>", user.matches("<\\d{4,}>"));
+
+        log(createdBy + impersonatedBy + user + comment);
+        log(projectAdminDisplayName + adminDisplayName + user + userDisplayName + " was deleted from the system");
+
+        assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, projectAdminDisplayName + adminDisplayName + user + userDisplayName + " was deleted from the system");
     }
 }
