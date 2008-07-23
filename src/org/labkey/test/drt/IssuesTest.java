@@ -16,7 +16,6 @@
 
 package org.labkey.test.drt;
 
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -141,7 +140,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         // test validate
         assertTextPresent("Field AssignedTo cannot be null");
-        selectOptionByText("assignedTo", PasswordUtil.getUsername());
+        selectOptionByText("assignedTo", getDisplayName());
         clickNavButton("Submit");
         assertTextPresent("Field Milestone cannot be null");
         selectOptionByText("milestone", "2012");
@@ -226,7 +225,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         selectOptionByText("priority", "1");
         setFormElement("comment", "alien autopsy");
         selectOptionByText("milestone", "2013");
-        selectOptionByText("assignedTo", PasswordUtil.getUsername());
+        selectOptionByText("assignedTo", getDisplayName());
         clickNavButton("Submit");
 
         // assert both issues are present
