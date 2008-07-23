@@ -43,6 +43,8 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin@security.test";
     protected static final String NORMAL_USER = "user@security.test";
+    protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
+    protected static final String SITE_ADMIN_USER = "siteadmin@security.test";
 
     public String getAssociatedModuleDirectory()
     {
@@ -57,6 +59,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         deleteUser(NORMAL_USER_TEMPLATE);
         deleteUser(PROJECT_ADMIN_USER);
         deleteUser(NORMAL_USER);
+        deleteUser(SITE_ADMIN_USER);
     }
 
     protected void doTestSteps()
@@ -118,7 +121,9 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         // create users and verify permissions
         createUser(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
+        createUser(SITE_ADMIN_USER, PasswordUtil.getUsername());
         createUser(NORMAL_USER, NORMAL_USER_TEMPLATE);
+        createUser(TO_BE_DELETED_USER, NORMAL_USER_TEMPLATE);
 
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators");
@@ -308,31 +313,21 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     private void impersonationTest()
     {
-        impersonate(NORMAL_USER);
+        String testUserDisplayName = getDisplayName();
 
-        String userDisplayName = getDisplayName();
+        impersonate(TO_BE_DELETED_USER);
+        String deletedUserDisplayName = getDisplayName();
         assertTextNotPresent("Admin Console");
         assertTextNotPresent("Hide Admin");
         assertTextNotPresent("Show Admin");
-
         stopImpersonating();
 
-        String adminDisplayName = getDisplayName();
-        ensureAdminMode();
-        clickLinkWithText("Site Admins");
-        setFormElement("names", PROJECT_ADMIN_USER);
-        uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership", "large");
-
-        impersonate(PROJECT_ADMIN_USER);
-
-        String projectAdminDisplayName = getDisplayName();
+        impersonate(SITE_ADMIN_USER);
+        String siteAdminDisplayName = getDisplayName();
         ensureAdminMode();
         clickLinkWithText("Admin Console");
-        assertTextPresent("Already impersonating; click here to change back to " + adminDisplayName);
-
-        deleteUser(NORMAL_USER);
-
+        assertTextPresent("Already impersonating; click here to change back to " + testUserDisplayName);
+        deleteUser(TO_BE_DELETED_USER);
         stopImpersonating();
 
         ensureAdminMode();
@@ -348,10 +343,6 @@ public class SecurityTest extends BaseSeleniumWebTest
         String comment = getTableCellText("dataregion_audit", 3, 4);
 
         assertTrue("Incorrect display for deleted user -- expected <nnnn>", user.matches("<\\d{4,}>"));
-
-        log(createdBy + impersonatedBy + user + comment);
-        log(projectAdminDisplayName + adminDisplayName + user + userDisplayName + " was deleted from the system");
-
-        assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, projectAdminDisplayName + adminDisplayName + user + userDisplayName + " was deleted from the system");
+        assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
     }
 }
