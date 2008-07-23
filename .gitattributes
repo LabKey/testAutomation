@@ -33,6 +33,7 @@ cruisecontrol/xsl/pmd.xsl -text
 cruisecontrol/xsl/testdetails.xsl -text
 cruisecontrol/xsl/unittests.xsl -text
 /resetDRT.cmd -text
+/resetDRT.sh -text
 src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseSeleniumWebTest.java -text
 src/org/labkey/test/Cleanable.java -text
