@@ -233,7 +233,7 @@ public class StudyBvtTest extends StudyTest
 
         // create a test group and give it container read perms
         clickLinkWithText("Permissions");
-        clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/Security/StudyVerifyProject/container.view?')]"));
+        clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/security/StudyVerifyProject/container.view?')]"));
         setFormElement("name", TEST_GROUP);
         clickAndWait(Locator.xpath("//input[@value='Create']"));
 
