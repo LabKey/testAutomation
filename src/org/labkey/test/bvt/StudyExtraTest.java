@@ -332,10 +332,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selectOptionByText("providerName", "General");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
 
-        selenium.type("//input[@type='text']", TEST_ASSAY);
-        selenium.type("//textarea", TEST_ASSAY_DESC);
+        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
+        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {

@@ -187,7 +187,7 @@ public class StudyTest extends BaseSeleniumWebTest
         setFormElement("typeName", "verifyAssay");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
 
         checkCheckbox("additionalKey", 1, true);
 

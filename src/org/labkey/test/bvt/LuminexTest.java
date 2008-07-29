@@ -85,11 +85,11 @@ public class LuminexTest extends AbstractAssayTest
         selectOptionByText("providerName", "Luminex");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@type='text']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
 
         log("Setting up Luminex assay");
-        selenium.type("//input[@type='text']", TEST_ASSAY_LUM);
-        selenium.type("//textarea", TEST_ASSAY_LUM_DESC);
+        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
+        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
 
         sleep(1000);
         clickNavButton("    Save    ", 0);
@@ -128,9 +128,9 @@ public class LuminexTest extends AbstractAssayTest
             setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
             setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE2));
             clickNavButton("Next", 60000);
-            selenium.type("//input[@type='text'][1]", "StandardName1b");
-            selenium.type("//input[@type='text'][1]/../../../tr[4]//input[@type='text']", "StandardName2");
-            selenium.type("//input[@type='text'][1]/../../../tr[5]//input[@type='text']", "StandardName4");
+            selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]", "StandardName1b");
+            selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']", "StandardName2");
+            selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[5]//input[@type='text']", "StandardName4");
             selenium.click("//input[contains(@name,'unitsofConcentrationCheckBox')]");
             selenium.type("//input[@type='text' and contains(@name, 'unitsofConcentration')]", "10 g/ml");
             clickNavButton("Save and Finish");
@@ -148,10 +148,10 @@ public class LuminexTest extends AbstractAssayTest
             clickNavButton("Next");
             setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
             clickNavButton("Next", 60000);
-            assertEquals("StandardName1b", selenium.getValue("//input[@type='text'][1]"));
-            assertEquals("StandardName4", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text'][1]"));
+            assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
+            assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
             assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
-            assertEquals("10 g/ml", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
             clickNavButton("Save and Finish");
 
             // Upload another run using a thaw list that pointed at the list we uploaded earlier
@@ -171,10 +171,10 @@ public class LuminexTest extends AbstractAssayTest
             setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
             setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
             clickNavButton("Next", 60000);
-            assertEquals("StandardName1b", selenium.getValue("//input[@type='text'][1]"));
-            assertEquals("StandardName4", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text'][1]"));
+            assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
+            assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
             assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
-            assertEquals("10 g/ml", selenium.getValue("//input[@type='text'][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsofConcentration')]"));
             clickNavButton("Save and Finish");
 
             log("Check that upload worked");

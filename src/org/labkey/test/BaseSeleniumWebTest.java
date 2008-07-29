@@ -148,7 +148,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 _fileUploadAvailable = true;
             }
         }
-        //browserPath = " c:\\program files\\mozilla firefox\\Firefox3\\firefox.exe";
         return browser + browserPath;
     }
 
