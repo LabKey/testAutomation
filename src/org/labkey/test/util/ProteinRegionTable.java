@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.SortDirection;
 
 /**
  * ProteinRegionTable class
@@ -40,7 +41,7 @@ public class ProteinRegionTable extends DataRegionTable
         _maxProbability = maxProbability;
 
         _test.setFilter("ProteinGroupsWithQuantitation", "GroupProbability", "Is Greater Than or Equal To", Double.toString(_maxProbability));
-        _test.clickLinkWithText("Group");
+        _test.setSort("ProteinGroupsWithQuantitation", "GroupNumber", SortDirection.ASC);
     }
 
     public int getProtCount()

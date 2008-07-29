@@ -19,6 +19,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ms2.MS2ClusterTest;
+import com.thoughtworks.selenium.SeleniumException;
 
 /**
  * MS2TestParams class
@@ -84,8 +85,17 @@ public class MS2TestParams
 
         for (int i = 0; i < table.getDataRowCount(); i++)
         {
-            if (!nameText.equals(table.getDataAsText(i, colDescription)))
-                continue;
+            try
+            {
+                if (!nameText.equals(table.getDataAsText(i, colDescription)))
+                    continue;
+            }
+            catch (SeleniumException e)
+            {
+                test.log("ERROR: Getting description text for row " + i + ", column " + colDescription);
+                test.log("       Row count " + table.getDataRowCount());
+                return "UNKNOWN";
+            }
 
             return table.getDataAsText(i, colStatus);
         }

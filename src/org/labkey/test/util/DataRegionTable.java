@@ -33,10 +33,17 @@ public class DataRegionTable
 {
     protected String _tableName;
     protected BaseSeleniumWebTest _test;
+    protected boolean _selectors;
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
+        this(tableName, test, true);
+    }
+
+    public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors)
+    {
         _tableName = tableName;
+        _selectors = selectors;
         reload(test);
     }
 
@@ -107,7 +114,7 @@ public class DataRegionTable
     {
         try
         {
-            for (int col = 0; getDataAsText(0, col-1) != null; col++)
+            for (int col = 0; getDataAsText(0, col-(_selectors ? 1 : 0)) != null; col++)
             {
                 String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+1) + "]/div"));
                 if (header.equals(name))
@@ -124,7 +131,7 @@ public class DataRegionTable
 
     public String getDataAsText(int row, int column)
     {
-        return _test.getTableCellText(getHtmlName(), row + 1, column + 1);
+        return _test.getTableCellText(getHtmlName(), row + 1, column + (_selectors ? 1 : 0));
     }
 
     public void setSort(String columnName, SortDirection direction)

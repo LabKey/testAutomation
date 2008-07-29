@@ -17,9 +17,11 @@ package org.labkey.test.ms2;
 
 import org.apache.commons.io.FileUtils;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.ms2.cluster.MS2TestParams;
 import org.labkey.test.ms2.cluster.MS2TestsBase;
 import org.labkey.test.ms2.cluster.MS2TestsBaseline;
+import org.labkey.test.ms2.cluster.MS2Tests_20070701__3_4_1;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -41,30 +43,42 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     private static boolean CLEAN_DATA = true;
     private static boolean NEW_DATA = true;
     private static boolean NEW_SEARCH = true;
-    private static boolean REMOVE_DATA = false;
+    private static boolean REMOVE_DATA = true;
+    private static boolean USE_GLOBUS = true;
 
     protected static final String PROJECT_NAME = "MS2ClusterProject";
     protected static final String FOLDER_NAME = "Pipeline";
     protected static final String PIPELINE_PATH = "T:/edi/pipeline/Test/regression";
     protected static final String FASTA_PATH = "T:/data/databases";
+    // These files are not checked in, since that would be a security issue.
+    // Ask Brendan, Josh or Brian, if you need them.
+    protected static final String USER_CERT = "/sampledata/pipeline/globus/usercert.pem";
+    protected static final String USER_KEY = "/sampledata/pipeline/globus/userkey.pem";
+    protected static final String USER_KEY_PASSWORD = "ChiKung1";
     protected static final int MAX_WAIT_SECONDS = 60*60*5;
 
     protected MS2TestsBase testSet;
 
     public MS2ClusterTest()
     {
-        testSet = new MS2TestsBaseline(this);
+        testSet = new MS2Tests_20070701__3_4_1(this);
 //        testSet.addTestsScoringMix();
-//        testSet.addTestsQuant();
+        testSet.addTestsQuant();
 //        testSet.addTestsScoringOrganisms();
 //        testSet.addTestsISBMix();
-        testSet.addTestsIPAS();
+//        testSet.addTestsIPAS();
     }
 
     // Return the directory of the module whose functionality this class tests, or "none" if multiple/all modules are tested
     public String getAssociatedModuleDirectory()
     {
         return "ms2";
+    }
+
+    @Override
+    protected boolean isFileUploadTest()
+    {
+        return USE_GLOBUS;
     }
 
     protected void doCleanup() throws IOException
@@ -102,9 +116,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         {
             DataRegionTable tableExp = new DataRegionTable("MS2SearchRuns", this);
             int rows = tableExp.getDataRowCount();
-            int nameCol = 3;
-
-            DataRegionTable tableStatus = new DataRegionTable("StatusFiles", this);
+            int nameCol = tableExp.getColumn("Name");
 
             for (MS2TestParams tp : testSet.getParams())
             {
@@ -117,6 +129,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
                         continue;
                     
                     // Make sure the status is COMPLETE.
+                    DataRegionTable tableStatus = new DataRegionTable("StatusFiles", this, false);
                     String status = tp.getStatus(name, tableStatus);
                     if (status != null)
                         continue;
@@ -188,6 +201,18 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
 
         log("Set pipeline root.");
         setFormElement("path", PIPELINE_PATH);
+
+        if (USE_GLOBUS)
+        {
+            assertTrue("Globus test requires file upload.", isFileUploadAvailable());
+            setFormElement("keyFile", new File(getLabKeyRoot() + USER_KEY));
+            setFormElement("keyPassword", USER_KEY_PASSWORD);
+            setFormElement("certFile", new File(getLabKeyRoot() + USER_CERT));
+        }
+        else
+        {
+            checkCheckbox("perlPipeline");
+        }
         submit();
 
         log("Set FASTA root");
@@ -218,10 +243,13 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
             clickNavButton("X%21Tandem Peptide Search");
 
             log("Choose existing protocol " + tp.getProtocol());
+            waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + tp.getProtocol() + "']" ), WAIT_FOR_GWT * 12);
             selectOptionByText("protocol", tp.getProtocol());
+            sleep(WAIT_FOR_GWT);
 
             log("Start the search");
             submit();
+            sleep(WAIT_FOR_GWT);
 
             if (!NEW_SEARCH)
             {

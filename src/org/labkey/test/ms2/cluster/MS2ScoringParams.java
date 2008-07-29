@@ -18,6 +18,7 @@ package org.labkey.test.ms2.cluster;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ProteinRegionTable;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.SortDirection;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -63,11 +64,15 @@ class MS2ScoringParams extends MS2TestParams
     {
         test.log("Validating " + getExperimentLink());
 
+        setGrouping("None");
+        test.clearAllFilters("MS2Peptides", "Scan");
+
         int protsActual = 0;
 
         if (positiveProteins != null)
         {
             setGrouping("Protein Prophet");
+            test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
             int protsExpect = positiveProteins.size();
             HashSet<String> protSet = new HashSet<String>();
@@ -108,7 +113,7 @@ class MS2ScoringParams extends MS2TestParams
 
         DataRegionTable tablePep = new DataRegionTable("MS2Peptides", test);
 
-        test.clickLinkWithText("PepProphet");
+        test.setSort("MS2Peptides", "PeptideProphet", SortDirection.DESC);
         test.setFilter("MS2Peptides", "Protein", "Starts With", "rev_");
         test.setFilter("MS2Peptides", "PeptideProphet", "Is Greater Than or Equal To", "0.9");
 
@@ -122,6 +127,7 @@ class MS2ScoringParams extends MS2TestParams
                 tablePep.getDataRowCount() == maxFPPeptideAbove);
 
         setGrouping("Protein Prophet");
+        test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
         protsActual = 0;
 
@@ -132,9 +138,7 @@ class MS2ScoringParams extends MS2TestParams
         while (tableProt.nextPage())
             protsActual += tableProt.getProtCount();
 
-
-        test.clickLinkWithText("Prob");
-        test.clickLinkWithText("Prob");
+        test.setSort("ProteinGroupsWithQuantitation", "GroupProbability", SortDirection.DESC);
         maxFound = Double.parseDouble(tableProt.getDataAsText(0, colProb));
 
         validateTrue("Maximum ProteinProphet false-positive value " + maxFound + " does not match " + maxFPProteinProb + ".",

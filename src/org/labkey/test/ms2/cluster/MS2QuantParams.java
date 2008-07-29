@@ -55,7 +55,13 @@ class MS2QuantParams extends MS2TestParams
     public void validate()
     {
         test.log("Validating " + getExperimentLink());
+
+        setGrouping("None");
+        test.clearAllFilters("MS2Peptides", "Scan");
+
         setGrouping("Protein Prophet");
+        test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
+
         test.log("Pick protein columns");
         test.clickNavButton("Pick Protein Columns");
         test.setFormElement("columns", "GroupNumber, GroupProbability, Protein, RatioMean, RatioStandardDev, RatioNumberPeptides, AACoverage, BestName, BestGeneName, Description");

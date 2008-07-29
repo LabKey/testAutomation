@@ -39,7 +39,8 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         "<bioml>\n" +
             "  <note label=\"pipeline, protocol name\" type=\"input\">test2</note> \n" +
             "  <note label=\"pipeline, protocol description\" type=\"input\">This is a test protocol using the defaults.</note> \n" +
-            "  <note label=\"pipeline prophet, min probability\" type=\"input\">0</note> \n" +
+            "  <note label=\"pipeline prophet, min peptide probability\" type=\"input\">0</note> \n" +
+            "  <note label=\"pipeline prophet, min protein probability\" type=\"input\">0</note> \n" +
             "  <note label=\"spectrum, minimum peaks\" type=\"input\">10</note> \n" +
             "  <note label=\"mzxml2search, charge\" type=\"input\">1,3</note> \n" +
         "  </bioml>";

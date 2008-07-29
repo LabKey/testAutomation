@@ -215,6 +215,7 @@ public class MS2Tests_20070701__3_4_1 extends MS2TestsBase
 //                new FalsePositiveMarks(0.9951, 210, 0.9608, 54);   TPP 3.4.0
                 new FalsePositiveMarks(0.9951, 210, 0.961, 54);
 
+//  TPP 3.0.2 k-score and X!Comet matched exactly
 //        listParams.add(new MS2ScoringParams(test, "yeast/Paulovich_101705_ltq", "xc_yeastp",
 //                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
         listParams.add(new MS2ScoringParams(test, "yeast/Paulovich_101705_ltq", "xk_yeastp",
