@@ -19,8 +19,6 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 
-import java.io.File;
-
 /**
  * This test tests uploading a FlowJo workspace that has results calculated in it, but no associated FCS files.
  * It then runs two queries on those results.
@@ -41,16 +39,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
         submit();
         clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Upload FlowJo Workspace");
-        clickImageWithAltText("Browse the pipeline");
-        clickLinkWithText("root");
-        clickLinkWithText("flowjoquery");
-        clickLinkWithText("Workspaces");
-        checkCheckbox("file", "flowjoquery" + File.separator + "Workspaces" + File.separator + "PV1-public.xml", true);
-        clickButtonWithImgSrc("Upload%20Workspace");
-        setFormElement("ff_newAnalysisName", "FlowJoAnalysis");
-        clickButtonWithImgSrc("Upload%20Results");
-        waitForPipeline(containerPath);
+        importAnalysis(containerPath, "/flowjoquery/Workspaces/PV1-public.xml", null, "FlowJoAnalysis");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         clearCustomizeViewColumns();
         addCustomizeViewColumn("Name");
@@ -84,15 +73,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 //        waitForPageToLoad();
 
         clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Upload FlowJo Workspace");
-        clickImageWithAltText("Browse the pipeline");
-        clickLinkWithText("root");
-        clickLinkWithText("flowjoquery");
-        clickLinkWithText("miniFCS");
-        checkCheckbox("file", "flowjoquery" + File.separator + "miniFCS" + File.separator + "mini-fcs.xml", true);
-        clickButtonWithImgSrc("Upload%20Workspace");
-        clickButtonWithImgSrc("Upload%20Results");
-        waitForPipeline(containerPath);
+        importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", "FlowJoAnalysis");
         clickLinkWithText("workspaceScript1");
         clickLinkWithText("Make a copy of this analysis script");
         setFormElement("name", "LabKeyScript");

@@ -119,4 +119,62 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
         beginAt(queryURL);
     }
+
+    protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, String analysisName)
+    {
+        clickLinkWithText("Import FlowJo Workspace Analysis");
+        assertTitleEquals("Import Analysis: " + containerPath);
+        clickNavButton("Begin");
+
+        assertTitleEquals("Import Analysis: Upload Workspace: " + containerPath);
+        selectTreeItem("tree", workspacePath);
+//        assertFormElementEquals("workspace.path", workspacePath);
+        clickNavButton("Next");
+
+        assertTitleEquals("Import Analysis: Associate FCS Files: " + containerPath);
+        if (fcsPath != null)
+            selectTreeItem("tree", fcsPath);
+        else
+            clearTreeSelections("tree");
+//        assertFormElementEquals("runFilePathRoot", "");
+        clickNavButton("Next");
+
+        assertTitleEquals("Import Analysis: Choose Analysis Folder: " + containerPath);
+        setFormElement("newAnalysisName", analysisName);
+
+        clickNavButton("Next");
+        assertTitleEquals("Import Analysis: Confirm: " + containerPath);
+        // XXX: check confim page
+        clickButtonWithImgSrc("Finish");
+        waitForPipeline(containerPath);
+    }
+
+    protected void selectTreeItem(String treeCmpId, String path)
+    {
+        String result = selenium.getEval(
+                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
+                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
+                "tree.selectPath('/<root>' + '"+ path + "', 'text');\n" +
+                "\"OK\"");
+        assertEquals("OK", result);
+        sleep(500);
+    }
+
+    protected void expandTreeItem(String treeCmpId, String path)
+    {
+        selenium.getEval(
+                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
+                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
+                "tree.expandPath('/<root>' + '"+ path + "', 'text');");
+        sleep(500);
+    }
+
+    protected void clearTreeSelections(String treeCmpId)
+    {
+        selenium.getEval(
+                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
+                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
+                "tree.getSelectionModel().clearSelections();");
+    }
+
 }

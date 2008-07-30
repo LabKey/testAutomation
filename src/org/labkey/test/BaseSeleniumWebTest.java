@@ -1253,13 +1253,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertFormElementEquals(Locator loc, String value)
     {
         assertElementPresent(loc);
-        assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", selenium.getValue(loc.toString()), value);
+        assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
     public void assertFormElementNotEquals(Locator loc, String value)
     {
         assertElementPresent(loc);
-        assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", selenium.getValue(loc.toString()), value);
+        assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
 
