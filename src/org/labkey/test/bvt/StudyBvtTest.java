@@ -343,6 +343,7 @@ public class StudyBvtTest extends StudyTest
             }
         }
         log("Failed R configuration, skipping R tests");
+        log("Environment info: " + System.getenv());
         return false;
     }
 
