@@ -148,6 +148,8 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         setStudyPerms(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1,
                         TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_STUDY_READALL);
 
+        setStudyQCStates(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1);
+
         //add the Assay List web part to the lab1 folder so we can upload data later as a labtech
         log("Adding assay list web part to lab1 folder");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
@@ -197,6 +199,23 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         clickAndWait(Locator.id("groupUpdateButton"));
     } //setStudyPerms
 
+    private void setStudyQCStates(String project, String folder)
+    {
+        log("Setting QC states in study " + folder + ".");
+        clickLinkWithText(project);
+        clickLinkWithText(folder);
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage QC States");
+        setFormElement("newLabel", "Approved");
+        setFormElement("newDescription", "We all like approval.");
+        clickNavButton("Save");
+        setFormElement("newLabel", "Pending Review");
+        setFormElement("newDescription", "No one likes to be reviewed.");
+        clickCheckbox("newPublicData", false);
+        clickNavButton("Save");
+        selectOptionByText("defaultAssayQCState", "Pending Review");
+        clickNavButton("Save");
+    }
     /**
      * Reverts to the admin account after impersonating a different user.
      * This will also work if the current user happens to be the admin,

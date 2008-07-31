@@ -349,6 +349,7 @@ public class AssayTest extends AbstractAssayTest
         clickNavButton("Copy to Study");
 
         log("Verifying that the data was published");
+        assertTextPresent("Pending Review");
         assertTextPresent("a");
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent("2000-01-01");

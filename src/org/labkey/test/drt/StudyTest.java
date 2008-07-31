@@ -227,6 +227,31 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("1234");
         assertTextPresent("2006-02-01");
         assertTextPresent("1.2");
+        assertTextNotPresent("QC State");
+
+        // configure QC state management before our second upload
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage QC States");
+        setFormElement("newLabel", "Approved");
+        setFormElement("newDescription", "We all like approval.");
+        clickNavButton("Save");
+        setFormElement("newLabel", "Pending Review");
+        setFormElement("newDescription", "No one likes to be reviewed.");
+        clickCheckbox("newPublicData", false);
+        clickNavButton("Save");
+        selectOptionByText("defaultDirectEntryQCState", "Pending Review");
+        clickNavButton("Save");
+
+        // return to dataset import page
+        clickLinkWithText("Study 001");
+        clickLinkWithText("verifyAssay");
+        assertTextPresent("QC State");
+        assertTextNotPresent("1234");
+        clickMenuButton("QC State", "QCState:All data");
+        assertTextPresent("Pending Review");
+        assertTextPresent("1234");
+
         //Import same data again
         clickNavButton("Import Data");
         setFormElement("tsv", tsv);
@@ -240,6 +265,9 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Import Data");
         assertTextPresent("5000.0");
         assertTextPresent("new text");
+        assertTextPresent("QC State");
+        assertTextPresent("Pending Review");
+
         // upload specimen data and verify import
         clickLinkWithText("Study 001");
         importSpecimenArchive(SPECIMEN_ARCHIVE_A);
@@ -308,6 +336,11 @@ public class StudyTest extends BaseSeleniumWebTest
         // create specimen request
         clickLinkWithText("Study 001");
         clickLinkWithText("Study Navigator");
+
+        assertLinkNotPresentWithText("24");
+        selectOptionByText("QCState", "All data");
+        waitForPageToLoad();
+
         clickLinkWithText("24");
         //getDialog().setWorkingForm("Dataset");
         checkCheckbox(Locator.checkboxByName(".toggle", false));

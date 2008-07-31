@@ -123,6 +123,17 @@ public class StudyBvtTest extends StudyTest
         click(Locator.xpath("//td[.='Users']/..//input[@value='READ']"));
         clickAndWait(Locator.id("groupUpdateButton"));
 
+        // set the QC state 
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(DATA_SET);
+        clickMenuButton("QC State", "QCState:All data");
+        checkAllOnPage("Dataset");
+        clickMenuButton("QC State", "QCState:updateSelected");
+        selectOptionByText("newState", "Approved");
+        setFormElement("comments", "This data is approved.");
+        clickNavButton("Update Status");
+        clickMenuButton("QC State", "QCState:Approved");
+        
         if (checkRSetup())
             RReportTest();
 
@@ -201,6 +212,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("edit");
         setFormElement("quf_DEMbdt", "2001-11-11");
         clickNavButton("Submit");
+        clickMenuButton("QC State", "QCState:Pending Review");
         assertTextPresent("2001-11-11");
 
         log("Test adding a row to a dataset");
@@ -210,6 +222,7 @@ public class StudyBvtTest extends StudyTest
         setFormElement("quf_participantid", TEST_ADD_ENTRY);
         setFormElement("quf_SequenceNum", "123");
         clickNavButton("Submit");
+        clickMenuButton("QC State", "QCState:All data");
         assertTextPresent(TEST_ADD_ENTRY);
 
         log("Test deleting rows in a dataset");
@@ -217,6 +230,13 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Delete Selected");
         selenium.getConfirmation();
         assertTextNotPresent("999320529");
+
+        // configure QC state management to show all data by default so the next steps don't have to keep changing the state:
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage QC States");
+        selectOptionByText("showPrivateDataByDefault", "All data");
+        clickNavButton("Save");
 
         // additional report and security tests
         setupDatasetSecurity();
