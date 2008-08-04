@@ -30,7 +30,7 @@ public class ExpTest extends BaseSeleniumWebTest
     private static final String EXPERIMENT_NAME = "Tutorial Examples";
     private static final String EXPERIMENT_LSID = "urn:lsid:cpas.fhcrc.org:dev.Experiment.ExperimentVerify.verifyfldr:Experiment:001";
     private static final String RUN_NAME = "Example 5 Run (XTandem peptide search)";
-    private static final String RUN_NAME_IMAGEMAP = "Example 5 Run\\n(XTandem peptide\\nsearch)";
+    private static final String RUN_NAME_IMAGEMAP = "Example 5 Run (XTandem peptide search)";
     private static final String DATA_OBJECT_TITLE = "CAexample_mini.mzXML";
     private static final int MAX_WAIT_SECONDS = 60*5;
 
