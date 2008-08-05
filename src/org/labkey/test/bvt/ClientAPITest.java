@@ -57,18 +57,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private static final String GRIDTEST_SRC =
                 "// create new grid over a list named 'People'\n" +
-                "var gridView = new LABKEY.GridView({\n" +
-                        "    schemaName : 'lists',\n" +
-                        "    queryName : 'People',\n" +
+                "window.gridView = new LABKEY.ext.EditorGridPanel({\n" +
+                        "    store: new LABKEY.ext.Store({\n" +
+                        "       schemaName : 'lists',\n" +
+                        "       queryName : 'People'}),\n" +
                         "    renderTo : '" + TEST_DIV_NAME + "',\n" +
                         "    editable : true,\n" +
-                        "    gridPanelConfig : {\n" +
-                        "        title :'" + GRIDTEST_GRIDTITLE + "',\n" +
-                        "        autoHeight : true\n" +
-                        "    }\n" +
-                        "});\n" +
-                "// place editable grid in 'grid-example':\n" +
-                "gridView.render();\n";
+                        "    title :'" + GRIDTEST_GRIDTITLE + "',\n" +
+                        "    autoHeight : true\n" +
+                        "});\n";
 
     private static final String CHARTTEST_SRC = "var chartConfig = {\n" +
             "    queryName: 'People',\n" +
@@ -396,7 +393,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         String prevActiveCellId;
 //        sleep(500);
         // enter a new first name
-        String activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
+        sleep(50);
+        String activeCellId = getActiveEditorId();
         selenium.type(Locator.id(activeCellId).toString(), "Fred");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
@@ -404,7 +402,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         sleep(50);
         // enter a new last name
         prevActiveCellId = activeCellId;
-        activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
+        activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Fredson");
@@ -414,7 +412,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         sleep(50);
         // enter a new age
         prevActiveCellId = activeCellId;
-        activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
+        activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "51");
@@ -424,7 +422,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         sleep(50);
         // on the next row, change 'John' to 'Jonny'
         prevActiveCellId = activeCellId;
-        activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
+        activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Jonny");
@@ -433,7 +431,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
         prevActiveCellId = activeCellId;
-        activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
+        activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Jonnyson");
@@ -442,7 +440,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(50);
         prevActiveCellId = activeCellId;
-        activeCellId = selenium.getEval("this.browserbot.getCurrentWindow().document.ActiveExtGridViewCellId;");
+        activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
@@ -452,7 +450,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         // delete the row below Jonny (which should contain Bill)
         selenium.click("delete-records-button");
-        selenium.getConfirmation();
+        sleep(50);
+        selenium.click("//div[@class='x-window x-window-plain x-window-dlg']//button[text()='Delete']");
         sleep(50);
         selenium.click("refresh-button");
 
@@ -464,6 +463,21 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("Jonny", 2);
         assertTextNotPresent("John");
         assertTextNotPresent("Bill");
+    }
+
+    private String getActiveEditorId()
+    {
+        int limit = 3;
+        String activeEditor = selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor;");
+        while(null == activeEditor && limit-- > 0)
+        {
+            sleep(50);
+            activeEditor = selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor;");
+        }
+        if(null == activeEditor)
+            fail("Could not get the id of the active editor in the grid!");
+
+        return selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor.field.id;");
     }
 
     private void assayTest()
