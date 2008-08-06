@@ -34,7 +34,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
     protected static final String SEARCH = "gi|4689022";
     protected static final String SEARCH_FIND = "SCHIZOSACCHAROMYCES";
     protected static final String SEARCH_FIND_ALT = "Schizosaccharomyces";
-    protected static final String PROTOCOL = "X!Tandem Analysis";
+    protected static final String PROTOCOL = "X!Tandem analysis";
     protected static final String SEARCH_TYPE = "xtandem";
     protected static final String SEARCH_BUTTON = "X%21Tandem";
     protected static final String SEARCH_NAME = "X! Tandem";
