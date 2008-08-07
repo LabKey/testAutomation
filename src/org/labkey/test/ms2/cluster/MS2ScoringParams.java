@@ -113,9 +113,9 @@ class MS2ScoringParams extends MS2TestParams
 
         DataRegionTable tablePep = new DataRegionTable("MS2Peptides", test);
 
-        test.setSort("MS2Peptides", "PeptideProphet", SortDirection.DESC);
-        test.setFilter("MS2Peptides", "Protein", "Starts With", "rev_");
         test.setFilter("MS2Peptides", "PeptideProphet", "Is Greater Than or Equal To", "0.9");
+        test.setFilter("MS2Peptides", "Protein", "Starts With", "rev_");
+        test.setSort("MS2Peptides", "PeptideProphet", SortDirection.DESC);
 
         double maxFound = Double.parseDouble(tablePep.getDataAsText(0, tablePep.getColumn("PepProphet")));
 

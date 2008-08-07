@@ -28,9 +28,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+
+import com.thoughtworks.selenium.SeleniumException;
 
 /**
  * @author brendanx
@@ -54,7 +54,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     // Ask Brendan, Josh or Brian, if you need them.
     protected static final String USER_CERT = "/sampledata/pipeline/globus/usercert.pem";
     protected static final String USER_KEY = "/sampledata/pipeline/globus/userkey.pem";
-    protected static final String USER_KEY_PASSWORD = "ChiKung1";
+    protected static final String USER_KEY_PASSWORD = "";
     protected static final int MAX_WAIT_SECONDS = 60*60*5;
 
     protected MS2TestsBase testSet;
@@ -62,9 +62,9 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     public MS2ClusterTest()
     {
         testSet = new MS2Tests_20070701__3_4_1(this);
-//        testSet.addTestsScoringMix();
+        testSet.addTestsScoringMix();
         testSet.addTestsQuant();
-//        testSet.addTestsScoringOrganisms();
+        testSet.addTestsScoringOrganisms();
 //        testSet.addTestsISBMix();
 //        testSet.addTestsIPAS();
     }
@@ -114,6 +114,8 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         List<MS2TestParams> listValidated = new ArrayList<MS2TestParams>();
         while (seconds++ < MAX_WAIT_SECONDS)
         {
+            Map<String, String> mapStatus = null;
+
             DataRegionTable tableExp = new DataRegionTable("MS2SearchRuns", this);
             int rows = tableExp.getDataRowCount();
             int nameCol = tableExp.getColumn("Name");
@@ -127,11 +129,13 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
                     String cellText = tableExp.getDataAsText(i, nameCol);
                     if (cellText.indexOf(name) == -1)
                         continue;
+
+                    // Enumerate status table only once.
+                    if (mapStatus == null)
+                        mapStatus = getStatusMap();
                     
                     // Make sure the status is COMPLETE.
-                    DataRegionTable tableStatus = new DataRegionTable("StatusFiles", this, false);
-                    String status = tp.getStatus(name, tableStatus);
-                    if (status != null)
+                    if (mapStatus.get(name) != null)
                         continue;
 
                     log("***** " + name + " *****");
@@ -332,4 +336,26 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         file.delete();
     }
 
+    private Map<String, String> getStatusMap()
+    {
+        DataRegionTable tableStatus = new DataRegionTable("StatusFiles", this, false);
+        int colDescription = tableStatus.getColumn("Description");
+        int colStatus = tableStatus.getColumn("Status");
+
+        Map<String, String> mapNameStatus = new HashMap<String, String>();
+        for (int i = 0; i < tableStatus.getDataRowCount(); i++)
+        {
+            try
+            {
+                mapNameStatus.put(tableStatus.getDataAsText(i, colDescription),
+                        tableStatus.getDataAsText(i, colStatus));
+            }
+            catch (SeleniumException e)
+            {
+                log("ERROR: Getting description text for row " + i + ", column " + colDescription);
+                log("       Row count " + tableStatus.getDataRowCount());
+            }
+        }
+        return mapNameStatus;
+    }
 }

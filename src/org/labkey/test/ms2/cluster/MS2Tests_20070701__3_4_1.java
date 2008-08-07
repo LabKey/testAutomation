@@ -758,8 +758,8 @@ public class MS2Tests_20070701__3_4_1 extends MS2TestsBase
         qpRaw.addAllRatios(qp);
         listRaw.add(qpRaw);
 
-//        listParams.addAll(list);
-        listParams.addAll(listRaw);
+        listParams.addAll(list);
+//        listParams.addAll(listRaw);
         //*/
     }
 

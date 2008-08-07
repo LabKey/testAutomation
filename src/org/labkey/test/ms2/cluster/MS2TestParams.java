@@ -75,33 +75,6 @@ public class MS2TestParams
         return link.toString();
     }
 
-    public String getStatus(String nameText, DataRegionTable table)
-    {
-        if (nameText == null)
-            return null;
-
-        int colDescription = table.getColumn("Description");
-        int colStatus = table.getColumn("Status");
-
-        for (int i = 0; i < table.getDataRowCount(); i++)
-        {
-            try
-            {
-                if (!nameText.equals(table.getDataAsText(i, colDescription)))
-                    continue;
-            }
-            catch (SeleniumException e)
-            {
-                test.log("ERROR: Getting description text for row " + i + ", column " + colDescription);
-                test.log("       Row count " + table.getDataRowCount());
-                return "UNKNOWN";
-            }
-
-            return table.getDataAsText(i, colStatus);
-        }
-        return null;
-    }
-
     public void setGrouping(String grouping)
     {
         test.log("Set grouping to " + grouping);

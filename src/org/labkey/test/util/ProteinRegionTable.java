@@ -40,8 +40,12 @@ public class ProteinRegionTable extends DataRegionTable
         _test = test;
         _maxProbability = maxProbability;
 
+        // Give this a little extra time, since we have timed out here.
+        int wait = _test.getDefaultWaitForPage();
+        _test.setDefaultWaitForPage(wait * 2);
         _test.setFilter("ProteinGroupsWithQuantitation", "GroupProbability", "Is Greater Than or Equal To", Double.toString(_maxProbability));
         _test.setSort("ProteinGroupsWithQuantitation", "GroupNumber", SortDirection.ASC);
+        _test.setDefaultWaitForPage(wait);
     }
 
     public int getProtCount()
