@@ -38,7 +38,7 @@
     }
     else
     {
-        %><p id="emailRecordError" class="labkey-error" style="display: none;">Failed to update email recorder status.</p><%
+        %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp</p><%
     }
 %>
 <script type="text/javascript">
@@ -53,31 +53,48 @@ function toggleRecorder(checkbox)
 {
     var checked = checkbox.checked;
 
-    var showError = function(show)
+    var showError = function(show, message)
     {
-        Ext.get("emailRecordError").setDisplayed(show ? "" : "none");
-    }
-
-    var onUpdateSuccess = function() // (response)
-    {
-        showError(false);
-
-        if (checked)
+        var el = Ext.get("emailRecordError");
+        if (el)
         {
-            var t = document.getElementById("mockregion_EmailRecord");
-            var len = t.rows.length;
-            for (var i = len - 1; i > 1; i--)
-                t.deleteRow(i);
-            Ext.get("emailRecordEmpty").setDisplayed("");
+            if (message)
+                el.update(message);
+            el.setDisplayed(show ? "" : "none");
         }
     }
 
-    var onUpdateFailure = function() // (response)
+    var onUpdateFailure = function(response, error)
     {
-        showError(true);
-        
+        if (!error)
+            error = "Failed to update email recorder status.";
+        showError(true, error);
+
         // Reset to its initial value.
         checkbox.checked = !checked;
+    }
+
+    var onUpdateSuccess = function(response)
+    {
+        var json;
+        var contentType = response.getResponseHeader['Content-Type'];
+        if(contentType && contentType.indexOf('application/json') >= 0)
+            json = Ext.util.JSON.decode(response.responseText);
+        if (json && json.error)
+            onUpdateFailure(response, json.error);
+        else
+        {
+            showError(false);
+
+            if (checked)
+            {
+                var t = document.getElementById("mockregion_EmailRecord");
+                var len = t.rows.length;
+                for (var i = len - 1; i > 1; i--)
+                    t.deleteRow(i);
+                Ext.get("emailRecordEmpty").setDisplayed("");
+            }
+        }
     }
 
     Ext.Ajax.request({

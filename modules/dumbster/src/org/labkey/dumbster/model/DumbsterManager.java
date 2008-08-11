@@ -18,16 +18,25 @@ package org.labkey.dumbster.model;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 
+import javax.mail.Session;
+import javax.mail.NoSuchProviderException;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.apache.log4j.Logger;
 
 /**
  * <code>DumbsterManager</code>
  */
 public class DumbsterManager
 {
-    static DumbsterManager instance;
+    private static final Logger _log = Logger.getLogger(DumbsterManager.class);
+
+    private static DumbsterManager instance;
 
     public static DumbsterManager get()
     {
@@ -41,9 +50,34 @@ public class DumbsterManager
 
     SimpleSmtpServer _server;
 
-    public void start()
+    public boolean start()
     {
-        _server = SimpleSmtpServer.start();
+        int port = 25;
+        try
+        {
+            Context initCtx = new InitialContext();
+            Context env = (Context) initCtx.lookup("java:comp/env");
+            Session mailSession = (Session) env.lookup("mail/Session");
+            port = Integer.parseInt(mailSession.getProperty("mail.smtp.port"));
+        }
+        catch (NamingException e)
+        {
+            _log.warn("No mail session specified.  Check labkey.xml.", e);
+        }
+        catch (NumberFormatException e)
+        {
+            _log.error("The property mail.smtp.port is not a number.  Check labkey.xml.", e);            
+        }
+
+        _log.info("Connecting mail recorder to port " + port);
+        
+        _server = SimpleSmtpServer.start(port);
+        if (_server.isStopped())
+        {
+            _log.error("Failed to connect mail recorder. Port " + port + " may be in use.");
+            return false;
+        }
+        return true;
     }
 
     public void stop()
@@ -52,6 +86,11 @@ public class DumbsterManager
         // viewing until the next call to start() overwrites.
         if (_server != null)
             _server.stop();
+    }
+
+    public boolean isRecording()
+    {
+        return _server != null && !_server.isStopped();
     }
 
     public SmtpMessage[] getMessages()

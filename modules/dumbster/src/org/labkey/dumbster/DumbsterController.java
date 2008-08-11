@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.ApiResponse;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.action.ApiSimpleResponse;
 import org.labkey.api.security.ACL;
 import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.settings.AppProps;
@@ -54,14 +55,19 @@ public class DumbsterController extends SpringActionController
     {
         public ApiResponse execute(RecordEmailForm form, BindException errors) throws Exception
         {
+            if (form.isRecord())
+            {
+                if (!DumbsterManager.get().start())
+                    return new ApiSimpleResponse("error", "Error starting mail recorder.  Check log for more information.");
+            }
+            else
+            {
+                DumbsterManager.get().stop();
+            }
+
             WriteableAppProps props = AppProps.getWriteableInstance();
             props.setMailRecorderEnabled(form.isRecord());
             props.save();
-
-            if (form.isRecord())
-                DumbsterManager.get().start();
-            else
-                DumbsterManager.get().stop();
             return null;
         }
     }

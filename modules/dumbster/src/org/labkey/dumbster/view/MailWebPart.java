@@ -50,8 +50,9 @@ public class MailWebPart extends JspView<MailPage>
 
         if (model.getMessages() == null)
         {
-            model.setEnableRecorder(AppProps.getInstance().isMailRecorderEnabled());
-            model.setMessages(DumbsterManager.get().getMessages());
+            DumbsterManager manager = DumbsterManager.get();
+            model.setEnableRecorder(manager.isRecording());
+            model.setMessages(manager.getMessages());
         }
     }
 }

@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class DumbsterModule extends DefaultModule implements ContainerManager.ContainerListener
 {
-    private static final Logger _log = Logger.getLogger(DefaultModule.class);
+    private static final Logger _log = Logger.getLogger(DumbsterModule.class);
     public static final String NAME = "Dumbster";
 
     public DumbsterModule()
