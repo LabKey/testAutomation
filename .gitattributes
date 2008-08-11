@@ -1,0 +1,11 @@
+* text=auto !eol
+/Dumbster.iml -text
+lib/dumbster-1.6.jar -text
+lib/dumbster-src.zip -text
+/module.properties -text
+src/org/labkey/dumbster/DumbsterController.java -text
+src/org/labkey/dumbster/DumbsterModule.java -text
+src/org/labkey/dumbster/model/DumbsterManager.java -text
+src/org/labkey/dumbster/view/MailPage.java -text
+src/org/labkey/dumbster/view/MailWebPart.java -text
+src/org/labkey/dumbster/view/mailWebPart.jsp -text
