@@ -120,7 +120,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
     {
         for (int row = 0; row < rowsToSearch; row++)
         {
-            String value = table.getDataAsText(row, column-1);
+            String value = table.getDataAsText(row, column);
             if (value.contains(txt))
                 return true;
         }
