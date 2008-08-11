@@ -44,7 +44,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     private static boolean NEW_DATA = true;
     private static boolean NEW_SEARCH = true;
     private static boolean REMOVE_DATA = true;
-    private static boolean USE_GLOBUS = true;
+    private static boolean USE_GLOBUS = false;
 
     protected static final String PROJECT_NAME = "MS2ClusterProject";
     protected static final String FOLDER_NAME = "Pipeline";
@@ -64,7 +64,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         testSet = new MS2Tests_20070701__3_4_1(this);
         testSet.addTestsScoringMix();
         testSet.addTestsQuant();
-        testSet.addTestsScoringOrganisms();
+//        testSet.addTestsScoringOrganisms();
 //        testSet.addTestsISBMix();
 //        testSet.addTestsIPAS();
     }
@@ -114,20 +114,20 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         List<MS2TestParams> listValidated = new ArrayList<MS2TestParams>();
         while (seconds++ < MAX_WAIT_SECONDS)
         {
-            Map<String, String> mapStatus = null;
-
             DataRegionTable tableExp = new DataRegionTable("MS2SearchRuns", this);
             int rows = tableExp.getDataRowCount();
             int nameCol = tableExp.getColumn("Name");
 
+            Map<String, String> mapStatus = null;
+
             for (MS2TestParams tp : testSet.getParams())
             {
+                String name = tp.getExperimentLink();
+
                 for (int i = 0; i < rows; i++)
                 {
-                    // See if the experiment is present.
-                    String name = tp.getExperimentLink();
-                    String cellText = tableExp.getDataAsText(i, nameCol);
-                    if (cellText.indexOf(name) == -1)
+                    String expName = tableExp.getDataAsText(i, nameCol);
+                    if (expName.indexOf(name) == -1)
                         continue;
 
                     // Enumerate status table only once.
@@ -136,7 +136,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
                     
                     // Make sure the status is COMPLETE.
                     if (mapStatus.get(name) != null)
-                        continue;
+                        break;
 
                     log("***** " + name + " *****");
 
@@ -149,7 +149,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
 
                     // Click the link for the MS2 peptides view.
                     log("Click peptide view link");
-                    clickLinkWithText(cellText);
+                    clickLinkWithText(expName);
 
                     // If experiment is present, and not still running, validate
                     tp.validate();
@@ -343,7 +343,8 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         int colStatus = tableStatus.getColumn("Status");
 
         Map<String, String> mapNameStatus = new HashMap<String, String>();
-        for (int i = 0; i < tableStatus.getDataRowCount(); i++)
+        int statusRows = tableStatus.getDataRowCount();
+        for (int i = 0; i < statusRows; i++)
         {
             try
             {

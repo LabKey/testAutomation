@@ -100,7 +100,7 @@ public class DataRegionTable
         }
 
         if (rows == 1 && "No data to show.".equals(getDataAsText(0, 0)))
-            return 0;
+            rows = 0;
 
         return rows;
     }
@@ -114,9 +114,10 @@ public class DataRegionTable
     {
         try
         {
-            for (int col = 0; getDataAsText(0, col-(_selectors ? 1 : 0)) != null; col++)
+            int sel = (_selectors ? 1 : 0);
+            for (int col = 0; getDataAsText(0, col) != null; col++)
             {
-                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+1) + "]/div"));
+                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+sel+1) + "]/div"));
                 if (header.equals(name))
                     return col;
             }
