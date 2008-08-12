@@ -342,7 +342,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         String user = getTableCellText("dataregion_audit", 3, 3);
         String comment = getTableCellText("dataregion_audit", 3, 4);
 
-        assertTrue("Incorrect display for deleted user -- expected <nnnn>", user.matches("<\\d{4,}>"));
+        assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
     }
 }
