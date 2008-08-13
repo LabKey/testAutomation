@@ -44,7 +44,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     private static boolean NEW_DATA = true;
     private static boolean NEW_SEARCH = true;
     private static boolean REMOVE_DATA = true;
-    private static boolean USE_GLOBUS = false;
+    private static boolean USE_GLOBUS = true;
 
     protected static final String PROJECT_NAME = "MS2ClusterProject";
     protected static final String FOLDER_NAME = "Pipeline";
@@ -54,7 +54,7 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     // Ask Brendan, Josh or Brian, if you need them.
     protected static final String USER_CERT = "/sampledata/pipeline/globus/usercert.pem";
     protected static final String USER_KEY = "/sampledata/pipeline/globus/userkey.pem";
-    protected static final String USER_KEY_PASSWORD = "";
+    protected static final String USER_KEY_PASSWORD = "ChiKung1";
     protected static final int MAX_WAIT_SECONDS = 60*60*5;
 
     protected MS2TestsBase testSet;
