@@ -235,6 +235,36 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "\n" +
             "executeNext();";
 
+    private static final String DOMAIN_SRC = "function getSuccessHandler(domainDesign)\n" +
+            "{\n" +
+            "    var html = '';\n" +
+            "\n" +
+            "        html += '<b>' + domainDesign.name + '</b><br> ';\n" +
+            "    for (var i in domainDesign.fields)\n" +
+            "    {\n" +
+            "        html += '   ' + domainDesign.fields[i].name + '<br>';\n" +
+            "        }\n" +
+            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = html;\n" +
+            "\n" +
+            "        LABKEY.Domain.save(saveHandler, saveErrorHandler, domainDesign, 'study', 'StudyProperties');\n" +
+            "    }\n" +
+            "\n" +
+            "    function getErrorHandler()\n" +
+            "    {\n" +
+            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = \"Failed to get StudyProperties domain\";\n" +
+            "    }\n" +
+            "\n" +
+            "    function saveHandler()\n" +
+            "    {\n" +
+            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = \"Updated StudyProperties domain\";\n" +
+            "    }\n" +
+            "    function saveErrorHandler()\n" +
+            "    {\n" +
+            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = \"Failed to save\";\n" +
+            "    }\n" +
+            "\n" +
+            "    LABKEY.Domain.get(getSuccessHandler, getErrorHandler, 'study', 'StudyProperties');\n";
+
     private static final String SRC_PREFIX = CLIENTAPI_HEADER + "\n<script type=\"text/javascript\">\n" +
             "    Ext.namespace('demoNamespace'); //define namespace with some 'name'\n" +
             "    demoNamespace.myModule = function(){//creates a property 'myModule' of the namespace object\n" +
@@ -271,12 +301,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
 
         clickLinkWithText(FOLDER_NAME);
-        addWebPart("Wiki");
-        createNewWikiPage("HTML");
-        setFormElement("name", WIKIPAGE_NAME);
-        setFormElement("title", WIKIPAGE_NAME);
-        setWikiBody("placeholder text");
-        saveWikiPage();
+        
+        createWiki();
 
         createList();
 
@@ -289,6 +315,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assayTest();
 
         queryTest();
+
+        domainTest();
 
         //clear the test page so the crawler doesn't refetch a test and cause errors
         clearTestPage();
@@ -354,6 +382,16 @@ public class ClientAPITest extends BaseSeleniumWebTest
         }
         fail("Div failed to render.");
         return null;
+    }
+
+    private void createWiki()
+    {
+        addWebPart("Wiki");
+        createNewWikiPage("HTML");
+        setFormElement("name", WIKIPAGE_NAME);
+        setFormElement("title", WIKIPAGE_NAME);
+        setWikiBody("placeholder text");
+        saveWikiPage();
     }
 
     private void webpartTest()
@@ -515,6 +553,34 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("TargetStudy - String");
         assertTextPresent(TEST_ASSAY + " Data Fields");
         assertTextPresent("VisitID - Double");
+    }
+
+    private void domainTest()
+    {
+        addWebPart("Study Overview");
+
+        clickNavButton("Create Study");
+        // next page
+        clickNavButton("Create Study");
+        clickLinkWithText("Edit Definition");
+        waitForText("No fields have been defined.", 10000);
+
+        clickNavButton("Add Field", 0);
+
+        selenium.type("//input[@id='ff_name0']", "species");
+        selenium.type("//input[@id='ff_label0']", "Species");
+
+        clickNavButton("Add Field", 0);
+
+        selenium.type("//input[@id='ff_name1']", "color");
+        selenium.type("//input[@id='ff_label1']", "Color");
+
+        sleep(1000);
+        clickNavButton("Save", 10000);
+
+        setSource(DOMAIN_SRC);
+
+        assertTextPresent("Updated StudyProperties domain");
     }
 
     private String setSource(String srcFragment)
