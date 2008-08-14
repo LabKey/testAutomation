@@ -63,6 +63,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
                         "       queryName : 'People'}),\n" +
                         "    renderTo : '" + TEST_DIV_NAME + "',\n" +
                         "    editable : true,\n" +
+                        "    enableFilters : true,\n" +
                         "    title :'" + GRIDTEST_GRIDTITLE + "',\n" +
                         "    autoHeight : true\n" +
                         "});\n";
