@@ -154,7 +154,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Data");
 
         log("Verify experiment view");
-//        assertImageMapAreaPresent("graphmap", "Verify MS2 Run");
+        assertImageMapAreaPresent("graphmap", "Verify MS2 Run");
         clickImageMapLinkByTitle("graphmap", "bov_sample/" + SAMPLE_BASE_NAME + " (test2)");
 
         log("Verify experiment run view.");
