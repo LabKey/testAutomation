@@ -88,9 +88,9 @@ function toggleRecorder(checkbox)
 
             if (checked)
             {
-                var t = document.getElementById("mockregion_EmailRecord");
+                var t = document.getElementById("dataregion_EmailRecord");
                 var len = t.rows.length;
-                for (var i = len - 1; i > 1; i--)
+                for (var i = len - 2; i > 0; i--)
                     t.deleteRow(i);
                 Ext.get("emailRecordEmpty").setDisplayed("");
             }
@@ -105,14 +105,14 @@ function toggleRecorder(checkbox)
     });
 }
 </script>
-<table id="mockregion_EmailRecord" class="labkey-data-region labkey-show-borders">
+<!--Fake data region for ease of testing.-->
+<table id="dataregion_EmailRecord" class="labkey-data-region labkey-show-borders">
     <colgroup><col width="120"/><col width="120"/><col width="400"></colgroup>
     <thead><tr>
-        <th class="labkey-col-header-filter" align="left">To</th>
-        <th class="labkey-col-header-filter" align="left">From</th>
-        <th class="labkey-col-header-filter" align="left">Message</th>
+        <th class="labkey-col-header-filter" align="left"><div>To</div></th>
+        <th class="labkey-col-header-filter" align="left"><div>From</div></th>
+        <th class="labkey-col-header-filter" align="left"><div>Message</div></th>
     </tr></thead>
-    <tr id="emailRecordEmpty" style="display: <%=messages.length > 0 ? "none" : ""%>;"><td colspan="3">No email recorded.</td></tr>
     <%
     if (messages.length > 0)
     {
@@ -150,12 +150,13 @@ function toggleRecorder(checkbox)
         }
     }
 %>
+    <tr id="emailRecordEmpty" style="display: <%=messages.length > 0 ? "none" : ""%>;"><td colspan="3">No email recorded.</td></tr>
 </table>
 <%
     if (devmode && context.getUser().isAdministrator())
     {
 %>
-        <input type="checkbox" onclick="toggleRecorder(this)" <%=recorder ? "checked" : ""%>> Record email messages sent
+        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this)" <%=recorder ? "checked" : ""%>> Record email messages sent
 <%
     }
 %>
