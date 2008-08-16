@@ -16,27 +16,23 @@
 package org.labkey.test.ms2;
 
 import org.apache.commons.io.FileUtils;
-import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.Locator;
-import org.labkey.test.ms2.cluster.MS2TestParams;
-import org.labkey.test.ms2.cluster.MS2TestsBase;
-import org.labkey.test.ms2.cluster.MS2TestsBaseline;
-import org.labkey.test.ms2.cluster.MS2Tests_20070701__3_4_1;
-import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.pipeline.PipelineWebTestBase;
+import org.labkey.test.pipeline.PipelineFolder;
+import org.labkey.test.pipeline.PipelineTestParams;
+import org.labkey.test.ms2.cluster.*;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
-
-import com.thoughtworks.selenium.SeleniumException;
 
 /**
  * @author brendanx
  */
-public class MS2ClusterTest extends BaseSeleniumWebTest
+public class MS2ClusterTest extends PipelineWebTestBase
 {
+    protected MS2TestsBase testSet = new MS2Tests_20070701__3_4_1(this);
+
     public static final String PROTOCOL_MODIFIER = "";
     public static final String PROTOCOL_MODIFIER_SEARCH = "";
 
@@ -46,22 +42,19 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     private static boolean REMOVE_DATA = true;
     private static boolean USE_GLOBUS = true;
 
-    protected static final String PROJECT_NAME = "MS2ClusterProject";
-    protected static final String FOLDER_NAME = "Pipeline";
-    protected static final String PIPELINE_PATH = "T:/edi/pipeline/Test/regression";
-    protected static final String FASTA_PATH = "T:/data/databases";
-    // These files are not checked in, since that would be a security issue.
-    // Ask Brendan, Josh or Brian, if you need them.
-    protected static final String USER_CERT = "/sampledata/pipeline/globus/usercert.pem";
-    protected static final String USER_KEY = "/sampledata/pipeline/globus/userkey.pem";
-    protected static final String USER_KEY_PASSWORD = "ChiKung1";
     protected static final int MAX_WAIT_SECONDS = 60*60*5;
-
-    protected MS2TestsBase testSet;
 
     public MS2ClusterTest()
     {
-        testSet = new MS2Tests_20070701__3_4_1(this);
+        super("MS2ClusterProject");
+
+        MS2PipelineFolder folder = new MS2PipelineFolder(this,
+                "Pipeline",
+                "T:/edi/pipeline/Test/regression",
+                (USE_GLOBUS ? PipelineFolder.Type.enterprise : PipelineFolder.Type.perl));
+        folder.setFastaPath("T:/data/databases");
+
+        testSet.setFolder(folder);
         testSet.addTestsScoringMix();
         testSet.addTestsQuant();
 //        testSet.addTestsScoringOrganisms();
@@ -81,13 +74,12 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
         return USE_GLOBUS;
     }
 
-    protected void doCleanup() throws IOException
+    protected void doCleanup() throws Exception
     {
         if (CLEAN_DATA)
         {
-            cleanPipe(PIPELINE_PATH);
-            try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
-            try {deleteProject(PROJECT_NAME); } catch (Throwable t) {} //*/
+            testSet.clean();
+            super.doCleanup();
         }
     }
 
@@ -95,171 +87,78 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
     {
         if (CLEAN_DATA)
         {
-            log("Verifying that pipeline files were cleaned up properly");
-            verifyPipeClean(PIPELINE_PATH);
+            testSet.verifyClean();
 
-            doSetup();
+            setupSite(true);
+            testSet.setup();
         }
         else
         {
-            beginAt("/labkey/Project/MS2ClusterProject/Pipeline/begin.view");
+            testSet.beginAt();
         }
-        
+
         if (NEW_DATA)
         {
             doAnalysis();
         }
 
         int seconds = 0;
-        List<MS2TestParams> listValidated = new ArrayList<MS2TestParams>();
+        List<PipelineTestParams> listValidated = new ArrayList<PipelineTestParams>();
         while (seconds++ < MAX_WAIT_SECONDS)
         {
-            DataRegionTable tableExp = new DataRegionTable("MS2SearchRuns", this);
-            int rows = tableExp.getDataRowCount();
-            int nameCol = tableExp.getColumn("Name");
-
-            Map<String, String> mapStatus = null;
-
-            for (MS2TestParams tp : testSet.getParams())
+            PipelineTestParams[] completeParams = testSet.getCompleteParams();
+            for (PipelineTestParams tp : completeParams)
             {
-                String name = tp.getExperimentLink();
+                pushLocation();
+                tp.validate();
+                popLocation();
 
-                for (int i = 0; i < rows; i++)
-                {
-                    String expName = tableExp.getDataAsText(i, nameCol);
-                    if (expName.indexOf(name) == -1)
-                        continue;
+                if (tp.isValid() && REMOVE_DATA)
+                    tp.remove();
 
-                    // Enumerate status table only once.
-                    if (mapStatus == null)
-                        mapStatus = getStatusMap();
-                    
-                    // Make sure the status is COMPLETE.
-                    if (mapStatus.get(name) != null)
-                        break;
-
-                    log("***** " + name + " *****");
-
-                    // Save the experiment run id for deletion.
-                    log("Click peptide view link");
-                    pushLocation();
-                    tableExp.clickLink(i, 2);
-                    URL url = getURL();
-                    popLocation();
-
-                    // Click the link for the MS2 peptides view.
-                    log("Click peptide view link");
-                    clickLinkWithText(expName);
-
-                    // If experiment is present, and not still running, validate
-                    tp.validate();
-
-                    clickLinkWithText("MS2 Dashboard");
-                    if (tp.isValid() && REMOVE_DATA)
-                    {
-                        String id = url.getQuery();
-                        id = id.substring(id.indexOf('=') + 1);
-                        checkCheckbox(".select", id, false);
-                        clickNavButton("Delete");
-                        clickNavButton("Confirm Delete");
-
-                        // Number of rows has changed, so recount them.
-                        rows = tableExp.getDataRowCount();
-                    }
-                    testSet.removeParams(tp);
-                    listValidated.add(tp);
-                    break;
-                }
+                testSet.removeParams(tp);
+                listValidated.add(tp);
             }
 
-            if (testSet.getParams().length == 0)
+            if (!testSet.hasParams())
                 break;
-            
-            log("Waiting to validate completed searches");
-            sleep(60*1000);
+
+            // If nothing was validated, wait for a minute.
+            if (completeParams.length == 0)
+            {
+                log("Waiting to validate completed searches");
+                sleep(60*1000);
+            }
             refresh();
         }
 
         // Count uses case sensitive match.
         assertLinkPresentWithTextCount("ERROR", 0);
 
-        for (MS2TestParams tp : listValidated)
+        for (PipelineTestParams tp : listValidated)
         {
-            assertTrue("Failed " + tp.getExperimentLink(), tp.isValid());
+            assertTrue("Tests failed.  Consult the log.", tp.isValid());
         }
-    }
-
-    protected void doSetup()
-    {
-        log("Set cluster checkbox");
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("site settings");
-        checkCheckbox("perlPipelineEnabled");
-        clickNavButton("Save");
-
-        createProject(PROJECT_NAME);
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "MS2", new String[] { });
-
-        log("Setup pipeline.");
-        clickNavButton("Setup");
-
-        log("Set pipeline root.");
-        setFormElement("path", PIPELINE_PATH);
-
-        if (USE_GLOBUS)
-        {
-            assertTrue("Globus test requires file upload.", isFileUploadAvailable());
-            setFormElement("keyFile", new File(getLabKeyRoot() + USER_KEY));
-            setFormElement("keyPassword", USER_KEY_PASSWORD);
-            setFormElement("certFile", new File(getLabKeyRoot() + USER_CERT));
-        }
-        else
-        {
-            checkCheckbox("perlPipeline");
-        }
-        submit();
-
-        log("Set FASTA root");
-        clickLinkWithText("Set FASTA root");
-
-        setFormElement("localPathRoot", FASTA_PATH);
-        submit();
-
-        clickNavButton("View Status");
     }
 
     protected void doAnalysis()
     {
         HashSet<String> searches = new HashSet<String>();
 
-        for (MS2TestParams tp : testSet.getParams())
+        for (PipelineTestParams tp : testSet.getParams())
         {
-            String searchKey = tp.getSearchKey();
+            String searchKey = tp.getRunKey();
             if (searches.contains(searchKey))
                 continue;
             searches.add(searchKey);
 
-            log("Start analysis of " + tp.getDataPath());
-            clickNavButton("Process and Import Data");
-            clickDirLinks(tp.getDataPath());
-
-            log("X! Tandem Search");
-            clickNavButton("X%21Tandem Peptide Search");
-
-            log("Choose existing protocol " + tp.getProtocol());
-            waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + tp.getProtocol() + "']" ), WAIT_FOR_GWT * 12);
-            selectOptionByText("protocol", tp.getProtocol());
-            sleep(WAIT_FOR_GWT);
-
-            log("Start the search");
-            submit();
-            sleep(WAIT_FOR_GWT);
+            tp.startProcessing();
 
             if (!NEW_SEARCH)
             {
-                File dirRoot = new File(PIPELINE_PATH);
+                File dirRoot = new File(testSet.getFolder().getPipelinePath());
                 String analysisPath = tp.getDataPath() + File.separator +
-                        "xtandem" + File.separator + tp.getProtocol();
+                        "xtandem" + File.separator + tp.getProtocolName();
                 File dirDest = new File(dirRoot,  analysisPath);
 
                 // Strip modifier from the name.
@@ -287,76 +186,5 @@ public class MS2ClusterTest extends BaseSeleniumWebTest
                 }
             }
         }
-    }
-
-    private void clickDirLinks(String path)
-    {
-        clickLinkWithText("root");
-        String[] dirs = path.split("/");
-        for (String dir : dirs)
-            clickLinkWithText(dir);
-    }
-
-    private void verifyPipeClean(String path)
-    {
-        if (path == null)
-            return;
-
-        File rootDir = new File(path);
-        for (MS2TestParams tp : testSet.getParams())
-        {
-            File analysisDir = new File(rootDir, tp.getDataPath() + File.separator + "xtandem");
-            if (analysisDir.exists())
-                fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
-        }
-    }
-
-    private void cleanPipe(String path) throws IOException
-    {
-        if (path == null)
-            return;
-
-        File rootDir = new File(path);
-        for (MS2TestParams tp : testSet.getParams())
-        {
-            delete(new File(rootDir, tp.getDataPath() + "/xtandem"));
-        }
-    }
-
-    private void delete(File file) throws IOException
-    {
-        if (file.isDirectory())
-        {
-            for (File child : file.listFiles())
-            {
-                delete(child);
-            }
-        }
-        System.out.println("Deleting " + file.getPath() + "\n");
-        file.delete();
-    }
-
-    private Map<String, String> getStatusMap()
-    {
-        DataRegionTable tableStatus = new DataRegionTable("StatusFiles", this, false);
-        int colDescription = tableStatus.getColumn("Description");
-        int colStatus = tableStatus.getColumn("Status");
-
-        Map<String, String> mapNameStatus = new HashMap<String, String>();
-        int statusRows = tableStatus.getDataRowCount();
-        for (int i = 0; i < statusRows; i++)
-        {
-            try
-            {
-                mapNameStatus.put(tableStatus.getDataAsText(i, colDescription),
-                        tableStatus.getDataAsText(i, colStatus));
-            }
-            catch (SeleniumException e)
-            {
-                log("ERROR: Getting description text for row " + i + ", column " + colDescription);
-                log("       Row count " + tableStatus.getDataRowCount());
-            }
-        }
-        return mapNameStatus;
     }
 }
