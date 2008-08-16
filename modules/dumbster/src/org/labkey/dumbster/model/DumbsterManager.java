@@ -26,8 +26,10 @@ import javax.naming.NamingException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.labkey.api.util.MailHelper;
 
 /**
  * <code>DumbsterManager</code>
@@ -52,25 +54,17 @@ public class DumbsterManager
 
     public boolean start()
     {
-        int port = 25;
-        try
-        {
-            Context initCtx = new InitialContext();
-            Context env = (Context) initCtx.lookup("java:comp/env");
-            Session mailSession = (Session) env.lookup("mail/Session");
-            port = Integer.parseInt(mailSession.getProperty("mail.smtp.port"));
-        }
-        catch (NamingException e)
-        {
-            _log.warn("No mail session specified.  Check labkey.xml.", e);
-        }
-        catch (NumberFormatException e)
-        {
-            _log.error("The property mail.smtp.port is not a number.  Check labkey.xml.", e);            
-        }
+        int port = 28;
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.host", "localhost");
+        props.setProperty("mail.smtp.user", "Anonymous");
+        props.setProperty("mail.smtp.port", Integer.toString(port));
+        Session session = Session.getInstance(props);
 
-        _log.info("Connecting mail recorder to port " + port);
-        
+        _log.info("Switching MailHelper to use port " + port);
+        MailHelper.setSession(session);
+
+        _log.info("Connecting mail recorder to port " + port);        
         _server = SimpleSmtpServer.start(port);
         if (_server.isStopped())
         {
@@ -85,7 +79,12 @@ public class DumbsterManager
         // Stop the server, if there is one, but leave it around for
         // viewing until the next call to start() overwrites.
         if (_server != null)
+        {
+            _log.info("Reverting MailHelper to labkey.xml configuration");
+            MailHelper.setSession(null);
+
             _server.stop();
+        }
     }
 
     public boolean isRecording()
