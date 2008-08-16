@@ -15,10 +15,10 @@
  */
 package org.labkey.test.ms2.cluster;
 
+import org.labkey.test.SortDirection;
+import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ProteinRegionTable;
-import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.SortDirection;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -39,7 +39,7 @@ class MS2ScoringParams extends MS2TestParams
     private int maxFPProteinAbove;
     private Set<String> positiveProteins;
 
-    MS2ScoringParams(BaseSeleniumWebTest test, String dataPath,
+    MS2ScoringParams(PipelineWebTestBase test, String dataPath,
                   String protocol,
                   String[] positiveProteins,
                   double maxFPPeptideProb,
@@ -62,22 +62,26 @@ class MS2ScoringParams extends MS2TestParams
 
     public void validate()
     {
-        test.log("Validating " + getExperimentLink());
+        String link = getExperimentLinks()[0];
+        _test.log("***** " + link + " *****");
+
+        // Navigate to the peptides view by clicking the experiment name link.
+        _test.clickLinkWithText(link);
 
         setGrouping("None");
-        test.clearAllFilters("MS2Peptides", "Scan");
+        _test.clearAllFilters("MS2Peptides", "Scan");
 
         int protsActual = 0;
 
         if (positiveProteins != null)
         {
             setGrouping("Protein Prophet");
-            test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
+            _test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
             int protsExpect = positiveProteins.size();
             HashSet<String> protSet = new HashSet<String>();
 
-            ProteinRegionTable tableProt = new ProteinRegionTable(0.995, test);
+            ProteinRegionTable tableProt = new ProteinRegionTable(0.995, _test);
 
             int colProtein = tableProt.getColumn("Protein");
 
@@ -111,11 +115,11 @@ class MS2ScoringParams extends MS2TestParams
             setGrouping("None");
         }
 
-        DataRegionTable tablePep = new DataRegionTable("MS2Peptides", test);
+        DataRegionTable tablePep = new DataRegionTable("MS2Peptides", _test);
 
-        test.setFilter("MS2Peptides", "PeptideProphet", "Is Greater Than or Equal To", "0.9");
-        test.setFilter("MS2Peptides", "Protein", "Starts With", "rev_");
-        test.setSort("MS2Peptides", "PeptideProphet", SortDirection.DESC);
+        _test.setFilter("MS2Peptides", "PeptideProphet", "Is Greater Than or Equal To", "0.9");
+        _test.setFilter("MS2Peptides", "Protein", "Starts With", "rev_");
+        _test.setSort("MS2Peptides", "PeptideProphet", SortDirection.DESC);
 
         double maxFound = Double.parseDouble(tablePep.getDataAsText(0, tablePep.getColumn("PepProphet")));
 
@@ -127,18 +131,18 @@ class MS2ScoringParams extends MS2TestParams
                 tablePep.getDataRowCount() == maxFPPeptideAbove);
 
         setGrouping("Protein Prophet");
-        test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
+        _test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
         protsActual = 0;
 
-        ProteinRegionTable tableProt = new ProteinRegionTable(0.5, test);
+        ProteinRegionTable tableProt = new ProteinRegionTable(0.5, _test);
 
         int colProb = tableProt.getColumn("Prob");
 
         while (tableProt.nextPage())
             protsActual += tableProt.getProtCount();
 
-        test.setSort("ProteinGroupsWithQuantitation", "GroupProbability", SortDirection.DESC);
+        _test.setSort("ProteinGroupsWithQuantitation", "GroupProbability", SortDirection.DESC);
         maxFound = Double.parseDouble(tableProt.getDataAsText(0, colProb));
 
         validateTrue("Maximum ProteinProphet false-positive value " + maxFound + " does not match " + maxFPProteinProb + ".",

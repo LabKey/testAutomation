@@ -21,6 +21,10 @@ import org.labkey.test.SortDirection;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
+import java.util.HashMap;
+
+import junit.framework.Assert;
 
 /**
  * DataRegionTable class
@@ -34,10 +38,14 @@ public class DataRegionTable
     protected String _tableName;
     protected BaseSeleniumWebTest _test;
     protected boolean _selectors;
+    protected Map<String, Integer> _mapColumns = new HashMap<String, Integer>();
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
         this(tableName, test, true);
+
+        // Already being created at the beginning of tests before tables are on the page.
+        // _test.assertElementPresent(Locator.xpath("//table[@id='" + getHtmlName() + "']"));
     }
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors)
@@ -112,6 +120,10 @@ public class DataRegionTable
 
     public int getColumn(String name)
     {
+        Integer colIndex = _mapColumns.get(name);
+        if (colIndex != null)
+            return colIndex.intValue();
+        
         try
         {
             int sel = (_selectors ? 1 : 0);
@@ -119,14 +131,18 @@ public class DataRegionTable
             {
                 String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+sel+1) + "]/div"));
                 if (header.equals(name))
+                {
+                    _mapColumns.put(name, col);
                     return col;
+                }
             }
+            _test.log("Column '" + name + "' not found");
         }
         catch (Exception e)
-        {
+        {            
+            // _test.log("Failed to get column named " + name);
         }
 
-        _test.log("Column '" + name + "' not found");
         return -1;
     }
 

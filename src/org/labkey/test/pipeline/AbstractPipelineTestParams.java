@@ -1,0 +1,249 @@
+/*
+ * Copyright (c) 2007-2008 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.labkey.test.pipeline;
+
+import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+import org.labkey.test.util.ExperimentRunTable;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+/**
+ * MS2TestParams class
+* <p/>
+* Created: Aug 15, 2007
+*
+* @author bmaclean
+*/
+abstract public class AbstractPipelineTestParams implements PipelineTestParams
+{
+    protected PipelineWebTestBase _test;
+    private String _dataPath;
+    private String _protocolType;
+    private String _parametersFile;
+    private String _protocolName;
+    private String[] _sampleNames;
+    private String[] _inputExtensions = new String[0];
+    private String[] _outputExtensions = new String[0];
+    private String[] _experimentLinks;
+    private boolean _valid;
+
+    public AbstractPipelineTestParams(PipelineWebTestBase test, String dataPath,
+                                      String protocolType, String protocolName, String... sampleNames)
+    {
+        _test = test;
+        _dataPath = dataPath;
+        _sampleNames = sampleNames;
+        _protocolType = protocolType;
+        _protocolName = protocolName;
+        _valid = true;
+    }
+
+    public PipelineWebTestBase getTest()
+    {
+        return _test;
+    }
+
+    public String getDataPath()
+    {
+        return _dataPath;
+    }
+
+    public String getDataDirName()
+    {
+        String[] parts = StringUtils.split(_dataPath, '/');
+        return parts[parts.length - 1]; 
+    }
+
+    public String getProtocolName()
+    {
+        return _protocolName;
+    }
+
+    public String getProtocolType()
+    {
+        return _protocolType;
+    }
+
+    public String[] getSampleNames()
+    {
+        return _sampleNames;
+    }
+
+    public String getParametersFile()
+    {
+        return _parametersFile != null ? _parametersFile : _protocolType + ".xml";
+    }
+
+    public void setParametersFile(String parametersFile)
+    {
+        _parametersFile = parametersFile;
+    }
+
+    public String[] getInputExtensions()
+    {
+        return _inputExtensions;
+    }
+
+    public void setInputExtensions(String... inputExtensions)
+    {
+        _inputExtensions = inputExtensions;
+    }
+
+    public String[] getOutputExtensions()
+    {
+        return _outputExtensions;
+    }
+
+    public void setOutputExtensions(String... outputExtensions)
+    {
+        _outputExtensions = outputExtensions;
+    }
+
+    public String getRunKey()
+    {
+        return _dataPath + " (" + _protocolType + "/" + _protocolName + ")";
+    }
+
+    public String getDirStatusDesciption()
+    {
+        return getDataDirName() + " (" + _protocolName + ")";
+    }
+
+    public String[] getExperimentLinks()
+    {
+        if (_experimentLinks == null)
+        {
+            String[] dirs = _dataPath.split("/");
+            String dataDirName = dirs[dirs.length - 1];
+
+            if (_sampleNames.length == 0)
+                _experimentLinks = new String[] { dataDirName + " (" + _protocolName + ")" };
+            else
+            {
+                ArrayList<String> listLinks = new ArrayList<String>();
+                for (String name : _sampleNames)
+                    listLinks.add(dataDirName + '/' + name + " (" + _protocolName + ")");
+                _experimentLinks = listLinks.toArray(new String[listLinks.size()]);
+            }
+        }
+        return _experimentLinks;
+    }
+
+    public void setExperimentLinks(String[] experimentLinks)
+    {
+        this._experimentLinks = experimentLinks;
+    }
+
+    public void validate()
+    {
+        // Default does fails to allow manual analysis of the run.
+        // Override to do actual automated validation of the resulting
+        // MS2 run data.
+
+        validateTrue("No automated validation", false);
+    }
+
+    public void validateTrue(String message, boolean condition)
+    {
+        if (!condition)
+        {
+            _test.log("INVALID: " + message);
+            _valid = false;
+        }
+    }
+
+    public boolean isValid()
+    {
+        return _valid;
+    }
+
+    public void verifyClean(File rootDir)
+    {
+        File analysisDir = new File(rootDir, getDataPath() + File.separator + getProtocolType());
+        if (analysisDir.exists())
+            BaseSeleniumWebTest.fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
+    }
+
+    public void clean(File rootDir) throws IOException
+    {
+        delete(new File(rootDir, getDataPath() + "/" + getProtocolType()));
+    }
+
+    private void delete(File file) throws IOException
+    {
+        if (file.isDirectory())
+        {
+            for (File child : file.listFiles())
+            {
+                delete(child);
+            }
+        }
+        System.out.println("Deleting " + file.getPath() + "\n");
+        file.delete();
+    }
+
+    public void startProcessing()
+    {
+        _test.log("Start analysis of " + getDataPath());
+        _test.clickNavButton("Process and Import Data");
+        _test.clickLinkWithText("root");
+        String[] dirs = getDataPath().split("/");
+        for (String dir : dirs)
+            _test.clickLinkWithText(dir);
+
+        clickActionButton();
+
+        int wait = BaseSeleniumWebTest.WAIT_FOR_GWT;
+        _test.log("Choose existing protocol " + getProtocolName());
+        _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ),
+                wait * 12);
+        _test.selectOptionByText("protocol", getProtocolName());
+        _test.sleep(wait);
+
+        _test.log("Start data processing");
+        _test.submit();
+        _test.sleep(wait);
+    }
+
+    public void remove()
+    {
+        ExperimentRunTable tableExp = getExperimentRunTable();
+
+        for (String name : getExperimentLinks())
+        {
+            _test.log("Removing " + name);
+
+            _test.pushLocation();
+            tableExp.clickGraphLink(name);
+            String id = _test.getURL().getQuery();
+            id = id.substring(id.indexOf('=') + 1);
+            _test.popLocation();
+
+            _test.checkCheckbox(".select", id, false);
+            _test.clickNavButton("Delete");
+            _test.clickNavButton("Confirm Delete");
+        }
+    }
+
+    private ExperimentRunTable getExperimentRunTable()
+    {
+        return new ExperimentRunTable(getExperimentRunTableName(), _test, false);
+    }
+}

@@ -15,7 +15,7 @@
  */
 package org.labkey.test.ms2.cluster;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.pipeline.PipelineWebTestBase;
 
 /**
  * TestsBaseline class
@@ -26,7 +26,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 */
 public class MS2TestsBaseline extends MS2TestsBase
 {
-    public MS2TestsBaseline(BaseSeleniumWebTest test)
+    public MS2TestsBaseline(PipelineWebTestBase test)
     {
         super(test);
     }
@@ -34,80 +34,80 @@ public class MS2TestsBaseline extends MS2TestsBase
     public void addTestsScoringOrganisms()
     {
         // Scoring tests
-        listParams.add(new MS2ScoringParams(test, "yeast/Paulovich_101705_ltq", "xt_yeastp",
+        _listParams.add(new MS2ScoringParams(_test, "yeast/Paulovich_101705_ltq", "xt_yeastp",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "yeast/Paulovich_101705_ltq", "xc_yeastp",
+        _listParams.add(new MS2ScoringParams(_test, "yeast/Paulovich_101705_ltq", "xc_yeastp",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "yeast/Paulovich_101705_ltq", "xk_yeastp",
-                new String[] {  },
-                0.0, 0, 0.0, 0));
-
-        listParams.add(new MS2ScoringParams(test, "yeast/comp12vs12standSCX", "xt_yeast",
-                new String[] {  },
-                0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "yeast/comp12vs12standSCX", "xc_yeast",
-                new String[] {  },
-                0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "yeast/comp12vs12standSCX", "xk_yeast",
+        _listParams.add(new MS2ScoringParams(_test, "yeast/Paulovich_101705_ltq", "xk_yeastp",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
 
-        listParams.add(new MS2ScoringParams(test, "human/Hupo_PPP", "xt_hupo",
+        _listParams.add(new MS2ScoringParams(_test, "yeast/comp12vs12standSCX", "xt_yeast",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "human/Hupo_PPP", "xc_hupo",
+        _listParams.add(new MS2ScoringParams(_test, "yeast/comp12vs12standSCX", "xc_yeast",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "human/Hupo_PPP", "xk_hupo",
+        _listParams.add(new MS2ScoringParams(_test, "yeast/comp12vs12standSCX", "xk_yeast",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+
+        _listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xt_hupo",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xc_hupo",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xk_hupo",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
     }
 
     public void addTestsISBMix()
     {
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/FT", "xt_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/FT", "xt_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/FT", "xk_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/FT", "xk_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/LCQ", "xt_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LCQ", "xt_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/LCQ", "xk_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LCQ", "xk_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/LTQ", "xt_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LTQ", "xt_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/LTQ", "xk_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LTQ", "xk_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/QSTAR", "xt_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QSTAR", "xt_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/QSTAR", "xk_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QSTAR", "xk_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/QTOF", "xt_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QTOF", "xt_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/ISB_18Mix/QTOF", "xk_isbmix",
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QTOF", "xk_isbmix",
                 new String[] {  },
                 0.0, 0, 0.0, 0));
     }
 
     public void addTestsScoringMix()
     {
-        listParams.add(new MS2ScoringParams(test, "mix/Keller_omics", "xt_komics",
+        _listParams.add(new MS2ScoringParams(_test, "mix/Keller_omics", "xt_komics",
                 new String[] { },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/Keller_omics", "xc_komics",
+        _listParams.add(new MS2ScoringParams(_test, "mix/Keller_omics", "xc_komics",
                 new String[] { },
                 0.0, 0, 0.0, 0));
-        listParams.add(new MS2ScoringParams(test, "mix/Keller_omics", "xk_komics",
+        _listParams.add(new MS2ScoringParams(_test, "mix/Keller_omics", "xk_komics",
                 new String[] { },
                 0.0, 0, 0.0, 0));
     }
@@ -135,7 +135,7 @@ public class MS2TestsBaseline extends MS2TestsBase
         listParams.add(new MS2ScoringParams(test, "human/IPAS0029", "xk_ipas",
                 new String[] { },
                 0.0, 0, 0.0, 0)); */
-        listParams.add(new MS2ScoringParams(test, "human/IPAS0029_raw", "xk_ipas",
+        _listParams.add(new MS2ScoringParams(_test, "human/IPAS0029_raw", "xk_ipas",
                 new String[] { },
                 0.0, 0, 0.0, 0));
     }
@@ -143,48 +143,48 @@ public class MS2TestsBaseline extends MS2TestsBase
     public void addTestsQuant()
     {
         // Q3 quantitation
-        MS2QuantParams qp = new MS2QuantParams(test, "quant/acrylamide", "BSA_10_1", "xc_bov_q3_75");
-        listParams.add(qp);
+        MS2QuantParams qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "BSA_10_1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "BSA_5_1", "xc_bov_q3_75");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "BSA_5_1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_3-1", "xc_bov_q3_75");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_3-1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-1", "xc_bov_q3_75");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-3", "xc_bov_q3_75");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-3");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-5", "xc_bov_q3_75");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-5");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-10", "xc_bov_q3_75");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-10");
+        _listParams.add(qp);
 
         // Xpress quantitation
-        qp = new MS2QuantParams(test, "quant/acrylamide", "BSA_10_1", "xc_bov_qc_5");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "BSA_10_1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "BSA_5_1", "xc_bov_qc_5");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "BSA_5_1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_3-1", "xc_bov_qc_5");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_3-1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-1", "xc_bov_qc_5");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-1");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-3", "xc_bov_qc_5");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-3");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-5", "xc_bov_qc_5");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-5");
+        _listParams.add(qp);
 
-        qp = new MS2QuantParams(test, "quant/acrylamide", "L_04_BSA_D0-D3_1-10", "xc_bov_qc_5");
-        listParams.add(qp);
+        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-10");
+        _listParams.add(qp);
         //*/
     }
 }

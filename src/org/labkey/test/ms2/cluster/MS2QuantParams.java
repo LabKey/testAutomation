@@ -15,8 +15,8 @@
  */
 package org.labkey.test.ms2.cluster;
 
+import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.util.ProteinRegionTable;
-import org.labkey.test.BaseSeleniumWebTest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,14 +32,14 @@ class MS2QuantParams extends MS2TestParams
 {
     protected Map<String, MS2QuantRatio> ratios = new HashMap<String, MS2QuantRatio>();
 
-    public MS2QuantParams(BaseSeleniumWebTest test, String dataPath, String protocol)
+    public MS2QuantParams(PipelineWebTestBase test, String dataPath, String protocol)
     {
-        this(test, dataPath, null, protocol);
+        this(test, dataPath, protocol, null);
     }
 
-    public MS2QuantParams(BaseSeleniumWebTest test, String dataPath, String sampleName, String protocol)
+    public MS2QuantParams(PipelineWebTestBase test, String dataPath, String protocol, String sampleName)
     {
-        super(test, dataPath, sampleName, protocol);
+        super(test, dataPath, protocol, sampleName);
     }
 
     public void addRatio(String protName, MS2QuantRatio ratio)
@@ -54,20 +54,24 @@ class MS2QuantParams extends MS2TestParams
 
     public void validate()
     {
-        test.log("Validating " + getExperimentLink());
+        String link = getExperimentLinks()[0];
+        _test.log("***** " + link + " *****");
+
+        // Navigate to the peptides view by clicking the experiment name link.
+        _test.clickLinkWithText(link);
 
         setGrouping("None");
-        test.clearAllFilters("MS2Peptides", "Scan");
+        _test.clearAllFilters("MS2Peptides", "Scan");
 
         setGrouping("Protein Prophet");
-        test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
+        _test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
-        test.log("Pick protein columns");
-        test.clickNavButton("Pick Protein Columns");
-        test.setFormElement("columns", "GroupNumber, GroupProbability, Protein, RatioMean, RatioStandardDev, RatioNumberPeptides, AACoverage, BestName, BestGeneName, Description");
-        test.clickNavButton("Pick Columns");
-        ProteinRegionTable tableProt = new ProteinRegionTable(0.75, test);
-        test.setFilter(tableProt.getTableName(), "RatioNumberPeptides", "Is Greater Than", "1");
+        _test.log("Pick protein columns");
+        _test.clickNavButton("Pick Protein Columns");
+        _test.setFormElement("columns", "GroupNumber, GroupProbability, Protein, RatioMean, RatioStandardDev, RatioNumberPeptides, AACoverage, BestName, BestGeneName, Description");
+        _test.clickNavButton("Pick Columns");
+        ProteinRegionTable tableProt = new ProteinRegionTable(0.75, _test);
+        _test.setFilter(tableProt.getTableName(), "RatioNumberPeptides", "Is Greater Than", "1");
 
         int colRatio = tableProt.getColumn("Ratio Peps");
         int colProtein = tableProt.getColumn("Protein");

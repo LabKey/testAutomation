@@ -16,8 +16,8 @@
 
 package org.labkey.test.bvt;
 
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

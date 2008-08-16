@@ -530,7 +530,7 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Setup");
         setFormElement("path", _studyDataRoot);
         submit();
-        clickNavButton("View Status");
+        clickLinkWithText("Pipeline");
         clickNavButton("Process and Import Data");
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");

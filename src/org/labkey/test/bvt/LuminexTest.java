@@ -16,9 +16,9 @@
 
 package org.labkey.test.bvt;
 
-import org.labkey.test.util.ListHelper;
-import org.labkey.test.Locator;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 

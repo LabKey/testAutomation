@@ -54,7 +54,6 @@ public class ExpTest extends BaseSeleniumWebTest
         clickNavButton("Setup");
         setFormElement("path", getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
         submit();
-        clickNavButton("View Status");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
         clickNavButton("Import Experiment");

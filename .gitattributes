@@ -83,9 +83,11 @@ src/org/labkey/test/drt/XTandemTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms2/AbstractMS2SearchEngineTest.java -text
 src/org/labkey/test/ms2/MS2ClusterTest.java -text
+src/org/labkey/test/ms2/MS2PipelineFolder.java -text
 src/org/labkey/test/ms2/MS2TestBase.java -text
 src/org/labkey/test/ms2/MascotTest.java -text
 src/org/labkey/test/ms2/SequestTest.java -text
+src/org/labkey/test/ms2/cluster/MS2EmailSuccessParams.java -text
 src/org/labkey/test/ms2/cluster/MS2QuantParams.java -text
 src/org/labkey/test/ms2/cluster/MS2QuantRatio.java -text
 src/org/labkey/test/ms2/cluster/MS2ScoringParams.java -text
@@ -100,6 +102,12 @@ src/org/labkey/test/ms2/cluster/MS2Tests_20070101__3_0_2a.java -text
 src/org/labkey/test/ms2/cluster/MS2Tests_20070701__3_0_2.java -text
 src/org/labkey/test/ms2/cluster/MS2Tests_20070701__3_4_0.java -text
 src/org/labkey/test/ms2/cluster/MS2Tests_20070701__3_4_1.java -text
+src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
+src/org/labkey/test/pipeline/ExperimentGraph.java -text
+src/org/labkey/test/pipeline/PipelineFolder.java -text
+src/org/labkey/test/pipeline/PipelineTestParams.java -text
+src/org/labkey/test/pipeline/PipelineTestsBase.java -text
+src/org/labkey/test/pipeline/PipelineWebTestBase.java -text
 src/org/labkey/test/seleniumHelpers.js -text
 src/org/labkey/test/testpicker/CheckNode.java -text
 src/org/labkey/test/testpicker/CheckRenderer.java -text
@@ -107,6 +115,8 @@ src/org/labkey/test/testpicker/TestHelper.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/Echo.java -text
+src/org/labkey/test/util/EmailRecordTable.java -text
+src/org/labkey/test/util/ExperimentRunTable.java -text
 src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text

@@ -15,11 +15,10 @@
  */
 package org.labkey.test.ms2.cluster;
 
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ms2.MS2ClusterTest;
-import com.thoughtworks.selenium.SeleniumException;
+import org.labkey.test.pipeline.AbstractPipelineTestParams;
+import org.labkey.test.pipeline.PipelineWebTestBase;
 
 /**
  * MS2TestParams class
@@ -28,80 +27,40 @@ import com.thoughtworks.selenium.SeleniumException;
 *
 * @author bmaclean
 */
-public class MS2TestParams
+public class MS2TestParams extends AbstractPipelineTestParams
 {
-    protected BaseSeleniumWebTest test;
-    protected String dataPath;
-    protected String sampleName;
-    protected String protocol;
-    protected boolean valid;
-
-    public MS2TestParams(BaseSeleniumWebTest test, String dataPath, String protocol)
+    public MS2TestParams(PipelineWebTestBase test, String dataPath, String protocolName, String... sampleNames)
     {
-        this(test, dataPath, null, protocol);
-    }
+        super(test, dataPath, "xtandem", protocolName + MS2ClusterTest.PROTOCOL_MODIFIER, sampleNames);
 
-    public MS2TestParams(BaseSeleniumWebTest test, String dataPath, String sampleName, String protocol)
-    {
-        this.test = test;
-        this.dataPath = dataPath;
-        this.sampleName = sampleName;
-        this.protocol = protocol + MS2ClusterTest.PROTOCOL_MODIFIER;
-        this.valid = true;
-    }
-
-    public String getDataPath()
-    {
-        return dataPath;
-    }
-
-    public String getProtocol()
-    {
-        return protocol;
-    }
-
-    public String getSearchKey()
-    {
-        return dataPath + " (" + protocol + ")";
-    }
-
-    public String getExperimentLink()
-    {
-        String[] dirs = dataPath.split("/");
-        StringBuffer link = new StringBuffer(dirs[dirs.length - 1]);
-        if (sampleName != null)
-            link.append('/').append(sampleName);
-        link.append(" (").append(protocol).append(")");
-        return link.toString();
-    }
-
-    public void setGrouping(String grouping)
-    {
-        test.log("Set grouping to " + grouping);
-        test.selectOptionByText("grouping", grouping);
-        test.clickAndWait(Locator.id("viewTypeSubmitButton"));
-    }
-
-    public void validate()
-    {
-        // Default does fails to allow manual analysis of the run.
-        // Override to do actual automated validation of the resulting
-        // MS2 run data.
-
-        validateTrue("No automated validation for " + getExperimentLink(), false);
-    }
-
-    public void validateTrue(String message, boolean condition)
-    {
-        if (!condition)
+        setParametersFile("tandem.xml");
+        if (sampleNames.length == 0)
         {
-            test.log("INVALID: " + message);
-            valid = false;
+            // todo: more info on inputs and outputs
+            setOutputExtensions(".pep.xml", ".prot.xml");
+        }
+        else
+        {
+            setInputExtensions(".mzXML");
+            setOutputExtensions(".xtan.xml", ".pep.xml", ".prot.xml");
         }
     }
 
-    public boolean isValid()
+    public String getExperimentRunTableName()
     {
-        return valid;
+        return "MS2SearchRuns";
+    }
+
+    public void clickActionButton()
+    {
+        _test.log("X! Tandem Search");
+        _test.clickNavButton("X%21Tandem Peptide Search");
+    }
+
+    protected void setGrouping(String grouping)
+    {
+        _test.log("Set grouping to " + grouping);
+        _test.selectOptionByText("grouping", grouping);
+        _test.clickAndWait(Locator.id("viewTypeSubmitButton"));
     }
 }

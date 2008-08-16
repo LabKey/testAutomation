@@ -15,10 +15,8 @@
  */
 package org.labkey.test.ms2.cluster;
 
-import org.labkey.test.BaseSeleniumWebTest;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.labkey.test.pipeline.PipelineTestsBase;
+import org.labkey.test.pipeline.PipelineWebTestBase;
 
 /**
  * MS2TestsBase class
@@ -27,24 +25,11 @@ import java.util.ArrayList;
 *
 * @author bmaclean
 */
-public class MS2TestsBase
+public class MS2TestsBase extends PipelineTestsBase
 {
-    protected BaseSeleniumWebTest test;
-    protected List<MS2TestParams> listParams = new ArrayList<MS2TestParams>();
-
-    public MS2TestsBase(BaseSeleniumWebTest test)
+    public MS2TestsBase(PipelineWebTestBase test)
     {
-        this.test = test;
-    }
-
-    public MS2TestParams[] getParams()
-    {
-        return listParams.toArray(new MS2TestParams[listParams.size()]);
-    }
-
-    public void removeParams(MS2TestParams params)
-    {
-        listParams.remove(params);
+        super(test);
     }
 
     public void addTestsScoringOrganisms() {}

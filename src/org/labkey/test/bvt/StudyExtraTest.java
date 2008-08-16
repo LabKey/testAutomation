@@ -16,7 +16,6 @@
 
 package org.labkey.test.bvt;
 
-import junit.framework.AssertionFailedError;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
