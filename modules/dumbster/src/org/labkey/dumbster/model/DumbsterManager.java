@@ -54,7 +54,7 @@ public class DumbsterManager
 
     public boolean start()
     {
-        int port = 28;
+        int port = 26;
         Properties props = new Properties();
         props.setProperty("mail.smtp.host", "localhost");
         props.setProperty("mail.smtp.user", "Anonymous");
