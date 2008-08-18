@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.Locator;
 import org.apache.commons.lang.StringUtils;
+import junit.framework.Assert;
 
 /**
  * <code>EmailRecordTable</code>
@@ -31,6 +32,12 @@ public class EmailRecordTable extends DataRegionTable
     public EmailRecordTable(PipelineWebTestBase test)
     {
         super("EmailRecord", test, false);
+    }
+
+    public int getDataRowCount()
+    {
+        // This mock data region always has a hidden row at the end.
+        return super.getDataRowCount() - 1;
     }
 
     public void startRecording()
@@ -62,6 +69,10 @@ public class EmailRecordTable extends DataRegionTable
         // the cache of previously recorded messages.
         stopRecording();
         startRecording();
+        
+        _test.sleep(1000);
+        String error = _test.getText(Locator.id("emailRecordError"));
+        Assert.assertTrue("Error setting email recorder", StringUtils.trimToNull(error) == null);
     }
 
     public void clickMessage(EmailMessage message)
@@ -72,24 +83,27 @@ public class EmailRecordTable extends DataRegionTable
 
     public EmailMessage getMessage(String subjectPart)
     {
-        int colTo = getColumn("To");
-        int colFrom = getColumn("From");
-        int colMessage = getColumn("Message");
-
         int rows = getDataRowCount();
-        for (int i = 0; i < rows; i++)
+
+        if (rows > 0)
         {
-            String message = getDataAsText(i, colMessage);
-            String[] lines = trimAll(StringUtils.split(message, "\n"));
-            String subjectLine = lines[0];
-            if (subjectLine.indexOf(subjectPart) != -1)
+            int colTo = getColumn("To");
+            int colFrom = getColumn("From");
+            int colMessage = getColumn("Message");
+            for (int i = 0; i < rows; i++)
             {
-                EmailMessage em = new EmailMessage();
-                em.setFrom(trimAll(StringUtils.split(getDataAsText(i, colFrom), ',')));
-                em.setTo(trimAll(StringUtils.split(getDataAsText(i, colTo), ',')));
-                em.setSubject(subjectLine);
-                em.setBody(StringUtils.join(lines, "\n", 1, lines.length - 1));
-                return em;
+                String message = getDataAsText(i, colMessage);
+                String[] lines = trimAll(StringUtils.split(message, "\n"));
+                String subjectLine = lines[0];
+                if (subjectLine.indexOf(subjectPart) != -1)
+                {
+                    EmailMessage em = new EmailMessage();
+                    em.setFrom(trimAll(StringUtils.split(getDataAsText(i, colFrom), ',')));
+                    em.setTo(trimAll(StringUtils.split(getDataAsText(i, colTo), ',')));
+                    em.setSubject(subjectLine);
+                    em.setBody(StringUtils.join(lines, "\n", 1, lines.length - 1));
+                    return em;
+                }
             }
         }
 
