@@ -110,6 +110,141 @@ public class StudyBvtTest extends StudyTest
     {
         super.doTestSteps();
 
+        // verify that we correctly warn when specimen tracking hasn't been configured
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Create New Request");
+        assertTextPresent("Specimen management is not configured for this study");
+
+        // configure specimen tracking
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Request Statuses");
+        setFormElement("newLabel", "New Request");
+        clickNavButton("Save");
+        setFormElement("newLabel", "Pending Approval");
+        clickNavButton("Save");
+        setFormElement("newLabel", "Complete");
+        clickNavButton("Done");
+        clickLinkWithText("Manage Actors and Groups");
+        setFormElement("newLabel", "Institutional Review Board");
+        selectOptionByText("newPerSite", "Multiple Per Study (Location Affiliated)");
+        clickNavButton("Save");
+        setFormElement("newLabel", "Scientific Leadership Group");
+        selectOptionByText("newPerSite", "One Per Study");
+        clickNavButton("Save");
+        clickLinkWithText("Update Members");
+        clickLinkWithText("FHCRC - Seattle");
+        assertTextPresent("Institutional Review Board, FHCRC - Seattle");
+        assertTextPresent("This group currently has no members.");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Default Requirements");
+        selectOptionByText("providerActor", "Institutional Review Board");
+        setFormElement("providerDescription", "To be deleted");
+        clickNavButtonByIndex("Add Requirement", 1);
+        assertTextPresent("To be deleted");
+        clickLinkWithText("Delete");
+        assertTextNotPresent("To be deleted");
+        selectOptionByText("providerActor", "Institutional Review Board");
+        setFormElement("providerDescription", "Providing lab approval");
+        clickNavButtonByIndex("Add Requirement", 1);
+        selectOptionByText("receiverActor", "Institutional Review Board");
+        setFormElement("receiverDescription", "Receiving lab approval");
+        clickNavButtonByIndex("Add Requirement", 2);
+        selectOptionByText("generalActor", "Scientific Leadership Group");
+        setFormElement("generalDescription", "SLG Request Approval");
+        clickNavButtonByIndex("Add Requirement", 3);
+        clickLinkWithText("manage study");
+
+        // create specimen request
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Study Navigator");
+
+        assertLinkNotPresentWithText("24");
+        selectOptionByText("QCState", "All data");
+        waitForPageToLoad();
+
+        clickLinkWithText("24");
+        //getDialog().setWorkingForm("Dataset");
+        checkCheckbox(Locator.checkboxByName(".toggle", false));
+        clickNavButton("View Specimens");
+        assertTextPresent("364V05000031");
+        clickLinkWithText("Show Vial and Request Options");
+        checkCheckbox(Locator.checkboxByName(".toggle", false));
+        clickNavButton("Request Options", 0);
+        clickLinkWithText("Create New Request");
+        assertTextPresent("HAQ0003Y-09");
+        assertTextPresent("BAQ00051-09");
+        assertTextNotPresent("KAQ0003Q-01");
+        selectOptionByText("destinationSite", "Duke University");
+        setFormElement("inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
+        clickNavButton("Create Request");
+
+        assertTextPresent("This request has not been submitted");
+        assertNavButtonPresent("Cancel Request");
+        assertNavButtonPresent("Submit Request");
+        clickLinkWithText("Specimen Requests");
+
+        assertNavButtonPresent("Submit");
+        assertNavButtonPresent("Cancel");
+        assertNavButtonPresent("Details");
+        assertTextPresent("Not Yet Submitted");
+        clickNavButton("Submit");
+        selenium.getConfirmation();
+        clickLinkWithText("Specimen Requests");
+        assertNavButtonNotPresent("Submit");
+        assertNavButtonNotPresent("Cancel");
+        assertNavButtonPresent("Details");
+        assertTextPresent("New Request");
+
+        // test auto-fill:
+        clickNavButton("Create New Request");
+        String inputs = selenium.getValue("inputs");
+        System.out.println(inputs);
+        assertFormElementNotEquals(Locator.dom("document.forms[0].inputs[1]"), "Duke University, NC");
+        selectOptionByText("destinationSite", "Duke University");
+        assertFormElementEquals(Locator.dom("document.forms[0].inputs[1]"), "Duke University, NC");
+        clickNavButton("Cancel");
+
+        // manage new request
+        clickNavButton("Details");
+        assertTextNotPresent("Complete");
+        assertTextNotPresent("WARNING: Missing Specimens");
+        assertTextPresent("New Request");
+        assertTextNotPresent("Pending Approval");
+        clickLinkWithText("Update Status");
+        selectOptionByText("status", "Pending Approval");
+        setFormElement("comments", "Request is now pending.");
+        clickNavButton("Save Changes and Send Notifications");
+        assertTextNotPresent("New Request");
+        assertTextPresent("Pending Approval");
+        clickLinkWithText("Details", 0);
+        assertTextPresent("Duke University");
+        assertTextPresent("Providing lab approval");
+        checkCheckbox("complete");
+        setFormElement("comment", "Approval granted.");
+        if (isFileUploadAvailable())
+            setFormElement("formFiles[0]", new File(getLabKeyRoot() + VISIT_MAP).getPath());
+        else
+            log("File upload skipped.");
+        clickNavButton("Save Changes and Send Notifications");
+        assertTextPresent("Complete");
+
+        clickLinkWithText("Details", 1);
+        clickNavButton("Delete Requirement");
+        assertTextNotPresent("Receiving lab approval");
+
+        clickLinkWithText("Originating Location Specimen Lists");
+        assertTextPresent("WARNING: The requirements for this request are incomplete");
+        assertTextPresent("KCMC, Moshi, Tanzania");
+        clickNavButton("Cancel");
+
+        clickLinkWithText("View History");
+        assertTextPresent("Request is now pending.");
+        assertTextPresent("Approval granted.");
+        assertTextPresent("Institutional Review Board (Duke University), Receiving lab approval");
+        if (isFileUploadAvailable())
+            assertTextPresent(VISIT_MAP.substring(VISIT_MAP.lastIndexOf("/") + 1));
+
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("Permissions");

@@ -32,6 +32,9 @@ public enum TestSet
     BVT(new Class[]
     {
         BasicTest.class,
+        MessagesTest.class,
+        NabTest.class,
+        IssuesTest.class,
         FlowJoQueryTest.class,
         AssayTest.class,
         LuminexTest.class,
@@ -64,12 +67,9 @@ public enum TestSet
         SecurityTest.class,
         ExpTest.class,
         FlowTest.class,
-        MessagesTest.class,
         XTandemTest.class,
         WikiTest.class,
         StudyTest.class,
-        NabTest.class,
-        IssuesTest.class,
     }),
 
     MS2(new Class[]
