@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.ms2.cluster;
+package org.labkey.test.ms2.params;
 
 import org.labkey.test.pipeline.PipelineWebTestBase;
 
@@ -24,9 +24,9 @@ import org.labkey.test.pipeline.PipelineWebTestBase;
 *
 * @author bmaclean
 */
-public class MS2Tests_20070101__3_0_2 extends MS2TestsBase
+public class MS2Tests_20070101__3_0_2a extends MS2TestsBase
 {
-    public MS2Tests_20070101__3_0_2(PipelineWebTestBase test)
+    public MS2Tests_20070101__3_0_2a(PipelineWebTestBase test)
     {
         super(test);
     }
@@ -460,7 +460,7 @@ public class MS2Tests_20070101__3_0_2 extends MS2TestsBase
 		_listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xc_hupo",
                 prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
         _listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xk_hupo",
-                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt + 1));
 	}
 
     public void addScoringTestsNot()
@@ -521,7 +521,7 @@ public class MS2Tests_20070101__3_0_2 extends MS2TestsBase
         _listParams.add(new MS2ScoringParams(_test, "mix/Keller_omics", "xc_komics",
                 prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
         _listParams.add(new MS2ScoringParams(_test, "mix/Keller_omics", "xk_komics",
-                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt - 1));
     }
 
     public void addTestsQuant()
@@ -585,7 +585,7 @@ public class MS2Tests_20070101__3_0_2 extends MS2TestsBase
 
         // Xpress quantitation
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "BSA_10_1");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(3.4, 2.39));
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(3.41, 2.4));
         qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.79, 0.65));
         qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.31, 0.46));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(8.11, 2.28));
@@ -597,7 +597,7 @@ public class MS2Tests_20070101__3_0_2 extends MS2TestsBase
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "BSA_5_1");
         qp.addRatio("TRYP_PIG", new MS2QuantRatio(4.54, 0.0));
         qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.14, 1.35));
-        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.79, 0.04));
+        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.74, 0.01));
         qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.49, 0.16));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(5.5, 0.56));
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(3.73, 1.28));

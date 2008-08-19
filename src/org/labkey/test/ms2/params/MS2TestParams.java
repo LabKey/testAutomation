@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.ms2.cluster;
+package org.labkey.test.ms2.params;
 
 import org.labkey.test.Locator;
 import org.labkey.test.ms2.MS2ClusterTest;

@@ -19,7 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.pipeline.PipelineFolder;
 import org.labkey.test.pipeline.PipelineTestParams;
-import org.labkey.test.ms2.cluster.*;
+import org.labkey.test.ms2.params.*;
 
 import java.io.File;
 import java.io.FilenameFilter;

@@ -32,7 +32,7 @@ public class PipelineFolder
     // Ask Brendan, Josh or Brian, if you need them.
     protected static final String USER_CERT = "/sampledata/pipeline/globus/usercert.pem";
     protected static final String USER_KEY = "/sampledata/pipeline/globus/userkey.pem";
-    protected static final String USER_KEY_PASSWORD = "ChiKung1";
+    protected static final String USER_KEY_PASSWORD = "";
 
     public enum Type { mini, perl, enterprise }
 

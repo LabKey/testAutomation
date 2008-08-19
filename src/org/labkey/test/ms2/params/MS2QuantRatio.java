@@ -13,28 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.ms2.cluster;
-
-import org.labkey.test.pipeline.PipelineTestsBase;
-import org.labkey.test.pipeline.PipelineWebTestBase;
+package org.labkey.test.ms2.params;
 
 /**
- * MS2TestsBase class
+ * QuantRatio class
 * <p/>
 * Created: Aug 15, 2007
 *
 * @author bmaclean
 */
-public class MS2TestsBase extends PipelineTestsBase
+class MS2QuantRatio
 {
-    public MS2TestsBase(PipelineWebTestBase test)
+    private double _ratio;
+    private double _stddev;
+
+    public MS2QuantRatio(double ratio, double stddev)
     {
-        super(test);
+        this._ratio = ratio;
+        this._stddev = stddev;
     }
 
-    public void addTestsScoringOrganisms() {}
-    public void addTestsISBMix() {}
-    public void addTestsScoringMix() {}
-    public void addTestsIPAS() {}
-    public void addTestsQuant() {}
+    public boolean isMatch(double ratio, double stddev)
+    {
+        if (Math.abs(this._ratio - ratio) > 0.0001)
+            return false;
+        if (Math.abs(this._stddev - stddev) > 0.0001)
+            return false;
+        return true;
+    }
+
+    public double getRatio()
+    {
+        return _ratio;
+    }
+
+    public double getStddev()
+    {
+        return _stddev;
+    }
 }

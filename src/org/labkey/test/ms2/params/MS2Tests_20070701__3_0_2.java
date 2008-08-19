@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.ms2.cluster;
+package org.labkey.test.ms2.params;
 
 import org.labkey.test.pipeline.PipelineWebTestBase;
-
-import java.util.ArrayList;
 
 /**
  * TestsBaseline class
@@ -26,9 +24,9 @@ import java.util.ArrayList;
 *
 * @author bmaclean
 */
-public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
+public class MS2Tests_20070701__3_0_2 extends MS2TestsBase
 {
-    public MS2Tests_20070701__3_4_0(PipelineWebTestBase test)
+    public MS2Tests_20070701__3_0_2(PipelineWebTestBase test)
     {
         super(test);
     }
@@ -68,7 +66,7 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                                 "YGR162W", "YGR180C", "YGR185C", "YGR192C", "YGR204W", "YGR209C", "YGR214W",
                                 "YGR234W", "YGR240C", "YGR253C", "YGR254W", "YGR264C", "YGR279C", "YGR282C",
                                 "YGR285C", "YHL001W", "YHL011C", "YHL015W", "YHL033C", "YHL034C", "YHR008C",
-                                "YHR018C", "YHR019C", "YHR020W", /* "YHR021C", 3.0.2 */ "YHR025W", "YHR027C", "YHR039C-A",
+                                "YHR018C", "YHR019C", "YHR020W", "YHR021C", "YHR025W", "YHR027C", "YHR039C-A",
                                 "YHR042W", "YHR064C", "YHR089C", "YHR104W", "YHR128W", "YHR132C", /* "YHR141C", 2.9.9 */
                                 "YHR163W", "YHR174W", "YHR179W", "YHR183W", "YHR193C", "YHR203C", "YHR208W",
                                 "YIL041W", /* "YIL043C", 2.9.9 */ "YIL051C", "YIL053W", "YIL075C", "YIL078W", "YIL094C",
@@ -113,23 +111,18 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                                 "YAR010C", "YBL005W-A", "YBR012W-A", "YDR098C-A", /* "YDR098C-B", 2005.12.01 */ "YDR210C-C",
                                 /* "YDR210C-D", 2.9.9 */ "YNL054W-A", "YNL284C-A", /* "YOL103W-A", "YOL103W-B", 2.9.9 */
                                 // X! Tandem 2007.01.01.1
-                                /* "YBR263W", "YGL078C", 2.9.9 */ "YKL029C", /* "YLR270W", 3.0.2 */ /* "YLR291C", "YLR447C", 2.9.9 */
+                                /* "YBR263W", "YGL078C", 2.9.9 */ "YKL029C", "YLR270W", /* "YLR291C", "YLR447C", 2.9.9 */
                                 // TPP 3.0.2
-                                "YDR012W", /* "YDR098C-B", 3.0.2 */
+                                "YDR012W", "YDR098C-B",
                                 // X! Tandem 2007.07.01
                                 "YDL131W", "YGL078C", "YIL043C", "YJR010W", "YMR303C", "YNL132W", "YNL189W",
                                 "YNR043W", "YOR261C", "YPR165W", "rev_HIW_DROME", "YDR316W-A", "YDR365W-A", "YOL103W-A",
-                                "YOL103W-B",
-                                // TPP 3.4.0
-                                "YDR170W-A", "YNL284C-B", "YBR111C", "YOR142W", "YJR148W", "YER031C", "rev_VIT2_FUNHE",
-                                "YBR248C", "YPL093W", "YLR291C", "YHR190W", "rev_VIT2_CHICK", "YNL014W", "YIL116W",
-                                "YLR449W", "YMR120C", "YGL137W", "YLR262C-A", "YOR117W",
+                                "YOL103W-B"
                                 },
 //                0.9973, 157, 1.0, 61));   X! Tandem 2005.12.01
 //                0.9975, 168, 1.0, 73));   TPP 2.9.9
 //                0.9998, 76, 1.0, 31));    X! Tandem 2007.01.01
-//                0.9998, 71, 1.0, 28));    TPP 3.0.2
-                1.0, 79, 1.0, 31));
+                0.9998, 71, 1.0, 28));
 
         String[] prots = new String[] { "YAL003W", "YAL005C", "YAL012W", "YAL023C", "YAL035W", "YAL038W", "YAR002C-A",
                                 "YBL002W", "YBL003C", "YBL024W", "YBL027W", "YBL030C", "YBL039C", "YBL045C",
@@ -201,24 +194,20 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                                 "YPR069C", "YPR074C", "YPR118W", "YPR145W", "YPR149W", "YPR163C", "YPR183W",
                                 "YPR191W", /* "rev_CAFF_RIFPA", 2.9.9*/ /* "rev_DPOE1_HUMAN", 2.9.9 */ "YAR010C", "YBL005W-A",
                                 "YBR012W-A", /* "YDR098C-B", 2.9.9 */ "YDR210C-C", "YNL054W-A", "YNL284C-A", "YOL103W-A",
-                                /* "YOL103W-B", 3.0.2 */
+                                "YOL103W-B",
                                 // TPP 3.0.2
-                                "YGL062W", /* "YIL066C", "YLR270W", 3.0.2 */
-                                // TPP 3.4.0
-                                "YDR098C-A", "YHR190W", "YJR148W", "YJR064W", "YLR449W", "YKL181W", "YHR021C",
-                                "YDR390C", "YDL160C", "YMR303C", "YDR012W", "YDR510W", "YLR447C", "YMR099C",
-                                "YGR211W",                
+                                "YGL062W", "YIL066C", "YLR270W",
         };
-        FalsePositiveMarks marks =
-//                new FalsePositiveMarks(0.9944, 157, 0.91, 33);     TPP 3.0.2
-                new FalsePositiveMarks(0.9951, 210, 0.9608, 54);
+        double maxFPPep = 0.9944;
+        int countFPPep = 157;
+        double maxFPProt = 0.91;
+        int countFPProt = 33;
 
-//        listParams.add(new MS2ScoringParams(test, "yeast/Paulovich_101705_ltq", "xc_yeastp",
-//                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+        _listParams.add(new MS2ScoringParams(_test, "yeast/Paulovich_101705_ltq", "xc_yeastp",
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
         _listParams.add(new MS2ScoringParams(_test, "yeast/Paulovich_101705_ltq", "xk_yeastp",
-                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
 
-        
         _listParams.add(new MS2ScoringParams(_test, "yeast/comp12vs12standSCX", "xt_yeast",
                 new String[] { "YAL003W", "YAL005C", "YAL012W", "YAL016W", "YAL023C", "YAL035W", "YAL038W",
                                 "YAL044C", "YAL060W", "YAR015W", "YBL002W", "YBL003C", "YBL015W", "YBL024W",
@@ -319,17 +308,11 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                                 // X! Tandem 2007.07.01
                                 "YBR106W", "YGL157W", "YHR201C", "YIL034C", "YIL043C", "YIL076W", "YKL148C",
                                 "YKR001C", "YOR341W", "YPR041W", "rev_S12A2_MOUSE", "rev_Y512_BUCAP", "YFL002W-A", "YOR343W-B",
-                                // TPP 3.4.0
-                                "YBR145W", "YJL020C", "YGL049C", "YJR148W", "YFR015C", "YPL171C", "YOR108W",
-                                "YHR030C", "YNL307C", "YDR168W", "YOR347C", "YJR065C", "YLR185W", "YER052C",
-                                "YOL097C",
                                 },
 //                0.9983, 88, 1.0, 52));    X! Tandem 2005.12.01
 //                0.997, 80, 1.0, 46));     TPP 2.9.9
 //                0.9966, 39, 0.99, 21));   X! Tandem 2007.01.01
-//                0.9998, 34, 1.0, 22));    TPP 3.0.2
-                0.9998, 36, 0.9996, 22));
-
+                0.9998, 34, 1.0, 22));
 
         prots = new String[] { "YAL003W", "YAL005C", "YAL012W", "YAL016W", "YAL023C", "YAL035W", "YAL038W",
                         "YAL044C", "YAL049C", "YAL060W", "YAR015W", "YBL002W", "YBL003C", /* "YBL015W", 2.9.9*/
@@ -427,19 +410,16 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                         /* "YPR158C-D", 2.9.9 */ "YPR158W-B", "YHR216W", "YLR432W", "YAR073W", "YML056C",
                         // TPP 3.0.2
                         "YOR108W",
-                        // TPP 3.4.0
-                        "YJL055W", "YDR071C", "YLR270W", "YGL049C", "YDR345C", "YJR148W", "YFR015C",
-                        "YIL109C",
         };
-        marks =
-//                new FalsePositiveMarks(0.987, 31, 1.0, 18);     TPP 3.0.2
-                new FalsePositiveMarks(0.9892, 37, 0.9985, 20);
+        maxFPPep = 0.987;
+        countFPPep = 31;
+        maxFPProt = 1.0;
+        countFPProt = 18;
 
-//  TPP 3.0.2 k-score and X!Comet matched exactly
-//        listParams.add(new MS2ScoringParams(test, "yeast/comp12vs12standSCX", "xc_yeast",
-//                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+        _listParams.add(new MS2ScoringParams(_test, "yeast/comp12vs12standSCX", "xc_yeast",
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
         _listParams.add(new MS2ScoringParams(_test, "yeast/comp12vs12standSCX", "xk_yeast",
-                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
 
         _listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xt_hupo",
 				new String[] { "IPI00017601", "IPI00019580", "IPI00641179", "IPI00020091", "IPI00021841", "IPI00021854", "IPI00021857",
@@ -459,17 +439,14 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                                 // X! Tandem 2007.01.01.1
                                 "IPI00642193", "IPI00426069",
                                 // TPP 3.0.2
-                                "IPI00032220", "IPI00334432", "IPI00478003", "IPI00470798", /* "IPI00549462", TPP 3.0.2 */
+                                "IPI00032220", "IPI00334432", "IPI00478003", "IPI00470798", "IPI00549462",
                                 // X! Tandem 2007.07.01
-                                "IPI00556632", "IPI00165421",
-                                // TPP 3.4.0
-                                "IPI00386785", "IPI00218732",
+                                "IPI00556632", "IPI00165421",                                
                 },
-//                0.9999, 19, 0.99, 11));     X! Tandem 2005.12.01
-//                0.9999, 17, 0.98, 9));      TPP 2.9.9
-//                0.9999, 11, 0.98, 6));      X! Tandem 2007.01.01
-//                0.9999, 14, 0.98, 8));      TPP 3.0.2
-                0.9999, 15, 0.9754, 6));
+			//    0.9999, 19, 0.99, 11));   X! Tandem 2005.12.01
+            //    0.9999, 17, 0.98, 9));    TPP 2.9.9
+            //    0.9999, 11, 0.98, 6));    X! Tandem 2007.01.01
+				0.9999, 14, 0.98, 8));
 
         prots = new String[] { "IPI00017601", "IPI00019568", "IPI00019580", "IPI00641179", "IPI00019943", "IPI00020091", "IPI00021841",
                                 "IPI00021854", "IPI00021857", "IPI00029717", "IPI00219713", "IPI00022229", "IPI00022371", "IPI00480192",
@@ -487,19 +464,54 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                                 /* "IPI00645822", 2.9.9 */ "IPI00645844", "IPI00654769", "IPI00216773", "IPI00384697", "IPI00218192", "IPI00294193",
                                 "IPI00556036", "IPI00385264", "IPI00479169", "IPI00477090", "IPI00645352", "IPI00647394", "IPI00641737",
                                 "IPI00431645", "IPI00478493", "IPI00646736", "IPI00061977", "IPI00646280", "IPI00423460", "IPI00430844",
-                                "IPI00384952", "IPI00423461", "IPI00473015", "IPI00643867", "IPI00644397", "IPI00646045",
-                                // TPP 3.4.0
-                                "IPI00383164",
-        };
-        marks =
-//                new FalsePositiveMarks(0.9893, 25, 0.84, 10);     TPP 3.0.2
-                new FalsePositiveMarks(0.9901, 28, 0.9923, 9);
+                                "IPI00384952", "IPI00423461", "IPI00473015", "IPI00643867", "IPI00644397", "IPI00646045" };
+        maxFPPep = 0.9893;
+        countFPPep = 25;
+        maxFPProt = 0.84;
+        countFPProt = 10;
 
-//  TPP 3.0.2 k-score and X!Comet matched exactly
-//		listParams.add(new MS2ScoringParams(test, "human/Hupo_PPP", "xc_hupo",
-//                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+		_listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xc_hupo",
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
         _listParams.add(new MS2ScoringParams(_test, "human/Hupo_PPP", "xk_hupo",
-                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
+    }
+
+    public void addScoringTestsNot()
+    {
+    }
+
+    public void addTestsISBMix()
+    {
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/FT", "xt_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/FT", "xk_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LCQ", "xt_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LCQ", "xk_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LTQ", "xt_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/LTQ", "xk_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QSTAR", "xt_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QSTAR", "xk_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QTOF", "xt_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
+        _listParams.add(new MS2ScoringParams(_test, "mix/ISB_18Mix/QTOF", "xk_isbmix",
+                new String[] {  },
+                0.0, 0, 0.0, 0));
     }
 
     public void addTestsScoringMix()
@@ -509,95 +521,66 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
                                 "CATA_BOVIN", "CYC_BOVIN", "G3P_RABIT", "LACB_BOVIN", "LALBA_BOVIN", "PHS2_RABIT",
                                 "PPB_ECOLI", "TRFE_BOVIN" },
 //                0.9948, 20, 0.87, 6));    X! Tandem 2007.01.01
-//                0.9894, 20, 0.78, 8));    TPP 3.0.2
-                0.9897, 24, 0.8077, 9));
+                0.9894, 20, 0.78, 8));
 
         // Comet and k-score should yield same results.
         String[] prots = new String[] { "ACTA_BOVIN", "ALBU_BOVIN", "AMY_BACLI", "BGAL_ECOLI", "CAH2_BOVIN", "CASB_BOVIN",
                                 "CATA_BOVIN", "CYC_BOVIN", "G3P_RABIT", "LACB_BOVIN", "LALBA_BOVIN", "PHS2_RABIT",
                                 "PPB_ECOLI", "TRFE_BOVIN" };
-        FalsePositiveMarks marks =
-//                new FalsePositiveMarks(0.9901, 80, 0.84, 16);     TPP 3.0.2
-                new FalsePositiveMarks(0.9916, 104, 0.9224, 22);
+        double maxFPPep = 0.9901;
+        int countFPPep = 80;
+        double maxFPProt = 0.84;
+        int countFPProt = 16;
 
-//  TPP 3.0.2 k-score and X!Comet matched exactly
-//        listParams.add(new MS2ScoringParams(test, "mix/Keller_omics", "xc_komics",
-//                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+        _listParams.add(new MS2ScoringParams(_test, "mix/Keller_omics", "xc_komics",
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
         _listParams.add(new MS2ScoringParams(_test, "mix/Keller_omics", "xk_komics",
-                prots, marks.getMaxFPPep(), marks.getCountFPPep(), marks.getMaxFPProt(), marks.getCountFPProt()));
+                prots, maxFPPep, countFPPep, maxFPProt, countFPProt));
     }
 
     public void addTestsQuant()
     {
-        MS2QuantParams qp, qpRaw;
-        ArrayList<MS2QuantParams> list = new ArrayList<MS2QuantParams>();
-        ArrayList<MS2QuantParams> listRaw = new ArrayList<MS2QuantParams>();
-
         // Q3 quantitation
-        qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "BSA_10_1");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(12.47, 5.23));
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(12.47, 5.24)); X!Tandem 07.01.01
+        MS2QuantParams qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "BSA_10_1");
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(12.47, 5.24));
         qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(4.39, 0.68));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(16.93, 5.72));
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(7.77, 0.38));
         qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(9.1, 1.03));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(13.38, 5.66));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(13.38, 5.68)); X!Tandem 07.01.01
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_q3_75", "BSA_10_1");
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(13.38, 5.68));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "BSA_5_1");
         qp.addRatio("TRYP_PIG", new MS2QuantRatio(5.15, 0.0));
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(6.02, 1.23));
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(6.03, 1.24)); TPP 3.0.2
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(6.03, 1.24));
         qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.31, 0.2));
         qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(4.4, 0.27));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(6.48, 0.79));
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(5.27, 0.19));
         qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(4.24, 0.41));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(6.47, 1.32));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(6.49, 1.33)); TPP 3.0.2
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_q3_75", "BSA_5_1");
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(6.49, 1.33));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_3-1");
         qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(3.8, 0.83));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(3.24, 0.41));
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(2.81, 0.01));
         qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(3.9, 1.0));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_q3_75", "L_04_BSA_D0-D3_10-1"); // 10-1 = 3:1
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-1");
         qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(1.09, 0.06));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.96, 0.03));
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.89, 0.01));
         qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(1.11, 0.06));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-5"); // 1-5 = 1:1
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-3");
         qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.34, 0.02));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.36, 0.02));
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.33, 0.02));
         qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.35, 0.02));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-10"); // 1-10 = 1:3
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-5");
         qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.21, 0.02));
@@ -605,192 +588,73 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.21, 0.01));
         qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.21, 0.02));
         qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(0.13, 0.0));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_q3_75", "L_04_BSA_D0-D3_3-1"); // 3-1 = 1:5
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "L_04_BSA_D0-D3_1-10");
         qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.09, 0.01));
         qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.1, 0.02));
         qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.13, 0.03));
         qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.09, 0.01));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_q3_75", "L_04_BSA_D0-D3_5-1"); // 5-1 = 1:10
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        _listParams.add(qp);
 
         // Xpress quantitation
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "BSA_10_1");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.75, 1.52));
-        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.55, 0.78));
-        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.29, 0.36));
-        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(6.27, 2.27));
-        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(5.98, 2.19));
-        qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(7.8, 0.13));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(2.4, 0.98));
-// TPP 3.0.2
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(3.4, 2.39));
-//        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.79, 0.65));
-//        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.31, 0.46));
-//        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(8.11, 2.28));
-//        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(7.83, 3.07));
-//        qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(8.97, 0.79));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(2.73, 1.16));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_qc_5", "BSA_10_1");
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(3.4, 2.39));
+        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.79, 0.65));
+        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.31, 0.46));
+        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(8.11, 2.28));
+        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(7.83, 3.07));
+        qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(8.97, 0.79));
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(2.73, 1.16));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "BSA_5_1");
-        qp.addRatio("TRYP_PIG", new MS2QuantRatio(3.51, 0.0));
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.26, 0.75));
-        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(5.08, 0.77));
-        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(3.36, 0.88));
-        qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(3.13, 0.46));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(2.69, 1.08));
-        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.24, 0.34));
-        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(3.59, 0.32));
-// TPP 3.0.2
-//        qp.addRatio("TRYP_PIG", new MS2QuantRatio(4.54, 0.0));
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.14, 1.35));
-//        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.79, 0.04));
-//        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.49, 0.16));
-//        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(5.5, 0.56));
-//        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(3.73, 1.28));
-//        qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(4.85, 0.64));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(3.47, 1.35));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_qc_5", "BSA_5_1");
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("TRYP_PIG", new MS2QuantRatio(4.54, 0.0));
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.14, 1.35));
+        qp.addRatio("UPSP:ANT3_BOVIN", new MS2QuantRatio(4.79, 0.04));
+        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(2.49, 0.16));
+        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(5.5, 0.56));
+        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(3.73, 1.28));
+        qp.addRatio("UPSP:TRFE_BOVIN", new MS2QuantRatio(4.85, 0.64));
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(3.47, 1.35));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_3-1");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.95, 0.52));
-        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(1.37, 0.21));
-        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(2.53, 0.17));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(2.49, 0.38));
-// TPP 3.0.2
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.3, 1.78));
-//        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(2.41, 0.26));
-//        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(2.86, 0.23));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(6.63, 6.56));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_qc_5", "L_04_BSA_D0-D3_10-1"); // 10-1 = 3:1
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(2.3, 1.78));
+        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(2.41, 0.26));
+        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(2.86, 0.23));
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(6.63, 6.56));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-1");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(1.04, 0.12));
-        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(1.06, 0.04));
-        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.9, 0.04));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(1.04, 0.08));
-// X!Tandem 2007.01.01
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(1.08, 0.18));
-//        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(1.48, 0.17));
-//        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.79, 0.07));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(1.01, 0.05));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-5"); // 1-5 = 1:1
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(1.08, 0.18));
+        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(1.48, 0.17));
+        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.79, 0.07));
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(1.01, 0.05));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-3");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.33, 0.04));
-        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.65, 0.14));
-        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.45, 0.02));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.35, 0.03));
-        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(3.01, 1.64));
-// TPP 3.0.2
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.24, 0.11));
-//        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.71, 0.2));
-//        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.33, 0.06));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.28, 0.01));
-//        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(4.52, 3.35));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-10"); // 1-10 = 1:3
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.24, 0.11));
+        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.71, 0.2));
+        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.33, 0.06));
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.28, 0.01));
+        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(4.52, 3.35));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-5");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.25, 0.06));
-        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.44, 0.05));
-        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.6, 0.06));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.27, 0.05));
-        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(0.85, 0.0));
-// TPP 3.0.2
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.21, 0.05));
-//        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.23, 0.02));
-//        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.56, 0.28));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.22, 0.03));
-//        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(0.86, 0.0));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_qc_5", "L_04_BSA_D0-D3_3-1"); // 3-1 = 1:5
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.21, 0.05));
+        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.23, 0.02));
+        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.56, 0.28));
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.22, 0.03));
+        qp.addRatio("UPSP:APOH_BOVIN", new MS2QuantRatio(0.86, 0.0));
+        _listParams.add(qp);
 
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_qc_5", "L_04_BSA_D0-D3_1-10");
-        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.16, 0.07));
-        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.23, 0.07));
-        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.42, 0.09));
-        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.83, 0.86));
-// X!Tandem 2007.01.01
-//        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.08, 0.05));
-//        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.14, 0.04));
-//        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.2, 0.04));
-//        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.15, 0.04));
-        list.add(qp);
-
-        qpRaw = new MS2QuantParams(_test, "quant/acrylamide_raw", "xc_bov_qc_5", "L_04_BSA_D0-D3_5-1"); // 5-1 = 1:10
-        qpRaw.addAllRatios(qp);
-        listRaw.add(qpRaw);
-
-//        listParams.addAll(list);
-        _listParams.addAll(listRaw);
+        qp.addRatio("UPSP:ALBU_BOVIN", new MS2QuantRatio(0.08, 0.05));
+        qp.addRatio("UPTR:O97941_BOVIN", new MS2QuantRatio(0.14, 0.04));
+        qp.addRatio("UPSP:CO4_BOVIN", new MS2QuantRatio(0.2, 0.04));
+        qp.addRatio("UPTR:Q3SZR2_BOVIN", new MS2QuantRatio(0.15, 0.04));
+        _listParams.add(qp);
         //*/
-    }
-
-    class FalsePositiveMarks
-    {
-        private double maxFPPep;
-        private int countFPPep;
-        private double maxFPProt;
-        private int countFPProt;
-
-        public FalsePositiveMarks(double maxFPPep, int countFPPep, double maxFPProt, int countFPProt)
-        {
-            this.maxFPPep = maxFPPep;
-            this.countFPPep = countFPPep;
-            this.maxFPProt = maxFPProt;
-            this.countFPProt = countFPProt;
-        }
-
-        public double getMaxFPPep()
-        {
-            return maxFPPep;
-        }
-
-        public int getCountFPPep()
-        {
-            return countFPPep;
-        }
-
-        public double getMaxFPProt()
-        {
-            return maxFPProt;
-        }
-
-        public int getCountFPProt()
-        {
-            return countFPProt;
-        }
     }
 }

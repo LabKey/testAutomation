@@ -15,13 +15,7 @@
  */
 package org.labkey.test.pipeline;
 
-import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.util.DataRegionTable;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author brendanx

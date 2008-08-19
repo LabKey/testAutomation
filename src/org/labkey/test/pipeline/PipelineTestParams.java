@@ -46,9 +46,19 @@ public interface PipelineTestParams
 
     void setExperimentLinks(String[] links);
 
+    PipelineFolder.MailSettings getMailSettings();
+    
+    void setMailSettings(PipelineFolder.MailSettings mailSettings);
+
+    boolean isExpectError();
+    
+    void setExpectError(boolean expectError);
+
     void validate();
 
     void validateTrue(String message, boolean condition);
+
+    void validateEmailEscalation(int sampleIndex);
 
     boolean isValid();
 

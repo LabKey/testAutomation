@@ -17,12 +17,20 @@ package org.labkey.test.pipeline;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import static org.labkey.test.WebTestHelper.buildNavButtonImagePath;
 import org.labkey.test.util.ExperimentRunTable;
+import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.EmailRecordTable;
+import org.labkey.test.util.PipelineStatusTable;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+
+import junit.framework.Assert;
 
 /**
  * MS2TestParams class
@@ -42,6 +50,8 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     private String[] _inputExtensions = new String[0];
     private String[] _outputExtensions = new String[0];
     private String[] _experimentLinks;
+    protected PipelineFolder.MailSettings _mailSettings;
+    private boolean _expectError;    
     private boolean _valid;
 
     public AbstractPipelineTestParams(PipelineWebTestBase test, String dataPath,
@@ -151,13 +161,43 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         this._experimentLinks = experimentLinks;
     }
 
+    public PipelineFolder.MailSettings getMailSettings()
+    {
+        return _mailSettings;
+    }
+
+    public void setMailSettings(PipelineFolder.MailSettings mailSettings)
+    {
+        _mailSettings = mailSettings;
+    }
+
+    public boolean isExpectError()
+    {
+        return _expectError;
+    }
+
+    public void setExpectError(boolean expectError)
+    {
+        _expectError = expectError;
+    }
+
     public void validate()
     {
-        // Default does fails to allow manual analysis of the run.
-        // Override to do actual automated validation of the resulting
-        // MS2 run data.
+        if (_mailSettings != null)
+        {
+            if (_expectError)
+                validateEmailError();
+            else
+                validateEmailSuccess();
+        }
+        else
+        {
+            // Default fails to allow manual analysis of the run.
+            // Override to do actual automated validation of the resulting
+            // MS2 run data.
 
-        validateTrue("No automated validation", false);
+            validateTrue("No automated validation", false);
+        }
     }
 
     public void validateTrue(String message, boolean condition)
@@ -176,17 +216,17 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     public void verifyClean(File rootDir)
     {
-        File analysisDir = new File(rootDir, getDataPath() + File.separator + getProtocolType());
+        File analysisDir = new File(rootDir, getDataPath() + File.separatorChar + getProtocolType());
         if (analysisDir.exists())
             BaseSeleniumWebTest.fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
     }
 
     public void clean(File rootDir) throws IOException
     {
-        delete(new File(rootDir, getDataPath() + "/" + getProtocolType()));
+        delete(new File(rootDir, getDataPath() + File.separatorChar + getProtocolType()));
     }
 
-    private void delete(File file) throws IOException
+    protected void delete(File file) throws IOException
     {
         if (file.isDirectory())
         {
@@ -245,5 +285,121 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     private ExperimentRunTable getExperimentRunTable()
     {
         return new ExperimentRunTable(getExperimentRunTableName(), _test, false);
+    }
+    
+    private void validateExperiment()
+    {
+        _test.clickNavButton("Data");
+        ExperimentGraph graph = new ExperimentGraph(_test);
+        graph.validate(this);
+    }
+
+    public void validateEmailSuccess()
+    {
+        Assert.assertNotNull("Email validation requires mail settings", _mailSettings);
+
+        validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
+                _mailSettings.getNotifyUsersOnSuccess());
+
+        if (_test.isLinkPresentWithImage(buildNavButtonImagePath("Data")))
+        {
+            validateExperiment();
+        }
+        else
+        {
+            int split = 0;
+            while (_test.isLinkPresentWithText("COMPLETE", split))
+            {
+                _test.pushLocation();
+                _test.clickLinkWithText("COMPLETE", split++);
+                validateExperiment();
+                _test.popLocation();
+            }
+        }
+    }
+
+    public void validateEmailError()
+    {
+        Assert.assertNotNull("Email validation requires mail settings", _mailSettings);
+
+        for (String sampleExp : getExperimentLinks())
+        {
+            _test.pushLocation();
+            validateEmail("ERROR", sampleExp, _mailSettings.isNotifyOnError(),
+                    _mailSettings.getNotifyUsersOnError());
+            _test.popLocation();
+        }
+    }
+
+    private void validateEmail(String status, String description, boolean notifyOwner, String[] notifyOthers)
+    {
+        if (!notifyOwner && notifyOthers.length == 0)
+            return; // No email expected.
+
+        String userEmail = PasswordUtil.getUsername();
+        EmailRecordTable emailTable = new EmailRecordTable(_test);
+        EmailRecordTable.EmailMessage message = emailTable.getMessage(description);
+        Assert.assertNotNull("No email message found for " + description, message);
+        emailTable.clickMessage(message);
+        validateTrue("The test " + description + " does not have expected status " + status,
+                message.getBody().indexOf("Status: " + status) != -1);
+        validateTrue("Unexpect message sender " + StringUtils.join(message.getFrom(), ','),
+                message.getFrom().length == 1 && message.getFrom()[0].equals(userEmail));
+        List<String> recipients = Arrays.asList(message.getTo());
+        if (notifyOwner)
+        {
+            validateTrue("Message not sent to owner " + userEmail, recipients.contains(userEmail));
+        }
+        for (String notify : notifyOthers)
+        {
+            validateTrue("Message not sent to " + notify, recipients.contains(notify));
+        }
+
+        // The link in this message uses the IP address.  Avoid clicking it, and
+        // possibly changing hostnames.
+        for (String line : StringUtils.split(message.getBody(), "\n"))
+        {
+            if (line.startsWith("http://"))
+            {
+                _test.beginAt(line.substring(line.indexOf('/', 7)));
+                break;
+            }
+        }
+
+        // Make sure we made it to a status page.
+        _test.assertTextPresent("Job Status");
+        _test.assertTextPresent(status);
+    }
+
+    public void validateEmailEscalation(int sampleIndex)
+    {
+        Assert.assertNotNull("Email validation requires mail settings", _mailSettings);
+
+        String userEmail = PasswordUtil.getUsername();
+        String escalateEmail = _mailSettings.getEscalateUsers()[0];
+        String messageText = "I have no idea why this job failed.  Please help me.";
+
+        String sampleExp = getExperimentLinks()[sampleIndex];
+
+        _test.log("Escalate an error");
+        EmailRecordTable emailTable = new EmailRecordTable(_test);
+        PipelineStatusTable statusTable = new PipelineStatusTable(_test, false, false);
+        _test.pushLocation();
+        statusTable.clickStatusLink(sampleExp);
+        _test.clickNavButton("Escalate Job Failure");
+        _test.setFormElement("escalateUser", escalateEmail);
+        _test.setFormElement("escalationMessage", messageText);
+        // DetailsView adds a useless form.
+        //_test.submit();
+        _test.clickNavButton("Send");
+        _test.popLocation();
+
+        EmailRecordTable.EmailMessage message = emailTable.getMessage(sampleExp);
+        Assert.assertNotNull("Escalation message not sent", message);
+        Assert.assertTrue("Escalation not sent to " + escalateEmail, escalateEmail.equals(message.getTo()[0]));
+
+        // Not sure why the angle-brackets are added...
+        String escalateFrom = '<' + userEmail + '>';
+        Assert.assertTrue("Escalation not sent from " + escalateFrom, escalateFrom.equals(message.getFrom()[0]));
     }
 }

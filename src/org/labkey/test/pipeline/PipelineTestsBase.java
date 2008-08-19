@@ -17,6 +17,7 @@ package org.labkey.test.pipeline;
 
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentRunTable;
+import org.labkey.test.util.PipelineStatusTable;
 
 import java.util.*;
 import java.io.File;
@@ -141,7 +142,7 @@ public class PipelineTestsBase
 
     public class PageCache
     {
-        private Map<String, String> _mapStatus;
+        private PipelineStatusTable _tableStatus;
         private Map<String, ExperimentRunTable> _mapTableExp = new HashMap<String, ExperimentRunTable>();
 
         /**
@@ -160,12 +161,21 @@ public class PipelineTestsBase
             String[] completeNames = new String[names.length];
             for (int i = 0; i < names.length; i++)
             {
-                String completeName = getExperimentTable(tableName).getRunName(names[i]);
-                if (completeName == null || getStatusMap().containsKey(names[i]))
-                    return false;
-                completeNames[i] = completeName;
+                if (tp.isExpectError())
+                {
+                    if (!"ERROR".equals(getStatusTable().getJobStatus(names[i])))
+                        return false;
+                }
+                else
+                {
+                    String completeName = getExperimentTable(tableName).getRunName(names[i]);
+                    if (completeName == null || getStatusTable().hasJob(names[i]))
+                        return false;
+                    completeNames[i] = completeName;
+                }
             }
-            tp.setExperimentLinks(completeNames);
+            if (!tp.isExpectError())
+                tp.setExperimentLinks(completeNames);
             return true;
         }
 
@@ -176,32 +186,11 @@ public class PipelineTestsBase
             return _mapTableExp.get(tableName);
         }
 
-        private Map<String, String> getStatusMap()
+        private PipelineStatusTable getStatusTable()
         {
-            if (_mapStatus == null)
-            {
-                _mapStatus = new HashMap<String, String>();
-
-                DataRegionTable tableStatus = new DataRegionTable("StatusFiles", _test, false);
-                int colDescription = tableStatus.getColumn("Description");
-                int colStatus = tableStatus.getColumn("Status");
-
-                int statusRows = tableStatus.getDataRowCount();
-                for (int i = 0; i < statusRows; i++)
-                {
-                    try
-                    {
-                        _mapStatus.put(tableStatus.getDataAsText(i, colDescription),
-                                tableStatus.getDataAsText(i, colStatus));
-                    }
-                    catch (SeleniumException e)
-                    {
-                        _test.log("ERROR: Getting description text for row " + i + ", column " + colDescription);
-                        _test.log("       Row count " + tableStatus.getDataRowCount());
-                    }
-                }
-            }
-            return _mapStatus;
+            if (_tableStatus == null)
+                _tableStatus = new PipelineStatusTable(_test, false, true);
+            return _tableStatus;
         }
     }
 }
