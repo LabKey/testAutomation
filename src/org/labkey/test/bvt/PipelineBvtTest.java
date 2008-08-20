@@ -98,36 +98,33 @@ public class PipelineBvtTest extends PipelineWebTestBase
         setupSite(true);
         _testSetMS2.setup();
 
-        EmailRecordTable mailTable = new EmailRecordTable(this);
-        mailTable.saveRecorderState();
-        mailTable.clearAndRecord();
+        EmailRecordTable emailTable = new EmailRecordTable(this);
+        emailTable.saveRecorderState();
+        emailTable.clearAndRecord();
         runProcessing(_testSetMS2);
 
         // Repeat to make sure retry works
-        mailTable.clearAndRecord();
+        emailTable.clearAndRecord();
         runProcessing(_testSetMS2);
-        assertTrue("Expected 2 notification emails", mailTable.getDataRowCount() == 2);
+        checkEmail(emailTable, 2);
 
         // Make sure there haven't been any errors yet.
         checkErrors();
 
         // Break the pipeline tools directory setting to cause errors.
         setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
-        mailTable.clearAndRecord();
         runProcessing(_testSetMS1);
-        assertTrue("Expected 4 notification emails", mailTable.getDataRowCount() == 4);
+        checkEmail(emailTable, 4);
 
         // Make sure the expected errors have been logged.
         checkExpectedErrors();
 
         // Test pipeline error escalation email.
-        mailTable.clearAndRecord();
         _testSetMS1.getParams()[0].validateEmailEscalation(0);
-        assertTrue("Expected 1 notification email", mailTable.getDataRowCount() == 1);
+        checkEmail(emailTable, 1);
 
         // Fix the pipeline tools directory.
         setPipelineToolsDirectory(getLabKeyRoot() + "/external/bin");
-        mailTable.clearAndRecord();
 
         PipelineStatusTable statusTable = new PipelineStatusTable(this, false, true);
         PipelineTestParams tpRetry = _testSetMS1.getParams()[0];
@@ -143,15 +140,22 @@ public class PipelineBvtTest extends PipelineWebTestBase
         waitToComplete(_testSetMS1);
 
         // Could validate here more, but the final validation should be enough.
-        assertTrue("Expected 1 notification emails", mailTable.getDataRowCount() == 1);
+        checkEmail(emailTable, 1);
 
         for (PipelineTestParams tp : _testSetMS1.getParams())
             tp.setExpectError(false);
-        mailTable.clearAndRecord();
         runProcessing(_testSetMS1);
-        assertTrue("Expected 2 notification emails", mailTable.getDataRowCount() == 2);
+        checkEmail(emailTable, 2);
 
-        mailTable.restoreRecorderState();
+        emailTable.restoreRecorderState();
+    }
+
+    public void checkEmail(EmailRecordTable emailTable, int countExpect)
+    {
+        int count = emailTable.getDataRowCount();
+        assertTrue("Expected " + countExpect + " notification emails, found " + count,
+                count == countExpect);
+        emailTable.clearAndRecord();
     }
 
     public void checkExpectedErrors()
