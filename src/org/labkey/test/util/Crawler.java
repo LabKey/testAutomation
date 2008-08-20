@@ -36,14 +36,20 @@ public class Crawler
             new ControllerActionId("admin", "deleteFolder"),
             new ControllerActionId("admin", "defineWebThemes"),
             new ControllerActionId("admin", "memTracker"),
+            new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("Experiment", "showFile"),
             new ControllerActionId("Experiment", "protocolPredecessors"),
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("login", "logout"),
+            new ControllerActionId("login", "enable"),
+            new ControllerActionId("login", "disable"),
             new ControllerActionId("MS2", "showParamsFile"),
+            new ControllerActionId("project", "deleteWebPart"),
+            new ControllerActionId("project", "moveWebPart"),
             new ControllerActionId("query", "printRows"),
             new ControllerActionId("query", "exportRowsExcel"),
             new ControllerActionId("query", "excelWebQueryDefinition"),
+            new ControllerActionId("reports", "downloadInputData"),
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("reports", "download"),
             new ControllerActionId("Security", "resetPassword"),
@@ -59,10 +65,7 @@ public class Crawler
             new ControllerActionId("Study-Samples", "emailLabSpecimenLists"),
             new ControllerActionId("Study-Samples", "getSpecimenExcel"),
             new ControllerActionId("Study-Samples", "download"),
-            new ControllerActionId("admin", "setAdminMode"),
-            new ControllerActionId("project", "deleteWebPart"),
-            new ControllerActionId("project", "moveWebPart"),
-            new ControllerActionId("reports", "downloadInputData")
+            new ControllerActionId("user", "impersonate")
     };
     private static final String[] ADMIN_CONTROLLERS = new String[]
             { "login", "admin", "Security", "User" };
@@ -263,7 +266,7 @@ public class Crawler
         if (currentDepth >= _alwaysFollowDepth && _actionsVisited.contains(actionId))
             return false;
 
-            // never visit explicity excluded actions:
+        // never visit explicity excluded actions:
         for (ControllerActionId excluded : _excludedActions)
         {
             if (actionId.equals(excluded))

@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -214,7 +216,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void log(String str)
     {
-        System.out.println(str);
+        String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date());      // Include time with log entry.  Use format that matches labkey log.
+        System.out.println(d + " " + str);
     }
 
     private static final Pattern LABKEY_ERROR_TITLE_PATTERN = Pattern.compile("\\d\\d\\d\\D.*Error.*", Pattern.CASE_INSENSITIVE);
