@@ -278,7 +278,8 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test pick peptide columns");
         clickNavButton("Pick Peptide Columns");
-        clickButtonWithImgSrc(getContextPath() + "/Pick.button?11", 0);
+//        clickButtonWithImgSrc(getContextPath() + "/Pick.button?11", 0);
+        clickNavButton("Pick", 0);
         clickNavButton("Pick Columns");
         assertTextPresent("RetTime");
 
@@ -462,10 +463,10 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("GroupProbability ASC");
         assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
         clickNavButton("Pick Peptide Columns");
-        clickButtonWithImgSrc(getContextPath() + "/Pick.button?11", 0);
+        clickNavButton("Pick", 0);
         clickNavButton("Pick Columns");
         clickNavButton("Pick Peptide Columns");
-        clickButtonWithImgSrc(getContextPath() + "/Pick.button?11", 0);
+        clickNavButton("Pick", 0);
         clickNavButton("Pick Columns");
         selectOptionByText("grouping", "Protein Prophet");
         checkCheckbox("expanded");
