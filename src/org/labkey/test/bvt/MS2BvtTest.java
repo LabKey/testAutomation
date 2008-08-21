@@ -278,7 +278,6 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test pick peptide columns");
         clickNavButton("Pick Peptide Columns");
-//        clickButtonWithImgSrc(getContextPath() + "/Pick.button?11", 0);
         clickNavButton("Pick", 0);
         clickNavButton("Pick Columns");
         assertTextPresent("RetTime");
