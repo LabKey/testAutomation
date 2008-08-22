@@ -133,14 +133,50 @@ public class Locator
         return xpath("//a/img[contains(@src, " + xq(image) + ")]");
     }
 
-    public static XPathLocator gwtButton(String image)
+
+    public static XPathLocator gwtNavButton(String text)
     {
-        return xpath("//img[contains(@src, " + xq(image) + ")]");
+        return xpath("//div[@class='html-face']/a/span[text() = '" + text + "']");
     }
 
-    public static XPathLocator gwtButton(String image, int index)
+    public static XPathLocator gwtNavButtonContainingText(String text)
     {
-        return xpath("(//img[contains(@src, " + xq(image) + ")])[" + (index + 1) + "]");
+        return xpath("//div[@class='html-face']/a/span[contains(text(), '" + text + "')]");
+    }
+
+    public static XPathLocator gwtNavButton(String text, int index)
+    {
+        return xpath("(//div[@class='html-face']/a/span[text() = '" + text + "'])[" + (index + 1) + "]");
+    }
+
+    public static XPathLocator navButton(String text)
+    {
+        return xpath("//a/span[text() = '" + text + "']");
+    }
+
+    public static XPathLocator navButtonContainingText(String text)
+    {
+        return xpath("//a/span[contains(text(),  '" + text + "')]");
+    }
+
+    public static XPathLocator navButton(String text, int index)
+    {
+        return xpath("(//a/span[text() = '" + text + "'])[" + (index + 1) + "]");
+    }
+
+    public static XPathLocator navSubmitButton(String text)
+    {
+        return xpath("//input[@type='submit' and @value='" + text + "']");
+    }
+
+    public static XPathLocator navSubmitButtonContainingText(String text)
+    {
+        return xpath("//input[@type='submit' and contains(@value, '" + text + "')]");
+    }
+
+    public static XPathLocator navSubmitButton(String text, int index)
+    {
+        return xpath("(//input[@type='submit' and @value='" + text + "'])[" + (index + 1) + "]");
     }
 
     public static XPathLocator linkWithImage(String image, int index)
@@ -312,6 +348,11 @@ public class Locator
         public XPathLocator index(int index)
         {
             return new XPathLocator("(" + path + ")[" + (index + 1) + "]");
+        }
+
+        public String getPath()
+        {
+            return path;
         }
     }
 

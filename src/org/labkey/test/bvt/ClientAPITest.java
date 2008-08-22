@@ -533,10 +533,10 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
-        
-        selenium.mouseOver(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
-        selenium.mouseDown(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
-        selenium.mouseUp(getPropertyXPath("Run Fields") + "//img[contains(@src, 'Add+Field.button')]");
+
+        selenium.mouseOver(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
+        selenium.mouseDown(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
+        selenium.mouseUp(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
         selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_name0']", "RunDate");
         selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_label0']", "Run Date");
         selenium.select(getPropertyXPath("Run Fields") + "//select[@id='ff_type0']", "DateTime");

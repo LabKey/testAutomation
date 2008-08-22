@@ -81,7 +81,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
         clickLinkWithText("manage group", 1);
         setFormElement("names", AUDIT_TEST_USER);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership", "large");
+        clickNavButton("Update Group Membership");
         deleteUser(AUDIT_TEST_USER);
         deleteProject(AUDIT_TEST_PROJECT);
 

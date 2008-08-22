@@ -51,7 +51,7 @@ public class FlowTest extends BaseFlowTest
 
     private void clickButtonWithText(String text)
     {
-        click(Locator.xpath("//input[@type='button' and @value='" + text + "']"));
+        click(Locator.raw("//input[@value = '" + text + "']"));
     }
 
     public int countEnabledInputs(String name)

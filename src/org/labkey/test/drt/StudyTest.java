@@ -207,7 +207,7 @@ public class StudyTest extends BaseSeleniumWebTest
         selenium.select("list_dataField", "label=Sample Id");
 
         clickNavButton("Save");
-        waitForElement(Locator.xpath("//img[@alt='Import Data']"), WAIT_FOR_GWT);
+        waitForElement(Locator.navButton("Import Data"), WAIT_FOR_GWT);
         clickNavButton("Import Data");
 
         String tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +

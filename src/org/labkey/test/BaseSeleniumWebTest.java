@@ -1189,23 +1189,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
-    public void waitForImageWithSrc(final String src, int wait)
-    {
-        waitForImageWithSrc(src, wait, false);
-    }
-
-    public void waitForImageWithSrc(final String src, int wait, final boolean substringMatch)
-    {
-        String failMessage = "Image with src " + src + " did not appear";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return isImagePresentWithSrc(src, substringMatch);
-            }
-        }, failMessage, wait);
-    }
-
     public void submit()
     {
         submit(Locator.dom("document.forms[0]"));
@@ -1406,19 +1389,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertEquals("Link with text '" + text + "' was not present " + count + " times", countLinksWithText(text), count);
     }
 
-    public boolean isGWTButtonPresentWithImage(String imageName)
+    public boolean isGWTButtonPresentWithText(String text)
     {
-        return isElementPresent(Locator.gwtButton(imageName));
+        return isElementPresent(Locator.gwtNavButton(text));
+    }
+
+    public boolean isGWTButtonPresentContainingText(String text)
+    {
+        return isElementPresent(Locator.gwtNavButtonContainingText(text));
     }
 
     public boolean isLinkPresentWithImage(String imageName)
     {
         return isElementPresent(Locator.linkWithImage(imageName));
-    }
-
-    public boolean isButtonPresentWithImage(String imageName)
-    {
-        return isElementPresent(Locator.buttonWithImgSrc(imageName));
     }
 
     public void assertLinkPresentWithImage(String imageName)
@@ -1483,15 +1466,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLink(getTabLinkId(tabname));
     }
 
-    public void clickButtonWithImgSrc(String src)
+    public void clickGWTButtonWithText(String text, int millis)
     {
-        clickButtonWithImgSrc(src, defaultWaitForPage);
-    }
-
-    public void clickGWTButtonWithImgSrc(String src, int millis)
-    {
-        log("Clicking GWT button with image src " + src);
-        Locator l = Locator.gwtButton(src);
+        log("Clicking GWT button with text " + text);
+        Locator l = Locator.gwtNavButton(text);
         assertElementPresent(l);
         selenium.mouseOver(l.toString());
         selenium.mouseDown(l.toString());
@@ -1500,30 +1478,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             waitForPageToLoad(millis);
     }
 
-    public void clickGWTButtonWithImgSrcByIndex(String src, int index)
+    public void clickGWTButtonContainingText(String text, int millis)
     {
-        log("Clicking GWT button with image src " + src);
-        Locator l = Locator.gwtButton(src, index);
+        log("Clicking GWT button with text " + text);
+        Locator l = Locator.gwtNavButtonContainingText(text);
         assertElementPresent(l);
         selenium.mouseOver(l.toString());
         selenium.mouseDown(l.toString());
         selenium.mouseUp(l.toString());
+        if (millis > 0)
+            waitForPageToLoad(millis);
     }
 
-    public void clickButtonWithImgSrc(String src, int millis)
+    public void clickGWTButtonWithTextByIndex(String text, int index)
     {
-        log("Clicking button with image src " + src);
-        Locator l = Locator.buttonWithImgSrc(src);
+        log("Clicking GWT button with text " + text);
+        Locator l = Locator.gwtNavButton(text, index);
         assertElementPresent(l);
-        clickAndWait(l, millis);
-    }
-
-    public void clickButtonWithImgSrcByIndex(String src, int index)
-    {
-        log("Clicking button with image src " + src);
-        Locator l = Locator.buttonWithImgSrc(src, index);
-        assertElementPresent(l);
-        clickAndWait(l, defaultWaitForPage);
+        selenium.mouseOver(l.toString());
+        selenium.mouseDown(l.toString());
+        selenium.mouseUp(l.toString());
     }
 
     public void clickImageWithAltText(String altText)
@@ -1613,6 +1587,44 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkNotPresent(getTabLinkId(tabText));
     }
 
+    public boolean isButtonPresent(String text)
+    {
+        return (isElementPresent(Locator.navButton(text)) ||
+                isElementPresent(Locator.navSubmitButton(text)));
+    }
+
+    public void clickButtonByIndex(String text, int index)
+    {
+        if (isElementPresent(Locator.navButton(text, index)))
+            clickAndWait(Locator.navButton(text, index), defaultWaitForPage);
+        else
+            clickAndWait(Locator.navSubmitButton(text, index), defaultWaitForPage);
+    }
+
+    public void clickButton(String text, int waitMillis)
+    {
+        if (isElementPresent(Locator.navButton(text)))
+            clickAndWait(Locator.navButton(text), waitMillis);
+        else
+            clickAndWait(Locator.navSubmitButton(text), waitMillis);
+    }
+
+    public void clickButtonContainingText(String text)
+    {
+        if (isElementPresent(Locator.navButtonContainingText(text)))
+            clickAndWait(Locator.navButtonContainingText(text), defaultWaitForPage);
+        else
+            clickAndWait(Locator.navSubmitButtonContainingText(text), defaultWaitForPage);
+    }
+
+    public void clickNavButtonContainingText(String buttonText)
+    {
+        if (isGWTButtonPresentContainingText(buttonText))
+            clickGWTButtonContainingText(buttonText, defaultWaitForPage);
+        else
+            clickButtonContainingText(buttonText);
+    }
+
     public void clickNavButton(String buttonText)
     {
         clickNavButton(buttonText, defaultWaitForPage);
@@ -1620,30 +1632,29 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickNavButton(String buttonText, int waitMillis)
     {
-        if (isLinkPresentWithImage(buildNavButtonImagePath(buttonText)))
-            clickLinkWithImage(buildNavButtonImagePath(buttonText), waitMillis);
-        else if (isGWTButtonPresentWithImage(buildGWTNavButtonImagePath(buttonText, null)))
-            clickGWTButtonWithImgSrc(buildGWTNavButtonImagePath(buttonText, null), waitMillis);
+        if (isGWTButtonPresentWithText(buttonText))
+            clickGWTButtonWithText(buttonText, waitMillis);
         else
-            clickButtonWithImgSrc(buildNavButtonImagePath(buttonText), waitMillis);
+            clickButton(buttonText, waitMillis);
     }
 
     public void clickNavButtonByIndex(String buttonText, int index)
     {
-        if (isLinkPresentWithImage(buildNavButtonImagePath(buttonText)))
-            clickLinkWithImageByIndex(buildNavButtonImagePath(buttonText), index);
-        else if (isGWTButtonPresentWithImage(buildGWTNavButtonImagePath(buttonText, null)))
-            clickGWTButtonWithImgSrcByIndex(buildGWTNavButtonImagePath(buttonText, null), index);
+        if (isGWTButtonPresentWithText(buttonText))
+            clickGWTButtonWithTextByIndex(buttonText, index);
         else
-            clickButtonWithImgSrcByIndex(buildNavButtonImagePath(buttonText), index);
+            clickButtonByIndex(buttonText, index);
     }
 
 
     public String goToNavButton(String buttonText, String controller, String folderPath)
     {
         // Returns address of NavButton
-        String imgName = buildNavButtonImagePath(buttonText);
-        Locator navButton = Locator.linkWithImage(imgName);
+        Locator navButton;
+        if (isElementPresent(Locator.navButton(buttonText)))
+            navButton = Locator.navButton(buttonText);
+        else
+            navButton = Locator.navSubmitButton(buttonText);
         Locator navButtonLink = Locator.raw(navButton.toString().concat("/.."));
         String localAddress = getButtonHref(navButtonLink);
         // IE puts the entire link in href, not just the local address
@@ -1672,16 +1683,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickImgButtonNoNav(String buttonText)
     {
         clickNavButton(buttonText, 0);
-    }
-
-
-    public void clickNavButton(String buttonText, String style)
-    {
-        String imgName = buildNavButtonImagePath(buttonText, style);
-        if (isLinkPresentWithImage(imgName))
-            clickLinkWithImage(imgName);
-        else
-            clickButtonWithImgSrc(imgName);
     }
 
     public void setText(String elementName, String text)
@@ -1793,7 +1794,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void addField(String areaTitle, int index, String name, String label, String type)
     {
-        String xpath = getPropertyXPath(areaTitle) + "//div/img[contains(@src, 'Add+Field.button')]";
+        String xpath = getPropertyXPath(areaTitle) + "//div" + Locator.navButton("Add Field").getPath();
         selenium.mouseOver(xpath);
         selenium.mouseDown(xpath);
         selenium.mouseUp(xpath);
@@ -1828,14 +1829,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public boolean isNavButtonPresent(String buttonText)
     {
-        String imgName = buildNavButtonImagePath(buttonText);
-        return isLinkPresentWithImage(imgName) || isButtonPresentWithImage(imgName);
+        return isButtonPresent(buttonText);
     }
 
     public boolean isMenuButtonPresent(String buttonText)
     {
-        String imgName = buildNavButtonImagePath(buttonText, "shadedMenu");
-        return isLinkPresentWithImage(imgName) || isButtonPresentWithImage(imgName);
+        return isButtonPresent(buttonText);
     }
 
     public void assertNavButtonPresent(String buttonText)
@@ -2440,8 +2439,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             refresh();
         }
         clickAndWait(Locator.raw("//td[contains(text(),'" + item + "')]/../td[2]/a"));
-        waitForElement(Locator.linkWithImage("Data.button"), 5000);
-        clickLinkWithImage("Data.button");
+        waitForElement(Locator.raw("//input[@value='Data']"), 5000);
+        clickNavButton("Data");
     }
 
     public List<Locator> findAllMatches(Locator.XPathLocator loc)

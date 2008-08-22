@@ -159,7 +159,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		setFormElement("ff_name", "List1");
 		clickNavButton("Create List");
         clickLinkWithText("edit fields");
-        waitForElement(Locator.imageWithSrc("Field.button", true),30000);
+        waitForElement(Locator.navButton("Add Field"),30000);
         clickNavButton("Add Field", 0);
 		selenium.type("ff_name0", "Value");
         clickNavButton("Save");
@@ -177,7 +177,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Create Snapshot");
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
-		clickNavButton("Admin", 0);
+        clickLinkWithImage("text_link_arrow", 0); /* click admin drop down */
         selenium.mouseOver("//a[contains(text(),'Go To Module')]");
         waitForElement(Locator.xpath("//a[contains(text(),'Query')]"), 2000);
         selenium.click("//a[contains(text(),'Query')]");
@@ -218,7 +218,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER +" Study");
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
-        clickNavButton("Admin", 0);
+        clickLinkWithImage("text_link_arrow", 0); /* click admin drop down */
         selenium.mouseOver("//a[contains(text(),'Go To Module')]");
         waitForElement(Locator.xpath("//a[contains(text(),'Query')]"), 2000);
         selenium.click("//a[contains(text(),'Query')]");
@@ -338,9 +338,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            selenium.mouseOver(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseDown(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
-            selenium.mouseUp(getPropertyXPath("Data Fields") + "//img[contains(@src, 'Add+Field.button')]");
+            selenium.mouseOver(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
+            selenium.mouseDown(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
+            selenium.mouseUp(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
             selenium.select(getPropertyXPath("Data Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);

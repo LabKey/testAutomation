@@ -17,7 +17,6 @@ package org.labkey.test.ms2.params;
 
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.pipeline.PipelineFolder;
-import static org.labkey.test.WebTestHelper.buildNavButtonImagePath;
 
 /**
  * <code>MS2EmailSuccessParams</code>

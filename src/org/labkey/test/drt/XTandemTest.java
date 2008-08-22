@@ -36,7 +36,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
     protected static final String SEARCH_FIND_ALT = "Schizosaccharomyces";
     protected static final String PROTOCOL = "X!Tandem analysis";
     protected static final String SEARCH_TYPE = "xtandem";
-    protected static final String SEARCH_BUTTON = "X%21Tandem";
+    protected static final String SEARCH_BUTTON = "X!Tandem";
     protected static final String SEARCH_NAME = "X! Tandem";
 
     protected void doCleanup() throws IOException

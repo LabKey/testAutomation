@@ -18,7 +18,6 @@ package org.labkey.test.bvt;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
-import static org.labkey.test.WebTestHelper.buildNavButtonImagePath;
 import org.labkey.test.drt.StudyTest;
 
 import java.io.File;
@@ -192,7 +191,6 @@ public class StudyBvtTest extends StudyTest
         selenium.getConfirmation();
         clickLinkWithText("Specimen Requests");
         assertNavButtonNotPresent("Submit");
-        assertNavButtonNotPresent("Cancel");
         assertNavButtonPresent("Details");
         assertTextPresent("New Request");
 
@@ -248,7 +246,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("Permissions");
-        clickImageWithAltText("Study Security");
+        clickNavButton("Study Security");
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED");
@@ -335,7 +333,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(FOLDER_NAME);
 
         clickLinkWithText("Permissions");
-        clickImageWithAltText("Study Security");
+        clickNavButton("Study Security");
 
         selectOptionByValue("securityString", "EDITABLE_DATASETS");
         clickNavButton("Update");
@@ -397,7 +395,7 @@ public class StudyBvtTest extends StudyTest
         selenium.waitForPageToLoad("30000");
         setFormElement("names", TEST_USER);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership", "large");
+        clickNavButton("Update Group Membership");
         clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/security/StudyVerifyProject/container.view?')]"));
 
         selectOptionByText("//td[contains(text(), '" + TEST_GROUP + "')]/..//td/select", "Reader");
@@ -406,7 +404,7 @@ public class StudyBvtTest extends StudyTest
         // give the test group read access to only the DEM-1 dataset
         selenium.click("link=exact:*My Study");
         selenium.waitForPageToLoad("30000");
-        clickImageWithAltText("Study Security");
+        clickNavButton("Study Security");
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED");
@@ -417,7 +415,7 @@ public class StudyBvtTest extends StudyTest
         clickAndWait(Locator.id("groupUpdateButton"));
 
         selectOptionByText("dataset.1", "READ");
-        clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//td/input[contains(@src, 'Update')]"));
+        clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//input[contains(@value, 'Update')]"));
     }
 
     protected void cleanPipelineItem(String item)
@@ -489,7 +487,7 @@ public class StudyBvtTest extends StudyTest
             for (File file : files)
             {
                 setFormElement("programPath", file.getAbsolutePath());
-                clickAndWait(Locator.raw("//input[contains(@src, 'Submit.button')]"));
+                clickNavButton("Submit");
                 if (isTextPresent("The R View configuration has been updated."))
                 {
                     log("R has been successfully configured");
@@ -727,7 +725,7 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Execute Script");
         clickNavButton("Start Job");
         waitForPageToLoad();
-        waitForElement(Locator.xpath("//img[@alt='Start Job']"), 30000);
+        waitForElement(Locator.navButton("Start Job"), 30000);
         assertTextPresent(R_SCRIPT2_TEXT1);
         assertTextNotPresent(R_SCRIPT2_TEXT2);
 
@@ -752,7 +750,7 @@ public class StudyBvtTest extends StudyTest
         setFormElement("reportName", "participant chart");
         clickNavButton("OK", 0);
 
-        waitForElement(Locator.linkWithImage(buildNavButtonImagePath("Views")), 5000);
+        waitForElement(Locator.navButton("Views"), 5000);
 
         clickMenuButton("Views", "Views:default");
         clickMenuButton("Views", "Views:Create", CREATE_CHART_MENU);
@@ -769,7 +767,7 @@ public class StudyBvtTest extends StudyTest
         checkCheckbox("shareReport");
         clickNavButton("OK", 0);
 
-        waitForElement(Locator.linkWithImage(buildNavButtonImagePath("Views")), 5000);
+        waitForElement(Locator.navButton("Views"), 5000);
 
         // create grid view
         clickLinkWithText(FOLDER_NAME);
@@ -792,14 +790,14 @@ public class StudyBvtTest extends StudyTest
 
         selenium.click("useExplicit");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
-        clickAndWait(Locator.xpath("//input[@type='image']"));
+        clickNavButton("save");
 
         clickLinkWithText("Manage Reports and Views");
         clickAndWait(Locator.xpath("//a[.='" + TEST_GRID_VIEW + "']/../..//td/a[.='permissions']"));
 
         selenium.click("useExplicit");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
-        clickAndWait(Locator.xpath("//input[@type='image']"));
+        clickNavButton("save");
 
         click(Locator.linkWithText("Manage Site"));
         sleep(3000);

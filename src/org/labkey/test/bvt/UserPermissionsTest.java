@@ -193,6 +193,6 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         
         setFormElement("names", userName );
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership", "large");
+        clickNavButton("Update Group Membership");
     }
 }

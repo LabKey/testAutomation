@@ -123,44 +123,6 @@ public class WebTestHelper
     }
 
 
-    public static String buildNavButtonImagePath(String buttonText)
-    {
-        return buildNavButtonImagePath(buttonText, null);
-    }
-
-    public static String buildGWTNavButtonImagePath(String buttonText, String style)
-    {
-        String and = "?";
-        buttonText = buttonText.replaceAll(" ", "+");
-        buttonText = buttonText.replaceAll(">", "%3E");
-        buttonText = buttonText.replaceAll("<", "%3C");
-        buttonText = "/" + buttonText + ".button";
-        if (style != null)
-        {
-            buttonText += and + "style=" + style;
-//          and = "&";
-        }
-//        buttonText += and + DEFAULT_BUTTON_FONT_SIZE;
-        return buttonText;
-    }
-
-    public static String buildNavButtonImagePath(String buttonText, String style)
-    {
-        String and = "?";
-        buttonText = buttonText.replaceAll(" ", "%20");
-        buttonText = buttonText.replaceAll(">", "%3E");
-        buttonText = buttonText.replaceAll("<", "%3C");
-        buttonText = "/" + buttonText + ".button";
-        if (style != null)
-        {
-            buttonText += and + "style=" + style;
-//          and = "&";
-        }
-//        buttonText += and + DEFAULT_BUTTON_FONT_SIZE;
-        return buttonText;
-    }
-
-
     private static String _labkeyRoot = null;
     private static String _targetServer = null;
 

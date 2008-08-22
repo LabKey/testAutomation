@@ -258,7 +258,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("new message");
         setFormElement("emailList", USER2);
-        click(Locator.buttonWithImgSrc("Submit.button"));
+        clickNavButton("Submit", 0);
         assertAlert("Title must not be blank");
         setFormElement("title", MSG3_TITLE);
         submit();

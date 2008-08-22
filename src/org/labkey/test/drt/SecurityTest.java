@@ -108,7 +108,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickLinkWithText("manage group", 0);
         setFormElement("names", ADMIN_USER_TEMPLATE);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership", "large");
+        clickNavButton("Update Group Membership");
         clickLinkWithText("Permissions");
 
         createPermissionsGroup("Testers");
@@ -117,7 +117,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickLinkWithText("manage group", 1);
         setFormElement("names", NORMAL_USER_TEMPLATE);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership", "large");
+        clickNavButton("Update Group Membership");
 
         // create users and verify permissions
         createUser(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);

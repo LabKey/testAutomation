@@ -62,7 +62,7 @@ public class CaBigTest extends BaseSeleniumWebTest
         clickLinkWithText("Permissions");
 
         // Test caBIG admin page
-        clickNavButtonByIndex("Admin", 1);
+        clickNavButton("Admin");
         assertNavButtonPresent("Publish");
         assertNavButtonPresent("Unpublish");
         clickNavButton("Publish All");

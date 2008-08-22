@@ -57,13 +57,13 @@ public class FlowJoQueryTest extends BaseFlowTest
         toggleCheckboxByTitle("Query", false);
         toggleCheckboxByTitle("Flow", false);
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
-        createQuery(PROJECT_NAME, "PassFail", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
+        createQuery(PROJECT_NAME, "PassFailQuery", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
         createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
         createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), "", true);
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), "", true);
         clickLinkWithText("flowFolder");
         clickLinkWithText("1 run");
-        clickMenuButton("Query", "Query:PassFail");
+        clickMenuButton("Query", "Query:PassFailQuery");
         waitForPageToLoad();
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
@@ -83,9 +83,9 @@ public class FlowJoQueryTest extends BaseFlowTest
         selectOptionByValue("ff_targetExperimentId", "");
         waitForPageToLoad();
         checkCheckbox(".toggle");
-        clickButtonWithImgSrc("Analyze%20selected%20runs");
+        clickNavButton("Analyze selected runs");
         setFormElement("ff_analysisName", "LabKeyAnalysis");
-        clickButtonWithImgSrc("Analyze%20runs");
+        clickNavButton("Analyze runs");
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("LabKeyAnalysis");

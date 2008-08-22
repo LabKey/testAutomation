@@ -104,16 +104,16 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         String queryURL = "query/" + container + "/begin.view?schemaName=flow";
         beginAt(queryURL);
-        clickImageWithAltText("Create New Query");
+        clickNavButton("Create New Query");
         setFormElement("ff_newQueryName", name);
-        clickButtonWithImgSrc("Create%20and%20edit%20SQL");
+        clickNavButton("Create and edit SQL");
         setFormElement("ff_queryText", sql);
         setFormElement("ff_metadataText", xml);
-        clickButtonWithImgSrc("Save");
+        clickNavButton("Save");
         if (inheritable)
         {
             beginAt(queryURL);
-            clickImageWithAltText("Properties " + name);
+            clickAndWait(Locator.raw("//td[contains(text(), '" + name + "')]/.." + Locator.navButton("Properties").getPath()));
             selectOptionByValue("ff_inheritable", "true");
             submit();
         }
@@ -145,7 +145,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("Next");
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
         // XXX: check confim page
-        clickButtonWithImgSrc("Finish");
+        clickNavButton("Finish");
         waitForPipeline(containerPath);
     }
 

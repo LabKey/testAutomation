@@ -686,7 +686,7 @@ public class MS2BvtTest extends MS2TestBase
         clickMenuButton("Views", "Views:" + VIEW4);
         waitForPageToLoad();
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
-        clickNavButton("Delete my grid view %27" + VIEW4 + "%27");
+        clickNavButtonContainingText("Delete my grid view");
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextNotPresent("Next AA");

@@ -224,7 +224,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test Export");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        waitForImageWithSrc(getContextPath() + "/Export.button", WAIT_FOR_GWT, true);
+        waitForElement(Locator.navButton("Export"), WAIT_FOR_GWT);
         clickNavButton("Export", 0);
         clickLinkContainingText("Export All to Text");
         assertTextPresent(TEST_DATA[0][3]);
@@ -249,7 +249,7 @@ public class ListTest extends BaseSeleniumWebTest
         runMenuItemHandler("qwp3:" + _listCol3.getName() + ":filter");
         assertTrue(!isElementPresent(Locator.raw("//option[@value='startswith']")));
         assertTrue(isElementPresent(Locator.raw("//option[@value='isblank']")));
-        clickImgButtonNoNav("Cancel ");
+        clickImgButtonNoNav("Cancel");
 
         log("Test that filters don't affect multiple web parts");
         assertTextPresent(TEST_DATA[1][0], 2);
@@ -313,7 +313,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test export");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        waitForImageWithSrc(getContextPath() + "/Export.button", WAIT_FOR_GWT, true);
+        waitForElement(Locator.navButton("Export"), WAIT_FOR_GWT);
         clickNavButton("Export", 0);
         clickLinkContainingText("Export All to Text");
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol1.getName());

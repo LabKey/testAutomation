@@ -273,6 +273,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
     {
         log("Testing peptide search view");
         clickLinkWithText(project);
+        ensureAdminMode();
         addWebPart("Peptide Search");
 
         setFormElement("pepSeq", "EASGDLPEAQIVK, AVVQDPALKPLALVYGEATSR");
@@ -464,15 +465,15 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         assertCharts();
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
-        assertImagePresentWithSrc("Previous%20Feature.button?style=disabled", true);
+        assertTrue(isButtonPresent("<< Previous Feature"));
 
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
         clickNavButton("Next Feature >>");
-        assertImagePresentWithSrc("Next%20Feature%20%3E%3E.button?style=disabled", true);
+        assertTrue(isButtonPresent("Next Feature >>"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
         clickNavButton("<< Previous Feature");
-        assertImagePresentWithSrc("Previous%20Feature.button?style=disabled", true);
+        assertTrue(isButtonPresent("<< Previous Feature"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
 
         log("showFeatureDetails.view OK");

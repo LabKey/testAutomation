@@ -17,7 +17,6 @@ package org.labkey.test.pipeline;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import static org.labkey.test.WebTestHelper.buildNavButtonImagePath;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.EmailRecordTable;
@@ -301,7 +300,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
                 _mailSettings.getNotifyUsersOnSuccess());
 
-        if (_test.isLinkPresentWithImage(buildNavButtonImagePath("Data")))
+        if (_test.isNavButtonPresent("Data"))
         {
             validateExperiment();
         }
