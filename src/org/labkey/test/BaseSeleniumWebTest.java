@@ -28,17 +28,15 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Mark Igra
  * Date: Feb 7, 2007
  * Time: 5:31:38 PM
@@ -623,9 +621,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 Crawler crawler = new Crawler(this);
                 crawler.crawlAllLinks();
+                checkLeaksAndErrors();
             }
 
-            checkLeaksAndErrors();
             _testFailed = false;
 
             try
@@ -743,13 +741,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void checkErrors()
     {
-        // Need to remember our location or the next test could start with a blank page
-        pushLocation();
         beginAt("/admin/showErrorsSinceMark.view");
 
         assertTrue("There were errors during the test run", isPageEmpty());
         log("No new errors found.");
-        popLocation();
+        beginAt("/project/home/start.view");         // Don't leave on an empty page
     }
 
 
@@ -2285,7 +2281,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         ensureAdminMode();
         clickLinkWithText("Site Users");
-        String userXPath = "//a[text()=\"[Details]\"]/../../td[text()=\"" + userEmail + "\"]";
+        String userXPath = "//a[text()=\"details\"]/../../td[text()=\"" + userEmail + "\"]";
         if (isElementPresent(new Locator(userXPath)))
         {
             checkCheckbox(new Locator(userXPath + "/../td[1]/input"));

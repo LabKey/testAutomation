@@ -37,10 +37,11 @@ public class JUnitTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        beginAt("/Junit/begin.view");
+        beginAt("/junit/begin.view");
         log("Run tests");
         //Wait up to 5 minutes!
         clickNavButton("Run All", 1000 * 60 * 5);
+        log("Tests complete; checking for SUCCESS");
         assertTextPresent("SUCCESS");
     }
 }
