@@ -249,8 +249,7 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Study Security");
 
         // enable advanced study security
-        selectOptionByValue("securityString", "ADVANCED");
-        clickNavButton("Update");
+        selectOptionByValue("securityString", "ADVANCED_READ");
         selenium.waitForPageToLoad("30000");
 
         click(Locator.xpath("//td[.='Users']/..//input[@value='READ']"));
@@ -335,8 +334,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Permissions");
         clickNavButton("Study Security");
 
-        selectOptionByValue("securityString", "EDITABLE_DATASETS");
-        clickNavButton("Update");
+        selectOptionByValue("securityString", "BASIC_WRITE");
         selenium.waitForPageToLoad("30000");
         
         clickLinkWithText(FOLDER_NAME);
@@ -407,14 +405,13 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Study Security");
 
         // enable advanced study security
-        selectOptionByValue("securityString", "ADVANCED");
-        clickNavButton("Update");
+        selectOptionByValue("securityString", "ADVANCED_READ");
         selenium.waitForPageToLoad("30000");
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
 
-        selectOptionByText("dataset.1", "READ");
+        selectOptionByText("dataset.1", "Read");
         clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//input[contains(@value, 'Update')]"));
     }
 

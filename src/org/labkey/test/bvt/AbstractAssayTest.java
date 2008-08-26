@@ -190,8 +190,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         clickLinkWithText(TEST_ASSAY_LINK_PERMS);
         clickNavButton("Study Security");
 
-        selectOptionByValue("securityString", "ADVANCED");
-        clickNavButton("Update");
+        selectOptionByValue("securityString", "ADVANCED_READ");
         selenium.waitForPageToLoad("30000");
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
