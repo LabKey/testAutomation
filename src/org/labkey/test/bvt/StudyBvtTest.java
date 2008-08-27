@@ -269,11 +269,37 @@ public class StudyBvtTest extends StudyTest
         if (checkRSetup())
             RReportTest();
 
+        // test specimen comments
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Plasma, Unknown Processing");
+        clickNavButton("Enable Comments");
+        checkAllOnPage("SpecimenDetail");
+        clickMenuButton("Comments", "Comments:Set");
+        setFormElement("comments", "These vials are very important.");
+        clickNavButton("Save Changes");
+        assertTextPresent("These vials are very important.", 4);
+        setFilter("SpecimenDetail", "SpecimenNumber", "Equals", "350V06002983");
+        checkAllOnPage("SpecimenDetail");
+        clickMenuButton("Comments", "Comments:Clear");
+        selenium.getConfirmation();
+        assertTextNotPresent("These vials are very important.");
+        clearFilter("SpecimenDetail", "SpecimenNumber");
+        assertTextPresent("These vials are very important.", 2);
+        clickMenuButton("Comments", "Comments:Exit");
+
         // import second archive, verify that that data is merged:
         click(Locator.linkWithText("Projects"));
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         importSpecimenArchive(SPECIMEN_ARCHIVE_B);
+
+
+        // verify that comments remain after second specimen load
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Plasma, Unknown Processing");
+        assertTextPresent("These vials are very important.", 2);
+
+        // check to see that data in the specimen archive was merged correctly:
         clickLinkWithText("Study 001");
         clickLinkWithText("By Vial");
         assertTextPresent("DRT000XX-01");
