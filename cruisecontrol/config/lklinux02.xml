@@ -91,7 +91,7 @@
                 password="cpas" />
         </modificationset>
         <schedule>
-            <ant target="cruisecontrol2">
+            <ant target="cruisecontrol">
                 <property name="cc.tomcat.home" value="${tomcat.home}"/>
                 <property name="cc.tomcat.port" value="${tomcatport}"/>
                 <property name="cc.suite" value="${suite}"/>

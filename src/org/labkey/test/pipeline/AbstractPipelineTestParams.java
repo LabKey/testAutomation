@@ -342,8 +342,10 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         emailTable.clickMessage(message);
         validateTrue("The test " + description + " does not have expected status " + status,
                 message.getBody().indexOf("Status: " + status) != -1);
-        validateTrue("Unexpect message sender " + StringUtils.join(message.getFrom(), ','),
-                message.getFrom().length == 1 && message.getFrom()[0].equals(userEmail));
+        // The return address comes from the Look and Feel settings, and may vary from installation to installation, so
+        // don't check it for now.
+//        validateTrue("Unexpected message sender: " + StringUtils.join(message.getFrom(), ',' + ", expected it to be " + userEmail),
+//                message.getFrom().length == 1 && message.getFrom()[0].equals(userEmail));
         List<String> recipients = Arrays.asList(message.getTo());
         if (notifyOwner)
         {

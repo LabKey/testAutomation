@@ -136,6 +136,7 @@ public class PipelineTestsBase
                 continue;
             runs.add(searchKey);
 
+            beginAt();
             tp.startProcessing();
         }
     }

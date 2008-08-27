@@ -6,7 +6,6 @@ cruisecontrol/config/lklinux01.xml -text
 cruisecontrol/config/lklinux02.xml -text
 cruisecontrol/config/lkwin01.xml -text
 cruisecontrol/config/lkwin02.xml -text
-cruisecontrol/cruisecontrol-config.xml -text
 cruisecontrol/css/cruisecontrol.css -text
 cruisecontrol/install_steps.txt -text
 cruisecontrol/jsp/controlpanel.jsp -text
