@@ -438,7 +438,7 @@ public class StudyBvtTest extends StudyTest
         clickAndWait(Locator.id("groupUpdateButton"));
 
         selectOptionByText("dataset.1", "Read");
-        clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//input[contains(@value, 'Update')]"));
+        clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//input[contains(@value, 'Save')]"));
     }
 
     protected void cleanPipelineItem(String item)
