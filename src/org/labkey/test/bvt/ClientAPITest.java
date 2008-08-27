@@ -65,7 +65,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
                         "    editable : true,\n" +
                         "    enableFilters : true,\n" +
                         "    title :'" + GRIDTEST_GRIDTITLE + "',\n" +
-                        "    autoHeight : true\n" +
+                        "    autoHeight : true,\n" +
+                        "    width: 800\n" +
                         "});\n";
 
     private static final String CHARTTEST_SRC = "var chartConfig = {\n" +
@@ -458,8 +459,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(50);
+        sleep(500);
         // on the next row, change 'John' to 'Jonny'
+        selenium.doubleClick("//div[contains(@class,'x-grid3-row-selected')]//div[contains(@class,'x-grid3-col-1')]");
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
@@ -485,7 +487,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(50);
+        sleep(500);
 
         // delete the row below Jonny (which should contain Bill)
         selenium.click("delete-records-button");
