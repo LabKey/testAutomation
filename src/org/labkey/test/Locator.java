@@ -136,37 +136,37 @@ public class Locator
 
     public static XPathLocator gwtNavButton(String text)
     {
-        return xpath("//div[@class='html-face']/a/span[text() = '" + text + "']");
+        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[text() = '" + text + "']");
     }
 
     public static XPathLocator gwtNavButtonContainingText(String text)
     {
-        return xpath("//div[@class='html-face']/a/span[contains(text(), '" + text + "')]");
+        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[contains(text(), '" + text + "')]");
     }
 
     public static XPathLocator gwtNavButton(String text, int index)
     {
-        return xpath("(//div[@class='html-face']/a/span[text() = '" + text + "'])[" + (index + 1) + "]");
+        return xpath("(//div[@class='html-face']/a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = '" + text + "'])[" + (index + 1) + "]");
     }
 
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a/span[text() = '" + text + "']");
+        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = '" + text + "']");
     }
 
     public static XPathLocator navButtonContainingText(String text)
     {
-        return xpath("//a/span[contains(text(),  '" + text + "')]");
+        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[contains(text(),  '" + text + "')]");
     }
 
     public static XPathLocator navButton(String text, int index)
     {
-        return xpath("(//a/span[text() = '" + text + "'])[" + (index + 1) + "]");
+        return xpath("(//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = '" + text + "'])[" + (index + 1) + "]");
     }
 
     public static XPathLocator navSubmitButton(String text)
     {
-        return xpath("//input[@type='submit' and @value='" + text + "']");
+        return xpath("//span[@class='labkey-button' or @class='labkey-menu-button']/input[@type='submit' and @value='" + text + "']");
     }
 
     public static XPathLocator navSubmitButtonContainingText(String text)
