@@ -265,10 +265,14 @@ public class StudyBvtTest extends StudyTest
         setFormElement("comments", "This data is approved.");
         clickNavButton("Update Status");
         clickMenuButton("QC State", "QCState:Approved");
-        
+
+        pushLocation();
+
         if (checkRSetup())
             RReportTest();
 
+        popLocation();
+        
         // test specimen comments
         clickLinkWithText("Study 001");
         clickLinkWithText("Plasma, Unknown Processing");
