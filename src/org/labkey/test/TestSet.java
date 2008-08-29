@@ -57,7 +57,8 @@ public enum TestSet
         MessagesBvtTest.class,
         AuditLogTest.class,
         MicroarrayTest.class,
-        HTTPApiTest.class
+        HTTPApiTest.class,
+        TimelineTest.class
     }),
 
     DRT(new Class[]

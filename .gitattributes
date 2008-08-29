@@ -65,6 +65,7 @@ src/org/labkey/test/bvt/SampleSetTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text
 src/org/labkey/test/bvt/StudyBvtTest.java -text
 src/org/labkey/test/bvt/StudyExtraTest.java -text
+src/org/labkey/test/bvt/TimelineTest.java -text
 src/org/labkey/test/bvt/UserBvtTest.java -text
 src/org/labkey/test/bvt/UserPermissionsTest.java -text
 src/org/labkey/test/bvt/WikiBvtTest.java -text
