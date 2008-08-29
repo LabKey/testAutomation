@@ -79,7 +79,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickNavButton("Submit");
 
             selenium.selectWindow("null");
-            assertTextPresent("Sign out");
+            assertTextPresent("Sign Out");
 
             signOut();
 
@@ -96,7 +96,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             log("Test that page was rendered inside of server UI");
 
-            assertTextPresent("Sign out");
+            assertTextPresent("Sign Out");
             assertTextPresent("My Account");
 
             assertTextPresent("antidisestablishmentarianism");

@@ -363,7 +363,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         if (isTextPresent("Type in your email address and password"))
             fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
-        assertTextPresent("Sign out");
+        assertTextPresent("Sign Out");
         assertTextPresent("My Account");
 
         ensureAdminMode();
@@ -2256,7 +2256,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Ending impersonation");
         assertTextPresent(fakeUser);
         clickLinkWithText("Stop Impersonating");
-        assertTextPresent("Sign out");
+        assertTextPresent("Sign Out");
         assertTextNotPresent(fakeUser);
     }
 
@@ -2495,7 +2495,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Signing out");
         beginAt("/login/logout.view");
-        assertLinkPresentWithText("Sign in");
+        assertLinkPresentWithText("Sign In");
     }
 
     /*

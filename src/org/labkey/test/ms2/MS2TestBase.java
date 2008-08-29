@@ -135,7 +135,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
                 delete(child);
             }
         }
-        System.out.println("Deleting " + file.getPath());
+        log("Deleting " + file.getPath());
         file.delete();
     }
 
