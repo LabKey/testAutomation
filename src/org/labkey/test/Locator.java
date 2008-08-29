@@ -154,6 +154,11 @@ public class Locator
         return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = '" + text + "']");
     }
 
+    public static XPathLocator navButtonDisabled(String text)
+    {
+        return xpath("//a[@class='labkey-disabled-button' or @class='labkey-disabled-menu-button']/span[text() = '" + text + "']");
+    }
+
     public static XPathLocator navButtonContainingText(String text)
     {
         return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[contains(text(),  '" + text + "')]");

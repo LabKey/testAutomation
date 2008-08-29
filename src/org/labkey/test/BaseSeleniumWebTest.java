@@ -1593,6 +1593,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 isElementPresent(Locator.navSubmitButton(text)));
     }
 
+    public boolean isButtonDisabled(String text)
+    {
+        return (isElementPresent(Locator.navButtonDisabled(text)));
+    }
+
     public void clickButtonByIndex(String text, int index)
     {
         if (isElementPresent(Locator.navButton(text, index)))

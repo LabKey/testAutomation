@@ -465,15 +465,15 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         assertCharts();
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
-        assertTrue(isButtonPresent("<< Previous Feature"));
+        assertTrue(isButtonDisabled("<< Previous Feature"));
 
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
         clickNavButton("Next Feature >>");
-        assertTrue(isButtonPresent("Next Feature >>"));
+        assertTrue(isButtonDisabled("Next Feature >>"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
         clickNavButton("<< Previous Feature");
-        assertTrue(isButtonPresent("<< Previous Feature"));
+        assertTrue(isButtonDisabled("<< Previous Feature"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
 
         log("showFeatureDetails.view OK");
