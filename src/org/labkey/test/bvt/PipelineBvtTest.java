@@ -112,19 +112,24 @@ public class PipelineBvtTest extends PipelineWebTestBase
         checkErrors();
 
         // Break the pipeline tools directory setting to cause errors.
-        setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
-        runProcessing(_testSetMS1);
-        checkEmail(emailTable, 4);
+        String oldToolsDirectory = setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
+        try
+        {
+            runProcessing(_testSetMS1);
+            checkEmail(emailTable, 4);
 
-        // Make sure the expected errors have been logged.
-        checkExpectedErrors();
+            // Make sure the expected errors have been logged.
+            checkExpectedErrors();
 
-        // Test pipeline error escalation email.
-        _testSetMS1.getParams()[0].validateEmailEscalation(0);
-        checkEmail(emailTable, 1);
-
-        // Fix the pipeline tools directory.
-        setPipelineToolsDirectory(getLabKeyRoot() + "/external/bin");
+            // Test pipeline error escalation email.
+            _testSetMS1.getParams()[0].validateEmailEscalation(0);
+            checkEmail(emailTable, 1);
+        }
+        finally
+        {
+            // Fix the pipeline tools directory.
+            setPipelineToolsDirectory(oldToolsDirectory);
+        }
 
         PipelineStatusTable statusTable = new PipelineStatusTable(this, false, true);
         PipelineTestParams tpRetry = _testSetMS1.getParams()[0];
@@ -220,14 +225,16 @@ public class PipelineBvtTest extends PipelineWebTestBase
                 seconds < MAX_WAIT_SECONDS);
     }
 
-    private void setPipelineToolsDirectory(String path)
+    private String setPipelineToolsDirectory(String path)
     {
         log("Set tools bin directory to " + path);
         pushLocation();
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
+        String existingValue = getFormElement("pipelineToolsDirectory");
         setFormElement("pipelineToolsDirectory", path);
         clickNavButton("Save");
         popLocation();
+        return existingValue;
     }
 }
