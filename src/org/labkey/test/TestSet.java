@@ -48,7 +48,7 @@ public enum TestSet
         SampleSetTest.class,
         MS2BvtTest.class,
         MS1Bvt.class,
-//        PipelineBvtTest.class,
+        PipelineBvtTest.class,
         CaBigTest.class,
         FileContentTest.class,
         DataRegionTest.class,
