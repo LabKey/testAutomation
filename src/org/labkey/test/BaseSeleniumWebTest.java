@@ -501,7 +501,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                     // in the sql script runner.
                     for (int i = 0; i < 5; i++)
                     {
-                        beginAt("/project/home/begin.view");
+                        goToHome();
                         Thread.sleep(200);
                         waitMs -= 200;
                     }
@@ -745,7 +745,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         assertTrue("There were errors during the test run", isPageEmpty());
         log("No new errors found.");
-        beginAt("/project/home/start.view");         // Don't leave on an empty page
+        goToHome();         // Don't leave on an empty page
     }
 
 
@@ -2268,6 +2268,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTextPresent(fakeUser);
         clickLinkWithText("Stop Impersonating");
         assertTextPresent("Sign Out");
+        goToHome();        
         assertTextNotPresent(fakeUser);
     }
 
@@ -2277,7 +2278,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText("Site Users");
         clickNavButton("Add Users");
 
-        setFormElement("newUsers", userName );
+        setFormElement("newUsers", userName);
         uncheckCheckbox("sendMail");
         if (cloneUserName != null)
         {
@@ -2437,6 +2438,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
+    public void goToHome()
+    {
+        beginAt("/project/home/begin.view");
+    }
 
 
     public void goToPipelineItem(String item)
