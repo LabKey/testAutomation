@@ -98,7 +98,7 @@ public class UserBvtTest extends SecurityTest
 //        assertTextPresent("Field firstName cannot be null.");
         assertTextPresent("This field is required");
 
-        clickNavButton("Show Grid");
+        clickNavButton("Show All Users");
     }
 
     private void checkRequiredField(String name, boolean select)
