@@ -38,7 +38,6 @@ public class Crawler
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("Experiment", "showFile"),
-            new ControllerActionId("Experiment", "protocolPredecessors"),
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "enable"),
@@ -198,6 +197,7 @@ public class Crawler
     {
         private String _controller;
         private String _action;
+        private String _folder;
 
         public ControllerActionId(String controller, String action)
         {
@@ -220,6 +220,7 @@ public class Crawler
             rootRelativeURL = BaseSeleniumWebTest.stripContextPath(rootRelativeURL);
             int postControllerSlashIdx = rootRelativeURL.indexOf('/');
             _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
+            _folder = rootRelativeURL.substring(postControllerSlashIdx, rootRelativeURL.lastIndexOf('/'));
         }
 
         public String getAction()
@@ -230,6 +231,11 @@ public class Crawler
         public String getController()
         {
             return _controller;
+        }
+
+        public String getFolder()
+        {
+            return _folder;
         }
 
         @Override
@@ -280,12 +286,12 @@ public class Crawler
         // skip expanding and collapsing paths -- no HTML returned
         if (actionId.getAction().equals("collapseExpand"))
                 return false;
-        
+
         // in addition to test projects, we'll crawl all admin functionality as well
         // (otherwise this never gets covered).
         for (String adminController : ADMIN_CONTROLLERS)
         {
-            if (actionId.getController().equals(adminController))
+            if (actionId.getController().equals(adminController) && !"/home".equals(actionId.getFolder()))
                 return true;
         }
         // always visit all links under projects created by the tests:
