@@ -23,6 +23,7 @@ import javax.mail.NoSuchProviderException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.ServletContextEvent;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,11 +31,13 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.labkey.api.util.MailHelper;
+import org.labkey.api.util.ContextListener;
+import org.labkey.api.util.ShutdownListener;
 
 /**
  * <code>DumbsterManager</code>
  */
-public class DumbsterManager
+public class DumbsterManager implements ShutdownListener
 {
     private static final Logger _log = Logger.getLogger(DumbsterManager.class);
 
@@ -69,8 +72,10 @@ public class DumbsterManager
         if (_server.isStopped())
         {
             _log.error("Failed to connect mail recorder. Port " + port + " may be in use.");
+            _server = null;
             return false;
         }
+        ContextListener.addShutdownListener(this);
         return true;
     }
 
@@ -84,7 +89,14 @@ public class DumbsterManager
             MailHelper.setSession(null);
 
             _server.stop();
+            ContextListener.removeShutdownListener(this);
         }
+    }
+
+    public void shutdownStarted(ServletContextEvent servletContextEvent)
+    {
+        // Stop listening on the mail port before shutdown.
+        stop();
     }
 
     public boolean isRecording()

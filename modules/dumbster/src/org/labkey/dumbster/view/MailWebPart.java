@@ -40,7 +40,6 @@ public class MailWebPart extends JspView<MailPage>
     {
         super("/org/labkey/dumbster/view/mailWebPart.jsp", new MailPage());
         setTitle("Mail Record");
-        setTitleHref(new ActionURL("demo", "begin", HttpView.currentContext().getContainer()));
     }
 
 
