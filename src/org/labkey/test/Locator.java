@@ -136,52 +136,52 @@ public class Locator
 
     public static XPathLocator gwtNavButton(String text)
     {
-        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[text() = '" + text + "']");
+        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator gwtNavButtonContainingText(String text)
     {
-        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[contains(text(), '" + text + "')]");
+        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[contains(text(), " + xq(text) + ")]");
     }
 
     public static XPathLocator gwtNavButton(String text, int index)
     {
-        return xpath("(//div[@class='html-face']/a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = '" + text + "'])[" + (index + 1) + "]");
+        return xpath("(//div[@class='html-face']/a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = '" + text + "']");
+        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator navButtonDisabled(String text)
     {
-        return xpath("//a[@class='labkey-disabled-button' or @class='labkey-disabled-menu-button']/span[text() = '" + text + "']");
+        return xpath("//a[@class='labkey-disabled-button' or @class='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator navButtonContainingText(String text)
     {
-        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[contains(text(),  '" + text + "')]");
+        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[contains(text(),  " + xq(text) + ")]");
     }
 
     public static XPathLocator navButton(String text, int index)
     {
-        return xpath("(//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = '" + text + "'])[" + (index + 1) + "]");
+        return xpath("(//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator navSubmitButton(String text)
     {
-        return xpath("//span[@class='labkey-button' or @class='labkey-menu-button']/input[@type='submit' and @value='" + text + "']");
+        return xpath("//span[@class='labkey-button' or @class='labkey-menu-button']/input[@type='submit' and @value=" + xq(text) + "]");
     }
 
     public static XPathLocator navSubmitButtonContainingText(String text)
     {
-        return xpath("//input[@type='submit' and contains(@value, '" + text + "')]");
+        return xpath("//input[@type='submit' and contains(@value, " + xq(text) + ")]");
     }
 
     public static XPathLocator navSubmitButton(String text, int index)
     {
-        return xpath("(//input[@type='submit' and @value='" + text + "'])[" + (index + 1) + "]");
+        return xpath("(//input[@type='submit' and @value=" + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator linkWithImage(String image, int index)
