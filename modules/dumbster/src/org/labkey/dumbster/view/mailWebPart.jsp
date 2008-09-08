@@ -38,7 +38,7 @@
     }
     else
     {
-        %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp</p><%
+        %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
     }
 %>
 <script type="text/javascript">
