@@ -144,7 +144,7 @@ public class HTTPApiTest extends BaseSeleniumWebTest
         checkPostResponsePresent(getQueryURL("deleteRows"),
                 "{ \"schemaName\": \"lists\",\n" +
                         " \"queryName\": \"Test List\",\n" +
-                        " \"command\": \"insert\",\n" +
+                        " \"command\": \"delete\",\n" +
                         " \"rowsAffected\": 3,\n" +
                         " \"rows\": [ " +
                         "{\n \"Color\": \"Green\"},\n" +
