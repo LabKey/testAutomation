@@ -102,6 +102,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickNavButton("Import MAGEML using " + ASSAY_NAME);
         clickNavButton("Next");
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), defaultWaitForPage);
+        selectOptionByText("//div[contains(text(), 'Sample 1')]/../..//tr/td/select", "First");
         selectOptionByText("//div[contains(text(), 'Sample 2')]/../..//tr/td/select", "Second");
         clickNavButton("Save and Finish");
         waitForText(ASSAY_NAME + " Runs", 30000);
@@ -114,6 +115,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickNavButton("Import MAGEML using " + ASSAY_NAME);
         clickNavButton("Next");
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), defaultWaitForPage);
+        selectOptionByText("//div[contains(text(), 'Sample 1')]/../..//tr/td/select", "First");
         selectOptionByText("//div[contains(text(), 'Sample 2')]/../..//tr/td/select", "Third");
         clickNavButton("Save and Finish");
         waitForText(ASSAY_NAME + " Runs", 30000);
