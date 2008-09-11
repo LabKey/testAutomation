@@ -432,15 +432,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Trying to register some bad email addresses");
             pushLocation();
             setFormElement("email", "bogus@bogus@bogus");
-            submit("register");
+            submit("Register");
             assertTextPresent("The string 'bogus@bogus@bogus' is not a valid email address. Please enter an email address in this form: user@domain.tld");
             setFormElement("email", "");
-            submit("register");
+            submit("Register");
             assertTextPresent("The string '' is not a valid email address. Please enter an email address in this form: user@domain.tld");
 
             log("Registering with the test email address");
             setText("email", PasswordUtil.getUsername());
-            submit("register");
+            submit("Register");
 
             log("Attempting to register another initial user");
             popLocation();
@@ -1203,6 +1203,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void submit(String buttonName)
     {
         Locator l = findButton(buttonName);
+
+        assertTrue("Button with name '" + buttonName + "' not found", null != l);
+
         selenium.click(l.toString());
         waitForPageToLoad();
     }
