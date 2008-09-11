@@ -1782,8 +1782,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearFilter(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        runMenuItemHandler(regionName + ":" + columnName + ":filter");
-        clickNavButton("Clear Filter");
+        runMenuItemHandler(regionName + ":" + columnName + ":clear-filter");
+        waitForPageToLoad();
     }
 
     /**
