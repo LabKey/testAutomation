@@ -74,7 +74,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         waitForElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
         setFormElement(Locator.raw("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
-        addField("Upload Set Fields", 0, SET_FIELD_TEST_NAME, SET_FIELD_TEST_NAME, "Text (String)");
+        addField("Run Set Fields", 0, SET_FIELD_TEST_NAME, SET_FIELD_TEST_NAME, "Text (String)");
         addField("Run Fields", 0, RUN_FIELD_TEST_NAME, RUN_FIELD_TEST_NAME, "Text (String)"); 
         setFormElement("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']", XPATH_TEST);
         addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, "Text (String)");

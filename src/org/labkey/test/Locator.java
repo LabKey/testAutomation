@@ -255,6 +255,11 @@ public class Locator
         return xpath("//input[@type='" + (radio ? "radio" : "checkbox" )+ "' and @name=" + xq(name) + "]");
     }
 
+    public static XPathLocator checkboxById(String id, boolean radio)
+    {
+        return xpath("//input[@type='" + (radio ? "radio" : "checkbox" )+ "' and @id=" + xq(id) + "]");
+    }
+
     public static XPathLocator checkboxByNameAndValue(String name, String value, boolean radio)
     {
         return xpath("//input[@type='" + (radio ? "radio" : "checkbox" )+ "' and @name=" + xq(name) + " and @value=" + xq(value) + "]");

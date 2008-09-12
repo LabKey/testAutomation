@@ -141,7 +141,7 @@ public class AssayTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
-            addField("Upload Set Fields", i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
+            addField("Run Set Fields", i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
         }
 
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
@@ -155,11 +155,11 @@ public class AssayTest extends AbstractAssayTest
         }
 
         // Set some to required
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Run Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
+        selenium.click(getPropertyXPath("Run Set Fields") + "//span/input[@type='checkbox']");
 
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
-        selenium.click(getPropertyXPath("Upload Set Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Run Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
+        selenium.click(getPropertyXPath("Run Set Fields") + "//span/input[@type='checkbox']");
 
         selenium.click(getPropertyXPath("Run Fields") + "//td/input[@id='ff_name0']");
         selenium.click(getPropertyXPath("Run Fields") + "//span/input[@type='checkbox']");
@@ -204,10 +204,10 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY);
 
-        clickNavButton("Upload Runs");
+        clickNavButton("Import Runs");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + "3");
 
-        log("Upload set properties");
+        log("Run set properties");
         clickNavButton("Next");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " is required and must be of type Number (Double).");
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1), "Bad Test");
@@ -264,12 +264,12 @@ public class AssayTest extends AbstractAssayTest
 //        setFormElement("dataCollectorName", "textAreaDataProvider");
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
-        clickNavButton("Save and Upload Another Run");
+        clickNavButton("Save and Import Another Run");
         assertTextPresent("There are errors in the uploaded data: " + TEST_ASSAY_DATA_PROP_NAME + "6 is required. ");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA4);
-        clickNavButton("Save and Upload Another Run");
+        clickNavButton("Save and Import Another Run");
 
         assertEquals("", selenium.getValue("name"));
         assertEquals("", selenium.getValue("comments"));

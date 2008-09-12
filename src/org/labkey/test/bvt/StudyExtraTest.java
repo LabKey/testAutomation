@@ -338,9 +338,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            selenium.mouseOver(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
-            selenium.mouseDown(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
-            selenium.mouseUp(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
+            selenium.click(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
             selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
             selenium.select(getPropertyXPath("Data Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
@@ -379,7 +377,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY);
 
-        clickNavButton("Upload Runs");
+        clickNavButton("Import Runs");
         selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(PROJECT_NAME, FOLDER_NAME, STUDY_FOLDER));
         click(Locator.checkboxByNameAndValue("participantVisitResolver", "SampleInfo", true));
         clickNavButton("Next");

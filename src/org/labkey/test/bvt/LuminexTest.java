@@ -111,17 +111,17 @@ public class LuminexTest extends AbstractAssayTest
         if(isFileUploadAvailable())
         {
             log("Uploading Luminex Runs");
-            clickNavButton("Upload Runs");
+            clickNavButton("Import Runs");
             setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
             clickNavButton("Next");
             setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
             File file1 = new File(TEST_ASSAY_LUM_FILE1);
             setFormElement("uploadedFile", file1);
             clickNavButton("Next", 60000);
-            clickNavButton("Save and Upload Another Run");
+            clickNavButton("Save and Import Another Run");
             clickLinkWithText(TEST_ASSAY_LUM);
 
-            clickNavButton("Upload Runs");
+            clickNavButton("Import Runs");
             assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
             setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
             clickNavButton("Next");
@@ -136,7 +136,7 @@ public class LuminexTest extends AbstractAssayTest
             clickNavButton("Save and Finish");
 
             // Upload another run using a thaw list pasted in as a TSV
-            clickNavButton("Upload Runs");
+            clickNavButton("Import Runs");
             assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
             setFormElement("participantVisitResolver", "Lookup");
             setFormElement("ThawListType", "Text");
@@ -155,7 +155,7 @@ public class LuminexTest extends AbstractAssayTest
             clickNavButton("Save and Finish");
 
             // Upload another run using a thaw list that pointed at the list we uploaded earlier
-            clickNavButton("Upload Runs");
+            clickNavButton("Import Runs");
             assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
             assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
             assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));

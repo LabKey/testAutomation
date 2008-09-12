@@ -536,9 +536,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
 
-        selenium.mouseOver(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
-        selenium.mouseDown(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
-        selenium.mouseUp(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
+        selenium.click(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
         selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_name0']", "RunDate");
         selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_label0']", "Run Date");
         selenium.select(getPropertyXPath("Run Fields") + "//select[@id='ff_type0']", "DateTime");
@@ -552,7 +550,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent(TEST_ASSAY);
         assertTextPresent(TEST_ASSAY + " Run Fields");
         assertTextPresent("RunDate - DateTime");
-        assertTextPresent(TEST_ASSAY + " Upload Set Fields");
+        assertTextPresent(TEST_ASSAY + " Run Set Fields");
         assertTextPresent("TargetStudy - String");
         assertTextPresent(TEST_ASSAY + " Data Fields");
         assertTextPresent("VisitID - Double");

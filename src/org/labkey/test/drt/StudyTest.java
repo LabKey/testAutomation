@@ -227,20 +227,18 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("1234");
         assertTextPresent("2006-02-01");
         assertTextPresent("1.2");
-        assertTextNotPresent("QC State");
 
         // configure QC state management before our second upload
         clickLinkWithText("Study 001");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage QC States");
-        setFormElement("newLabel", "Approved");
-        setFormElement("newDescription", "We all like approval.");
-        clickNavButton("Save");
-        setFormElement("newLabel", "Pending Review");
-        setFormElement("newDescription", "No one likes to be reviewed.");
+        setFormElement("newLabel", "unknown QC");
+        setFormElement("newDescription", "Unknown data is neither clean nor dirty.");
+        clickCheckboxById("dirty_public", false);
         clickCheckbox("newPublicData", false);
         clickNavButton("Save");
-        selectOptionByText("defaultDirectEntryQCState", "Pending Review");
+        selectOptionByText("defaultDirectEntryQCState", "unknown QC");
+        selectOptionByText("showPrivateDataByDefault", "Public data");
         clickNavButton("Save");
 
         // return to dataset import page
@@ -249,7 +247,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("QC State");
         assertTextNotPresent("1234");
         clickMenuButton("QC State", "QCState:All data");
-        assertTextPresent("Pending Review");
+        assertTextPresent("unknown QC");
         assertTextPresent("1234");
 
         //Import same data again
@@ -266,7 +264,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("5000.0");
         assertTextPresent("new text");
         assertTextPresent("QC State");
-        assertTextPresent("Pending Review");
+        assertTextPresent("unknown QC");
 
         // upload specimen data and verify import
         clickLinkWithText("Study 001");
@@ -388,6 +386,13 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("Screening Cycle");
         assertTextPresent("Cycle 1");
         assertTextPresent("Pre-exist Cond");
+
+        // configure QC state management so that all data is displayed by default (we'll test with hiden data later):
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage QC States");
+        selectOptionByText("showPrivateDataByDefault", "All data");
+        clickNavButton("Save");
 
         // upload data:
         clickLinkWithText("Study 001");

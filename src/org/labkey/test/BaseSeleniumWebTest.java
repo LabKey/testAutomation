@@ -1808,10 +1808,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void addField(String areaTitle, int index, String name, String label, String type)
     {
-        String xpath = getPropertyXPath(areaTitle) + "//div" + Locator.navButton("Add Field").getPath();
-        selenium.mouseOver(xpath);
-        selenium.mouseDown(xpath);
-        selenium.mouseUp(xpath);
+        String xpath = getPropertyXPath(areaTitle) + "//span" + Locator.navButton("Add Field").getPath();
+        selenium.click(xpath);
         setFormElement(getPropertyXPath(areaTitle) + "//td/input[@id='ff_name" + index + "']", name);
         setFormElement(getPropertyXPath(areaTitle) + "//td/input[@id='ff_label" + index + "']", label);
         selectOptionByText(getPropertyXPath(areaTitle) + "//td/select[@id='ff_type" + index + "']", type);
@@ -1992,6 +1990,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickCheckbox(String name, boolean radio)
     {
         Locator l = Locator.checkboxByName(name, radio);
+        click(l);
+    }
+
+    public void clickCheckboxById(String id, boolean radio)
+    {
+        Locator l = Locator.checkboxById(id, radio);
         click(l);
     }
 

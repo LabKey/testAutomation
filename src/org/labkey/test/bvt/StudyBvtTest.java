@@ -261,10 +261,10 @@ public class StudyBvtTest extends StudyTest
         clickMenuButton("QC State", "QCState:All data");
         checkAllOnPage("Dataset");
         clickMenuButton("QC State", "QCState:updateSelected");
-        selectOptionByText("newState", "Approved");
-        setFormElement("comments", "This data is approved.");
+        selectOptionByText("newState", "clean");
+        setFormElement("comments", "This data is clean.");
         clickNavButton("Update Status");
-        clickMenuButton("QC State", "QCState:Approved");
+        clickMenuButton("QC State", "QCState:clean");
 
         pushLocation();
 
@@ -373,7 +373,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("edit");
         setFormElement("quf_DEMbdt", "2001-11-11");
         clickNavButton("Submit");
-        clickMenuButton("QC State", "QCState:Pending Review");
+        clickMenuButton("QC State", "QCState:unknown QC");
         assertTextPresent("2001-11-11");
 
         log("Test adding a row to a dataset");
