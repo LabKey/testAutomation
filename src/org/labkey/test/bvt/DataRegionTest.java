@@ -111,28 +111,26 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertEquals("#FFFF00", table.getDataAsText(15, 4));
 
-        assertMenuButtonNotPresent("per page");
-        assertMenuButtonNotPresent("All Rows");
+        assertMenuButtonPresent("Page Size");
         assertLinkNotPresentWithTitle(PREV_LINK);
         assertLinkNotPresentWithTitle(NEXT_LINK);
 
         log("Test 3 per page");
         table.setMaxRows(3);
-        assertMenuButtonPresent("3 per page");
-        assertMenuButtonNotPresent("All Rows");
-        clickNavButton("3 per page", 0);
+        clickNavButton("Page Size", 0);
         assertLinkPresentWithText("3 per page");
         assertLinkPresentWithText("40 per page");
         assertLinkPresentWithText("100 per page");
         assertLinkPresentWithText("250 per page");
         assertLinkPresentWithText("1000 per page");
+        assertLinkPresentWithText("Show Selected");
+        assertLinkPresentWithText("Show Unselected");
         assertLinkPresentWithText("Show All");
         assertTextPresent("1 - 3 of 16");
         assertEquals(3, table.getDataRowCount());
 
         log("Test 5 per page");
         table.setMaxRows(5);
-        assertMenuButtonPresent("5 per page");
         assertTextPresent("1 - 5 of 16");
         assertEquals(5, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
@@ -175,23 +173,19 @@ public class DataRegionTest extends BaseSeleniumWebTest
         table.setFilter(NAME_COLUMN.getName(), "Does not Equal", "aqua");
         assertTextPresent("1 - 5 of 15");
         assertEquals("black", table.getDataAsText(0, 3));
-        
+
         log("Show All");
-        clickNavButton("5 per page", 0);
+        clickNavButton("Page Size", 0);
         clickLinkWithText("Show All");
         assertEquals(15, table.getDataRowCount());
-        assertMenuButtonNotPresent("per page");
-        assertMenuButtonPresent("All Rows");
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
         assertLinkNotPresentWithTitle(NEXT_LINK);
         assertLinkNotPresentWithTitle(LAST_LINK);
 
         log("Test 1000 per page");
-        clickNavButton("All Rows", 0);
+        clickNavButton("Page Size", 0);
         clickLinkWithText("1000 per page");
-        assertMenuButtonPresent("1000 per page");
-        assertMenuButtonNotPresent("All Rows");
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
         assertLinkNotPresentWithTitle(NEXT_LINK);
