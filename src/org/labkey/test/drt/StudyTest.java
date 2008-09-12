@@ -19,6 +19,7 @@ package org.labkey.test.drt;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 
 import java.io.*;
 import java.util.Date;
@@ -95,6 +96,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("999320518");
 
         // verify that the participant view repsects the cohort filter:
+        setSort("Dataset", "ParticipantId", SortDirection.ASC);
         clickLinkWithText("999320518");
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
