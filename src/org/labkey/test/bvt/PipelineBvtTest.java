@@ -27,6 +27,8 @@ import org.labkey.test.ms1.params.PepMatchTestParams;
 import org.labkey.test.ms1.params.FeaturesTestParams;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
+
 /**
  * <code>PipelineBvtTest</code>
  */
@@ -128,7 +130,14 @@ public class PipelineBvtTest extends PipelineWebTestBase
         finally
         {
             // Fix the pipeline tools directory.
-            setPipelineToolsDirectory(oldToolsDirectory);
+            if (new File(oldToolsDirectory).exists())
+            {
+                setPipelineToolsDirectory(oldToolsDirectory);
+            }
+            else
+            {
+                setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "deploy" + File.separatorChar + "bin");
+            }
         }
 
         PipelineStatusTable statusTable = new PipelineStatusTable(this, false, true);
@@ -157,6 +166,14 @@ public class PipelineBvtTest extends PipelineWebTestBase
 
     public void checkEmail(EmailRecordTable emailTable, int countExpect)
     {
+        int sleepCount = 0;
+        // Wait up to 15 seconds for the email to be sent and show up in the table
+        while (emailTable.getDataRowCount() < countExpect && sleepCount < 3)
+        {
+            try { Thread.sleep(5000); } catch (InterruptedException e) {}
+            refresh();
+            sleepCount++;
+        }
         int count = emailTable.getDataRowCount();
         assertTrue("Expected " + countExpect + " notification emails, found " + count,
                 count == countExpect);
