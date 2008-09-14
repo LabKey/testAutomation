@@ -136,7 +136,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
             }
             else
             {
-                setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "deploy" + File.separatorChar + "bin");
+                setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "build" + File.separatorChar + "deploy" + File.separatorChar + "bin");
             }
         }
 
