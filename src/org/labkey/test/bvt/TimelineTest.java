@@ -48,8 +48,11 @@ public class TimelineTest extends BaseSeleniumWebTest
     private static final String WIKIPAGE_NAME = "TimelineTestPage";
 
     private static final String CLIENTAPI_HEADER =
-        "<script type=\"text/javascript\">LABKEY.requiresClientAPI();</script>\n"+
-        "<script type=\"text/javascript\">LABKEY.requiresScript('timeline.js');</script>\n";
+        "<script type=\"text/javascript\">LABKEY.requiresClientAPI();</script>\n" +
+         "<script src='/labkey/timeline.js'></script>\n" +
+        "<script src='/labkey/similetimeline/bundle.js'></script>\n" +
+        "<script src='/labkey/similetimeline/scripts/l10n/en/timeline.js'></script>\n" +
+        "<script src='/labkey/similetimeline/scripts/l10n/en/labellers.js'></script>\n";
 
     private static final String TEST_DIV_NAME = "testDiv";
 
@@ -128,12 +131,12 @@ public class TimelineTest extends BaseSeleniumWebTest
         //Click on jane and make sure the bubble comes up
         selenium.mouseDown(Locator.tagContainingText("div", "Jane").toString());
         assertTextPresent("Janeson");
-
     }
 
     private void apiTest()
     {
-         setSource(TIMELINE_TEST_SRC);
+        setSource(TIMELINE_TEST_SRC);
+        clickLinkWithText(WIKIPAGE_NAME);
         waitForElement(Locator.tagContainingText("div", "Jane Janeson"), 10000);
         selenium.mouseDown(Locator.tagContainingText("div", "Jane Janeson").toString());
         assertTextPresent("Hi Jane I am the description");
