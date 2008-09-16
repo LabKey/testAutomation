@@ -174,6 +174,17 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertTextPresent("1 - 5 of 15");
         assertEquals("black", table.getDataAsText(0, 3));
 
+        log("Show Selected");
+        table.checkAllOnPage();
+        assertTextPresent("Selected 5 of 15 rows.");
+        clickNavButton("Page Size", 0);
+        clickLinkWithText("Show Selected");
+        assertEquals(5, table.getDataRowCount());
+        assertLinkNotPresentWithTitle(FIRST_LINK);
+        assertLinkNotPresentWithTitle(PREV_LINK);
+        assertLinkNotPresentWithTitle(NEXT_LINK);
+        assertLinkNotPresentWithTitle(LAST_LINK);
+
         log("Show All");
         clickNavButton("Page Size", 0);
         clickLinkWithText("Show All");
