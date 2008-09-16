@@ -37,7 +37,7 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String LIST_KEY_NAME = "Key";
     private final static String LIST_KEY_NAME2 = "Color";
     private final static String LIST_DESCRIPTION = "A list of colors and what they are like";
-    private final static String FAKE_COL1_NAME = "Fake Name";
+    private final static String FAKE_COL1_NAME = "FakeName";
     private ListColumn _listCol1 = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
     private final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
     private final ListColumn _listCol3 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
@@ -51,9 +51,11 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String LIST_ROW3 = TEST_DATA[0][2] + "\t" + TEST_DATA[1][2] + "\t" + CONVERTED_MONTHS[2];
     private final String LIST_DATA = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME +
             "\t" + _listCol2.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3;
-    private final String LIST_DATA2 = LIST_KEY_NAME2 + "\t" + _listCol3.getName() + "\n" + TEST_DATA[0][0] + "\t" +
-            TEST_DATA[3][0] + "\n" + TEST_DATA[0][1] + "\t" + TEST_DATA[3][1] + "\n" + TEST_DATA[0][2] + "\t" +
-            TEST_DATA[3][2];
+    private final String LIST_DATA2 = 
+            LIST_KEY_NAME2 + "\t" + _listCol3.getName() + "\n" +
+            TEST_DATA[0][0] + "\t" + TEST_DATA[3][0] + "\n" +
+            TEST_DATA[0][1] + "\t" + TEST_DATA[3][1] + "\n" +
+            TEST_DATA[0][2] + "\t" + TEST_DATA[3][2];
     private final String TEST_FAIL2 = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol2.getName() + "\n" +
             LIST_ROW1 + "\t" + "String";
     private final static String TEST_FAIL = "testfail";
@@ -158,13 +160,23 @@ public class ListTest extends BaseSeleniumWebTest
         selectOptionByValue("ff_titleColumn", "Desc");
         submit();
 
+        clickLinkWithText("view data");
+        assertTextPresent(TEST_DATA[0][0]);
+        assertTextPresent(TEST_DATA[1][1]);
+        assertTextPresent(TEST_DATA[2][2]);
+
         log("Add data to existing rows");
-        clickLinkWithText("import data");
+        clickLinkWithText("Import Data");
         setFormElement("ff_data", LIST_DATA2);
         submit();
 
         log("Check that data was added correctly");
+        assertTextPresent(TEST_DATA[0][0]);
+        assertTextPresent(TEST_DATA[1][1]);
+        assertTextPresent(TEST_DATA[2][2]);
         assertTextPresent(TEST_DATA[3][0]);
+        assertTextPresent(TEST_DATA[3][1]);
+        assertTextPresent(TEST_DATA[3][2]);
 
         log("Test inserting new row");
         clickNavButton("Insert New");

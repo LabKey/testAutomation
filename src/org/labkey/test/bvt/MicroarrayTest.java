@@ -35,10 +35,10 @@ public class MicroarrayTest extends BaseSeleniumWebTest
     private static final String MAGEML_FILE1 = "test1_MAGEML.xml";
     private static final String MAGEML_FILE2_FOLDER = "TestRun2";
     private static final String MAGEML_FILE2 = "test2_MAGEML.xml";
-    private static final String SET_FIELD_TEST_NAME = "Test Set Field 1";
-    private static final String RUN_FIELD_TEST_NAME = "Test Run Field 1";
+    private static final String SET_FIELD_TEST_NAME = "TestSetField1";
+    private static final String RUN_FIELD_TEST_NAME = "TestRunField1";
     private static final String XPATH_TEST = "/MAGE-ML/Descriptions_assnlist/Description/Annotations_assnlist/OntologyEntry[@category='Producer']/@value";
-    private static final String DATA_FIELD_TEST_NAME = "Test Data Field 1";
+    private static final String DATA_FIELD_TEST_NAME = "TestDataField1";
     private static final String SAMPLE_SET = "Test Sample Set";   
     private static final String SAMPLE_SET_ROWS = "Name\nFirst\nSecond\nThird"; 
 
