@@ -78,9 +78,9 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         addField("Run Fields", 0, RUN_FIELD_TEST_NAME, RUN_FIELD_TEST_NAME, "Text (String)"); 
         setFormElement("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']", XPATH_TEST);
         addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, "Text (String)");
-        clickNavButton("    Save    ", 0);
+        clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
-        clickNavButton("Finish");
+        clickNavButton("Save & Close");
         
         log("Setup the pipeline");
         clickLinkWithText("setup pipeline");

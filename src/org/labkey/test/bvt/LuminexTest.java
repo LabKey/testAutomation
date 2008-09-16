@@ -92,7 +92,7 @@ public class LuminexTest extends AbstractAssayTest
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
 
         sleep(1000);
-        clickNavButton("    Save    ", 0);
+        clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
 
         ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListHelper.ListColumnType.String, "Participant ID");

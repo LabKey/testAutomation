@@ -345,7 +345,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         }
 
         sleep(1000);
-        clickNavButton("    Save    ", 0);
+        clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
 
     } //defineAssay()

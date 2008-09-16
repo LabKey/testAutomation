@@ -171,7 +171,7 @@ public class AssayTest extends AbstractAssayTest
         selenium.click(getPropertyXPath("Data Fields") + "//span/input[@type='checkbox']");
 
         sleep(1000);
-        clickNavButton("    Save    ", 0);
+        clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
 
     } //defineAssay()
@@ -385,7 +385,7 @@ public class AssayTest extends AbstractAssayTest
         selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_label5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
         click(Locator.raw(getPropertyXPath("Data Fields") + "//td/img[@id='partdelete_4']"));
         waitForElement(Locator.raw("//td/img[@id='partdeleted_4']"), WAIT_FOR_GWT);
-        clickNavButton("    Save    ", 0);
+        clickNavButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_GWT);
 
         //ensure that label has changed in run data in Lab 1 folder
