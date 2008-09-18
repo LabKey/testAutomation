@@ -460,7 +460,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(500);
+        sleep(1000);
         // on the next row, change 'John' to 'Jonny'
         selenium.doubleClick("//div[contains(@class,'x-grid3-row-selected')]//div[contains(@class,'x-grid3-col-1')]");
         prevActiveCellId = activeCellId;
