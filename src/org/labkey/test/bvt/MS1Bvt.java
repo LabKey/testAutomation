@@ -288,14 +288,14 @@ public class MS1Bvt extends BaseSeleniumWebTest
         assertTextPresent("K.E^ASGDLPEAQIVK.H");
 
         //make sure that an exact search doesn't find peptides with modifiers
-//        checkCheckbox("exact");
-//        clickNavButton("Search");
-//        assertTextNotPresent("K.E^ASGDLPEAQIVK.H");
-//
-//        //jump to details
-//        clickLinkWithText("details");
-//        clickLinkWithText("features with same");
-//        assertTextPresent("K.AVVQDPALKPLALVYGEATSR.R");
+        checkCheckbox("exact");
+        clickNavButton("Search");
+        assertTextNotPresent("K.E^ASGDLPEAQIVK.H");
+
+        //jump to details
+        clickLinkWithText("details");
+        clickLinkWithText("features with same");
+        assertTextPresent("K.AVVQDPALKPLALVYGEATSR.R");
 
         log("Peptide search OK.");
     }
