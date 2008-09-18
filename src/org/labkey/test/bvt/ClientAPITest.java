@@ -49,6 +49,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private static final String WIKIPAGE_NAME = "ClientAPITestPage";
 
     private static final String CLIENTAPI_HEADER =
+        "<script type=\"text/javascript\">LABKEY.requiresScript('filter.js');</script>\n" +
         "<script type=\"text/javascript\">LABKEY.requiresClientAPI();</script>\n";
 
     private static final String TEST_DIV_NAME = "testDiv";
