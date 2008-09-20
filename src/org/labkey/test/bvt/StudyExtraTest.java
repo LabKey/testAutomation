@@ -77,16 +77,16 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[5]/td[2]/input", "Vaccine2");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[5]/td[3]/input", "3");
         selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("check3");
-        selenium.click("check4");
+        selenium.click("//label[text()='Immunogen3']/../input");
+        selenium.click("//label[text()='Adjuvant1']/../input");
         click(Locator.tagWithText("button", "Done"));
         selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("check8");
+        selenium.click("//label[text()='Immunogen3']/../input");
         click(Locator.tagWithText("button", "Done"));
         selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Click to Add Timepoint')]");
         selenium.type("timepointName", "Pre-immunization");
         click(Locator.tagWithText("button", "OK"));
-        selenium.click("check12");
+        selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/../..//input");
         clickNavButton("Finished", 0);
 
         //Can't simply wait for page load here cause also need to wait for
@@ -110,7 +110,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Click to Add Timepoint')]");
 		selenium.type("timepointCount", "8");
         click(Locator.tagWithText("button", "OK"));
-		selenium.click("check8");
+        selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/ancestor::tr/td[5]//input");
         clickNavButton("Finished", 0);
 
         //Can't simply wait for page load here cause also need to wait for
@@ -120,7 +120,11 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         while (!isTextPresent("This is a very important protocol") && n++ < 10)
             sleep(1000);
 
-        clickNavButton("Create Study Folder");
+        click(Locator.navButton("Create Study Folder"));
+        if (selenium.isAlertPresent()) {
+            fail("Unexpected alert:" + selenium.getAlert());
+        }
+        waitForPageToLoad();
         setFormElement("beginDate", "2007-01-01");
         clickNavButton("Next");
         String cohorts = "SubjectId\tCohort\tStartDate\n" +

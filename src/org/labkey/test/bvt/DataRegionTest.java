@@ -176,6 +176,8 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         log("Show Selected");
         table.checkAllOnPage();
+        for (int i = 0; i < 10 && !isTextPresent("Selected 5 of 15 rows."); i++)
+            Thread.sleep(1000);
         assertTextPresent("Selected 5 of 15 rows.");
         clickNavButton("Page Size", 0);
         clickLinkWithText("Show Selected");
