@@ -28,11 +28,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
+import java.net.ServerSocket;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.util.ContextListener;
 import org.labkey.api.util.ShutdownListener;
+import org.labkey.api.util.UnexpectedException;
 
 /**
  * <code>DumbsterManager</code>
@@ -57,7 +60,28 @@ public class DumbsterManager implements ShutdownListener
 
     public boolean start()
     {
-        int port = 2026;
+        int port;
+        ServerSocket socket = null;
+        try
+        {
+            socket = new ServerSocket(0);
+            port = socket.getLocalPort();
+        }
+        catch (IOException e)
+        {
+            _log.error("Failed to open a server socket", e);
+            return false;
+        }
+        finally
+        {
+            try
+            {
+                if (socket != null)
+                    socket.close();
+            }
+            catch (IOException e) {}
+        }
+        
         Properties props = new Properties();
         props.setProperty("mail.smtp.host", "localhost");
         props.setProperty("mail.smtp.user", "Anonymous");
