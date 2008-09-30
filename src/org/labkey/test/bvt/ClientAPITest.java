@@ -460,7 +460,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(1000);
+
+        waitUntilGridUpdateComplete();
+
         // on the next row, change 'John' to 'Jonny'
         selenium.doubleClick("//div[contains(@class,'x-grid3-row-selected')]//div[contains(@class,'x-grid3-col-1')]");
         prevActiveCellId = activeCellId;
@@ -520,6 +522,22 @@ public class ClientAPITest extends BaseSeleniumWebTest
             fail("Could not get the id of the active editor in the grid!");
 
         return selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor.field.id;");
+    }
+
+    private void waitUntilGridUpdateComplete()
+    {
+        int tries = 20;
+        String numDirty = "";
+        while(tries > 0 && "0".compareTo(numDirty) != 0)
+        {
+            numDirty = selenium.getEval("this.browserbot.getCurrentWindow().gridView.getStore().getModifiedRecords().length;");
+            log("getModifiedRecords().length returned " + numDirty);
+            sleep(500);
+            --tries;
+        }
+        if(tries == 0)
+            fail("Insert or update via the Ext grid did not complete!");
+
     }
 
     private void assayTest()

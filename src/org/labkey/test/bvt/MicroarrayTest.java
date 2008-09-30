@@ -20,15 +20,14 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Erik
  * Date: Jun 23, 2008
  * Time: 4:20:38 PM
- * To change this template use File | Settings | File Templates.
  */
 public class MicroarrayTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "MicroArrayVerifyProject";
+    private static final String EXTRACTION_SERVER = "http://www.google.com";
     private static final String ASSAY_NAME = "Test Assay 1";
     private static final String ASSAY_DESCRIPTION = "Test Assay 1 Description";
     private static final String MAGEML_FILE1_FOLDER = "TestRun1";
@@ -57,7 +56,11 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         log("Point at extraction server");
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
-        setFormElement("microarrayFeatureExtractionServer", "http://viromics.washington.edu/FeatureExtractionQueue");
+        String oldName = getFormElement("microarrayFeatureExtractionServer");
+        setFormElement("microarrayFeatureExtractionServer", EXTRACTION_SERVER);
+        clickNavButton("Save");
+        assertTrue(EXTRACTION_SERVER.equals(getFormElement("microarrayFeatureExtractionServer")));
+        setFormElement("microarrayFeatureExtractionServer", oldName);
         clickNavButton("Save");
 
         log("Create Project");
