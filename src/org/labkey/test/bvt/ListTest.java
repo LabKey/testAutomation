@@ -352,7 +352,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test deleting rows");
         checkCheckbox(".toggle");
-        click(Locator.raw("//input[@value='Delete']"));
+        clickNavButton("Delete");
         waitForPageToLoad();
         assertTextNotPresent(LIST2_KEY);
         assertTextNotPresent(LIST2_KEY2);

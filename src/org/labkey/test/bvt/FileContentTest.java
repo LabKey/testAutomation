@@ -89,7 +89,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertFormPresent("login");
             setText("email", PasswordUtil.getUsername());
             setText("password", PasswordUtil.getPassword());
-            submit("SUBMIT");
+            clickNavButton("Sign In");
 
             if (isTextPresent("Type in your email address and password"))
                 fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");

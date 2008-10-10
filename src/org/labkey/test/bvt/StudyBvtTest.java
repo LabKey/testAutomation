@@ -416,7 +416,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Permissions");
         clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/security/StudyVerifyProject/container.view?')]"));
         setFormElement("name", TEST_GROUP);
-        clickAndWait(Locator.xpath("//input[@value='Create']"));
+        clickAndWait(Locator.navButton("Create"));
 
         // add user to the first test group
         selenium.click("managegroup/StudyVerifyProject/" + TEST_GROUP);
@@ -442,7 +442,7 @@ public class StudyBvtTest extends StudyTest
         clickAndWait(Locator.id("groupUpdateButton"));
 
         selectOptionByText("dataset.1", "Read");
-        clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//input[contains(@value, 'Save')]"));
+        clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//a[@class='labkey-button']/span[text() = 'Save']"));
     }
 
     protected void cleanPipelineItem(String item)
