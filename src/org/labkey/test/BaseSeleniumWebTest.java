@@ -359,7 +359,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertFormPresent("login");
         setText("email", PasswordUtil.getUsername());
         setText("password", PasswordUtil.getPassword());
-        submit("SUBMIT");
+        clickLinkWithText("Sign In");
 
         if (isTextPresent("Type in your email address and password"))
             fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
@@ -2331,7 +2331,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
 
         log("Saving wiki...");
-        clickNavButton("    Save    ", 0);
+        clickNavButton("Save", 0);
         log("Waiting for AJAX save return...");
         //waitForText("Saved.", 10000);
         waitFor(new WikiSaveChecker(), "Wiki page failed to save!", 10000);
