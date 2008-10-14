@@ -247,10 +247,10 @@ public class StudyTest extends BaseSeleniumWebTest
         clickLinkWithText("Study 001");
         clickLinkWithText("verifyAssay");
         assertTextPresent("QC State");
-        assertTextNotPresent("1234");
+        assertTextNotPresent("1234_B");
         clickMenuButton("QC State", "QCState:All data");
         assertTextPresent("unknown QC");
-        assertTextPresent("1234");
+        assertTextPresent("1234_B");
 
         //Import same data again
         clickNavButton("Import Data");
