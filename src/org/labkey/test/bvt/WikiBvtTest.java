@@ -228,9 +228,10 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         setFormElement("title", DISC1_TITLE);
         setFormElement("body", DISC1_BODY);
         submit();
+        assertTextPresent("see discussions (1)");
+        clickLinkWithText(DISC1_TITLE);
         assertTextPresent(DISC1_TITLE);
         assertTextPresent(DISC1_BODY);
-        assertTextPresent("see discussions (1)");
 
         log("Check response on discussion board works");
         clickNavButton("Post Response");

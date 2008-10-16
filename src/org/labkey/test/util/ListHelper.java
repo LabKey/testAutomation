@@ -65,6 +65,109 @@ public class ListHelper
         }
     }
 
+    public static abstract class FieldValidator
+    {
+        private String _name;
+        private String _description;
+        private String _message;
+
+        public FieldValidator(String name, String description, String message)
+        {
+            _name = name;
+            _description = description;
+            _message = message;
+        }
+
+        public String getName()
+        {
+            return _name;
+        }
+
+        public String getDescription()
+        {
+            return _description;
+        }
+
+        public String getMessage()
+        {
+            return _message;
+        }
+    }
+
+    public static class RegExValidator extends FieldValidator
+    {
+        private String _expression;
+
+        public RegExValidator(String name, String description, String message, String expression)
+        {
+            super(name, description, message);
+            _expression = expression;
+        }
+
+        public String getExpression()
+        {
+            return _expression;
+        }
+    }
+
+    public enum RangeType
+    {
+        Equals("Equals"), NE("Does not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
+        private final String _description;
+
+        private RangeType(String description)
+        {
+            _description = description;
+        }
+
+        public String toString()
+        {
+            return _description;
+        }
+    }
+
+    public static class RangeValidator extends FieldValidator
+    {
+        private RangeType _firstType;
+        private String _firstRange;
+        private RangeType _secondType;
+        private String _secondRange;
+
+        public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange)
+        {
+            super(name, description, message);
+            _firstType = firstType;
+            _firstRange = firstRange;
+        }
+
+        public RangeValidator(String name, String description, String message, RangeType firstType, String firstRange, RangeType secondType, String secondRange)
+        {
+            this(name, description, message, firstType, firstRange);
+            _secondType = secondType;
+            _secondRange = secondRange;
+        }
+
+        public RangeType getFirstType()
+        {
+            return _firstType;
+        }
+
+        public String getFirstRange()
+        {
+            return _firstRange;
+        }
+
+        public RangeType getSecondType()
+        {
+            return _secondType;
+        }
+
+        public String getSecondRange()
+        {
+            return _secondRange;
+        }
+    }
+
     public enum ListColumnType
     {
         Integer("Integer"), String("Text (String)"), DateTime("DateTime"), Boolean("Boolean"), Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer");
@@ -90,8 +193,9 @@ public class ListHelper
         private String _description;
         private String _format;
         private LookupInfo _lookup;
+        private FieldValidator _validator;
 
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup)
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator)
         {
             _name = name;
             _label = label;
@@ -99,21 +203,27 @@ public class ListHelper
             _description = description;
             _format = format;
             _lookup = lookup;
+            _validator = validator;
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description, LookupInfo lookup)
         {
-            this(name, label, type, description, null, lookup);
+            this(name, label, type, description, null, lookup, null);
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description, String format)
         {
-            this(name, label, type, description, format, null);
+            this(name, label, type, description, format, null, null);
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description)
         {
-            this(name, label, type, description, null, null);
+            this(name, label, type, description, null, null, null);
+        }
+
+        public ListColumn(String name, String label, ListColumnType type, String description, FieldValidator validator)
+        {
+            this(name, label, type, description, null, null, validator);
         }
 
         public String getName()
@@ -144,6 +254,11 @@ public class ListHelper
         public LookupInfo getLookup()
         {
             return _lookup;
+        }
+
+        public FieldValidator getValidator()
+        {
+            return _validator;
         }
     }
 
@@ -197,6 +312,28 @@ public class ListHelper
                 test.setFormElement("schema", lookup.getSchema());
                 test.setFormElement("table", lookup.getTable());
                 test.clickNavButton("Close", 0);
+            }
+
+            FieldValidator validator = col.getValidator();
+            if (validator != null)
+            {
+                if (validator instanceof RegExValidator)
+                    test.clickNavButton("Add New Regular Expression", 0);
+                else
+                    test.clickNavButton("Add New Range", 0);
+                test.setFormElement("name", validator.getName());
+                test.setFormElement("description", validator.getDescription());
+                test.setFormElement("errorMessage", validator.getMessage());
+
+                if (validator instanceof RegExValidator)
+                {
+                    test.setFormElement("expression", ((RegExValidator)validator).getExpression());
+                }
+                else if (validator instanceof RangeValidator)
+                {
+                    test.setFormElement("firstRangeValue", ((RangeValidator)validator).getFirstRange());
+                }
+                test.clickNavButton("OK", 0);
             }
         }
         test.clickNavButton("Save");

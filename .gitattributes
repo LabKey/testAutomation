@@ -31,6 +31,7 @@ cruisecontrol/xsl/pmd-details.xsl -text
 cruisecontrol/xsl/pmd.xsl -text
 cruisecontrol/xsl/testdetails.xsl -text
 cruisecontrol/xsl/unittests.xsl -text
+/force_upgrade.cmd -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/test/BaseFlowTest.java -text
@@ -49,6 +50,7 @@ src/org/labkey/test/bvt/AuditLogTest.java -text
 src/org/labkey/test/bvt/CaBigTest.java -text
 src/org/labkey/test/bvt/ClientAPITest.java -text
 src/org/labkey/test/bvt/DataRegionTest.java -text
+src/org/labkey/test/bvt/FieldValidatorTest.java -text
 src/org/labkey/test/bvt/FileContentTest.java -text
 src/org/labkey/test/bvt/FlowJoQueryTest.java -text
 src/org/labkey/test/bvt/HTTPApiTest.java -text

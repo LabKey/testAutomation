@@ -1230,6 +1230,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
     }
 
+    public void assertElementContains(Locator loc, String text)
+    {
+        String elemText = selenium.getText(loc.toString());
+        if(elemText == null)
+            fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
+        if(!elemText.contains(text))
+            fail("The element at location '" + loc.toString() + "' contains '" + elemText + "'; expected '" + text + "'.");
+    }
+
+    public boolean elementContains(Locator loc, String text)
+    {
+        String elemText = selenium.getText(loc.toString());
+        return (elemText != null && elemText.contains(text));
+    }
+
     public void assertFormElementEquals(String elementName, String value)
     {
         assertFormElementEquals(new Locator(elementName), value);

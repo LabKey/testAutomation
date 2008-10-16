@@ -41,9 +41,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private final static String[][] TEST_DATA =
     {
-        { "1", "John", "Johnson", "17" },
-        { "2", "Bill", "Billson", "34" },
-        { "3", "Jane", "Janeson", "42" }
+        { "1", "Bill", "Billson", "34" },
+        { "2", "Jane", "Janeson", "42" },
+        { "3", "John", "Johnson", "17" },
+        { "4", "Mandy", "Mandyson", "32" },
+        { "5", "Norbert", "Norbertson", "28" },
+        { "6", "Penny", "Pennyson", "38" },
+        { "7", "Yak", "Yakson", "88" },
     };
 
     private static final String WIKIPAGE_NAME = "ClientAPITestPage";
@@ -56,18 +60,21 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private static final String GRIDTEST_GRIDTITLE = "ClientAPITest Grid Title";
 
+    private static final int PAGE_SIZE = 4;
     private static final String GRIDTEST_SRC =
                 "// create new grid over a list named 'People'\n" +
                 "window.gridView = new LABKEY.ext.EditorGridPanel({\n" +
                         "    store: new LABKEY.ext.Store({\n" +
                         "       schemaName : 'lists',\n" +
-                        "       queryName : 'People'}),\n" +
+                        "       queryName : 'People',\n" +
+                        "       sort: 'LastName'}),\n" +
                         "    renderTo : '" + TEST_DIV_NAME + "',\n" +
                         "    editable : true,\n" +
                         "    enableFilters : true,\n" +
                         "    title :'" + GRIDTEST_GRIDTITLE + "',\n" +
                         "    autoHeight : true,\n" +
-                        "    width: 800\n" +
+                        "    width: 800,\n" +
+                        "    pageSize: " + PAGE_SIZE + "\n" +
                         "});\n";
 
     private static final String CHARTTEST_SRC = "var chartConfig = {\n" +
@@ -135,7 +142,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "\n" +
             "    function()\n" +
             "    {\n" +
-            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('FirstName', 'Jonny') ]);\n" +
+            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('FirstName', 'Norbert') ]);\n" +
             "    },\n" +
             "\n" +
             "    function()\n" +
@@ -179,10 +186,10 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "    function()\n" +
             "    {\n" +
             "        var html = '';\n" +
-            "        if (testResults[0].rowCount == 3)\n" +
-            "            html += 'SUCCESS: Select 1 returned 3 rows<br>';\n" +
+            "        if (testResults[0].rowCount == 7)\n" +
+            "            html += 'SUCCESS: Select 1 returned 7 rows<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: Select 1 returned ' + testResults[0].rowCount + ' rows, expected 3.  Error value = ' + testResults[0].exception + '<br>';\n" +
+            "            html += 'FAILURE: Select 1 returned ' + testResults[0].rowCount + ' rows, expected 7.  Error value = ' + testResults[0].exception + '<br>';\n" +
             "\n" +
             "        if (testResults[1].rowCount == 1)\n" +
             "            html += 'SUCCESS: Select 2 returned 1 rows<br>';\n" +
@@ -209,10 +216,10 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        else\n" +
             "            html += 'FAILURE: bad query did not generate expected exception.<br>';\n" +
             "\n" +
-            "        if (testResults[6].rowCount == 3)\n" +
-            "            html += 'SUCCESS: executeSql returned 3 rows<br>';\n" +
+            "        if (testResults[6].rowCount == 7)\n" +
+            "            html += 'SUCCESS: executeSql returned 7 rows<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: executeSql returned ' + testResults[6].rowCount + ' rows, expected 3. Error value = ' + testResults[6].exception + '<br>';\n" +
+            "            html += 'FAILURE: executeSql returned ' + testResults[6].rowCount + ' rows, expected 7. Error value = ' + testResults[6].exception + '<br>';\n" +
             "\n" +
             "        document.getElementById('testDiv').innerHTML = html;        \n" +
             "    }\n" +
@@ -423,12 +430,14 @@ public class ClientAPITest extends BaseSeleniumWebTest
         for (ListHelper.ListColumn col : LIST_COLUMNS)
             assertTextPresent(col.getLabel());
 
-        for (String[] rowData : TEST_DATA)
+        for (int row = 0; row < PAGE_SIZE; ++row)
         {
-            // check that all the data is in the grid (skipping the key column at index 0)
-            for (int col = 1; col < rowData.length; col++)
-                assertTextPresent(rowData[col]);
+            // check that the first PAGE_SIZE rows of the data is in the grid (skipping the key column at index 0)
+            for (int col = 1; col < TEST_DATA[row].length; col++)
+                assertTextPresent(TEST_DATA[row][col]);
         }
+
+        assertTextPresent("Displaying 1 - " + PAGE_SIZE);
 
         selenium.click("add-record-button");
         String prevActiveCellId;
@@ -436,7 +445,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         // enter a new first name
         sleep(50);
         String activeCellId = getActiveEditorId();
-        selenium.type(Locator.id(activeCellId).toString(), "Fred");
+        selenium.type(Locator.id(activeCellId).toString(), "Abe");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
@@ -446,7 +455,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
-        selenium.type(Locator.id(activeCellId).toString(), "Fredson");
+        selenium.type(Locator.id(activeCellId).toString(), "Abeson");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
@@ -463,13 +472,14 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         waitUntilGridUpdateComplete();
 
-        // on the next row, change 'John' to 'Jonny'
+        // on the next row, change 'Bill' to 'Billy'
         selenium.doubleClick("//div[contains(@class,'x-grid3-row-selected')]//div[contains(@class,'x-grid3-col-1')]");
+        sleep(500);
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
-        selenium.type(Locator.id(activeCellId).toString(), "Jonny");
+        selenium.type(Locator.id(activeCellId).toString(), "Billy");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
@@ -478,7 +488,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             fail("Failed to advance to next edit field");
-        selenium.type(Locator.id(activeCellId).toString(), "Jonnyson");
+        selenium.type(Locator.id(activeCellId).toString(), "Billyson");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
@@ -492,21 +502,41 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
         sleep(500);
 
-        // delete the row below Jonny (which should contain Bill)
+        // delete the row below Billy (which should contain Jane)
         selenium.click("delete-records-button");
         sleep(50);
         selenium.click("//div[@class='x-window x-window-plain x-window-dlg']//button[text()='Delete']");
         sleep(50);
-        selenium.click("refresh-button");
+        //selenium.click("refresh-button");
 
         int limit = 30;
-        while (isTextPresent("Bill") && limit-- > 0)
+        while (isTextPresent("Jane") && limit-- > 0)
             sleep(1000);
 
-        assertTextPresent("Fredson", 1);
-        assertTextPresent("Jonny", 2);
-        assertTextNotPresent("John");
-        assertTextNotPresent("Bill");
+        assertTextPresent("Abeson", 1);
+        assertTextPresent("Billy", 2);
+        assertTextNotPresent("Billson");
+        assertTextNotPresent("Jane");
+
+        //test paging
+        selenium.click("//button[@class='x-btn-text x-tbar-page-next']");
+
+        limit = 30;
+        while (!isTextPresent("Norbert") && limit-- > 0)
+            sleep(1000);
+
+        assertTextPresent("Norbert");
+        assertTextPresent("Penny");
+        assertTextPresent("Yak");
+
+        selenium.click("//button[@class='x-btn-text x-tbar-page-prev']");
+        limit = 30;
+        while (!isTextPresent("Abe") && limit-- > 0)
+            sleep(1000);
+
+        assertTextPresent("Abeson");
+        assertTextPresent("Billyson");
+        assertTextPresent("Johnson");
     }
 
     private String getActiveEditorId()
@@ -600,7 +630,12 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         setSource(DOMAIN_SRC);
 
-        assertTextPresent("Updated StudyProperties domain");
+        int limit = 30;
+        Locator loc = Locator.id(TEST_DIV_NAME);
+        while (!elementContains(loc, "Failed") && !elementContains(loc, "Updated") && limit-- > 0)
+            sleep(1000);
+
+        assertElementContains(Locator.id(TEST_DIV_NAME), "Updated StudyProperties domain");
     }
 
     private String setSource(String srcFragment)
@@ -620,11 +655,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private void queryTest()
     {
         setSource(QUERYTEST_SRC);
-        assertTextPresent("SUCCESS: Select 1 returned 3 rows");
-        assertTextPresent("SUCCESS: Select 2 returned 1 rows");
-        assertTextPresent("SUCCESS: Update affected 1 rows");
-        assertTextPresent("SUCCESS: Delete affected 1 rows");
-        assertTextPresent("SUCCESS: Insert created 1 rows");
-        assertTextPresent("SUCCESS: bad query generated exception: Could not find schema: lists_badname");
+        Locator loc = Locator.id(TEST_DIV_NAME);
+        assertElementContains(loc, "SUCCESS: Select 1 returned 7 rows");
+        assertElementContains(loc, "SUCCESS: Select 2 returned 1 rows");
+        assertElementContains(loc, "SUCCESS: Update affected 1 rows");
+        assertElementContains(loc, "SUCCESS: Delete affected 1 rows");
+        assertElementContains(loc, "SUCCESS: Insert created 1 rows");
+        assertElementContains(loc, "SUCCESS: bad query generated exception: Could not find schema: lists_badname");
+        assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
     }
 }

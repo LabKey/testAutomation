@@ -17,7 +17,6 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.Locator;
 
 /**
  * User: tamram
@@ -122,6 +121,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         selectOptionByText("rendererType", "Wiki Page");
         assertTextPresent("Admin Broadcast");
         submit();
+        clickLinkWithText(MSG1_TITLE);
         assertTextPresent(MSG1_TITLE);
         assertTextPresent(EXPIRES1);
         assertTextPresent("<b>x</b>");
@@ -134,6 +134,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         setFormElement("body", HTML_BODY);
         selectOptionByText("rendererType", "HTML");
         submit();
+        clickLinkWithText(MSG1_TITLE);
         assertTextPresent("1 x");
         assertTextPresent(HTML_BODY_WEBPART_TEST);
 
@@ -266,6 +267,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         setFormElement("emailList", USER1);
         selectOptionByText("assignedTo", USER3);
         submit();
+        clickLinkWithText(MSG3_TITLE);
         assertTextPresent("Members: "+USER1);
         assertTextPresent("Assigned To: "+USER3);
         impersonate(USER1);
@@ -302,6 +304,5 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         assertTextNotPresent(MSG1_TITLE);
     }
-
 }
 

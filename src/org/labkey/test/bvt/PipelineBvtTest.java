@@ -146,6 +146,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
         for (String sampleExp : tpRetry.getExperimentLinks())
         {
             pushLocation();
+            log("Trying to view status info for " + sampleExp);
             statusTable.clickStatusLink(sampleExp);
             clickNavButton("Retry");
             popLocation();
