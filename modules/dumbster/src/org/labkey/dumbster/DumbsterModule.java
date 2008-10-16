@@ -22,10 +22,7 @@ import org.labkey.api.data.ContainerManager;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.security.User;
-import org.labkey.api.view.Portal;
-import org.labkey.api.view.ViewContext;
-import org.labkey.api.view.WebPartFactory;
-import org.labkey.api.view.WebPartView;
+import org.labkey.api.view.*;
 import org.labkey.api.settings.AppProps;
 import org.labkey.dumbster.model.DumbsterManager;
 import org.labkey.dumbster.view.MailWebPart;
@@ -41,7 +38,7 @@ public class DumbsterModule extends DefaultModule implements ContainerManager.Co
     public DumbsterModule()
     {
         super(NAME, 1.00, null, false,
-            new WebPartFactory("Mail Record") {
+            new BaseWebPartFactory("Mail Record") {
                 public WebPartView getWebPartView(ViewContext portalCtx, Portal.WebPart webPart) throws IllegalAccessException, InvocationTargetException
                 {
                     return new MailWebPart();
