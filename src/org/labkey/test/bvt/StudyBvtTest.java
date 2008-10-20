@@ -45,6 +45,7 @@ public class StudyBvtTest extends StudyTest
     private static final String CREATE_CHART_MENU = "Views:Create:Chart View";
     private static final String CREATE_R_MENU = "Views:Create:R View";
     private static final String TEST_GRID_VIEW = "Test Grid View";
+    private static final String CREATE_SNAPSHOT_MENU = "Views:Create:Query Snapshot";
 
     // mssql and postgres
     private String R_SCRIPT1(String function, String database)
@@ -272,7 +273,7 @@ public class StudyBvtTest extends StudyTest
             RReportTest();
 
         popLocation();
-        
+
         // test specimen comments
         clickLinkWithText("Study 001");
         clickLinkWithText("Plasma, Unknown Processing");
@@ -366,7 +367,7 @@ public class StudyBvtTest extends StudyTest
 
         selectOptionByValue("securityString", "BASIC_WRITE");
         selenium.waitForPageToLoad("30000");
-        
+
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("DEM-1: Demographics");
 
@@ -399,10 +400,161 @@ public class StudyBvtTest extends StudyTest
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickNavButton("Save");
 
+        // query snapshot tests
+        querySnapshotTest();
+
         // additional report and security tests
         setupDatasetSecurity();
         createCharts();
         doTestSecurity();
+    }
+
+    private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
+    private final String APX_SNAPSHOT = "APX Joined Snapshot";
+
+    protected void querySnapshotTest()
+    {
+/*
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Security");
+
+        // enable advanced study security
+        selectOptionByValue("securityString", "BASIC_WRITE");
+        clickNavButton("Update");
+*/
+
+        // create a snapshot from a dataset
+        log("create a snapshot from a dataset");
+        clickLinkWithText("Study 001");
+        clickLinkWithText("DEM-1: Demographics");
+        createQuerySnapshot(DEMOGRAPHICS_SNAPSHOT, true, false);
+
+        assertTextPresent("Dataset: " + DEMOGRAPHICS_SNAPSHOT);
+
+        // test automatic updates by altering the source dataset
+        log("test automatic updates by altering the source dataset");
+        clickLinkWithText("Study 001");
+        clickLinkWithText("DEM-1: Demographics");
+        clickNavButton("Insert New");
+        setFormElement("quf_participantid", "999121212");
+        setFormElement("quf_SequenceNum", "101");
+        setFormElement("quf_DEMraco", "Armenian");
+
+        clickNavButton("Submit");
+
+        clickLinkWithText("Study 001");
+        clickLinkWithText(DEMOGRAPHICS_SNAPSHOT);
+        clickMenuButton("QC State", "QCState:All data");
+        waitForSnapshotUpdate("Armenian");
+
+        // snapshot over a custom view
+        // test automatic updates by altering the source dataset
+        log("create a snapshot over a custom view");
+        clickLinkWithText("Study 001");
+        clickLinkWithText("APX-1: Abbreviated Physical Exam");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+
+        click(Locator.xpath("//img[@id='expand_ParticipantId']"));
+        click(Locator.xpath("//img[@id='expand_ParticipantId/DataSet']"));
+        click(Locator.xpath("//img[@id='expand_ParticipantId/DataSet/DEM-1: Demographics']"));
+        click(Locator.xpath("//img[@id='expand_ParticipantId/DataSet/DEM-1: Demographics/seq101']"));
+
+        addCustomizeViewColumn("ParticipantId/DataSet/DEM-1: Demographics/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
+        setFormElement("ff_columnListName", "APX Joined View");
+        clickNavButton("Save");
+
+        createQuerySnapshot(APX_SNAPSHOT, true, false);
+        assertTextNotPresent("Slovakian");
+
+        log("test automatic updates for a joined snapshot view");
+        clickLinkWithText("Study 001");
+        clickLinkWithText("DEM-1: Demographics");
+        clickLink(Locator.xpath("//a[.='999320016']/../..//td/a[.='edit']"));
+        setFormElement("quf_DEMraco", "Slovakian");
+        clickNavButton("Submit");
+
+        clickLinkWithText("Study 001");
+        clickLinkWithText(APX_SNAPSHOT);
+        clickMenuButton("QC State", "QCState:All data");
+
+        waitForSnapshotUpdate("Slovakian");
+
+        // snapshot over a custom query
+        log("create a snapshot over a custom query");
+        clickLinkWithText("Study 001");
+        clickLinkWithText("Manage Reports and Views");
+        clickLinkWithText("new grid view");
+        clickLinkWithText("Modify Dataset List (Advanced)");
+        clickNavButton("Create New Query");
+
+        setFormElement("ff_newQueryName", "APX: Custom Query");
+        selectOptionByText("ff_baseTableName", "APX-1: Abbreviated Physical Exam");
+        clickNavButton("Create and design");
+        clickNavButton("Run Query");
+
+        createQuerySnapshot("Custom Query Snapshot", true, true);
+        assertTextPresent("Dataset: Custom Query Snapshot");
+
+        // edit snapshot then delete
+        log("edit the snapshot");
+        clickEditSnapshotMenu();
+        checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
+        clickNavButton("Update");
+        assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
+        clickNavButton("Update Snapshot");
+        selenium.getConfirmation();
+        waitForText("Dataset: Custom Query Snapshot", 10000);
+
+        log("delete the snapshot");
+        clickEditSnapshotMenu();
+        clickNavButton("Delete Snapshot");
+        selenium.getConfirmation();
+
+        waitForText("Manage Datasets", 10000);
+        assertLinkNotPresentWithText("Custom Query Snapshot");
+    }
+
+    private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic)
+    {
+        clickMenuButton("Views", "Views:Create", CREATE_SNAPSHOT_MENU);
+
+        setFormElement("snapshotName", snapshotName);
+        if (autoUpdate)
+            checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
+        if (isDemographic)
+            checkCheckbox("demographicData");
+
+        // make sure additional key fields and demographic data are there
+        assertElementPresent(Locator.xpath("//input[@type='radio' and @name='additionalKeyType']"));
+        assertElementPresent(Locator.xpath("//input[@type='checkbox' and @name='demographicData']"));
+
+        clickNavButton("Next");
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+
+        clickNavButton("Cancel");
+    }
+
+    // temporary helper until I can get an ext id on that element
+    private void clickEditSnapshotMenu()
+    {
+        clickNavButton("Views", 0);
+        // allow the DOM to be updated
+        sleep(1000);
+        clickLinkWithText("Edit Snapshot");
+    }
+
+    private void waitForSnapshotUpdate(String text)
+    {
+        int time = 0;
+        while (!isTextPresent(text) && time < defaultWaitForPage)
+        {
+            sleep(3000);
+            time += 3000;
+            refresh();
+        }
+        assertTextPresent(text);
     }
 
     protected void setupDatasetSecurity()
@@ -482,7 +634,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Admin Console");
         clickLinkWithText("R view configuration");
         log("Check if it already is configured");
-        
+
         try
         {
             if (getAttribute(Locator.name("programPath"), "value") != null &&
