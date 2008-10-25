@@ -31,7 +31,6 @@ cruisecontrol/xsl/pmd-details.xsl -text
 cruisecontrol/xsl/pmd.xsl -text
 cruisecontrol/xsl/testdetails.xsl -text
 cruisecontrol/xsl/unittests.xsl -text
-/force_upgrade.cmd -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/test/BaseFlowTest.java -text
@@ -128,3 +127,4 @@ src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
 src/org/labkey/test/util/StopSelenium.java -text
+/upgrade_stress_test.cmd -text
