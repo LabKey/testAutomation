@@ -523,17 +523,17 @@ public class StudyBvtTest extends StudyTest
         setFormElement("snapshotName", snapshotName);
         if (autoUpdate)
             checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
-        if (isDemographic)
-            checkCheckbox("demographicData");
+        //if (isDemographic)
+        //    checkCheckbox("demographicData");
 
         // make sure additional key fields and demographic data are there
-        assertElementPresent(Locator.xpath("//input[@type='radio' and @name='additionalKeyType']"));
-        assertElementPresent(Locator.xpath("//input[@type='checkbox' and @name='demographicData']"));
+        //assertElementPresent(Locator.xpath("//input[@type='radio' and @name='additionalKeyType']"));
+        //assertElementPresent(Locator.xpath("//input[@type='checkbox' and @name='demographicData']"));
 
-        clickNavButton("Next");
-        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+        clickNavButton("Create Snapshot");
+        //waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
 
-        clickNavButton("Cancel");
+        //clickNavButton("Cancel");
     }
 
     // temporary helper until I can get an ext id on that element
