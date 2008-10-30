@@ -37,16 +37,18 @@ public class DumbsterModule extends DefaultModule implements ContainerManager.Co
 
     public DumbsterModule()
     {
-        super(NAME, 1.00, null, false,
+        super(NAME, 1.00, "/org/labkey/dumbster", false,
             new BaseWebPartFactory("Mail Record") {
                 public WebPartView getWebPartView(ViewContext portalCtx, Portal.WebPart webPart) throws IllegalAccessException, InvocationTargetException
                 {
                     return new MailWebPart();
                 }
             });
+    }
 
+    protected void init()
+    {
         addController("dumbster", DumbsterController.class);
-        
         DumbsterManager.setInstance(new DumbsterManager());
     }
 
