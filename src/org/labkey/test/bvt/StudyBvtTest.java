@@ -46,6 +46,7 @@ public class StudyBvtTest extends StudyTest
     private static final String CREATE_R_MENU = "Views:Create:R View";
     private static final String TEST_GRID_VIEW = "Test Grid View";
     private static final String CREATE_SNAPSHOT_MENU = "Views:Create:Query Snapshot";
+    private static final String EDIT_SNAPSHOT_MENU = "Views:Edit Snapshot";
 
     // mssql and postgres
     private String R_SCRIPT1(String function, String database)
@@ -499,7 +500,7 @@ public class StudyBvtTest extends StudyTest
 
         // edit snapshot then delete
         log("edit the snapshot");
-        clickEditSnapshotMenu();
+        clickMenuButton("Views", null, EDIT_SNAPSHOT_MENU);
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickNavButton("Update");
         assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
@@ -508,7 +509,7 @@ public class StudyBvtTest extends StudyTest
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
-        clickEditSnapshotMenu();
+        clickMenuButton("Views", null, EDIT_SNAPSHOT_MENU);
         clickNavButton("Delete Snapshot");
         selenium.getConfirmation();
 
@@ -534,15 +535,6 @@ public class StudyBvtTest extends StudyTest
         //waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
 
         //clickNavButton("Cancel");
-    }
-
-    // temporary helper until I can get an ext id on that element
-    private void clickEditSnapshotMenu()
-    {
-        clickNavButton("Views", 0);
-        // allow the DOM to be updated
-        sleep(1000);
-        clickLinkWithText("Edit Snapshot");
     }
 
     private void waitForSnapshotUpdate(String text)
