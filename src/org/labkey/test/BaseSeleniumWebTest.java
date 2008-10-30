@@ -1210,10 +1210,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForPageToLoad();
     }
 
-    //TODO: Make this really return a button, not just any input
     public Locator findButton(String name)
     {
-        Locator l = Locator.tagWithName("input", name);
+        // Note: we do not use inputs anymore, but instead links spans inside
+        Locator l = Locator.tagWithName("a", name);
         if (isElementPresent(l))
             return l;
 
