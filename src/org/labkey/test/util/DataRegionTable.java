@@ -130,7 +130,8 @@ public class DataRegionTable
             for (int col = 0; getDataAsText(0, col) != null; col++)
             {
                 String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+sel+1) + "]/div"));
-                if (header.equals(name))
+                String headerName = header.split("\n")[0];
+                if (headerName.equals(name))
                 {
                     _mapColumns.put(name, col);
                     return col;

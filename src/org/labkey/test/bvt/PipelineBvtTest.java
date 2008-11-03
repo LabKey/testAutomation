@@ -140,12 +140,13 @@ public class PipelineBvtTest extends PipelineWebTestBase
             }
         }
 
-        PipelineStatusTable statusTable = new PipelineStatusTable(this, false, true);
+        PipelineStatusTable statusTable = new PipelineStatusTable(this, true, true);
         PipelineTestParams tpRetry = _testSetMS1.getParams()[0];
         tpRetry.setExpectError(false);
         for (String sampleExp : tpRetry.getExperimentLinks())
         {
             pushLocation();
+            clickLinkWithText("All");
             log("Trying to view status info for " + sampleExp);
             statusTable.clickStatusLink(sampleExp);
             clickNavButton("Retry");

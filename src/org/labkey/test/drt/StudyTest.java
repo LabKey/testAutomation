@@ -273,7 +273,8 @@ public class StudyTest extends BaseSeleniumWebTest
         importSpecimenArchive(SPECIMEN_ARCHIVE_A);
         clickLinkWithText("Study 001");
         clickLinkWithText("Blood (Whole)");
-        assertTextPresent("350V06001416");
+        assertTextPresent("350V06002948");
+        clickMenuButton("Page Size", "Page Size:All");
         assertTextNotPresent("DRT000XX-01");
         assertTextPresent("GAA082NH-01");
         clickLinkWithText("Hide Vial and Request Options");
@@ -284,9 +285,13 @@ public class StudyTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Show Vial and Request Options");
         clickLinkContainingText("history");
-        assertTextPresent("1.0&nbsp;ML");
+        assertTextPresent("2.0&nbsp;ML");
         assertTextNotPresent("Added Comments");
+        // confirm collection location:
         assertTextPresent("Johannesburg, South Africa");
+        // confirm historical locations:
+        assertTextPresent("Contract Lab Services, Johannesburg, South Africa");
+        assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
     }
 
     protected void createStudy()

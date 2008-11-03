@@ -168,8 +168,10 @@ public class StudyBvtTest extends StudyTest
         //getDialog().setWorkingForm("Dataset");
         checkCheckbox(Locator.checkboxByName(".toggle", false));
         clickNavButton("View Specimens");
-        assertTextPresent("364V05000031");
+        assertTextPresent("999320016");
+        assertTextPresent("999320518");
         clickLinkWithText("Show Vial and Request Options");
+        assertTextPresent("364V05000031");
         checkCheckbox(Locator.checkboxByName(".toggle", false));
         clickNavButton("Request Options", 0);
         clickLinkWithText("Create New Request");
@@ -308,6 +310,7 @@ public class StudyBvtTest extends StudyTest
         // check to see that data in the specimen archive was merged correctly:
         clickLinkWithText("Study 001");
         clickLinkWithText("By Vial");
+        clickMenuButton("Page Size", "Page Size:All");
         assertTextPresent("DRT000XX-01");
         clickLinkWithText("Search");
         clickLinkWithText("Search by specimen");
@@ -327,14 +330,14 @@ public class StudyBvtTest extends StudyTest
         */
 
         // Hard-code the element names, since code above is unpredictable
-        selectOptionByValue("searchParams[0].compareType", "CONTAINS");
-        setFormElement("searchParams[0].value", "1416");
-        selectOptionByValue("searchParams[1].value", "999320528");
+        selectOptionByValue("searchParams[0].value", "999320528");
+        selectOptionByValue("searchParams[1].value", "Enroll/Vacc #1");
 
         clickNavButton("Search");
-        assertTextPresent("350V06001416");
+        assertTextPresent("999320528");
         clickLinkWithText("Show Vial and Request Options");
         // if our search worked, we'll only have six vials:
+        assertTextPresent("350V06001416", 6);
         assertLinkPresentWithTextCount("999320528", 6);
         assertTextNotPresent("DRT000XX-01");
         clickLinkWithText("[history]");
