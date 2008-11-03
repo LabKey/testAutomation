@@ -206,7 +206,18 @@ public class TestHelper
         optionsText.add(portName, gbcShort);
         optionsText.add(_port, gbcShort);
         JLabel labkeyRootName = new JLabel("LabKey Root:");
-        _root = new JTextField(DEFAULT_ROOT);
+
+        File rootFile = new File(DEFAULT_ROOT);
+        String rootPath;
+        try
+        {
+            rootPath = rootFile.getCanonicalPath();
+        }
+        catch (IOException ioe)
+        {
+            rootPath = DEFAULT_ROOT;
+        }
+        _root = new JTextField(rootPath);
         optionsText.add(labkeyRootName, gbcShort);
         optionsText.add(_root, gbcLong);
         optionsText.setBackground(Color.white);
@@ -237,6 +248,14 @@ public class TestHelper
             if (suite.isSuite())
             {
                 CheckNode suiteNode = new CheckNode(suite);
+                Class[] tests = suite.tests;
+                Arrays.sort(tests, new Comparator<Class>()
+                {
+                    public int compare(Class o1, Class o2)
+                    {
+                        return o1.getSimpleName().compareTo(o2.getSimpleName());
+                    }
+                });
                 for (Class test : suite.tests)
                 {
                     CheckNode testNode = new CheckNode(test.getSimpleName(), false, false);
@@ -594,7 +613,7 @@ public class TestHelper
         _port.setText(config.getPort());
         _contextPath.setText(config.getContextPath());
         _server.setText(config.getServer());
-        _root.setText(config.getRoot());
+        //_root.setText(config.getRoot());  jgarms: do not persist the root across branches
         checkNodes(config.getConfigCheckedNodes());
     }
 
