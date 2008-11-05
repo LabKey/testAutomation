@@ -29,16 +29,33 @@ import org.labkey.dumbster.view.MailWebPart;
 
 import java.beans.PropertyChangeEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Arrays;
 
 public class DumbsterModule extends DefaultModule implements ContainerManager.ContainerListener
 {
     private static final Logger _log = Logger.getLogger(DumbsterModule.class);
     public static final String NAME = "Dumbster";
 
-    public DumbsterModule()
+    public String getName()
     {
-        super(NAME, 1.00, "/org/labkey/dumbster", false,
-            new BaseWebPartFactory("Mail Record") {
+        return "Dumbster";
+    }
+
+    public double getVersion()
+    {
+        return 1.00;
+    }
+
+    protected void init()
+    {
+        addController("dumbster", DumbsterController.class);
+        DumbsterManager.setInstance(new DumbsterManager());
+    }
+
+    protected Collection<? extends WebPartFactory> createWebPartFactories()
+    {
+        return Arrays.asList(new BaseWebPartFactory("Mail Record") {
                 public WebPartView getWebPartView(ViewContext portalCtx, Portal.WebPart webPart) throws IllegalAccessException, InvocationTargetException
                 {
                     return new MailWebPart();
@@ -46,10 +63,9 @@ public class DumbsterModule extends DefaultModule implements ContainerManager.Co
             });
     }
 
-    protected void init()
+    public boolean hasScripts()
     {
-        addController("dumbster", DumbsterController.class);
-        DumbsterManager.setInstance(new DumbsterManager());
+        return false;
     }
 
     public void containerCreated(Container c)
