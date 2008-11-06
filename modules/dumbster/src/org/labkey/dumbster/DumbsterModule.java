@@ -17,22 +17,18 @@
 package org.labkey.dumbster;
 
 import org.apache.log4j.Logger;
-import org.labkey.api.data.Container;
-import org.labkey.api.data.ContainerManager;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
-import org.labkey.api.security.User;
-import org.labkey.api.view.*;
 import org.labkey.api.settings.AppProps;
+import org.labkey.api.view.*;
 import org.labkey.dumbster.model.DumbsterManager;
 import org.labkey.dumbster.view.MailWebPart;
 
-import java.beans.PropertyChangeEvent;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Arrays;
+import java.util.Collection;
 
-public class DumbsterModule extends DefaultModule implements ContainerManager.ContainerListener
+public class DumbsterModule extends DefaultModule
 {
     private static final Logger _log = Logger.getLogger(DumbsterModule.class);
     public static final String NAME = "Dumbster";
@@ -68,23 +64,9 @@ public class DumbsterModule extends DefaultModule implements ContainerManager.Co
         return false;
     }
 
-    public void containerCreated(Container c)
-    {
-    }
-
-    public void containerDeleted(Container c, User user)
-    {
-    }
-
-    public void propertyChange(PropertyChangeEvent evt)
-    {
-    }
-
     public void startup(ModuleContext moduleContext)
     {
         super.startup(moduleContext);
-        // add a container listener so we'll know when our container is deleted:
-        ContainerManager.addContainerListener(this);
 
         if (AppProps.getInstance().isMailRecorderEnabled())
             DumbsterManager.get().start();
