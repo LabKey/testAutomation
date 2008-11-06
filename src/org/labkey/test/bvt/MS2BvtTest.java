@@ -104,7 +104,7 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "Choose A View");
+        selectOptionByText("viewParams", "<Standard View>");
         clickNavButton("Go");
 
         assertTextPresent(SEARCH_NAME3);
@@ -147,7 +147,7 @@ public class MS2BvtTest extends MS2TestBase
         popLocation();
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "Choose A View");
+        selectOptionByText("viewParams", "<Standard View>");
         clickNavButton("Go");
 
         log("Test export selected");

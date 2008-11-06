@@ -71,7 +71,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "Choose A View");
+        selectOptionByText("viewParams", "<Standard View>");
         clickNavButton("Go");
 
         log("Test filtering and sorting");
@@ -84,7 +84,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         clickNavButton("Save View");
         setFormElement("name", VIEW);
         clickNavButton("Save View");
-        selectOptionByText("viewParams", "Choose A View");
+        selectOptionByText("viewParams", "<Standard View>");
         clickNavButton("Go");
         assertTextPresent(PEPTIDE);
         selectOptionByText("viewParams", VIEW);
