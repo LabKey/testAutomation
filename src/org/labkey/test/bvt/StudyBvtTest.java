@@ -48,6 +48,8 @@ public class StudyBvtTest extends StudyTest
     private static final String CREATE_SNAPSHOT_MENU = "Views:Create:Query Snapshot";
     private static final String EDIT_SNAPSHOT_MENU = "Views:Edit Snapshot";
 
+    private final String DATASET_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/dataset_data.xls";
+
     // mssql and postgres
     private String R_SCRIPT1(String function, String database)
     {
@@ -406,6 +408,9 @@ public class StudyBvtTest extends StudyTest
 
         // query snapshot tests
         querySnapshotTest();
+
+        // Test creating and importing a dataset from an excel file
+        doTestDatasetImport();
 
         // additional report and security tests
         setupDatasetSecurity();
@@ -950,6 +955,34 @@ public class StudyBvtTest extends StudyTest
         setFormElement("label", TEST_GRID_VIEW);
         selectOptionByText("datasetSelection", "APX-1: Abbreviated Physical Exam");
         clickNavButton("Create View");
+    }
+
+    protected void doTestDatasetImport()
+    {
+        if (!isFileUploadAvailable())
+            return;
+
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Create New Dataset");
+        setFormElement("typeName", "fileImportDataset");
+        clickCheckbox("fileImport", false);
+        clickNavButton("Next");
+
+        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), WAIT_FOR_GWT);
+
+        File datasetFile = new File(DATASET_DATA_FILE);
+        setFormElement("uploadFormElement", datasetFile);
+
+        waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_GWT);
+
+        clickNavButton("Import");
+
+        waitForPageToLoad();
+
+        assertTextPresent("kevin");
+        assertTextPresent("chimpanzee");
     }
 
     protected void doTestSecurity()

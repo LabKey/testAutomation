@@ -1413,16 +1413,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertEquals("Link with text '" + text + "' was not present " + count + " times", countLinksWithText(text), count);
     }
 
-    public boolean isGWTButtonPresentWithText(String text)
-    {
-        return isElementPresent(Locator.gwtNavButton(text));
-    }
-
-    public boolean isGWTButtonPresentContainingText(String text)
-    {
-        return isElementPresent(Locator.gwtNavButtonContainingText(text));
-    }
-
     public boolean isLinkPresentWithImage(String imageName)
     {
         return isElementPresent(Locator.linkWithImage(imageName));
@@ -1490,40 +1480,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLink(getTabLinkId(tabname));
     }
 
-    public void clickGWTButtonWithText(String text, int millis)
-    {
-        log("Clicking GWT button with text " + text);
-        Locator l = Locator.gwtNavButton(text);
-        assertElementPresent(l);
-        selenium.mouseOver(l.toString());
-        selenium.mouseDown(l.toString());
-        selenium.mouseUp(l.toString());
-        if (millis > 0)
-            waitForPageToLoad(millis);
-    }
-
-    public void clickGWTButtonContainingText(String text, int millis)
-    {
-        log("Clicking GWT button with text " + text);
-        Locator l = Locator.gwtNavButtonContainingText(text);
-        assertElementPresent(l);
-        selenium.mouseOver(l.toString());
-        selenium.mouseDown(l.toString());
-        selenium.mouseUp(l.toString());
-        if (millis > 0)
-            waitForPageToLoad(millis);
-    }
-
-    public void clickGWTButtonWithTextByIndex(String text, int index)
-    {
-        log("Clicking GWT button with text " + text);
-        Locator l = Locator.gwtNavButton(text, index);
-        assertElementPresent(l);
-        selenium.mouseOver(l.toString());
-        selenium.mouseDown(l.toString());
-        selenium.mouseUp(l.toString());
-    }
-
     public void clickImageWithAltText(String altText)
     {
         log("Clicking first image with alt text " + altText );
@@ -1561,7 +1517,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
-
 
     public String getTableCellText(String tableName, int row, int column)
     {
@@ -1648,10 +1603,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickNavButtonContainingText(String buttonText)
     {
-        if (isGWTButtonPresentContainingText(buttonText))
-            clickGWTButtonContainingText(buttonText, defaultWaitForPage);
-        else
-            clickButtonContainingText(buttonText);
+        clickButtonContainingText(buttonText);
     }
 
     public void clickNavButton(String buttonText)
@@ -1661,18 +1613,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickNavButton(String buttonText, int waitMillis)
     {
-        if (isGWTButtonPresentWithText(buttonText))
-            clickGWTButtonWithText(buttonText, waitMillis);
-        else
-            clickButton(buttonText, waitMillis);
+        clickButton(buttonText, waitMillis);
     }
 
     public void clickNavButtonByIndex(String buttonText, int index)
     {
-        if (isGWTButtonPresentWithText(buttonText))
-            clickGWTButtonWithTextByIndex(buttonText, index);
-        else
-            clickButtonByIndex(buttonText, index);
+        clickButtonByIndex(buttonText, index);
     }
 
 
