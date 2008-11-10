@@ -16,8 +16,10 @@
 
 package org.labkey.test.util;
 
-import org.labkey.test.Locator;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+
+import java.io.File;
 
 /**
  * User: jeckels
@@ -347,5 +349,34 @@ public class ListHelper
                 test.assertTextPresent(col.getName());
             }
         }
+    }
+
+    public static void createListFromFile(BaseSeleniumWebTest test, String folderName, String listName, File inputFile)
+    {
+        test.clickLinkWithText(folderName);
+        test.waitForPageToLoad();
+        if (!test.isLinkPresentWithText("Lists"))
+        {
+            test.addWebPart("Lists");
+        }
+
+        test.clickLinkWithText("manage lists");
+
+        test.log("Add List");
+        test.clickNavButton("Create New List");
+        test.setFormElement("ff_name", listName);
+        test.clickCheckbox("fileImport", false);
+
+        test.clickNavButton("Create List");
+
+        test.waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+
+        test.setFormElement("uploadFormElement", inputFile);
+
+        test.waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+
+        test.clickNavButton("Import");
+
+        test.waitForPageToLoad();
     }
 }

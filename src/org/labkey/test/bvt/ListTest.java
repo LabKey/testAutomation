@@ -24,6 +24,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
 
+import java.io.File;
+
 /**
  * User: ulberge
  * Date: Jul 13, 2007
@@ -88,6 +90,9 @@ public class ListTest extends BaseSeleniumWebTest
             LIST3_COL2;
     public static final String LIST_AUDIT_EVENT = "List events";
 
+    private final String EXCEL_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.xls";
+    private final String TSV_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.tsv";
+
     public String getAssociatedModuleDirectory()
     {
         return "";
@@ -97,6 +102,12 @@ public class ListTest extends BaseSeleniumWebTest
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME2); } catch (Throwable t) {}
+    }
+
+    @Override
+    protected boolean isFileUploadTest()
+    {
+        return true;
     }
 
     protected void doTestSteps()
@@ -386,5 +397,22 @@ public class ListTest extends BaseSeleniumWebTest
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain Colors was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
+
+        doUploadTest();
+    }
+
+    private void doUploadTest()
+    {
+        if (!isFileUploadAvailable())
+            return;
+
+        File excelFile = new File(EXCEL_DATA_FILE);
+        ListHelper.createListFromFile(this, PROJECT_NAME, "Fruits from Excel", excelFile);
+        assertTextPresent("pomegranate");
+
+        File tsvFile = new File(TSV_DATA_FILE);
+        ListHelper.createListFromFile(this, PROJECT_NAME, "Fruits from a TSV", tsvFile);
+        assertTextPresent("pomegranate");
+
     }
 }
