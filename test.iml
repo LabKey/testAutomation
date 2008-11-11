@@ -23,7 +23,7 @@
           <root url="jar://$MODULE_DIR$/lib/selenium-java-client-driver.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="http://release.openqa.org/selenium-remote-control/0.9.0/doc/java/" />
+          <root url="http://release.openqa.org/selenium-remote-control/0.9.0/doc/java" />
         </JAVADOC>
         <SOURCES>
           <root url="jar://$MODULE_DIR$/lib/selenium-0.9.1-nightly-src.zip!/selenium-0.9.1-nightly-src/server/source/main" />
@@ -49,7 +49,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntryProperties />
   </component>
 </module>
 

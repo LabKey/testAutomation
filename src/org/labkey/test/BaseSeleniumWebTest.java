@@ -432,15 +432,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Trying to register some bad email addresses");
             pushLocation();
             setFormElement("email", "bogus@bogus@bogus");
-            submit("Register");
+            clickLinkWithText("Register");
             assertTextPresent("The string 'bogus@bogus@bogus' is not a valid email address. Please enter an email address in this form: user@domain.tld");
             setFormElement("email", "");
-            submit("Register");
+            clickLinkWithText("Register");
             assertTextPresent("The string '' is not a valid email address. Please enter an email address in this form: user@domain.tld");
 
             log("Registering with the test email address");
             setText("email", PasswordUtil.getUsername());
-            submit("Register");
+            clickLinkWithText("Register");
 
             log("Attempting to register another initial user");
             popLocation();
@@ -452,33 +452,33 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             assertTitleEquals("Choose a Password");
 
             log("Testing bad passwords");
-            submit("set");
+            clickLinkWithText("Set Password");
             assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
 
             setFormElement("password", "short");
             setFormElement("password2", "short");
-            submit("set");
+            clickLinkWithText("Set Password");
             assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
 
             setFormElement("password", "short");
             setFormElement("password2", "short");
-            submit("set");
+            clickLinkWithText("Set Password");
             assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
 
             setFormElement("password", PasswordUtil.getUsername());
             setFormElement("password2", PasswordUtil.getUsername());
-            submit("set");
+            clickLinkWithText("Set Password");
             assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
 
             setFormElement("password", "LongEnough");
             setFormElement("password2", "ButDontMatch");
-            submit("set");
+            clickLinkWithText("Set Password");
             assertTextPresent("Your password entries didn't match.");
 
             log("Set the test password");
             setText("password", PasswordUtil.getPassword());
             setText("password2", PasswordUtil.getPassword());
-            submit("set");
+            clickLinkWithText("Set Password");
         }
 
         if (isTitleEqual("Sign In"))
@@ -487,11 +487,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             assertFormPresent("login");
             setText("email", PasswordUtil.getUsername());
             setText("password", PasswordUtil.getPassword());
-            submit("SUBMIT");
-            if (isNavButtonPresent("Express Install"))
-                clickNavButton("Express Install");
-            if (isNavButtonPresent("Express Upgrade"))
-                clickNavButton("Express Upgrade");
+            clickLinkWithText("Sign In");
+
+            if (isNavButtonPresent("Install"))
+                clickNavButton("Install");
+            if (isNavButtonPresent("Upgrade"))
+                clickNavButton("Upgrade");
             int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
             while (waitMs > 0 && (!(isNavButtonPresent("Next") || isLinkPresentWithText("Home"))))
             {
