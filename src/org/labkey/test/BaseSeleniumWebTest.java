@@ -354,7 +354,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         //
         beginAt("/login/logout.view");
         checkForUpgrade();
-        beginAt("/login/login.view");
+        simpleSignIn();
+        ensureAdminMode();
+    }
+
+    // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
+    public void simpleSignIn()
+    {
+        if (!isTitleEqual("Sign In"))
+            beginAt("/login/login.view");
+
         assertTitleEquals("Sign In");
         assertFormPresent("login");
         setText("email", PasswordUtil.getUsername());
@@ -365,8 +374,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
         assertTextPresent("Sign Out");
         assertTextPresent("My Account");
-
-        ensureAdminMode();
     }
 
     public void ensureAdminMode()
@@ -429,6 +436,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             assertTitleEquals("Register First User");
             log("Need to bootstrap");
+            verifyUpgradeRedirect("You are the first user");
             log("Trying to register some bad email addresses");
             pushLocation();
             setFormElement("email", "bogus@bogus@bogus");
@@ -484,15 +492,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isTitleEqual("Sign In"))
         {
             // if the logout page takes us to the sign-in page, then we may have a schema update to do:
-            assertFormPresent("login");
-            setText("email", PasswordUtil.getUsername());
-            setText("password", PasswordUtil.getPassword());
-            clickLinkWithText("Sign In");
+            simpleSignIn();
 
-            if (isNavButtonPresent("Install"))
-                clickNavButton("Install");
-            if (isNavButtonPresent("Upgrade"))
-                clickNavButton("Upgrade");
+            String upgradeButtonText = (isNavButtonPresent("Install") ? "Install" : (isNavButtonPresent("Upgrade") ? "Upgrade" : null));
+
+            if (null != upgradeButtonText)
+            {
+                verifyUpgradeRedirect(upgradeButtonText);
+
+                // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
+                signOut();
+                simpleSignIn();
+
+                clickNavButton(upgradeButtonText);
+            }
+
             int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
             while (waitMs > 0 && (!(isNavButtonPresent("Next") || isLinkPresentWithText("Home"))))
             {
@@ -535,6 +549,33 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 clickLinkWithText("Home");
             }
         }
+    }
+
+
+    private void verifyUpgradeRedirect(String assertText)
+    {
+        // These should all redirect to the upgrade page
+        goToHome();
+        assertTextPresent(assertText);
+        beginAt("/nab/home/begin.view");  // A Beehive action
+        assertTextPresent(assertText);
+        beginAt("/test/begin.view");      // A Spring action
+        assertTextPresent(assertText);
+        beginAt("/test/permNone.view");   // A Spring action with no permissions
+        assertTextPresent(assertText);
+        beginAt("/admin/credits.view");   // An admin Spring action with no permissions
+        assertTextPresent(assertText);
+        beginAt("/admin/begin.view");     // An admin Spring action requiring admin permissions
+        assertTextPresent(assertText);
+
+        // These should NOT redirect to the upgrade page
+        beginAt("/login/resetPassword.view");
+        assertTextNotPresent(assertText);
+        beginAt("/admin/maintenance.view");
+        assertTextNotPresent(assertText);
+
+        // Back to upgrade process
+        goToHome();
     }
 
 

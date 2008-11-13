@@ -17,7 +17,6 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -86,18 +85,10 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Test that renderAs can be observed through a login
             beginAt("files/" + encode(PROJECT_NAME) + "/" + filename + "?renderAs=INLINE");
             assertTitleEquals("Sign In");
-            assertFormPresent("login");
-            setText("email", PasswordUtil.getUsername());
-            setText("password", PasswordUtil.getPassword());
-            clickNavButton("Sign In");
 
-            if (isTextPresent("Type in your email address and password"))
-                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
-
-            log("Test that page was rendered inside of server UI");
-
-            assertTextPresent("Sign Out");
-            assertTextPresent("My Account");
+            log("Test renderAs through login and ensure that page is rendered inside of server UI");
+            // If this succeeds, then page has been rendered in frame
+            simpleSignIn();
 
             assertTextPresent("antidisestablishmentarianism");
         }
