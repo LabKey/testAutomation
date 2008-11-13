@@ -29,6 +29,9 @@ public class IssuesTest extends BaseSeleniumWebTest
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
 
+    private static final String[] REQUIRED_FIELDS = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",
+                "NotifyList", "String1", "Int1"};
+    
     public String getAssociatedModuleDirectory()
     {
         return "issues";
@@ -205,6 +208,12 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         queryTest();
 
+        // back to grid view
+        clickLinkWithText("Issues Summary");
+
+        requiredFieldsTest();
+        viewSelectedDetailsTest();
+        
         // UNDONE test these actions
         // CompleteUserAction
         // EmailPrefsAction
@@ -213,6 +222,70 @@ public class IssuesTest extends BaseSeleniumWebTest
         // RssAction
     }
 
+    private void requiredFieldsTest()
+    {
+        clickNavButton("Admin");
+        setFormElement("int1", "Contract Number");
+        setFormElement("string1", "Customer Name");
+        clickNavButton("Update Custom Fields");
+
+        //setWorkingForm("requiredFieldsForm");
+        for (String field : REQUIRED_FIELDS)
+            checkRequiredField(field, true);
+
+        clickNavButton("Update Required Fields");
+        clickNavButton("Back to Issues");
+        clickNavButton("Admin");
+
+        //setWorkingForm("requiredFieldsForm");
+        for (String field : REQUIRED_FIELDS)
+        {
+            verifyFieldChecked(field);
+            checkRequiredField(field, false);
+        }
+        clickNavButton("Update Required Fields");
+
+        checkRequiredField("Title", true);
+        clickNavButton("Update Required Fields");
+        clickNavButton("Back to Issues");
+        clickNavButton("New Issue");
+        clickNavButton("Submit");
+
+        assertTextPresent("Field Title cannot be null.");
+        clickNavButton("View Grid");
+    }
+
+    private void checkRequiredField(String name, boolean select)
+    {
+        Locator checkBoxLocator = Locator.checkboxByNameAndValue("requiredFields", name, false);
+
+        if (select)
+            checkCheckbox("requiredFields", name, false);
+        else
+        {
+            if (isChecked(checkBoxLocator))
+                click(checkBoxLocator);
+        }
+    }
+
+    private void verifyFieldChecked(String fieldName)
+    {
+        if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName, false)))
+            return;
+
+        assertFalse("Checkbox not set for element: " + fieldName, false);
+    }
+
+    private void viewSelectedDetailsTest()
+    {
+        setFilter("Issues", "Status", "<has any value>");
+        clickCheckbox(".toggle", false);
+        clickNavButton("View Details");
+        assertTextPresent("a bright flash of light");
+        assertTextPresent("don't believe the hype");
+        clickLinkWithText("view grid");
+    }
+    
     public void testLastFilter(int issueId)
     {
         log("Testing .lastFilter");
@@ -261,7 +334,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("ff_newQueryName", "xxyzzy");
         clickNavButton("Create and edit SQL");
         clickNavButton("Run Query");
-        clickLinkWithText("issues");
+        clickLinkWithText("issues Schema");
         clickNavButton("Delete");
         clickNavButton("OK");
         clickLinkWithText(PROJECT_NAME);

@@ -41,7 +41,6 @@ public enum TestSet
         ListTest.class,
         StudyBvtTest.class,
         StudyExtraTest.class,
-        IssuesBvtTest.class,
         UserBvtTest.class,
         UserPermissionsTest.class,
         SpecimenTest.class,

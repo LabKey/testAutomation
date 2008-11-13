@@ -54,7 +54,6 @@ src/org/labkey/test/bvt/FieldValidatorTest.java -text
 src/org/labkey/test/bvt/FileContentTest.java -text
 src/org/labkey/test/bvt/FlowJoQueryTest.java -text
 src/org/labkey/test/bvt/HTTPApiTest.java -text
-src/org/labkey/test/bvt/IssuesBvtTest.java -text
 src/org/labkey/test/bvt/ListTest.java -text
 src/org/labkey/test/bvt/LuminexTest.java -text
 src/org/labkey/test/bvt/MS1Bvt.java -text
