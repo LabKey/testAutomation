@@ -15,16 +15,15 @@
  */
 package org.labkey.test.util;
 
+import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 import java.util.HashMap;
-
-import junit.framework.Assert;
+import java.util.Map;
 
 /**
  * DataRegionTable class
@@ -39,6 +38,7 @@ public class DataRegionTable
     protected BaseSeleniumWebTest _test;
     protected boolean _selectors;
     protected Map<String, Integer> _mapColumns = new HashMap<String, Integer>();
+    protected Map<String, Integer> _mapRows = new HashMap<String, Integer>();
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
@@ -147,9 +147,49 @@ public class DataRegionTable
         return -1;
     }
 
+    /** Find the row number for the given primary key. */
+    public int getRow(String pk)
+    {
+        Assert.assertTrue("Need the selector checkbox's value to find the row with the given pk", _selectors);
+
+        Integer cached = _mapRows.get(pk);
+        if (cached != null)
+            return cached.intValue();
+
+        int row = 0;
+        try
+        {
+            while (true)
+            {
+                String value = _test.getAttribute(Locator.xpath("//table[@id='dataregion_query']//tr[" + (row+1) + "]//input[@name='.select']/"), "value");
+                _mapRows.put(value, row);
+                if (value.equals(pk))
+                    return row;
+                row += 1;
+            }
+        }
+        catch (Exception e)
+        {
+            // Throws an exception, if row is out of bounds.
+        }
+
+        return -1;
+    }
+
     public String getDataAsText(int row, int column)
     {
         return _test.getTableCellText(getHtmlName(), row + 1, column + (_selectors ? 1 : 0));
+    }
+
+    public String getDataAsText(String pk, String column)
+    {
+        int row = getRow(pk);
+        if (row == -1)
+            return null;
+        int col = getColumn(column);
+        if (col == -1)
+            return null;
+        return getDataAsText(row, col);
     }
 
     public void setSort(String columnName, SortDirection direction)

@@ -58,7 +58,8 @@ public enum TestSet
         MicroarrayTest.class,
         HTTPApiTest.class,
         TimelineTest.class,
-        FieldValidatorTest.class,            
+        FieldValidatorTest.class,
+//        DbUserSchemaTest.class,
     }),
 
     DRT(new Class[]
@@ -119,6 +120,13 @@ public enum TestSet
             StudyBvtTest.class,
             StudyExtraTest.class,
             AssayTest.class
+    }),
+
+    Data(new Class[] {
+            DataRegionTest.class,
+            DbUserSchemaTest.class,
+            ListTest.class,
+            IssuesTest.class,
     }),
 
     CONTINUE(new Class[] {})
