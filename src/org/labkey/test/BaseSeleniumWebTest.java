@@ -436,7 +436,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             assertTitleEquals("Register First User");
             log("Need to bootstrap");
-            verifyUpgradeRedirect("You are the first user");
+            verifyInitialUserRedirects();
             log("Trying to register some bad email addresses");
             pushLocation();
             setFormElement("email", "bogus@bogus@bogus");
@@ -552,7 +552,33 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-    private void verifyUpgradeRedirect(String assertText)
+    private void verifyInitialUserRedirects()
+    {
+        String initialText = "You are the first user";
+
+        // These should NOT redirect to the upgrade page
+        beginAt("/login/resetPassword.view");
+        assertTextPresent(initialText);
+        beginAt("/admin/maintenance.view");
+        assertTextPresent(initialText);
+
+        verifyStandardRedirects(initialText);
+    }
+
+
+    private void verifyUpgradeRedirect(String buttonText)
+    {
+        // These should NOT redirect to the upgrade page
+        beginAt("/login/resetPassword.view");
+        assertTextNotPresent(buttonText);
+        beginAt("/admin/maintenance.view");
+        assertTextNotPresent(buttonText);
+
+        verifyStandardRedirects(buttonText);
+    }
+
+
+    private void verifyStandardRedirects(String assertText)
     {
         // These should all redirect to the upgrade page
         goToHome();
@@ -567,12 +593,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTextPresent(assertText);
         beginAt("/admin/begin.view");     // An admin Spring action requiring admin permissions
         assertTextPresent(assertText);
-
-        // These should NOT redirect to the upgrade page
-        beginAt("/login/resetPassword.view");
-        assertTextNotPresent(assertText);
-        beginAt("/admin/maintenance.view");
-        assertTextNotPresent(assertText);
 
         // Back to upgrade process
         goToHome();
