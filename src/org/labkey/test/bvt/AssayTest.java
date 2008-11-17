@@ -365,6 +365,22 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_ASSAY_RUN_PROP1);
         assertTextPresent("18");
 
+        // test recall
+        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickLinkWithText(TEST_ASSAY);
+        clickLinkWithText("view copy-to-study history");
+
+        clickLinkWithText("details");
+        checkCheckbox(Locator.checkboxByName(".toggle", false));
+        clickNavButton("Recall Selected Rows");
+        selenium.getConfirmation();
+        waitForPageToLoad();
+        assertTextPresent("row(s) were deleted from the assay: " + TEST_ASSAY);
+
+        // verify audit entry was adjusted
+        clickLinkWithText("details");
+        assertTextPresent("All rows that were previously copied in this event have been recalled");
+
         stopImpersonating();
     } //publishData()
 
