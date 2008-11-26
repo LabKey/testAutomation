@@ -608,20 +608,31 @@ public class Runner extends TestSuite
     /** Entry point for Ant JUnit runner. */
     public static TestSuite suite()
     {
-        TestSet set = getTestSet();
-        List<String> testNames = getTestNames();
-
-        if (TestSet.TEST == set && testNames.isEmpty())
+        try
         {
-            TestHelper.ResultPair pair = TestHelper.run();
-            if (pair != null)
-            {
-                set = pair.set;
-                testNames = pair.testNames;
-            }
-        }
+            TestSet set = getTestSet();
+            List<String> testNames = getTestNames();
 
-        return suite(testNames, set);
+            if (TestSet.TEST == set && testNames.isEmpty())
+            {
+                TestHelper.ResultPair pair = TestHelper.run();
+                if (pair != null)
+                {
+                    set = pair.set;
+                    testNames = pair.testNames;
+                }
+            }
+
+            return suite(testNames, set);
+        }
+        catch (Exception e)
+        {
+            System.err.print(BaseTestRunner.getFilteredTrace(e));
+            if (e instanceof RuntimeException)
+                throw (RuntimeException) e;
+            else
+                throw new RuntimeException(e);
+        }
     }
 
     public static TestSuite suite(List<String> testNames, TestSet set)

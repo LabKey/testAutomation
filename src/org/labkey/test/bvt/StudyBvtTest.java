@@ -173,7 +173,7 @@ public class StudyBvtTest extends StudyTest
         assertTextPresent("999320016");
         assertTextPresent("999320518");
         clickLinkWithText("Show Vial and Request Options");
-        assertTextPresent("364V05000031");
+        assertTextPresent("999320016");
         checkCheckbox(Locator.checkboxByName(".toggle", false));
         clickNavButton("Request Options", 0);
         clickLinkWithText("Create New Request");
@@ -288,12 +288,12 @@ public class StudyBvtTest extends StudyTest
         setFormElement("comments", "These vials are very important.");
         clickNavButton("Save Changes");
         assertTextPresent("These vials are very important.", 4);
-        setFilter("SpecimenDetail", "SpecimenNumber", "Equals", "350V06002983");
+        setFilter("SpecimenDetail", "ParticipantId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
         clickMenuButton("Comments", "Comments:Clear");
         selenium.getConfirmation();
         assertTextNotPresent("These vials are very important.");
-        clearFilter("SpecimenDetail", "SpecimenNumber");
+        clearFilter("SpecimenDetail", "ParticipantId");
         assertTextPresent("These vials are very important.", 2);
         clickMenuButton("Comments", "Comments:Exit");
 
@@ -339,7 +339,7 @@ public class StudyBvtTest extends StudyTest
         assertTextPresent("999320528");
         clickLinkWithText("Show Vial and Request Options");
         // if our search worked, we'll only have six vials:
-        assertTextPresent("350V06001416", 6);
+        assertTextPresent("[history]", 6);
         assertLinkPresentWithTextCount("999320528", 6);
         assertTextNotPresent("DRT000XX-01");
         clickLinkWithText("[history]");

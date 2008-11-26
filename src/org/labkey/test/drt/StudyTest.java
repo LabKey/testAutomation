@@ -273,7 +273,6 @@ public class StudyTest extends BaseSeleniumWebTest
         importSpecimenArchive(SPECIMEN_ARCHIVE_A);
         clickLinkWithText("Study 001");
         clickLinkWithText("Blood (Whole)");
-        assertTextPresent("350V06002948");
         clickMenuButton("Page Size", "Page Size:All");
         assertTextNotPresent("DRT000XX-01");
         assertTextPresent("GAA082NH-01");
