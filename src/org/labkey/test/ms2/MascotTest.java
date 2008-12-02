@@ -212,7 +212,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickLinkWithText("bov_sample");
         clickLinkWithText(SEARCH_TYPE);
         clickLinkWithText("test3");
-        clickNavButton("Import Peptides");
+        clickNavButton("Import Results");
 
         log("Verify upload started.");
         String mascotDatLabel = SAMPLE_BASE_NAME + ".dat (none)";
