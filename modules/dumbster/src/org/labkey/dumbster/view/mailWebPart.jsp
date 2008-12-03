@@ -62,7 +62,7 @@ function toggleRecorder(checkbox)
                 el.update(message);
             el.setDisplayed(show ? "" : "none");
         }
-    }
+    };
 
     var onUpdateFailure = function(response, error)
     {
@@ -72,7 +72,7 @@ function toggleRecorder(checkbox)
 
         // Reset to its initial value.
         checkbox.checked = !checked;
-    }
+    };
 
     var onUpdateSuccess = function(response)
     {
@@ -95,7 +95,7 @@ function toggleRecorder(checkbox)
                 Ext.get("emailRecordEmpty").setDisplayed("");
             }
         }
-    }
+    };
 
     Ext.Ajax.request({
         url : LABKEY.ActionURL.buildURL('dumbster', 'setRecordEmail') + '?record=' + checked,
@@ -125,7 +125,7 @@ function toggleRecorder(checkbox)
             {    %><tr class="labkey-row"><% }
 
             String[] lines = m.getBody().split("\n");
-            StringBuffer body = new StringBuffer();
+            StringBuilder body = new StringBuilder();
             boolean sawHtml = false;
             boolean inHtml = false;
             for (String line : lines)
@@ -156,7 +156,7 @@ function toggleRecorder(checkbox)
     if (devmode && context.getUser().isAdministrator())
     {
 %>
-        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this)" <%=recorder ? "checked" : ""%>> Record email messages sent
+        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);" <%=recorder ? "checked" : ""%>> Record email messages sent
 <%
     }
 %>
