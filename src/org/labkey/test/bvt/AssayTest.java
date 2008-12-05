@@ -75,8 +75,6 @@ public class AssayTest extends AbstractAssayTest
             "s7\tg\t7\ttrue\t20\t2000-01-01\n" +
             "s8\th\t8\ttrue\t19\t2000-02-02\n" +
             "s9\ti\t9\ttrue\t18\t2000-03-03\n";
-    private final static String TEST_ASSAY_PERMS_STUDY_READSOME = "READOWN";
-    private final static String TEST_ASSAY_PERMS_STUDY_READNONE = "NONE";
 
     public String getAssociatedModuleDirectory()
     {
@@ -115,6 +113,7 @@ public class AssayTest extends AbstractAssayTest
         uploadRuns(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_USR_TECH1);
         publishData();
         editAssay();
+        viewCrossFolderData();
     }
 
     /**
@@ -414,15 +413,65 @@ public class AssayTest extends AbstractAssayTest
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.ASSAY_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "were copied to a study from the assay: " + TEST_ASSAY, 5);
     } //editAssay()
 
-    /**   TODO: DELETE  
-     * Reverts to the admin account, and then selects a particular project
-     *
-     * @param project project to select.
-     */
-    private void revertToAdmin(String project)
+    private void viewCrossFolderData()
     {
-        revertToAdmin();
-        clickLinkWithText(project);
+        log("Testing cross-folder data");
+
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        
+        addWebPart("Assay Details");
+        clickButton("Submit", defaultWaitForPage); // assay details has a details page that needs to be submitted
+
+        assertTextPresent("FirstRun");
+        assertTextPresent("SecondRun");
+
+        log("Testing select all data and view");
+        clickCheckbox(".toggle", false);
+        clickButton("Show Data For Runs", defaultWaitForPage);
+        verifySpecimensPresent(9);
+
+        log("Testing clicking on a run");
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickLinkWithText("FirstRun");
+        verifySpecimensPresent(6);
+
+        clickLinkWithText("view all data");
+        verifySpecimensPresent(9);
+
+        log("Testing assay-study linkage");
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
+        clickLinkWithText(TEST_ASSAY);
+        clickButton("View Source Assay", defaultWaitForPage);
+
+        assertTextPresent("FirstRun");
+        assertTextPresent("SecondRun");
+
+        clickLinkWithText("FirstRun");
+        verifySpecimensPresent(6);
+
+        clickLinkWithText("view all data");
+        verifySpecimensPresent(9);
+
+        log("Testing copy to study availability");
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickLinkWithText("SecondRun");
+
+        clickCheckbox(".toggle", false);
+        clickButton("Copy Selected to Study", defaultWaitForPage);
+        clickButton("Next", defaultWaitForPage);
+
+        for (int i=7; i<=9; i++)
+            assertTextPresent("s" + i);
+
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+    }
+
+    private void verifySpecimensPresent(int maxIndex)
+    {
+        for (int i=1; i<=maxIndex; i++)
+        {
+            assertTextPresent("s" + i);
+        }
     }
 
     protected boolean isFileUploadTest()
