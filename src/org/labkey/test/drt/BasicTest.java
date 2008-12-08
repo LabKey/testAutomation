@@ -56,8 +56,8 @@ public class BasicTest extends BaseSeleniumWebTest
         clickLinkWithImage("/_images/partdelete.gif");
         // verify that messages is still present:
         assertLinkPresentWithText("Messages");
-        addWebPart("MS2 Runs");
-        assertLinkPresentWithText("MS2 Runs");
+        addWebPart("MS2 Experiment Runs");
+        assertLinkPresentWithText("MS2 Experiment Runs");
 
         addWebPart("Search");
         //assertTextPresent("Search fcs files, wiki pages, messages, and issues in this folder and all subfolders"); //removed for bug 4678

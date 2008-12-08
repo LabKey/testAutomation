@@ -110,7 +110,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
 
-        clickLinkWithText("MS2 Runs");
+        clickLinkWithText("MS2 Experiment Runs");
         selectOptionByText("experimentRunFilter", "All Runs");
         waitForPageToLoad();
         if (!isTextPresent("No data to show"))
