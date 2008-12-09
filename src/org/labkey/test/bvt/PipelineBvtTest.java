@@ -47,7 +47,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
                 getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe");
         folder.setFolderType("None");
         folder.setTabs("Pipeline", "MS1", "MS2", "Dumbster");
-        folder.setWebParts("Data Pipeline", "MS1 Runs", "MS2 Runs (Enhanced)", "Mail Record");
+        folder.setWebParts("Data Pipeline", "MS1 Runs", "MS2 Experiment Runs", "Mail Record");
 
         PipelineFolder.MailSettings mail = new PipelineFolder.MailSettings(this);
         mail.setNotifyOnSuccess(true, true, "brother@labkey.org");
