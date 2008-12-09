@@ -420,7 +420,11 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         
         addWebPart("Assay Details");
-        clickButton("Submit", defaultWaitForPage); // assay details has a details page that needs to be submitted
+        // assay details has a details page that needs to be submitted
+        clickButton("Submit", defaultWaitForPage);
+
+        // Set the container filter to include subfolders
+        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current Folder and Subfolders");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
@@ -432,6 +436,8 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing clicking on a run");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        // Set the container filter to include subfolders
+        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current Folder and Subfolders");
         clickLinkWithText("FirstRun");
         verifySpecimensPresent(6);
 
@@ -454,6 +460,8 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing copy to study availability");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        // Set the container filter to include subfolders
+        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current Folder and Subfolders");
         clickLinkWithText("SecondRun");
 
         clickCheckbox(".toggle", false);
