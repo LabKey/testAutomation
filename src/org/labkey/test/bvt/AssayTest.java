@@ -429,6 +429,15 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
 
+        log("Setting the customized view to include subfolders");
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+
+        clickCheckbox("ff_saveFilter", false);
+        clickNavButton("Save");
+
+        assertTextPresent("FirstRun");
+        assertTextPresent("SecondRun");
+
         log("Testing select all data and view");
         clickCheckbox(".toggle", false);
         clickButton("Show Data For Runs", defaultWaitForPage);
@@ -436,8 +445,6 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing clicking on a run");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
-        // Set the container filter to include subfolders
-        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current Folder and Subfolders");
         clickLinkWithText("FirstRun");
         verifySpecimensPresent(6);
 
@@ -460,8 +467,6 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing copy to study availability");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
-        // Set the container filter to include subfolders
-        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current Folder and Subfolders");
         clickLinkWithText("SecondRun");
 
         clickCheckbox(".toggle", false);
