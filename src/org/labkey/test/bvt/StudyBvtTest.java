@@ -628,6 +628,11 @@ public class StudyBvtTest extends StudyTest
         }
     }
 
+    private boolean isREngineConfigured()
+    {
+        return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
+    }
+
     protected boolean checkRSetup()
     {
         ensureAdminMode();
@@ -637,9 +642,8 @@ public class StudyBvtTest extends StudyTest
 
         try
         {
-            if (getAttribute(Locator.name("programPath"), "value") != null &&
-                    getAttribute(Locator.name("programPath"), "value").compareTo("") != 0)
-                  return true;
+            if (isREngineConfigured())
+                return true;
         }
         catch (SeleniumException e)
         {
@@ -665,13 +669,34 @@ public class StudyBvtTest extends StudyTest
 
             for (File file : files)
             {
-                setFormElement("programPath", file.getAbsolutePath());
-                clickNavButton("Submit");
-                if (isTextPresent("The R View configuration has been updated."))
+                // add a new r engine configuration
+                String id = getExtElementId("btn_addEngine");
+                click(Locator.id(id));
+
+                id = getExtElementId("add_rEngine");
+                click(Locator.id(id));
+
+                id = getExtElementId("btn_submit");
+                waitForElement(Locator.id(id), 10000);
+
+                id = getExtElementId("editEngine_exePath");
+                setFormElement(Locator.id(id), file.getAbsolutePath());
+
+                id = getExtElementId("btn_submit");
+                click(Locator.id(id));
+
+                // wait until the dialog has been dismissed
+                int cnt = 3;
+                while (isElementPresent(Locator.id(id)) && cnt > 0)
                 {
-                    log("R has been successfully configured");
-                    return true;
+                    sleep(1000);
+                    cnt--;
                 }
+
+                if (isREngineConfigured())
+                    return true;
+
+                refresh();
             }
         }
         log("Failed R configuration, skipping R tests");
@@ -728,11 +753,11 @@ public class StudyBvtTest extends StudyTest
 
         log("Execute bad scripts");
         clickNavButton("Execute Script");
-        assertTextPresent("An R script must be provided.");
+        assertTextPresent("Empty script, a script must be provided.");
         if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
                 fail("Their was an error running the script");
-        assertTextPresent("Error 1 executing command");
+        assertTextPresent("Error executing command");
         assertTextPresent("Error: object \"badString\" not found");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
@@ -791,7 +816,7 @@ public class StudyBvtTest extends StudyTest
         //clickLinkWithText(R_SCRIPTS[0]);
         clickMenuButton("Views", "Views:" + R_SCRIPTS[0]);
         assertTextPresent("null device");
-        assertTextNotPresent("Error 1 executing command");
+        assertTextNotPresent("Error executing command");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
         assertElementPresent(Locator.id(R_SCRIPT1_IMG));
