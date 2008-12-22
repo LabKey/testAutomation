@@ -54,7 +54,10 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
     protected void doCleanup()
     {
         log(this.getClass().getName() + " Cleaning UP");
-        try {deleteProject(PERM_PROJECT_NAME); } catch (Throwable t) { t.printStackTrace();}
+        if (isLinkPresentContainingText(PERM_PROJECT_NAME))
+        {
+            try {deleteProject(PERM_PROJECT_NAME); } catch (Throwable t) { t.printStackTrace();}
+        }
 
         deleteUser(GAMMA_EDITOR_USER);
         deleteUser(GAMMA_AUTHOR_USER);

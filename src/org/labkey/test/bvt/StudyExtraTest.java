@@ -399,7 +399,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-        deleteProject(PROJECT_NAME);
+        if (isLinkPresentContainingText(PROJECT_NAME))
+        {
+            deleteProject(PROJECT_NAME);
+        }
     }
 
     public String getAssociatedModuleDirectory()
