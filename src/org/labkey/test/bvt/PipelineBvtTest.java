@@ -149,6 +149,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
             clickLinkWithText("All");
             log("Trying to view status info for " + sampleExp);
             statusTable.clickStatusLink(sampleExp);
+            log("Now on job with URL " + getURL());
             clickNavButton("Retry");
             popLocation();
         }
