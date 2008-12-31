@@ -60,6 +60,7 @@ public enum TestSet
         TimelineTest.class,
         FieldValidatorTest.class,
 //        DbUserSchemaTest.class,
+        ModuleAssayTest.class,
     }),
 
     DRT(new Class[]

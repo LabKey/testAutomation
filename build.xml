@@ -27,6 +27,7 @@
     <property name="external.lib.home" value="${project.root}/external/lib/server"/>
     <property name="test.log.dir" value="${test.dir}/logs"/>
     <property name="test.log.output.dir" value="${test.build.home}/logs" />
+    <property name="deploy.modules.dir" value="${basedir}/../../build/deploy/modules"/>
 
     <property name="test.compile.debug" value="true"/>
     <property name="test.compile.deprecation" value="false"/>
@@ -179,6 +180,32 @@
         </java>
     </target>
 
+    <target name="deploy-test-modules">
+      <antcall target="deploy-test-module">
+        <param name="module.name" value="miniassay"/>
+        <param name="module.src.dir" value="${project.root}/sampledata/miniassay"/>
+      </antcall>
+    </target>
+
+    <target name="deploy-test-module.check">
+      <fail message="module.name property required" unless="module.name"/>
+      <fail message="module.src.dir property required" unless="module.src.dir"/>
+      <uptodate property="deploy-test-module.uptodate"
+          targetfile="${deploy.modules.dir}/${module.name}.module">
+          <srcfiles dir="${module.src.dir}/${module.name}" includes="**/*"/>
+      </uptodate>
+    </target>
+
+    <target name="deploy-test-module" depends="deploy-test-module.check" unless="deploy-test-module.uptodate">
+      <fail message="module.name property required" unless="module.name"/>
+      <fail message="module.src.dir property required" unless="module.src.dir"/>
+      <jar jarfile="${deploy.modules.dir}/${module.name}.module">
+        <fileset dir="${module.src.dir}/${module.name}">
+          <include name="**/*"/>
+        </fileset>
+      </jar>
+    </target>
+
     <target name="continue" description="Continue running a stopped or failed test suite">
         <property name="suite" value="CONTINUE"/>
         <antcall inheritall="true" target="sub-selenium">
@@ -289,7 +316,7 @@
         <antcall target="stopSeleniumServer" />
     </target>
 
-    <target name="runsuite-selenium-tomcat" depends="init-selenium,compile,ensurePassword,set-user-props">
+    <target name="runsuite-selenium-tomcat" depends="init-selenium,compile,ensurePassword,deploy-test-modules,set-user-props">
         <fail unless="tomcat.home" />
         <echo message="Deleting log files from ${tomcat.home}/logs"/>
         <delete failonerror="false" dir="${tomcat.home}/logs" />
@@ -677,7 +704,7 @@
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
     </target>
 
-    <target name="runsuite" depends="compile,ensurePassword,set-user-props,modifiedFiles">
+    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,modifiedFiles">
         <junit fork="true" forkmode="once" maxmemory="128m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltonerror}"
@@ -724,7 +751,7 @@
         <touch file="${svnModifiedFiles}" />
     </target>
 
-    <target name="runsuite-perf" depends="compile,ensurePassword,set-user-props">
+    <target name="runsuite-perf" depends="compile,ensurePassword,deploy-test-modules,set-user-props">
         <junit fork="true" forkmode="once" maxmemory="256m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="true" showoutput="false">
@@ -754,7 +781,7 @@
         </junit>
     </target>
 
-    <target name="runsuite-tomcat" depends="compile,ensurePassword,set-user-props">
+    <target name="runsuite-tomcat" depends="compile,ensurePassword,deploy-test-modules,set-user-props">
         <echo message="Deleting log files from ${tomcat.home}/logs"/>
         <delete failonerror="false" dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/logs" />
