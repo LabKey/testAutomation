@@ -59,7 +59,7 @@ public enum TestSet
         HTTPApiTest.class,
         TimelineTest.class,
         FieldValidatorTest.class,
-//        DbUserSchemaTest.class,
+        DbUserSchemaTest.class,
         ModuleAssayTest.class,
     }),
 

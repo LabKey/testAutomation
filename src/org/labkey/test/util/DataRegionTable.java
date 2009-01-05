@@ -19,6 +19,7 @@ import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.apache.commons.lang.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -131,9 +132,10 @@ public class DataRegionTable
             {
                 String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+sel+1) + "]/div"));
                 String headerName = header.split("\n")[0];
+                if (!StringUtils.isEmpty(headerName))
+                    _mapColumns.put(headerName, col);
                 if (headerName.equals(name))
                 {
-                    _mapColumns.put(name, col);
                     return col;
                 }
             }

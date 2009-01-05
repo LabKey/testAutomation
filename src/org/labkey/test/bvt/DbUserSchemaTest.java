@@ -20,6 +20,9 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.Arrays;
 
 /**
  * User: kevink
@@ -27,7 +30,7 @@ import org.labkey.test.util.DataRegionTable;
  */
 public class DbUserSchemaTest extends BaseSeleniumWebTest
 {
-    private static final String PROJECT_NAME = "DataRegionProject";
+    private static final String PROJECT_NAME = "DbUserSchemaProject";
     private static final String DB_SCHEMA_NAME = "test";
     private static final String USER_SCHEMA_NAME = "Test";
     private static final String TABLE_NAME = "testtable";
@@ -59,6 +62,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             clickLinkWithText("Define New Schema");
             setFormElement("userSchemaName", USER_SCHEMA_NAME);
             setFormElement("dbSchemaName", DB_SCHEMA_NAME);
+            setFormElement("metaData", getFileContents("server/modules/core/src/META-INF/test.xml"));
             checkCheckbox("editable");
             clickNavButton("Create");
         }
@@ -71,49 +75,61 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "";
+        return "query";
     }
 
-    public int insert(String text, int intnotnull)
+    public int insert(String text, int intNotNull)
     {
+        log("Inserting text='" + text + "', intNotNull=" + intNotNull + "...");
         beginAt("/dbuserschema/" + PROJECT_NAME + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
-        setFormElement("quf_text", text);
-        setFormElement("quf_intnotnull", String.valueOf(intnotnull));
-        setFormElement("quf_datetimenotnull", "2008-09-25");
+        setFormElement("quf_Text", text);
+        setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
+        setFormElement("quf_DatetimeNotNull", "2008-09-25");
         submit();
 
         // assume no errors if we end up back on the grid view
         assertTitleEquals(TABLE_NAME + ": /" + PROJECT_NAME);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        table.setSort("rowid", SortDirection.DESC);
+        table.setSort("RowId", SortDirection.DESC);
 
-        assertEquals(text, table.getDataAsText(0, table.getColumn("Text")));
-//        assertEquals(String.valueOf(intnotnull), table.getDataAsText(0, table.getColumn("Intnotnull")));
+        assertEquals("Expected 'Text' column to contain '" + text + "' for newly inserted row",
+                text, table.getDataAsText(0, table.getColumn("Text")));
+        assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for newly inserted row",
+                String.valueOf(intNotNull), table.getDataAsText(0, table.getColumn("IntNotNull")));
 
         // get newly inserted pk
-        String rowidStr = table.getDataAsText(0, table.getColumn("Rowid"));
+        String rowidStr = table.getDataAsText(0, table.getColumn("RowId"));
+        assertTrue("Expected to find the RowId for the new row instead of '" + rowidStr + "'",
+                rowidStr != null && !rowidStr.equals(""));
         return Integer.parseInt(rowidStr);
     }
 
-    public void update(int pk, String text, int intnotnull)
+    public void update(int pk, String text, int intNotNull)
     {
+        log("Updating pk=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
         beginAt("/dbuserschema/" + PROJECT_NAME + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&pk=" + pk);
-        setFormElement("quf_text", text);
-        setFormElement("quf_intnotnull", String.valueOf(intnotnull));
-        setFormElement("quf_datetimenotnull", "2008-09-25");
+        setFormElement("quf_Text", text);
+        setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
+        setFormElement("quf_DatetimeNotNull", "2008-09-25");
         submit();
 
         // assume no errors if we end up back on the grid view
         assertTitleEquals(TABLE_NAME + ": /" + PROJECT_NAME);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        assertEquals(text, table.getDataAsText(String.valueOf(pk), "Text"));
-//        assertEquals(String.valueOf(intnotnull), table.getDataAsText(String.valueOf(pk), "Intnotnull"));
+        int row = table.getRow(String.valueOf(pk));
+        assertTrue("Expected to find row with pk='" + pk + "'", row > -1);
+        
+        assertEquals("Expected 'Text' column to contain '" + text + "' for updated row",
+                text, table.getDataAsText(row, table.getColumn("Text")));
+        assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for updated row",
+                String.valueOf(intNotNull), table.getDataAsText(row, table.getColumn("IntNotNull")));
     }
 
     public void delete(int[] pk)
     {
+        log("Deleting pks=" + StringUtils.join(Arrays.asList(pk), ",") + "...");
         beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
         for (int i = 0; i < pk.length; i++)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(pk[i]), false));
@@ -124,6 +140,6 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
 
         DataRegionTable table = new DataRegionTable("query", this);
         for (int i = 0; i < pk.length; i++)
-            assertEquals(-1, table.getRow(String.valueOf(pk)));
+            assertEquals("Expected row '" + pk + "' to be deleted.", -1, table.getRow(String.valueOf(pk)));
     }
 }
