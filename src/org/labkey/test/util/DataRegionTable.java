@@ -121,6 +121,7 @@ public class DataRegionTable
 
     public int getColumn(String name)
     {
+        name = name.replaceAll(" ", "");
         Integer colIndex = _mapColumns.get(name);
         if (colIndex != null)
             return colIndex.intValue();
@@ -132,6 +133,7 @@ public class DataRegionTable
             {
                 String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+sel+1) + "]/div"));
                 String headerName = header.split("\n")[0];
+                headerName = headerName.replaceAll(" ", "");
                 if (!StringUtils.isEmpty(headerName))
                     _mapColumns.put(headerName, col);
                 if (headerName.equals(name))
