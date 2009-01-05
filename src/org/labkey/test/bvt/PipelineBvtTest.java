@@ -140,7 +140,6 @@ public class PipelineBvtTest extends PipelineWebTestBase
             }
         }
 
-        PipelineStatusTable statusTable = new PipelineStatusTable(this, true, true);
         PipelineTestParams tpRetry = _testSetMS1.getParams()[0];
         tpRetry.setExpectError(false);
         for (String sampleExp : tpRetry.getExperimentLinks())
@@ -148,6 +147,9 @@ public class PipelineBvtTest extends PipelineWebTestBase
             pushLocation();
             clickLinkWithText("All");
             log("Trying to view status info for " + sampleExp);
+            // Create a fresh PipelineStatusTable every time through the loop so that we're looking at a current set
+            // of cached table info
+            PipelineStatusTable statusTable = new PipelineStatusTable(this, true, true);
             statusTable.clickStatusLink(sampleExp);
             log("Now on job with URL " + getURL());
             clickNavButton("Retry");

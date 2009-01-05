@@ -57,9 +57,9 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         log("Create DbUserSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + PROJECT_NAME + "/begin.view");
         clickLinkWithText("Schema Administration");
-        if (!isTextPresent("Reload"))
+        if (!isTextPresent("reload"))
         {
-            clickLinkWithText("Define New Schema");
+            clickLinkWithText("define new schema");
             setFormElement("userSchemaName", USER_SCHEMA_NAME);
             setFormElement("dbSchemaName", DB_SCHEMA_NAME);
             setFormElement("metaData", getFileContents("server/modules/core/src/META-INF/test.xml"));
