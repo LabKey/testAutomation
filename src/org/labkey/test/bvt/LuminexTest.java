@@ -111,7 +111,7 @@ public class LuminexTest extends AbstractAssayTest
         if(isFileUploadAvailable())
         {
             log("Uploading Luminex Runs");
-            clickNavButton("Import Runs");
+            clickNavButton("Import Data");
             setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
             clickNavButton("Next");
             setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
@@ -121,7 +121,7 @@ public class LuminexTest extends AbstractAssayTest
             clickNavButton("Save and Import Another Run");
             clickLinkWithText(TEST_ASSAY_LUM);
 
-            clickNavButton("Import Runs");
+            clickNavButton("Import Data");
             assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
             setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
             clickNavButton("Next");
@@ -136,7 +136,7 @@ public class LuminexTest extends AbstractAssayTest
             clickNavButton("Save and Finish");
 
             // Upload another run using a thaw list pasted in as a TSV
-            clickNavButton("Import Runs");
+            clickNavButton("Import Data");
             assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
             setFormElement("participantVisitResolver", "Lookup");
             setFormElement("ThawListType", "Text");
@@ -155,7 +155,7 @@ public class LuminexTest extends AbstractAssayTest
             clickNavButton("Save and Finish");
 
             // Upload another run using a thaw list that pointed at the list we uploaded earlier
-            clickNavButton("Import Runs");
+            clickNavButton("Import Data");
             assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
             assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
             assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));

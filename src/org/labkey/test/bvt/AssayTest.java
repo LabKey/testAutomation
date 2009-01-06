@@ -203,7 +203,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY);
 
-        clickNavButton("Import Runs");
+        clickNavButton("Import Data");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + "3");
 
         log("Run set properties");

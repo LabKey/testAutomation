@@ -113,7 +113,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(ASSAY_NAME);
 
-        clickNavButton("Import Runs");
+        clickNavButton("Import Data");
         // skip run set properties for now
         clickNavButton("Next");
         setFormElement("name", runName);

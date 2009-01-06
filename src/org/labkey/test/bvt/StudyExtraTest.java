@@ -187,7 +187,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.click("//a[contains(text(),'Query')]");
 		selenium.waitForPageToLoad("30000");
         clickLinkWithText("Schema Administration");
-		clickLinkWithText("Define New Schema");
+		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
 		setFormElement("dbSchemaName", "verifysnapshot");
         clickNavButton("Create");
@@ -229,7 +229,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.waitForPageToLoad("30000");
 
         clickLinkWithText("Schema Administration");
-        clickLinkWithText("Reload");
+        clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
         clickLinkWithText("Query start page");
         clickLinkWithText("VerifySnapshot");
