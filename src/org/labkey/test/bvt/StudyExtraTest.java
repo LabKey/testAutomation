@@ -381,7 +381,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY);
 
-        clickNavButton("Import Runs");
+        clickNavButton("Import Data");
         selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(PROJECT_NAME, FOLDER_NAME, STUDY_FOLDER));
         click(Locator.checkboxByNameAndValue("participantVisitResolver", "SampleInfo", true));
         clickNavButton("Next");
