@@ -930,13 +930,11 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Start Job");
         waitForPageToLoad();
         waitForElement(Locator.navButton("Start Job"), 30000);
-/*
         assertTextPresent(R_SCRIPT2_TEXT1);
         assertTextNotPresent(R_SCRIPT2_TEXT2);
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
-*/
     }
 
     protected void createCharts()
