@@ -184,9 +184,9 @@
 
     <target name="deploy-test-modules" depends="stage-test-modules">
       <copy todir="${deploy.modules.dir}">
-        <filelist dir="${staging.modules.dir}">
-          <file name="miniassay.module"/>
-        </filelist>
+        <fileset dir="${staging.modules.dir}">
+          <include name="miniassay.module"/>
+        </fileset>
       </copy>
     </target>
 
