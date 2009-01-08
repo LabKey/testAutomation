@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.drt.StudyTest;
 
 import java.io.File;
@@ -636,8 +637,11 @@ public class StudyBvtTest extends StudyTest
     protected boolean checkRSetup()
     {
         ensureAdminMode();
+        // user need to be added to the site develpers group
+        createSiteDeveloper(PasswordUtil.getUsername());
+
         clickLinkWithText("Admin Console");
-        clickLinkWithText("R view configuration");
+        clickLinkWithText("reports and scripting");
         log("Check if it already is configured");
 
         try

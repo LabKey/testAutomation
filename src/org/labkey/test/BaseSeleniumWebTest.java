@@ -2318,6 +2318,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Add Users");
     }
 
+    public void createSiteDeveloper(String userEmail)
+    {
+        ensureAdminMode();
+        clickLinkWithText("Site Developers");
+
+        if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
+        {
+            setFormElement("names", userEmail);
+            uncheckCheckbox("sendEmail");
+            clickNavButton("Update Group Membership");
+        }
+    }
+
     public void deleteUser(String userEmail)
     {
         ensureAdminMode();
