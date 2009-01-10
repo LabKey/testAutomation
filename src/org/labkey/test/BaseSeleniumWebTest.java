@@ -1630,8 +1630,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public boolean isButtonPresent(String text)
     {
-        return (isElementPresent(Locator.navButton(text)) ||
-                isElementPresent(Locator.navSubmitButton(text)));
+        return (getButtonLocator(text) != null);
     }
 
     public boolean isButtonDisabled(String text)
@@ -1641,26 +1640,89 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickButtonByIndex(String text, int index)
     {
-        if (isElementPresent(Locator.navButton(text, index)))
-            clickAndWait(Locator.navButton(text, index), defaultWaitForPage);
+        Locator.XPathLocator buttonLocator = getButtonLocator(text, index);
+        if (buttonLocator != null)
+            clickAndWait(buttonLocator, defaultWaitForPage);
         else
-            clickAndWait(Locator.navSubmitButton(text, index), defaultWaitForPage);
+            fail("No button found with text \"" + text + "\" at index " + index);
+    }
+
+    private Locator.XPathLocator getButtonLocator(String text, int index)
+    {
+        // check for normal labkey nav button:
+        Locator.XPathLocator locator = Locator.navButton(text, index);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for normal labkey submit button:
+        locator = Locator.navButton(text, index);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for Ext button:
+        locator = Locator.extButton(text, index);
+        if (isElementPresent(locator))
+            return locator;
+
+        return null;
+    }
+
+    private Locator.XPathLocator getButtonLocator(String text)
+    {
+        // check for normal labkey nav button:
+        Locator.XPathLocator locator = Locator.navButton(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for normal labkey submit button:
+        locator = Locator.navButton(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for Ext button:
+        locator = Locator.extButton(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        return null;
+    }
+
+    private Locator.XPathLocator getButtonLocatorContainingText(String text)
+    {
+        // check for normal labkey nav button:
+        Locator.XPathLocator locator = Locator.navButtonContainingText(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for normal labkey submit button:
+        locator = Locator.navButtonContainingText(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for Ext button:
+        locator = Locator.extButtonContainingText(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        return null;
     }
 
     public void clickButton(String text, int waitMillis)
     {
-        if (isElementPresent(Locator.navButton(text)))
-            clickAndWait(Locator.navButton(text), waitMillis);
+        Locator.XPathLocator buttonLocator = getButtonLocator(text);
+        if (buttonLocator != null)
+            clickAndWait(buttonLocator, waitMillis);
         else
-            clickAndWait(Locator.navSubmitButton(text), waitMillis);
+            fail("No button found with text \"" + text + "\"");
     }
 
     public void clickButtonContainingText(String text)
     {
-        if (isElementPresent(Locator.navButtonContainingText(text)))
-            clickAndWait(Locator.navButtonContainingText(text), defaultWaitForPage);
+        Locator.XPathLocator buttonLocator = getButtonLocatorContainingText(text);
+        if (buttonLocator != null)
+            clickAndWait(buttonLocator, defaultWaitForPage);
         else
-            clickAndWait(Locator.navSubmitButtonContainingText(text), defaultWaitForPage);
+            fail("No button found with text \"" + text + "\"");
     }
 
     public void clickNavButtonContainingText(String buttonText)

@@ -154,6 +154,21 @@ public class Locator
         return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "]");
     }
 
+    public static XPathLocator extButton(String text)
+    {
+        return xpath("//button[@class='x-btn-text' and text() = " + xq(text) + "]");
+    }
+
+    public static XPathLocator extButton(String text, int index)
+    {
+        return xpath("(//button[@class='x-btn-text' and text() = " + xq(text) + "])[" + (index + 1) + "]");
+    }
+
+    public static XPathLocator extButtonContainingText(String text)
+    {
+        return xpath("//button[@class='x-btn-text' and contains(text(), " + xq(text) + ")]");
+    }
+
     public static XPathLocator navButtonDisabled(String text)
     {
         return xpath("//a[@class='labkey-disabled-button' or @class='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");

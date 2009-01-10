@@ -183,7 +183,7 @@ public class StudyBvtTest extends StudyTest
         assertTextNotPresent("KAQ0003Q-01");
         selectOptionByText("destinationSite", "Duke University");
         setFormElement("inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
-        clickNavButton("Create Request");
+        clickNavButton("Create and View Details");
 
         assertTextPresent("This request has not been submitted");
         assertNavButtonPresent("Cancel Request");
