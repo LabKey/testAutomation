@@ -31,6 +31,7 @@ public enum TestSet
 {
     BVT(new Class[]
     {
+        BasicTest.class,
         MessagesTest.class,
         NabTest.class,
         IssuesTest.class,
