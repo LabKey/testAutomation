@@ -205,7 +205,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-
     public void tearDown() throws Exception {
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
         if (!skipTearDown)
@@ -1136,7 +1135,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertTextPresent(String text, int amount, boolean browserDependent)
     {
         // IE doesn't getHtmlSource the same as Firefox, it replaces \t and \n with spaces, so skip if IE
-        if (getBrowserType() != IE_BROWSER)
+        if (!getBrowserType().equals(IE_BROWSER))
         {
             int count = countText(text);
 
@@ -1155,7 +1154,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public int countText(String text)
     {
         text = text.replace("&nbsp;", " ");
-        String source = selenium.getHtmlSource();
+        String html = selenium.getHtmlSource();
+        // Strip all JavaScript tags; in particular, the selenium-injected javascript tag, which can foul up the expected occurrences
+        String source = html.replaceAll("(?msi)<script type=\"text/javascript\">.*?</script>", "");
         int current_index = 0;
         int count = 0;
 
@@ -2366,6 +2367,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void createUser(String userName, String cloneUserName)
     {
+        createUser(userName, cloneUserName, true);
+    }
+
+    public void createUser(String userName, String cloneUserName, boolean verifySuccess)
+    {
         ensureAdminMode();
         clickLinkWithText("Site Users");
         clickNavButton("Add Users");
@@ -2378,6 +2384,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             setFormElement("cloneUser", cloneUserName);
         }
         clickNavButton("Add Users");
+
+        if (verifySuccess)
+            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the sytem, but no email was sent."));
     }
 
     public void createSiteDeveloper(String userEmail)
@@ -2402,6 +2411,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             checkCheckbox(new Locator(userXPath + "/../td[1]/input"));
             clickNavButton("Delete");
+            selenium.getConfirmation();
         }
     }
 

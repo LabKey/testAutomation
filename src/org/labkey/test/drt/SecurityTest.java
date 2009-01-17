@@ -59,6 +59,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         deleteUser(NORMAL_USER_TEMPLATE);
         deleteUser(PROJECT_ADMIN_USER);
         deleteUser(NORMAL_USER);
+        deleteUser(TO_BE_DELETED_USER);
         deleteUser(SITE_ADMIN_USER);
     }
 
@@ -99,7 +100,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     private void clonePermissionsTest()
     {
         // create admin templates, plus test bogus & duplicate email addresses
-        createUser(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null);
+        createUser(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
         assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address");
         assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user. Click here to see this user's profile and history.");
 

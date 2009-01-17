@@ -75,9 +75,11 @@ public class FileContentTest extends BaseSeleniumWebTest
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
             setFormElement("formFiles[0]", f);
-            clickNavButton("Submit");
+            clickNavButton("Submit", 0);
 
-            selenium.selectWindow("null");
+            selenium.selectWindow(null);
+            waitForPageToLoad();
+
             assertTextPresent("Sign Out");
 
             signOut();
