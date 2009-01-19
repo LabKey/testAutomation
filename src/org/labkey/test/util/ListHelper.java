@@ -194,6 +194,7 @@ public class ListHelper
         private ListColumnType _type;
         private String _description;
         private String _format;
+        private boolean _allowsQc;
         private LookupInfo _lookup;
         private FieldValidator _validator;
 
@@ -262,6 +263,16 @@ public class ListHelper
         {
             return _validator;
         }
+
+        public boolean isAllowsQc()
+        {
+            return _allowsQc;
+        }
+
+        public void setAllowsQc(boolean allowsQc)
+        {
+            _allowsQc = allowsQc;
+        }
     }
 
 
@@ -303,6 +314,12 @@ public class ListHelper
             {
                 test.setFormElement("propertyFormat", col.getFormat());
             }
+
+            if (col.isAllowsQc())
+            {
+                test.checkCheckbox("allowsQc");
+            }
+
             LookupInfo lookup = col.getLookup();
             if (lookup != null)
             {
