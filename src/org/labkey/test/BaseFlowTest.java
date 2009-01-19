@@ -151,10 +151,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void selectTreeItem(String treeCmpId, String path)
     {
+        log("selectTreeItem path: " + path);
         String result = selenium.getEval(
                 "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
                 "var tree = ext.getCmp('" + treeCmpId + "');\n" +
                 "tree.selectPath('/<root>' + '"+ path + "', 'text');\n" +
+                "selenium.browserbot.getCurrentWindow().document.getElementById('labkey-main-title').innerHTML='" + path + "';\n" +
                 "\"OK\"");
         assertEquals("OK", result);
         sleep(500);
