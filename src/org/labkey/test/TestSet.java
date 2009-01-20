@@ -35,7 +35,7 @@ public enum TestSet
         MessagesTest.class,
         NabTest.class,
         IssuesTest.class,
-        FlowJoQueryTest.class,
+//        FlowJoQueryTest.class,
         AssayTest.class,
         LuminexTest.class,
         ListTest.class,
