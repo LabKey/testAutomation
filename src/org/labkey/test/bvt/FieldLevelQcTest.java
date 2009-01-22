@@ -41,8 +41,16 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws Exception
     {
-        log("Setup project and list module");
+        log("Create QC project");
         createProject(PROJECT_NAME);
+
+        checkListQc();
+        checkDatasetQc();
+    }
+
+    private void checkListQc() throws Exception
+    {
+        log("Create list");
 
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
 
@@ -57,35 +65,42 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         listColumn.setAllowsQc(true);
         columns[2] = listColumn;
 
-
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
-        log("Test upload data");
+        log("Test upload list data with a combined data and QC column");
         clickLinkWithText("import data");
         setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_QC);
         submit();
+        assertNoLabkeyErrors();
         assertTextPresent("Ted");
         assertTextPresent("Alice");
         assertTextPresent("Bob");
         assertTextPresent(".Q");
         assertTextPresent(".N");
 
-        log("Test inserting new row");
+        log("Test inserting a single new row");
         clickNavButton("Insert New");
         setFormElement("quf_name", "Sid");
         setFormElement("quf_sex", "male");
         setFormElement("quf_age", ".N");
         submit();
+        assertNoLabkeyErrors();
         assertTextPresent("Sid");
         assertTextPresent("Ted");
 
-        log("Test QCIndicator column");
+        log("Test separate QCIndicator column");
         clickNavButton("Import Data");
         setFormElement("ff_data", TEST_DATA_TWO_COLUMN_QC);
         submit();
+        assertNoLabkeyErrors();
         assertTextPresent("Franny");
         assertTextPresent("Zoe");
         assertTextPresent("J.D.");
+    }
+
+    private void checkDatasetQc() throws Exception
+    {
+
     }
 
     protected void doCleanup() throws Exception
