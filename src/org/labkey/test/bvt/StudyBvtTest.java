@@ -631,7 +631,15 @@ public class StudyBvtTest extends StudyTest
 
     private boolean isREngineConfigured()
     {
-        return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
+        // need to allow time for the server to return the engine list and the ext grid to render
+        Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
+        int time = 0;
+        while (!isElementPresent(engine) && time < 5000)
+        {
+            sleep(100);
+            time += 100;
+        }
+        return isElementPresent(engine);
     }
 
     protected boolean checkRSetup()
