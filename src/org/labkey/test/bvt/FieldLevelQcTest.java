@@ -36,8 +36,8 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
     private static final String TEST_DATA_TWO_COLUMN_QC =
             "Name" +    "\t" + "Age" +  "\t" + "AgeQCIndicator" +   "\t" + "Sex" +  "\t" + "SexQCIndicator" + "\n" +
             "Franny" +  "\t" + "" +     "\t" + ".N" +               "\t" + "male" + "\t" +  "" + "\n" +
-            "Zoe" +     "\t" + "25" +   "\t" + ".Q" +               "\t" + "" +     "\t" +  ".N" + "\n" +
-            "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  "" + "\n";
+            "Zoe" +     "\t" + "25" +   "\t" + ".Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
+            "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  ".Q" + "\n";
 
     protected void doTestSteps() throws Exception
     {
@@ -77,6 +77,11 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         assertTextPresent("Bob");
         assertTextPresent(".Q");
         assertTextPresent(".N");
+        assertTextPresent("male");
+        assertTextPresent("female");
+        assertTextPresent("17");
+
+        deleteListData();        
 
         log("Test inserting a single new row");
         clickNavButton("Insert New");
@@ -86,7 +91,10 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         submit();
         assertNoLabkeyErrors();
         assertTextPresent("Sid");
-        assertTextPresent("Ted");
+        assertTextPresent("male");
+        assertTextPresent(".N");
+
+        deleteListData();
 
         log("Test separate QCIndicator column");
         clickNavButton("Import Data");
@@ -96,6 +104,18 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         assertTextPresent("Franny");
         assertTextPresent("Zoe");
         assertTextPresent("J.D.");
+        assertTextPresent(".Q");
+        assertTextPresent(".N");
+        assertTextPresent("male");
+        assertTextPresent("female");
+        assertTextPresent("50");
+        assertTextPresent("25");
+    }
+
+    private void deleteListData()
+    {
+        checkCheckbox(".toggle");
+        clickButton("Delete", defaultWaitForPage);
     }
 
     private void checkDatasetQc() throws Exception
