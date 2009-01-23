@@ -27,22 +27,45 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
     private static final String PROJECT_NAME = "FieldLevelQcVerifyProject";
     private static final String LIST_NAME = "QCList";
 
-    private static final String TEST_DATA_SINGLE_COLUMN_QC =
+    private static final String TEST_DATA_SINGLE_COLUMN_QC_LIST =
             "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
             "Ted" + "\t" + ".N" + "\t" + "male" + "\n" +
             "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
             "Bob" + "\t" + ".Q" + "\t" + ".N" + "\n";
 
-    private static final String TEST_DATA_TWO_COLUMN_QC =
+    private static final String TEST_DATA_TWO_COLUMN_QC_LIST =
             "Name" +    "\t" + "Age" +  "\t" + "AgeQCIndicator" +   "\t" + "Sex" +  "\t" + "SexQCIndicator" + "\n" +
             "Franny" +  "\t" + "" +     "\t" + ".N" +               "\t" + "male" + "\t" +  "" + "\n" +
             "Zoe" +     "\t" + "25" +   "\t" + ".Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
             "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  ".Q" + "\n";
 
+    private static final String TEST_DATA_SINGLE_COLUMN_QC_DATASET = 
+            "participantid\tSequenceNum\tAge\tSex\n" +
+            "Ted\t1\t.N\tmale\n" +
+            "Alice\t1\t17\tfemale\n" +
+            "Bob\t1\t.Q\t.N";
+
+    private static final String TEST_DATA_TWO_COLUMN_QC_DATASET =
+            "participantid\tSequenceNum\tAge\tAgeQCIndicator\tSex\tSexQCIndicator\n" +
+            "Franny\t1\t\t.N\tmale\t\n" +
+            "Zoe\t1\t25\t.Q\tfemale\t\n" +
+            "J.D.\t1\t50\t\tmale\t.Q";
+
+    private static final String DATASET_SCHEMA_FILE = "/sampledata/fieldLevelQC/dataset_schema.tsv";
+
     protected void doTestSteps() throws Exception
     {
         log("Create QC project");
-        createProject(PROJECT_NAME);
+        createProject(PROJECT_NAME, "Study");
+        clickNavButton("Done");
+        clickNavButton("Create Study");
+        selectOptionByValue("securityString", "BASIC_WRITE");
+        clickNavButton("Create Study");
+        clickLinkWithText(PROJECT_NAME + " Study");
+        clickLinkWithText("Data Pipeline");
+        clickNavButton("Setup");
+        setFormElement("path", getLabKeyRoot() + "/sampledata/fieldLevelQC");
+        submit();
 
         checkListQc();
         checkDatasetQc();
@@ -69,7 +92,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         log("Test upload list data with a combined data and QC column");
         clickLinkWithText("import data");
-        setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_QC);
+        setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_QC_LIST);
         submit();
         assertNoLabkeyErrors();
         assertTextPresent("Ted");
@@ -98,7 +121,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         log("Test separate QCIndicator column");
         clickNavButton("Import Data");
-        setFormElement("ff_data", TEST_DATA_TWO_COLUMN_QC);
+        setFormElement("ff_data", TEST_DATA_TWO_COLUMN_QC_LIST);
         submit();
         assertNoLabkeyErrors();
         assertTextPresent("Franny");
@@ -120,7 +143,72 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
     private void checkDatasetQc() throws Exception
     {
+        log("Create dataset");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Define Dataset Schemas");
+        clickLinkWithText("Bulk Import Schemas");
+        setFormElement("typeNameColumn", "datasetName");
+        setFormElement("labelColumn", "datasetLabel");
+        setFormElement("typeIdColumn", "datasetId");
+        setLongTextField("tsv", getFileContents(DATASET_SCHEMA_FILE));
+        clickNavButton("Submit", 180000);
+        assertNoLabkeyErrors();
+        assertTextPresent("QC Dataset");
 
+        log("Import dataset data");
+        clickLinkWithText("QC Dataset");
+        clickNavButton("Import Data");
+
+        setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_QC_DATASET);
+        submit();
+        assertNoLabkeyErrors();
+        assertTextPresent("Ted");
+        assertTextPresent("Alice");
+        assertTextPresent("Bob");
+        assertTextPresent(".Q");
+        assertTextPresent(".N");
+        assertTextPresent("male");
+        assertTextPresent("female");
+        assertTextPresent("17");
+
+        deleteDatasetData();
+
+        log("Test inserting a single row");
+        clickNavButton("Insert New");
+        setFormElement("quf_participantid", "Sid");
+        setFormElement("quf_SequenceNum", "1");
+        setFormElement("quf_Age", ".N");
+        setFormElement("quf_Sex", "male");
+        submit();
+        assertNoLabkeyErrors();
+        assertTextPresent("Sid");
+        assertTextPresent("male");
+        assertTextPresent(".N");
+
+        deleteDatasetData();
+
+        log("Import dataset data with two qc columns");
+        clickNavButton("Import Data");
+        setFormElement("tsv", TEST_DATA_TWO_COLUMN_QC_DATASET);
+        submit();
+        assertNoLabkeyErrors();
+        assertTextPresent("Franny");
+        assertTextPresent("Zoe");
+        assertTextPresent("J.D.");
+        assertTextPresent(".Q");
+        assertTextPresent(".N");
+        assertTextPresent("male");
+        assertTextPresent("female");
+        assertTextPresent("50");
+        assertTextPresent("25");
+    }
+
+    private void deleteDatasetData()
+    {
+        clickButton("Delete All Rows", defaultWaitForPage);
+        selenium.getConfirmation();
     }
 
     protected void doCleanup() throws Exception
@@ -133,6 +221,6 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "";
+        return "experiment";
     }
 }
