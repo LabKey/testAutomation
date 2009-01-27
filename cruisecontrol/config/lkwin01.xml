@@ -20,7 +20,7 @@
     <property name="anthome" value="${projectdir}/external/ant"/>
 
     <!-- Defaults for email -->
-    <property name="buildmaster.email" value="brittp@labkey.com"/>
+    <property name="buildmaster.email" value="jeckels@labkey.com"/>
     <property name="buildmaster.name" value="Buildmaster"/>
 
     <!-- Preconfigure our plugins -->
