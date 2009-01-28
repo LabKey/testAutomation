@@ -68,7 +68,6 @@
         <map alias="d.stearns" address="daves@labkey.com" />
         <map alias="k.krouse" address="kevink@labkey.com" />
         <map alias="j.garms" address="jgarms@labkey.com" />
-        <always address="${buildmaster.email}"/>
         <failure reportWhenFixed="true" address="cpas-developers@lists.fhcrc.org"/>
         <parameter name="lineCount" value="250" />
     </plugin>
