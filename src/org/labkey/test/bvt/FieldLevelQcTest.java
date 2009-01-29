@@ -19,6 +19,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
+import java.io.File;
+
 /*
 * User: Jess Garms
 * Date: Jan 16, 2009
@@ -30,6 +32,8 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
     private static final String ASSAY_NAME = "QCAssay";
     private static final String ASSAY_RUN_SINGLE_COLUMN = "QCAssayRunSingleColumn";
     private static final String ASSAY_RUN_TWO_COLUMN = "QCAssayRunTwoColumn";
+    private static final String ASSAY_EXCEL_RUN_SINGLE_COLUMN = "QCAssayExcelRunSingleColumn";
+    private static final String ASSAY_EXCEL_RUN_TWO_COLUMN = "QCAssayExcelRunTwoColumn";
 
     private static final String TEST_DATA_SINGLE_COLUMN_QC_LIST =
             "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
@@ -68,6 +72,9 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
                     "1\tFranny\t1\t01-Jan-09\t\t.N\tmale\t\n" +
                     "2\tZoe\t1\t01-Jan-09\t25\t.Q\tfemale\t\n" +
                     "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\t.Q";
+
+    private final String ASSAY_SINGLE_COLUMN_EXCEL_FILE = getLabKeyRoot() + "/sampledata/fieldLevelQC/assay_single_column.xls";
+    private final String ASSAY_TWO_COLUMN_EXCEL_FILE = getLabKeyRoot() + "/sampledata/fieldLevelQC/assay_two_column.xls";
 
     protected void doTestSteps() throws Exception
     {
@@ -262,6 +269,47 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         clickNavButton("Copy to Study");
         validateSingleColumnData();
+
+        if (isFileUploadAvailable())
+        {
+            log("Import from Excel in single-column format");
+            clickLinkWithText(PROJECT_NAME);
+            clickLinkWithText(ASSAY_NAME);
+            clickNavButton("Import Data");
+            selenium.select("//select[@name='targetStudy']", targetStudyValue);
+
+            clickNavButton("Next");
+            selenium.type("name", ASSAY_EXCEL_RUN_SINGLE_COLUMN);
+            checkCheckbox("dataCollectorName", "File upload", true);
+            File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
+            setFormElement("uploadedFile", file);
+            clickNavButton("Save and Finish");
+            assertNoLabkeyErrors();
+            clickLinkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN);
+            validateSingleColumnData();
+
+            log("Import from Excel in two-column format");
+            clickLinkWithText(PROJECT_NAME);
+            clickLinkWithText(ASSAY_NAME);
+            clickNavButton("Import Data");
+            selenium.select("//select[@name='targetStudy']", targetStudyValue);
+
+            clickNavButton("Next");
+            selenium.type("name", ASSAY_EXCEL_RUN_TWO_COLUMN);
+            checkCheckbox("dataCollectorName", "File upload", true);
+            file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
+            setFormElement("uploadedFile", file);
+            clickNavButton("Save and Finish");
+            assertNoLabkeyErrors();
+            clickLinkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN);
+            validateTwoColumnData();
+        }
+    }
+
+    @Override
+    protected boolean isFileUploadTest()
+    {
+        return true;
     }
 
     /**
