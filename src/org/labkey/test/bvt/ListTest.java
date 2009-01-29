@@ -406,12 +406,16 @@ public class ListTest extends BaseSeleniumWebTest
         if (!isFileUploadAvailable())
             return;
 
+        log("Infer from excel file, then import data");
         File excelFile = new File(EXCEL_DATA_FILE);
         ListHelper.createListFromFile(this, PROJECT_NAME, "Fruits from Excel", excelFile);
+        assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
 
+        log("Infer from a tsv file, then import data");
         File tsvFile = new File(TSV_DATA_FILE);
         ListHelper.createListFromFile(this, PROJECT_NAME, "Fruits from a TSV", tsvFile);
+        assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
 
     }

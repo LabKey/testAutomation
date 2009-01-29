@@ -40,7 +40,7 @@ public class AssayTest extends AbstractAssayTest
     protected static final String[] TEST_ASSAY_RUN_PROP_TYPES = { "Text (String)", "Boolean", "Number (Double)", "Integer", "DateTime" };
     protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
-    protected static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
+    public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
     protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = { "Boolean", "Integer", "DateTime" };
     protected static final String TEST_RUN1 = "FirstRun";
     protected static final String TEST_RUN1_COMMENTS = "First comments";

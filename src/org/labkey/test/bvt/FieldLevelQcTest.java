@@ -16,6 +16,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
 /*
@@ -26,6 +27,9 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "FieldLevelQcVerifyProject";
     private static final String LIST_NAME = "QCList";
+    private static final String ASSAY_NAME = "QCAssay";
+    private static final String ASSAY_RUN_SINGLE_COLUMN = "QCAssayRunSingleColumn";
+    private static final String ASSAY_RUN_TWO_COLUMN = "QCAssayRunTwoColumn";
 
     private static final String TEST_DATA_SINGLE_COLUMN_QC_LIST =
             "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
@@ -53,6 +57,18 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
     private static final String DATASET_SCHEMA_FILE = "/sampledata/fieldLevelQC/dataset_schema.tsv";
 
+    private static final String TEST_DATA_SINGLE_COLUMN_QC_ASSAY =
+            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
+                    "1\tTed\t1\t01-Jan-09\t.N\tmale\n" +
+                    "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
+                    "3\tBob\t1\t01-Jan-09\t.Q\t.N";
+
+    private static final String TEST_DATA_TWO_COLUMN_QC_ASSAY =
+            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageQCIndicator\tsex\tsexQCIndicator\n" +
+                    "1\tFranny\t1\t01-Jan-09\t\t.N\tmale\t\n" +
+                    "2\tZoe\t1\t01-Jan-09\t25\t.Q\tfemale\t\n" +
+                    "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\t.Q";
+
     protected void doTestSteps() throws Exception
     {
         log("Create QC project");
@@ -69,6 +85,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         checkListQc();
         checkDatasetQc();
+        checkAssayQC();
     }
 
     private void checkListQc() throws Exception
@@ -94,15 +111,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickLinkWithText("import data");
         setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_QC_LIST);
         submit();
-        assertNoLabkeyErrors();
-        assertTextPresent("Ted");
-        assertTextPresent("Alice");
-        assertTextPresent("Bob");
-        assertTextPresent(".Q");
-        assertTextPresent(".N");
-        assertTextPresent("male");
-        assertTextPresent("female");
-        assertTextPresent("17");
+        validateSingleColumnData();
 
         deleteListData();        
 
@@ -123,16 +132,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Import Data");
         setFormElement("ff_data", TEST_DATA_TWO_COLUMN_QC_LIST);
         submit();
-        assertNoLabkeyErrors();
-        assertTextPresent("Franny");
-        assertTextPresent("Zoe");
-        assertTextPresent("J.D.");
-        assertTextPresent(".Q");
-        assertTextPresent(".N");
-        assertTextPresent("male");
-        assertTextPresent("female");
-        assertTextPresent("50");
-        assertTextPresent("25");
+        validateTwoColumnData();
     }
 
     private void deleteListData()
@@ -163,15 +163,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_QC_DATASET);
         submit();
-        assertNoLabkeyErrors();
-        assertTextPresent("Ted");
-        assertTextPresent("Alice");
-        assertTextPresent("Bob");
-        assertTextPresent(".Q");
-        assertTextPresent(".N");
-        assertTextPresent("male");
-        assertTextPresent("female");
-        assertTextPresent("17");
+        validateSingleColumnData();
 
         deleteDatasetData();
 
@@ -193,6 +185,24 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Import Data");
         setFormElement("tsv", TEST_DATA_TWO_COLUMN_QC_DATASET);
         submit();
+        validateTwoColumnData();
+    }
+
+    private void validateSingleColumnData()
+    {
+        assertNoLabkeyErrors();
+        assertTextPresent("Ted");
+        assertTextPresent("Alice");
+        assertTextPresent("Bob");
+        assertTextPresent(".Q");
+        assertTextPresent(".N");
+        assertTextPresent("male");
+        assertTextPresent("female");
+        assertTextPresent("17");
+    }
+
+    private void validateTwoColumnData()
+    {
         assertNoLabkeyErrors();
         assertTextPresent("Franny");
         assertTextPresent("Zoe");
@@ -203,6 +213,98 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         assertTextPresent("female");
         assertTextPresent("50");
         assertTextPresent("25");
+    }
+
+    private void checkAssayQC()
+    {
+        log("Create assay");
+        defineAssay();
+
+        log("Import single column QC data");
+        clickLinkWithText(ASSAY_NAME);
+        clickNavButton("Import Data");
+        String targetStudyValue = "/" + PROJECT_NAME + " (" + PROJECT_NAME + " Study)";
+        selenium.select("//select[@name='targetStudy']", targetStudyValue);
+
+        clickNavButton("Next");
+        selenium.type("name", ASSAY_RUN_SINGLE_COLUMN);
+        selenium.click("//input[@value='textAreaDataProvider']");
+        selenium.type("TextAreaDataCollector.textArea", TEST_DATA_SINGLE_COLUMN_QC_ASSAY);
+        clickNavButton("Save and Finish");
+        assertNoLabkeyErrors();
+        clickLinkWithText(ASSAY_RUN_SINGLE_COLUMN);
+        validateSingleColumnData();
+
+        log("Import two column QC data");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(ASSAY_NAME);
+        clickNavButton("Import Data");
+        selenium.select("//select[@name='targetStudy']", targetStudyValue);
+
+        clickNavButton("Next");
+        selenium.type("name", ASSAY_RUN_TWO_COLUMN);
+        selenium.click("//input[@value='textAreaDataProvider']");
+        selenium.type("TextAreaDataCollector.textArea", TEST_DATA_TWO_COLUMN_QC_ASSAY);
+        clickNavButton("Save and Finish");
+        assertNoLabkeyErrors();
+        clickLinkWithText(ASSAY_RUN_TWO_COLUMN);
+        validateTwoColumnData();
+
+        log("Copy to study");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(ASSAY_NAME);
+        clickLinkWithText(ASSAY_RUN_SINGLE_COLUMN);
+        validateSingleColumnData();
+        checkCheckbox(".toggle");
+        clickNavButton("Copy Selected to Study");
+        
+        clickNavButton("Next");
+
+        clickNavButton("Copy to Study");
+        validateSingleColumnData();
+    }
+
+    /**
+     * Defines an test assay at the project level for the security-related tests
+     */
+    @SuppressWarnings({"UnusedAssignment"})
+    private void defineAssay()
+    {
+        log("Defining a test assay at the project level");
+        //define a new assay at the project level
+        //the pipeline must already be setup
+        clickLinkWithText(PROJECT_NAME);
+        addWebPart("Assay List");
+
+        //copied from old test
+        clickLinkWithText("Manage Assays");
+        clickNavButton("New Assay Design");
+        selectOptionByText("providerName", "General");
+        clickNavButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+
+        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
+
+        int index = AssayTest.TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT;
+        addField("Data Fields", index++, "age", "Age", "Integer");
+        addField("Data Fields", index++, "sex", "Sex", "Text (String)");
+        sleep(1000);
+
+        log("setting fields to allow QC");
+        selenium.click("//input[@id='ff_name4']");
+        // This is gross, I know. I don't know why using just the name doesn't work
+        //checkCheckbox("allowsQc");
+        clickCheckboxById("gwt-uid-8", false);
+
+        selenium.click("//input[@id='ff_name5']");
+        // Yes, icky again. See above
+        //checkCheckbox("allowsQc");
+        clickCheckboxById("gwt-uid-8", false);
+
+        clickNavButton("Save & Close");
+        assertNoLabkeyErrors();
+
     }
 
     private void deleteDatasetData()

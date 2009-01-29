@@ -1112,6 +1112,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertNoLabkeyErrors()
     {
         assertElementNotPresent(Locator.xpath("//div[@class='labkey-error']"));
+        assertElementNotPresent(Locator.xpath("//font[@class='labkey-error']"));
     }
 
     public boolean isTextPresent(String text)
