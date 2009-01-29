@@ -70,7 +70,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
                 "14\t104\tdd");
         clickNavButton("Submit");
 
-        clickNavButton("Show Sample Sets");
+        clickLinkWithText("Sample Sets");
         assertTextPresent(PROJECT_SAMPLE_SET_NAME);
         assertTextPresent(FOLDER_NAME);
 
@@ -142,7 +142,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         setFormElement("outputSample1_DateCol", "1/1/2007");
         clickNavButton("Submit");
 
-        assertLinkPresentWithText("Derive 1 sample from 16");
+        assertLinkPresentWithText("Derive sample from 16");
         assertLinkPresentWithText("11");
         assertLinkPresentWithText("12");
         assertLinkPresentWithText("13");
@@ -150,7 +150,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
         clickLinkWithText("11");
 
-        assertLinkPresentWithText("Derive 1 sample from 16");
+        assertLinkPresentWithText("Derive sample from 16");
         assertLinkPresentWithText("Derive 2 samples from 11, 12, 13, 14");
 
         clickLinkWithText(FOLDER_NAME);
@@ -163,6 +163,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("firstOutput");
         assertTextPresent("secondOutput");
 
+        clickLinkWithText("Sample Sets");
         clickNavButton("Show All Materials");
         assertTextPresent("ProjectSampleSet");
         assertTextPresent("200");
