@@ -1064,7 +1064,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void addWebPart(String webPartName)
     {
-        Locator.XPathLocator selects = Locator.xpath("//form[@action='addWebPart.view']//tr/td/select[@name='name']");
+        Locator.XPathLocator selects = Locator.xpath("//form[contains(@action,'addWebPart.view')]//tr/td/select[@name='name']");
 
         for (int i = 0; i <= 1; i++)
         {
@@ -1075,7 +1075,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 if (label.equals(webPartName))
                 {
                     selenium.select(loc.toString(), webPartName);
-                    submit(Locator.xpath("//form[@action='addWebPart.view']").index(i));
+                    submit(Locator.xpath("//form[contains(@action,'addWebPart.view')]").index(i));
                     return;
                 }
             }
