@@ -239,7 +239,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Save View");
 
         log("Continue with filters");
-        setFilter("MS2Peptides", "Charge", "Equals", "2+");
+        setFilter("MS2Peptides", "Charge", "Equals", "2");
         assertTextNotPresent("R.APPSTQESESPR.Q");
         assertTextPresent("R.TIDPVIAR.K");
         setFilter("MS2Peptides", "Hyper", "Is Greater Than or Equal To", "14.6");
