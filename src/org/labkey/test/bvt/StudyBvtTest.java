@@ -35,7 +35,7 @@ public class StudyBvtTest extends StudyTest
     protected static final String TEST_GROUP = "firstGroup";
     protected static final String TEST_USER = "user1@test.com";
 
-    private final static String[] R_SCRIPTS = { "rScript1", "rScript2", "rScript3" };
+    private final static String[] R_SCRIPTS = { "rScript1", "rScript2", "rScript3", "rScript4" };
     private final static String DATA_SET = "DEM-1: Demographics";
     private final static String DATA_BASE_PREFIX = "DEM";
     private final static String R_SCRIPT1_METHOD = "func1";
@@ -495,7 +495,8 @@ public class StudyBvtTest extends StudyTest
         log("create a snapshot over a custom query");
         clickLinkWithText("Study 001");
         clickLinkWithText("Manage Reports and Views");
-        clickLinkWithText("new grid view");
+        createReport(GRID_VIEW);
+
         clickLinkWithText("Modify Dataset List (Advanced)");
         clickNavButton("Create New Query");
 
@@ -811,6 +812,12 @@ public class StudyBvtTest extends StudyTest
         assertTextNotPresent(R_REMCOL);
         assertTextNotPresent(R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
+
+        clickLinkWithText("Source");
+        clickNavButton("Save View", 0);
+        setFormElement("reportName", R_SCRIPTS[3]);
+        clickNavButton("Save");
+
         popLocation();
 
         // no longer relevant, all views for the dataset are in the dropdown now
@@ -922,9 +929,7 @@ public class StudyBvtTest extends StudyTest
         signIn();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Reports and Views");
-        click(Locator.raw("//a[contains(text(),'" + R_SCRIPTS[0] + "')]/../..//a[.='edit']"));
-        waitForPageToLoad();
+        clickReportGridLink(R_SCRIPTS[0], "edit");
         if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 fail("Their was an error running the script");
@@ -934,16 +939,15 @@ public class StudyBvtTest extends StudyTest
         log("Check that edit worked");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Reports and Views");
-        click(Locator.raw("//a[contains(text(),'" + R_SCRIPTS[1] + "')]/../..//a[.='edit']"));
-        waitForPageToLoad();
+        clickReportGridLink(R_SCRIPTS[1], "edit");
+
         checkCheckbox(Locator.name("includedReports"));
         clickNavButton("Execute Script");
         clickNavButton("Start Job");
         waitForPageToLoad();
         waitForElement(Locator.navButton("Start Job"), 30000);
-        assertTextPresent(R_SCRIPT2_TEXT1);
-        assertTextNotPresent(R_SCRIPT2_TEXT2);
+        assertTextPresent(R_SCRIPT2_TEXT2);
+        assertTextNotPresent(R_SCRIPT2_TEXT1);
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
@@ -987,8 +991,10 @@ public class StudyBvtTest extends StudyTest
 
         // create grid view
         clickLinkWithText(FOLDER_NAME);
+        waitForElement(Locator.linkWithText("Manage Reports and Views"), 5000);
         clickLinkWithText("Manage Reports and Views");
-        clickLinkWithText("new grid view");
+
+        createReport(GRID_VIEW);
         setFormElement("label", TEST_GRID_VIEW);
         selectOptionByText("datasetSelection", "APX-1: Abbreviated Physical Exam");
         clickNavButton("Create View");
@@ -1029,16 +1035,12 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("StudyVerifyProject");
         clickLinkWithText("My Study");
 
-        clickLinkWithText("Manage Reports and Views");
-        clickAndWait(Locator.xpath("//a[.='participant chart']/../..//td/a[.='permissions']"));
-
+        clickReportGridLink("participant chart", "permissions");
         selenium.click("useExplicit");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickNavButton("save");
 
-        clickLinkWithText("Manage Reports and Views");
-        clickAndWait(Locator.xpath("//a[.='" + TEST_GRID_VIEW + "']/../..//td/a[.='permissions']"));
-
+        clickReportGridLink(TEST_GRID_VIEW, "permissions");
         selenium.click("useExplicit");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickNavButton("save");
@@ -1066,21 +1068,5 @@ public class StudyBvtTest extends StudyTest
         assertTextPresent("User does not have read permission on this dataset.");
 */
         stopImpersonating();
-        deleteCharts();
-    }
-
-    protected void deleteCharts()
-    {
-        click(Locator.linkWithText("Projects"));
-        sleep(3000);
-        clickLinkWithText("StudyVerifyProject");
-        clickLinkWithText("My Study");
-        clickLinkWithText("Manage Reports and Views");
-        click(Locator.xpath("//a[.='participant chart']/../..//td/a[.='delete']"));
-		assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
-        waitForPageToLoad();
-        click(Locator.xpath("//a[.='non participant chart']/../..//td/a[.='delete']"));
-		assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
-        waitForPageToLoad();
     }
 }

@@ -17,6 +17,7 @@
 package org.labkey.test.drt;
 
 import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang.BooleanUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -56,7 +57,83 @@ public class StudyTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-        try { deleteProject(PROJECT_NAME); } catch (Throwable e) {}
+       try { deleteProject(PROJECT_NAME); } catch (Throwable e) {}
+    }
+
+    protected static final String GRID_VIEW = "create_gridView";
+    protected static final String CROSSTAB_VIEW = "create_crosstabView";
+    protected static final String R_VIEW = "create_rView";
+
+    protected void createReport(String reportType)
+    {
+        // click the create button dropdown
+        String id = getExtElementId("btn_createView");
+        click(Locator.id(id));
+
+        id = getExtElementId(reportType);
+        click(Locator.id(id));
+        waitForPageToLoad();
+    }
+
+    protected void waitForExtDialog(int timeout)
+    {
+        for (int time=0; time < timeout; time+= 500)
+        {
+            if (BooleanUtils.toBoolean(selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().isVisible();")))
+                return;
+            sleep(500);
+        }
+        fail("Failed waiting for Ext dialog to appear");
+    }
+
+    protected void deleteReport(String reportName)
+    {
+        clickLinkWithText("Manage Reports and Views");
+        final Locator report = Locator.tagContainingText("div", reportName);
+
+        // select the report and click the delete button
+        waitForElement(report, 10000);
+        selenium.mouseDown(report.toString());
+
+        String id = getExtElementId("btn_deleteView");
+        click(Locator.id(id));
+
+        waitForExtDialog(5000);
+
+        String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
+        click(Locator.id(btnId));
+
+        // make sure the report is deleted
+        waitFor(new Checker() {
+            public boolean check()
+            {
+                return !isElementPresent(report);
+            }
+        }, "Failed to delete report: " + reportName, 5000);
+    }
+
+    protected void clickReportGridLink(String reportName, String linkText)
+    {
+        clickLinkWithText("Manage Reports and Views");
+        final Locator report = Locator.tagContainingText("div", reportName);
+
+        waitForElement(report, 10000);
+
+        // click the row expander
+        Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//div[contains(@class, 'x-grid3-row-expander')]");
+        selenium.mouseDown(expander.toString());
+
+        final Locator link = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//..//td//a[contains(text(),'" + linkText + "')]");
+
+        // make sure the row has expanded
+        waitFor(new Checker() {
+            public boolean check()
+            {
+                return isElementPresent(link);
+            }
+        }, "Unable to click the link: " + linkText + " for report: " + reportName, 5000);
+
+        clickAndWait(link);
     }
 
     protected void doTestSteps()
@@ -66,6 +143,7 @@ public class StudyTest extends BaseSeleniumWebTest
         // verify reports
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
+/*
         clickLinkWithText("Manage Reports and Views");
         clickLinkWithText("new enrollment view");
         selectOptionByText("datasetId", "1: DEM-1: Demographics");
@@ -78,6 +156,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertImagePresentWithSrc("timePlot.view?reportId=", true);
 
         clickLinkWithText("Study 001");
+*/
         clickLinkWithText("Study Navigator");
         clickLinkWithText("24");
 
@@ -132,19 +211,11 @@ public class StudyTest extends BaseSeleniumWebTest
         //Delete the report
         clickLinkWithText("Study 001");
         clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Reports and Views");
-        click(Locator.linkWithText("delete"));
-        selenium.getConfirmation();
-        waitForPageToLoad();
-
-        click(Locator.linkWithText("delete"));
-        selenium.getConfirmation();
-        waitForPageToLoad();
-        assertLinkNotPresentWithText("TestReport");
+        deleteReport("TestReport");
 
         // create new grid view report:
         String viewName = "DRT Eligibility Query";
-        clickLinkWithText("new grid view");
+        createReport(GRID_VIEW);
         setFormElement("label", viewName);
         selectOptionByText("params", "ECI-1: Eligibility Criteria");
         clickNavButton("Create View");
@@ -154,13 +225,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertNavButtonNotPresent("go");
         clickLinkWithText("Study 001");
         clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Reports and Views");
-
-        click(Locator.linkWithText("delete"));
-        selenium.getConfirmation();
-        waitForPageToLoad(longWaitForPage);
-
-        assertTextNotPresent(viewName);
+        deleteReport(viewName);
 
         // create new external report
         clickLinkWithText("Study 001");
