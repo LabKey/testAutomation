@@ -77,7 +77,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         waitForElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
         setFormElement(Locator.raw("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
-        addField("Run Set Fields", 0, SET_FIELD_TEST_NAME, SET_FIELD_TEST_NAME, "Text (String)");
+        addField("Batch Fields", 0, SET_FIELD_TEST_NAME, SET_FIELD_TEST_NAME, "Text (String)");
         addField("Run Fields", 0, RUN_FIELD_TEST_NAME, RUN_FIELD_TEST_NAME, "Text (String)"); 
         setFormElement("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']", XPATH_TEST);
         addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, "Text (String)");
@@ -135,7 +135,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickLink(Locator.raw("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
         waitForText(ASSAY_NAME + " Description", 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
-        clickLinkWithText("view all data");
+        clickLinkWithText("view all results");
         waitForText(ASSAY_NAME + " Description", 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
 

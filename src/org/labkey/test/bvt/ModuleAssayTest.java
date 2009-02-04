@@ -114,7 +114,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(ASSAY_NAME);
 
         clickNavButton("Import Data");
-        // skip run set properties for now
+        // skip batch properties for now
         clickNavButton("Next");
         setFormElement("name", runName);
         setFormElement("TextAreaDataCollector.textArea", getFileContents(uploadedFile));

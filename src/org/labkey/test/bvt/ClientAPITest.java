@@ -599,7 +599,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent(TEST_ASSAY);
         assertTextPresent(TEST_ASSAY + " Run Fields");
         assertTextPresent("RunDate - DateTime");
-        assertTextPresent(TEST_ASSAY + " Run Set Fields");
+        assertTextPresent(TEST_ASSAY + " Batch Fields");
         assertTextPresent("TargetStudy - String");
         assertTextPresent(TEST_ASSAY + " Data Fields");
         assertTextPresent("VisitID - Double");

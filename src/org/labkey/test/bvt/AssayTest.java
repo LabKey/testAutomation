@@ -140,7 +140,7 @@ public class AssayTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
-            addField("Run Set Fields", i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
+            addField("Batch Fields", i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
         }
 
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
@@ -154,11 +154,11 @@ public class AssayTest extends AbstractAssayTest
         }
 
         // Set some to required
-        selenium.click(getPropertyXPath("Run Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
-        selenium.click(getPropertyXPath("Run Set Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Batch Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
+        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@type='checkbox']");
 
-        selenium.click(getPropertyXPath("Run Set Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
-        selenium.click(getPropertyXPath("Run Set Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Batch Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
+        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@type='checkbox']");
 
         selenium.click(getPropertyXPath("Run Fields") + "//td/input[@id='ff_name0']");
         selenium.click(getPropertyXPath("Run Fields") + "//span/input[@type='checkbox']");
@@ -206,7 +206,7 @@ public class AssayTest extends AbstractAssayTest
         clickNavButton("Import Data");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + "3");
 
-        log("Run set properties");
+        log("Batch properties");
         clickNavButton("Next");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " is required and must be of type Number (Double).");
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1), "Bad Test");
@@ -294,7 +294,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("f");
 
         log("Check out the data for all of the runs");
-        clickLinkWithText("view all data");
+        clickLinkWithText("view all results");
         waitForPageToLoad();
         isTextPresent("2.0");
         assertTextPresent("7.0");
@@ -320,7 +320,7 @@ public class AssayTest extends AbstractAssayTest
         //select the Lab1 folder and view all the data for the test assay
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view all data");
+        clickLinkWithText("view all results");
 
         //select all the data rows and click publish
         selenium.click(".toggle");
@@ -440,7 +440,7 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing select all data and view");
         clickCheckbox(".toggle", false);
-        clickButton("Show Data For Runs", defaultWaitForPage);
+        clickButton("Show Results For Selected", defaultWaitForPage);
         verifySpecimensPresent(9);
 
         log("Testing clicking on a run");
@@ -448,7 +448,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("FirstRun");
         verifySpecimensPresent(6);
 
-        clickLinkWithText("view all data");
+        clickLinkWithText("view all results");
         verifySpecimensPresent(9);
 
         log("Testing assay-study linkage");
@@ -462,7 +462,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("FirstRun");
         verifySpecimensPresent(6);
 
-        clickLinkWithText("view all data");
+        clickLinkWithText("view all results");
         verifySpecimensPresent(9);
 
         // Verify that the correct copied to study columns are present
