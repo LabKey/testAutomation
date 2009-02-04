@@ -114,7 +114,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             beginAt(queryURL);
             clickAndWait(Locator.raw("//td[contains(text(), '" + name + "')]/.." + Locator.navButton("Properties").getPath()));
-            selectOptionByValue("ff_inheritable", "true");
+            selectOptionByValue("inheritable", "true");
             submit();
         }
         beginAt(queryURL);
