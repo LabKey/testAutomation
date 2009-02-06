@@ -517,6 +517,6 @@ public class Crawler
 
 	void fail(String msg)
 	{
-		fail(msg);
+		BaseSeleniumWebTest.fail(msg);
 	}
 }
