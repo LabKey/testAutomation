@@ -86,6 +86,9 @@
         <echo message="by default. To enable link checking:"/>
         <echo message="    -DlinkCheck=true"/>
         <echo message=""/>
+        <echo message="Add javascript injection testing:"/>
+        <echo message="    -DinjectCheck=true"/>
+        <echo message=""/>
         <echo message="The leak checker is run by default for DRT and BVT tests.  To disable mem checking:"/>
         <echo message="    -DmemCheck=false"/>
     </target>
@@ -363,6 +366,7 @@
             <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
@@ -622,6 +626,16 @@
             <isset property="linkCheck"/>
         </condition>
 
+        <!-- Set property sysprop.injectCheck: true or false -->
+        <condition property="sysprop.injectCheck" value="false">
+            <not>
+                <isset property="injectCheck"/>
+            </not>
+        </condition>
+        <condition property="sysprop.injectCheck" value="${injectCheck}">
+            <isset property="injectCheck"/>
+        </condition>
+
         <!-- Set property sysprop.memCheck: true or false -->
         <condition property="sysprop.memCheck" value="true">
             <not>
@@ -733,6 +747,7 @@
             <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
@@ -780,6 +795,7 @@
             <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
@@ -810,6 +826,7 @@
             <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
+            <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>

@@ -648,7 +648,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void resetErrors()
     {
-        beginAt("/admin/resetErrorMark.view");
+		if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
+        	beginAt("/admin/resetErrorMark.view");
     }
 
     public void testSteps() throws Exception
@@ -658,8 +659,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             Runner.setCurrentWebTest(this);
             log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
             signIn();
-            if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
-                resetErrors();
+			resetErrors();
 
             try
             {
@@ -680,9 +680,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             if (enableLinkCheck())
             {
+				boolean injectTest = enableInjectCheck();
                 Crawler crawler = new Crawler(this);
-                crawler.crawlAllLinks();
-                checkLeaksAndErrors();
+                crawler.crawlAllLinks(injectTest);
+				if (!injectTest)
+					checkLeaksAndErrors();
+				else
+					resetErrors();
             }
 
             _testFailed = false;
@@ -756,8 +760,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public boolean enableLinkCheck()
     {
-        return "true".equals(System.getProperty("linkCheck"));
+        return "true".equals(System.getProperty("linkCheck")) || enableInjectCheck();
     }
+
+	public boolean enableInjectCheck()
+	{
+		return "true".equals(System.getProperty("injectCheck"));
+	}
 
     public boolean skipLeakCheck()
     {
@@ -766,15 +775,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void checkLeaksAndErrors()
     {
-        if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
-        {
-            checkErrors();
-            checkLeaks();
-        }
+		checkErrors();
+		checkLeaks();
     }
 
     public void checkLeaks()
     {
+		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+			return;
         if (skipLeakCheck())
             return;
 
@@ -802,6 +810,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void checkErrors()
     {
+		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+			return;
         beginAt("/admin/showErrorsSinceMark.view");
 
         assertTrue("There were errors during the test run", isPageEmpty());
@@ -896,6 +906,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("JavaScript Alert Ignored: " + selenium.getAlert());
         }
     }
+
+	public boolean isAlertPresent()
+	{
+		return selenium.isAlertPresent();
+	}
+
+	public String getAlert()
+	{
+		return selenium.getAlert();
+	}
 
     public void createProject(String projectName)
     {
@@ -2690,6 +2710,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String cellText = getText(Locator.xpath("//table[@id='header']/tbody/tr/td[3]"));
         return cellText.split("\\n")[0];
     }
+
+
+	public String getHtmlSource()
+	{
+		return selenium.getHtmlSource();
+	}
+	
 
     public class DefaultSeleniumWrapper extends DefaultSelenium
     {

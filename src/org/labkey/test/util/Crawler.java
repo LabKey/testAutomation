@@ -18,6 +18,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.WebTestHelper;
+import org.apache.commons.lang.StringUtils;
 
 import java.net.URL;
 import java.util.*;
@@ -163,19 +164,22 @@ public class Crawler
         return url;
     }
 
+
     private class UrlToCheck
     {
         // Keep track of urls to check for breadth first crawl
         private URL _origin;
         private String _urlText;
         private int _depth;
+		private boolean _testInjection;
 
-        public UrlToCheck(URL origin, String urlText, int depth)
-        {
-            _origin = origin;
-            _urlText = urlText;
-            _depth = depth;
-        }
+		public UrlToCheck(URL origin, String urlText, int depth, boolean inject)
+		{
+			_origin = origin;
+			_urlText = urlText;
+			_depth = depth;
+			_testInjection = inject;
+		}
 
         public URL getOrigin()
         {
@@ -191,7 +195,13 @@ public class Crawler
         {
             return _depth;
         }
+
+		public boolean testInjection()
+		{
+			return _testInjection;
+		}
     }
+
 
     private class ControllerActionId
     {
@@ -255,10 +265,12 @@ public class Crawler
         }
     }
 
+
     private boolean isVisitableURL(String rootRelativeURL, int currentDepth)
     {
         ControllerActionId actionId = new ControllerActionId(rootRelativeURL);
         String strippedRelativeURL = stripQueryParams(rootRelativeURL);
+		
         // never go to the exactly same URL (minus query params) twice:
         if (_urlsChecked.contains(strippedRelativeURL) && currentDepth > 1)
             return false;
@@ -294,10 +306,11 @@ public class Crawler
             if (actionId.getController().equals(adminController) && !"/home".equals(actionId.getFolder()))
                 return true;
         }
+		
         // always visit all links under projects created by the tests:
         return underCreatedProject(rootRelativeURL);
-
     }
+
 
     private boolean underCreatedProject(String relativeURL)
     {
@@ -313,14 +326,14 @@ public class Crawler
         return false;
     }
 
-    public void crawlAllLinks()
+    public void crawlAllLinks(boolean inject)
     {
         _test.log("Starting crawl...");
         _test.beginAt(WebTestHelper.getContextPath() + "/");
         _test.waitForPageToLoad();
 
         // Breadth first search
-        int newPages = crawl();
+        int newPages = crawl(inject);
         saveCrawlStats(_test, _urlToCheck.getDepth(), newPages, _actionsVisited.size(), _crawlTime);
 
         _test.log("Crawl complete. " + newPages + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
@@ -328,16 +341,18 @@ public class Crawler
         _test.waitForPageToLoad();
     }
 
-    private int crawl()
+
+    private int crawl(boolean inject)
     {
         // Breadth first crawl
         long startTime = System.currentTimeMillis();
         int linkCount = 0;
+		
         // Initialize list to links present at start page
         URL startPageURL = _test.getURL();
         String[] linkAddresses = _test.getLinkAddresses();
         for (String url : linkAddresses)
-            _urlsToCheck.add(new UrlToCheck(startPageURL, url, 1));
+            _urlsToCheck.add(new UrlToCheck(startPageURL, url, 1, inject));
 
         // Loop through links in list until its empty or time runs out
         while ((!_urlsToCheck.isEmpty()) && (_crawlTime < MAX_CRAWL_TIME))
@@ -396,7 +411,7 @@ public class Crawler
             // Find all the links at the site
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
-                _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));
+                _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1, urlToCheck.testInjection()));
 
             // Keep track of where crawler has been
             _actionsVisited.add(new ControllerActionId(relativeURL));
@@ -421,6 +436,8 @@ public class Crawler
             int code = _test.getResponseCode();
             if (code == 404 || code == 500)
                 BaseSeleniumWebTest.fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
+
+			testInjection(urlToCheck ,currentPageUrl);
         }
         catch (RuntimeException re)
         {
@@ -429,4 +446,68 @@ public class Crawler
                 throw re;
         }
     }
+
+
+	final static String alertText = "8(";
+	final static String maliciousScript = "<script>alert(\"" + alertText + "\");</script>";
+	final static String injectString = "\"'>--></script>" + maliciousScript;
+	
+	private void testInjection(UrlToCheck urlToCheck, URL start)
+	{
+		if (!urlToCheck.testInjection())
+			return;
+
+		String base = start.toString();
+		String query = start.getQuery();
+		int q = base.indexOf('?');
+		if (q != -1)
+			base = base.substring(0,q);
+
+		if (query == null)
+			return;
+		if (query.startsWith("?"))
+			query = query.substring(1);
+		if (query.length() == 0)
+			return;
+
+		String[] parts = StringUtils.split(query,'&');
+		for (int i=0 ; i<parts.length ; i++)
+		{
+			String save = parts[i];
+			parts[i] = save + ( save.indexOf('=') == -1 ? "=" : "") + injectString;
+			String queryMalicious = StringUtils.join(parts, '&');
+			parts[i] = save;
+
+			String urlMalicious = base + "?" + queryMalicious;
+
+			try
+			{
+				_test.beginAt(urlMalicious);
+
+				while (_test.isAlertPresent())
+				{
+					if (alertText.equals(_test.getAlert()))
+						BaseSeleniumWebTest.fail(urlMalicious + " failed injection attack test");
+				}
+				
+				String html = _test.getHtmlSource();
+				if (html.contains(maliciousScript))
+					fail(urlMalicious + " failed injection attack test");
+                // see ConnectionWrapper.java
+                if (html.contains("SQL injection test failed"))
+                    fail(urlMalicious + " failed injection attack test");
+			}
+			catch (RuntimeException re)
+			{
+				// ignore javascript errors (HTTPUnit has a poor engine) and non-HTML download links:
+				if (re.getMessage().indexOf("ScriptException") < 0 && !re.getClass().getSimpleName().equals("NotHTMLException"))
+					throw re;
+			}
+		}
+	}
+
+	void fail(String msg)
+	{
+		fail(msg);
+	}
 }
