@@ -416,19 +416,21 @@ public class Crawler
             // Keep track of where crawler has been
             _actionsVisited.add(new ControllerActionId(relativeURL));
 
-            String responseText = _test.getResponseText().toLowerCase();
-
-            for (Map.Entry<String, String> entry : _sourceReplacements.entrySet())
-                responseText = responseText.replaceAll(entry.getKey(), entry.getValue());
-
-            //loop through forbidden words
-            for (String word : FORBIDDEN_WORDS)
+            if (FORBIDDEN_WORDS.length > 0)
             {
+                String responseText = _test.getResponseText().toLowerCase();
 
-                if (responseText.indexOf(word.toLowerCase()) > 0)
+                for (Map.Entry<String, String> entry : _sourceReplacements.entrySet())
+                    responseText = responseText.replaceAll(entry.getKey(), entry.getValue());
+
+                //loop through forbidden words
+                for (String word : FORBIDDEN_WORDS)
                 {
-                    _test.log("Illegal use of forbidden word '" + word + "'> " + relativeURL);
-                    BaseSeleniumWebTest.fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
+                    if (responseText.indexOf(word.toLowerCase()) > 0)
+                    {
+                        _test.log("Illegal use of forbidden word '" + word + "'> " + relativeURL);
+                        BaseSeleniumWebTest.fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
+                    }
                 }
             }
 
@@ -482,20 +484,27 @@ public class Crawler
 
 			try
 			{
+                boolean fail = false;
 				_test.beginAt(urlMalicious);
 
 				while (_test.isAlertPresent())
 				{
-					if (alertText.equals(_test.getAlert()))
-						BaseSeleniumWebTest.fail(urlMalicious + " failed injection attack test");
+					if (alertText.startsWith(_test.getAlert()))
+                        fail = true;
 				}
 				
 				String html = _test.getHtmlSource();
 				if (html.contains(maliciousScript))
-					fail(urlMalicious + " failed injection attack test");
+                    fail = true;
                 // see ConnectionWrapper.java
                 if (html.contains("SQL injection test failed"))
+                    fail = true;
+
+                if (fail)
+                {
                     fail(urlMalicious + " failed injection attack test");
+                    throw new RuntimeException(urlMalicious + " failed injection attack test");
+               }
 			}
 			catch (RuntimeException re)
 			{
