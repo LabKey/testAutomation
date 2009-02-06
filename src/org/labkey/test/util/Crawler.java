@@ -484,26 +484,26 @@ public class Crawler
 
 			try
 			{
-                boolean fail = false;
+                String msg = null;
 				_test.beginAt(urlMalicious);
+
+                String html = _test.getHtmlSource();
+                if (html.contains(maliciousScript))
+                    msg = "page contains injected script";
 
 				while (_test.isAlertPresent())
 				{
-					if (alertText.startsWith(_test.getAlert()))
-                        fail = true;
+					if (_test.getAlert().startsWith(alertText))
+                        msg = " malicious script executed";
 				}
 				
-				String html = _test.getHtmlSource();
-				if (html.contains(maliciousScript))
-                    fail = true;
                 // see ConnectionWrapper.java
                 if (html.contains("SQL injection test failed"))
-                    fail = true;
+                    msg = "SQL injection detected";
 
-                if (fail)
+                if (msg != null)
                 {
-                    fail(urlMalicious + " failed injection attack test");
-                    throw new RuntimeException(urlMalicious + " failed injection attack test");
+                    fail(msg + "\n" + urlMalicious);
                }
 			}
 			catch (RuntimeException re)
