@@ -122,6 +122,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, String analysisName)
     {
+        log("begin import analysis wizard");
         clickLinkWithText("Import FlowJo Workspace Analysis");
         assertTitleEquals("Import Analysis: " + containerPath);
         clickNavButton("Begin");
@@ -147,6 +148,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         // XXX: check confim page
         clickNavButton("Finish");
         waitForPipeline(containerPath);
+        log("finished import analysis wizard");
     }
 
     protected void selectTreeItem(String treeCmpId, String path)
@@ -163,6 +165,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void expandTreeItem(String treeCmpId, String path)
     {
+        log("expandtree item '" + path + "'");
         selenium.getEval(
                 "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
                 "var tree = ext.getCmp('" + treeCmpId + "');\n" +
@@ -172,6 +175,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void clearTreeSelections(String treeCmpId)
     {
+        log("clean tree selections");
         selenium.getEval(
                 "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
                 "var tree = ext.getCmp('" + treeCmpId + "');\n" +
