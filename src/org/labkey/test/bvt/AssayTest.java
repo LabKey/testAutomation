@@ -419,8 +419,8 @@ public class AssayTest extends AbstractAssayTest
 
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         
-        addWebPart("Assay Details");
-        // assay details has a details page that needs to be submitted
+        addWebPart("Assay Runs");
+        // assay runs has a details page that needs to be submitted
         clickButton("Submit", defaultWaitForPage);
 
         // Set the container filter to include subfolders
