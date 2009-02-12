@@ -661,7 +661,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertElementContains(loc, "SUCCESS: Update affected 1 rows");
         assertElementContains(loc, "SUCCESS: Delete affected 1 rows");
         assertElementContains(loc, "SUCCESS: Insert created 1 rows");
-        assertElementContains(loc, "SUCCESS: bad query generated exception: Could not find schema: lists_badname");
+        assertElementContains(loc, "SUCCESS: bad query generated exception: Failed to convert property value of type");
         assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
     }
 }
