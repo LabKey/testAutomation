@@ -16,15 +16,14 @@
 
 package org.labkey.test.drt;
 
-import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 
 import java.io.*;
 import java.util.Date;
-import java.net.URL;
 
 /**
  * User: brittp
@@ -274,7 +273,8 @@ public class StudyTest extends BaseSeleniumWebTest
         selenium.select("list_dataField", "label=Sample Id");
 
         clickNavButton("Save");
-        waitForElement(Locator.navButton("Import Data"), WAIT_FOR_GWT);
+        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_GWT);
+        clickNavButton("View Dataset Data");
         clickNavButton("Import Data");
 
         String tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +

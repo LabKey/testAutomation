@@ -254,8 +254,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Next");
         waitForElement(Locator.raw("ff_name0"), WAIT_FOR_GWT);
         selenium.type("ff_name0", "Value");
-        clickNavButton("Save", 0);
-        selenium.waitForPageToLoad("30000");
+        clickNavButton("Save");
+        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_GWT);
+        clickNavButton("View Dataset Data");
         clickNavButton("Import Data");
         selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
         submit();

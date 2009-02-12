@@ -166,6 +166,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         log("Import dataset data");
         clickLinkWithText("QC Dataset");
+        clickNavButton("View Dataset Data");
         clickNavButton("Import Data");
 
         setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_QC_DATASET);
