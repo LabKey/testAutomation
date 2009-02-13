@@ -181,7 +181,7 @@ public class LuminexTest extends AbstractAssayTest
             clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME);
             assertTextPresent("Hu IL-1b (32)");
 
-            clickLinkWithText(TEST_ASSAY_LUM);
+            clickLinkWithText(TEST_ASSAY_LUM + " Runs");
             clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME3);
             assertTextPresent("IL-1b (1)");
             assertTextPresent("ParticipantID1");
@@ -192,7 +192,7 @@ public class LuminexTest extends AbstractAssayTest
             setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ParticipantID2");
             assertTextPresent("1.2");
 
-            clickLinkWithText(TEST_ASSAY_LUM);
+            clickLinkWithText(TEST_ASSAY_LUM + " Runs");
             clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME4);
             assertTextPresent("IL-1b (1)");
             assertTextPresent("ListParticipant1");
@@ -204,7 +204,7 @@ public class LuminexTest extends AbstractAssayTest
             setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ListParticipant2");
             assertTextPresent("1001.2");
 
-            clickLinkWithText(TEST_ASSAY_LUM);
+            clickLinkWithText(TEST_ASSAY_LUM + " Runs");
             clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME2);
             assertTextPresent("IL-1b (1)");
             assertTextPresent("9011-04");
