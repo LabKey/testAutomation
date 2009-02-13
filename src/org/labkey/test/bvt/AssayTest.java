@@ -374,7 +374,7 @@ public class AssayTest extends AbstractAssayTest
         clickNavButton("Recall Selected Rows");
         selenium.getConfirmation();
         waitForPageToLoad();
-        assertTextPresent("row(s) were deleted from the assay: " + TEST_ASSAY);
+        assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
 
         // verify audit entry was adjusted
         clickLinkWithText("details");
