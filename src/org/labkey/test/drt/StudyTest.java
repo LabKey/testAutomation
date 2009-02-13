@@ -87,7 +87,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     protected void deleteReport(String reportName)
     {
-        clickLinkWithText("Manage Reports and Views");
+        clickLinkWithText("Manage Views");
         final Locator report = Locator.tagContainingText("div", reportName);
 
         // select the report and click the delete button
@@ -113,7 +113,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     protected void clickReportGridLink(String reportName, String linkText)
     {
-        clickLinkWithText("Manage Reports and Views");
+        clickLinkWithText("Manage Views");
         final Locator report = Locator.tagContainingText("div", reportName);
 
         waitForElement(report, 10000);

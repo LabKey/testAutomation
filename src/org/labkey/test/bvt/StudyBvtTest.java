@@ -494,7 +494,7 @@ public class StudyBvtTest extends StudyTest
         // snapshot over a custom query
         log("create a snapshot over a custom query");
         clickLinkWithText("Study 001");
-        clickLinkWithText("Manage Reports and Views");
+        clickLinkWithText("Manage Views");
         createReport(GRID_VIEW);
 
         clickLinkWithText("Modify Dataset List (Advanced)");
@@ -617,7 +617,7 @@ public class StudyBvtTest extends StudyTest
         log("Clean up R Reports");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Reports and Views");
+        clickLinkWithText("Manage Views");
         for (String script : R_SCRIPTS)
         {
             while (isTextPresent(script))
@@ -650,7 +650,7 @@ public class StudyBvtTest extends StudyTest
         createSiteDeveloper(PasswordUtil.getUsername());
 
         clickLinkWithText("Admin Console");
-        clickLinkWithText("reports and scripting");
+        clickLinkWithText("views and scripting");
         log("Check if it already is configured");
 
         try
@@ -991,8 +991,8 @@ public class StudyBvtTest extends StudyTest
 
         // create grid view
         clickLinkWithText(FOLDER_NAME);
-        waitForElement(Locator.linkWithText("Manage Reports and Views"), 5000);
-        clickLinkWithText("Manage Reports and Views");
+        waitForElement(Locator.linkWithText("Manage Views"), 5000);
+        clickLinkWithText("Manage Views");
 
         createReport(GRID_VIEW);
         setFormElement("label", TEST_GRID_VIEW);
