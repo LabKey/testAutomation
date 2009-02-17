@@ -338,6 +338,7 @@
         <delete failonerror="false" dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/logs" />
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
+        <antcall target="waitfor-labkey-started"/>
 
         <antcall target="startSeleniumServer" />
 
@@ -646,8 +647,8 @@
             <isset property="memCheck"/>
         </condition>
 
-        <!-- Set property sysprop.labkey.port: user provided or empty -->
-        <condition property="sysprop.labkey.port" value="">
+        <!-- Set property sysprop.labkey.port: user provided or '8080' -->
+        <condition property="sysprop.labkey.port" value="8080">
             <not>
                 <isset property="labkey.port"/>
             </not>
@@ -656,8 +657,8 @@
             <isset property="labkey.port"/>
         </condition>
 
-        <!-- Set property sysprop.labkey.server: user provided or empty -->
-        <condition property="sysprop.labkey.server" value="">
+        <!-- Set property sysprop.labkey.server: user provided or 'http://localhost' -->
+        <condition property="sysprop.labkey.server" value="http://localhost">
             <not>
                 <isset property="labkey.server"/>
             </not>
@@ -666,8 +667,8 @@
             <isset property="labkey.server"/>
         </condition>
 
-        <!-- Set property sysprop.cpas.contextpath: user provided or empty -->
-        <condition property="sysprop.labkey.contextpath" value="">
+        <!-- Set property sysprop.cpas.contextpath: user provided or '/labkey' -->
+        <condition property="sysprop.labkey.contextpath" value="/labkey">
             <not>
                 <isset property="labkey.contextpath"/>
             </not>
@@ -731,7 +732,13 @@
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
     </target>
 
-    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,modifiedFiles">
+    <target name="waitfor-labkey-started">
+      <waitfor maxwait="4" maxwaitunit="minute" checkevery="500">
+        <http url="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view" />
+      </waitfor>
+    </target>
+
+    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started,modifiedFiles">
         <junit fork="true" forkmode="once" maxmemory="128m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltonerror}"
@@ -779,7 +786,7 @@
         <touch file="${svnModifiedFiles}" />
     </target>
 
-    <target name="runsuite-perf" depends="compile,ensurePassword,deploy-test-modules,set-user-props">
+    <target name="runsuite-perf" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started">
         <junit fork="true" forkmode="once" maxmemory="256m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="true" showoutput="false">
@@ -815,6 +822,8 @@
         <delete failonerror="false" dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/logs" />
         <ant inheritall="true" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
+        <antcall target="waitfor-labkey-started"/>
+
         <junit fork="true" forkmode="once" maxmemory="128m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="false" showoutput="true">
