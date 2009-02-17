@@ -736,6 +736,10 @@
       <waitfor maxwait="4" maxwaitunit="minute" checkevery="500">
         <http url="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view" />
       </waitfor>
+      <sleep seconds="2"/>
+      <waitfor maxwait="4" maxwaitunit="minute" checkevery="500">
+        <http url="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view" />
+      </waitfor>
     </target>
 
     <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started,modifiedFiles">
