@@ -363,7 +363,9 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test deleting rows");
         checkCheckbox(".toggle");
-        clickNavButton("Delete");
+        selenium.chooseOkOnNextConfirmation();
+        clickButton("Delete", 0);
+        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
         waitForPageToLoad();
         assertTextNotPresent(LIST2_KEY);
         assertTextNotPresent(LIST2_KEY2);

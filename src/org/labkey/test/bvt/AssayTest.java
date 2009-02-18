@@ -325,7 +325,7 @@ public class AssayTest extends AbstractAssayTest
 
         //select all the data rows and click publish
         selenium.click(".toggle");
-        clickNavButton("Copy Selected to Study");
+        clickNavButton("Copy to Study");
 
         //the target study selected before was Study2, but the PI is not an editor there
         //so ensure that system has correctly caught this fact and now asks the PI to
@@ -372,7 +372,7 @@ public class AssayTest extends AbstractAssayTest
 
         clickLinkWithText("details");
         checkCheckbox(Locator.checkboxByName(".toggle", false));
-        clickNavButton("Recall Selected Rows");
+        clickNavButton("Recall Rows");
         selenium.getConfirmation();
         waitForPageToLoad();
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
@@ -441,7 +441,7 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing select all data and view");
         clickCheckbox(".toggle", false);
-        clickButton("Show Results For Selected", defaultWaitForPage);
+        clickButton("Show Results", defaultWaitForPage);
         verifySpecimensPresent(9);
 
         log("Testing clicking on a run");
@@ -475,7 +475,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("SecondRun");
 
         clickCheckbox(".toggle", false);
-        clickButton("Copy Selected to Study", defaultWaitForPage);
+        clickButton("Copy to Study", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
 
         for (int i=7; i<=9; i++)

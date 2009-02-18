@@ -93,7 +93,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         addWebPart("Assay List");
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        selectOptionByText("providerName", "simple");
+        selectOptionByText("providerName", "Simple");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);

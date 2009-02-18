@@ -211,7 +211,7 @@ public class LuminexTest extends AbstractAssayTest
 
             setFilter(TEST_ASSAY_LUM + " Data", "FI", "Equals", "20");
             selenium.click(".toggle");
-            clickNavButton("Copy Selected to Study");
+            clickNavButton("Copy to Study");
             selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
             clickNavButton("Next");
             setFormElement("participantId", "ParticipantID");

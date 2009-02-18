@@ -209,7 +209,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         clickLinkContainingText(TEST_RUN1);
         selenium.click(".toggle");
-        clickNavButton("Copy Selected to Study");
+        clickNavButton("Copy to Study");
         clickNavButton("Next");
         clickNavButton("Copy to Study");
         clickLinkContainingText(STUDY_FOLDER + " Study");

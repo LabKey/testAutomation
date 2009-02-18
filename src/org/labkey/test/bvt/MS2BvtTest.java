@@ -1062,7 +1062,7 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithText("Run Groups");
         checkAllOnPage("RunGroupWide");
-        clickNavButton("Delete Selected");
+        clickNavButton("Delete");
         clickNavButton("Confirm Delete");
         assertTextNotPresent(RUN_GROUP1_NAME2);
         assertTextNotPresent(RUN_GROUP2_NAME);

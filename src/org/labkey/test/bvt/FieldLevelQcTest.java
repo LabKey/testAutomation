@@ -145,7 +145,9 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
     private void deleteListData()
     {
         checkCheckbox(".toggle");
-        clickButton("Delete", defaultWaitForPage);
+        selenium.chooseOkOnNextConfirmation();
+        clickButton("Delete", 0);
+        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
     }
 
     private void checkDatasetQc() throws Exception
@@ -264,7 +266,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickLinkWithText(ASSAY_RUN_SINGLE_COLUMN);
         validateSingleColumnData();
         checkCheckbox(".toggle");
-        clickNavButton("Copy Selected to Study");
+        clickNavButton("Copy to Study");
         
         clickNavButton("Next");
 

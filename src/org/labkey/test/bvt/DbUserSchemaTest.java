@@ -133,7 +133,10 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
         for (int i = 0; i < pk.length; i++)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(pk[i]), false));
-        clickNavButton("Delete");
+        selenium.chooseOkOnNextConfirmation();
+        clickButton("Delete", 0);
+        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+        waitForPageToLoad();
 
         // assume no errors if we end up back on the grid view
         assertTitleEquals(TABLE_NAME + ": /" + PROJECT_NAME);

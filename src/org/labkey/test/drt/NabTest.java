@@ -107,7 +107,7 @@ public class NabTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Previous Runs By Sample");
         checkCheckbox(".select", 0, false);
-        clickNavButton("Copy Selected to Study");
+        clickNavButton("Copy to Study");
         selectOptionByText("targetContainerId", "/NabVerifyProject/NabFolder (NabFolder Study)");
         clickNavButton("Next");
         setFormElement("sequenceNums", "100.1");
@@ -121,7 +121,7 @@ public class NabTest extends BaseSeleniumWebTest
         clickLinkWithText("Previous Runs");
         log("Delete run");
         clickImgButtonNoNav("Select All");
-        clickNavButton("Delete Selected");
+        clickNavButton("Delete");
 
         log("Verify deleted run");
         assertTextPresent("Incubation Time");

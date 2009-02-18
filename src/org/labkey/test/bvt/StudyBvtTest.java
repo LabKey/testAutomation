@@ -396,7 +396,7 @@ public class StudyBvtTest extends StudyTest
 
         log("Test deleting rows in a dataset");
         checkCheckbox(Locator.raw("//input[contains(@value, '999320529')]"));
-        clickNavButton("Delete Selected");
+        clickNavButton("Delete");
         selenium.getConfirmation();
         assertTextNotPresent("999320529");
 
