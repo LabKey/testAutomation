@@ -425,7 +425,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Submit", defaultWaitForPage);
 
         // Set the container filter to include subfolders
-        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current Folder and Subfolders");
+        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current folder and subfolders");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
