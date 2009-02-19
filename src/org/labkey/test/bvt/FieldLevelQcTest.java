@@ -148,6 +148,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
         assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+        waitForPageToLoad();
     }
 
     private void checkDatasetQc() throws Exception
