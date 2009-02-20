@@ -118,9 +118,10 @@ public class StudyTest extends BaseSeleniumWebTest
 
         waitForElement(report, 10000);
 
-        // click the row expander
-        Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//div[contains(@class, 'x-grid3-row-expander')]");
-        selenium.mouseDown(expander.toString());
+        // click the row to expand it
+        //Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//div[contains(@class, 'x-grid3-row-expander')]");
+        Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']");
+        selenium.click(expander.toString());
 
         final Locator link = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//..//td//a[contains(text(),'" + linkText + "')]");
 

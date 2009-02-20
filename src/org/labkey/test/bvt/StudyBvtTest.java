@@ -929,7 +929,7 @@ public class StudyBvtTest extends StudyTest
         signIn();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickReportGridLink(R_SCRIPTS[0], "edit");
+        clickReportGridLink(R_SCRIPTS[0], "source");
         if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 fail("Their was an error running the script");
@@ -939,7 +939,7 @@ public class StudyBvtTest extends StudyTest
         log("Check that edit worked");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickReportGridLink(R_SCRIPTS[1], "edit");
+        clickReportGridLink(R_SCRIPTS[1], "source");
 
         checkCheckbox(Locator.name("includedReports"));
         clickNavButton("Execute Script");
