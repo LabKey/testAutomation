@@ -466,9 +466,8 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("view all results");
         verifySpecimensPresent(9);
 
-        // Verify that the correct copied to study columns are present
+        // Verify that the correct copied to study column is present
         assertTextPresent("Copied to Study 1 Study");
-        assertTextPresent("Copied to Study 2 Study");
 
         log("Testing copy to study availability");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
