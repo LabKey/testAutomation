@@ -100,6 +100,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String script = getStreamContentsAsString(inputStream);
         System.out.println("Loading scripts from seleniumHelpers.js");
         System.out.println(selenium.getEval(script));
+
+        if (this.enableScriptCheck())
+            beginJsErrorChecker();
+    }
+
+    public void beginJsErrorChecker()
+    {
+        selenium.getEval("selenium.doBeginJsErrorChecker();");
+    }
+
+    public void endJsErrorChecker()
+    {
+        selenium.getEval("selenium.doEndJsErrorChecker();");
     }
 
     /**
@@ -206,6 +219,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
 
     public void tearDown() throws Exception {
+        if (this.enableScriptCheck())
+            endJsErrorChecker();
+
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
         if (!skipTearDown)
             selenium.stop();
@@ -767,6 +783,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 	{
 		return "true".equals(System.getProperty("injectCheck"));
 	}
+
+    public boolean enableScriptCheck()
+    {
+        return "true".equals(System.getProperty("scriptCheck"));
+    }
 
     public boolean skipLeakCheck()
     {

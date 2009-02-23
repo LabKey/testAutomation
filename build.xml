@@ -91,6 +91,9 @@
         <echo message=""/>
         <echo message="The leak checker is run by default for DRT and BVT tests.  To disable mem checking:"/>
         <echo message="    -DmemCheck=false"/>
+        <echo message=""/>
+        <echo message="Add javascript error checking (firefox only):"/>
+        <echo message="    -DscriptCheck=true"/>
     </target>
 
     <target name="clean">
@@ -369,6 +372,7 @@
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -647,6 +651,16 @@
             <isset property="memCheck"/>
         </condition>
 
+        <!-- Set property sysprop.scriptCheck: true or false -->
+        <condition property="sysprop.scriptCheck" value="false">
+            <not>
+                <isset property="scriptCheck"/>
+            </not>
+        </condition>
+        <condition property="sysprop.scriptCheck" value="${scriptCheck}">
+            <isset property="scriptCheck"/>
+        </condition>
+
         <!-- Set property sysprop.labkey.port: user provided or '8080' -->
         <condition property="sysprop.labkey.port" value="8080">
             <not>
@@ -727,17 +741,19 @@
         <echo message="    loop forever: ${sysprop.loop}"/>
         <echo message="    link check: ${sysprop.linkCheck}"/>
         <echo message="    memory check: ${sysprop.memCheck}"/>
+        <echo message="    script check: ${sysprop.scriptCheck}"/>
         <echo message="    labkey.port: ${sysprop.labkey.port}"/>
         <echo message="    target server ${sysprop.labkey.server}"/>
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
     </target>
 
     <target name="waitfor-labkey-started">
-      <waitfor maxwait="4" maxwaitunit="minute" checkevery="500">
+      <echo message="waiting for the server to start..."/>
+      <waitfor maxwait="10" maxwaitunit="second" checkevery="100">
         <http url="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view" />
       </waitfor>
       <sleep seconds="2"/>
-      <waitfor maxwait="4" maxwaitunit="minute" checkevery="500">
+      <waitfor maxwait="2" maxwaitunit="minute" checkevery="100">
         <http url="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view" />
       </waitfor>
     </target>
@@ -760,6 +776,7 @@
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -808,6 +825,7 @@
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -841,6 +859,7 @@
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
+            <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>

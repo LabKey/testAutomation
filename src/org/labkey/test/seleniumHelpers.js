@@ -18,7 +18,7 @@ selenium.getLinkAddresses = function () {
         var addresses = new Array();
         for (var i = 0; i < links.length; i++)
           addresses[i] = links[i].getAttribute('href');
-        return addresses.join('\\n')
+        return addresses.join('\\n');
 };
 
 selenium.countLinksWithText = function (txt) {
@@ -29,13 +29,13 @@ selenium.countLinksWithText = function (txt) {
             count++;
     }
     return count;
-}
+};
 
 selenium.appendToFormField = function (fieldName, txt) {
     var doc = selenium.browserbot.getCurrentWindow().document;
     doc.forms[0][fieldName].value = doc.forms[0][fieldName].value + txt;
     return "OK";
-}
+};
 
 selenium.clickExtComponent = function (id) {
     var ext = selenium.browserbot.getCurrentWindow().Ext;
@@ -51,7 +51,7 @@ selenium.clickExtComponent = function (id) {
         return true;
     }
     return false;
-}
+};
 
 selenium.getExtElementId = function (id) {
     var ext = selenium.browserbot.getCurrentWindow().Ext;
@@ -60,7 +60,87 @@ selenium.getExtElementId = function (id) {
     //if (!cmp) return false;
 
     return cmp.getEl().id;
-}
+};
+
+// firefox error console listener
+// http://sejq.blogspot.com/2008/12/can-selenium-detect-if-page-has.html
+// https://developer.mozilla.org/en/Console_service
+if (browserVersion.isChrome) {
+    var consoleListener = {
+        installed: false,
+        observe: function( msg ) {
+//            LOG.info("JsErrorChecker: " + msg.message);
+            try {
+                dump("Log : " + msg.message);
+                if (msg.message != null &&
+                    msg.message.indexOf("[JavaScript Error:") == 0 &&
+                    msg.message.indexOf("{file: \"chrome://") == -1)
+                {
+                    LOG.error("JsErrorChecker: " + msg.message);
+
+                    var result = {};
+                    result.failed = true;
+                    result.failureMessage = "JsErrorChecker: " + msg.message;
+                    currentTest.result = result;
+                    currentTest.commandComplete(this.result);
+                 }
+            }
+            catch (e) {
+                LOG.error("JsErrorChecker observe error: " + e.message);
+            }
+        },
+        QueryInterface: function (iid) {
+             if (!iid.equals(Components.interfaces.nsIConsoleListener) &&
+                   !iid.equals(Components.interfaces.nsISupports)) {
+                 throw Components.results.NS_ERROR_NO_INTERFACE;
+             }
+             return this;
+        }
+   };
+ }
+
+selenium.doBeginJsErrorChecker = function() {
+    try {
+        if (browserVersion.isChrome) {// firefox
+            if (!consoleListener.installed)
+            {
+                var consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
+                consoleService.registerListener(consoleListener);
+                consoleService.reset();
+                consoleListener.installed = true;
+                LOG.info("console listener registered");
+            }
+            else {
+                LOG.warn("console listener already registered");
+            }
+        } else {
+            throw new Error("TODO: Non-FF browser...");
+        }
+    } catch (e) {
+        throw new Error("doBeginJsErrorChecker() threw an exception: " + e.message);
+    }
+};
+
+selenium.doEndJsErrorChecker = function() {
+    try {
+        if (browserVersion.isChrome) {// firefox
+            if (consoleListener.installed) {
+                var consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
+                consoleService.unregisterListener(consoleListener);
+                consoleService.reset();
+                consoleListener.installed = false;
+                LOG.info("console listener unregistered");
+            }
+            else {
+                LOG.warn("console listener not previously registered");
+            }
+        } else {
+            throw new SeleniumError("TODO: Non-FF browser...");
+        }
+    } catch (e) {
+        throw new SeleniumError("doEndJsErrorChecker() threw an exception: " + e.message);
+    }
+};
 
 "OK";
 
