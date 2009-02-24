@@ -130,7 +130,7 @@ public class AssayTest extends AbstractAssayTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        selectOptionByText("providerName", "General");
+        checkCheckbox("providerName", "General", true);
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);

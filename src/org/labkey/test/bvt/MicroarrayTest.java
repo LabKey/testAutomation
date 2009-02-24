@@ -72,7 +72,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         log("Create an assay");
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        selectOptionByText("providerName", "Microarray");
+        checkCheckbox("providerName", "Microarray", true);
         clickNavButton("Next");
         waitForElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);

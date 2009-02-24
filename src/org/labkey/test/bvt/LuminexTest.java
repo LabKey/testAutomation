@@ -82,7 +82,7 @@ public class LuminexTest extends AbstractAssayTest
         //create a new luminex assay
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        selectOptionByText("providerName", "Luminex");
+        checkCheckbox("providerName", "Luminex", true);
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
