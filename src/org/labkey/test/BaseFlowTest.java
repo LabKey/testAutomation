@@ -128,6 +128,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("Begin");
 
         assertTitleEquals("Import Analysis: Upload Workspace: " + containerPath);
+        sleep(500);
         selectTreeItem("tree", workspacePath);
 //        assertFormElementEquals("workspace.path", workspacePath);
         clickNavButton("Next");
@@ -154,13 +155,34 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void selectTreeItem(String treeCmpId, String path)
     {
         log("selectTreeItem path: " + path);
-        String result = selenium.getEval(
-                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
-                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
-                "tree.selectPath('/<root>' + '"+ path + "', 'text');\n" +
-                "\"OK\"");
-        assertEquals("OK", result);
-        sleep(500);
+//        String result = selenium.getEval(
+//                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
+//                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
+//                "tree.selectPath('/<root>' + '"+ path + "', 'text');\n" +
+//                "\"OK\"");
+//        assertEquals("OK", result);
+
+        if (path.startsWith("/"))
+            path = path.substring(1);
+        String[] parts = path.split("/");
+        String treeNodeXpath = "//div[contains(@class, 'x-tree-node-el')]/div[@class='x-tree-col']";
+        for (int i = 0; i < parts.length; i++)
+        {
+            String part = parts[i];
+            if (i == parts.length - 1)
+            {
+                // select last item: click on tree node name
+                String xpath = treeNodeXpath + "/a[./span='" + part + "']";
+                click(Locator.xpath(xpath));
+            }
+            else
+            {
+                // expand tree node: click on expand/collapse icon
+                String xpath = treeNodeXpath + "/img[contains(@class, 'x-tree-ec-icon') and ../a/span='" + part + "']";
+                click(Locator.xpath(xpath));
+            }
+            sleep(500);
+        }
     }
 
     protected void expandTreeItem(String treeCmpId, String path)
