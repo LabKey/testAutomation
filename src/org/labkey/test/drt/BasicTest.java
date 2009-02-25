@@ -74,17 +74,9 @@ public class BasicTest extends BaseSeleniumWebTest
         clickLinkWithText("credits");
         assertTextNotPresent("WARNING:");
 
-        log("Test hide admin");
         ensureAdminMode();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Hide Admin");
-        //Admin menu stays visible...
-//        assertTextNotPresent("Manage Site");
-//        assertTextNotPresent("Manage Project");
-        assertElementNotPresent(Locator.raw("//img[@title='Remove From Page']"));
-        assertElementNotPresent(Locator.raw("//img[@title='Move Up']"));
-        clickLinkWithText("Show Admin");
         
         log("Test webpart buttons");
         clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));

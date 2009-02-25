@@ -319,8 +319,6 @@ public class SecurityTest extends BaseSeleniumWebTest
         impersonate(TO_BE_DELETED_USER);
         String deletedUserDisplayName = getDisplayName();
         assertTextNotPresent("Admin Console");
-        assertTextNotPresent("Hide Admin");
-        assertTextNotPresent("Show Admin");
         stopImpersonating();
 
         impersonate(SITE_ADMIN_USER);

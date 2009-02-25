@@ -394,9 +394,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void ensureAdminMode()
     {
         //Now switch to admin mode if available
-        if (isLinkPresentWithText("Show Admin"))
+        if (isLinkPresentWithText("Show Navigation Bar"))
         {
-            clickLinkWithText("Show Admin");
+            clickLinkWithText("Show Navigation Bar");
         }
     }
 
