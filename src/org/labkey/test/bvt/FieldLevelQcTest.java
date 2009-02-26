@@ -37,44 +37,82 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
     private static final String TEST_DATA_SINGLE_COLUMN_QC_LIST =
             "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
-            "Ted" + "\t" + ".N" + "\t" + "male" + "\n" +
+            "Ted" + "\t" + "N" + "\t" + "male" + "\n" +
             "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
-            "Bob" + "\t" + ".Q" + "\t" + ".N" + "\n";
+            "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
 
     private static final String TEST_DATA_TWO_COLUMN_QC_LIST =
             "Name" +    "\t" + "Age" +  "\t" + "AgeQCIndicator" +   "\t" + "Sex" +  "\t" + "SexQCIndicator" + "\n" +
-            "Franny" +  "\t" + "" +     "\t" + ".N" +               "\t" + "male" + "\t" +  "" + "\n" +
-            "Zoe" +     "\t" + "25" +   "\t" + ".Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
+            "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
+            "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
+            "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  "Q" + "\n";
+
+    private static final String TEST_DATA_SINGLE_COLUMN_QC_LIST_BAD =
+            "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
+            "Ted" + "\t" + ".N" + "\t" + "male" + "\n" +
+            "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
+            "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
+
+    private static final String TEST_DATA_TWO_COLUMN_QC_LIST_BAD =
+            "Name" +    "\t" + "Age" +  "\t" + "AgeQCIndicator" +   "\t" + "Sex" +  "\t" + "SexQCIndicator" + "\n" +
+            "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
+            "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
             "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  ".Q" + "\n";
 
     private static final String TEST_DATA_SINGLE_COLUMN_QC_DATASET = 
             "participantid\tSequenceNum\tAge\tSex\n" +
-            "Ted\t1\t.N\tmale\n" +
+            "Ted\t1\tN\tmale\n" +
             "Alice\t1\t17\tfemale\n" +
-            "Bob\t1\t.Q\t.N";
+            "Bob\t1\tQ\tN";
 
     private static final String TEST_DATA_TWO_COLUMN_QC_DATASET =
             "participantid\tSequenceNum\tAge\tAgeQCIndicator\tSex\tSexQCIndicator\n" +
-            "Franny\t1\t\t.N\tmale\t\n" +
-            "Zoe\t1\t25\t.Q\tfemale\t\n" +
+            "Franny\t1\t\tN\tmale\t\n" +
+            "Zoe\t1\t25\tQ\tfemale\t\n" +
+            "J.D.\t1\t50\t\tmale\tQ";
+
+    private static final String TEST_DATA_SINGLE_COLUMN_QC_DATASET_BAD =
+            "participantid\tSequenceNum\tAge\tSex\n" +
+            "Ted\t1\t.N\tmale\n" +
+            "Alice\t1\t17\tfemale\n" +
+            "Bob\t1\tQ\tN";
+
+    private static final String TEST_DATA_TWO_COLUMN_QC_DATASET_BAD =
+            "participantid\tSequenceNum\tAge\tAgeQCIndicator\tSex\tSexQCIndicator\n" +
+            "Franny\t1\t\tN\tmale\t\n" +
+            "Zoe\t1\t25\tQ\tfemale\t\n" +
             "J.D.\t1\t50\t\tmale\t.Q";
 
     private static final String DATASET_SCHEMA_FILE = "/sampledata/fieldLevelQC/dataset_schema.tsv";
 
     private static final String TEST_DATA_SINGLE_COLUMN_QC_ASSAY =
             "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
-                    "1\tTed\t1\t01-Jan-09\t.N\tmale\n" +
+                    "1\tTed\t1\t01-Jan-09\tN\tmale\n" +
                     "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
-                    "3\tBob\t1\t01-Jan-09\t.Q\t.N";
+                    "3\tBob\t1\t01-Jan-09\tQ\tN";
 
     private static final String TEST_DATA_TWO_COLUMN_QC_ASSAY =
             "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageQCIndicator\tsex\tsexQCIndicator\n" +
-                    "1\tFranny\t1\t01-Jan-09\t\t.N\tmale\t\n" +
-                    "2\tZoe\t1\t01-Jan-09\t25\t.Q\tfemale\t\n" +
+                    "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
+                    "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
+                    "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\tQ";
+
+    private static final String TEST_DATA_SINGLE_COLUMN_QC_ASSAY_BAD =
+            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
+                    "1\tTed\t1\t01-Jan-09\t.N\tmale\n" +
+                    "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
+                    "3\tBob\t1\t01-Jan-09\tQ\tN";
+
+    private static final String TEST_DATA_TWO_COLUMN_QC_ASSAY_BAD =
+            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageQCIndicator\tsex\tsexQCIndicator\n" +
+                    "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
+                    "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
                     "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\t.Q";
 
     private final String ASSAY_SINGLE_COLUMN_EXCEL_FILE = getLabKeyRoot() + "/sampledata/fieldLevelQC/assay_single_column.xls";
     private final String ASSAY_TWO_COLUMN_EXCEL_FILE = getLabKeyRoot() + "/sampledata/fieldLevelQC/assay_two_column.xls";
+    private final String ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD = getLabKeyRoot() + "/sampledata/fieldLevelQC/assay_single_column_bad.xls";
+    private final String ASSAY_TWO_COLUMN_EXCEL_FILE_BAD = getLabKeyRoot() + "/sampledata/fieldLevelQC/assay_two_column_bad.xls";
 
     protected void doTestSteps() throws Exception
     {
@@ -116,6 +154,10 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         log("Test upload list data with a combined data and QC column");
         clickLinkWithText("import data");
+        setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_QC_LIST_BAD);
+        submit();
+        assertLabkeyErrorPresent();
+
         setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_QC_LIST);
         submit();
         validateSingleColumnData();
@@ -126,17 +168,21 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Insert New");
         setFormElement("quf_name", "Sid");
         setFormElement("quf_sex", "male");
-        setFormElement("quf_age", ".N");
+        setFormElement("quf_age", "N");
         submit();
         assertNoLabkeyErrors();
         assertTextPresent("Sid");
         assertTextPresent("male");
-        assertTextPresent(".N");
+        assertTextPresent("N");
 
         deleteListData();
 
         log("Test separate QCIndicator column");
         clickNavButton("Import Data");
+        setFormElement("ff_data", TEST_DATA_TWO_COLUMN_QC_LIST_BAD);
+        submit();
+        assertLabkeyErrorPresent();
+
         setFormElement("ff_data", TEST_DATA_TWO_COLUMN_QC_LIST);
         submit();
         validateTwoColumnData();
@@ -172,6 +218,11 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("View Dataset Data");
         clickNavButton("Import Data");
 
+        setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_QC_DATASET_BAD);
+        submit();
+        assertLabkeyErrorPresent();
+        submit();
+
         setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_QC_DATASET);
         submit();
         validateSingleColumnData();
@@ -182,18 +233,23 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Insert New");
         setFormElement("quf_participantid", "Sid");
         setFormElement("quf_SequenceNum", "1");
-        setFormElement("quf_Age", ".N");
+        setFormElement("quf_Age", "N");
         setFormElement("quf_Sex", "male");
         submit();
         assertNoLabkeyErrors();
         assertTextPresent("Sid");
         assertTextPresent("male");
-        assertTextPresent(".N");
+        assertTextPresent("N");
 
         deleteDatasetData();
 
         log("Import dataset data with two qc columns");
         clickNavButton("Import Data");
+
+        setFormElement("tsv", TEST_DATA_TWO_COLUMN_QC_DATASET_BAD);
+        submit();
+        assertLabkeyErrorPresent();
+
         setFormElement("tsv", TEST_DATA_TWO_COLUMN_QC_DATASET);
         submit();
         validateTwoColumnData();
@@ -202,11 +258,12 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
     private void validateSingleColumnData()
     {
         assertNoLabkeyErrors();
+        assertQcValuePresent();
         assertTextPresent("Ted");
         assertTextPresent("Alice");
         assertTextPresent("Bob");
-        assertTextPresent(".Q");
-        assertTextPresent(".N");
+        assertTextPresent("Q");
+        assertTextPresent("N");
         assertTextPresent("male");
         assertTextPresent("female");
         assertTextPresent("17");
@@ -215,11 +272,12 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
     private void validateTwoColumnData()
     {
         assertNoLabkeyErrors();
+        assertQcValuePresent();
         assertTextPresent("Franny");
         assertTextPresent("Zoe");
         assertTextPresent("J.D.");
-        assertTextPresent(".Q");
-        assertTextPresent(".N");
+        assertTextPresent("Q");
+        assertTextPresent("N");
         assertTextPresent("male");
         assertTextPresent("female");
         assertTextPresent("50");
@@ -240,6 +298,12 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Next");
         selenium.type("name", ASSAY_RUN_SINGLE_COLUMN);
         selenium.click("//input[@value='textAreaDataProvider']");
+
+        selenium.type("TextAreaDataCollector.textArea", TEST_DATA_SINGLE_COLUMN_QC_ASSAY_BAD);
+        clickNavButton("Save and Finish");
+        assertLabkeyErrorPresent();
+
+        selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_DATA_SINGLE_COLUMN_QC_ASSAY);
         clickNavButton("Save and Finish");
         assertNoLabkeyErrors();
@@ -254,6 +318,12 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
         clickNavButton("Next");
         selenium.type("name", ASSAY_RUN_TWO_COLUMN);
+
+        selenium.click("//input[@value='textAreaDataProvider']");
+        selenium.type("TextAreaDataCollector.textArea", TEST_DATA_TWO_COLUMN_QC_ASSAY_BAD);
+        clickNavButton("Save and Finish");
+        assertLabkeyErrorPresent();
+
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_DATA_TWO_COLUMN_QC_ASSAY);
         clickNavButton("Save and Finish");
@@ -285,7 +355,14 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
             clickNavButton("Next");
             selenium.type("name", ASSAY_EXCEL_RUN_SINGLE_COLUMN);
             checkCheckbox("dataCollectorName", "File upload", true);
-            File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
+
+            File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
+            setFormElement("uploadedFile", file);
+            clickNavButton("Save and Finish");
+            assertLabkeyErrorPresent();
+
+            checkCheckbox("dataCollectorName", "File upload", true);
+            file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
             setFormElement("uploadedFile", file);
             clickNavButton("Save and Finish");
             assertNoLabkeyErrors();
@@ -301,6 +378,12 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
             clickNavButton("Next");
             selenium.type("name", ASSAY_EXCEL_RUN_TWO_COLUMN);
             checkCheckbox("dataCollectorName", "File upload", true);
+            file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
+            setFormElement("uploadedFile", file);
+            clickNavButton("Save and Finish");
+            assertLabkeyErrorPresent();
+
+            checkCheckbox("dataCollectorName", "File upload", true);
             file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
             setFormElement("uploadedFile", file);
             clickNavButton("Save and Finish");
@@ -308,6 +391,12 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
             clickLinkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN);
             validateTwoColumnData();
         }
+    }
+
+    private void assertQcValuePresent()
+    {
+        // We'd better have some 
+        assertElementPresent(Locator.xpath("//img[@class='labkey-qc-indicator']"));
     }
 
     @Override

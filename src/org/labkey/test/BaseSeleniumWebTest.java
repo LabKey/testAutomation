@@ -1156,6 +1156,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertElementNotPresent(Locator.xpath("//font[@class='labkey-error']"));
     }
 
+    public void assertLabkeyErrorPresent()
+    {
+        assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
+            isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
+
+    }
+
     public boolean isTextPresent(String text)
     {
         //Need to unencode here? Selenium turns &nbsp; into space???
