@@ -433,15 +433,11 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         sleep(1000);
 
         log("setting fields to allow QC");
-        selenium.click("//input[@id='ff_name4']");
-        // This is gross, I know. I don't know why using just the name doesn't work
-        //checkCheckbox("allowsQc");
-        clickCheckboxById("gwt-uid-8", false);
+        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name4']");
+        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='allowsQc']");
 
-        selenium.click("//input[@id='ff_name5']");
-        // Yes, icky again. See above
-        //checkCheckbox("allowsQc");
-        clickCheckboxById("gwt-uid-8", false);
+        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']");
+        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='allowsQc']");
 
         clickNavButton("Save & Close");
         assertNoLabkeyErrors();

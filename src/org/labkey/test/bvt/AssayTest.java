@@ -155,19 +155,19 @@ public class AssayTest extends AbstractAssayTest
 
         // Set some to required
         selenium.click(getPropertyXPath("Batch Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
-        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@name='required']");
 
         selenium.click(getPropertyXPath("Batch Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
-        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@name='required']");
 
         selenium.click(getPropertyXPath("Run Fields") + "//td/input[@id='ff_name0']");
-        selenium.click(getPropertyXPath("Run Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Run Fields") + "//span/input[@name='required']");
 
         selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name0']");
-        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='required']");
 
         selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2) + "']");
-        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@type='checkbox']");
+        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='required']");
 
         sleep(1000);
         clickNavButton("Save", 0);
