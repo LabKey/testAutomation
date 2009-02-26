@@ -347,12 +347,12 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         selenium.click("//input[@id='ff_name4']");
         // This is gross, I know. I don't know why using just the name doesn't work
         //checkCheckbox("allowsQc");
-        clickCheckboxById("gwt-uid-11", false);
+        clickCheckboxById("gwt-uid-8", false);
 
         selenium.click("//input[@id='ff_name5']");
         // Yes, icky again. See above
         //checkCheckbox("allowsQc");
-        clickCheckboxById("gwt-uid-11", false);
+        clickCheckboxById("gwt-uid-8", false);
 
         clickNavButton("Save & Close");
         assertNoLabkeyErrors();
