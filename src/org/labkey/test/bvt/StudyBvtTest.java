@@ -647,7 +647,7 @@ public class StudyBvtTest extends StudyTest
     {
         ensureAdminMode();
         // user need to be added to the site develpers group
-        createSiteDeveloper(PasswordUtil.getUsername());
+        // createSiteDeveloper(PasswordUtil.getUsername());
 
         clickLinkWithText("Admin Console");
         clickLinkWithText("views and scripting");
