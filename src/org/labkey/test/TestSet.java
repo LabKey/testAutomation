@@ -61,7 +61,7 @@ public enum TestSet
         FieldValidatorTest.class,
         DbUserSchemaTest.class,
         FieldLevelQcTest.class,
-        //ModuleAssayTest.class,
+        ModuleAssayTest.class,
     }),
 
     DRT(new Class[]

@@ -185,7 +185,14 @@ public class ModuleAssayTest extends AbstractAssayTest
         {
             String uploadedFile = uploadedFiles[i];
             setFormElement("upload-run-field-file", new File(dataRoot, uploadedFile));
-            sleep(1500);
+            int count = 5;
+            do
+            {
+                sleep(1500);
+                String runCountStr = selenium.getText(Locator.id("batch_runCount_div").toString());
+                if (runCountStr != null && Integer.parseInt(runCountStr) == i+1)
+                    break;
+            } while (--count > 0);
             assertElementContains(Locator.id("batch_runCount_div"), String.valueOf(i+1));
             // file name should appear in runs grid on upload page
             assertTextPresent(uploadedFile);
