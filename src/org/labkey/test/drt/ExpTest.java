@@ -28,7 +28,6 @@ public class ExpTest extends BaseSeleniumWebTest
     private static final String PROJECT_NAME = "ExpVerifyProject";
     private static final String FOLDER_NAME = "verifyfldr";
     private static final String EXPERIMENT_NAME = "Tutorial Examples";
-    private static final String EXPERIMENT_LSID = "urn:lsid:cpas.fhcrc.org:dev.Experiment.ExperimentVerify.verifyfldr:Experiment:001";
     private static final String RUN_NAME = "Example 5 Run (XTandem peptide search)";
     private static final String RUN_NAME_IMAGEMAP = "Example 5 Run (XTandem peptide search)";
     private static final String DATA_OBJECT_TITLE = "Data: CAexample_mini.mzXML";
@@ -71,7 +70,6 @@ public class ExpTest extends BaseSeleniumWebTest
 
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(EXPERIMENT_NAME);
-        assertTextPresent(EXPERIMENT_LSID);
         assertTextPresent("Example 5 Run");
         clickLinkWithText(RUN_NAME);
         clickLinkWithText("graph summary view");
