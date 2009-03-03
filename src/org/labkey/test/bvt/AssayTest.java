@@ -480,6 +480,8 @@ public class AssayTest extends AbstractAssayTest
         for (int i=7; i<=9; i++)
             assertTextPresent("s" + i);
 
+        clickButton("Cancel", defaultWaitForPage);
+
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
     }
 
