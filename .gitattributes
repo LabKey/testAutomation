@@ -116,6 +116,8 @@ src/org/labkey/test/pipeline/PipelineFolder.java -text
 src/org/labkey/test/pipeline/PipelineTestParams.java -text
 src/org/labkey/test/pipeline/PipelineTestsBase.java -text
 src/org/labkey/test/pipeline/PipelineWebTestBase.java -text
+src/org/labkey/test/qc/JavaQC.java -text
+src/org/labkey/test/qc/build.xml -text
 src/org/labkey/test/seleniumHelpers.js -text
 src/org/labkey/test/testpicker/CheckNode.java -text
 src/org/labkey/test/testpicker/CheckRenderer.java -text
