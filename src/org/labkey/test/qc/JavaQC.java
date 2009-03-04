@@ -15,7 +15,6 @@
  */
 package org.labkey.test.qc;
 
-import javax.xml.bind.ValidationException;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
