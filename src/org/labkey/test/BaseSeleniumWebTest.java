@@ -448,9 +448,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private void checkForUpgrade()
     {
+        boolean bootstrapped = false;
         // check to see if we're the first user:
         if (isTextPresent("You are the first user"))
         {
+            bootstrapped = true;
             assertTitleEquals("Register First User");
             log("Need to bootstrap");
             verifyInitialUserRedirects();
@@ -506,7 +508,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickLinkWithText("Set Password");
         }
 
-        if (isTitleEqual("Sign In"))
+        if (bootstrapped || isTitleEqual("Sign In"))
         {
             // if the logout page takes us to the sign-in page, then we may have a schema update to do:
             simpleSignIn();
