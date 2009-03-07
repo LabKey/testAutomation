@@ -310,6 +310,9 @@ public class Runner extends TestSuite
                     WebTest test = c.newInstance();
                     String directory = test.getAssociatedModuleDirectory();
 
+                    if (null == directory || 0 == directory.length())
+                        System.out.println("ERROR: Invalid module directory \"" + directory + "\" specified by " + testClass);                        
+
                     if (!"none".equals(directory))
                     {
                         File testDir = new File(WebTestHelper.getLabKeyRoot(), "/server/modules/" + directory);

@@ -86,7 +86,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "";
+        return "none";
     }
 
     protected void doCleanup() throws Exception

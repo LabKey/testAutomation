@@ -95,7 +95,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "";
+        return "experiment";
     }
 
     protected void doCleanup()

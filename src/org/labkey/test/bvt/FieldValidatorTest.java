@@ -133,6 +133,6 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "";
+        return "experiment";
     }
 }
