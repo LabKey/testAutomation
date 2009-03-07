@@ -342,13 +342,13 @@ public class StudyTest extends BaseSeleniumWebTest
         clickMenuButton("Page Size", "Page Size:All");
         assertTextNotPresent("DRT000XX-01");
         assertTextPresent("GAA082NH-01");
-        clickLinkWithText("Hide Vial and Request Options");
+        clickLinkWithText("Hide Vial Info");
         assertTextPresent("Total:");
         assertTextPresent("444");
 
         assertTextNotPresent("BAD");
 
-        clickLinkWithText("Show Vial and Request Options");
+        clickLinkWithText("Show Vial Info");
         clickLinkContainingText("history");
         assertTextPresent("2.0&nbsp;ML");
         assertTextNotPresent("Added Comments");

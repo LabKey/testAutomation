@@ -312,7 +312,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("Submit without agreeing");
         clickNavButton("Agree");
 
-        assertTextPresent("You must agree");
+        assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickNavButton("Agree");
 
