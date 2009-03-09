@@ -2740,7 +2740,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public String getDisplayName()
     {
         String cellText = getText(Locator.xpath("//table[@id='header']/tbody/tr/td[3]"));
-        return cellText.split("\\n")[0];
+        return cellText.split("\\n")[0].trim();
     }
 
 
