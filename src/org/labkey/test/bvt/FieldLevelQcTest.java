@@ -446,8 +446,11 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
     private void deleteDatasetData()
     {
-        clickButton("Delete All Rows", defaultWaitForPage);
-        selenium.getConfirmation();
+        checkCheckbox(".toggle");
+        selenium.chooseOkOnNextConfirmation();
+        clickButton("Delete", 0);
+        assertEquals(selenium.getConfirmation(), "Delete selected rows of this dataset?");
+        waitForPageToLoad();
     }
 
     protected void doCleanup() throws Exception
