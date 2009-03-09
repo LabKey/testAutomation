@@ -512,7 +512,7 @@ public class StudyBvtTest extends StudyTest
         log("edit the snapshot");
         clickMenuButton("Views", null, EDIT_SNAPSHOT_MENU);
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
-        clickNavButton("Update");
+        clickNavButton("Save");
         assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
         clickNavButton("Update Snapshot");
         selenium.getConfirmation();
