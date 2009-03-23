@@ -24,7 +24,6 @@ import org.labkey.test.util.ListHelper;
  * User: Erik
  * Date: Jul 2, 2008
  * Time: 2:03:39 PM
- * To change this template use File | Settings | File Templates.
  */
 public class HTTPApiTest extends BaseSeleniumWebTest
 {
