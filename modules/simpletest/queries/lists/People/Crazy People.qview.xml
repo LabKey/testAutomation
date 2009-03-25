@@ -1,0 +1,12 @@
+<cv:customView xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+    <cv:columns>
+        <cv:column name="Name"/>
+        <cv:column name="Age"/>
+    </cv:columns>
+    <cv:filters>
+        <cv:filter column="Crazy" operator="eq" value="true"/>
+    </cv:filters>
+    <cv:sorts>
+        <cv:sort column="Age" descending="true"/>
+    </cv:sorts>
+</cv:customView>

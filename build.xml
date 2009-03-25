@@ -192,11 +192,19 @@
       <copy todir="${deploy.modules.dir}">
         <fileset dir="${staging.modules.dir}">
           <include name="miniassay.module"/>
+          <include name="simpletest.module"/>
         </fileset>
       </copy>
     </target>
 
-    <target name="stage-test-modules" depends="stage-miniassay-module">
+    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module">
+    </target>
+
+    <target name="stage-simpletest-module">
+      <antcall target="stage-test-module">
+        <param name="module.name" value="simpletest"/>
+        <param name="module.src.dir" value="${project.root}/server/test/modules"/>
+      </antcall>
     </target>
 
     <target name="stage-miniassay-module">

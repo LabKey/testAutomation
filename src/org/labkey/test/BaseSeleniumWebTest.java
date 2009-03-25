@@ -1281,6 +1281,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return new File(buildDir, "testTemp");
     }
 
+    protected boolean isREngineConfigured()
+    {
+        // need to allow time for the server to return the engine list and the ext grid to render
+        Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
+        int time = 0;
+        while (!isElementPresent(engine) && time < 5000)
+        {
+            sleep(100);
+            time += 100;
+        }
+        return isElementPresent(engine);
+    }
+
     public interface Checker
     {
         public boolean check();
@@ -2608,6 +2621,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         Locator sourceTab = Locator.tagContainingText("td", "Source");
         if(null != sourceTab)
             click(sourceTab);
+    }
+
+    public void enableModule(String projectName, String moduleName)
+    {
+        ensureAdminMode();
+        clickLinkWithText(projectName);
+        clickLinkWithText("Customize Folder");
+        checkCheckbox(Locator.checkboxByTitle(moduleName, false));
+        clickNavButton("Update Folder");
     }
 
 

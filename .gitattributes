@@ -32,6 +32,13 @@ cruisecontrol/xsl/pmd-details.xsl -text
 cruisecontrol/xsl/pmd.xsl -text
 cruisecontrol/xsl/testdetails.xsl -text
 cruisecontrol/xsl/unittests.xsl -text
+modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
+modules/simpletest/queries/lists/TestQuery.sql -text
+modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
+modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
+modules/simpletest/views/begin.html -text
+modules/simpletest/views/other.html -text
+modules/simpletest/views/webpart.html -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/test/BaseFlowTest.java -text
@@ -65,6 +72,7 @@ src/org/labkey/test/bvt/MicroarrayTest.java -text
 src/org/labkey/test/bvt/ModuleAssayTest.java -text
 src/org/labkey/test/bvt/PipelineBvtTest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
+src/org/labkey/test/bvt/SimpleModuleTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text
 src/org/labkey/test/bvt/StudyBvtTest.java -text
 src/org/labkey/test/bvt/StudyExtraTest.java -text
