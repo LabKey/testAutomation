@@ -172,7 +172,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "\n" +
             "    function()\n" +
             "    {\n" +
-            "        LABKEY.Query.selectRows(schemaName + '_badname', queryName, successHandler, failureHandler);\n" +
+            "        LABKEY.Query.selectRows(schemaName + '-badname', queryName, successHandler, failureHandler);\n" +
             "    },\n" +
             "\n" +
             "    function()\n" +
