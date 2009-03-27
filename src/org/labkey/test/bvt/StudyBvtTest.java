@@ -18,7 +18,6 @@ package org.labkey.test.bvt;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.drt.StudyTest;
 
 import java.io.File;
