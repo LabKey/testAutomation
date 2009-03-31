@@ -57,7 +57,7 @@
             subjectprefix="[CC] Win/MSSQL"
             xsldir="${ccdir}/webapps/cruisecontrol/xsl"
             css="${ccdir}/webapps/cruisecontrol/css/cruisecontrol.css">
-        <!-- Special-case peterhus, since his SVN username doesn't include '@labkey.com' -->
+        <!-- Special-case users who have a SVN user name that's not their email address -->
         <map alias="peterhus" address="peterhus@labkey.com" />
         <map alias="e.ulberg" address="ulberge@labkey.com" />
         <map alias="migra@fhcrc.org" address="marki@labkey.com" />
@@ -68,6 +68,7 @@
         <map alias="d.stearns" address="daves@labkey.com" />
         <map alias="k.krouse" address="kevink@labkey.com" />
         <map alias="j.garms" address="jgarms@labkey.com" />
+        <map alias="v.obenchain" address="vobencha@fhcrc.org" />
         <failure reportWhenFixed="true" address="cpas-developers@lists.fhcrc.org"/>
         <failure reportWhenFixed="true" address="cpas-developers@lists.fhcrc.org"/>
         <parameter name="lineCount" value="250" />
