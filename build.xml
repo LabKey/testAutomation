@@ -27,7 +27,7 @@
     <property name="external.lib.home" value="${project.root}/external/lib/server"/>
     <property name="test.log.dir" value="${test.dir}/logs"/>
     <property name="test.log.output.dir" value="${test.build.home}/logs" />
-    <property name="javaclient.dir" value="${basedir}/../../remoteapi/java"/>
+    <property name="javaclient.dir" value="${project.root}/remoteapi/java"/>
     <property name="javaclient.build.xml" value="${javaclient.dir}/build.xml"/>
     <property name="javaclientjar.dir" value="${javaclient.dir}/build/jar"/>
     <property name="javaclientlib.dir" value="${javaclient.dir}/lib"/>
