@@ -27,6 +27,10 @@
     <property name="external.lib.home" value="${project.root}/external/lib/server"/>
     <property name="test.log.dir" value="${test.dir}/logs"/>
     <property name="test.log.output.dir" value="${test.build.home}/logs" />
+    <property name="javaclient.dir" value="${basedir}/../../remoteapi/java"/>
+    <property name="javaclient.build.xml" value="${javaclient.dir}/build.xml"/>
+    <property name="javaclientjar.dir" value="${javaclient.dir}/build/jar"/>
+    <property name="javaclientlib.dir" value="${javaclient.dir}/lib"/>
 
     <property name="staging.modules.dir" value="${project.root}/build/staging/modules"/>
     <property name="deploy.modules.dir" value="${project.root}/build/deploy/modules"/>
@@ -121,6 +125,12 @@
             <include name="log4j-1.2.8.jar" />
             <include name="commons-logging-1.1.jar" />
         </fileset>
+        <fileset dir="${javaclientjar.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${javaclientlib.dir}">
+            <include name="*.jar"/>
+        </fileset>
     </path>
 
     <path id="test.build.classpath">
@@ -156,6 +166,10 @@
             </fileset>
         </copy>
         <touch file="${test.build.uptodate}" />
+    </target>
+
+    <target name="build-java-client" description="calls the jar task in the remoteapi/java/build.xml">
+        <ant antfile="${javaclient.build.xml}" target="jar" inheritall="false"/>
     </target>
 
     <target name="setPassword" depends="compile">
@@ -534,7 +548,7 @@
         </antcall>
     </target>
 
-    <target name="bvt" description="run build verification tests">
+    <target name="bvt" depends="build-java-client" description="run build verification tests">
         <property name="suite" value="BVT"/>
         <property name="debug.suspend.selenium" value="n"/>
         <property name="linkCheck" value="true"/>
