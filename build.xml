@@ -142,7 +142,7 @@
         <pathelement location="${test.build.home}/classes" />
     </path>
 
-    <target name="compile" depends="prepare" description="Compile Java sources">
+    <target name="compile" depends="build-java-client,prepare" description="Compile Java sources">
         <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
             <srcfiles dir="${test.src.home}" />
         </uptodate>
@@ -338,7 +338,7 @@
         <echo message=" selenium.server.needs.starting: ${selenium.server.needs.starting}" />
     </target>
 
-    <target name="sub-selenium" depends="init-selenium">
+    <target name="sub-selenium" depends="build-java-client,init-selenium">
         <antcall target="startSeleniumServer" />
 
         <condition property="no.selenium.server">
@@ -548,7 +548,7 @@
         </antcall>
     </target>
 
-    <target name="bvt" depends="build-java-client" description="run build verification tests">
+    <target name="bvt" description="run build verification tests">
         <property name="suite" value="BVT"/>
         <property name="debug.suspend.selenium" value="n"/>
         <property name="linkCheck" value="true"/>
