@@ -65,7 +65,8 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
                 new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "Last Name"),
                 new ListHelper.ListColumn("Birthdate", "Birthdate", ListHelper.ListColumnType.DateTime, "Birthdate"),
                 new ListHelper.ListColumn("GooAmount", "Goo Amount", ListHelper.ListColumnType.Double, "Amount of Goo"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"),
+                new ListHelper.ListColumn("Notes", "Notes", ListHelper.ListColumnType.String, "Notes"));
 
         log("Setting permissions...");
         clickLinkWithText(PROJECT_NAME);
@@ -75,6 +76,8 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(LIST_NAME);
         doCRUDtTest();
+        doCommandFromResponseTest();
+        doExtendedFormatTest();
 
         log("Finished query portion of test.");
     }
@@ -93,6 +96,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         rowMap.put("LastName", "last to be inserted");
         rowMap.put("Birthdate", now);
         rowMap.put("GooAmount", 4.2);
+        rowMap.put("Crazy", true);
         insertCmd.addRow(rowMap);
         SaveRowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
         assertTrue(1 == saveResp.getRowsAffected().intValue());
@@ -111,6 +115,8 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         assertTrue("last to be inserted".equals(rowMap.get("LastName")));
         assertTrue(rowMap.get("Birthdate") instanceof Date);
         assertTrue(new Double(4.2).equals(rowMap.get("GooAmount")));
+        assertTrue(rowMap.get("Crazy") instanceof Boolean);
+        assertTrue(null == rowMap.get("Notes"));
 
         //refresh the list in the browser and make sure it appears there too
         refresh();
@@ -156,6 +162,75 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         assertTextNotPresent("UPDATED first name");
 
         log("Completed CRUD test...");
+    }
+
+    protected void doCommandFromResponseTest() throws Exception
+    {
+        log("Testing the copy command to response functionality...");
+        SelectRowsCommand selCmd = new SelectRowsCommand("lists", LIST_NAME);
+        selCmd.setRequiredVersion(9.1);
+        selCmd.setMaxRows(2);
+        selCmd.addFilter(new Filter("FirstName", "Fred", Filter.Operator.STARTS_WITH));
+
+        Connection cn = new Connection(getBaseURL());
+        SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
+
+        //verify that the command we get back from the response object is a copy
+        //yet has the same settings
+        SelectRowsCommand cmdFromResp = (SelectRowsCommand)resp.getSourceCommand();
+        assertTrue(cmdFromResp != selCmd);
+        assertTrue(2 == cmdFromResp.getMaxRows());
+        assertTrue(9.1 == cmdFromResp.getRequiredVersion());
+        assertTrue(null != cmdFromResp.getFilters());
+        assertTrue(cmdFromResp.getFilters().size() > 0);
+
+        Filter filter = cmdFromResp.getFilters().get(0);
+        assertTrue(filter != selCmd.getFilters().get(0)); //ensure the filter is a copy of the original
+        assertTrue("FirstName".equals(filter.getColumnName()));
+        assertTrue("Fred".equals(filter.getValue()));
+        assertTrue(Filter.Operator.STARTS_WITH == filter.getOperator());
+
+        log("Completed testing the copy command to response functionality.");
+    }
+
+    protected void doExtendedFormatTest() throws Exception
+    {
+        log("Testing the new extended select results format...");
+        Connection cn = new Connection(getBaseURL());
+
+        InsertRowsCommand insCmd = new InsertRowsCommand("lists", LIST_NAME);
+
+        Map<String,Object> row = new HashMap<String,Object>();
+        row.put("FirstName", "Barney");
+        row.put("LastName", "Rubble");
+        insCmd.addRow(row);
+
+        row.put("FirstName", "Fred");
+        row.put("LastName", "Flintstone");
+        insCmd.addRow(row);
+
+        insCmd.execute(cn, PROJECT_NAME);
+        
+        SelectRowsCommand selCmd = new SelectRowsCommand("lists", LIST_NAME);
+        selCmd.setRequiredVersion(9.1);
+        selCmd.addSort("LastName", Sort.Direction.ASCENDING);
+        SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
+
+        assert null != resp.getRows() : "null rows array";
+        assert resp.getRows().size() > 0 : "empty rows array";
+        assert resp.getRows().get(0).get("FirstName") instanceof Map : "FirstName column value was not a map";
+        Map<String,Object> colMap = resp.getRows().get(0);
+        assert "Fred".equals(colMap.get("value")) : "FirstName.value contained '" + colMap.get("value") + "': expected 'Fred'";
+
+        log("Completed test of the new extended select results format.");
+
+        //also test maxrows = 0
+        log("Testing maxrows=0...");
+        selCmd.setMaxRows(0);
+        resp = selCmd.execute(cn, PROJECT_NAME);
+        assert null != resp.getRows() : "Rows array was null! Expected an empty array.";
+        assert 0 == resp.getRows().size() : "Rows array contained " + resp.getRows().size() + " items: expected 0.";
+        log("Completed test of maxrows=0");
     }
 
     protected void doCleanup() throws Exception
