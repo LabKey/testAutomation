@@ -26,20 +26,23 @@ import org.labkey.test.Locator;
  */
 public class MicroarrayTest extends BaseSeleniumWebTest
 {
-    private static final String PROJECT_NAME = "MicroArrayVerifyProject";
+    private static final String PROJECT_NAME = "MicroarrayBVTProject";
     private static final String EXTRACTION_SERVER = "http://www.google.com";
     private static final String ASSAY_NAME = "Test Assay 1";
     private static final String ASSAY_DESCRIPTION = "Test Assay 1 Description";
-    private static final String MAGEML_FILE1_FOLDER = "TestRun1";
     private static final String MAGEML_FILE1 = "test1_MAGEML.xml";
-    private static final String MAGEML_FILE2_FOLDER = "TestRun2";
     private static final String MAGEML_FILE2 = "test2_MAGEML.xml";
-    private static final String SET_FIELD_TEST_NAME = "TestSetField1";
-    private static final String RUN_FIELD_TEST_NAME = "TestRunField1";
+    private static final String BATCH_STRING_FIELD = "BatchStringField";
+    private static final String RUN_STRING_FIELD = "RunStringField";
+    private static final String RUN_INTEGER_FIELD = "RunIntegerField";
     private static final String XPATH_TEST = "/MAGE-ML/Descriptions_assnlist/Description/Annotations_assnlist/OntologyEntry[@category='Producer']/@value";
     private static final String DATA_FIELD_TEST_NAME = "TestDataField1";
     private static final String SAMPLE_SET = "Test Sample Set";   
-    private static final String SAMPLE_SET_ROWS = "Name\nFirst\nSecond\nThird"; 
+    private static final String SAMPLE_SET_ROWS = "Name\tBarcode\n" +
+            "First\t251379110131_A01\n" +
+            "Second\t251379110131_A01\n" +
+            "Third\t\n" +
+            "Fourth\t\n";
 
     public String getAssociatedModuleDirectory()
     {
@@ -66,20 +69,21 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         log("Create Project");
         createProject(PROJECT_NAME);
         clickLinkWithText("Customize Folder");
-        checkCheckbox(Locator.checkboxByNameAndValue("folderType", "Microarray", true));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Microarray"));
         submit();
 
         log("Create an assay");
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        checkCheckbox("providerName", "Microarray", true);
+        checkRadioButton("providerName", "Microarray");
         clickNavButton("Next");
         waitForElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
         setFormElement(Locator.raw("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
-        addField("Batch Fields", 0, SET_FIELD_TEST_NAME, SET_FIELD_TEST_NAME, "Text (String)");
-        addField("Run Fields", 0, RUN_FIELD_TEST_NAME, RUN_FIELD_TEST_NAME, "Text (String)"); 
+        addField("Batch Fields", 0, BATCH_STRING_FIELD, BATCH_STRING_FIELD, "Text (String)");
+        addField("Run Fields", 0, RUN_STRING_FIELD, RUN_STRING_FIELD, "Text (String)");
         setFormElement("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']", XPATH_TEST);
+        addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, "Integer");
         addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, "Text (String)");
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
@@ -99,39 +103,110 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         setFormElement("data", SAMPLE_SET_ROWS);
         submit();
 
+        // First try importing the runs individually
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
-        clickLinkWithText(MAGEML_FILE1_FOLDER);
         clickNavButton("Import MAGEML using " + ASSAY_NAME);
+        setFormElement("batchStringField", "SingleRunProperties");
         clickNavButton("Next");
+        assertTextPresent(MAGEML_FILE1);
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), defaultWaitForPage);
-        selectOptionByText("//div[contains(text(), 'Sample 1')]/../..//tr/td/select", "First");
-        selectOptionByText("//div[contains(text(), 'Sample 2')]/../..//tr/td/select", "Second");
-        clickNavButton("Save and Finish");
-        waitForText(ASSAY_NAME + " Runs", 30000);
+        setFormElement("runIntegerField", "115468001");
+        clickNavButton("Save and Import Another Run");
 
         log("Import second run");
-        clickLinkWithText("Microarray Dashboard");
-        clickNavButton("Process and Import Data");
-        clickLinkWithText("root");
-        clickLinkWithText(MAGEML_FILE2_FOLDER);
-        clickNavButton("Import MAGEML using " + ASSAY_NAME);
-        clickNavButton("Next");
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), defaultWaitForPage);
-        selectOptionByText("//div[contains(text(), 'Sample 1')]/../..//tr/td/select", "First");
-        selectOptionByText("//div[contains(text(), 'Sample 2')]/../..//tr/td/select", "Third");
+        assertTextPresent(MAGEML_FILE2);
+        setFormElement("runIntegerField", "115468002");
+        selectOptionByText("//div[contains(text(), 'Sample 1')]/../..//tr/td/select", "Third");
+        selectOptionByText("//div[contains(text(), 'Sample 2')]/../..//tr/td/select", "Fourth");
         clickNavButton("Save and Finish");
         waitForText(ASSAY_NAME + " Runs", 30000);
+        assertTextPresent("SingleRunProperties");
 
+        validateRuns();
+
+        // Now try doing the runs in bulk, so delete the existing runs
+        checkAllOnPage(ASSAY_NAME + " Runs");
+        clickNavButton("Delete");
+        clickNavButton("Confirm Delete");
+
+        // Start the upload wizard again
+        clickLinkWithText("data pipeline");
+        clickNavButton("Import MAGEML using " + ASSAY_NAME);
+        setFormElement("batchStringField", "BulkProperties");
+        
+        assertTextPresent("BulkProperties");
+        checkCheckbox("__enableBulkProperties");
+        // Try with an invalid sample name first
+        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+                "251379110131_A01\tBogusSampleName!!\tSecond\tFirstString\t11\n" +
+                "251379110137_A01\tThird\tFourth\tSecondString\t22\n");
+        clickNavButton("Next");
+        assertTextPresent("No sample with name 'BogusSampleName!!' was found");
+
+        // Try with invalid sample set name
+        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+                "251379110131_A01\tBogus__SampleSetName.First\tSecond\tFirstString\t11\n" +
+                "251379110137_A01\tBogus__SampleSetName.Third\tFourth\tSecondString\t22\n");
+        clickNavButton("Next");
+        assertTextPresent("No sample with name 'Bogus__SampleSetName.First' was found");
+
+        // Try with incorrect barcodes
+        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+                "FakeBarcode_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
+                "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
+        clickNavButton("Next");
+        assertTextPresent("Could not find a row for barcode '251379110131_A01' specified in test1_MAGEML.xml");
+
+        // Try with incorrect property type
+        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+                "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
+                "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22a\n");
+        clickNavButton("Next");
+        assertTextPresent(RUN_INTEGER_FIELD + " must be of type Integer");
+
+        // Try with the wrong sample colum names
+        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3a\tProbeID_Cy5a\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+                "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
+                "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
+        clickNavButton("Next");
+        assertTextPresent("Could not find a 'ProbeID_Cy3' column for sample information.");
+
+        // Try with the wrong number of samples
+        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+                "251379110131_A01\t\t\tFirstString\t11\n" +
+                "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
+        clickNavButton("Next");
+        assertTextPresent("No sample information specified for 'ProbeID_Cy3'");
+
+        // Try the same submit again to make sure the form was repopulated
+        clickNavButton("Next");
+        assertTextPresent("No sample information specified for 'ProbeID_Cy3'");
+
+        // Finally do it with the right info
+        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+                "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t115468001\n" +
+                "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t115468002\n");
+        clickNavButton("Next");
+
+        validateRuns();
+    }
+
+    private void validateRuns()
+    {
         log("Test run inputs");
         clickLinkWithText(MAGEML_FILE1);
+        assertTextPresent("115468001");
         clickLinkWithText("First");
         assertTextPresent(MAGEML_FILE1);
-        assertTextPresent(MAGEML_FILE2);
+        assertTextNotPresent(MAGEML_FILE2);
         assertTextPresent(SAMPLE_SET);
 
         log("Test run outputs/ data files");
+        clickLinkWithText(ASSAY_NAME);
         clickLinkWithText(MAGEML_FILE2);
+        assertTextPresent("115468002");
         clickLink(Locator.raw("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
         waitForText(ASSAY_NAME + " Description", 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);

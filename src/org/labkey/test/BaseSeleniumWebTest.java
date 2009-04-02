@@ -67,6 +67,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     //protected final static String IE_UPLOAD_BROWSER = "*iehta";
     public static final String CUSTOMIZE_VIEW_ID = "Views:Customize View";
 
+    /** Have we already done a memory leak and error check in this test harness VM instance? */
+    private static boolean _checkedLeaksAndErrors = false;
+
     public BaseSeleniumWebTest()
     {
 
@@ -692,7 +695,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 // fall through
             }
 
-            checkLeaksAndErrors();
+            // Only do this as part of test startup if we haven't already checked. Since we do this as the last
+            // step in the test, there's no reason to bother doing it again at the beginning of the next test
+            if (!_checkedLeaksAndErrors)
+            {
+                checkLeaksAndErrors();
+            }
 
             doTestSteps();
 
@@ -802,6 +810,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
 		checkErrors();
 		checkLeaks();
+        _checkedLeaksAndErrors = true;
     }
 
     public void checkLeaks()
@@ -957,9 +966,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText("Create Project");
         setText("name", projectName);
         if (null != folderType)
-            checkCheckbox("folderType", folderType, true);
+            checkRadioButton("folderType", folderType);
         else
-            checkCheckbox("folderType", "None", true);
+            checkRadioButton("folderType", "None");
         submit();
         _createdProjects.add(projectName);
     }
@@ -998,7 +1007,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(parent, countLinksWithText(parent) - 1);
         clickNavButton("Create Subfolder");
         setText("name", child);
-        checkCheckbox("folderType", folderType, true);
+        checkRadioButton("folderType", folderType);
         submit();
 
         _createdFolders.add(new FolderIdentifier(project, child));
@@ -1021,7 +1030,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (tabsToAdd != null)
         {
             for (String tabname : tabsToAdd)
-                toggleCheckboxByTitle(tabname, false);
+                toggleCheckboxByTitle(tabname);
         }
 
         submit();
@@ -1090,7 +1099,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         //Delete even if terms of use is required
         if (isElementPresent(Locator.name("approvedTermsOfUse")))
         {
-            clickCheckbox("approvedTermsOfUse", false);
+            clickCheckbox("approvedTermsOfUse");
             clickNavButton("Agree");
         }
 
@@ -1503,12 +1512,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
+    /** Find a link with the exact text specified, clicks it, and waits for the page to load */
     public void clickLinkWithText(String text)
     {
         assertLinkPresentWithText(text);
         clickLinkWithText(text, true);
     }
 
+    /** Find a nth link with the exact text specified, clicks it, and waits for the page to load */
     public void clickLinkWithText(String text, int index)
     {
         Locator l = Locator.linkWithText(text, index);
@@ -1516,6 +1527,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, defaultWaitForPage);
     }
 
+    /** Find a nth link with the exact text specified, clicks it, optionally waiting for the page to load */
     public void clickLinkWithText(String text, boolean wait)
     {
         log("Clicking link with text '" + text + "'");
@@ -1977,7 +1989,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement(elementName, "");
         int offset = 0;
         text = text.replace("'", "\\'").replace("\r\n", "\\n").replace("\n", "\\n");
-        String line = null;
         while (offset < text.length())
         {
             String postString = text.substring(offset, Math.min(offset + MAX_TEXT_LENGTH, text.length()));
@@ -1992,7 +2003,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setLongTextField(Locator loc, String text)
     {
-            setLongTextField(loc.toString(), text);
+        setLongTextField(loc.toString(), text);
     }
 
 
@@ -2137,28 +2148,36 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         checkCheckbox(Locator.raw("document.forms['" + dataRegionName + "'].elements['.select'][" + index + "]"));
     }
 
-    public void toggleCheckboxByTitle(String title, boolean radio)
+    public void toggleCheckboxByTitle(String title)
     {
         log("Clicking checkbox with title " + title);
-        Locator l = Locator.checkboxByTitle(title, radio);
+        Locator l = Locator.checkboxByTitle(title);
         click(l);
     }
 
-    public void clickCheckbox(String name, boolean radio)
+    public void clickCheckbox(String name)
     {
-        Locator l = Locator.checkboxByName(name, radio);
-        click(l);
+        click(Locator.checkboxByName(name));
     }
 
-    public void clickCheckboxById(String id, boolean radio)
+    public void clickRadioButtonById(String id)
     {
-        Locator l = Locator.checkboxById(id, radio);
-        click(l);
+        click(Locator.checkboxById(id));
     }
 
-    public void checkCheckbox(String name, String value, boolean radio)
+    public void clickCheckboxById(String id)
     {
-        checkCheckbox(Locator.checkboxByNameAndValue(name, value, radio));
+        click(Locator.checkboxById(id));
+    }
+
+    public void checkRadioButton(String name, String value)
+    {
+        checkCheckbox(Locator.radioButtonByNameAndValue(name, value));
+    }
+
+    public void checkCheckbox(String name, String value)
+    {
+        checkCheckbox(Locator.checkboxByNameAndValue(name, value));
     }
 
 
@@ -2172,6 +2191,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         checkCheckbox(Locator.raw("//a[contains(text(), '" + name + "')]/../..//td/input"));
     }
 
+    public void checkRadioButton(Locator radioButtonLocator)
+    {
+        checkCheckbox(radioButtonLocator);
+    }
+
     public void checkCheckbox(Locator checkBoxLocator)
     {
         log("Checking checkbox " + checkBoxLocator);
@@ -2181,9 +2205,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         logJavascriptAlerts();
     }
 
-    public void checkCheckbox(String name, int index, boolean radio)
+    public void checkRadioButton(String name, int index)
     {
-        checkCheckbox(Locator.checkboxByName(name, radio).index(index));
+        checkCheckbox(Locator.radioButtonByName(name).index(index));
+    }
+
+    public void checkCheckbox(String name, int index)
+    {
+        checkCheckbox(Locator.checkboxByName(name).index(index));
     }
 
     public void uncheckCheckbox(String name)
@@ -2628,7 +2657,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
         clickLinkWithText(projectName);
         clickLinkWithText("Customize Folder");
-        checkCheckbox(Locator.checkboxByTitle(moduleName, false));
+        checkCheckbox(Locator.checkboxByTitle(moduleName));
         clickNavButton("Update Folder");
     }
 

@@ -256,7 +256,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
 
-        checkCheckbox("additionalKey", 1, true);
+        checkRadioButton("additionalKey", 1);
 
         clickNavButton("Import Schema", 0);
         waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_GWT);
@@ -302,8 +302,8 @@ public class StudyTest extends BaseSeleniumWebTest
         clickLinkWithText("Manage QC States");
         setFormElement("newLabel", "unknown QC");
         setFormElement("newDescription", "Unknown data is neither clean nor dirty.");
-        clickCheckboxById("dirty_public", false);
-        clickCheckbox("newPublicData", false);
+        clickCheckboxById("dirty_public");
+        clickCheckbox("newPublicData");
         clickNavButton("Save");
         selectOptionByText("defaultDirectEntryQCState", "unknown QC");
         selectOptionByText("showPrivateDataByDefault", "Public data");
@@ -366,7 +366,7 @@ public class StudyTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null, true);
         clickNavButton("Create Study");
-        click(Locator.checkboxByNameAndValue("simpleRepository", "false", true));
+        click(Locator.radioButtonByNameAndValue("simpleRepository", "false"));
         clickNavButton("Create Study");
 
         // change study label

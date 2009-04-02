@@ -382,7 +382,7 @@ public class ListHelper
         test.log("Add List");
         test.clickNavButton("Create New List");
         test.setFormElement("ff_name", listName);
-        test.clickCheckbox("fileImport", false);
+        test.clickCheckbox("fileImport");
 
         test.clickNavButton("Create List");
 

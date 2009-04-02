@@ -91,7 +91,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         log("Check email preferences");
         clickLinkWithText("email preferences");
-        checkCheckbox("emailPreference", "1", true);
+        checkRadioButton("emailPreference", "1");
         clickNavButton("Update");
         clickNavButton("Done");
 
@@ -104,8 +104,8 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         assertFormElementEquals("emailOptionId", "1");
         clickLinkWithText("Messages");
         clickLinkWithText("email preferences");
-        checkCheckbox("notificationType", "256", true);
-        checkCheckbox("emailPreference", "0", true);
+        checkRadioButton("notificationType", "256");
+        checkRadioButton("emailPreference", "0");
         clickNavButton("Update");
         clickNavButton("Done");
         clickLinkWithText("email admin");
@@ -178,7 +178,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         log("Check with security");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("customize");
-        checkCheckbox("secure", 1, true);
+        checkRadioButton("secure", 1);
         clickNavButton("Save");
         permissionCheck("Reader", false);
         permissionCheck("Editor", true);
@@ -209,7 +209,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         submit();
         clickLinkWithText("Messages");
         clickLinkWithText("customize");
-        checkCheckbox("sortOrderIndex", 1, true);
+        checkRadioButton("sortOrderIndex", 1);
         clickNavButton("Save");
         clickLinkWithText("view message or respond");
         assertTextPresent(MSG1_TITLE);
@@ -280,7 +280,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("customize");
-        checkCheckbox("secure", 0, true);
+        checkRadioButton("secure", 0);
         clickNavButton("Save");
         clickLinkWithText(MSG3_TITLE);
         clickNavButton("Delete Message");

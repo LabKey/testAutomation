@@ -121,7 +121,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         clickLinkWithText(PERM_PROJECT_NAME);
         clickLinkWithText(GAMMA_SUB_FOLDER_NAME);
         clickLinkWithText("email preferences");
-        checkCheckbox("emailPreference", "0", true);
+        checkRadioButton("emailPreference", "0");
         clickNavButton("Update");
         clickLinkWithText(GAMMA_SUB_FOLDER_NAME);
 
@@ -137,7 +137,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         clickLinkWithText(PERM_PROJECT_NAME);
         clickLinkWithText(GAMMA_SUB_FOLDER_NAME);
         clickLinkWithText("email preferences");
-        checkCheckbox("emailPreference", "0", true);
+        checkRadioButton("emailPreference", "0");
         clickNavButton("Update");
         clickLinkWithText(GAMMA_SUB_FOLDER_NAME);
 

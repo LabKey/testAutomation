@@ -210,7 +210,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         clickNavButton("Save");
         setFormElement("newLabel", "Pending Review");
         setFormElement("newDescription", "No one likes to be reviewed.");
-        clickCheckbox("newPublicData", false);
+        clickCheckbox("newPublicData");
         clickNavButton("Save");
         selectOptionByText("defaultAssayQCState", "Pending Review");
         clickNavButton("Save");

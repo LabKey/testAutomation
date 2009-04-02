@@ -52,7 +52,7 @@ public class EmailRecordTable extends DataRegionTable
 
     public void saveRecorderState()
     {
-        _recordOn = _test.isChecked(Locator.checkboxByName(RECORDER_CHECKBOX_NAME, false));
+        _recordOn = _test.isChecked(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
     }
 
     public void restoreRecorderState()

@@ -260,24 +260,44 @@ public class Locator
         return dom("document['" + formName + "']['" +elementName + "']");
     }
 
-    public static XPathLocator checkboxByTitle(String title, boolean radio)
+    public static XPathLocator radioButtonByTitle(String title)
     {
-        return xpath("//input[@type='" + (radio ? "radio" : "checkbox" )+ "' and @title=" + xq(title) + "]");
+        return xpath("//input[@type='radio' and @title=" + xq(title) + "]");
     }
 
-    public static XPathLocator checkboxByName(String name, boolean radio)
+    public static XPathLocator checkboxByTitle(String title)
     {
-        return xpath("//input[@type='" + (radio ? "radio" : "checkbox" )+ "' and @name=" + xq(name) + "]");
+        return xpath("//input[@type='checkbox' and @title=" + xq(title) + "]");
     }
 
-    public static XPathLocator checkboxById(String id, boolean radio)
+    public static XPathLocator radioButtonByName(String name)
     {
-        return xpath("//input[@type='" + (radio ? "radio" : "checkbox" )+ "' and @id=" + xq(id) + "]");
+        return xpath("//input[@type='radio' and @name=" + xq(name) + "]");
     }
 
-    public static XPathLocator checkboxByNameAndValue(String name, String value, boolean radio)
+    public static XPathLocator checkboxByName(String name)
     {
-        return xpath("//input[@type='" + (radio ? "radio" : "checkbox" )+ "' and @name=" + xq(name) + " and @value=" + xq(value) + "]");
+        return xpath("//input[@type='checkbox' and @name=" + xq(name) + "]");
+    }
+
+    public static XPathLocator radioButtonById(String id)
+    {
+        return xpath("//input[@type='radio' and @id=" + xq(id) + "]");
+    }
+
+    public static XPathLocator checkboxById(String id)
+    {
+        return xpath("//input[@type='checkbox' and @id=" + xq(id) + "]");
+    }
+
+    public static XPathLocator radioButtonByNameAndValue(String name, String value)
+    {
+        return xpath("//input[@type='radio' and @name=" + xq(name) + " and @value=" + xq(value) + "]");
+    }
+
+    public static XPathLocator checkboxByNameAndValue(String name, String value)
+    {
+        return xpath("//input[@type='checkbox' and @name=" + xq(name) + " and @value=" + xq(value) + "]");
     }
 
     public static XPathLocator imageMapLinkByTitle(String imageMapName, String title)

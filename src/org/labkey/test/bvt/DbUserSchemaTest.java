@@ -132,7 +132,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         log("Deleting pks=" + StringUtils.join(Arrays.asList(pk), ",") + "...");
         beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
         for (int i = 0; i < pk.length; i++)
-            checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(pk[i]), false));
+            checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(pk[i])));
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
         assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");

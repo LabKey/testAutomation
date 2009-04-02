@@ -17,6 +17,11 @@
 package org.labkey.test.drt;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * User: brittp
@@ -40,14 +45,13 @@ public class ExpTest extends BaseSeleniumWebTest
 
     protected void doCleanup()
     {
-        try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
-    protected void doTestSteps()
+    protected void doTestSteps() throws InterruptedException
     {
         createProject(PROJECT_NAME);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment" });
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment", "Query" });
         addWebPart("Data Pipeline");
         addWebPart("Run Groups");
         clickNavButton("Setup");
@@ -75,6 +79,84 @@ public class ExpTest extends BaseSeleniumWebTest
         clickLinkWithText("graph summary view");
         clickImageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP);
         clickImageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE);
+        assertTextPresent("CAexample_mini.mzXML");
         assertTextPresent("Not available on disk");
+
+        // Write a simple custom query that wraps the data table
+        clickTab("Query");
+        clickLinkWithText("exp");
+        clickLinkWithText("create new query");
+        setFormElement("ff_newQueryName", "dataCustomQuery");
+        selectOptionByText("ff_baseTableName", "Datas");
+        clickNavButton("Create and edit SQL");
+        setFormElement("ff_queryText", "SELECT Datas.Name AS Name,\n" +
+                "Datas.RowId AS RowId,\n" +
+                "Datas.Run AS Run,\n" +
+                "Datas.DataFileUrl AS DataFileUrl,\n" +
+                "substring(Datas.DataFileUrl, 0, 7) AS DataFileUrlPrefix,\n" +
+                "Datas.Created AS Created\n" +
+                "FROM Datas");
+        clickNavButton("Run Query");
+
+        // Check that it contains the date format we expect
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        assertTextPresent(dateFormat.format(new Date()), 5);
+        assertTextPresent("file:/", 10);
+
+        // Edit the metadata to use a special date format
+        clickMenuButton("Query", "Query:EditQuery");
+        clickNavButton("Edit Metadata with GUI");
+        waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
+        selenium.type("//td/input[@id='ff_label5']", "editedCreated");
+        setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
+        selenium.click("//span" + Locator.navButton("Save").getPath());
+        waitForText("Save successful.", 10000);
+
+        // Verify that it ended up in the XML version of the metadata
+        clickNavButton("Edit as XML");
+        assertTextPresent("<ns:columnTitle>editedCreated</ns:columnTitle>");
+        assertTextPresent("<ns:formatString>ddd MMM dd yyyy</ns:formatString>");
+
+        // Run it and see if we used the format correctly
+        clickNavButton("Run Query");
+        assertTextPresent("editedCreated");
+        dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
+        assertTextPresent(dateFormat.format(new Date()), 5);
+
+        // Add a new wrapped column to the exp.Datas table
+        clickLinkWithText("exp Schema");
+        click(Locator.raw("//a[contains(text(), 'Datas')]/../..//a[contains(text(), 'customize display')]"));
+        waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
+        selenium.click("//span" + Locator.navButton("Alias Field").getPath());
+        selectOptionByText("sourceColumn", "RowId");
+        selenium.click("//span" + Locator.navButton("OK").getPath());
+
+        // Make it a lookup into our custom query
+        int fieldCount = selenium.getXpathCount("//img[contains(@src, 'partdown')]").intValue();
+        click(Locator.id("partdown_" + (fieldCount - 1)));
+        setFormElement("schema", "exp");
+        setFormElement("table", "dataCustomQuery");
+        clickNavButton("Close", 0);
+
+        // Save it
+        selenium.click("//span" + Locator.navButton("Save").getPath());
+        waitForText("Save successful.", 10000);
+        clickNavButton("Edit as XML");
+        clickNavButton("Run Query");
+
+        // Customize the view to add the newly joined column
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        click(Locator.raw("expand_WrappedRowId"));
+        addCustomizeViewColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
+        clickNavButton("Save");
+        // Verify that it was joined and formatted correctly
+        assertTextPresent(dateFormat.format(new Date()), 5);
+
+        // Since this metadata is shared, clear it out 
+        clickMenuButton("Query", "Query:EditQuery");
+        clickNavButton("Edit Metadata with GUI");
+        selenium.click("//span" + Locator.navButton("Reset to Default").getPath());
+        selenium.click("//span" + Locator.navButton("OK").getPath());
+        waitForText("Reset successful", 10000);
     }
 }

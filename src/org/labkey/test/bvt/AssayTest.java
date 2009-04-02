@@ -130,7 +130,7 @@ public class AssayTest extends AbstractAssayTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        checkCheckbox("providerName", "General", true);
+        checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
@@ -371,7 +371,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("view copy-to-study history");
 
         clickLinkWithText("details");
-        checkCheckbox(Locator.checkboxByName(".toggle", false));
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         clickNavButton("Recall Rows");
         selenium.getConfirmation();
         waitForPageToLoad();
@@ -433,14 +433,14 @@ public class AssayTest extends AbstractAssayTest
         log("Setting the customized view to include subfolders");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
 
-        clickCheckbox("ff_saveFilter", false);
+        clickCheckbox("ff_saveFilter");
         clickNavButton("Save");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
 
         log("Testing select all data and view");
-        clickCheckbox(".toggle", false);
+        clickCheckbox(".toggle");
         clickButton("Show Results", defaultWaitForPage);
         verifySpecimensPresent(9);
 
@@ -473,7 +473,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         clickLinkWithText("SecondRun");
 
-        clickCheckbox(".toggle", false);
+        clickCheckbox(".toggle");
         clickButton("Copy to Study", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
 

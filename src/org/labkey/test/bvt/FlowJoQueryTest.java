@@ -54,8 +54,8 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickNavButton("Save", longWaitForPage);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Customize Folder");
-        toggleCheckboxByTitle("Query", false);
-        toggleCheckboxByTitle("Flow", false);
+        toggleCheckboxByTitle("Query");
+        toggleCheckboxByTitle("Flow");
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
         createQuery(PROJECT_NAME, "PassFailQuery", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
         createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);

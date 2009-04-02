@@ -154,8 +154,8 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		clickNavButton("Next");
         clickNavButton("Finish");
         clickLinkWithText("Customize Folder");
-        checkCheckbox(Locator.checkboxByTitle("Experiment", false));
-        checkCheckbox(Locator.checkboxByTitle("Query", false));
+        checkCheckbox(Locator.checkboxByTitle("Experiment"));
+        checkCheckbox(Locator.checkboxByTitle("Query"));
         clickNavButton("Update Folder");
         addWebPart("Lists");
         clickLinkWithText("manage lists");
@@ -333,7 +333,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        checkCheckbox("providerName", "General", true);
+        checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
@@ -384,7 +384,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         clickNavButton("Import Data");
         selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(PROJECT_NAME, FOLDER_NAME, STUDY_FOLDER));
-        click(Locator.checkboxByNameAndValue("participantVisitResolver", "SampleInfo", true));
+        click(Locator.radioButtonByNameAndValue("participantVisitResolver", "SampleInfo"));
         clickNavButton("Next");
 
 

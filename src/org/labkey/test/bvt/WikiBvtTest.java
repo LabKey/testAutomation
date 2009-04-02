@@ -101,12 +101,12 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         setPermissions("testers", "Editor");
         setPermissions("Users", "Editor");
         clickLinkWithText("Customize Folder");
-        checkCheckbox(Locator.checkboxByTitle("Wiki", false));
+        checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
         clickLinkWithText(PROJECT2_NAME);
         clickLinkWithText("Customize Folder");
-        checkCheckbox(Locator.checkboxByTitle("Wiki", false));
+        checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
         clickLinkWithText(PROJECT_NAME);

@@ -354,14 +354,14 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
             clickNavButton("Next");
             selenium.type("name", ASSAY_EXCEL_RUN_SINGLE_COLUMN);
-            checkCheckbox("dataCollectorName", "File upload", true);
+            checkRadioButton("dataCollectorName", "File upload");
 
             File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
             setFormElement("uploadedFile", file);
             clickNavButton("Save and Finish");
             assertLabkeyErrorPresent();
 
-            checkCheckbox("dataCollectorName", "File upload", true);
+            checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
             setFormElement("uploadedFile", file);
             clickNavButton("Save and Finish");
@@ -377,13 +377,13 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
 
             clickNavButton("Next");
             selenium.type("name", ASSAY_EXCEL_RUN_TWO_COLUMN);
-            checkCheckbox("dataCollectorName", "File upload", true);
+            checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
             setFormElement("uploadedFile", file);
             clickNavButton("Save and Finish");
             assertLabkeyErrorPresent();
 
-            checkCheckbox("dataCollectorName", "File upload", true);
+            checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
             setFormElement("uploadedFile", file);
             clickNavButton("Save and Finish");
@@ -420,7 +420,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        checkCheckbox("providerName", "General", true);
+        checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);

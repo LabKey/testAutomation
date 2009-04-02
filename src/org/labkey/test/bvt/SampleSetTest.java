@@ -95,7 +95,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);
         assertTextNotPresent(PROJECT_SAMPLE_SET_NAME);
 
-        clickCheckbox(".toggle", false);
+        clickCheckbox(".toggle");
         clickNavButton("Derive Samples");
 
         clickLinkContainingText("valid pipeline root");
@@ -106,7 +106,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);
         assertTextPresent(PROJECT_SAMPLE_SET_NAME);
         clickLinkWithText(FOLDER_SAMPLE_SET_NAME);
-        clickCheckbox(".toggle", false);
+        clickCheckbox(".toggle");
         clickNavButton("Derive Samples");
 
         selenium.select("inputRole0", "label=Add a new role...");
@@ -130,7 +130,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
 
         assertTextPresent("must be of type Integer");
-        clickCheckbox("outputSample1_IntColFolderCheckBox", false);
+        clickCheckbox("outputSample1_IntColFolderCheckBox");
         setFormElement("outputSample1_IntColFolder", "500");
         clickNavButton("Submit");
 
@@ -257,7 +257,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
         clickLinkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME);
         clickNavButton("Import More Samples");
-        clickCheckboxById("replaceOverwriteChoice", true);
+        clickRadioButtonById("replaceOverwriteChoice");
         setFormElement("data", REPARENTED_CHILD_SAMPLE_SET_TSV);
         clickNavButton("Submit");
 

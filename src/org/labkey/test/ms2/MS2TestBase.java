@@ -97,7 +97,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
                 log("Deleting View " + viewName);
                 if (isTextPresent(viewName))
                 {
-                    checkCheckbox("viewsToDelete", viewName, false);
+                    checkCheckbox("viewsToDelete", viewName);
                 }
             }
             clickNavButton("OK");

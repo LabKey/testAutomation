@@ -838,7 +838,7 @@ public class MS2BvtTest extends MS2TestBase
         pushLocation();
         searchRunsTable.checkAllOnPage();
         clickNavButton("MS2 Export");
-        checkCheckbox("exportFormat", "TSV", true);
+        checkRadioButton("exportFormat", "TSV");
         selectOptionByText("viewParams", VIEW);
         clickNavButton("Go");
         assertTextPresent("Scan");
@@ -854,7 +854,7 @@ public class MS2BvtTest extends MS2TestBase
 
         searchRunsTable.checkAllOnPage();
         clickNavButton("MS2 Export");
-        checkCheckbox("exportFormat", "AMT", true);
+        checkRadioButton("exportFormat", "AMT");
         selectOptionByText("viewParams", VIEW);
         clickNavButton("Go");
         assertTextPresent("Run");
@@ -991,12 +991,12 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("Run Groups " + RUN_GROUP2_NAME);
         assertTextPresent("Run Groups Default Experiment");
 
-        checkCheckbox("experimentMembership", 0, false);
-        checkCheckbox("experimentMembership", 1, false);
-        checkCheckbox("experimentMembership", 2, false);
-        checkCheckbox("experimentMembership", 3, false);
-        checkCheckbox("experimentMembership", 4, false);
-        checkCheckbox("experimentMembership", 5, false);
+        checkCheckbox("experimentMembership", 0);
+        checkCheckbox("experimentMembership", 1);
+        checkCheckbox("experimentMembership", 2);
+        checkCheckbox("experimentMembership", 3);
+        checkCheckbox("experimentMembership", 4);
+        checkCheckbox("experimentMembership", 5);
 
         log("Test editing a run group's runs");
         clickLinkWithText("MS2 Dashboard");

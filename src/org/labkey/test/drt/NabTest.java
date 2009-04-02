@@ -106,7 +106,7 @@ public class NabTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_FILE_NAME);
 
         clickLinkWithText("Previous Runs By Sample");
-        checkCheckbox(".select", 0, false);
+        checkCheckbox(".select", 0);
         clickNavButton("Copy to Study");
         selectOptionByText("targetContainerId", "/NabVerifyProject/NabFolder (NabFolder Study)");
         clickNavButton("Next");

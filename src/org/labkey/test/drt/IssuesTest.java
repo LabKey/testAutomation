@@ -122,7 +122,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         // UpdateRequiredFieldsAction
         //         <tr><td><input type="checkbox" name="requiredFields"  value="Milestone">Milestone</td></tr>
-        checkCheckbox("requiredFields", "Milestone", false);
+        checkCheckbox("requiredFields", "Milestone");
         clickNavButton("Update Required Fields");
 
         // SetCustomColumnConfigurationAction
@@ -257,10 +257,10 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     private void checkRequiredField(String name, boolean select)
     {
-        Locator checkBoxLocator = Locator.checkboxByNameAndValue("requiredFields", name, false);
+        Locator checkBoxLocator = Locator.checkboxByNameAndValue("requiredFields", name);
 
         if (select)
-            checkCheckbox("requiredFields", name, false);
+            checkCheckbox("requiredFields", name);
         else
         {
             if (isChecked(checkBoxLocator))
@@ -270,7 +270,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     private void verifyFieldChecked(String fieldName)
     {
-        if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName, false)))
+        if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)))
             return;
 
         assertFalse("Checkbox not set for element: " + fieldName, false);
@@ -279,7 +279,7 @@ public class IssuesTest extends BaseSeleniumWebTest
     private void viewSelectedDetailsTest()
     {
         setFilter("Issues", "Status", "<has any value>");
-        clickCheckbox(".toggle", false);
+        clickCheckbox(".toggle");
         clickNavButton("View Details");
         assertTextPresent("a bright flash of light");
         assertTextPresent("don't believe the hype");

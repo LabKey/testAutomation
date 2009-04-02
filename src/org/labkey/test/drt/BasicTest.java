@@ -90,8 +90,8 @@ public class BasicTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
-        checkCheckbox("usageReportingLevel", "MEDIUM", true);     // Force devs to report full usage info
-        checkCheckbox("exceptionReportingLevel", "HIGH", true);   // Force devs to report full exception info
+        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
+        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
         clickNavButton("Save");
         
         selenium.openWindow("", "systemMaintenance");

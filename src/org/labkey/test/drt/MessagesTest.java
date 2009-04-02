@@ -54,7 +54,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("Create Project");
         createProject(PROJECT_NAME);
         clickLinkWithText("Customize Folder");
-        checkCheckbox(Locator.checkboxByNameAndValue("folderType", "Collaboration", true));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         submit();
         addWebPart("Search");
 

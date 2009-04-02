@@ -275,7 +275,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             id = id.substring(id.indexOf('=') + 1);
             _test.popLocation();
 
-            _test.checkCheckbox(".select", id, false);
+            _test.checkCheckbox(".select", id);
             _test.clickNavButton("Delete");
             _test.clickNavButton("Confirm Delete");
         }

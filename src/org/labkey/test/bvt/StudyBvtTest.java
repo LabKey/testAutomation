@@ -168,13 +168,13 @@ public class StudyBvtTest extends StudyTest
 
         clickLinkWithText("24");
         //getDialog().setWorkingForm("Dataset");
-        checkCheckbox(Locator.checkboxByName(".toggle", false));
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         clickNavButton("View Specimens");
         assertTextPresent("999320016");
         assertTextPresent("999320518");
         clickLinkWithText("Show Vial Info");
         assertTextPresent("999320016");
-        checkCheckbox(Locator.checkboxByName(".toggle", false));
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         clickNavButton("Request Options", 0);
         clickLinkWithText("Create New Request");
         assertTextPresent("HAQ0003Y-09");
@@ -996,7 +996,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "fileImportDataset");
-        clickCheckbox("fileImport", false);
+        clickCheckbox("fileImport");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), WAIT_FOR_GWT);

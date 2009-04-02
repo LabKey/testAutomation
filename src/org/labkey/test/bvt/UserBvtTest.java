@@ -103,10 +103,10 @@ public class UserBvtTest extends SecurityTest
 
     private void checkRequiredField(String name, boolean select)
     {
-        Locator checkBoxLocator = Locator.checkboxByNameAndValue("requiredFields", name, false);
+        Locator checkBoxLocator = Locator.checkboxByNameAndValue("requiredFields", name);
 
         if (select)
-            checkCheckbox("requiredFields", name, false);
+            checkCheckbox("requiredFields", name);
         else
         {
             if (isChecked(checkBoxLocator))
@@ -116,7 +116,7 @@ public class UserBvtTest extends SecurityTest
 
     private void verifyFieldChecked(String fieldName)
     {
-        if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName, false)))
+        if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)))
             return;
 
         assertFalse("Checkbox not set for element: " + fieldName, false);

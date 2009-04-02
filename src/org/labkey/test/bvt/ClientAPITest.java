@@ -577,7 +577,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         //copied from old test
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
-        checkCheckbox("providerName", "General", true);
+        checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
