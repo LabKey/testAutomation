@@ -329,15 +329,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
         domainTest();
 
         //clear the test page so the crawler doesn't refetch a test and cause errors
-        clearTestPage();
+        clearTestPage("Test Complete.");
     }
 
-    private void clearTestPage()
+    private void clearTestPage(String message)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("edit");
-        setWikiBody("<p>Test Complete.</p>");
+        setWikiBody("<p>" + message + "</p>");
         saveWikiPage();
     }
 
@@ -663,5 +663,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertElementContains(loc, "SUCCESS: Insert created 1 rows");
         assertElementContains(loc, "SUCCESS: bad query generated exception: Failed to convert property value of type");
         assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
+        clearTestPage("Query portion of test page complete");
     }
 }
