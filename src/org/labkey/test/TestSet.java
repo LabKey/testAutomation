@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.labkey.test.bvt.*;
 import org.labkey.test.daily.UniprotAnnotationTest;
+import org.labkey.test.daily.FlowImportTest;
 import org.labkey.test.drt.*;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
@@ -36,6 +37,7 @@ public enum TestSet
         NabTest.class,
         IssuesTest.class,
         FlowJoQueryTest.class,
+        FlowImportTest.class,
         AssayTest.class,
         LuminexTest.class,
         ListTest.class,
@@ -87,7 +89,7 @@ public enum TestSet
 
     Daily(new Class[]
     {
-        UniprotAnnotationTest.class   
+        UniprotAnnotationTest.class
     }),
 
     Cluster(new Class[]
@@ -117,7 +119,8 @@ public enum TestSet
 
     Flow(new Class[] {
         FlowTest.class,
-        FlowJoQueryTest.class
+        FlowJoQueryTest.class,
+        FlowImportTest.class,
     }),
 
     Study(new Class[] {

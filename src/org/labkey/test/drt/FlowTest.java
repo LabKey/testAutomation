@@ -70,14 +70,14 @@ public class FlowTest extends BaseFlowTest
     protected void doTestSteps()
     {
         init();
-        String containerPath = "/" + PROJECT_NAME + "/" + FOLDER_NAME;
+        String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
         beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
         clickNavButton("Create New Query");
         setFormElement(Locator.nameOrId("ff_newQueryName"), "DRTQuery1");
         selectOptionByText("identifier=ff_baseTableName", "FCSAnalyses");
         submit();
 
-        beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
+        beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + getFolderName() + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
         setFormElement("ff_queryText", "SELECT FCSAnalyses.RowId,\n" +
                 "FCSAnalyses.Statistic.\"Count\",\n" +
                 "FCSAnalyses.Run.FilePathRoot,\n" +

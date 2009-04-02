@@ -18,6 +18,12 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.DataRegionTable;
+
+import java.net.URL;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * This test tests uploading a FlowJo workspace that has results calculated in it, but no associated FCS files.
@@ -30,10 +36,10 @@ import org.labkey.test.Locator;
  */
 public class FlowJoQueryTest extends BaseFlowTest
 {
-    protected void doTestSteps()
+    protected void doTestSteps() throws Exception
     {
         init();
-        String containerPath = "/" + PROJECT_NAME + "/" + FOLDER_NAME;
+        String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
         clickLinkWithText("Set pipeline root");
         setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
@@ -61,7 +67,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
         createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), "", true);
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), "", true);
-        clickLinkWithText("flowFolder");
+        clickLinkWithText(getFolderName());
         clickLinkWithText("1 run");
         clickMenuButton("Query", "Query:PassFailQuery");
         waitForPageToLoad();
@@ -74,6 +80,23 @@ public class FlowJoQueryTest extends BaseFlowTest
 
         clickLinkWithText("Flow Dashboard");
         importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", "FlowJoAnalysis");
+
+        int runId = -1;
+        String currentURL = getCurrentRelativeURL();
+        Pattern p = Pattern.compile(".*runId=([0-9]+).*$");
+        Matcher m = p.matcher(currentURL);
+        if (m.matches())
+        {
+            String runIdStr = m.group(1);
+            runId = Integer.parseInt(runIdStr);
+            log("mini-fcs.xml runId = " + runId);
+        }
+        else
+        {
+            fail("Failed to match runId pattern for url: " + currentURL);
+        }
+        assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
+
         clickLinkWithText("workspaceScript1");
         clickLinkWithText("Make a copy of this analysis script");
         setFormElement("name", "LabKeyScript");
@@ -82,7 +105,8 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickLinkWithText("Analyze some runs");
         selectOptionByValue("ff_targetExperimentId", "");
         waitForPageToLoad();
-        checkCheckbox(".toggle");
+        // select mini-fcs.xml Analysis run
+        checkCheckbox(".select", String.valueOf(runId));
         clickNavButton("Analyze selected runs");
         setFormElement("ff_analysisName", "LabKeyAnalysis");
         clickNavButton("Analyze runs");

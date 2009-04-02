@@ -185,12 +185,20 @@ public class DataRegionTable
         return _test.getTableCellText(getHtmlName(), row + 1, column + (_selectors ? 1 : 0));
     }
 
-    public String getDataAsText(String pk, String column)
+    public String getDataAsText(int row, String columnName)
+    {
+        int col = getColumn(columnName);
+        if (col == -1)
+            return null;
+        return getDataAsText(row, col);
+    }
+
+    public String getDataAsText(String pk, String columnName)
     {
         int row = getRow(pk);
         if (row == -1)
             return null;
-        int col = getColumn(column);
+        int col = getColumn(columnName);
         if (col == -1)
             return null;
         return getDataAsText(row, col);

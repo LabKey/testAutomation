@@ -24,7 +24,6 @@ import java.io.IOException;
 abstract public class BaseFlowTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "FlowVerifyProject";
-    protected static final String FOLDER_NAME = "flowFolder";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
 
     public String getAssociatedModuleDirectory()
@@ -92,7 +91,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("update");
         assertTextNotPresent("Path does not exist");
         createProject(PROJECT_NAME);
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Flow", null);
+        createSubfolder(PROJECT_NAME, PROJECT_NAME, getFolderName(), "Flow", null);
+    }
+
+    protected String getFolderName()
+    {
+        return getClass().getSimpleName();
     }
 
     protected void gotoProjectQuery()
@@ -122,31 +126,101 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, String analysisName)
     {
+        importAnalysis(containerPath, workspacePath, fcsPath, false, analysisName, false);
+    }
+
+    protected void importAnalysis(String containerPath, String workspacePath,
+                                  String fcsPath, boolean existingKeywordRun,
+                                  String analysisName, boolean existingAnalysisFolder)
+    {
+        importAnalysis_begin(containerPath);
+        importAnalysis_uploadWorkspace(containerPath, workspacePath);
+        importAnalysis_FCSFiles(containerPath, fcsPath, existingKeywordRun);
+        if (fcsPath == null)
+        {
+            assertFormElementEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
+            assertFormElementEquals(Locator.name("runFilePathRoot"), "");
+        }
+        else
+        {
+            if (existingKeywordRun)
+                assertFormElementNotEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
+            else
+                assertFormElementEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
+            assertFormElementNotEquals(Locator.name("runFilePathRoot"), "");
+        }
+
+        importAnalysis_analysisFolder(containerPath, analysisName, existingAnalysisFolder);
+
+        importAnalysis_confirm(containerPath, workspacePath, fcsPath, existingKeywordRun, analysisName, existingAnalysisFolder);
+    }
+
+    protected void importAnalysis_begin(String containerPath)
+    {
         log("begin import analysis wizard");
+        if (!selenium.getTitle().startsWith("Flow Dashboard:"))
+            clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Import FlowJo Workspace Analysis");
         assertTitleEquals("Import Analysis: " + containerPath);
         clickNavButton("Begin");
+    }
 
+    protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
+    {
         assertTitleEquals("Import Analysis: Upload Workspace: " + containerPath);
         sleep(500);
         selectTreeItem("tree", workspacePath);
 //        assertFormElementEquals("workspace.path", workspacePath);
         clickNavButton("Next");
+    }
 
+    protected void importAnalysis_FCSFiles(String containerPath, String fcsPath, boolean existingRun)
+    {
         assertTitleEquals("Import Analysis: Associate FCS Files: " + containerPath);
-        if (fcsPath != null)
+        if (existingRun)
+        {
+            selectOptionByText("existingKeywordRunId", fcsPath);
+            clickNavButton("Next");
+        }
+        else if (fcsPath != null)
+        {
             selectTreeItem("tree", fcsPath);
+            clickNavButton("Next");
+        }
         else
-            clearTreeSelections("tree");
-//        assertFormElementEquals("runFilePathRoot", "");
-        clickNavButton("Next");
+        {
+            setFormElement(Locator.name("runFilePathRoot"), ""); // XXX: clicking the Skip button doesn't clear selections
+            clickNavButton("Skip");
+        }
+    }
 
+    protected void importAnalysis_analysisFolder(String containerPath, String analysisName, boolean existing)
+    {
         assertTitleEquals("Import Analysis: Choose Analysis Folder: " + containerPath);
-        setFormElement("newAnalysisName", analysisName);
-
+        if (existing)
+        {
+            selectOptionByText("existingAnalysisId", analysisName);
+        }
+        else
+        {
+            setFormElement("newAnalysisName", analysisName);
+        }
         clickNavButton("Next");
+    }
+
+    protected void importAnalysis_confirm(String containerPath, String workspacePath,
+                                          String fcsPath, boolean existingKeywordRun,
+                                          String analysisFolder, boolean existingAnalysisFolder)
+    {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
-        // XXX: check confim page
+        assertTextPresent("Analysis Folder: " + analysisFolder);
+        if (existingKeywordRun)
+            assertTextNotPresent("Existing FCS File run: none set");
+        // XXX: assert fcsPath is present: need to normalize windows path backslashes
+        if (fcsPath == null)
+            assertTextPresent("FCS File Path: none set");
+        assertTextPresent("Workspace: " + workspacePath);
+        
         clickNavButton("Finish");
         waitForPipeline(containerPath);
         log("finished import analysis wizard");
@@ -202,6 +276,16 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
                 "var tree = ext.getCmp('" + treeCmpId + "');\n" +
                 "tree.getSelectionModel().clearSelections();");
+    }
+
+    protected String getTreeSelection(String treeCmpId)
+    {
+        log("getting tree selection");
+        return selenium.getEval("{\n" +
+                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
+                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
+                "tree.getSelectedValues();\n" +
+                "}");
     }
 
 }
