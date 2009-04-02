@@ -2162,7 +2162,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickRadioButtonById(String id)
     {
-        click(Locator.checkboxById(id));
+        click(Locator.radioButtonById(id));
     }
 
     public void clickCheckboxById(String id)
