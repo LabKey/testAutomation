@@ -243,19 +243,21 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         for (int i = 0; i < parts.length; i++)
         {
             String part = parts[i];
+            String xpath;
             if (i == parts.length - 1)
             {
                 // select last item: click on tree node name
-                String xpath = treeNodeXpath + "/a[./span='" + part + "']";
-                click(Locator.xpath(xpath));
+                xpath = treeNodeXpath + "/a[./span='" + part + "']";
             }
             else
             {
                 // expand tree node: click on expand/collapse icon
-                String xpath = treeNodeXpath + "/img[contains(@class, 'x-tree-ec-icon') and ../a/span='" + part + "']";
-                click(Locator.xpath(xpath));
+                xpath = treeNodeXpath + "/img[contains(@class, 'x-tree-ec-icon') and ../a/span='" + part + "']";
             }
-            sleep(500);
+
+            Locator l = Locator.xpath(xpath);
+            waitForElement(l, 5000);
+            click(l);
         }
     }
 
