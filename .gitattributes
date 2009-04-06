@@ -86,6 +86,7 @@ src/org/labkey/test/daily/UniprotAnnotationTest.java -text
 src/org/labkey/test/drt/BasicTest.java -text
 src/org/labkey/test/drt/ExpTest.java -text
 src/org/labkey/test/drt/FlowTest.java -text
+src/org/labkey/test/drt/ImportStudyTest.java -text
 src/org/labkey/test/drt/IssuesTest.java -text
 src/org/labkey/test/drt/JUnitTest.java -text
 src/org/labkey/test/drt/MessagesTest.java -text

@@ -114,12 +114,12 @@ public class StudyBvtTest extends StudyTest
         super.doTestSteps();
 
         // verify that we correctly warn when specimen tracking hasn't been configured
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Create New Request");
         assertTextPresent("Specimen management is not configured for this study");
 
         // configure specimen tracking
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Request Statuses");
         setFormElement("newLabel", "New Request");
@@ -159,7 +159,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("manage study");
 
         // create specimen request
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Study Navigator");
 
         assertLinkNotPresentWithText("24");
@@ -249,8 +249,8 @@ public class StudyBvtTest extends StudyTest
         if (isFileUploadAvailable())
             assertTextPresent(VISIT_MAP.substring(VISIT_MAP.lastIndexOf("/") + 1));
 
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Permissions");
         clickNavButton("Study Security");
 
@@ -262,7 +262,7 @@ public class StudyBvtTest extends StudyTest
         clickAndWait(Locator.id("groupUpdateButton"));
 
         // set the QC state 
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("QC State", "QCState:All data");
         checkAllOnPage("Dataset");
@@ -280,7 +280,7 @@ public class StudyBvtTest extends StudyTest
         popLocation();
 
         // test specimen comments
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Plasma, Unknown Processing");
         clickNavButton("Enable Comments");
         checkAllOnPage("SpecimenDetail");
@@ -299,18 +299,18 @@ public class StudyBvtTest extends StudyTest
 
         // import second archive, verify that that data is merged:
         click(Locator.linkWithText("Projects"));
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         importSpecimenArchive(SPECIMEN_ARCHIVE_B);
 
 
         // verify that comments remain after second specimen load
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Plasma, Unknown Processing");
         assertTextPresent("These vials are very important.", 2);
 
         // check to see that data in the specimen archive was merged correctly:
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("By Vial");
         clickMenuButton("Page Size", "Page Size:All");
         assertTextPresent("DRT000XX-01");
@@ -349,7 +349,7 @@ public class StudyBvtTest extends StudyTest
         assertTextPresent("Added Comments");
         assertTextPresent("Johannesburg, South Africa");
 
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("View Existing Requests");
         clickNavButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
@@ -365,8 +365,8 @@ public class StudyBvtTest extends StudyTest
         assertTextPresent("BAQ00051-11");
 
         log("Test editing rows in a dataset");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
 
         clickLinkWithText("Permissions");
         clickNavButton("Study Security");
@@ -374,7 +374,7 @@ public class StudyBvtTest extends StudyTest
         selectOptionByValue("securityString", "BASIC_WRITE");
         selenium.waitForPageToLoad("30000");
 
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getFolderName());
         clickLinkWithText("DEM-1: Demographics");
 
         clickLinkWithText("edit");
@@ -400,7 +400,7 @@ public class StudyBvtTest extends StudyTest
         assertTextNotPresent("999320529");
 
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
@@ -424,8 +424,8 @@ public class StudyBvtTest extends StudyTest
     protected void querySnapshotTest()
     {
 /*
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Security");
 
@@ -436,7 +436,7 @@ public class StudyBvtTest extends StudyTest
 
         // create a snapshot from a dataset
         log("create a snapshot from a dataset");
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("DEM-1: Demographics");
         createQuerySnapshot(DEMOGRAPHICS_SNAPSHOT, true, false);
 
@@ -444,7 +444,7 @@ public class StudyBvtTest extends StudyTest
 
         // test automatic updates by altering the source dataset
         log("test automatic updates by altering the source dataset");
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("DEM-1: Demographics");
         clickNavButton("Insert New");
         setFormElement("quf_participantid", "999121212");
@@ -453,7 +453,7 @@ public class StudyBvtTest extends StudyTest
 
         clickNavButton("Submit");
 
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText(DEMOGRAPHICS_SNAPSHOT);
         clickMenuButton("QC State", "QCState:All data");
         waitForSnapshotUpdate("Armenian");
@@ -461,7 +461,7 @@ public class StudyBvtTest extends StudyTest
         // snapshot over a custom view
         // test automatic updates by altering the source dataset
         log("create a snapshot over a custom view");
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
 
@@ -478,13 +478,13 @@ public class StudyBvtTest extends StudyTest
         assertTextNotPresent("Slovakian");
 
         log("test automatic updates for a joined snapshot view");
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("DEM-1: Demographics");
         clickLink(Locator.xpath("//a[.='999320016']/../..//td/a[.='edit']"));
         setFormElement("quf_DEMraco", "Slovakian");
         clickNavButton("Submit");
 
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText(APX_SNAPSHOT);
         clickMenuButton("QC State", "QCState:All data");
 
@@ -492,7 +492,7 @@ public class StudyBvtTest extends StudyTest
 
         // snapshot over a custom query
         log("create a snapshot over a custom query");
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Views");
         createReport(GRID_VIEW);
 
@@ -600,8 +600,8 @@ public class StudyBvtTest extends StudyTest
 
     protected void cleanPipelineItem(String item)
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Data Pipeline");
         if (isTextPresent(item))
         {
@@ -614,8 +614,8 @@ public class StudyBvtTest extends StudyTest
     protected void deleteRReports()
     {
         log("Clean up R Reports");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Views");
         for (String script : R_SCRIPTS)
         {
@@ -745,8 +745,8 @@ public class StudyBvtTest extends StudyTest
     {
         log("Create an R Report");
         click(Locator.linkWithText("Projects"));
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
 
@@ -860,7 +860,7 @@ public class StudyBvtTest extends StudyTest
 
         log("Test user permissions");
         clickLinkWithText("Permissions");
-        clickLink("managegroup/" + PROJECT_NAME + "/Users");
+        clickLink("managegroup/" + getProjectName() + "/Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
@@ -869,8 +869,8 @@ public class StudyBvtTest extends StudyTest
         impersonate(USER1);
 
         log("Access shared R script");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         pushLocation();
         //clickNavButton("Reports >>", 0);
@@ -890,15 +890,15 @@ public class StudyBvtTest extends StudyTest
 
         log("Change user permission");
         stopImpersonating();
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getProjectName());
         if (isTextPresent("Enable Admin"))
             clickLinkWithText("Enable Admin");
         clickLinkWithText("Permissions");
         setPermissions("Users", "Admin (all permissions)");
 
         log("Create a new R script which uses others R scripts");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
@@ -913,8 +913,8 @@ public class StudyBvtTest extends StudyTest
         log("Test editing R scripts");
         signOut();
         signIn();
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickReportGridLink(R_SCRIPTS[0], "source");
         if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
@@ -923,8 +923,8 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Save View");
 
         log("Check that edit worked");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickReportGridLink(R_SCRIPTS[1], "source");
 
         checkCheckbox(Locator.name("includedReports"));
@@ -941,8 +941,8 @@ public class StudyBvtTest extends StudyTest
 
     protected void createCharts()
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
         clickMenuButton("Views", "Views:Create", CREATE_CHART_MENU);
@@ -976,7 +976,7 @@ public class StudyBvtTest extends StudyTest
         waitForElement(Locator.navButton("Views"), 5000);
 
         // create grid view
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getFolderName());
         waitForElement(Locator.linkWithText("Manage Views"), 5000);
         clickLinkWithText("Manage Views");
 
@@ -991,8 +991,8 @@ public class StudyBvtTest extends StudyTest
         if (!isFileUploadAvailable())
             return;
 
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "fileImportDataset");
@@ -1041,7 +1041,7 @@ public class StudyBvtTest extends StudyTest
         assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");
         clickLinkWithText("participant chart");
 
-        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(getFolderName());
         clickLinkWithText(TEST_GRID_VIEW);
         assertTextPresent("999320016");
         pushLocation();

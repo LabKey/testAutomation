@@ -32,16 +32,35 @@ import java.util.Date;
  */
 public class StudyTest extends BaseSeleniumWebTest
 {
-    protected static final String PROJECT_NAME = "StudyVerifyProject";
-    protected static final String FOLDER_NAME = "My Study";
-    protected static final String VISIT_MAP = "/sampledata/study/v068_visit_map.txt";
-    private static final String CRF_SCHEMAS = "/sampledata/study/schema.tsv";
-    private static final String SPECIMEN_ARCHIVE_A = "/sampledata/study/sample_a.specimens";
-    private static final String ARCHIVE_TEMP_DIR = "/sampledata/study/drt_temp";
+    protected final String STUDY_LABEL = "Study 001";
+    protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
+
+    private final String CRF_SCHEMAS = getSampleDataPath() + "schema.tsv";
+    private final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "sample_a.specimens";
+    private final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
     private static final int MAX_WAIT_SECONDS = 4*60;
-    private String _studyDataRoot = null;
     private int _completedSpecimenImports = 0;
 
+
+    protected String getSampleDataPath()
+    {
+        return "/sampledata/study/";
+    }
+
+    protected String getProjectName()
+    {
+        return "StudyVerifyProject";
+    }
+
+    protected String getFolderName()
+    {
+        return "My Study";
+    }
+
+    protected String getPipelinePath()
+    {
+        return getLabKeyRoot() + getSampleDataPath();
+    }
 
     public String getAssociatedModuleDirectory()
     {
@@ -56,7 +75,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-       try { deleteProject(PROJECT_NAME); } catch (Throwable e) {}
+       try { deleteProject(getProjectName()); } catch (Throwable e) {}
     }
 
     protected static final String GRID_VIEW = "create_gridView";
@@ -139,11 +158,12 @@ public class StudyTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         createStudy();
+        waitForDatasetUpload();
 
         // verify reports
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
 /*
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Reports and Views");
         clickLinkWithText("new enrollment view");
         selectOptionByText("datasetId", "1: DEM-1: Demographics");
@@ -155,37 +175,17 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
         assertImagePresentWithSrc("timePlot.view?reportId=", true);
 
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
 */
-        clickLinkWithText("Study Navigator");
-        clickLinkWithText("24");
 
-        // verify that cohorts are working
-        assertTextPresent("999320016");
-        assertTextPresent("999320518");
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
 
-        clickMenuButton("Cohorts", "Cohorts:Group 1");
-        waitForPageToLoad();
-        assertTextPresent("999320016");
-        assertTextNotPresent("999320518");
-
-        clickMenuButton("Cohorts", "Cohorts:Group 2");
-        waitForPageToLoad();
-        assertTextNotPresent("999320016");
-        assertTextPresent("999320518");
-
-        // verify that the participant view repsects the cohort filter:
-        setSort("Dataset", "ParticipantId", SortDirection.ASC);
-        clickLinkWithText("999320518");
-        assertTextNotPresent("Group 1");
-        assertTextPresent("Group 2");
-        clickLinkWithText("Next Participant >");
-        assertTextNotPresent("Group 1");
-        assertTextPresent("Group 2");
-        clickLinkWithText("Next Participant >");
-        assertTextNotPresent("Group 1");
-        assertTextPresent("Group 2");
-        clickLinkWithText("Next Participant >");
+        verifyDemographics();
+        verifyVisitMapPage();
+        verifyManageDatasetsPage();
+        verifyHiddenVisits();
+        verifyCohorts();
 
         clickLinkWithText("Dataset: DEM-1: Demographics, All Visits");
 
@@ -202,14 +202,14 @@ public class StudyTest extends BaseSeleniumWebTest
         selectOptionByText("showWithDataset", "DEM-1: Demographics");
         clickNavButton("Save");
 
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         assertTextPresent("TestReport");
         clickLinkWithText("TestReport");
 
         assertTableCellTextEquals("report", 2, 0, "Female");
 
         //Delete the report
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         deleteReport("TestReport");
 
@@ -223,12 +223,12 @@ public class StudyTest extends BaseSeleniumWebTest
         //Not sure what we are lookgin for here
         //assertTextPresent("urn:lsid");
         assertNavButtonNotPresent("go");
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         deleteReport(viewName);
 
         // create new external report
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("DEM-1: Demographics");
         clickMenuButton("Views", "Views:Create", "Views:Create:Advanced View");
         selectOptionByText("queryName", "DEM-1: Demographics");
@@ -243,12 +243,12 @@ public class StudyTest extends BaseSeleniumWebTest
         setFormElement("label", "tsv");
         selectOptionByText("showWithDataset", "DEM-1: Demographics");
         clickNavButton("Save");
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("tsv");
         assertTextPresent("Female");
 
         // test custom assays
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "verifyAssay");
@@ -297,7 +297,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("1.2");
 
         // configure QC state management before our second upload
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage QC States");
         setFormElement("newLabel", "unknown QC");
@@ -310,7 +310,7 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Save");
 
         // return to dataset import page
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("verifyAssay");
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
@@ -335,9 +335,9 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("unknown QC");
 
         // upload specimen data and verify import
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         importSpecimenArchive(SPECIMEN_ARCHIVE_A);
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Page Size:All");
         assertTextNotPresent("DRT000XX-01");
@@ -359,61 +359,21 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
     }
 
-    protected void createStudy()
+    private void verifyDemographics()
     {
-        _studyDataRoot = getLabKeyRoot() + "/sampledata/study";
+        clickLinkWithText("Study Navigator");
+        clickLinkWithText("24");
+        assertTextPresent("Male");
+        assertTextPresent("African American or Black");
+        clickLinkWithText("999320016");
+        assertTextPresent("right deltoid");
+    }
 
-        createProject(PROJECT_NAME);
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null, true);
-        clickNavButton("Create Study");
-        click(Locator.radioButtonByNameAndValue("simpleRepository", "false"));
-        clickNavButton("Create Study");
-
-        // change study label
-        clickLinkWithText("Change Label");
-        setFormElement("label", "Study 001");
-        clickNavButton("Update");
-        assertTextPresent("Study 001");
-
-        // import visit map
-        clickLinkWithText("Manage Visits");
-        clickLinkWithText("Import Visit Map");
-        String visitMapData = getFileContents(VISIT_MAP);
-        setLongTextField("content", visitMapData);
-        clickNavButton("Import");
-
-        // define forms
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Define Dataset Schemas");
-        clickLinkWithText("Bulk Import Schemas");
-        setFormElement("typeNameColumn", "platename");
-        setFormElement("labelColumn", "platelabel");
-        setFormElement("typeIdColumn", "plateno");
-        setLongTextField("tsv", getFileContents(CRF_SCHEMAS));
-        clickNavButton("Submit", 180000);
-        assertTextPresent("DEM-1: Demographics");
-        clickLinkWithText("489");
-        assertTextPresent("ESIdt");
-        assertTextPresent("Form Completion Date");
-
-        // setup cohorts:
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Cohorts");
-        selectOptionByText("participantCohortDataSetId", "EVC-1: Enrollment Vaccination");
-        waitForPageToLoad();
-        selectOptionByText("participantCohortProperty", "2. Enrollment group");
-        clickNavButton("Update Assignments");
-
-        // hide visits:
+    private void verifyVisitMapPage()
+    {
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Visits");
-        for (int i = 0; i < 2; i++)
-        {
-            clickLinkWithText("edit", i);
-            uncheckCheckbox("showByDefault");
-            clickNavButton("Save");
-        }
 
         // test optional/required/not associated
         clickLinkWithText("edit", 0);
@@ -448,8 +408,22 @@ public class StudyTest extends BaseSeleniumWebTest
         assertSelectOption("dataSetStatus", 6, "NOT_ASSOCIATED");
         assertSelectOption("dataSetStatus", 7, "OPTIONAL");
         assertSelectOption("dataSetStatus", 8, "REQUIRED");
+    }
 
-        clickLinkWithText("Study 001");
+    private void verifyManageDatasetsPage()
+    {
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Datasets");
+
+        assertTextPresent("DEM-1: Demographics");
+        clickLinkWithText("489");
+        assertTextPresent("ESIdt");
+        assertTextPresent("Form Completion Date");
+    }
+
+    private void verifyHiddenVisits()
+    {
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Study Navigator");
         assertTextNotPresent("Screening Cycle");
         assertTextNotPresent("Cycle 1");
@@ -458,19 +432,104 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("Screening Cycle");
         assertTextPresent("Cycle 1");
         assertTextPresent("Pre-exist Cond");
+    }
+
+    private void verifyCohorts()
+    {
+        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText("Study Navigator");
+        clickLinkWithText("24");
+
+        // verify that cohorts are working
+        assertTextPresent("999320016");
+        assertTextPresent("999320518");
+
+        clickMenuButton("Cohorts", "Cohorts:Group 1");
+        waitForPageToLoad();
+        assertTextPresent("999320016");
+        assertTextNotPresent("999320518");
+
+        clickMenuButton("Cohorts", "Cohorts:Group 2");
+        waitForPageToLoad();
+        assertTextNotPresent("999320016");
+        assertTextPresent("999320518");
+
+        // verify that the participant view respects the cohort filter:
+        setSort("Dataset", "ParticipantId", SortDirection.ASC);
+        clickLinkWithText("999320518");
+        assertTextNotPresent("Group 1");
+        assertTextPresent("Group 2");
+        clickLinkWithText("Next Participant >");
+        assertTextNotPresent("Group 1");
+        assertTextPresent("Group 2");
+        clickLinkWithText("Next Participant >");
+        assertTextNotPresent("Group 1");
+        assertTextPresent("Group 2");
+        clickLinkWithText("Next Participant >");
+    }
+
+    protected void createStudy()
+    {
+        initializeFolder();
+
+        clickNavButton("Create Study");
+        click(Locator.radioButtonByNameAndValue("simpleRepository", "false"));
+        clickNavButton("Create Study");
+
+        // change study label
+        clickLinkWithText("Change Label");
+        setFormElement("label", STUDY_LABEL);
+        clickNavButton("Update");
+        assertTextPresent(STUDY_LABEL);
+
+        // import visit map
+        clickLinkWithText("Manage Visits");
+        clickLinkWithText("Import Visit Map");
+        String visitMapData = getFileContents(VISIT_MAP);
+        setLongTextField("content", visitMapData);
+        clickNavButton("Import");
+
+        // define forms
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Define Dataset Schemas");
+        clickLinkWithText("Bulk Import Schemas");
+        setFormElement("typeNameColumn", "platename");
+        setFormElement("labelColumn", "platelabel");
+        setFormElement("typeIdColumn", "plateno");
+        setLongTextField("tsv", getFileContents(CRF_SCHEMAS));
+        clickNavButton("Submit", 180000);
+
+        // setup cohorts:
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Cohorts");
+        selectOptionByText("participantCohortDataSetId", "EVC-1: Enrollment Vaccination");
+        waitForPageToLoad();
+        selectOptionByText("participantCohortProperty", "2. Enrollment group");
+        clickNavButton("Update Assignments");
+
+        // hide visits:
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Visits");
+        for (int i = 0; i < 2; i++)
+        {
+            clickLinkWithText("edit", i);
+            uncheckCheckbox("showByDefault");
+            clickNavButton("Save");
+        }
 
         // configure QC state management so that all data is displayed by default (we'll test with hiden data later):
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickNavButton("Save");
 
         // upload data:
-        clickLinkWithText("Study 001");
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Data Pipeline");
         clickNavButton("Setup");
-        setFormElement("path", _studyDataRoot);
+        setFormElement("path", getPipelinePath());
         submit();
         clickLinkWithText("Pipeline");
         clickNavButton("Process and Import Data");
@@ -481,7 +540,10 @@ public class StudyTest extends BaseSeleniumWebTest
             fail("Datasets must be generated: run 'makePlates.bat' from within sampledata/study.");
         clickNavButton("Import datasets");
         clickNavButton("Submit");
+    }
 
+    private void waitForDatasetUpload()
+    {
         // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header,
         // and it picks up the upload of 'FPX-1: Final Complete Physical Exam' as containing complete.
         // we exclude the word 'REPLACE' to catch this case:
@@ -496,14 +558,12 @@ public class StudyTest extends BaseSeleniumWebTest
         }
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
         assertLinkPresentWithTextCount("COMPLETE", 1);
+    }
 
-        clickLinkWithText("Study 001");
-        clickLinkWithText("Study Navigator");
-        clickLinkWithText("24");
-        assertTextPresent("Male");
-        assertTextPresent("African American or Black");
-        clickLinkWithText("999320016");
-        assertTextPresent("right deltoid");
+    protected void initializeFolder()
+    {
+        createProject(getProjectName());
+        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 
     protected void importSpecimenArchive(String archivePath)
@@ -541,7 +601,7 @@ public class StudyTest extends BaseSeleniumWebTest
     {
         try
         {
-            BufferedReader in = new BufferedReader(new FileReader(_studyDataRoot + "/v068_dump.sql"));
+            BufferedReader in = new BufferedReader(new FileReader(getPipelinePath() + "/v068_dump.sql"));
             String s;
             while (null != (s = in.readLine()))
             {
@@ -559,7 +619,7 @@ public class StudyTest extends BaseSeleniumWebTest
                     header += "\t" + c.trim();
                 header = header.trim();
 
-                File f = new File(_studyDataRoot + "/" + plate + ".tsv");
+                File f = new File(getPipelinePath() + "/" + plate + ".tsv");
                 PrintWriter out = new PrintWriter(new FileWriter(f));
                 log("Generated plate " + f.getPath());
                 out.println("# " + plate);
@@ -580,7 +640,7 @@ public class StudyTest extends BaseSeleniumWebTest
     {
         try
         {
-            BufferedReader in = new BufferedReader(new FileReader(_studyDataRoot + "/v068_dump.sql"));
+            BufferedReader in = new BufferedReader(new FileReader(getPipelinePath() + "/v068_dump.sql"));
             String s;
             while (null != (s = in.readLine()))
             {
@@ -588,7 +648,7 @@ public class StudyTest extends BaseSeleniumWebTest
                     continue;
 
                 String plate = s.substring(5, s.indexOf('(')).trim();
-                File f = new File(_studyDataRoot + "/" + plate + ".tsv");
+                File f = new File(getPipelinePath() + "/" + plate + ".tsv");
                 f.delete();
             }
         }
@@ -600,7 +660,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     private void deleteLogFiles()
     {
-        File dataRoot = new File(_studyDataRoot);
+        File dataRoot = new File(getPipelinePath());
         File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
             public boolean accept(File dir, String name)
             {
@@ -613,12 +673,12 @@ public class StudyTest extends BaseSeleniumWebTest
 
     private void deleteAssayUploadFiles()
     {
-        deleteDir(new File(_studyDataRoot, "assaydata"));
+        deleteDir(new File(getPipelinePath(), "assaydata"));
     }
 
     private void deleteReportFiles()
     {
-        deleteDir(new File(_studyDataRoot, "Reports"));
+        deleteDir(new File(getPipelinePath(), "Reports"));
     }
 
     private void deleteDir(File dir)
