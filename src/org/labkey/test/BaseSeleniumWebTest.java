@@ -2511,7 +2511,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             checkCheckbox(new Locator(userXPath + "/../td[1]/input"));
             clickNavButton("Delete");
-            selenium.getConfirmation();
+            assertTextPresent(userEmail);
+            assertTextPresent("permanently delete");
+            clickNavButton("Permanently Delete");
         }
     }
 
