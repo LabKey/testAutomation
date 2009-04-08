@@ -298,9 +298,6 @@ public class StudyBvtTest extends StudyTest
         clickMenuButton("Comments", "Comments:Exit");
 
         // import second archive, verify that that data is merged:
-        click(Locator.linkWithText("Projects"));
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
         importSpecimenArchive(SPECIMEN_ARCHIVE_B);
 
 

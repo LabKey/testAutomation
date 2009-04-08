@@ -65,4 +65,10 @@ public class ImportStudyTest extends StudyTest
         setFormElement("path", getPipelinePath());
         submit();
     }
+
+    @Override
+    protected void importSpecimenArchive(String archivePath)
+    {
+        // Do nothing -- we already loaded the specimen archive with the initial study load
+    }
 }

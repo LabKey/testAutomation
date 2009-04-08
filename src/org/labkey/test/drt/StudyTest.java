@@ -335,7 +335,6 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("unknown QC");
 
         // upload specimen data and verify import
-        clickLinkWithText(STUDY_LABEL);
         importSpecimenArchive(SPECIMEN_ARCHIVE_A);
         clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Blood (Whole)");
@@ -573,6 +572,8 @@ public class StudyTest extends BaseSeleniumWebTest
         File specimenArchive = new File(getLabKeyRoot() + archivePath);
         // copy the file into its own directory
         copyFile(specimenArchive, copiedArchive);
+
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Data Pipeline");
         assertLinkPresentWithTextCount("COMPLETE", _completedSpecimenImports + 1);
         clickNavButton("Process and Import Data");
