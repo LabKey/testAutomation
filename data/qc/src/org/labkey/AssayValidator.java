@@ -81,7 +81,7 @@ public class AssayValidator
 
                 // add a log entry for this run
                 //setCredentials(HOST);
-                insertLog();
+                //insertLog();
             }
             else
                 writeError("Unable to locate the runDataFile", "runDataFile");
