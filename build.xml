@@ -142,7 +142,7 @@
         <pathelement location="${test.build.home}/classes" />
     </path>
 
-    <target name="compile" depends="build-java-client,prepare" description="Compile Java sources">
+    <target name="compile" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
         <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
             <srcfiles dir="${test.src.home}" />
         </uptodate>
@@ -917,4 +917,30 @@
         </java>
     </target>
 
+    <target name="build-qc-validator">
+        <delete dir="${project.root}/sampledata/qc/classes"/>
+        <mkdir dir="${project.root}/sampledata/qc/classes"/>
+        <javac srcdir="${project.root}/sampledata/qc/src"
+               destdir="${project.root}/sampledata/qc/classes"
+               debug="${test.compile.debug}"
+               deprecation="${test.compile.deprecation}"
+               optimize="${test.compile.optimize}"
+               source="1.5"
+               classpathref="test.build.classpath">
+        </javac>
+
+        <mkdir dir="${project.root}/sampledata/qc"/>
+        <jar destfile="${project.root}/sampledata/qc/validator.jar">
+            <fileset dir="${project.root}/remoteapi/java/build/classes"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.2.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/commons-httpclient-3.1.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/commons-logging.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/json_simple.jar" includes="**/*.class"/>
+            <fileset dir="${project.root}/sampledata/qc/classes"/>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="org.labkey.AssayValidator"/>
+            </manifest>
+        </jar>
+    </target>
 </project>

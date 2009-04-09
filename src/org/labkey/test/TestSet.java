@@ -65,7 +65,8 @@ public enum TestSet
         FieldLevelQcTest.class,
         ModuleAssayTest.class,
         SimpleModuleTest.class,
-        JavaClientApiTest.class
+        JavaClientApiTest.class,
+        ProgrammaticQCTest.class
     }),
 
     DRT(new Class[]

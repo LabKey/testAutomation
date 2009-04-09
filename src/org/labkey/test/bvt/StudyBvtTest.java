@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.drt.StudyTest;
 
 import java.io.File;
@@ -506,7 +507,7 @@ public class StudyBvtTest extends StudyTest
 
         // edit snapshot then delete
         log("edit the snapshot");
-        clickMenuButton("Views", null, EDIT_SNAPSHOT_MENU);
+        ExtHelper.clickMenuButton(this, "Views", null, EDIT_SNAPSHOT_MENU);
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickNavButton("Save");
         assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
@@ -515,7 +516,7 @@ public class StudyBvtTest extends StudyTest
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
-        clickMenuButton("Views", null, EDIT_SNAPSHOT_MENU);
+        ExtHelper.clickMenuButton(this, "Views", null, EDIT_SNAPSHOT_MENU);
         clickNavButton("Delete Snapshot");
         selenium.getConfirmation();
 
@@ -525,7 +526,7 @@ public class StudyBvtTest extends StudyTest
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic)
     {
-        clickMenuButton("Views", "Views:Create", CREATE_SNAPSHOT_MENU);
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_SNAPSHOT_MENU);
 
         setFormElement("snapshotName", snapshotName);
         if (autoUpdate)
@@ -666,19 +667,19 @@ public class StudyBvtTest extends StudyTest
             for (File file : files)
             {
                 // add a new r engine configuration
-                String id = getExtElementId("btn_addEngine");
+                String id = ExtHelper.getExtElementId(this, "btn_addEngine");
                 click(Locator.id(id));
 
-                id = getExtElementId("add_rEngine");
+                id = ExtHelper.getExtElementId(this, "add_rEngine");
                 click(Locator.id(id));
 
-                id = getExtElementId("btn_submit");
+                id = ExtHelper.getExtElementId(this, "btn_submit");
                 waitForElement(Locator.id(id), 10000);
 
-                id = getExtElementId("editEngine_exePath");
+                id = ExtHelper.getExtElementId(this, "editEngine_exePath");
                 setFormElement(Locator.id(id), file.getAbsolutePath());
 
-                id = getExtElementId("btn_submit");
+                id = ExtHelper.getExtElementId(this, "btn_submit");
                 click(Locator.id(id));
 
                 // wait until the dialog has been dismissed
@@ -745,7 +746,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
 
         log("Execute bad scripts");
         clickNavButton("Execute Script");
@@ -789,7 +790,7 @@ public class StudyBvtTest extends StudyTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
         setFormElement(Locator.id("script"), "labkey.data");
         clickNavButton("Execute Script");
         assertTextNotPresent(R_REMCOL);
@@ -826,7 +827,7 @@ public class StudyBvtTest extends StudyTest
         popLocation();
 
         log("Create second R script");
-        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
             if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
@@ -897,7 +898,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        clickMenuButton("Views", "Views:Create", CREATE_R_MENU);
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
@@ -942,7 +943,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(getFolderName());
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        clickMenuButton("Views", "Views:Create", CREATE_CHART_MENU);
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_CHART_MENU);
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
@@ -956,7 +957,7 @@ public class StudyBvtTest extends StudyTest
         waitForElement(Locator.navButton("Views"), 5000);
 
         clickMenuButton("Views", "Views:default");
-        clickMenuButton("Views", "Views:Create", CREATE_CHART_MENU);
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_CHART_MENU);
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
 
         // create a non-participant chart

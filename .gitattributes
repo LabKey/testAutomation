@@ -72,6 +72,7 @@ src/org/labkey/test/bvt/MessagesBvtTest.java -text
 src/org/labkey/test/bvt/MicroarrayTest.java -text
 src/org/labkey/test/bvt/ModuleAssayTest.java -text
 src/org/labkey/test/bvt/PipelineBvtTest.java -text
+src/org/labkey/test/bvt/ProgrammaticQCTest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
 src/org/labkey/test/bvt/SimpleModuleTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text
@@ -137,6 +138,7 @@ src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/ExperimentRunTable.java -text
+src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PipelineStatusTable.java -text

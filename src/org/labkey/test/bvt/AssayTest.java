@@ -17,6 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * User: jeckels
@@ -425,7 +426,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Submit", defaultWaitForPage);
 
         // Set the container filter to include subfolders
-        clickMenuButton("Views", "Views:Folder Filter", "Views:Folder Filter:Current folder and subfolders");
+        ExtHelper.clickMenuButton(this, "Views", "Views:Folder Filter", "Views:Folder Filter:Current folder and subfolders");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");

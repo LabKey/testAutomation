@@ -23,6 +23,7 @@ import org.apache.commons.lang.time.FastDateFormat;
 import static org.labkey.test.WebTestHelper.*;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -83,6 +84,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public static int getSeleniumServer() {
         String portString = System.getProperty("selenium.server", DEFAULT_SELENIUM_SERVER);
         return Integer.parseInt(portString);
+    }
+
+    public DefaultSeleniumWrapper getWrapper()
+    {
+        return selenium;
     }
 
     public String getLabKeyRoot()
@@ -2055,42 +2061,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void clickMenuButton(String buttonName, String extId)
     {
-        clickMenuButton(buttonName, null, extId);
-    }
-
-    /**
-     * Clicks the ext menu item from the submenu specified by the ext object id
-     */
-    public void clickMenuButton(String buttonName, String subMenuId, String itemId)
-    {
-        clickNavButton(buttonName, 0);
-        // allow the DOM to be updated
-        sleep(1000);
-        if (subMenuId != null)
-        {
-            String id = getExtElementId(subMenuId);
-            if (id != null)
-            {
-                // render the submenu
-                selenium.mouseOver("//a[@id='" + id + "']");
-                sleep(1000);
-            }
-        }
-        String menuItemId = getExtElementId(itemId);
-        if (menuItemId != null)
-            clickLink(menuItemId);
-    }
-
-    /**
-     * Returns a DOM Element id from an ext object id. Assumes that the ext component
-     * has already been rendered.
-     */
-    protected String getExtElementId(String extId)
-    {
-        String id = selenium.getEval("selenium.getExtElementId('" + extId + "');");
-        log("Element id for ext component id: " + extId + " is: " + id);
-
-        return id;
+        ExtHelper.clickMenuButton(this, buttonName, null, extId);
     }
 
     public void dataRegionPageFirst(String dataRegionName)

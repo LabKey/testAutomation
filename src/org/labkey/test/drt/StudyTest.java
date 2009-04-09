@@ -21,6 +21,7 @@ import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.*;
 import java.util.Date;
@@ -85,26 +86,15 @@ public class StudyTest extends BaseSeleniumWebTest
     protected void createReport(String reportType)
     {
         // click the create button dropdown
-        String id = getExtElementId("btn_createView");
+        String id = ExtHelper.getExtElementId(this, "btn_createView");
         click(Locator.id(id));
 
-        id = getExtElementId(reportType);
+        id = ExtHelper.getExtElementId(this, reportType);
         click(Locator.id(id));
         waitForPageToLoad();
     }
 
-    protected void waitForExtDialog(int timeout)
-    {
-        for (int time=0; time < timeout; time+= 500)
-        {
-            if (BooleanUtils.toBoolean(selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().isVisible();")))
-                return;
-            sleep(500);
-        }
-        fail("Failed waiting for Ext dialog to appear");
-    }
-
-    protected void deleteReport(String reportName)
+   protected void deleteReport(String reportName)
     {
         clickLinkWithText("Manage Views");
         final Locator report = Locator.tagContainingText("div", reportName);
@@ -113,10 +103,10 @@ public class StudyTest extends BaseSeleniumWebTest
         waitForElement(report, 10000);
         selenium.mouseDown(report.toString());
 
-        String id = getExtElementId("btn_deleteView");
+        String id = ExtHelper.getExtElementId(this, "btn_deleteView");
         click(Locator.id(id));
 
-        waitForExtDialog(5000);
+        ExtHelper.waitForExtDialog(this, 5000);
 
         String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
         click(Locator.id(btnId));
@@ -189,7 +179,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Dataset: DEM-1: Demographics, All Visits");
 
-        clickMenuButton("Views", "Views:Create", "Views:Create:Crosstab View");
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", "Views:Create:Crosstab View");
         selectOptionByValue("rowField",  "DEMsex");
         selectOptionByValue("colField", "DEMsexor");
         selectOptionByValue("statField", "SequenceNum");
@@ -230,7 +220,7 @@ public class StudyTest extends BaseSeleniumWebTest
         // create new external report
         clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("DEM-1: Demographics");
-        clickMenuButton("Views", "Views:Create", "Views:Create:Advanced View");
+        ExtHelper.clickMenuButton(this, "Views", "Views:Create", "Views:Create:Advanced View");
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
