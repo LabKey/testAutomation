@@ -108,7 +108,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
             setFormElement(Locator.id(id), "jar");
 
             id = ExtHelper.getExtElementId(this, "editEngine_exeCommand");
-            setFormElement(Locator.id(id), "-jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\"");
+            setFormElement(Locator.id(id), "-jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
 
             id = ExtHelper.getExtElementId(this, "btn_submit");
             click(Locator.id(id));
