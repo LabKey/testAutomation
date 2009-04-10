@@ -34,13 +34,12 @@ public class AssayValidator
     private File _errorFile;
     private Map<String, String> _runProperties;
     private List<String> _errors = new ArrayList<String>();
-
-    private static final String HOST_NAME = "http://localhost:8080/labkey";
+    private String _host;
     private static final String HOST = "localhost:8080";
 
     public static void main(String[] args)
     {
-        if (args.length < 3)
+        if (args.length < 4)
             throw new IllegalArgumentException("Input data file not passed in");
 
         File runProperties = new File(args[0]);
@@ -48,17 +47,18 @@ public class AssayValidator
         {
             AssayValidator qc = new AssayValidator();
 
-            qc.runQC(runProperties, args[1], args[2]);
+            qc.runQC(runProperties, args[1], args[2], args[3]);
         }
         else
             throw new IllegalArgumentException("Input data file does not exist");
     }
 
-    public void runQC(File inputFile, String username, String password)
+    public void runQC(File inputFile, String username, String password, String host)
     {
         try {
             _email = username;
             _password = password;
+            _host = host;
             _runProperties = parseRunProperties(inputFile);
 
             if (_runProperties.containsKey("errorsFile"))
@@ -81,7 +81,7 @@ public class AssayValidator
 
                 // add a log entry for this run
                 //setCredentials(HOST);
-                //insertLog();
+                insertLog();
             }
             else
                 writeError("Unable to locate the runDataFile", "runDataFile");
@@ -94,7 +94,7 @@ public class AssayValidator
 
     private void insertLog() throws Exception
     {
-        Connection con = new Connection(HOST_NAME, _email, _password);
+        Connection con = new Connection(_host, _email, _password);
         InsertRowsCommand cmd = new InsertRowsCommand("lists", "QC Log");
 
         Map<String, Object> row = new HashMap<String,Object>();
