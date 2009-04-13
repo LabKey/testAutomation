@@ -785,7 +785,7 @@
       </waitfor>
     </target>
 
-    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started,modifiedFiles">
+    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,modifiedFiles,waitfor-labkey-started">
         <junit fork="true" forkmode="once" maxmemory="128m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltonerror}"
