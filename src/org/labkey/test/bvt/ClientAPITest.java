@@ -537,6 +537,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("Abeson");
         assertTextPresent("Billyson");
         assertTextPresent("Johnson");
+
+        //test sorting
+        selenium.click("//div[@class='x-grid3-hd-inner x-grid3-hd-2']");
+        limit = 30;
+        while (!isTextPresent("Yak") && limit-- > 0)
+            sleep(1000);
+
+        assertTextBefore("Yakson", "Pennyson");
+        assertTextBefore("Pennyson", "Norbertson");
     }
 
     private String getActiveEditorId()
