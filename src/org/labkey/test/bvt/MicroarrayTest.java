@@ -106,7 +106,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         // First try importing the runs individually
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
-        clickNavButton("Import MAGEML using " + ASSAY_NAME);
+        clickMenuButton("Import MageML", "Import MageML:Use " + ASSAY_NAME);
         setFormElement("batchStringField", "SingleRunProperties");
         clickNavButton("Next");
         assertTextPresent(MAGEML_FILE1);
@@ -133,7 +133,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         // Start the upload wizard again
         clickLinkWithText("data pipeline");
-        clickNavButton("Import MAGEML using " + ASSAY_NAME);
+        clickMenuButton("Import MageML", "Import MageML:Use " + ASSAY_NAME);
         setFormElement("batchStringField", "BulkProperties");
         
         assertTextPresent("BulkProperties");
