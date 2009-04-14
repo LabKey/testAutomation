@@ -935,7 +935,7 @@
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.2.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-httpclient-3.1.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-logging.jar" includes="**/*.class"/>
-            <zipfileset src="${project.root}/remoteapi/java/lib/json_simple.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/json_simple-1.1.jar" includes="**/*.class"/>
             <fileset dir="${project.root}/sampledata/qc/classes"/>
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
