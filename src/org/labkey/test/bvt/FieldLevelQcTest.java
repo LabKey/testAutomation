@@ -168,7 +168,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Insert New");
         setFormElement("quf_name", "Sid");
         setFormElement("quf_sex", "male");
-        setFormElement("quf_age", "N");
+        selectOptionByValue("quf_ageQCIndicator", "N");
         submit();
         assertNoLabkeyErrors();
         assertTextPresent("Sid");
@@ -233,7 +233,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Insert New");
         setFormElement("quf_participantid", "Sid");
         setFormElement("quf_SequenceNum", "1");
-        setFormElement("quf_Age", "N");
+        selectOptionByValue("quf_AgeQCIndicator", "N");
         setFormElement("quf_Sex", "male");
         submit();
         assertNoLabkeyErrors();
