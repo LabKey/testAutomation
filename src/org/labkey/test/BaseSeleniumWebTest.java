@@ -1028,10 +1028,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if (null == tabsToAdd || tabsToAdd.length == 0)
                 return;
 
-            clickLinkWithText("Customize Folder");
+            clickLinkWithText("Folder Settings");
         }
         // verify that we're on the customize tabs page, then submit:
-        assertTextPresent("Customize folder /" + project);
+        assertTextPresent("Folder Settings: /" + project);
 
         if (tabsToAdd != null)
         {
@@ -2629,7 +2629,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         ensureAdminMode();
         clickLinkWithText(projectName);
-        clickLinkWithText("Customize Folder");
+        clickLinkWithText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle(moduleName));
         clickNavButton("Update Folder");
     }

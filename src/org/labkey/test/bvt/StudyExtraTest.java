@@ -153,7 +153,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         setFormElement("specimenTSV", specimens);
 		clickNavButton("Next");
         clickNavButton("Finish");
-        clickLinkWithText("Customize Folder");
+        clickLinkWithText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle("Experiment"));
         checkCheckbox(Locator.checkboxByTitle("Query"));
         clickNavButton("Update Folder");

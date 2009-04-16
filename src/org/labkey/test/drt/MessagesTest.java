@@ -53,7 +53,7 @@ public class MessagesTest extends BaseSeleniumWebTest
     {
         log("Create Project");
         createProject(PROJECT_NAME);
-        clickLinkWithText("Customize Folder");
+        clickLinkWithText("Folder Settings");
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         submit();
         addWebPart("Search");

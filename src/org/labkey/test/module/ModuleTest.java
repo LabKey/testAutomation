@@ -20,11 +20,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: ulberge
  * Date: Aug 7, 2007
- * Time: 3:41:56 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ModuleTest extends BaseSeleniumWebTest
 {
@@ -41,7 +38,7 @@ public class ModuleTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME);
         log("Test module created from moduleTemplate");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Customize Folder");
+        clickLinkWithText("Folder Settings");
         checkCheckbox(Locator.raw("//input[@value='" + TEST_MODULE_TEMPLATE_FOLDER_NAME + "']"));
         clickNavButton("Update Folder");
         clickTab(TEST_MODULE_TEMPLATE_FOLDER_NAME);

@@ -110,7 +110,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         setFormElement("names", ADMIN_USER_TEMPLATE);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
 
         createPermissionsGroup("Testers");
         assertPermissionSetting("Testers", "No Permissions");

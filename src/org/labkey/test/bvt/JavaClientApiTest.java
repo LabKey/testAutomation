@@ -70,7 +70,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
 
         log("Setting permissions...");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         setPermissions("Guests", "Editor");
 
         clickLinkWithText(PROJECT_NAME);

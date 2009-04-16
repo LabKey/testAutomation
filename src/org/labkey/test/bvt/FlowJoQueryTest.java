@@ -59,7 +59,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         clickNavButton("Save", longWaitForPage);
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Customize Folder");
+        clickLinkWithText("Folder Settings");
         toggleCheckboxByTitle("Query");
         toggleCheckboxByTitle("Flow");
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);

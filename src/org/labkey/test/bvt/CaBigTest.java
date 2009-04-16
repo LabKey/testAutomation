@@ -56,10 +56,10 @@ public class CaBigTest extends BaseSeleniumWebTest
 
         // Create a subfolder
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         clickNavButton("Publish");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
 
         // Test caBIG admin page
         clickNavButton("Admin");

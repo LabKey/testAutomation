@@ -57,7 +57,7 @@ public class ImportStudyTest extends StudyTest
 
     private void initializePipeline()
     {
-        clickLinkWithText("Customize Folder");
+        clickLinkWithText("Folder Settings");
         toggleCheckboxByTitle("Pipeline");
         submit();
         addWebPart("Data Pipeline");

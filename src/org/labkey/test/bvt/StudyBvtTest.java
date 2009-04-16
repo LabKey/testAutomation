@@ -252,7 +252,7 @@ public class StudyBvtTest extends StudyTest
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         clickNavButton("Study Security");
 
         // enable advanced study security
@@ -366,7 +366,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
 
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         clickNavButton("Study Security");
 
         selectOptionByValue("securityString", "BASIC_WRITE");
@@ -564,7 +564,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("My Study");
 
         // create a test group and give it container read perms
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/security/StudyVerifyProject/container.view?')]"));
         setFormElement("name", TEST_GROUP);
         clickAndWait(Locator.navButton("Create"));
@@ -857,12 +857,12 @@ public class StudyBvtTest extends StudyTest
         //assertTextPresent(R_SCRIPT2_TEXT1);
 
         log("Test user permissions");
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         clickLink("managegroup/" + getProjectName() + "/Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         setPermissions("Users", "Editor");
         impersonate(USER1);
 
@@ -891,7 +891,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(getProjectName());
         if (isTextPresent("Enable Admin"))
             clickLinkWithText("Enable Admin");
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         setPermissions("Users", "Admin (all permissions)");
 
         log("Create a new R script which uses others R scripts");

@@ -92,21 +92,21 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
 
         //Create Reader User
         clickLinkWithText(PERM_PROJECT_NAME);
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         createPermissionsGroup(GAMMA_READER_GROUP_NAME);
         assertPermissionSetting(GAMMA_READER_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_READER_GROUP_NAME, "Reader");
         createUserInProjectForGroup(GAMMA_READER_USER, PERM_PROJECT_NAME, GAMMA_READER_GROUP_NAME);
         //Create Author User
         clickLinkWithText(PERM_PROJECT_NAME);
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         createPermissionsGroup(GAMMA_AUTHOR_GROUP_NAME);
         assertPermissionSetting(GAMMA_AUTHOR_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_AUTHOR_GROUP_NAME, "Author");
         createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME);
         //Create the Submitter User
         clickLinkWithText(PERM_PROJECT_NAME);
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         createPermissionsGroup(GAMMA_SUBMITTER_GROUP_NAME);
         assertPermissionSetting(GAMMA_SUBMITTER_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_SUBMITTER_GROUP_NAME, "Submitter");
@@ -191,7 +191,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
      */
     private void createUserInProjectForGroup(String userName, String projectName, String groupName){
         clickLinkWithText(projectName);
-        clickLinkWithText("Permissions");
+        clickLinkWithText("Folder Permissions");
         clickLink("managegroup/" + projectName + "/" + groupName);
         
         setFormElement("names", userName );
