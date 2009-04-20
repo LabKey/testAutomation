@@ -56,7 +56,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Save", 0);
         //This is done async so need to sleep a bit...
         int n = 1;
-        while (!isTextPresent("Revision 1 saved successfully") && n++ < 5)
+        while (!isTextPresent("Revision 1 saved successfully") && n++ < 20)
             sleep(500);
         assertTextPresent("Revision 1 saved successfully");
 
