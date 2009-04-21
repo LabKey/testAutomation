@@ -1757,7 +1757,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return null;
     }
 
-    private Locator.XPathLocator getButtonLocator(String text)
+    public Locator.XPathLocator getButtonLocator(String text)
     {
         // check for normal labkey nav button:
         Locator.XPathLocator locator = Locator.navButton(text);

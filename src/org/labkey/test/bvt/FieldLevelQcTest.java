@@ -128,9 +128,53 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         setFormElement("path", getLabKeyRoot() + "/sampledata/fieldLevelQC");
         submit();
 
+        setupQcValues();
+
         checkListQc();
         checkDatasetQc();
         checkAssayQC();
+    }
+
+    private void setupQcValues() throws InterruptedException
+    {
+        log("Setting QC values");
+        
+        clickLinkWithText("Folder Settings");
+        clickLinkWithText("QC Values");
+        clickCheckboxById("inherit");
+
+        // Delete all site-level settings
+        while(isElementPresent(Locator.tagWithAttribute("img", "alt", "delete")))
+        {
+            click(Locator.tagWithAttribute("img", "alt", "delete"));
+            Thread.sleep(500);
+        }
+
+        click(getButtonLocator("Add"));
+        click(getButtonLocator("Add"));
+        click(getButtonLocator("Add"));
+        Thread.sleep(500);
+
+        // This is disgusting. For some reason a simple XPath doesn't seem to work: we have to get the id right,
+        // and unfortunately the id is dependent on how many inherited QC values we had, which can vary by server.
+        // So we have to try all possible ids.
+        int completedCount = 0;
+        String[] qcValues = new String[] {"Q", "N", "Z"};
+        int index = 1; // xpath is 1-based
+        while (completedCount < 3 && index < 1000)
+        {
+            String xpathString = "//div[@id='qcValuesDiv']//input[@name='qcValues' and @id='qcValues" + index + "']";
+            if (isElementPresent(Locator.xpath(xpathString)))
+            {
+                String qcValue = qcValues[completedCount++];
+                selenium.type(xpathString, qcValue);
+            }
+            index++;
+        }
+
+        clickNavButton("Save");
+
+        log("Set QC values.");
     }
 
     private void checkListQc() throws Exception
@@ -168,7 +212,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Insert New");
         setFormElement("quf_name", "Sid");
         setFormElement("quf_sex", "male");
-        selectOptionByValue("quf_ageQCIndicator", "N");
+        selectOptionByValue("quf_ageQCIndicator", "Z");
         submit();
         assertNoLabkeyErrors();
         assertTextPresent("Sid");
@@ -233,7 +277,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         clickNavButton("Insert New");
         setFormElement("quf_participantid", "Sid");
         setFormElement("quf_SequenceNum", "1");
-        selectOptionByValue("quf_AgeQCIndicator", "N");
+        selectOptionByValue("quf_AgeQCIndicator", "Z");
         setFormElement("quf_Sex", "male");
         submit();
         assertNoLabkeyErrors();
