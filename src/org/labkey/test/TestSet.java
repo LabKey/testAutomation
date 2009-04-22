@@ -30,9 +30,18 @@ import java.util.Arrays;
 
 public enum TestSet
 {
-    BVT(new Class[]
-    {
+    DRT(new Class[] {
         BasicTest.class,
+        JUnitTest.class,
+        SecurityTest.class,
+        ExpTest.class,
+        FlowTest.class,
+        XTandemTest.class,
+        WikiTest.class,
+        StudyTest.class
+    }),
+
+    BVT(DRT, new Class[] {
         MessagesTest.class,
         NabTest.class,
         IssuesTest.class,
@@ -67,18 +76,6 @@ public enum TestSet
         SimpleModuleTest.class,
         JavaClientApiTest.class,
         ProgrammaticQCTest.class
-    }),
-
-    DRT(new Class[]
-    {
-        BasicTest.class,
-        JUnitTest.class,
-        SecurityTest.class,
-        ExpTest.class,
-        FlowTest.class,
-        XTandemTest.class,
-        WikiTest.class,
-        StudyTest.class,
     }),
 
     MS2(new Class[]
@@ -158,12 +155,20 @@ public enum TestSet
 
     public Class[] tests;
 
-    TestSet(Class[] tests)
+    TestSet(TestSet set, Class... tests)
+    {
+        Class[] all = new Class[set.tests.length + tests.length];
+        System.arraycopy(set.tests, 0, all, 0, set.tests.length);
+        System.arraycopy(tests, 0, all, set.tests.length, tests.length);
+        setTests(all);
+    }
+
+    TestSet(Class... tests)
     {
         setTests(tests);
     }
 
-    void setTests(Class[] tests)
+    void setTests(Class... tests)
     {
         this.tests = tests;
     }
