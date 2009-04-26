@@ -775,13 +775,15 @@
     </target>
 
     <target name="waitfor-labkey-started">
-      <echo message="waiting for the server to start..."/>
+      <property name="server.started.url" value="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view"/>
+
+      <echo message="waiting for the server to start: $server.started.url"/>
       <waitfor maxwait="10" maxwaitunit="second" checkevery="100">
-        <http url="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view" />
+        <http url="${server.started.url}" />
       </waitfor>
       <sleep seconds="2"/>
       <waitfor maxwait="2" maxwaitunit="minute" checkevery="100">
-        <http url="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}/project/home/begin.view" />
+        <http url="${server.started.url}" />
       </waitfor>
     </target>
 
