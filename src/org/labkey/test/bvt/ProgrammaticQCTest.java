@@ -77,8 +77,11 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
     protected void doCleanup() throws Exception
     {
-        deleteEngine();
-        deleteProject(TEST_PROGRAMMATIC_QC_PRJ);
+        try {
+            deleteEngine();
+            deleteProject(TEST_PROGRAMMATIC_QC_PRJ);
+        }
+        catch (Throwable t) {}
     }
 
     protected void prepare()
