@@ -140,7 +140,7 @@ public class FieldLevelQcTest extends BaseSeleniumWebTest
         log("Setting QC values");
         
         clickLinkWithText("Folder Settings");
-        clickLinkWithText("QC Values");
+        clickLinkWithText("Missing Value Indicators");
         clickCheckboxById("inherit");
 
         // Delete all site-level settings
