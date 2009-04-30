@@ -17,10 +17,13 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+
+import com.thoughtworks.selenium.DefaultSelenium;
 
 public class FileContentTest extends BaseSeleniumWebTest
 {
@@ -70,20 +73,17 @@ public class FileContentTest extends BaseSeleniumWebTest
         {
             clickLinkWithText("Manage Files");
 
-            clickLinkWithText("Upload File", false);
-            selenium.waitForPopUp("uploadFiles", "30000");
-            selenium.selectWindow("uploadFiles");
+//            clickLinkWithText("Upload File...", false);
+//            selenium.waitForPopUp("uploadFiles", "30000");
+//            selenium.selectWindow("uploadFiles");
 
             String filename = "InlineFile.html";
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
-            setFormElement("formFiles[0]", f);
-            clickNavButton("Submit", 0);
-
-            selenium.selectWindow(null);
-            waitForPageToLoad();
-
-            assertTextPresent("Sign Out");
+            setFormElement("fileUpload-file", f);
+            // move focus to trigger change event
+            selenium.focus("//body");
+            waitForText(filename, 1000);
 
             signOut();
 
