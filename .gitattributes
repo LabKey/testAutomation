@@ -58,7 +58,6 @@ src/org/labkey/test/bvt/CaBigTest.java -text
 src/org/labkey/test/bvt/ClientAPITest.java -text
 src/org/labkey/test/bvt/DataRegionTest.java -text
 src/org/labkey/test/bvt/DbUserSchemaTest.java -text
-src/org/labkey/test/bvt/FieldLevelQcTest.java -text
 src/org/labkey/test/bvt/FieldValidatorTest.java -text
 src/org/labkey/test/bvt/FileContentTest.java -text
 src/org/labkey/test/bvt/FlowJoQueryTest.java -text
@@ -70,6 +69,7 @@ src/org/labkey/test/bvt/MS1Bvt.java -text
 src/org/labkey/test/bvt/MS2BvtTest.java -text
 src/org/labkey/test/bvt/MessagesBvtTest.java -text
 src/org/labkey/test/bvt/MicroarrayTest.java -text
+src/org/labkey/test/bvt/MissingValueIndicatorsTest.java -text
 src/org/labkey/test/bvt/ModuleAssayTest.java -text
 src/org/labkey/test/bvt/PipelineBvtTest.java -text
 src/org/labkey/test/bvt/ProgrammaticQCTest.java -text

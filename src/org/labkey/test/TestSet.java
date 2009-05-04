@@ -71,7 +71,7 @@ public enum TestSet
         TimelineTest.class,
         FieldValidatorTest.class,
         DbUserSchemaTest.class,
-        FieldLevelQcTest.class,
+        MissingValueIndicatorsTest.class,
         ModuleAssayTest.class,
         SimpleModuleTest.class,
         JavaClientApiTest.class,

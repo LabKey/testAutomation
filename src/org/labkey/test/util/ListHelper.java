@@ -194,7 +194,7 @@ public class ListHelper
         private ListColumnType _type;
         private String _description;
         private String _format;
-        private boolean _allowsQc;
+        private boolean _mvEnabled;
         private LookupInfo _lookup;
         private FieldValidator _validator;
 
@@ -264,14 +264,14 @@ public class ListHelper
             return _validator;
         }
 
-        public boolean isAllowsQc()
+        public boolean isMvEnabled()
         {
-            return _allowsQc;
+            return _mvEnabled;
         }
 
-        public void setAllowsQc(boolean allowsQc)
+        public void setMvEnabled(boolean mvEnabled)
         {
-            _allowsQc = allowsQc;
+            _mvEnabled = mvEnabled;
         }
     }
 
@@ -315,9 +315,9 @@ public class ListHelper
                 test.setFormElement("propertyFormat", col.getFormat());
             }
 
-            if (col.isAllowsQc())
+            if (col.isMvEnabled())
             {
-                test.checkCheckbox("allowsQc");
+                test.checkCheckbox("mvEnabled");
             }
 
             LookupInfo lookup = col.getLookup();
