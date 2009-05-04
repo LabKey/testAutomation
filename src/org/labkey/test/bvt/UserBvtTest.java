@@ -48,8 +48,9 @@ public class UserBvtTest extends SecurityTest
     private void siteUsersTest()
     {
         clickLinkWithText("Site Users");
-        assertTextPresent("User Id");
         assertTextPresent("Last Login");
+        assertTextPresent("Last Name");
+        assertTextPresent("Active");
 
         clickLinkWithText("My Account");
         assertTextPresent("User Id");
