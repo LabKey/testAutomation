@@ -288,14 +288,14 @@ public class StudyBvtTest extends StudyTest
         clickMenuButton("Comments", "Comments:Set");
         setFormElement("comments", "These vials are very important.");
         clickNavButton("Save Changes");
-        assertTextPresent("These vials are very important.", 4);
+        assertTextPresent("These vials are very important.", 25);
         setFilter("SpecimenDetail", "ParticipantId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
         clickMenuButton("Comments", "Comments:Clear");
         selenium.getConfirmation();
         assertTextNotPresent("These vials are very important.");
         clearFilter("SpecimenDetail", "ParticipantId");
-        assertTextPresent("These vials are very important.", 2);
+        assertTextPresent("These vials are very important.", 23);
         clickMenuButton("Comments", "Comments:Exit");
 
         // import second archive, verify that that data is merged:

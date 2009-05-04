@@ -333,7 +333,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("GAA082NH-01");
         clickLinkWithText("Hide Vial Info");
         assertTextPresent("Total:");
-        assertTextPresent("444");
+        assertTextPresent("466");
 
         assertTextNotPresent("BAD");
 
@@ -342,10 +342,30 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("2.0&nbsp;ML");
         assertTextNotPresent("Added Comments");
         // confirm collection location:
-        assertTextPresent("Johannesburg, South Africa");
+        assertTextPresent("KCMC, Moshi, Tanzania");
         // confirm historical locations:
         assertTextPresent("Contract Lab Services, Johannesburg, South Africa");
         assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
+
+        clickLinkWithText("Specimens");
+        setFilter("SpecimenDetail", "QualityControlFlag", "Equals", "true");
+        setSort("SpecimenDetail", "GlobalUniqueId", SortDirection.ASC);
+        assertTextPresent("AAA07XK5-02");
+        assertTextPresent("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId");
+        clickLinkContainingText("history");
+        assertTextPresent("Blood (Whole)");
+        assertTextPresent("Vaginal Swab");
+        assertTextPresent("Vial is flagged for quality control");
+        clickLinkWithText("update");
+        setFormElement("qualityControlFlag", "false");
+        setFormElement("comments", "Manually removed flag");
+        clickNavButton("Save Changes");
+        assertTextPresent("Manually removed flag");
+        assertTextPresent("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId");
+        assertTextNotPresent("Vial is flagged for quality control");
+        clickLinkWithText("return to vial view");
+        assertTextNotPresent("AAA07XK5-02");
+        assertTextPresent("KBH00S5S-01");
     }
 
     private void verifyDemographics()
