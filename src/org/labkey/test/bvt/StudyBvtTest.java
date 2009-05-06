@@ -892,7 +892,7 @@ public class StudyBvtTest extends StudyTest
         if (isTextPresent("Enable Admin"))
             clickLinkWithText("Enable Admin");
         clickLinkWithText("Folder Permissions");
-        setPermissions("Users", "Admin (all permissions)");
+        setPermissions("Users", "Project Administrator");
 
         log("Create a new R script which uses others R scripts");
         clickLinkWithText(getProjectName());

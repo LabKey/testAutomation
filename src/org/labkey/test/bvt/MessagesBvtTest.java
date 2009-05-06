@@ -81,7 +81,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         log("Open new project, add group, alter permissions");
         createProject(PROJECT_NAME, "Collaboration");
         createPermissionsGroup("testers1");
-        assertPermissionSetting("Administrators", "Admin (all permissions)");
+        assertPermissionSetting("Administrators", "Project Administrator");
         assertPermissionSetting("testers1", "No Permissions");
 
         log("Add messages and search to project");

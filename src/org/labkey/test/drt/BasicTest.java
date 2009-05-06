@@ -40,7 +40,7 @@ public class BasicTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
         assertElementNotPresent(Locator.id("inheritPermissions"));
-        assertPermissionSetting("Administrators", "Admin (all permissions)");
+        assertPermissionSetting("Administrators", "Project Administrator");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] {"Messages", "Wiki"});

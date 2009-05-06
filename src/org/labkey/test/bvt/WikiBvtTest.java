@@ -96,7 +96,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         setPermissions("Users", "Editor");
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
-        assertPermissionSetting("Administrators", "Admin (all permissions)");
+        assertPermissionSetting("Administrators", "Project Administrator");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
         setPermissions("Users", "Editor");
@@ -402,7 +402,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent(WIKI_PAGE2_TITLE);
         clickLinkWithText("Folder Permissions");
-        setPermissions("User", "Admin (all permissions)");
+        setPermissions("User", "Project Administrator");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextNotPresent("Welcome");
@@ -428,7 +428,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Folder Permissions");
-        setPermissions("User", "Admin (all permissions)");
+        setPermissions("User", "Project Administrator");
 
         log("make sure the changes went through");
         impersonate(USER1);

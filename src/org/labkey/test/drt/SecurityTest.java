@@ -181,7 +181,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertTrue(emailName.equals(userName));
         String token = params.get("labkeyToken");
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 65535);
+        assertSuccessAuthenticationToken(xml, token, email, 32783);
 
         beginAt(baseUrl + "invalidateToken.view?labkeyToken=" + token + "&returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
@@ -201,7 +201,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertTrue(email.equals(NORMAL_USER));
         token = params.get("labkeyToken");
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
-        assertSuccessAuthenticationToken(xml, token, email, 223);
+        assertSuccessAuthenticationToken(xml, token, email, 15);
 
         // Back to the admin user
         stopImpersonating();
