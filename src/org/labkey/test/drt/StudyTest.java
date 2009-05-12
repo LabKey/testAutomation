@@ -542,6 +542,7 @@ public class StudyTest extends BaseSeleniumWebTest
         submit();
         clickLinkWithText("Pipeline");
         clickNavButton("Process and Import Data");
+        waitForElement(Locator.navButton("Import datasets"),5000);
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
         generateFiles();
@@ -588,8 +589,8 @@ public class StudyTest extends BaseSeleniumWebTest
         assertLinkPresentWithTextCount("COMPLETE", _completedSpecimenImports + 1);
         clickNavButton("Process and Import Data");
         String tempDirShortName = ARCHIVE_TEMP_DIR.substring(ARCHIVE_TEMP_DIR.lastIndexOf('/') + 1);
-        clickLinkWithText(tempDirShortName);
-        clickNavButton("Import specimen data");
+        waitAndClick(Locator.fileTreeByName(tempDirShortName));
+        waitAndClickNavButton("Import specimen data");
         clickNavButton("Start Import");
 
         // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.

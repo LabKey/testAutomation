@@ -43,6 +43,6 @@ public class PepMatchTestParams extends AbstractInspectTestParams
     public void clickActionButton()
     {
         _test.log("msInspect & pepmatch run");
-        _test.clickNavButton("msInspect Find Features and Match Peptides");
+        _test.waitAndClickNavButton("msInspect Find Features and Match Peptides");
     }
 }

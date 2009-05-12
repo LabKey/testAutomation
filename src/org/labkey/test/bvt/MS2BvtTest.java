@@ -75,10 +75,10 @@ public class MS2BvtTest extends MS2TestBase
         log("Upload existing MS2 data.");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
-        clickLinkWithText("bov_sample");
-        clickLinkWithText(SEARCH_TYPE);
-        clickLinkWithText(TEST);
-        clickNavButton("Import Experiment");
+        waitAndClick(Locator.fileTreeByName("bov_sample"));
+        waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
+        waitAndClick(Locator.fileTreeByName(TEST));
+        waitAndClickNavButton("Import Experiment");
 
         log("Going to the list of all pipeline jobs");
         clickLinkWithText("All");
@@ -814,10 +814,10 @@ public class MS2BvtTest extends MS2TestBase
         log("Upload second MS2 Run");
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
-        clickLinkWithText("bov_sample");
-        clickLinkWithText(SEARCH_TYPE);
-        clickLinkWithText(TEST2);
-        clickNavButton("Import Experiment");
+        waitAndClick(Locator.fileTreeByName("bov_sample"));
+        waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
+        waitAndClick(Locator.fileTreeByName(TEST2));
+        waitAndClickNavButton("Import Experiment");
 
         log("Verify upload finished.");
         seconds = 0;

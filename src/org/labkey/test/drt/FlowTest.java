@@ -91,12 +91,9 @@ public class FlowTest extends BaseFlowTest
         submit();
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for FCS files to be loaded");
-//        clickNavButton("Upload Multiple Runs");
-//        assertTextPresent("No FCS files");
-//        clickNavButton("Browse for more runs");
 
-        clickLinkWithText("8color");
-        clickNavButton("Import Multiple Runs");
+        waitAndClick(Locator.fileTreeByName("8color"));
+        waitAndClickNavButton("Import Multiple Runs");
         // First, just upload the run "8colordata"
         checkCheckbox("ff_path", "8color/8colordata/");
         clickNavButton("Import Selected Runs");
@@ -234,8 +231,8 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for more FCS files to be loaded");
 
-        clickLinkWithText("8color");
-        clickNavButton("Import Multiple Runs");
+        waitAndClick(Locator.fileTreeByName("8color"));
+        waitAndClickNavButton("Import Multiple Runs");
         assertTextNotPresent("8colordata");
         clickImgButtonNoNav("Select All");
         clickNavButton("Import Selected Runs");

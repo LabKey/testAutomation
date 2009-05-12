@@ -142,14 +142,12 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         if(!isTextPresent(BASE_FILE_NAME_1 + SEARCH_XAR_XML_EXTENSION))
         {
-            //ensure that we start at the data root
-            clickLinkWithText(PIPELINE_ROOT_LINK);
-
             //go down to the xtandem protocol directory under xtandem
-            clickLinkWithText(PIPELINE_XTANDEM_DIR);
-            clickLinkWithText(xProtocol);
+            waitAndClick(Locator.fileTreeByName(PIPELINE_XTANDEM_DIR));
+            waitAndClick(Locator.fileTreeByName(xProtocol));
         }
 
+        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON),5000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
     }
 
@@ -162,18 +160,16 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         if(!isTextPresent(BASE_FILE_NAME_1 + PIPE_XAR_XML_EXTENSION))
         {
-            //ensure that we start at the data root
-            clickLinkWithText(PIPELINE_ROOT_LINK);
-
             //go down to the xtandem protocol directory under xtandem
-            clickLinkWithText(PIPELINE_XTANDEM_DIR);
-            clickLinkWithText(xProtocol);
+            waitAndClick(Locator.fileTreeByName(PIPELINE_XTANDEM_DIR));
+            waitAndClick(Locator.fileTreeByName(xProtocol));
 
             //go down to the features protocol directory
-            clickLinkWithText(PIPELINE_MS1PEP_DIR);
-            clickLinkWithText(featuresProtocol);
+            waitAndClick(Locator.fileTreeByName(PIPELINE_MS1PEP_DIR));
+            waitAndClick(Locator.fileTreeByName(featuresProtocol));
         }
 
+        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON),5000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
     }
 
@@ -184,16 +180,14 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         clickNavButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        if(!isTextPresent(BASE_FILE_NAME_3 + PIPE_XAR_XML_EXTENSION))
+        if (!isTextPresent(BASE_FILE_NAME_3 + PIPE_XAR_XML_EXTENSION))
         {
-            //ensure that we start at the data root
-            clickLinkWithText(PIPELINE_ROOT_LINK);
-
             //go down to the protocol directory under the inspect directory
-            clickLinkWithText(PIPELINE_INSPECT_DIR);
-            clickLinkWithText(protocol);
+            waitAndClick(Locator.fileTreeByName(PIPELINE_INSPECT_DIR));
+            waitAndClick(Locator.fileTreeByName(protocol));
         }
 
+        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON),5000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
     }
 

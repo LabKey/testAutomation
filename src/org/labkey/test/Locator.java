@@ -337,6 +337,17 @@ public class Locator
         return elementByLabel(group, 0, "select", 1);
     }
 
+    public static XPathLocator fileTreeByName(String name)
+    {
+        return xpath("//a[@class='x-tree-node-anchor']/span[text()=" + xq(name) + "]");
+    }
+
+
+//    public static XPathLocator fileTreeByPath(String path)
+//    {
+//        return xpath("//a[@class='x-tree-node-anchor']/span[text()=" + xq(path) + "]");
+//    }
+
     /**
      * Quote text to be used as literal string in xpath expression
      *     Direct port from attibuteValue function in selenium IDE locatorBuilders.js

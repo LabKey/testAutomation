@@ -106,6 +106,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         // First try importing the runs individually
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
+        waitForText("Import MAGE-ML",5000);
         clickMenuButton("Import MAGE-ML", "Import MAGE-ML:Use " + ASSAY_NAME);
         setFormElement("batchStringField", "SingleRunProperties");
         clickNavButton("Next");
@@ -133,6 +134,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         // Start the upload wizard again
         clickNavButton("Import Data");
+        waitForText("Import MAGE-ML",5000);
         clickMenuButton("Import MAGE-ML", "Import MAGE-ML:Use " + ASSAY_NAME);
         setFormElement("batchStringField", "BulkProperties");
         

@@ -1764,11 +1764,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isElementPresent(locator))
             return locator;
 
-        // check for normal labkey submit button:
-        locator = Locator.navButton(text);
-        if (isElementPresent(locator))
-            return locator;
-
         // check for Ext button:
         locator = Locator.extButton(text);
         if (isElementPresent(locator))
@@ -1833,6 +1828,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickNavButtonByIndex(String buttonText, int index)
     {
         clickButtonByIndex(buttonText, index);
+    }
+
+
+    public void waitAndClickNavButton(String text)
+    {
+        waitAndClick(5000, Locator.navButton(text), defaultWaitForPage);
+    }
+
+    public void waitAndClick(Locator l)
+    {
+        waitAndClick(5000, l, 0);
+    }
+
+    public void waitAndClick(int waitFor, Locator l, int waitAfter)
+    {
+        waitForElement(l, waitFor);
+        clickAndWait(l, waitAfter);
     }
 
 

@@ -41,8 +41,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         log("Start analysis running.");
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
-        clickLinkWithText("bov_sample");
-        clickNavButton("Describe Samples");
+
+        waitAndClick(Locator.fileTreeByName("bov_sample"));
+        waitAndClickNavButton("Describe Samples");
 
         log("Jump to new MS2 protocol page.");
         clickLinkWithText("create a new protocol");
@@ -127,7 +128,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         log("Analyze again.");
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
-        clickLinkWithText("bov_sample");
+        waitAndClick(Locator.fileTreeByName("bov_sample"));
 
         setupEngine();
 

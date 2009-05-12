@@ -59,7 +59,7 @@ public class ExpTest extends BaseSeleniumWebTest
         submit();
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
-        clickNavButton("Import Experiment");
+        waitAndClickNavButton("Import Experiment");
         clickLinkWithText("Data Pipeline");
         assertLinkNotPresentWithText("ERROR");
         int seconds = 0;

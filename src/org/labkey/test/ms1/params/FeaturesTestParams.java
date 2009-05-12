@@ -35,6 +35,6 @@ public class FeaturesTestParams extends AbstractInspectTestParams
     public void clickActionButton()
     {
         _test.log("msInspect run");
-        _test.clickNavButton("msInspect Find Features");
+        _test.waitAndClickNavButton("msInspect Find Features");
     }
 }
