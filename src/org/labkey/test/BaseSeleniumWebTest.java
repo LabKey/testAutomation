@@ -1838,15 +1838,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitAndClick(Locator l)
     {
-        waitAndClick(5000, l, 0);
+        waitAndClick(10000, l, 0);
     }
 
-    public void waitAndClick(int waitFor, Locator l, int waitAfter)
+    public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
         waitForElement(l, waitFor);
-        clickAndWait(l, waitAfter);
+        clickAndWait(l, waitForPageToLoad);
     }
-
 
     public String goToNavButton(String buttonText, String controller, String folderPath)
     {
