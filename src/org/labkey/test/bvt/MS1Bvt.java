@@ -161,16 +161,19 @@ public class MS1Bvt extends BaseSeleniumWebTest
         if(!isTextPresent(BASE_FILE_NAME_1 + PIPE_XAR_XML_EXTENSION))
         {
             //go down to the xtandem protocol directory under xtandem
+            sleep(3000);
             waitAndClick(Locator.fileTreeByName(PIPELINE_XTANDEM_DIR));
+            sleep(3000);
             waitAndClick(Locator.fileTreeByName(xProtocol));
-
             //go down to the features protocol directory
+            sleep(3000);
             waitAndClick(Locator.fileTreeByName(PIPELINE_MS1PEP_DIR));
+            sleep(3000);
             waitAndClick(Locator.fileTreeByName(featuresProtocol));
         }
 
-        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),5000);
-        clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
+        sleep(3000);
+        waitAndClick(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index));
     }
 
     protected void importPepTsvFile(String project, String protocol, int index)
