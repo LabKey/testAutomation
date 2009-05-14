@@ -147,7 +147,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(xProtocol));
         }
 
-        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON),5000);
+        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),5000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
     }
 
@@ -169,7 +169,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(featuresProtocol));
         }
 
-        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON),5000);
+        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),5000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
     }
 
@@ -185,9 +185,9 @@ public class MS1Bvt extends BaseSeleniumWebTest
             //go down to the protocol directory under the inspect directory
             waitAndClick(Locator.fileTreeByName(PIPELINE_INSPECT_DIR));
             waitAndClick(Locator.fileTreeByName(protocol));
-        }
+        }                                                      
 
-        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON),5000);
+        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),5000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
     }
 
