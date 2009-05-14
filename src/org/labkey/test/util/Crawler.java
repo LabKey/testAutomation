@@ -291,6 +291,10 @@ public class Crawler
                 return false;
         }
 
+        //skip any _webdav urls
+        if (actionId.getController().equalsIgnoreCase("_webdav"))
+            return false;
+
         // skip export actions. 
         if (actionId.getAction().toLowerCase().indexOf("export") >= 0)
                 return false;
