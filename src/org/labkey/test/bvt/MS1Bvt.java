@@ -173,7 +173,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         }
 
         sleep(3000);
-        waitAndClick(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index));
+        waitAndClick(5000, Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index), defaultWaitForPage);
     }
 
     protected void importPepTsvFile(String project, String protocol, int index)
