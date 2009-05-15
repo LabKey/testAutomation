@@ -110,6 +110,7 @@
         </publishers>
     </plugin>
 
+    <!--
     <project.labkey name="Trunk BVT" buildafterfailed="false">
         <property name="instance" value="trunk"/>
         <property name="tomcatport" value="8090"/>
@@ -119,6 +120,7 @@
         <property name="linkCheck" value="true"/>
         <property name="database" value="postgres"/>
     </project.labkey>
+    -->
 
 
     <project.labkey name="Branch BVT" buildafterfailed="false">
