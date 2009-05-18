@@ -68,18 +68,15 @@ public class StudyImportTest extends StudyTest
     @Override
     protected void waitForInitialUpload()
     {
-        // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header,
-        // and it picks up the upload of 'FPX-1: Final Complete Physical Exam' as containing complete.
-        // we exclude the word 'REPLACE' to catch this case:
-        startTimer();                           // TODO: Check for 3 COMPLETE links, once final pipeline job is working
-        while (!isLinkPresentWithTextCount("COMPLETE", 2) && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
+        startTimer();
+        while (!isLinkPresentWithTextCount("COMPLETE", 3) && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             log("Waiting for study import");
             sleep(1000);
             refresh();
         }
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertLinkPresentWithTextCount("COMPLETE", 2);
+        assertLinkPresentWithTextCount("COMPLETE", 3);
     }
 
     @Override
