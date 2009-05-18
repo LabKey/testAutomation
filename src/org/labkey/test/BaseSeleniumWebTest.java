@@ -1476,6 +1476,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return isElementPresent(Locator.linkWithText(text));
     }
 
+    public boolean isLinkPresentWithTextCount(String text, int count)
+    {
+        log("Checking for " + count + " links with exact text '" + text + "'");
+        return countLinksWithText(text) == count;
+    }
+
+    // TODO: Clarify or fix this.  Requires number of links > index!?
     public boolean isLinkPresentWithText(String text, int index)
     {
         return countLinksWithText(text) > index;

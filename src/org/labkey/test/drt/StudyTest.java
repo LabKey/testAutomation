@@ -16,7 +16,6 @@
 
 package org.labkey.test.drt;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -39,7 +38,7 @@ public class StudyTest extends BaseSeleniumWebTest
     private final String CRF_SCHEMAS = getSampleDataPath() + "schema.tsv";
     private final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "sample_a.specimens";
     private final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
-    private static final int MAX_WAIT_SECONDS = 4*60;
+    protected static final int MAX_WAIT_SECONDS = 4*60;
     private int _completedSpecimenImports = 0;
 
 
@@ -148,7 +147,7 @@ public class StudyTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         createStudy();
-        waitForDatasetUpload();
+        waitForInitialUpload();
 
         // verify reports
 /*
@@ -552,7 +551,7 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
     }
 
-    private void waitForDatasetUpload()
+    protected void waitForInitialUpload()
     {
         // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header,
         // and it picks up the upload of 'FPX-1: Final Complete Physical Exam' as containing complete.
@@ -705,14 +704,14 @@ public class StudyTest extends BaseSeleniumWebTest
         dir.delete();
     }
 
-    long start = 0;
-    private void startTimer()
+    private long start = 0;
+
+    protected void startTimer()
     {
         start = System.currentTimeMillis();
     }
 
-
-    private int elapsedSeconds()
+    protected int elapsedSeconds()
     {
         return (int)((System.currentTimeMillis() - start) / 1000);
     }

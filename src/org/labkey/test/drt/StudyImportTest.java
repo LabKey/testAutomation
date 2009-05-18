@@ -20,7 +20,7 @@ package org.labkey.test.drt;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-public class ImportStudyTest extends StudyTest
+public class StudyImportTest extends StudyTest
 {
     protected static final String PROJECT_NAME = "ImportStudyVerifyProject";
     protected static final String FOLDER_NAME = "My Import Study";
@@ -50,9 +50,8 @@ public class ImportStudyTest extends StudyTest
         initializePipeline();
 
         beginAt("study/" + getProjectName() + "/" + getFolderName() + "/importStudy.view");
+        checkRadioButton("source", "pipeline");
         clickButtonContainingText("Import Study");
-
-        // TODO: Verify that pipeline is done?
     }
 
     private void initializePipeline()
@@ -64,6 +63,23 @@ public class ImportStudyTest extends StudyTest
         clickNavButton("Setup");
         setFormElement("path", getPipelinePath());
         submit();
+    }
+
+    @Override
+    protected void waitForInitialUpload()
+    {
+        // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header,
+        // and it picks up the upload of 'FPX-1: Final Complete Physical Exam' as containing complete.
+        // we exclude the word 'REPLACE' to catch this case:
+        startTimer();                           // TODO: Check for 3 COMPLETE links, once final pipeline job is working
+        while (!isLinkPresentWithTextCount("COMPLETE", 2) && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
+        {
+            log("Waiting for study import");
+            sleep(1000);
+            refresh();
+        }
+        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
+        assertLinkPresentWithTextCount("COMPLETE", 2);
     }
 
     @Override

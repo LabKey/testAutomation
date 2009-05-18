@@ -125,7 +125,7 @@ public enum TestSet
             StudyBvtTest.class,
             StudyExtraTest.class,
             AssayTest.class,
-            ImportStudyTest.class
+            StudyImportTest.class
     }),
 
     Data(new Class[] {
