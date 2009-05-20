@@ -17,16 +17,17 @@
 package org.labkey.test;
 
 import org.labkey.test.bvt.*;
-import org.labkey.test.daily.UniprotAnnotationTest;
 import org.labkey.test.daily.FlowImportTest;
+import org.labkey.test.daily.IDRIParticleSizeTest;
+import org.labkey.test.daily.UniprotAnnotationTest;
 import org.labkey.test.drt.*;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.SequestTest;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 public enum TestSet
 {
@@ -134,6 +135,10 @@ public enum TestSet
             DbUserSchemaTest.class,
             ListTest.class,
             IssuesTest.class,
+    }),
+
+    IDRI(new Class[] {
+            IDRIParticleSizeTest.class
     }),
 
     CONTINUE(new Class[] {})
