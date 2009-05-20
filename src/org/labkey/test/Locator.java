@@ -214,6 +214,17 @@ public class Locator
         return xpath("//a[contains(text(), " + xq(text) + ")]");
     }
 
+    public static XPathLocator menuItem(String text)
+    {
+        return xpath("//a[contains(text(), " + xq(text) + ") and contains(@class, 'menu-item')]");
+    }
+
+    public static XPathLocator menuBarItem(String text)
+    {
+        return xpath("//table[@id='menubar']//a/span[contains(text(), " + xq(text) + ")]");
+    }
+
+
     public static XPathLocator linkWithText(String text, int index)
     {
         return xpath("(//a[contains(text(), " + xq(text) + ")])[" + (index + 1) + "]");
@@ -231,7 +242,7 @@ public class Locator
 
     public static XPathLocator bodyLinkWithText(String text)
     {
-        return xpath("//td[id()='bodypanel']//a[contains(text(), " + xq(text) + ")]");
+        return xpath("//td[@id='bodypanel']//a[contains(text(), " + xq(text) + ")]");
     }
 
 

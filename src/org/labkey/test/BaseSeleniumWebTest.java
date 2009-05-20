@@ -403,12 +403,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void ensureAdminMode()
     {
         //Now switch to admin mode if available
-        if (!isLinkPresentWithText("Manage Project") && !isLinkPresentWithText("Manage Site"))
+        if (!isLinkPresentWithText("Projects"))
+            clickAdminMenuItem("Show Navigation Bar");
+    }
+
+    public void clickAdminMenuItem(String... items)
+    {
+        clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
+        for (int i = 0; i < items.length - 1; i++)
         {
-            clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
-            sleep(1000);
-            clickLinkWithText("Show Navigation Bar");
+            Locator parentLocator = Locator.menuItem(items[i]);
+            waitForElement(parentLocator, 1000);
+            mouseOver(parentLocator);
         }
+        Locator itemLocator = Locator.menuItem(items[items.length - 1]);
+        waitForElement(itemLocator, 1000);
+        clickAndWait(itemLocator);
     }
 
     private void waitForStartup()
@@ -1630,6 +1640,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickLink(Locator l)
     {
         clickAndWait(l, defaultWaitForPage);
+    }
+
+    public void mouseOver(Locator l)
+    {
+        selenium.mouseOver(l.toString());
     }
 
     public void clickTab(String tabname)
