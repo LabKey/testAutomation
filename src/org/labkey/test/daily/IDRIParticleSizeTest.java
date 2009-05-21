@@ -41,12 +41,14 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
         clickLinkWithText("IDRI Particle Size Assay");
         clickButtonContainingText("Import Data");
 
-        File sampleRoot = new File(getLabKeyRoot() + SAMPLE_ROOT);
-        File[] allFiles = sampleRoot.listFiles(new FilenameFilter()
+        File root = new File(getLabKeyRoot() + SAMPLE_ROOT);
+        //File root = new File("/IDRI/Stability Reports");
+
+        File[] allFiles = root.listFiles(new FilenameFilter()
         {
             public boolean accept(File dir, String name)
             {
-                return name.endsWith(".xls");
+                return name.matches("^TD[0-9]+\\.xls");
             }
         });
 
@@ -57,6 +59,12 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
             for (int i=0; i<5; i++)
             {
                 sleep(1500);
+                if (isMaterialPopupVisible())
+                {
+                    // if we don't have any material, submit an empty entry
+                    click(getButtonLocator("Submit"));
+                    sleep(1500);
+                }
                 if(isTextPresent(file.getName()))
                     break;
             }
@@ -73,6 +81,12 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
         }
 
         log("Excel files uploaded");
+    }
+
+    private boolean isMaterialPopupVisible()
+    {
+        String divClass = selenium.getEval("this.browserbot.getCurrentWindow().document.getElementById('material').className");
+        return !divClass.equals("x-hidden");
     }
 
     protected void doCleanup() throws Exception
