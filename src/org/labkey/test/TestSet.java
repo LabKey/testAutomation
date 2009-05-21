@@ -77,7 +77,7 @@ public enum TestSet
         SimpleModuleTest.class,
         JavaClientApiTest.class,
         ProgrammaticQCTest.class,
-//        MenuBarTest.class
+        MenuBarTest.class
     }),
 
     MS2(new Class[]

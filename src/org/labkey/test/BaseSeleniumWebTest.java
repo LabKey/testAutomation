@@ -407,6 +407,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickAdminMenuItem("Show Navigation Bar");
     }
 
+    public void hideNavigationBar()
+    {
+        clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
+        waitForElement(Locator.linkContainingText("Navigation Bar"), 1000);
+        if (isLinkPresentWithText("Hide Navigation Bar"))
+            clickLinkWithText("Hide Navigation Bar");
+    }
+    
     public void clickAdminMenuItem(String... items)
     {
         clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
@@ -1012,6 +1020,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd, boolean inheritPermissions)
     {
+        ensureAdminMode();
         if (isLinkPresentWithText(child))
             fail("Cannot create folder; A link with text " + child + " already exists.  " +
                     "This folder may already exist, or the name appears elsewhere in the UI.");

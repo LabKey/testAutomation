@@ -51,6 +51,8 @@ public class MenuBarTest extends BaseSeleniumWebTest
         addWebPart("Wiki Menu");
 
         clickLinkWithText(PROJECT_NAME);
+        hideNavigationBar();
+
         createNewWikiPage("HTML");
         setFormElement("name", WIKI_PAGE_TITLE);
         setFormElement("title", WIKI_PAGE_TITLE);
@@ -58,7 +60,6 @@ public class MenuBarTest extends BaseSeleniumWebTest
         saveWikiPage();
         clickAdminMenuItem("Manage Project", "Project Settings");
         clickLinkWithText("Menu Bar");
-
 
         clickLinkWithImage(getContextPath() + "/_images/partedit.gif");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
@@ -91,7 +92,9 @@ public class MenuBarTest extends BaseSeleniumWebTest
         clickNavButton("Next");
         waitForElement(Locator.id("AssayDesignerName"), 5000);
         setFormElement(Locator.id("AssayDesignerName"), "Test Assay");
-        clickNavButton("Save & Close");
+        clickNavButton("Save", 0);
+        waitForText("Save successful.", WAIT_FOR_GWT);
+        clickLinkWithText(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");
         mouseOver(Locator.menuBarItem("Assays"));
