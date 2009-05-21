@@ -75,7 +75,18 @@ public class StudyTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-       try { deleteProject(getProjectName()); } catch (Throwable e) {}
+        try { deleteProject(getProjectName()); } catch (Throwable e) {}
+
+        // Delete log files from specimen imports
+        File tempDir = new File(getLabKeyRoot() + ARCHIVE_TEMP_DIR);
+        File[] tempFiles = tempDir.listFiles();
+        if (tempFiles != null)
+        {
+            for (File tempFile : tempFiles)
+            {
+                tempFile.delete();
+            }
+        }
     }
 
     protected static final String GRID_VIEW = "create_gridView";
