@@ -52,6 +52,7 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
             }
         });
 
+fileLoop:
         for(File file : allFiles)
         {
             log("uploading " + file.getName());
@@ -64,6 +65,12 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
                     // if we don't have any material, submit an empty entry
                     click(getButtonLocator("Submit"));
                     sleep(1500);
+                }
+                if (isTextPresent("The data file " + file.getName() + " contains no rows"))
+                {
+                    click(getButtonLocator("OK"));
+                    selenium.refresh();
+                    continue fileLoop;
                 }
                 if(isTextPresent(file.getName()))
                     break;
