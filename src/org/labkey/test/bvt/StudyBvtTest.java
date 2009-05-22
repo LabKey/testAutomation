@@ -764,7 +764,10 @@ public class StudyBvtTest extends StudyTest
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
                 fail("Their was an error running the script");
         assertTextPresent("Error executing command");
-        assertTextPresent("Error: object \"badString\" not found");
+//        assertTextPresent("Error: object \"badString\" not found");
+        // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
+        assertTextPresent("Error: object ");
+        assertTextPresent("badString");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
         assertElementPresent(Locator.id(R_SCRIPT1_IMG));
