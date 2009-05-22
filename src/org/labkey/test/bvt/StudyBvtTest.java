@@ -654,7 +654,7 @@ public class StudyBvtTest extends StudyTest
         {
             log("R_HOME is set to: " + rHome + " searching for the R application");
             File rHomeDir = new File(rHome);
-            File[] files = rHomeDir.listFiles(new FilenameFilter()
+            FilenameFilter rFilenameFilter = new FilenameFilter()
             {
                 public boolean accept(File dir, String name)
                 {
@@ -662,38 +662,47 @@ public class StudyBvtTest extends StudyTest
                         return true;
                     return false;
                 }
-            });
+            };
+            File[] files = rHomeDir.listFiles(rFilenameFilter);
 
-            for (File file : files)
+            if (files == null || files.length == 0)
             {
-                // add a new r engine configuration
-                String id = ExtHelper.getExtElementId(this, "btn_addEngine");
-                click(Locator.id(id));
+                files = new File(rHome, "bin").listFiles(rFilenameFilter);
+            }
 
-                id = ExtHelper.getExtElementId(this, "add_rEngine");
-                click(Locator.id(id));
-
-                id = ExtHelper.getExtElementId(this, "btn_submit");
-                waitForElement(Locator.id(id), 10000);
-
-                id = ExtHelper.getExtElementId(this, "editEngine_exePath");
-                setFormElement(Locator.id(id), file.getAbsolutePath());
-
-                id = ExtHelper.getExtElementId(this, "btn_submit");
-                click(Locator.id(id));
-
-                // wait until the dialog has been dismissed
-                int cnt = 3;
-                while (isElementPresent(Locator.id(id)) && cnt > 0)
+            if (files != null)
+            {
+                for (File file : files)
                 {
-                    sleep(1000);
-                    cnt--;
+                    // add a new r engine configuration
+                    String id = ExtHelper.getExtElementId(this, "btn_addEngine");
+                    click(Locator.id(id));
+
+                    id = ExtHelper.getExtElementId(this, "add_rEngine");
+                    click(Locator.id(id));
+
+                    id = ExtHelper.getExtElementId(this, "btn_submit");
+                    waitForElement(Locator.id(id), 10000);
+
+                    id = ExtHelper.getExtElementId(this, "editEngine_exePath");
+                    setFormElement(Locator.id(id), file.getAbsolutePath());
+
+                    id = ExtHelper.getExtElementId(this, "btn_submit");
+                    click(Locator.id(id));
+
+                    // wait until the dialog has been dismissed
+                    int cnt = 3;
+                    while (isElementPresent(Locator.id(id)) && cnt > 0)
+                    {
+                        sleep(1000);
+                        cnt--;
+                    }
+
+                    if (isREngineConfigured())
+                        return true;
+
+                    refresh();
                 }
-
-                if (isREngineConfigured())
-                    return true;
-
-                refresh();
             }
         }
         log("Failed R configuration, skipping R tests");
