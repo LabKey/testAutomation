@@ -57,7 +57,7 @@ selenium.getExtElementId = function (id) {
     var ext = selenium.browserbot.getCurrentWindow().Ext;
     //if (!ext) return false;
     var cmp = ext.getCmp(id);
-    //if (!cmp) return false;
+    if (!cmp) return null;
 
     return cmp.getEl().id;
 };

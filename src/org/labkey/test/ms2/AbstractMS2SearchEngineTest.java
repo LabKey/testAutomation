@@ -28,6 +28,9 @@ import java.io.IOException;
  */
 public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 {
+    protected static final String TEST_ASSAY_NAME = "AutomatedTestAssay";
+    private static final String ANNOTATION_RUN_NAME = "Automated Test Annotation Run";
+
     abstract protected void doCleanup() throws IOException;
 
     abstract protected void setupEngine();
@@ -43,41 +46,55 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClickNavButton("Describe Samples");
+        waitAndClick(5000, Locator.navButton("Describe Samples with Assay"), 0);
+        clickMenuButton("Describe Samples with Assay", "Describe Samples:Create Assay Definition");
 
-        log("Jump to new MS2 protocol page.");
-        clickLinkWithText("create a new protocol");
+        log("Create a new MS2 sample prep assay definition.");
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAME);
 
-        log("Pick a template");
-        clickLinkWithText("TestProtocol");
+        addField("Run Fields", 0, "IntegerField", "IntegerField", "Integer");
+        addField("Run Fields", 1, "TextField", "TextField", "Text (String)");
+        addField("Run Fields", 2, "BooleanField", "BooleanField", "Boolean");
 
-        log("Create a new MS2 protocol.");
-        assertTextPresent("Create MS2 Protocol");
-        setFormElement("name", "TestMS2Protocol");
-        setFormElement("samplePrepDescription", "Prepare the sample as:\n1.\n2.\n3.\n");
-        setFormElement("lcmsDescription", "Run the LCMS2:\n1.\n2.\n");
-        clickNavButton("Submit");
+        sleep(1000);
+        clickNavButton("Save", 0);
+        waitForText("Save successful.", 20000);
 
-        log("Pick a protocol.");
-        //Only one file in test directory so we don't need to do this
-        //selectOption("sharedProtocol", "TestMS2Protocol");
-        selectOptionByText("protocolNames[0]", "TestMS2Protocol");
-        submit();
+        clickLinkWithText("MS2 Dashboard");
+        clickNavButton("Process and Import Data");
+        waitAndClick(Locator.fileTreeByName("bov_sample"));
+        waitAndClick(5000, Locator.navButton("Describe Samples with Assay"), 0);
+        clickMenuButton("Describe Samples with Assay", "Describe Samples:Use " + TEST_ASSAY_NAME);
 
         log("Describe MS2 run.");
-        assertFormElementEquals("runInfos[0].parameterValues[2]", "5");
-        assertFormElementEquals("runInfos[0].parameterValues[4]", "60");
-        setFormElement("runNames[0]", "Verify MS2 Run");
-        setFormElement("runInfos[0].parameterValues[0]", "10");
-        setFormElement("runInfos[0].sampleIdsNew[0]", "");
-        submit();
+        setFormElement("name", ANNOTATION_RUN_NAME);
+        setFormElement("integerField", "10");
+        setFormElement("textField", "Text value");
+        clickCheckbox("booleanField");
 
-        log("Sample ID Required");
-        assertTextPresent("Please enter a sample");
-        setFormElement("runInfos[0].sampleIdsNew[0]", "verify:001");
-        submit();
+        selectOptionByText("sampleSetListBox0", "<None>");
+        setFormElement("sampleTextBox0", "verify:001");
 
+        clickNavButton("Save and Finish");
+
+//        assertFormElementEquals("runInfos[0].parameterValues[2]", "5");
+//        assertFormElementEquals("runInfos[0].parameterValues[4]", "60");
+//        setFormElement("runNames[0]", "Verify MS2 Run");
+//        setFormElement("runInfos[0].parameterValues[0]", "10");
+//        setFormElement("runInfos[0].sampleIdsNew[0]", "");
+//        submit();
+//
+//        log("Sample ID Required");
+//        assertTextPresent("Please enter a sample");
+//        setFormElement("runInfos[0].sampleIdsNew[0]", "verify:001");
+//        submit();
+//
         log("Return to search page");
+        clickLinkWithText("MS2 Dashboard");
+
+        assertLinkPresentWithText(ANNOTATION_RUN_NAME);
+
         clickNavButton("Process and Import Data");
         setupEngine();
 
@@ -155,13 +172,20 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Data");
 
         log("Verify experiment view");
-        assertImageMapAreaPresent("graphmap", "Verify MS2 Run");
+        assertImageMapAreaPresent("graphmap", ANNOTATION_RUN_NAME);
         clickImageMapLinkByTitle("graphmap", "bov_sample/" + SAMPLE_BASE_NAME + " (test2)");
 
         log("Verify experiment run view.");
-        clickImageMapLinkByTitle("graphmap", "Data: MzXML file");
+        clickImageMapLinkByTitle("graphmap", "Data: CAexample_mini.mzXML");
         assertTextPresent("bov_sample/" + SAMPLE_BASE_NAME);
-        assertTextPresent("Data File MzXML file");
+        assertTextPresent("Data File CAexample_mini.mzXML");
+        assertTextPresent("AutomatedTestAssay");
+
+        clickLinkWithText(ANNOTATION_RUN_NAME);
+        clickImageMapLinkByTitle("graphmap", "Material: verify:001");
+
+        assertTextPresent("verify:001");
+        assertTextPresent("Not a member of a sample set");
 
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");

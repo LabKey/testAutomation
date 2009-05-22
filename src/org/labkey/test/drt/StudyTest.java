@@ -16,14 +16,12 @@
 
 package org.labkey.test.drt;
 
-import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.*;
-import java.util.Date;
 
 /**
  * User: brittp
@@ -37,10 +35,8 @@ public class StudyTest extends BaseSeleniumWebTest
 
     private final String CRF_SCHEMAS = getSampleDataPath() + "schema.tsv";
     private final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "sample_a.specimens";
-    private final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
+    protected final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
     protected static final int MAX_WAIT_SECONDS = 4*60;
-    private int _completedSpecimenImports = 0;
-
 
     protected String getSampleDataPath()
     {
@@ -335,7 +331,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("unknown QC");
 
         // upload specimen data and verify import
-        importSpecimenArchive(SPECIMEN_ARCHIVE_A);
+        importSpecimenArchive(new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), STUDY_LABEL, 1);
         clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Page Size:All");
@@ -586,39 +582,6 @@ public class StudyTest extends BaseSeleniumWebTest
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 
-    protected void importSpecimenArchive(String archivePath)
-    {
-        log("Starting import of specimen archive " + archivePath);
-        File copiedArchive = new File(new File(getLabKeyRoot() + ARCHIVE_TEMP_DIR), FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
-        File specimenArchive = new File(getLabKeyRoot() + archivePath);
-        // copy the file into its own directory
-        copyFile(specimenArchive, copiedArchive);
-
-        clickLinkWithText(STUDY_LABEL);
-        clickLinkWithText("Data Pipeline");
-        assertLinkPresentWithTextCount("COMPLETE", _completedSpecimenImports + 1);
-        clickNavButton("Process and Import Data");
-        String tempDirShortName = ARCHIVE_TEMP_DIR.substring(ARCHIVE_TEMP_DIR.lastIndexOf('/') + 1);
-        waitAndClick(Locator.fileTreeByName(tempDirShortName));
-        waitAndClickNavButton("Import specimen data");
-        clickNavButton("Start Import");
-
-        // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.
-        startTimer();
-        while (countLinksWithText("COMPLETE") == _completedSpecimenImports + 1 && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
-        {
-            log("Waiting for specimen import...");
-            sleep(1000);
-            refresh();
-        }
-        // Unfortunately assertNotLinkWithText also picks up the "Errors" link in the header.
-        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertLinkPresentWithTextCount("COMPLETE", _completedSpecimenImports + 2);
-        _completedSpecimenImports++;
-        copiedArchive.delete();
-    }
-
-
     private void generateFiles()
     {
         try
@@ -713,18 +676,6 @@ public class StudyTest extends BaseSeleniumWebTest
             f.delete();
 
         dir.delete();
-    }
-
-    private long start = 0;
-
-    protected void startTimer()
-    {
-        start = System.currentTimeMillis();
-    }
-
-    protected int elapsedSeconds()
-    {
-        return (int)((System.currentTimeMillis() - start) / 1000);
     }
 
     protected void selectOption(String name, int i, String value)

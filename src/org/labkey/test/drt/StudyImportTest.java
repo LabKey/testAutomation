@@ -15,6 +15,8 @@
  */
 package org.labkey.test.drt;
 
+import java.io.File;
+
 /**
  * User: adam
  * Date: Apr 3, 2009
@@ -80,7 +82,7 @@ public class StudyImportTest extends StudyTest
     }
 
     @Override
-    protected void importSpecimenArchive(String archivePath)
+    protected void importSpecimenArchive(File archiveFile, File tempDir, String folderName, int completedPipelineJobs)
     {
         // Do nothing -- we already loaded the specimen archive with the initial study load
     }

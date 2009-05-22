@@ -19,6 +19,8 @@ package org.labkey.test.bvt;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 
+import java.io.File;
+
 /**
  * User: jeckels
  * Date: Aug 10, 2007
@@ -46,36 +48,36 @@ public class AssayTest extends AbstractAssayTest
     protected static final String TEST_RUN1 = "FirstRun";
     protected static final String TEST_RUN1_COMMENTS = "First comments";
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
-            "s1\ta\t1\ttrue\t20\t2000-01-01\n" +
-            "s2\tb\t2\ttrue\t19\t2000-02-02\n" +
-            "s3\tc\t3\ttrue\t18\t2000-03-03\n" +
-            "s4\td\t4\tfalse\t17\t2000-04-04\n" +
-            "s5\te\t5\tfalse\t16\t2000-05-05\n" +
-            "s6\tf\tg\tfalse\t15\t2000-06-06";
+            "AAA07XK5-05\t\t\ttrue\t20\t2000-01-01\n" +
+            "AAA07XMC-02\t\t\ttrue\t19\t2000-02-02\n" +
+            "AAA07XMC-04\t\t\ttrue\t18\t2000-03-03\n" +
+            "AAA07XSF-02\t\t\tfalse\t17\t2000-04-04\n" +
+            "AssayTestControl1\te\t5\tfalse\t16\t2000-05-05\n" +
+            "AssayTestControl2\tf\tg\tfalse\t15\t2000-06-06";
     protected static final String TEST_RUN1_DATA2 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
-            "s1\ta\t1\ttrue\t20\t2000-01-01\n" +
-            "s2\tb\t2\ttrue\t19\t2000-02-02\n" +
-            "s3\tc\t3\ttrue\t18\t2000-03-03\n" +
-            "s4\td\t4\tfalse\t17\t2000-04-04\n" +
-            "s5\te\t5\tfalse\t16\t2000-05-05\n" +
-            "s6\tf\tg\tfalse\t15\t2000-06-06";
+            "AAA07XK5-05\t\ttrue\t20\t2000-01-01\n" +
+            "AAA07XMC-02\t\t\ttrue\t19\t2000-02-02\n" +
+            "AAA07XMC-04\t\t\ttrue\t18\t2000-03-03\n" +
+            "AAA07XSF-02\t\t\tfalse\t17\t2000-04-04\n" +
+            "AssayTestControl1\te\t5\tfalse\t16\t2000-05-05\n" +
+            "AssayTestControl2\tf\tg\tfalse\t15\t2000-06-06";
     protected static final String TEST_RUN1_DATA3 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
-            "s1\ta\t1\ttrue\t20\t\n" +
-            "s2\tb\t2\ttrue\t19\t\n" +
-            "s3\tc\t3\ttrue\t18\t";
+            "AAA07XK5-05\t\t\ttrue\t20\t\n" +
+            "AAA07XMC-02\t\t\ttrue\t19\t\n" +
+            "AAA07XMC-04\t\t\ttrue\t18\t";
     protected static final String TEST_RUN1_DATA4 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
-            "s1\ta\t1\ttrue\t\t2000-01-01\n" +
-            "s2\tb\t2\ttrue\t\t2000-02-02\n" +
-            "s3\tc\t3\ttrue\t\t2000-03-03\n" +
-            "s4\td\t4\tfalse\t\t2000-04-04\n" +
-            "s5\te\t5\tfalse\t\t2000-05-05\n" +
-            "s6\tf\t6\tfalse\t\t2000-06-06";
+            "AAA07XK5-05\t\t\ttrue\t\t2000-01-01\n" +
+            "AAA07XMC-02\t\t\ttrue\t\t2000-02-02\n" +
+            "AAA07XMC-04\t\t\ttrue\t\t2000-03-03\n" +
+            "AAA07XSF-02\t\t\tfalse\t\t2000-04-04\n" +
+            "AssayTestControl1\te\t5\tfalse\t\t2000-05-05\n" +
+            "AssayTestControl2\tf\t6\tfalse\t\t2000-06-06";
     protected static final String TEST_RUN2 = "SecondRun";
     protected static final String TEST_RUN2_COMMENTS = "Second comments";
     protected static final String TEST_RUN2_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
-            "s7\tg\t7\ttrue\t20\t2000-01-01\n" +
-            "s8\th\t8\ttrue\t19\t2000-02-02\n" +
-            "s9\ti\t9\ttrue\t18\t2000-03-03\n";
+            "BAQ00051-09\tg\t7\ttrue\t20\t2000-01-01\n" +
+            "BAQ00051-08\th\t8\ttrue\t19\t2000-02-02\n" +
+            "BAQ00051-11\ti\t9\ttrue\t18\t2000-03-03\n";
 
     public String getAssociatedModuleDirectory()
     {
@@ -110,6 +112,7 @@ public class AssayTest extends AbstractAssayTest
         log("Starting Assay security scenario tests");
         setupEnvironment();
         setupPipeline(TEST_ASSAY_PRJ_SECURITY);
+        importSpecimenArchive(new File(getLabKeyRoot(), "/sampledata/study/sample_a.specimens"), new File(getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY2, 0);
         defineAssay();
         uploadRuns(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_USR_TECH1);
         publishData();
@@ -288,6 +291,13 @@ public class AssayTest extends AbstractAssayTest
         waitForPageToLoad();
         isTextPresent("2.0");
         assertTextNotPresent("7.0");
+        // Make sure that our specimen IDs resolved correctly
+        assertTextPresent("AAA07XSF-02");
+        assertTextPresent("999320885");
+        assertTextPresent("301");
+        assertTextPresent("AAA07XK5-05");
+        assertTextPresent("999320812");
+        assertTextPresent("601");
         assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "4");
         assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "5");
         assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "6");
@@ -295,12 +305,35 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("0.0");
         assertTextPresent("f");
 
+        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        click(Locator.raw("expand_Properties"));
+        click(Locator.raw("expand_Properties/SpecimenID"));
+        addCustomizeViewColumn("Properties/SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
+        addCustomizeViewColumn("Properties/SpecimenID/PrimaryType", "Specimen Primary Type");
+        addCustomizeViewColumn("Properties/SpecimenID/AssayMatch", "Specimen Assay Match");
+        removeCustomizeViewColumn("testAssayRunProp1");
+        removeCustomizeViewColumn("testAssaySetProp2");
+        removeCustomizeViewColumn("testAssayDataProp4");
+        clickNavButton("Save");
+
+        assertTextPresent("Blood (Whole)", 4);
+        int totalTrues = countText("true");
+        setFilter("TestAssay1 Data", "Properties/SpecimenID", "Starts With", "AssayTestControl");
+        // Subtract four trues for the assay match column that were filtered out
+        assertEquals(countText("true"), totalTrues - 4);
+
         log("Check out the data for all of the runs");
         clickLinkWithText("view all results");
         waitForPageToLoad();
         isTextPresent("2.0");
         assertTextPresent("7.0");
         assertTextPresent("18");
+
+        assertTextPresent("Blood (Whole)", 7);
+        int totalFalses = countText("false");
+        setFilter("TestAssay1 Data", "Properties/SpecimenID", "Does Not Start With", "BAQ");
+        // Subtract three falses for the assay match column that were filtered out
+        assertEquals(countText("false"), totalFalses - 3);
 
         stopImpersonating();
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
@@ -357,7 +390,10 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("Study Overview");
         clickLinkWithText("9");
 
-        assertTextPresent("2.0");
+        assertTextPresent("301.0");
+        assertTextPresent("601.0");
+        assertLinkPresentWithTextCount("999320396", 2);
+        assertLinkPresentWithTextCount("999320812", 1);
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent(TEST_RUN2_COMMENTS);
         assertTextPresent(TEST_RUN1);
@@ -443,15 +479,15 @@ public class AssayTest extends AbstractAssayTest
         log("Testing select all data and view");
         clickCheckbox(".toggle");
         clickButton("Show Results", defaultWaitForPage);
-        verifySpecimensPresent(9);
+        verifySpecimensPresent(4, 2, 3);
 
         log("Testing clicking on a run");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         clickLinkWithText("FirstRun");
-        verifySpecimensPresent(6);
+        verifySpecimensPresent(4, 2, 0);
 
         clickLinkWithText("view all results");
-        verifySpecimensPresent(9);
+        verifySpecimensPresent(4, 2, 3);
 
         log("Testing assay-study linkage");
         clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
@@ -462,10 +498,10 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("SecondRun");
 
         clickLinkWithText("FirstRun");
-        verifySpecimensPresent(6);
+        verifySpecimensPresent(4, 2, 0);
 
         clickLinkWithText("view all results");
-        verifySpecimensPresent(9);
+        verifySpecimensPresent(4, 2, 3);
 
         // Verify that the correct copied to study column is present
         assertTextPresent("Copied to Study 1 Study");
@@ -478,20 +514,18 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Copy to Study", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
 
-        for (int i=7; i<=9; i++)
-            assertTextPresent("s" + i);
+        verifySpecimensPresent(0, 0, 3);
 
         clickButton("Cancel", defaultWaitForPage);
 
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
     }
 
-    private void verifySpecimensPresent(int maxIndex)
+    private void verifySpecimensPresent(int aaa07Count, int controlCount, int baq00051Count)
     {
-        for (int i=1; i<=maxIndex; i++)
-        {
-            assertTextPresent("s" + i);
-        }
+        assertTextPresent("AAA07", aaa07Count);
+        assertTextPresent("AssayTestControl", controlCount);
+        assertTextPresent("BAQ00051", baq00051Count);
     }
 
     protected boolean isFileUploadTest()

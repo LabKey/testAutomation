@@ -121,8 +121,6 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         clickLinkWithText("MS2 Dashboard");
 
         log("Verify experiment information in MS2 runs.");
-        assertLinkPresentWithText("Verify MS2 Run");
-        assertLinkPresentWithText("MS2 Experiment, No Searching");
         assertLinkPresentWithText(PROTOCOL);
 
         log("Test Protein Search");

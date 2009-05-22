@@ -1588,7 +1588,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertLinkPresentWithTextCount(String text, int count)
     {
-        assertEquals("Link with text '" + text + "' was not present " + count + " times", countLinksWithText(text), count);
+        assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
     public boolean isLinkPresentWithImage(String imageName)
@@ -2592,6 +2592,48 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             return "Saved.".equals(getText(_locator));
         }
+    }
+
+    private long start = 0;
+
+    protected void startTimer()
+    {
+        start = System.currentTimeMillis();
+    }
+
+    protected int elapsedSeconds()
+    {
+        return (int)((System.currentTimeMillis() - start) / 1000);
+    }
+
+    protected void importSpecimenArchive(File specimenArchive, File tempDir, String studyFolderName, int completedPipelineJobs)
+    {
+        log("Starting import of specimen archive " + specimenArchive);
+        File copiedArchive = new File(tempDir, FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
+        // copy the file into its own directory
+        copyFile(specimenArchive, copiedArchive);
+
+        clickLinkWithText(studyFolderName);
+        clickLinkWithText("Data Pipeline");
+        assertLinkPresentWithTextCount("COMPLETE", completedPipelineJobs);
+        clickNavButton("Process and Import Data");
+        String tempDirShortName = tempDir.getName();
+        waitAndClick(Locator.fileTreeByName(tempDirShortName));
+        waitAndClickNavButton("Import specimen data");
+        clickNavButton("Start Import");
+
+        // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.
+        startTimer();
+        while (countLinksWithText("COMPLETE") == completedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < 4*60)
+        {
+            log("Waiting for specimen import...");
+            sleep(1000);
+            refresh();
+        }
+        // Unfortunately assertNotLinkWithText also picks up the "Errors" link in the header.
+        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
+        assertLinkPresentWithTextCount("COMPLETE", completedPipelineJobs + 1);
+        copiedArchive.delete();
     }
 
     /**

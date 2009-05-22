@@ -299,8 +299,7 @@ public class StudyBvtTest extends StudyTest
         clickMenuButton("Comments", "Comments:Exit");
 
         // import second archive, verify that that data is merged:
-        importSpecimenArchive(SPECIMEN_ARCHIVE_B);
-
+        importSpecimenArchive(new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), STUDY_LABEL, 2);
 
         // verify that comments remain after second specimen load
         clickLinkWithText(STUDY_LABEL);

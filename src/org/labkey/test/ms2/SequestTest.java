@@ -16,13 +16,12 @@
 
 package org.labkey.test.ms2;
 
+import junit.framework.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 
-import java.io.IOException;
 import java.io.File;
-
-import junit.framework.Assert;
+import java.io.IOException;
 
 /**
  * User: billnelson@uky.edu
@@ -151,8 +150,6 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         clickLinkWithText("MS2 Dashboard");
 
         log("Verify experiment information in MS2 runs.");
-        assertLinkPresentWithText("Verify MS2 Run");
-        assertLinkPresentWithText("MS2 Experiment, No Searching");
         assertLinkPresentWithText(PROTOCOL);
 
         log("Test Protein Search");
