@@ -81,7 +81,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
         assertPermissionSetting("Testers", "No Permissions");
         setPermissions("Testers", "Editor");
 
-        clickLinkWithText("manage group", 1);
+        clickLinkWithText("manage group", 0);
         setFormElement("names", AUDIT_TEST_USER);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
