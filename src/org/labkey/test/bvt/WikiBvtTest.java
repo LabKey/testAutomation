@@ -96,7 +96,6 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         setPermissions("Users", "Editor");
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
-        assertPermissionSetting("Administrators", "Project Administrator");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
         setPermissions("Users", "Editor");

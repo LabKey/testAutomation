@@ -46,7 +46,6 @@ public class IssuesTest extends BaseSeleniumWebTest
     {
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
-        assertPermissionSetting("Administrators", "Project Administrator");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
         setPermissions("Guests", "No Permissions");
