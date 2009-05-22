@@ -25,7 +25,7 @@ import java.io.File;
  * Date: May 13, 2006
  * Time: 2:53:13 PM
  */
-public class NabTest extends BaseSeleniumWebTest
+public class NabOldTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "NabVerifyProject";
     private static final String FOLDER_NAME = "NabFolder";

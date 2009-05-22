@@ -44,12 +44,13 @@ public enum TestSet
 
     BVT(DRT, new Class[] {
         MessagesTest.class,
-        NabTest.class,
+        NabOldTest.class,
         IssuesTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
         AssayTest.class,
         LuminexTest.class,
+        NabAssayTest.class,
         ListTest.class,
         StudyBvtTest.class,
         StudyExtraTest.class,
