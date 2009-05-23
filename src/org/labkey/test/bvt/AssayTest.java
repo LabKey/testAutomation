@@ -325,6 +325,7 @@ public class AssayTest extends AbstractAssayTest
         log("Check out the data for all of the runs");
         clickLinkWithText("view all results");
         waitForPageToLoad();
+        clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
         isTextPresent("2.0");
         assertTextPresent("7.0");
         assertTextPresent("18");
@@ -487,6 +488,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(4, 2, 0);
 
         clickLinkWithText("view all results");
+        clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
         verifySpecimensPresent(4, 2, 3);
 
         log("Testing assay-study linkage");
@@ -501,6 +503,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(4, 2, 0);
 
         clickLinkWithText("view all results");
+        clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
         verifySpecimensPresent(4, 2, 3);
 
         // Verify that the correct copied to study column is present
