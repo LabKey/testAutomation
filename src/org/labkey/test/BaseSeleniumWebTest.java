@@ -2439,19 +2439,72 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 beginAt(getCurrentRelativeURL().concat("?" + parameter));
     }
 
+    String toRole(String perm)
+    {
+        String R = "org.labkey.api.security.roles.";
+        if ("No Permissions".equals(perm))
+            return R + "NoPermissionsRole";
+        if ("Project Administrator".equals(perm))
+            return R + "ProjectAdminRole";
+        return perm;
+    }
+
+    public void assertNoPermissions(String groupName)
+    {
+        fail("NYI");        
+    }
+
     public void assertPermissionSetting(String groupName, String permissionSetting)
     {
-        log("Checking permission setting for group " + groupName + " equals " + permissionSetting);
-        assertEquals("Permission for '" + groupName + "' was not '" + permissionSetting + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
+        if (1==1)
+        {
+            log("Checking permission setting for group " + groupName + " equals " + permissionSetting);
+            assertEquals("Permission for '" + groupName + "' was not '" + permissionSetting + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
+        }
+        else
+        {
+            String role = toRole(permissionSetting);
+            if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
+            {
+                assertNoPermissions(groupName);
+                return;
+            }
+            log("Checking permission setting for group " + groupName + " equals " + role);
+            waitForElement(Locator.permissionRendered(), 5000);
+            assertElementPresent(Locator.permissionButton(groupName,role));
+            //assertEquals("'" + groupName + "' is not in role '" + role + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
+        }
     }
+
 
     public void setPermissions(String groupName, String permissionString)
     {
-        log("Setting permissions for group " + groupName + " to " + permissionString);
-        //setWorkingForm("updatePermissions");
-        selenium.select(Locator.permissionSelect(groupName).toString(), permissionString);
-        clickNavButton("Update");
-        assertPermissionSetting(groupName, permissionString);
+        if (1==1)
+        {
+            log("Setting permissions for group " + groupName + " to " + permissionString);
+            //setWorkingForm("updatePermissions");
+            selenium.select(Locator.permissionSelect(groupName).toString(), permissionString);
+            clickNavButton("Update");
+            assertPermissionSetting(groupName, permissionString);
+
+        }
+        else
+        {
+            String role = toRole(permissionString);
+            if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
+            {
+                fail("NYI");
+                return;
+            }
+            log("Setting permissions for group " + groupName + " to " + role);
+
+            waitForElement(Locator.permissionRendered(), 5000);
+            String name = "$add$" + role;
+            selenium.type(name, groupName);
+            clickNavButton("Save");
+            sleep(100);
+            assertPermissionSetting(groupName, permissionString);
+        }
     }
 
 

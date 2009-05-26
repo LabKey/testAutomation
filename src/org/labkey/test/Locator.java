@@ -348,6 +348,25 @@ public class Locator
         return elementByLabel(group, 0, "select", 1);
     }
 
+
+    public static XPathLocator permissionRendered()
+    {
+        return xpath("//input[@id='policyRendered']");
+    }
+
+    public static XPathLocator permissionButton(String groupName, String role)
+    {
+        return xpath("//div[@id='permissionDetailDIV']//td[@id=" + xq(role) + "]//button[contains(text()," + xq(groupName) + ")]");
+    }
+
+
+    public static XPathLocator permissionsInput(String role)
+    {
+        String id = "$add$" + role;
+        return xpath("//div[@id='permissionDetailDIV']//input[@id="+ xq(id) +"]");
+    }
+    
+
     public static XPathLocator fileTreeByName(String name)
     {
         return xpath("//a[@class='x-tree-node-anchor']/span[text()=" + xq(name) + "]");
