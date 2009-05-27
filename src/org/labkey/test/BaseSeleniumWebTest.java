@@ -880,15 +880,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public File dumpHtml(File dir)
     {
+        FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
+        String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
+
+        try
+        {
+            File screenFile = new File(dir, baseName + ".png");
+            selenium.captureEntirePageScreenshot(screenFile.getAbsolutePath(), "");
+        }
+        catch (SeleniumException se)
+        {
+            // too bad
+            log("Failed to take screenshot: " + se.getMessage());
+        }
+
         FileWriter writer = null;
         try
         {
-            FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
-            String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
-
-            File screenFile = new File(dir, baseName + ".png");
-            selenium.captureEntirePageScreenshot(screenFile.getAbsolutePath(), "");
-
             File htmlFile = new File(dir, baseName + ".html");
             writer = new FileWriter(htmlFile);
             writer.write(getLastPageText());
