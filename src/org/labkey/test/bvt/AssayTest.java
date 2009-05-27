@@ -368,7 +368,7 @@ public class AssayTest extends AbstractAssayTest
         //an editor
 
         //ensure warning
-        assertTextPresent("WARNING: You do not have permissions to publish to one or more of the selected run's associated studies.");
+        assertTextPresent("WARNING: You do not have permissions to copy to one or more of the selected run's associated studies.");
 
         //ensure that Study2 and Study 3 are not available in the target study drop down
         assertElementNotPresent(Locator.xpath("//select[@name='targetStudy']/option[.='" +
