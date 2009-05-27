@@ -212,6 +212,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         requiredFieldsTest();
         viewSelectedDetailsTest();
+        entryTypeNameTest();
         
         // UNDONE test these actions
         // CompleteUserAction
@@ -219,6 +220,32 @@ public class IssuesTest extends BaseSeleniumWebTest
         // ExportTsvAction
         // PurgeAction
         // RssAction
+    }
+
+    private void entryTypeNameTest()
+    {
+        clickNavButton("Admin");
+        setFormElement(Locator.formElement("entryTypeNames", "entrySingularName"), "Ticket");
+        setFormElement(Locator.formElement("entryTypeNames", "entryPluralName"), "Tickets");
+        clickNavButton("Update Entry Type Names");
+
+        assertFormElementEquals("entrySingularName", "Ticket");
+        assertFormElementEquals("entryPluralName", "Tickets");
+
+        assertTextPresent("Tickets Admin Page");
+        clickLinkWithText("Tickets List");
+
+        assertTextPresent("Tickets List");
+        assertTextNotPresent("Issues List");
+        assertNavButtonPresent("New Ticket");
+        assertNavButtonPresent("Jump to Ticket");
+        assertTextPresent("Ticket ID");
+        assertTextNotPresent("Issue ID");
+
+        clickNavButton("Admin");
+        setFormElement(Locator.formElement("entryTypeNames", "entrySingularName"), "Issue");
+        setFormElement(Locator.formElement("entryTypeNames", "entryPluralName"), "Issues");
+        clickNavButton("Update Entry Type Names");
     }
 
     private void requiredFieldsTest()
