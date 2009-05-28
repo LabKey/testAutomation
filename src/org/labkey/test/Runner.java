@@ -35,6 +35,7 @@ import java.util.*;
  */
 public class Runner extends TestSuite
 {
+    private static final int MAX_TEST_FAILURES = 5;
     private static final TestSet DEFAULT_TEST_SET = TestSet.DRT;
     private static WebTest _currentWebTest;
     private static Map<Test, Long> _testStats = new LinkedHashMap<Test, Long>();
@@ -42,6 +43,7 @@ public class Runner extends TestSuite
     private static List<Class> _remainingTests;
     private static List<String> _passedTests = new ArrayList<String>();
     private static List<String> _failedTests = new ArrayList<String>();
+    private static List<String> _erroredTests = new ArrayList<String>();
 
     private Set<TestFailure> _failures = new HashSet<TestFailure>();
     private boolean _cleanOnly;
@@ -58,12 +60,14 @@ public class Runner extends TestSuite
         _currentWebTest = currentWebTest;
     }
 
-    private void updateRemainingTests(Test test, boolean failed)
+    private void updateRemainingTests(Test test, boolean failed, boolean errored)
     {
         Class testClass = getTestClass(test);
         _remainingTests.remove(testClass);
         if (failed)
             _failedTests.add(test.toString());
+        else if (errored)
+            _erroredTests.add(test.toString());
         else
             _passedTests.add(test.toString());
     }
@@ -72,6 +76,7 @@ public class Runner extends TestSuite
     {
         ArrayList<String> failedAndRemaining = new ArrayList<String>();
         failedAndRemaining.addAll(_failedTests);
+        failedAndRemaining.addAll(_erroredTests);
         for (Class clazz : _remainingTests)
             failedAndRemaining.add(clazz.getName());
         writeClasses(failedAndRemaining, getRemainingTestsFile());
@@ -200,16 +205,27 @@ public class Runner extends TestSuite
         }
         else
         {
-            int failCount = testResult.failureCount();
-            int errorCount = testResult.errorCount();
-            super.runTest(test, testResult);
-            boolean failed = testResult.failureCount() > failCount || testResult.errorCount() > errorCount;
-            if (failed)
+            boolean failed = false;
+            boolean errored = false;
+            if (_failedTests.size() + _erroredTests.size() < MAX_TEST_FAILURES)
             {
-                dumpFailures(testResult.errors());
-                dumpFailures(testResult.failures());
+                int failCount = testResult.failureCount();
+                int errorCount = testResult.errorCount();
+                super.runTest(test, testResult);
+                failed = testResult.failureCount() > failCount;
+                errored = testResult.errorCount() > errorCount;
             }
-            updateRemainingTests(test, failed);
+            else
+            {
+                testResult.addError(test, new Throwable(test.toString() + " not run: reached " + MAX_TEST_FAILURES + " failures."));
+                errored = true;
+            }
+
+            if (failed)
+                dumpFailures(testResult.failures());
+            if (errored)
+                dumpFailures(testResult.errors());
+            updateRemainingTests(test, failed, errored);
             writeRemainingTests();
         }
 
@@ -219,7 +235,7 @@ public class Runner extends TestSuite
         if (_remainingTests.isEmpty())
         {
             writeTimeReport();
-            if (_failedTests.isEmpty())
+            if (_failedTests.isEmpty() && _erroredTests.isEmpty())
             {
                 getRemainingTestsFile().delete();
             }
@@ -405,7 +421,8 @@ public class Runner extends TestSuite
             String percentStr = (percent < 10 ? " " : "") + percent + "%";
             String durationAndPercent =
                 (_passedTests.contains(testName) ? "passed" :
-                    (_failedTests.contains(testName) ? "FAILED" : "not run")) +
+                    (_failedTests.contains(testName) ? "FAILED" :
+                        (_erroredTests.contains(testName) ? "ERROR" : "not run"))) +
                 " - " +
                 formatDuration(duration) + " " + percentStr;
             testName = testName.substring(testName.lastIndexOf('.') + 1);
