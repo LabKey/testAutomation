@@ -190,7 +190,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(protocol));
         }                                                      
 
-        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),5000);
+        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),10000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
     }
 
