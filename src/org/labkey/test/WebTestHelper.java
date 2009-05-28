@@ -141,7 +141,7 @@ public class WebTestHelper
             if (_contextPath == null)
             {
                 _contextPath = System.getProperty("labkey.contextpath");
-                if (_contextPath == null || _contextPath.length() == 0)
+                if (_contextPath == null)
                 {
                     log("Using default labkey context path (" + DEFAULT_CONTEXT_PATH +
                             ").\nThis can be changed by passing VM arg '-Dlabkey.contextpath=[yourpath]'.");
