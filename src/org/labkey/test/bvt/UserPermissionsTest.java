@@ -189,11 +189,11 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
      * @param projectName
      * @param groupName
      */
-    private void createUserInProjectForGroup(String userName, String projectName, String groupName){
+    private void createUserInProjectForGroup(String userName, String projectName, String groupName)
+    {
         clickLinkWithText(projectName);
         clickLinkWithText("Folder Permissions");
-        clickLink("managegroup/" + projectName + "/" + groupName);
-        
+        clickManageGroup(groupName);
         setFormElement("names", userName );
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");

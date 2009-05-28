@@ -356,14 +356,18 @@ public class Locator
 
     public static XPathLocator permissionButton(String groupName, String role)
     {
-        return xpath("//div[@id='permissionDetailDIV']//td[@id=" + xq(role) + "]//button[contains(text()," + xq(groupName) + ")]");
+        return xpath("//td[@id=" + xq("$buttons$"+role) + "]//button[contains(text()," + xq(groupName) + ")]");
     }
 
+    public static XPathLocator closePermissionButton(String groupName, String role)
+    {
+        return xpath("//td[@id=" + xq("$buttons$"+role) + "]//button[contains(text()," + xq(groupName) + ")]/../../..//i[@class='pclose']");
+    }
 
     public static XPathLocator permissionsInput(String role)
     {
-        String id = "$add$" + role;
-        return xpath("//div[@id='permissionDetailDIV']//input[@id="+ xq(id) +"]");
+        String inputId = "$add$" + role;
+        return xpath("//input[@id="+ xq(inputId) +"]");
     }
     
 
@@ -434,6 +438,11 @@ public class Locator
         public XPathLocator index(int index)
         {
             return new XPathLocator("(" + path + ")[" + (index + 1) + "]");
+        }
+
+        public XPathLocator parent()
+        {
+            return new XPathLocator("(" + path + ")/..");
         }
 
         public String getPath()

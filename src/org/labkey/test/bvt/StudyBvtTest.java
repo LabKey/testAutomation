@@ -314,19 +314,15 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("Search");
         clickLinkWithText("Search by specimen");
 
-        /*
-
-        WARNING: Using getFormElementNameByTableCaption() is dangerous... if muliple values are returned their
-        order is unpredictable, since they come back in keyset order.  The code below breaks under Java 6.
-
-        String[] globalUniqueIDCompareElems = getFormElementNameByTableCaption("Specimen Number", 0, 1);
-        String[] globalUniqueIDValueElems = getFormElementNameByTableCaption("Specimen Number", 0, 2);
-        String[] participantIDFormElems = getFormElementNameByTableCaption("Participant Id", 0, 1);
-        setFormElement(globalUniqueIDCompareElems[1], "CONTAINS");
-        setFormElement(globalUniqueIDValueElems[0], "1416");
-        setFormElement(participantIDFormElems[2], "999320528");
-
-        */
+//        WARNING: Using getFormElementNameByTableCaption() is dangerous... if muliple values are returned their
+//        order is unpredictable, since they come back in keyset order.  The code below breaks under Java 6.
+//
+//        String[] globalUniqueIDCompareElems = getFormElementNameByTableCaption("Specimen Number", 0, 1);
+//        String[] globalUniqueIDValueElems = getFormElementNameByTableCaption("Specimen Number", 0, 2);
+//        String[] participantIDFormElems = getFormElementNameByTableCaption("Participant Id", 0, 1);
+//        setFormElement(globalUniqueIDCompareElems[1], "CONTAINS");
+//        setFormElement(globalUniqueIDValueElems[0], "1416");
+//        setFormElement(participantIDFormElems[2], "999320528");
 
         // Hard-code the element names, since code above is unpredictable
         selectOptionByValue("searchParams[0].value", "999320528");
@@ -564,24 +560,21 @@ public class StudyBvtTest extends StudyTest
 
         // create a test group and give it container read perms
         clickLinkWithText("Folder Permissions");
-        clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/security/StudyVerifyProject/container.view?')]"));
-        setFormElement("name", TEST_GROUP);
-        clickAndWait(Locator.navButton("Create"));
+
+        createPermissionsGroup(TEST_GROUP);
 
         // add user to the first test group
-        selenium.click("managegroup/StudyVerifyProject/" + TEST_GROUP);
-        selenium.waitForPageToLoad("30000");
+        clickManageGroup(TEST_GROUP);
         setFormElement("names", TEST_USER);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
-        clickAndWait(Locator.xpath("//a[contains(@href, '/labkey/security/StudyVerifyProject/container.view?')]"));
 
-        selectOptionByText("//td[contains(text(), '" + TEST_GROUP + "')]/..//td/select", "Reader");
-        clickNavButton("Update");
+        clickLinkWithText("Folder Permissions");
+        setPermissions(TEST_GROUP, "Reader");
 
         // give the test group read access to only the DEM-1 dataset
-        selenium.click("link=exact:*My Study");
-        selenium.waitForPageToLoad("30000");
+        clickLinkWithText("My Study");
+        clickLinkWithText("Folder Permissions");
         clickNavButton("Study Security");
 
         // enable advanced study security
@@ -869,7 +862,7 @@ public class StudyBvtTest extends StudyTest
 
         log("Test user permissions");
         clickLinkWithText("Folder Permissions");
-        clickLink("managegroup/" + getProjectName() + "/Users");
+        clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");

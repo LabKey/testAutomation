@@ -81,16 +81,16 @@ public class AuditLogTest extends BaseSeleniumWebTest
         assertPermissionSetting("Testers", "No Permissions");
         setPermissions("Testers", "Editor");
 
-        clickLinkWithText("manage group", 0);
+        clickManageGroup("Testers");
         setFormElement("names", AUDIT_TEST_USER);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
         deleteUser(AUDIT_TEST_USER);
         deleteProject(AUDIT_TEST_PROJECT);
 
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The group: Testers was created", 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The permissions for group Testers were changed from No Permissions to Editor", 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was added as a member to Group: Testers", 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "A new security group named Testers was created", 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The user/group Testers was assigned to the security role Editor.", 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "User: " + AUDIT_TEST_USER + " was added as a member to Group: Testers", 10);
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was deleted from the system", 10);
 
         log("testing project audit events");

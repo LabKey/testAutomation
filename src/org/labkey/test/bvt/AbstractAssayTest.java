@@ -170,8 +170,15 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         clickLinkWithText(subfolder);
         clickLinkWithText(TEST_ASSAY_LINK_PERMS);
-        uncheckCheckbox("inheritPermissions");
-        setPermissions(group, perms);
+        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        uncheckInheritedPermissions();
+        if (TEST_ASSAY_PERMS_NONE.equals(perms))
+        {
+            removePermission(group, "Editor");
+            removePermission(group, "Reader");
+        }
+        else
+            setPermissions(group, perms);
     } //setSubFolderSecurity()
 
     /**
@@ -239,8 +246,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
     {
         clickLinkWithText(projectName);
         clickLinkWithText("Folder Permissions");
-        clickLink("managegroup/" + projectName + "/" + groupName);
-
+        clickManageGroup(groupName);
         setFormElement("names", userName );
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");

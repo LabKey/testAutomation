@@ -1012,11 +1012,40 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void createPermissionsGroup(String groupName)
     {
         log("Creating permissions group " + groupName);
-        assertTextPresent("Permissions for /");
-        setFormElement("name", groupName);
-        submit(Locator.formWithAction("newGroup.post"));
+        if (1==0)
+        {
+            assertTextPresent("Permissions for /");
+            setFormElement("name", groupName);
+            submit(Locator.formWithAction("newGroup.post"));
+        }
+        else
+        {
+            setFormElement("newGroupForm$input",groupName);
+            clickButton("Create new group", 0);
+            sleep(500);
+            waitForElement(Locator.tagWithText("td",groupName), defaultWaitForPage);
+        }
     }
 
+
+    public void clickManageGroup(String groupName)
+    {
+        // warning Adminstrators can apper multiple times
+        waitAndClick(Locator.xpath("//div[@id='groupsFrame']//td[contains(text()," + Locator.xq(groupName) + ")]"));
+        sleep(100);
+        waitAndClick(Locator.tagContainingText("a","manage group"));
+        waitForPageToLoad();
+    }
+
+
+    public void clickManageSiteGroup(String groupName)
+    {
+        // warning Adminstrators can apper multiple times
+        waitAndClick(Locator.xpath("//div[@id='siteGroupsFrame']//td[contains(text()," + Locator.xq(groupName) + ")]"));
+        sleep(100);
+        waitAndClick(Locator.tagContainingText("a","manage group"));
+        waitForPageToLoad();
+    }
 
 
     public void createSubfolder(String project, String child, String[] tabsToAdd)
@@ -1052,8 +1081,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             if (inheritPermissions)
             {
-                checkCheckbox("inheritPermissions");
-                clickNavButton("Update");
+                checkInheritedPermissions();
+                savePermissions();
             }
             clickNavButton("Done"); //Leave permissions where they are
             if (null == tabsToAdd || tabsToAdd.length == 0)
@@ -1075,8 +1104,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             if (inheritPermissions)
             {
-                checkCheckbox("inheritPermissions");
-                clickNavButton("Update");
+                checkInheritedPermissions();
+                savePermissions();
             }
             clickNavButton("Done"); //Permissions
         }
@@ -2458,17 +2487,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             return R + "NoPermissionsRole";
         if ("Project Administrator".equals(perm))
             return R + "ProjectAdminRole";
+        else if (-1 == perm.indexOf("."))
+            return R + perm + "Role";
         return perm;
     }
 
-    public void assertNoPermissions(String groupName)
+    public void assertNoPermission(String groupName, String permissionSetting)
     {
-        fail("NYI");        
+        String role = toRole(permissionSetting);
+        waitForElement(Locator.permissionRendered(), 5000);
+        assertElementNotPresent(Locator.permissionButton(groupName,role));
     }
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
     {
-        if (1==1)
+        if (1==0)
         {
             log("Checking permission setting for group " + groupName + " equals " + permissionSetting);
             assertEquals("Permission for '" + groupName + "' was not '" + permissionSetting + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
@@ -2478,7 +2511,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             String role = toRole(permissionSetting);
             if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
             {
-                assertNoPermissions(groupName);
+                assertNoPermission(groupName,"Reader");
+                assertNoPermission(groupName,"Editor");
+                assertNoPermission(groupName,"Project Administrator");
                 return;
             }
             log("Checking permission setting for group " + groupName + " equals " + role);
@@ -2489,33 +2524,110 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
+    Locator inherited = Locator.name("inheritedCheckbox");
+    Locator.XPathLocator inheritedParent = Locator.xpath("//input[@name='inheritedCheckbox']/..");
+
+
+    public void checkInheritedPermissions()
+    {
+        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        waitForElement(inherited,1000);
+        if (!isChecked(inherited))
+            click(inheritedParent);
+        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        assertTrue(isChecked(inherited));
+    }
+
+
+    public void uncheckInheritedPermissions()
+    {
+        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        waitForElement(inherited,1000);
+        if (isChecked(inherited))
+            click(inheritedParent);
+        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        assertFalse(isChecked(inherited));
+    }
+
+    public void savePermissions()
+    {
+        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        clickNavButton("Save", 0);
+        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+    }
+    
     public void setPermissions(String groupName, String permissionString)
     {
-        if (1==1)
+        _setPermissions(groupName, permissionString, "pGroup");    
+    }
+
+    public void setSiteGroupPermissions(String groupName, String permissionString)
+    {
+        _setPermissions(groupName, permissionString, "pSite");
+    }
+
+    public void setUserPermissions(String groupName, String permissionString)
+    {
+        _setPermissions(groupName, permissionString, "pUser");
+    }
+
+    public void _setPermissions(String groupName, String permissionString, String className)
+    {
+        if (1==0)
         {
             log("Setting permissions for group " + groupName + " to " + permissionString);
             //setWorkingForm("updatePermissions");
             selenium.select(Locator.permissionSelect(groupName).toString(), permissionString);
             clickNavButton("Update");
             assertPermissionSetting(groupName, permissionString);
-
         }
         else
         {
             String role = toRole(permissionString);
             if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
             {
-                fail("NYI");
+                fail("call removePermission()");
                 return;
             }
             log("Setting permissions for group " + groupName + " to " + role);
 
             waitForElement(Locator.permissionRendered(), 5000);
-            String name = "$add$" + role;
-            selenium.type(name, groupName);
-            clickNavButton("Save");
+            String input = "$add$" + role;
+            String combo = "$combo$" + role;
+            //selenium.type(name, groupName + "\n");
+            click(Locator.xpath("//td[@id='" + combo + "']//img[contains(@class,'x-form-trigger')]"));
+            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and contains(text(),'" + groupName + "')]"));
+            //selenium.type(name, "\n");
+            //selenium.focus("//body");
             sleep(100);
+            savePermissions();
             assertPermissionSetting(groupName, permissionString);
+        }
+    }
+
+
+    public void removeSiteGroupPermission(String groupName, String permissionString)
+    {
+        _removePermission(groupName, permissionString, "pSite");
+    }
+
+    public void removePermission(String groupName, String permissionString)
+    {
+        _removePermission(groupName, permissionString, "pGroup");
+    }
+
+
+    public void _removePermission(String groupName, String permissionString, String className)
+    {
+        String role = toRole(permissionString);
+
+        waitForElement(Locator.permissionRendered(), 5000);
+        Locator close = Locator.closePermissionButton(groupName,role);
+        if (isElementPresent(close))
+        {
+            click(close);
+            savePermissions();
+            assertNoPermission(groupName, role);
         }
     }
 

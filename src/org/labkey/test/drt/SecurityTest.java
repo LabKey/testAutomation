@@ -107,18 +107,17 @@ public class SecurityTest extends BaseSeleniumWebTest
         // create the project and set permissions
         createProject(PROJECT_NAME);
         createPermissionsGroup("Administrators");
-        clickLinkWithText("manage group", 0);
+        clickManageGroup("Administrators");
         setFormElement("names", ADMIN_USER_TEMPLATE);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
         clickLinkWithText("Folder Permissions");
         setPermissions("Administrators", "Project Administrator");
-        clickNavButton("Update");
 
         createPermissionsGroup("Testers");
         assertPermissionSetting("Testers", "No Permissions");
         setPermissions("Testers", "Editor");
-        clickLinkWithText("manage group", 1);
+        clickManageGroup("Testers");
         setFormElement("names", NORMAL_USER_TEMPLATE);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");

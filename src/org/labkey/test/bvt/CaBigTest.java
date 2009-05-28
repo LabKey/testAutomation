@@ -73,7 +73,7 @@ public class CaBigTest extends BaseSeleniumWebTest
         clickNavButton("Done");
 
         // Should be on the project permissions page
-        assertTextPresent("Permissions for /" + PROJECT_NAME);
+        assertTextPresent("Publish to caBIG");
         assertTextPresent("This folder is not published to the caBIG");
 
         // Turn off caBIG if it was originally off

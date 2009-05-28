@@ -96,7 +96,6 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         setPermissions("Users", "Editor");
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
-        assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
         setPermissions("Users", "Editor");
         clickLinkWithText("Folder Settings");
@@ -359,7 +358,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("Check Permissions");
         log("Create fake user for permissions check");
         clickLinkWithText("Folder Permissions");
-        clickLink("managegroup/" + PROJECT2_NAME + "/Users");
+        clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
@@ -375,7 +374,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT2_NAME);
         clickLinkWithText("Folder Permissions");
-        setPermissions("User", "No Permissions");
+        removePermission("User", "Editor");
+        removePermission("User", "Reader");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextNotPresent(WIKI_PAGE2_TITLE);
@@ -412,7 +412,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Folder Permissions");
-        clickLink("managegroup/" + PROJECT_NAME + "/Users");
+        clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
