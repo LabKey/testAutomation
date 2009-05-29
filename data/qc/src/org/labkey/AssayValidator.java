@@ -27,16 +27,8 @@ import java.util.*;
 * Date: Mar 4, 2009
 * Time: 9:17:41 AM
 */
-public class AssayValidator
+public class AssayValidator extends AbstractAssayValidator
 {
-    private String _email;
-    private String _password;
-    private File _errorFile;
-    private Map<String, String> _runProperties;
-    private List<String> _errors = new ArrayList<String>();
-    private String _host;
-    private static final String HOST = "localhost:8080";
-
     public static void main(String[] args)
     {
         if (args.length < 4)
@@ -56,32 +48,39 @@ public class AssayValidator
     public void runQC(File inputFile, String username, String password, String host)
     {
         try {
-            _email = username;
-            _password = password;
-            _host = host;
-            _runProperties = parseRunProperties(inputFile);
+            setEmail(username);
+            setPassword(password);
+            setHost(host);
+            parseRunProperties(inputFile);
 
-            if (_runProperties.containsKey("errorsFile"))
-                _errorFile = new File(_runProperties.get("errorsFile"));
-
-            if (_runProperties.containsKey("runDataFile"))
+            if (getRunProperties().containsKey(Props.runDataFile.name()))
             {
-                List<Map<String, String>> dataMap = parseRunData(new File(_runProperties.get("runDataFile")));
+                List<Map<String, String>> dataMap = parseRunData(new File(getRunProperties().get(Props.runDataFile.name())));
                 Map<String, String> ptidMap = new HashMap<String, String>();
+                Map<String, String> animalMap = new HashMap<String, String>();
 
-                // check for ptid duplicates
                 for (Map<String, String> row : dataMap)
                 {
+                    // check for ptid duplicates
                     String ptid = row.get("participantid");
                     if (!ptidMap.containsKey(ptid))
                         ptidMap.put(ptid, ptid);
                     else
                         writeError("A duplicate PTID was discovered : " + ptid, "runDataFile");
+
+                    // if the data contains a transformed column, make sure it contains a required value
+                    if (row.containsKey("animal"))
+                        animalMap.put(row.get("animal"), row.get("animal"));
                 }
 
+                if (!animalMap.isEmpty())
+                {
+                    if (!animalMap.containsKey("goat"))
+                        writeError("The animal column must contain a goat", "runDataFile");
+                }
                 // add a log entry for this run
                 //setCredentials(HOST);
-                insertLog();
+                insertLog("Programmatic QC was run and " + getErrors().size() + " errors were found");
             }
             else
                 writeError("Unable to locate the runDataFile", "runDataFile");
@@ -89,132 +88,6 @@ public class AssayValidator
         catch (Exception e)
         {
             throw new RuntimeException(e);
-        }
-    }
-
-    private void insertLog() throws Exception
-    {
-        Connection con = new Connection(_host, _email, _password);
-        InsertRowsCommand cmd = new InsertRowsCommand("lists", "QC Log");
-
-        Map<String, Object> row = new HashMap<String,Object>();
-        row.put("Date", new Date());
-        row.put("Container", _runProperties.get("containerPath"));
-        row.put("AssayId", _runProperties.get("assayId"));
-        row.put("AssayName", _runProperties.get("assayName"));
-        row.put("User", _runProperties.get("userName"));
-        row.put("Comments", "Programmatic QC was run and " + _errors.size() + " errors were found");
-
-        cmd.addRow(row);
-        cmd.execute(con, _runProperties.get("containerPath"));
-    }
-
-    private void writeError(String message, String prop) throws IOException
-    {
-        if (_errorFile != null)
-        {
-            _errors.add(message);
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_errorFile, true)));
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("error\t");
-            sb.append(prop);
-            sb.append('\t');
-            sb.append(message);
-            sb.append('\n');
-
-            pw.write(sb.toString());
-            pw.close();
-        }
-        else
-            throw new RuntimeException("Errors file does not exist");
-    }
-
-    private Map<String, String> parseRunProperties(File runProperties)
-    {
-        BufferedReader br = null;
-        Map<String, String> props = new HashMap<String, String>();
-
-        try {
-            br = new BufferedReader(new FileReader(runProperties));
-            String l;
-            while ((l = br.readLine()) != null)
-            {
-                System.out.println(l);
-                String[] parts = l.split("\t");
-                props.put(parts[0], parts[1]);
-            }
-            return props;
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e.getMessage());
-        }
-        finally
-        {
-            if (br != null)
-                try {br.close();} catch(IOException ioe) {}
-        }
-    }
-
-    /**
-     * Parse the tab-delimitted input data file
-     */
-    private List<Map<String, String>> parseRunData(File data)
-    {
-        BufferedReader br = null;
-        Map<Integer, String> columnMap = new HashMap<Integer, String>();
-        List<Map<String, String>> dataMap = new ArrayList<Map<String, String>>();
-
-        try {
-            br = new BufferedReader(new FileReader(data));
-            String l;
-            boolean isHeader = true;
-            while ((l = br.readLine()) != null)
-            {
-                if (isHeader)
-                {
-                    int i=0;
-                    for (String col : l.split("\t"))
-                        columnMap.put(i++, col.toLowerCase());
-                    isHeader = false;
-                }
-                dataMap.add(parseDataRow(l, columnMap));
-            }
-            return dataMap;
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e.getMessage());
-        }
-        finally
-        {
-            if (br != null)
-                try {br.close();} catch(IOException ioe) {}
-        }
-    }
-
-    private Map<String, String> parseDataRow(String row, Map<Integer, String> columnMap)
-    {
-        Map<String, String> props = new HashMap<String, String>();
-        int i=0;
-        for (String col : row.split("\t"))
-        {
-            props.put(columnMap.get(i), col);
-            i++;
-        }
-        return props;
-    }
-
-    private void setCredentials(String host) throws IOException
-    {
-        NetrcFileParser parser = new NetrcFileParser();
-        NetrcFileParser.NetrcEntry entry = parser.getEntry(host);
-
-        if (null != entry)
-        {
-            _email = entry.getLogin();
-            _password = entry.getPassword();
         }
     }
 }

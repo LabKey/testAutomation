@@ -1,2 +1,4 @@
 * text=auto !eol
+src/org/labkey/AbstractAssayValidator.java -text
+src/org/labkey/AssayTransform.java -text
 src/org/labkey/AssayValidator.java -text
