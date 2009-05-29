@@ -15,13 +15,11 @@
  */
 package org.labkey.test.bvt;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
-import com.thoughtworks.selenium.SeleniumException;
 
 import java.io.*;
 
@@ -35,7 +33,9 @@ import java.io.*;
 public class ProgrammaticQCTest extends AbstractAssayTest
 {
     protected final static String TEST_PROGRAMMATIC_QC_PRJ = "Programmatic QC Test";
-    protected final static String TEST_ASSAY = "QC Assay";
+    protected final static String QC_ASSAY = "QC Assay";
+    protected final static String TRANSFORM_ASSAY = "Transform Assay";
+    protected final static String TRANSFORM_QC_ASSAY = "Transform & QC Assay";
 
     private final ListHelper.ListColumn _listCol1 = new ListHelper.ListColumn("Date", "Date", ListHelper.ListColumnType.DateTime, "date");
     private final ListHelper.ListColumn _listCol2 = new ListHelper.ListColumn("Container", "Container", ListHelper.ListColumnType.String, "container path");
@@ -63,6 +63,15 @@ public class ProgrammaticQCTest extends AbstractAssayTest
             "s4\td\t4\tfalse\t17\t2000-04-04\n" +
             "s5\te\t5\tfalse\t16\t2000-05-05\n" +
             "s6\tf\t6\tfalse\t15\t2000-06-06";
+    protected static final String TEST_RUN1_DATA3 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
+            "s1\ta\t1\ttrue\t20\t2000-01-01\n" +
+            "s2\tb\t2\ttrue\t19\t2000-02-02\n" +
+            "s3\tc\t3\ttrue\t18\t2000-03-03\n" +
+            "s4\td\t4\tfalse\t17\t2000-04-04\n" +
+            "s5\te\t5\tfalse\t16\t2000-05-05\n" +
+            "s6\tf\t4\tfalse\t17\t2000-04-04\n" +
+            "s7\tg\t5\tfalse\t16\t2000-05-05\n" +
+            "s8\th\t6\tfalse\t15\t2000-06-06";
 
     protected void doTestSteps() throws Exception
     {
@@ -71,8 +80,15 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         createProject(TEST_PROGRAMMATIC_QC_PRJ);
         setupPipeline(TEST_PROGRAMMATIC_QC_PRJ);
 
-        defineAssay();
-        uploadRuns();
+        defineQCAssay();
+        uploadQCRuns();
+
+        defineTransformAssay(TRANSFORM_ASSAY, false);
+        uploadTransformRuns();
+
+        // define and run an assay with both a transform and QC validator
+        defineTransformAssay(TRANSFORM_QC_ASSAY, true);
+        uploadTransformQCRuns();
     }
 
     protected void doCleanup() throws Exception
@@ -208,9 +224,9 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         }
     }
 
-    private void defineAssay()
+    private void defineQCAssay()
     {
-        log("Defining a test assay at the project level");
+        log("Defining a QC test assay at the project level");
 
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
         addWebPart("Assay List");
@@ -222,7 +238,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
 
-        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
+        selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
 
         File qcScript = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar");
         if (qcScript.exists())
@@ -243,12 +259,56 @@ public class ProgrammaticQCTest extends AbstractAssayTest
                 _listCol3, _listCol4, _listCol5, _listCol6);
     }
 
-    private void uploadRuns()
+    private void defineTransformAssay(String assayName, boolean addQCScript)
+    {
+        log("Defining a transform test assay at the project level");
+
+        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
+        addWebPart("Assay List");
+
+        clickLinkWithText("Manage Assays");
+        clickNavButton("New Assay Design");
+        checkRadioButton("providerName", "General");
+        clickNavButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+
+        selenium.type("//input[@id='AssayDesignerName']", assayName);
+
+        File transformScript = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar");
+        if (transformScript.exists())
+            selenium.type("//input[@id='AssayDesignerTransformScript']", transformScript.getAbsolutePath());
+        else
+            fail("unable to locate the Transform script");
+
+        if (addQCScript)
+        {
+            File qcScript = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar");
+            if (qcScript.exists())
+                selenium.type("//input[@id='AssayDesignerQCScript']", qcScript.getAbsolutePath());
+            else
+                fail("unable to locate the QC script");
+        }
+
+        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
+        {
+            addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+        }
+
+        // add an 'animal' field which will be populated by the transform script
+        addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Animal", "Animal", "Text (String)");
+
+        sleep(1000);
+        clickNavButton("Save", 0);
+        waitForText("Save successful.", 20000);
+    }
+
+    private void uploadQCRuns()
     {
         log("uploading runs");
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
         clickLinkWithText("Assay List");
-        clickLinkWithText(TEST_ASSAY);
+        clickLinkWithText(QC_ASSAY);
 
         clickNavButton("Import Data");
         clickNavButton("Next");
@@ -270,6 +330,73 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         assertTextPresent("Programmatic QC was run and 2 errors were found");
         assertTextPresent("Programmatic QC was run and 0 errors were found");
+    }
+
+    private void uploadTransformRuns()
+    {
+        log("uploading transform runs");
+        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
+        clickLinkWithText("Assay List");
+        clickLinkWithText(TRANSFORM_ASSAY);
+
+        clickNavButton("Import Data");
+        clickNavButton("Next");
+
+        selenium.click("//input[@value='textAreaDataProvider']");
+        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
+        clickNavButton("Save and Finish");
+
+        assertTextPresent("A duplicate PTID was discovered : b");
+        assertTextPresent("A duplicate PTID was discovered : e");
+
+        selenium.click("//input[@value='textAreaDataProvider']");
+        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
+        clickNavButton("Save and Finish");
+
+        clickLinkWithText("view all results");
+
+        assertTextPresent("monkey");
+        assertTextPresent("hamster");
+
+        // verify the log entry
+        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
+        clickLinkWithText("QC Log");
+
+        assertTextPresent("Programmatic Data Transform was run and 2 errors were found");
+        assertTextPresent("Programmatic Data Transform was run and 0 errors were found");
+    }
+
+    private void uploadTransformQCRuns()
+    {
+        log("uploading transform & QC runs");
+        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
+        clickLinkWithText("Assay List");
+        clickLinkWithText(TRANSFORM_QC_ASSAY);
+
+        clickNavButton("Import Data");
+        clickNavButton("Next");
+
+        selenium.click("//input[@value='textAreaDataProvider']");
+        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
+        clickNavButton("Save and Finish");
+
+        assertTextPresent("The animal column must contain a goat");
+
+        selenium.click("//input[@value='textAreaDataProvider']");
+        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
+        clickNavButton("Save and Finish");
+
+        clickLinkWithText("view all results");
+
+        assertTextPresent("monkey");
+        assertTextPresent("hamster");
+        assertTextPresent("goat");
+
+        // verify the log entry
+        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
+        clickLinkWithText("QC Log");
+
+        assertTextPresent("Programmatic QC was run and 1 errors were found");
     }
 
     public String getAssociatedModuleDirectory()
