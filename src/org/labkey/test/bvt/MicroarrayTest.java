@@ -212,7 +212,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickLink(Locator.raw("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
         waitForText(ASSAY_NAME + " Description", 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
-        clickLinkWithText("view all results");
+        clickLinkWithText("view results");
         waitForText(ASSAY_NAME + " Description", 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
 

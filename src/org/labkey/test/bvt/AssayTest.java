@@ -323,7 +323,7 @@ public class AssayTest extends AbstractAssayTest
         assertEquals(countText("true"), totalTrues - 4);
 
         log("Check out the data for all of the runs");
-        clickLinkWithText("view all results");
+        clickLinkWithText("view results");
         waitForPageToLoad();
         clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
         isTextPresent("2.0");
@@ -333,8 +333,9 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("Blood (Whole)", 7);
         int totalFalses = countText("false");
         setFilter("TestAssay1 Data", "Properties/SpecimenID", "Does Not Start With", "BAQ");
-        // Subtract three falses for the assay match column that were filtered out
-        assertEquals(countText("false"), totalFalses - 3);
+        // Subtract three falses for the assay match column that were filtered out, add one false
+        // for the 'return false' that appears in the filter notification header javascript link.
+        assertEquals(countText("false"), totalFalses - 2);
 
         stopImpersonating();
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
@@ -356,7 +357,7 @@ public class AssayTest extends AbstractAssayTest
         //select the Lab1 folder and view all the data for the test assay
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view all results");
+        clickLinkWithText("view results");
 
         //select all the data rows and click publish
         selenium.click(".toggle");
@@ -487,7 +488,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("FirstRun");
         verifySpecimensPresent(4, 2, 0);
 
-        clickLinkWithText("view all results");
+        clickLinkWithText("view results");
         clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
         verifySpecimensPresent(4, 2, 3);
 
@@ -502,7 +503,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("FirstRun");
         verifySpecimensPresent(4, 2, 0);
 
-        clickLinkWithText("view all results");
+        clickLinkWithText("view results");
         clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
         verifySpecimensPresent(4, 2, 3);
 

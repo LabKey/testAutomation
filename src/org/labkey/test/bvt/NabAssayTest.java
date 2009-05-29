@@ -132,7 +132,7 @@ public class NabAssayTest extends AbstractAssayTest
             assertTextPresent("186");
 
             // test creating a custom details view via a "magic" named run-level view:
-            clickLinkWithText("view all runs");
+            clickLinkWithText("view runs");
             clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
             removeCustomizeViewColumn("Virus Name");
             setFormElement("ff_columnListName", "CustomDetailsView");
@@ -143,7 +143,7 @@ public class NabAssayTest extends AbstractAssayTest
             assertTextNotPresent("Virus Name");
             assertTextNotPresent("Nasty Virus");
 
-            clickLinkWithText("view all results");
+            clickLinkWithText("view results");
             setFilter(TEST_ASSAY_NAB + " Data", "Properties/SpecimenLsid/Property/ParticipantID", "Starts With", "ptid 1");
             assertTextPresent("ptid 1 A");
             assertTextPresent("ptid 1 B");
