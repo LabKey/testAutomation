@@ -72,6 +72,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
     private static final String NAVBAR2_CONTENT =
             "{labkey:tree|name=core.currentProject}\n" +
                     "{labkey:tree|name=core.projects}\n"+
+                    "{labkey:tree|name=core.folderAdmin}\n" +
                     "{labkey:tree|name=core.projectAdmin}\n" +
                     "{labkey:tree|name=core.siteAdmin}\n";
 
