@@ -256,9 +256,9 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText("edit");
         setWikiBody(NAVBAR2_CONTENT);
         saveWikiPage();
-        assertTextPresent("Projects");
-        assertTextPresent("Manage Project");
-        assertTextPresent("Manage Site");
+        assertLinkPresentWithText("Projects");
+        assertLinkPresentWithText("Manage Project");
+        assertLinkPresentWithText("Manage Site");
 
         //test deleting via edit page
         clickLinkWithText("edit");
