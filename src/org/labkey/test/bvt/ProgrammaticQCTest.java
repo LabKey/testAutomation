@@ -353,7 +353,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
         clickNavButton("Save and Finish");
 
-        clickLinkWithText("view all results");
+        clickLinkWithText("view results");
 
         assertTextPresent("monkey");
         assertTextPresent("hamster");
@@ -386,7 +386,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
         clickNavButton("Save and Finish");
 
-        clickLinkWithText("view all results");
+        clickLinkWithText("view results");
 
         assertTextPresent("monkey");
         assertTextPresent("hamster");
