@@ -139,44 +139,44 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         setFormElement("batchStringField", "BulkProperties");
         
         assertTextPresent("BulkProperties");
-        checkCheckbox("__enableBulkProperties");
+        checkRadioButton("__enableBulkProperties", "on");
         // Try with an invalid sample name first
-        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+        setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\tBogusSampleName!!\tSecond\tFirstString\t11\n" +
                 "251379110137_A01\tThird\tFourth\tSecondString\t22\n");
         clickNavButton("Next");
         assertTextPresent("No sample with name 'BogusSampleName!!' was found");
 
         // Try with invalid sample set name
-        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+        setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\tBogus__SampleSetName.First\tSecond\tFirstString\t11\n" +
                 "251379110137_A01\tBogus__SampleSetName.Third\tFourth\tSecondString\t22\n");
         clickNavButton("Next");
         assertTextPresent("No sample with name 'Bogus__SampleSetName.First' was found");
 
         // Try with incorrect barcodes
-        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+        setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "FakeBarcode_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
         clickNavButton("Next");
-        assertTextPresent("Could not find a row for barcode '251379110131_A01' specified in test1_MAGEML.xml");
+        assertTextPresent("Could not find a row for barcode '251379110131_A01'");
 
         // Try with incorrect property type
-        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+        setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22a\n");
         clickNavButton("Next");
         assertTextPresent(RUN_INTEGER_FIELD + " must be of type Integer");
 
         // Try with the wrong sample colum names
-        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3a\tProbeID_Cy5a\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+        setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3a\tProbeID_Cy5a\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
         clickNavButton("Next");
         assertTextPresent("Could not find a 'ProbeID_Cy3' column for sample information.");
 
         // Try with the wrong number of samples
-        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+        setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t\t\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
         clickNavButton("Next");
@@ -187,7 +187,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         assertTextPresent("No sample information specified for 'ProbeID_Cy3'");
 
         // Finally do it with the right info
-        setFormElement("__bulkProperties", "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
+        setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t115468001\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t115468002\n");
         clickNavButton("Next");

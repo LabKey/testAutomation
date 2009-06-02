@@ -46,8 +46,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClick(5000, Locator.navButton("Describe Samples with Assay"), 0);
-        clickMenuButton("Describe Samples with Assay", "Describe Samples:Create Assay Definition");
+        waitAndClick(5000, Locator.navButton("Describe Samples"), 0);
+        clickMenuButton("Describe Samples", "Describe Samples:Create Assay Definition");
 
         log("Create a new MS2 sample prep assay definition.");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
@@ -64,10 +64,11 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClick(5000, Locator.navButton("Describe Samples with Assay"), 0);
-        clickMenuButton("Describe Samples with Assay", "Describe Samples:Use " + TEST_ASSAY_NAME);
+        waitAndClick(5000, Locator.navButton("Describe Samples"), 0);
+        clickMenuButton("Describe Samples", "Describe Samples:Use " + TEST_ASSAY_NAME);
 
         log("Describe MS2 run.");
+        clickNavButton("Next");
         setFormElement("name", ANNOTATION_RUN_NAME);
         setFormElement("integerField", "10");
         setFormElement("textField", "Text value");
