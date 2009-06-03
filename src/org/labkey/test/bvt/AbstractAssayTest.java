@@ -30,13 +30,16 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
     protected final static int WAIT_FOR_GWT = 5000;
 
     //constants added for security tests
-    private final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role
+    protected final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role
     private final static String TEST_ASSAY_PERMS_EDITOR = "Editor";                 //name of built-in editor role
     private final static String TEST_ASSAY_PERMS_NONE = "No Permissions";           //name of built-in no perms role
+
     private final static String TEST_ASSAY_GRP_USERS = "Users";                     //name of built-in Users group
     private final static String TEST_ASSAY_GRP_PIS = "PIs";                         //name of PI group to add
+
     protected final static String TEST_ASSAY_USR_PI1 = "pi1@security.test";           //user within that group
     protected final static String TEST_ASSAY_USR_TECH1 = "labtech1@security.test";    //a typical lab tech user
+
     protected final static String TEST_ASSAY_PRJ_SECURITY = "Assay Security Test";    //test project (kept separate from previous tests)
     protected final static String TEST_ASSAY_FLDR_LABS = "Labs";                      //sub-folder of test project
     protected final static String TEST_ASSAY_FLDR_LAB1 = "Lab 1";                     //sub-folder of Labs
@@ -45,7 +48,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
     protected final static String TEST_ASSAY_FLDR_STUDY2 = "Study 2";                 //another sub of Studies
     protected final static String TEST_ASSAY_FLDR_STUDY3 = "Study 3";                 //another sub of Studies
     private final static String TEST_ASSAY_LINK_PERMS = "Folder Permissions";               //name of Permissions link
-    private final static String TEST_ASSAY_PERMS_STUDY_READALL = "READ";
+    protected final static String TEST_ASSAY_PERMS_STUDY_READALL = "READ";
 
     /**
      * Sets up the data pipeline for the specified project. This can be called from any page.
@@ -129,10 +132,10 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         //setup security on sub-folders:
         // PIs should be Editors on Lab1 and Study1, but not Study2 or Study3
         // Users should be Editors on Lab1, readers on Study2, and nothing on Study3
-        setSubfolderSecurity(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(TEST_ASSAY_FLDR_STUDY3, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_NONE);
+        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY3, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_NONE);
 
         //setup study-level security:
         // TODO: due to bug 3625, the PIs group may not have study-level read permissions
@@ -160,14 +163,15 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
     /**
      * Sets the permissions for an existing group on an existing subfolder
      *
+     * @param project   name of the existing project
      * @param subfolder name of the existing subfolder
      * @param group     name of the existing group
      * @param perms     permissions role to set (e.g., Editor, Reader, Author, No Permissions, etc.)
      */
-    private void setSubfolderSecurity(String subfolder, String group, String perms)
+    protected void setSubfolderSecurity(String project, String subfolder, String group, String perms)
     {
-        log("Setting permissions for group '" + group + "' on subfolder '" + subfolder + "' to '" + perms + "'");
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
+        clickLinkWithText(project);
         clickLinkWithText(subfolder);
         clickLinkWithText(TEST_ASSAY_LINK_PERMS);
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
@@ -189,7 +193,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
      * @param group     name of the group
      * @param perms     read permissions to set (use TEST_STUDY_PERMS_STUDY_* constants)
      */
-    private void setStudyPerms(String project, String folder, String group, String perms)
+    protected void setStudyPerms(String project, String folder, String group, String perms)
     {
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
         clickLinkWithText(project);
@@ -242,7 +246,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
      * @param projectName existing project name
      * @param groupName existing group within the project to which we should add the user
      */
-    private void addUserToProjGroup(String userName, String projectName, String groupName)
+    protected void addUserToProjGroup(String userName, String projectName, String groupName)
     {
         clickLinkWithText(projectName);
         clickLinkWithText("Folder Permissions");

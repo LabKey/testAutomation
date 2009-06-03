@@ -27,9 +27,13 @@ import java.io.File;
 public class NabAssayTest extends AbstractAssayTest
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
+    private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
 
     protected static final String TEST_ASSAY_NAB = "TestAssayNab";
     protected static final String TEST_ASSAY_NAB_DESC = "Description for NAb assay";
+
+    protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
+    private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
     protected final String TEST_ASSAY_NAB_FILE1 = getLabKeyRoot() + "/sampledata/Nab/m0902051;3997.xls";
     protected final String TEST_ASSAY_NAB_FILE2 = getLabKeyRoot() + "/sampledata/Nab/m0902053;3999.xls";
@@ -64,18 +68,19 @@ public class NabAssayTest extends AbstractAssayTest
             //setup a pipeline for it
             setupPipeline(TEST_ASSAY_PRJ_NAB);
 
-            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
-
             // create a study so we can test copy-to-study later:
+            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
             addWebPart("Study Overview");
             clickNavButton("Create Study");
             clickNavButton("Create Study");
-            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
-            
+
             //add the Assay List web part so we can create a new nab assay
+            createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
+            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
             addWebPart("Assay List");
 
-            //create a new luminex assay
+            //create a new nab assay
             clickLinkWithText("Manage Assays");
             clickNavButton("New Assay Design");
             checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
@@ -93,11 +98,13 @@ public class NabAssayTest extends AbstractAssayTest
         }
 
         clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+        clickLinkWithText(TEST_ASSAY_FLDR_NAB);
+        addWebPart("Assay List");
 
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY_NAB);
 
-        if(isFileUploadAvailable())
+        if (isFileUploadAvailable())
         {
             log("Uploading NAb Runs");
             clickNavButton("Import Data");
@@ -119,17 +126,18 @@ public class NabAssayTest extends AbstractAssayTest
 
             uploadFile(TEST_ASSAY_NAB_FILE1, "A", "Save and Import Another Run");
             assertTextPresent("Upload successful.");
-            uploadFile(TEST_ASSAY_NAB_FILE2, "B", "Save and Finish");
-            //uploadFile(TEST_ASSAY_NAB_FILE3, "C");
+            uploadFile(TEST_ASSAY_NAB_FILE2, "B", "Save and Import Another Run");
+            assertTextPresent("Upload successful.");
+            uploadFile(TEST_ASSAY_NAB_FILE3, "C", "Save and Finish");
             //uploadFile(TEST_ASSAY_NAB_FILE4, "D");
             //uploadFile(TEST_ASSAY_NAB_FILE5, "E");
 
             assertTextPresent("Virus Name");
             assertTextPresent("Nasty Virus");
-            assertTextPresent("ptid 1 B, Vst 1.0");
-            assertTextPresent("&lt; 20", 4);
-            // check for the first dilution for the first participant:
-            assertTextPresent("186");
+            assertTextPresent("ptid 1 C, Vst 1.0");
+            assertTextPresent("&lt; 20", 10);
+            // check for the first dilution for the second participant:
+            assertTextPresent("561");
 
             // test creating a custom details view via a "magic" named run-level view:
             clickLinkWithText("view runs");
@@ -139,38 +147,55 @@ public class NabAssayTest extends AbstractAssayTest
             clickNavButton("Save");
 
             clickLinkWithText("details", 1);
-            assertTextPresent("Virus ID");
-            assertTextNotPresent("Virus Name");
-            assertTextNotPresent("Nasty Virus");
+            assertNabData(true);
 
             clickLinkWithText("view results");
-            setFilter(TEST_ASSAY_NAB + " Data", "Properties/SpecimenLsid/Property/ParticipantID", "Starts With", "ptid 1");
+            setFilter(TEST_ASSAY_NAB + " Data", "Properties/SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
+            assertTextPresent("ptid 1 C");
+            String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
+
+            setFilter(TEST_ASSAY_NAB + " Data", "Properties/SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. 'a;b;c')", "ptid 1 A;ptid 1 B");
             assertTextPresent("ptid 1 A");
             assertTextPresent("ptid 1 B");
+            assertTextNotPresent("ptid 1 C");
             assertTextNotPresent("ptid 2");
             checkAllOnPage(TEST_ASSAY_NAB + " Data");
             clickNavButton("Copy to Study");
 
-            selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_NAB + " (" + TEST_ASSAY_PRJ_NAB + " Study)");
+            selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
             clickNavButton("Next");
             clickNavButton("Copy to Study");
-            assertTextPresent("Dataset: " + TEST_ASSAY_NAB);
-            assertTextPresent("ptid 1 A");
-            assertTextPresent("CurveIC50");
-            assertTextPresent("1353");
-            assertTextPresent("Specimen 1", 2);
+            assertStudyData();
             clickLinkWithText("assay");
+            assertNabData(true);
 
-            assertTextPresent("Cutoff Dilutions");
-            assertTextPresent("ptid 1");
-            assertTextPresent("ptid 2");
-            assertTextPresent("ptid 3");
-            assertTextPresent("ptid 4");
-            assertTextPresent("ptid 5");
-            assertTextPresent("Virus ID");
-            assertTextNotPresent("Virus Name");
-            assertTextNotPresent("Nasty Virus");
+            // create user with read permissions to study and dataset, but no permissions to source assay
+            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
+            clickLinkWithText("Folder Permissions");
+            createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER);
+            addUserToProjGroup(TEST_ASSAY_USR_NAB_READER, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER);
+            setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
+            setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
+
+            // view dataset, click [assay] link, see assay details in nabassay container
+            impersonate(TEST_ASSAY_USR_NAB_READER);
+            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to nabassay container
+            clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
+            clickLinkWithText("Study Navigator");
+            clickLinkWithText("2");
+            assertStudyData();
+            clickLinkWithText("assay");
+            assertNabData(false); // CustomDetailsView not enabled for all users so "Virus Name" is present
+
+            // no permission to details page for "ptid 1 C"; it wasn't copied to the study
+            beginAt(ptid1c_detailsURL);
+            assertEquals(getResponseCode(), 401);
+
+            beginAt("/login/logout.view");  // stop impersonating
         }
+
     } //doTestSteps()
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton)
@@ -188,6 +213,37 @@ public class NabAssayTest extends AbstractAssayTest
         File file1 = new File(filePath);
         setFormElement("uploadedFile", file1);
         clickNavButton(finalButton, 60000);
+    }
+
+    private void assertStudyData()
+    {
+        assertTextPresent("Dataset: " + TEST_ASSAY_NAB);
+        assertTextPresent("ptid 1 A");
+        assertTextPresent("ptid 1 B");
+        assertTextPresent("CurveIC50");
+        assertTextPresent("1353");
+        assertTextPresent("Specimen 1", 2);
+    }
+
+    private void assertNabData(boolean hasCustomView)
+    {
+        assertTextPresent("Cutoff Dilutions");
+        assertTextPresent("ptid 1");
+        assertTextPresent("ptid 2");
+        assertTextPresent("ptid 3");
+        assertTextPresent("ptid 4");
+        assertTextPresent("ptid 5");
+        assertTextPresent("Virus ID");
+        if (hasCustomView)
+        {
+            assertTextNotPresent("Virus Name");
+            assertTextNotPresent("Nasty Virus");
+        }
+        else
+        {
+            assertTextPresent("Virus Name");
+            assertTextPresent("Nasty Virus");
+        }
     }
 
     /**
