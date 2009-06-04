@@ -22,6 +22,11 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.*;
+import java.util.Set;
+import java.util.Arrays;
+import java.util.HashSet;
+
+import com.thoughtworks.selenium.SeleniumException;
 
 /**
  * User: brittp
@@ -155,6 +160,9 @@ public class StudyTest extends BaseSeleniumWebTest
     {
         createStudy();
         waitForInitialUpload();
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        afterCreateStudy();
 
         // verify reports
 /*
@@ -173,9 +181,6 @@ public class StudyTest extends BaseSeleniumWebTest
 
         clickLinkWithText(STUDY_LABEL);
 */
-
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
 
         verifyDemographics();
         verifyVisitMapPage();
@@ -378,6 +383,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     private void verifyDemographics()
     {
+        clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Study Navigator");
         clickLinkWithText("24");
         assertTextPresent("Male");
@@ -525,17 +531,7 @@ public class StudyTest extends BaseSeleniumWebTest
         selectOptionByText("participantCohortProperty", "2. Enrollment group");
         clickNavButton("Update Assignments");
 
-        // hide visits:
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Visits");
-        for (int i = 0; i < 2; i++)
-        {
-            clickLinkWithText("edit", i);
-            uncheckCheckbox("showByDefault");
-            clickNavButton("Save");
-        }
-
-        // configure QC state management so that all data is displayed by default (we'll test with hiden data later):
+        // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
         clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage QC States");
@@ -576,6 +572,51 @@ public class StudyTest extends BaseSeleniumWebTest
         }
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
         assertLinkPresentWithTextCount("COMPLETE", 1);
+    }
+
+    // This is separate from createStudy() because new visit map format support setting visit visibility, but old format
+    // does not (so we want to set it manually).
+    protected void afterCreateStudy()
+    {
+        // Hide visits based on label -- manual create vs. import will result in different indexes for these visits
+        hideVisits("Screening Cycle", "Cycle 1");
+    }
+
+    protected void hideVisits(String... visitLabel)
+    {
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Visits");
+
+        Set<String> labels = new HashSet<String>(Arrays.asList(visitLabel));
+        int row = 2;  // Skip header row (row index is one-based)
+        String currentLabel;
+
+        // Loop until we find all the labels or we hit the end of the table
+        while(!labels.isEmpty() && null != (currentLabel = getVisitLabel(row)))
+        {
+            if (labels.contains(currentLabel))
+            {
+                clickLinkWithText("edit", row - 2);   // Zero-based, plus the header row doesn't have an edit link
+                uncheckCheckbox("showByDefault");
+                clickNavButton("Save");
+                labels.remove(currentLabel);
+            }
+
+            row++;
+        }
+    }
+
+    // row is one-based
+    private String getVisitLabel(int row)
+    {
+        try
+        {
+            return selenium.getText("//table[@id='visits']/tbody/tr[" + row + "]/th");
+        }
+        catch (SeleniumException e)
+        {
+            return null;
+        }
     }
 
     protected void initializeFolder()

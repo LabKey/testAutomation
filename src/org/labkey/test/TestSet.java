@@ -138,6 +138,10 @@ public enum TestSet
             IssuesTest.class,
     }),
 
+    TestDevHepers(new Class[] {
+            StudyQuickTest.class
+    }),
+
     IDRI(new Class[] {
             IDRIParticleSizeTest.class
     }),
