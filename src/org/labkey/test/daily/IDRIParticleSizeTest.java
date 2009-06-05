@@ -29,21 +29,36 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "Particle Size";
 
-    private static final String SAMPLE_ROOT = "/sampledata/particleSize";
+    private static final String DATA_DIRECTORY = "c:/temp/IDRI";
 
     private static final String FORMULATIONS_DATA = "Batch\tDM\tBatchSize\tNB_Pg\tAdjuvant\tSqualene_Oil\tPC\tFailure\tUsedInExperiments\n" +
             "TD100\t1-Jan-2004\t25ml\t150-1\tMPL\tShark - Sigma\tEgg - Avanti\t\t\n" +
             "TD101\t1-Jan-2005\t50ml\t150-2\tMPL\tShark - Sigma\tEgg - Avanti\t\t\n";
 
+    /**
+     * Assumes that you already have a project named "Particle Size" with a particle size assay definition, and that
+     * it has a run list web part on its portal page. It also assumes that you have defined a Formulations sample set.
+     *
+     * It iterates through all input files and upload them, and moving them to subdirectories based on the result.
+     */
     protected void doTestSteps() throws Exception
     {
-        defineProject();
-        clickLinkWithText("IDRI Particle Size Assay");
+//        defineProject();
+//        clickLinkWithText("IDRI Particle Size Assay");
+        clickLinkWithText("Particle Size Database");
         clickButtonContainingText("Import Data");
 
-        File root = new File(getLabKeyRoot() + SAMPLE_ROOT);
-        //File root = new File("/IDRI/Stability Reports");
+        File root = new File(DATA_DIRECTORY);
+        File emptyDir = new File(root, "empty");
+        File errorDir = new File(root, "error");
+        File successDir = new File(root, "success");
 
+        emptyDir.mkdirs();
+        errorDir.mkdirs();
+        successDir.mkdirs();
+
+
+        // Look for TDxxx.xls files
         File[] allFiles = root.listFiles(new FilenameFilter()
         {
             public boolean accept(File dir, String name)
@@ -52,32 +67,44 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
             }
         });
 
-fileLoop:
         for(File file : allFiles)
         {
             log("uploading " + file.getName());
             setFormElement("upload-run-field-file", file);
-            for (int i=0; i<5; i++)
+            sleep(2500);
+            if (isMaterialPopupVisible())
             {
-                sleep(1500);
-                if (isMaterialPopupVisible())
-                {
-                    // if we don't have any material, submit an empty entry
-                    click(getButtonLocator("Submit"));
-                    sleep(1500);
-                }
-                if (isTextPresent("The data file " + file.getName() + " contains no rows"))
-                {
-                    click(getButtonLocator("OK"));
-                    selenium.refresh();
-                    continue fileLoop;
-                }
-                if(isTextPresent(file.getName()))
-                    break;
+                // if we don't have any material, submit an empty entry
+                click(getButtonLocator("Submit"));
             }
-            assertTextPresent(file.getName());
+            int seconds = 0;
+            while (!isTextPresent(file.getName()) && seconds < 10)
+            {
+                seconds++;
+                sleep(1000);
+            }
+            
+            if (isTextPresent("The data file " + file.getName() + " contains no rows") ||
+                isTextPresent("Failure when communicating with the server: Data file contained zero data rows"))
+            {
+                click(getButtonLocator("OK"));
+                file.renameTo(new File(emptyDir, file.getName()));
+            }
+            else if (isTextPresent("Failure when communicating with the server"))
+            {
+                click(getButtonLocator("OK"));
+                file.renameTo(new File(errorDir, file.getName()));
+            }
+            else
+            {
+                assertTextPresent(file.getName());
+                file.renameTo(new File(successDir, file.getName()));
+            }
+            
+            clickNavButton("Done");
 
             clickLinkWithText("Import Data");
+            sleep(1000);
         }
 
         clickButtonContainingText("Done");
@@ -99,7 +126,7 @@ fileLoop:
     protected void doCleanup() throws Exception
     {
         // IMPORTANT: don't do this in production!
-        deleteProject(PROJECT_NAME);
+//        deleteProject(PROJECT_NAME);
     }
 
     private void defineProject() throws Exception
