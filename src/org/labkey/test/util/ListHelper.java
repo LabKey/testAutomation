@@ -301,6 +301,7 @@ public class ListHelper
 
         test.log("Add columns");
         test.clickLinkWithText("edit fields");
+
         for (int i = 0; i < cols.length; i++)
         {
             ListColumn col = cols[i];

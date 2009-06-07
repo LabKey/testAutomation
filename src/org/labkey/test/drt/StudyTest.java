@@ -156,13 +156,18 @@ public class StudyTest extends BaseSeleniumWebTest
         clickAndWait(link);
     }
 
-    protected void doTestSteps()
+    protected void doCreateSteps()
     {
         createStudy();
         waitForInitialUpload();
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         afterCreateStudy();
+    }
+
+    protected void doTestSteps()
+    {
+        doCreateSteps();
 
         // verify reports
 /*
@@ -386,6 +391,7 @@ public class StudyTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_LABEL);
         clickLinkWithText("Study Navigator");
         clickLinkWithText("24");
+        assertTextPresent("This is the demographics dataset, dammit");
         assertTextPresent("Male");
         assertTextPresent("African American or Black");
         clickLinkWithText("999320016");
@@ -438,10 +444,22 @@ public class StudyTest extends BaseSeleniumWebTest
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
 
-        assertTextPresent("DEM-1: Demographics");
         clickLinkWithText("489");
         assertTextPresent("ESIdt");
         assertTextPresent("Form Completion Date");
+        assertTableCellTextEquals("details", 5, 1, "false");     // "Demographics Data" should be false
+
+        // Verify that "Demographics Data" is checked and description is set
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("DEM-1: Demographics");
+        assertTableCellTextEquals("details", 5, 1, "true");
+        assertTableCellTextEquals("details", 8, 1, "This is the demographics dataset, dammit");
+
+        // "Demographics Data" needs to be false for the rest of the test
+        clickButtonContainingText("Edit Dataset Definition");
+        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);        
+        uncheckCheckbox("demographicData");
+        clickNavButton("Save");
     }
 
     private void verifyHiddenVisits()
@@ -574,12 +592,21 @@ public class StudyTest extends BaseSeleniumWebTest
         assertLinkPresentWithTextCount("COMPLETE", 1);
     }
 
-    // This is separate from createStudy() because new visit map format support setting visit visibility, but old format
+    // This is separate from createStudy() because new visit map format supports setting visit visibility, but old format
     // does not (so we want to set it manually).
     protected void afterCreateStudy()
     {
         // Hide visits based on label -- manual create vs. import will result in different indexes for these visits
         hideVisits("Screening Cycle", "Cycle 1");
+
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("DEM-1: Demographics");
+        clickButtonContainingText("Edit Dataset Definition");
+        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);        
+        checkCheckbox("demographicData");
+        setFormElement("description", "This is the demographics dataset, dammit");
+        clickNavButton("Save");
     }
 
     protected void hideVisits(String... visitLabel)
@@ -592,7 +619,7 @@ public class StudyTest extends BaseSeleniumWebTest
         String currentLabel;
 
         // Loop until we find all the labels or we hit the end of the table
-        while(!labels.isEmpty() && null != (currentLabel = getVisitLabel(row)))
+        while (!labels.isEmpty() && null != (currentLabel = getVisitLabel(row)))
         {
             if (labels.contains(currentLabel))
             {
