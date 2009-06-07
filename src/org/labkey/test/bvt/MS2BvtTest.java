@@ -676,7 +676,7 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test restoring default view");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
-        clickNavButton("Reset my default grid view");
+        clickNavButton("Reset my default view");
         assertTextPresent("K.LLASMLAK.A");
         assertTextNotPresent("Fraction");
         assertTextBefore("R.LGARRVSPVR.A", "K.TKDYEGMQVPVK.V");
@@ -686,7 +686,7 @@ public class MS2BvtTest extends MS2TestBase
         clickMenuButton("Views", "Views:" + VIEW4);
         waitForPageToLoad();
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
-        clickNavButtonContainingText("Delete my grid view");
+        clickNavButtonContainingText("Delete my view");
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextNotPresent("Next AA");

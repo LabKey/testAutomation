@@ -376,7 +376,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         //reset view
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
-        clickNavButton("Reset my default grid view");
+        clickNavButton("Reset my default view");
 
         //add other columns from peptide data
         //and test saving under a name
