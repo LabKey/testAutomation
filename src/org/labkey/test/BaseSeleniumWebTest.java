@@ -1016,6 +1016,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create new group", 0);
         sleep(500);
+        waitAndClick(Locator.xpath("//div[@id='userInfoPopup']//div[contains(@class,'x-tool-close')]"));
         waitForElement(Locator.tagWithText("td",groupName), defaultWaitForPage);
     }
 
