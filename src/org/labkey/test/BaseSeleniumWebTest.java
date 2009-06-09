@@ -1077,7 +1077,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 checkInheritedPermissions();
                 savePermissions();
             }
-            clickNavButton("Done"); //Leave permissions where they are
+            waitAndClickNavButton("Done"); //Leave permissions where they are
             if (null == tabsToAdd || tabsToAdd.length == 0)
                 return;
 
@@ -1100,7 +1100,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 checkInheritedPermissions();
                 savePermissions();
             }
-            clickNavButton("Done"); //Permissions
+            waitAndClickNavButton("Done");
         }
 
 
@@ -1896,9 +1896,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-    public void waitAndClickNavButton(String text)
+    public void waitAndClickNavButton(final String text)
     {
-        waitAndClick(10000, Locator.navButton(text), defaultWaitForPage);
+        String failMessage = "Button with text '" + text + "' did not appear";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return null != getButtonLocator(text);
+            }
+        }, failMessage, 10000);
+        clickNavButton(text);
     }
 
     public void waitAndClick(Locator l)
