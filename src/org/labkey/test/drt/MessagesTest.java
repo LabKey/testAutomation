@@ -61,6 +61,14 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("Check that Plain Text message works and is added everywhere");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("new message");
+
+        // Check defaults for uncustomized message board
+        assertTextNotPresent("Status");
+        assertTextNotPresent("Assigned To");
+        assertTextNotPresent("Members");
+        assertTextNotPresent("Expires");
+        assertTextPresent("Admin Broadcast");
+        
         setFormElement("title", MSG1_TITLE);
         setFormElement("body", MSG1_BODY_FIRST);
         selectOptionByText("rendererType", "Plain Text");
@@ -91,10 +99,17 @@ public class MessagesTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent(MSG1_BODY);
 
+        log("test customize");
+        clickLinkWithText("Messages");
+        clickLinkWithText("customize");
+        checkCheckbox("expires");
+        clickNavButton("Save");
+
         log("test add response");
+        clickLinkWithText("view message or respond");
         clickNavButton("Post Response");
-        setFormElement("title", RESP1_TITLE);
         setFormElement("expires", EXPIRES);
+        setFormElement("title", RESP1_TITLE);
         setFormElement("body", RESP1_BODY);
         submit();
 
