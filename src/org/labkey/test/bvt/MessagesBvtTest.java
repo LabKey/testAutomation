@@ -80,7 +80,6 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-
         log("Open new project, add group, alter permissions");
         createProject(PROJECT_NAME, "Collaboration");
         createPermissionsGroup("Administrators");
@@ -98,6 +97,12 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         checkRadioButton("emailPreference", "1");
         clickNavButton("Update");
         clickNavButton("Done");
+
+        log("Customize message board");
+        clickLinkWithText("Messages");
+        clickLinkWithText("customize");
+        checkCheckbox("expires");
+        clickNavButton("Save");
 
         log("Check email admin works");
         clickLinkWithText("email admin");

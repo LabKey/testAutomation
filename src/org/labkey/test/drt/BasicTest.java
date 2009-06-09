@@ -81,7 +81,7 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTextPresent("Customize");
         clickNavButton("Cancel");
         clickAndWait(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"));
-        assertTrue(isTextBefore("No data to show", "No recent messages"));
+        assertTrue(isTextBefore("No data to show", "No messages"));
         clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']"));
         assertElementNotPresent(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']"));
         isElementPresent(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"));
