@@ -337,6 +337,15 @@ public class AssayTest extends AbstractAssayTest
         // for the 'return false' that appears in the filter notification header javascript link.
         assertEquals(countText("false"), totalFalses - 2);
 
+        //Check to see that the bad specimen report includes the bad assay results and not the good ones
+        //The report doesn't have top level UI (use a wiki) so just jump there.
+        beginAt("specimencheck/" + TEST_ASSAY_PRJ_SECURITY + "/assayReport.view");
+        waitForText("Global Specimen ID", 10000);
+        waitForElement(Locator.linkWithText("BAQ00051-09"), 10000);
+        assertLinkPresentWithText("BAQ00051-09");
+        assertLinkPresentWithText("BAQ00051-08");
+        assertLinkPresentWithText("BAQ00051-11");
+        assertTextNotPresent("AAA");
         stopImpersonating();
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
     } //uploadRuns()
