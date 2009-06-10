@@ -23,7 +23,7 @@ import java.io.IOException;
 
 abstract public class BaseFlowTest extends BaseSeleniumWebTest
 {
-    protected static final String PROJECT_NAME = "FlowVerifyProject";
+    protected static final String PROJECT_NAME = "Flow Verify Project";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
 
     public String getAssociatedModuleDirectory()
