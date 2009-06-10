@@ -1896,6 +1896,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
+    /**
+     *  wait for button to appear, click it, wait for page to load
+     */
     public void waitAndClickNavButton(final String text)
     {
         String failMessage = "Button with text '" + text + "' did not appear";
@@ -1909,16 +1912,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton(text);
     }
 
+
+    /**
+     *  wait for element, clickit, return immediately
+     */
     public void waitAndClick(Locator l)
     {
         waitAndClick(10000, l, 0);
     }
 
+
+    /**
+     *  wait for element, click it, wait for page to load
+     */
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
         waitForElement(l, waitFor);
         clickAndWait(l, waitForPageToLoad);
     }
+
 
     public String goToNavButton(String buttonText, String controller, String folderPath)
     {
@@ -1939,6 +1951,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         return (getContextPath() + "/" + controller + folderPath + "/" + localAddress);
     }
+
 
     public String getButtonHref(Locator buttonLoc)
     {
