@@ -2809,6 +2809,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkPresentWithTextCount("COMPLETE", completedPipelineJobs);
         clickNavButton("Process and Import Data");
         String tempDirShortName = tempDir.getName();
+        waitAndClick(Locator.fileTreeByName("Assay Security Test"));
         waitAndClick(Locator.fileTreeByName(tempDirShortName));
         waitAndClickNavButton("Import specimen data");
         clickNavButton("Start Import");
