@@ -2811,7 +2811,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String tempDirShortName = tempDir.getName();
         sleep(100);
         waitAndClick(Locator.fileTreeByName(tempDirShortName));
+        int seconds = 0;
         sleep(100);
+        while (!isNavButtonPresent("Import specimen data") && seconds < 20)
+        {
+            seconds++;
+            click(Locator.fileTreeByName(tempDirShortName));
+            sleep(1000);
+        }
         waitAndClickNavButton("Import specimen data");
         clickNavButton("Start Import");
 

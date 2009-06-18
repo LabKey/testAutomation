@@ -186,9 +186,11 @@ public class MS1Bvt extends BaseSeleniumWebTest
         if (!isTextPresent(BASE_FILE_NAME_3 + PIPE_XAR_XML_EXTENSION))
         {
             //go down to the protocol directory under the inspect directory
+            sleep(1000);
             waitAndClick(Locator.fileTreeByName(PIPELINE_INSPECT_DIR));
+            sleep(1000);
             waitAndClick(Locator.fileTreeByName(protocol));
-        }                                                      
+        }
 
         waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),10000);
         clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
