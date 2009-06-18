@@ -74,6 +74,12 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("textField", "Text value");
         clickCheckbox("booleanField");
 
+        int seconds = 0;
+        while (!isTextPresent("<None>") && seconds < 20)
+        {
+            seconds++;
+            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+        }
         selectOptionByText("sampleSetListBox0", "<None>");
         setFormElement("sampleTextBox0", "verify:001");
 
@@ -131,7 +137,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         clickLinkWithText("Pipeline");
 
-        int seconds = 0;
+        seconds = 0;
         while (getText(Locator.raw("//td[contains(text(),'" + SAMPLE_BASE_NAME + " (test2)" + "')]/../td[2]/a")).compareTo("COMPLETE") != 0
                 && seconds++ < MAX_WAIT_SECONDS)
         {

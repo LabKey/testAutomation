@@ -31,14 +31,14 @@ import java.net.MalformedURLException;
  *
  * Tests the fields added to the Customize Site form for the MS2 modules.
  *
- * WCH: Please take note on how you should set up the sequence database 
+ * WCH: Please take note on how you should set up the sequence database
  *      Bovine_mini.fasta Mascot server.  You should copy it to
  *      <Mascot dir>/sequence/Bovine_mini.fasta/current/Bovine_mini.fasta
  *      Its name MUST BE "Bovine_mini.fasta" (excluding the quotes)
  *      Its Path "<Mascot dir>/sequence/Bovine_mini.fasta/current/Bovine_mini*.fasta" (excluding the quotes, and note the *)
- *      Its Rule to parse accession string from Fasta file: MUST BE 
+ *      Its Rule to parse accession string from Fasta file: MUST BE
  *          Rule 4 ">\([^ ]*\)"      (the rule number can be different, but regex must be the same or equivalent)
- *      Its Rule to Rule to parse description string from Fasta file: MUST BE 
+ *      Its Rule to Rule to parse description string from Fasta file: MUST BE
  *          Rule 5 ">[^ ]* \(.*\)"   (the rule number can be different, but regex must be the same or equivalent)
  *
  */
@@ -52,15 +52,17 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     protected static final String PROTEIN = "gi|23335713|hypothetical_prot";
     protected static final String SEARCH = "gi|23335713|hypothetical_prot";
     protected static final String SEARCH_FIND = "BIFIDOBACTERIUM LONGUM";
-    protected static final String PROTOCOL = "Mascot Analysis";
+    protected static final String SEARCH_FIND_ALT = "Bifidobacterium longum";
+    protected static final String PROTOCOL = "Mascot analysis";
     protected static final String SEARCH_TYPE = "mascot";
     protected static final String SEARCH_BUTTON = "Mascot";
     protected static final String SEARCH_NAME = "MASCOT";
 
     protected void doCleanup() throws IOException
     {
-        deleteViews(VIEW);
-        deleteRuns();
+        try {
+            deleteViews(VIEW); } catch (Throwable t) {}
+        try {deleteRuns(); } catch (Throwable t) {}
         cleanPipe(SEARCH_TYPE);
         try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
@@ -209,10 +211,10 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Upload existing Mascot .dat result file.");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
-        clickLinkWithText("bov_sample");
-        clickLinkWithText(SEARCH_TYPE);
-        clickLinkWithText("test3");
-        clickNavButton("Import Results");
+        waitAndClick(Locator.fileTreeByName("bov_sample"));
+        waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
+        waitAndClick(Locator.fileTreeByName("test3"));
+        waitAndClickNavButton("Import Results");
 
         log("Verify upload started.");
         String mascotDatLabel = SAMPLE_BASE_NAME + ".dat (none)";
@@ -237,13 +239,13 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("All");
         int sec = 300;
-        while (!isLinkPresentWithText("COMPLETE", 2) && sec-- > 0)
+        while (!isLinkPresentWithText("COMPLETE", 1) && sec-- > 0)
         {
             log("Waiting for load to complete");
             sleep(1000);
             refresh();
         }
-        if (!isLinkPresentWithText("COMPLETE", 2))
+        if (!isLinkPresentWithText("COMPLETE", 1))
             fail("Mascot .dat import did not complete.");
 
         popLocation();
@@ -264,7 +266,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     protected void setupEngine()
     {
         log("Analyze " + SEARCH_NAME + " sample data.");
-        clickNavButton(SEARCH_BUTTON +  " Peptide Search");
+        waitAndClickNavButton(SEARCH_BUTTON +  " Peptide Search");
     }
 
     protected void basicChecks()
@@ -315,7 +317,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         //Put in once bug with filters in postgres is fixed
         //assertTextNotPresent(PEPTIDE);
-       
+
         setSort("MS2Compare", "Peptide", SortDirection.DESC);
         assertTextBefore(PEPTIDE5, PEPTIDE4);
 
@@ -329,11 +331,11 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         selenium.type("identifier", SEARCH);
         selenium.click("exactMatch");
         clickNavButton("Search");
-        assertTextPresent(SEARCH_FIND);
+        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
         selenium.type("minimumProbability", "2.0");
         clickNavButton("Search");
-        assertTextPresent(SEARCH_FIND);
+        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
         selenium.type("identifier", "GarbageProteinName");

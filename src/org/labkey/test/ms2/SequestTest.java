@@ -38,16 +38,17 @@ public class SequestTest extends AbstractMS2SearchEngineTest
     protected static final String PEPTIDE5 = "K.DSPRISIAGR.L";
     protected static final String PROTEIN = "gi|34558016|50S_RIBOSOMAL_PRO";
     protected static final String SEARCH = "gi|15677167|30S_ribosomal_pro";
-    protected static final String SEARCH_FIND = "NMB1301";
-    protected static final String PROTOCOL = "Sequest Analysis";
+    protected static final String SEARCH_FIND = "Neisseria meningitidis";
+    protected static final String PROTOCOL = "Sequest analysis";
     protected static final String SEARCH_TYPE = "sequest";
     protected static final String SEARCH_BUTTON = "Sequest";
     protected static final String SEARCH_NAME = "SEQUEST";
 
     protected void doCleanup() throws IOException
     {
-        deleteViews(VIEW);
-        deleteRuns();
+        try {
+            deleteViews(VIEW); } catch (Throwable t) {}
+        try {deleteRuns(); } catch (Throwable t) {}
         cleanPipe(SEARCH_TYPE);
         try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
@@ -84,14 +85,14 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
             Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
-        
+
         super.doTestSteps();
     }
 
     protected void setupEngine()
     {
         log("Analyze " + SEARCH_NAME + " sample data.");
-        clickNavButton(SEARCH_BUTTON +  " Peptide Search");
+        waitAndClickNavButton(SEARCH_BUTTON +  " Peptide Search");
     }
 
     protected void basicChecks()
