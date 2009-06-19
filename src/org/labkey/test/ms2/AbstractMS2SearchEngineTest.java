@@ -85,18 +85,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         clickNavButton("Save and Finish");
 
-//        assertFormElementEquals("runInfos[0].parameterValues[2]", "5");
-//        assertFormElementEquals("runInfos[0].parameterValues[4]", "60");
-//        setFormElement("runNames[0]", "Verify MS2 Run");
-//        setFormElement("runInfos[0].parameterValues[0]", "10");
-//        setFormElement("runInfos[0].sampleIdsNew[0]", "");
-//        submit();
-//
-//        log("Sample ID Required");
-//        assertTextPresent("Please enter a sample");
-//        setFormElement("runInfos[0].sampleIdsNew[0]", "verify:001");
-//        submit();
-//
         log("Return to search page");
         clickLinkWithText("MS2 Dashboard");
 
@@ -114,7 +102,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("configureXml", INPUT_XML);
         submit();
         log("View the analysis log.");
-       sleep(WAIT_FOR_GWT);
+        sleep(WAIT_FOR_GWT);
 //        waitFor(new Checker(){
 //            public boolean check()
 //            {
