@@ -1928,6 +1928,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
         waitForElement(l, waitFor);
+        sleep(500);
         clickAndWait(l, waitForPageToLoad);
     }
 
