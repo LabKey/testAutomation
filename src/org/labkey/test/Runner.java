@@ -242,11 +242,11 @@ public class Runner extends TestSuite
         }
     }
 
-    private void dumpFailures(Enumeration failures)
+    private void dumpFailures(Enumeration<TestFailure> failures)
     {
         while (failures.hasMoreElements())
         {
-            TestFailure failure = (TestFailure) failures.nextElement();
+            TestFailure failure = failures.nextElement();
             if (!_failures.contains(failure))
             {
                 _failures.add(failure);
@@ -294,7 +294,15 @@ public class Runner extends TestSuite
             if (testClass == null)
             {
                 System.out.println("Couldn't find test '" + testName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
-                for (Class c : testSet.tests)
+                Class[] sortedTests = Arrays.copyOf(testSet.tests, testSet.tests.length);
+                Arrays.sort(sortedTests, new Comparator<Class>(){
+                    public int compare(Class c1, Class c2)
+                    {
+                        return c1.getName().compareTo(c2.getName());
+                    }
+                });
+
+                for (Class c : sortedTests)
                     System.out.println("    " + c.getSimpleName());
             }
             else
