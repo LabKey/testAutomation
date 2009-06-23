@@ -308,8 +308,9 @@ public class AssayTest extends AbstractAssayTest
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         click(Locator.raw("expand_Properties"));
         click(Locator.raw("expand_Properties/SpecimenID"));
+        click(Locator.raw("expand_Properties/SpecimenID/Specimen"));
         addCustomizeViewColumn("Properties/SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
-        addCustomizeViewColumn("Properties/SpecimenID/PrimaryType", "Specimen Primary Type");
+        addCustomizeViewColumn("Properties/SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
         addCustomizeViewColumn("Properties/SpecimenID/AssayMatch", "Specimen Assay Match");
         removeCustomizeViewColumn("testAssayRunProp1");
         removeCustomizeViewColumn("testAssaySetProp2");
