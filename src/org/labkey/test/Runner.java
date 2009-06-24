@@ -294,7 +294,8 @@ public class Runner extends TestSuite
             if (testClass == null)
             {
                 System.out.println("Couldn't find test '" + testName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
-                Class[] sortedTests = Arrays.copyOf(testSet.tests, testSet.tests.length);
+                Class[] sortedTests = new Class[testSet.tests.length];
+                System.arraycopy(testSet.tests, 0, sortedTests, 0, testSet.tests.length);
                 Arrays.sort(sortedTests, new Comparator<Class>(){
                     public int compare(Class c1, Class c2)
                     {

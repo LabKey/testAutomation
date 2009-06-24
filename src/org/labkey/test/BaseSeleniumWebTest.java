@@ -1006,12 +1006,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else
             checkRadioButton("folderType", "None");
         submit();
+        clickNavButton("Save and Finish");
         _createdProjects.add(projectName);
     }
 
     public void createPermissionsGroup(String groupName)
     {
         log("Creating permissions group " + groupName);
+        if (isLinkPresentWithText("Folder Permissions"))
+            clickLinkWithText("Folder Permissions");
         waitForElement(Locator.permissionRendered(), 5000);
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create new group", 0);
@@ -1077,7 +1080,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 checkInheritedPermissions();
                 savePermissions();
             }
-            waitAndClickNavButton("Done"); //Leave permissions where they are
+            waitAndClickNavButton("Save and Finish"); //Leave permissions where they are
             if (null == tabsToAdd || tabsToAdd.length == 0)
                 return;
 
@@ -1100,7 +1103,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 checkInheritedPermissions();
                 savePermissions();
             }
-            waitAndClickNavButton("Done");
+            waitAndClickNavButton("Save and Finish");
         }
 
 
@@ -2598,6 +2601,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         else
         {
+            if (isLinkPresentWithText("Folder Permissions"))
+                clickLinkWithText("Folder Permissions");
+            
             String role = toRole(permissionString);
             if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
             {
@@ -2644,6 +2650,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             savePermissions();
             assertNoPermission(groupName, role);
         }
+    }
+
+    public void exitPermissionsUI()
+    {
+        clickNavButton("Save and Finish");
     }
 
 

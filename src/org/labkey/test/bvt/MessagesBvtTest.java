@@ -55,6 +55,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         removePermission("Users","Author");
         removePermission("Users","Editor");
         setPermissions("Users", permission);
+        exitPermissionsUI();
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
         if (readAbility)
@@ -86,6 +87,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         setPermissions("Administrators", "Project Administrator");
         createPermissionsGroup("testers1");
         assertPermissionSetting("testers1", "No Permissions");
+        exitPermissionsUI();
 
         log("Add messages and search to project");
         clickLinkWithText(PROJECT_NAME);
@@ -257,6 +259,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText("Folder Permissions");
         removePermission("Users", "Editor");
         setPermissions("Users", "Reader");
+        exitPermissionsUI();
 
         // USER2 is a nobody
         clickLinkWithText("Site Users");

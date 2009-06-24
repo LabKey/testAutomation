@@ -95,10 +95,12 @@ public class WikiBvtTest extends BaseSeleniumWebTest
     {
         createProject(PROJECT2_NAME);
         setPermissions("Users", "Editor");
+        clickNavButton("Save and Finish");
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
         setPermissions("testers", "Editor");
         setPermissions("Users", "Editor");
+        clickNavButton("Save and Finish");
         clickLinkWithText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
@@ -367,6 +369,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("Check if permissions work");
         clickLinkWithText("Folder Permissions");
         setPermissions("User", "Reader");
+        clickNavButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextPresent(WIKI_PAGE2_TITLE);
@@ -377,6 +380,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText("Folder Permissions");
         removePermission("User", "Editor");
         removePermission("User", "Reader");
+        clickNavButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextNotPresent(WIKI_PAGE2_TITLE);
@@ -403,6 +407,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE2_TITLE);
         clickLinkWithText("Folder Permissions");
         setPermissions("User", "Project Administrator");
+        clickNavButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextNotPresent("Welcome");
@@ -429,6 +434,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Folder Permissions");
         setPermissions("User", "Project Administrator");
+        clickNavButton("Save and Finish");
 
         log("make sure the changes went through");
         impersonate(USER1);

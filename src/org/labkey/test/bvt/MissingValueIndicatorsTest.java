@@ -123,7 +123,6 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
     {
         log("Create MV project");
         createProject(PROJECT_NAME, "Study");
-        waitAndClickNavButton("Done");
         clickNavButton("Create Study");
         selectOptionByValue("securityString", "BASIC_WRITE");
         clickNavButton("Create Study");

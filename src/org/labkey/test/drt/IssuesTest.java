@@ -48,6 +48,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         createPermissionsGroup("testers");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
+        clickNavButton("Save and Finish");
 
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Issues");

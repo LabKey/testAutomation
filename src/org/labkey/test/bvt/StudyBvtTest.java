@@ -571,6 +571,7 @@ public class StudyBvtTest extends StudyTest
 
         clickLinkWithText("Folder Permissions");
         setPermissions(TEST_GROUP, "Reader");
+        clickNavButton("Save and Finish");
 
         // give the test group read access to only the DEM-1 dataset
         clickLinkWithText("My Study");

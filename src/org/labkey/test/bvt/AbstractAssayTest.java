@@ -171,9 +171,14 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
     protected void setSubfolderSecurity(String project, String subfolder, String group, String perms)
     {
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
-        clickLinkWithText(project);
-        clickLinkWithText(subfolder);
-        clickLinkWithText(TEST_ASSAY_LINK_PERMS);
+        if (!isLinkPresent(TEST_ASSAY_LINK_PERMS))
+        {
+            if (isNavButtonPresent("Save and Finish"))
+                clickNavButton("Save and Finish");
+            clickLinkWithText(project);
+            clickLinkWithText(subfolder);
+            clickLinkWithText(TEST_ASSAY_LINK_PERMS);
+        }
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
         uncheckInheritedPermissions();
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
@@ -196,9 +201,14 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
     protected void setStudyPerms(String project, String folder, String group, String perms)
     {
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
-        clickLinkWithText(project);
-        clickLinkWithText(folder);
-        clickLinkWithText(TEST_ASSAY_LINK_PERMS);
+        if (!isLinkPresent(TEST_ASSAY_LINK_PERMS))
+        {
+            if (isNavButtonPresent("Save and Finish"))
+                clickNavButton("Save and Finish");
+            clickLinkWithText(project);
+            clickLinkWithText(folder);
+            clickLinkWithText(TEST_ASSAY_LINK_PERMS);
+        }
         clickNavButton("Study Security");
 
         selectOptionByValue("securityString", "ADVANCED_READ");
@@ -248,8 +258,11 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
      */
     protected void addUserToProjGroup(String userName, String projectName, String groupName)
     {
-        clickLinkWithText(projectName);
-        clickLinkWithText("Folder Permissions");
+        if (isLinkPresentWithText("Folder Permissions"))
+        {
+            clickLinkWithText(projectName);
+            clickLinkWithText("Folder Permissions");
+        }
         clickManageGroup(groupName);
         setFormElement("names", userName );
         uncheckCheckbox("sendEmail");

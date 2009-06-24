@@ -191,8 +191,11 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
      */
     private void createUserInProjectForGroup(String userName, String projectName, String groupName)
     {
-        clickLinkWithText(projectName);
-        clickLinkWithText("Folder Permissions");
+        if (isLinkPresentWithText("Folder Permissions"))
+        {
+            clickLinkWithText(projectName);
+            clickLinkWithText("Folder Permissions");
+        }
         clickManageGroup(groupName);
         setFormElement("names", userName );
         uncheckCheckbox("sendEmail");

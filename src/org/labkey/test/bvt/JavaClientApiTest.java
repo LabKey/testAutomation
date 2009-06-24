@@ -72,6 +72,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Folder Permissions");
         setSiteGroupPermissions("Guests", "Editor");
+        exitPermissionsUI();
 
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(LIST_NAME);

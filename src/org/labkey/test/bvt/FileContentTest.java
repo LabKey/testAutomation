@@ -60,7 +60,6 @@ public class FileContentTest extends BaseSeleniumWebTest
         assertFalse("ERROR: Add project with special characters failed; check that tomcat's server.xml contains the following attribute " +
             "in its Connector element: URIEncoding=\"UTF-8\"", isTextPresent("404: page not found"));
 
-        waitAndClickNavButton("Done");
         addWebPart("Files");
 
         clickLinkWithText("Configure Directories");

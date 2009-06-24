@@ -52,7 +52,6 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     {
         log("Create project: " + PROJECT_NAME);
         createProject(PROJECT_NAME);
-        waitAndClickNavButton("Done");
 
         log("Create DbUserSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + PROJECT_NAME + "/begin.view");
