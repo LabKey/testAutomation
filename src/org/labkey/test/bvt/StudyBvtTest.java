@@ -869,6 +869,7 @@ public class StudyBvtTest extends StudyTest
         clickNavButton("Update Group Membership");
         clickLinkWithText("Folder Permissions");
         setPermissions("Users", "Editor");
+        exitPermissionsUI();
         impersonate(USER1);
 
         log("Access shared R script");
@@ -898,6 +899,7 @@ public class StudyBvtTest extends StudyTest
             clickLinkWithText("Enable Admin");
         clickLinkWithText("Folder Permissions");
         setPermissions("Users", "Project Administrator");
+        exitPermissionsUI();
 
         log("Create a new R script which uses others R scripts");
         clickLinkWithText(getProjectName());
