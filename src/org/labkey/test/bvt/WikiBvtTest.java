@@ -360,14 +360,14 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check Permissions");
         log("Create fake user for permissions check");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
 
         log("Check if permissions work");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         setPermissions("User", "Reader");
         clickNavButton("Save and Finish");
         impersonate(USER1);
@@ -377,7 +377,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextNotPresent("copy pages");
         stopImpersonating();
         clickLinkWithText(PROJECT2_NAME);
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         removePermission("User", "Editor");
         removePermission("User", "Reader");
         clickNavButton("Save and Finish");
@@ -405,7 +405,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         selectOptionByText("name", WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         submit();
         assertTextPresent(WIKI_PAGE2_TITLE);
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         setPermissions("User", "Project Administrator");
         clickNavButton("Save and Finish");
         impersonate(USER1);
@@ -417,7 +417,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
@@ -432,7 +432,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         setPermissions("User", "Project Administrator");
         clickNavButton("Save and Finish");
 
@@ -492,7 +492,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         //assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
 
         log("delete project with copied wiki");
-        clickLinkWithText("Manage Folders");
+        clickLinkWithText("Folders");
         clickNavButton("Delete");
         log("confirm delete");
         clickNavButton("Delete");

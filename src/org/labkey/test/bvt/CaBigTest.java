@@ -47,7 +47,7 @@ public class CaBigTest extends BaseSeleniumWebTest
         if (!caBigEnabled)
             setCaBigSiteSetting(true);
 
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
 
         // Test publish/unpublish on the project
         assertTextPresent("This folder is not published to the caBIG");
@@ -59,11 +59,11 @@ public class CaBigTest extends BaseSeleniumWebTest
 
         // Create a subfolder
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickNavButton("Publish");
         clickNavButton("Save and Finish");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
 
         // Test caBIG admin page
         clickNavButton("Admin");

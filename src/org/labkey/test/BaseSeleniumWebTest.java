@@ -1013,8 +1013,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void createPermissionsGroup(String groupName)
     {
         log("Creating permissions group " + groupName);
-        if (isLinkPresentWithText("Folder Permissions"))
-            clickLinkWithText("Folder Permissions");
+        if (!isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), 5000);
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create new group", 0);
@@ -1064,7 +1064,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkNotPresentWithText(child);
         log("Creating subfolder " + child + " under project " + parent);
         clickLinkWithText(project);
-        clickLinkWithText("Manage Folders");
+        clickLinkWithText("Folders");
         // click last index, since this text appears in the nav tree
         clickLinkWithText(parent, countLinksWithText(parent) - 1);
         clickNavButton("Create Subfolder");
@@ -1142,7 +1142,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Deleting folder " + folderName + " under project " + project);
         clickLinkWithText(project);
         ensureAdminMode();
-        clickLinkWithText("Manage Folders");
+        clickLinkWithText("Folders");
         // click index 1, since this text appears in the nav tree as well as the folder management tree:
         clickLinkWithText(folderName, 1);
         clickNavButton("Delete");
@@ -1165,7 +1165,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickNavButton("Agree");
         }
 
-        clickLinkWithText("Manage Folders");
+        clickLinkWithText("Folders");
         clickNavButton("Delete");
         // in case there are sub-folders
         if (isNavButtonPresent("Delete All Folders"))
@@ -2601,8 +2601,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         else
         {
-            if (isLinkPresentWithText("Folder Permissions"))
-                clickLinkWithText("Folder Permissions");
+            if (!isElementPresent(Locator.permissionRendered()))
+                enterPermissionsUI();
             
             String role = toRole(permissionString);
             if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
@@ -2650,6 +2650,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             savePermissions();
             assertNoPermission(groupName, role);
         }
+    }
+
+    public void enterPermissionsUI()
+    {
+        //if the following assert triggers, you were already in the permissions UI when this was called
+        assertElementNotPresent(Locator.permissionRendered());
+        clickLinkWithText("Permissions");
+        waitForElement(Locator.permissionRendered(), 60000);
     }
 
     public void exitPermissionsUI()

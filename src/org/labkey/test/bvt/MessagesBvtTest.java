@@ -50,7 +50,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
     protected void permissionCheck(String permission, boolean readAbility)
     {
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         removePermission("Users","Reader");
         removePermission("Users","Author");
         removePermission("Users","Editor");
@@ -176,7 +176,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         assertTextPresent("2 responses");
 
         log("Create fake user for permissions check");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
@@ -256,7 +256,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         // USER1 is now a reader
         log("Test member list");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         removePermission("Users", "Editor");
         setPermissions("Users", "Reader");
         exitPermissionsUI();
@@ -270,7 +270,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
 
         // USER3 is a Project Administrator
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickManageGroup("Administrators");
         setFormElement("names", USER3);
         uncheckCheckbox("sendEmail");

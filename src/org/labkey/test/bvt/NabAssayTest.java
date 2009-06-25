@@ -172,7 +172,7 @@ public class NabAssayTest extends AbstractAssayTest
             // create user with read permissions to study and dataset, but no permissions to source assay
             clickLinkWithText(TEST_ASSAY_PRJ_NAB);
             clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
-            clickLinkWithText("Folder Permissions");
+            enterPermissionsUI();
             createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER);
             addUserToProjGroup(TEST_ASSAY_USR_NAB_READER, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER);
             setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);

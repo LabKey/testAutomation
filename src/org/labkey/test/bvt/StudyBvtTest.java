@@ -252,7 +252,7 @@ public class StudyBvtTest extends StudyTest
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickNavButton("Study Security");
 
         // enable advanced study security
@@ -361,7 +361,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
 
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickNavButton("Study Security");
 
         selectOptionByValue("securityString", "BASIC_WRITE");
@@ -559,7 +559,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText("My Study");
 
         // create a test group and give it container read perms
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
 
         createPermissionsGroup(TEST_GROUP);
 
@@ -569,13 +569,13 @@ public class StudyBvtTest extends StudyTest
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
 
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         setPermissions(TEST_GROUP, "Reader");
         clickNavButton("Save and Finish");
 
         // give the test group read access to only the DEM-1 dataset
         clickLinkWithText("My Study");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickNavButton("Study Security");
 
         // enable advanced study security
@@ -862,12 +862,12 @@ public class StudyBvtTest extends StudyTest
         //assertTextPresent(R_SCRIPT2_TEXT1);
 
         log("Test user permissions");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         setPermissions("Users", "Editor");
         exitPermissionsUI();
         impersonate(USER1);
@@ -897,7 +897,7 @@ public class StudyBvtTest extends StudyTest
         clickLinkWithText(getProjectName());
         if (isTextPresent("Enable Admin"))
             clickLinkWithText("Enable Admin");
-        clickLinkWithText("Folder Permissions");
+        enterPermissionsUI();
         setPermissions("Users", "Project Administrator");
         exitPermissionsUI();
 
