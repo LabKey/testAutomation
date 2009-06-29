@@ -346,8 +346,6 @@ public class StudyTest extends BaseSeleniumWebTest
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Page Size:All");
         assertTextNotPresent("DRT000XX-01");
-        // verify that we're correctly parsing frozen time, which is a date with a time portion only:
-        assertTextPresent("15:30:00");
         assertTextPresent("GAA082NH-01");
         clickLinkWithText("Hide Vial Info");
         assertTextPresent("Total:");
@@ -357,6 +355,8 @@ public class StudyTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Show Vial Info");
         clickLinkContainingText("history");
+        // verify that we're correctly parsing frozen time, which is a date with a time portion only:
+        assertTextPresent("15:30:00");
         assertTextPresent("2.0&nbsp;ML");
         assertTextNotPresent("Added Comments");
         // confirm collection location:
