@@ -265,7 +265,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         //test deleting via edit page
         clickLinkWithText("edit");
-        clickNavButton("Delete Page");
+        waitAndClickNavButton("Delete Page");
         clickNavButton("Delete");
         assertLinkPresentWithText("Home");
 
