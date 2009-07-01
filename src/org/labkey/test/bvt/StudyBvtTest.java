@@ -275,8 +275,8 @@ public class StudyBvtTest extends StudyTest
 
         pushLocation();
 
-        if (checkRSetup())
-            RReportTest();
+        checkRSetup();
+        RReportTest();
 
         popLocation();
 
@@ -698,9 +698,9 @@ public class StudyBvtTest extends StudyTest
                 }
             }
         }
-        log("Failed R configuration, skipping R tests");
-        //fail("R is not configured on this system. Failed R tests.");
+        //log("Failed R configuration, skipping R tests");
         log("Environment info: " + System.getenv());
+        fail("R is not configured on this system. Failed R tests.");
         return false;
     }
 
