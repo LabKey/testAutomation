@@ -99,6 +99,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("protocolDescription", "This is a test protocol for Verify.");
         selectOptionByText("sequenceDB", DATABASE);
         setFormElement("configureXml", "");
+        waitAndClick(Locator.xpath("//a[@class='labkey-button']/span[text() = 'OK']"));
         setFormElement("configureXml", INPUT_XML);
         submit();
         log("View the analysis log.");

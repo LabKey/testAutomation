@@ -342,6 +342,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         selenium.type("minimumProbability", "");
         clickNavButton("Search");
         assertTextNotPresent(SEARCH_FIND);
+        assertTextNotPresent(SEARCH_FIND_ALT);
         assertTextPresent("No data to show");
     }
 

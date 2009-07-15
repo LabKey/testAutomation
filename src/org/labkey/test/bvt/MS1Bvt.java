@@ -414,11 +414,22 @@ public class MS1Bvt extends BaseSeleniumWebTest
         assertTextPresent("1585");
 
         //ensure filtering and sorting are still in effect
-        assertTextNotPresent("43");
+        assertTextNotPresent("5,972.8930");
         assertTextBefore("66,204.2900", "49,012.0600");
         
         popLocation();
 
+        //test printing
+        pushLocation();
+        addUrlParameter("exportType=printRows&exportRegion=fv");
+        assertTextPresent("Scan");
+        assertTextPresent("1948");
+        assertTextPresent("1585");
+
+        //ensure filtering and sorting are still in effect
+        assertTextNotPresent("5,972.8930");
+        assertTextBefore("66,204.2900", "49,012.0600");
+        popLocation();
 
         //filter to just a single scan with peak data so we can test the other views
         setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");

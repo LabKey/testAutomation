@@ -69,6 +69,29 @@ public class SecurityTest extends BaseSeleniumWebTest
         clonePermissionsTest();
         tokenAuthenticationTest();
         impersonationTest();
+        guestTest();
+    }
+
+    private void guestTest()
+    {
+        clickLinkWithText(PROJECT_NAME);
+        enterPermissionsUI();
+        setSiteGroupPermissions("All Site Users", "Author");
+        setSiteGroupPermissions("Guests", "Reader");
+        exitPermissionsUI();
+
+        addWebPart("Messages");
+        assertLinkPresentWithText("new message");
+        signOut();
+        clickLinkWithText(PROJECT_NAME);
+        assertLinkNotPresentWithText("new message");
+        signIn();
+        clickLinkWithText(PROJECT_NAME);
+        assertLinkPresentWithText("new message");
+        impersonate(NORMAL_USER);
+        clickLinkWithText(PROJECT_NAME);
+        assertLinkPresentWithText("new message");
+        stopImpersonating();
     }
 
     private void displayNameTest()
