@@ -400,6 +400,7 @@ public class ListTest extends BaseSeleniumWebTest
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
 
+        doRenameFieldsTest();
         doUploadTest();
     }
 
@@ -419,6 +420,25 @@ public class ListTest extends BaseSeleniumWebTest
         ListHelper.createListFromFile(this, PROJECT_NAME, "Fruits from a TSV", tsvFile);
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
+    }
 
+    private void doRenameFieldsTest()
+    {
+        log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
+        ListHelper.createList(this, PROJECT_NAME, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
+        assertTextPresent("BarBar");
+        clickLinkWithText("edit fields");
+        setFormElement(Locator.id("ff_name0"), "FooFoo");
+        clickNavButton("Save");
+        assertTextPresent("FooFoo");
+        assertTextNotPresent("BarBar");
+        clickLinkWithText("edit fields");
+        waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+        clickNavButton("Add Field", 0);
+        setFormElement(Locator.id("ff_name1"), "BarBar");
+        clickNavButton("Save");
+        assertTextPresent("FooFoo");
+        assertTextPresent("BarBar");
+        assertTextBefore("FooFoo", "BarBar");
     }
 }

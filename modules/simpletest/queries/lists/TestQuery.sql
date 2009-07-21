@@ -13,4 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-select People.Name, People.Age from People where People.Crazy='1'
+select People.Name, People.Age from People where People.Crazy=CONVERT(1, BIT)
