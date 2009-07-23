@@ -39,6 +39,10 @@
     <property name="test.compile.deprecation" value="false"/>
     <property name="test.compile.optimize" value="true"/>
 
+    <property file="${project.root}/server/version.properties" />
+    <property name="version" value="${product.version}"/>
+
+
     <target name="usage">
         <echo message="Valid Test Targets:" />
         <echo message="drt                run developer regression tests (short suite)" />
@@ -126,7 +130,7 @@
             <include name="commons-logging-1.1.jar" />
         </fileset>
         <fileset dir="${javaclientjar.dir}">
-            <include name="*.jar"/>
+            <include name="labkey-remote-api-${product.version}.jar"/>
         </fileset>
         <fileset dir="${javaclientlib.dir}">
             <include name="*.jar"/>
