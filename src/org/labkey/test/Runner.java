@@ -299,7 +299,7 @@ public class Runner extends TestSuite
                 Arrays.sort(sortedTests, new Comparator<Class>(){
                     public int compare(Class c1, Class c2)
                     {
-                        return c1.getName().compareTo(c2.getName());
+                        return c1.getSimpleName().compareTo(c2.getSimpleName());
                     }
                 });
 
