@@ -369,6 +369,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         log("Testing customize view...");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         removeCustomizeViewColumn("Related Peptide");
+        removeCustomizeViewColumn("Related Peptide Fraction Run Description");
         addCustomizeViewColumn("KL");
         clickNavButton("Save");
 
