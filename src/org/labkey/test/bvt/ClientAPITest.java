@@ -3,6 +3,8 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Copyright (c) 2008-2009 LabKey Corporation
@@ -290,6 +292,25 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "</script>\n" +
             "<div id=\"" + TEST_DIV_NAME + "\" />";
 
+    private static final String EMAIL_SRC_TEMPLATE =
+            "function errorHandler(errorInfo, options, responseObj)\n" +
+            "{\n" +
+            "   document.getElementById('" + TEST_DIV_NAME + "').innerHTML = 'failure';\n" +
+            "}\n" +
+            "\n" +
+            "function onSuccess(result)\n" +
+            "{\n" +
+            "   document.getElementById('" + TEST_DIV_NAME + "').innerHTML = 'success';\n" +
+            "}\n" +
+            "LABKEY.Message.sendMessage({\n" +
+            "   msgFrom: '%s',\n" +
+            "   msgSubject: '%s',\n" +
+            "   msgRecipients: [%s],\n" +
+            "   msgContent: [%s],\n" +
+            "   successCallback: onSuccess,\n" +
+            "   errorCallback: errorHandler,\n" +
+            "});";
+
     protected String getFullSource(String testFragment)
     {
         return SRC_PREFIX + "\n" + testFragment + "\n" + SRC_SUFFIX;
@@ -302,6 +323,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
+        for (String user : EMAIL_RECIPIENTS)
+            deleteUser(user);
+
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
@@ -328,6 +352,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         domainTest();
 
+        emailApiTest();
+        
         //clear the test page so the crawler doesn't refetch a test and cause errors
         clearTestPage("Test Complete.");
     }
@@ -673,5 +699,89 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertElementContains(loc, "SUCCESS: bad query generated exception: Failed to convert property value of type");
         assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
         clearTestPage("Query portion of test page complete");
+    }
+
+    private static final String EMAIL_SUBJECT = "Testing the email API";
+    private static final String EMAIL_SUBJECT_1 = "Testing the email API (all params)";
+    private static final String EMAIL_SUBJECT_2 = "Testing the email API (plain txt body)";
+    private static final String EMAIL_SUBJECT_3 = "Testing the email API (html txt body)";
+    private static final String EMAIL_BODY_PLAIN = "This is a test message.";
+    private static final String EMAIL_BODY_HTML = "<h2>This is a test message.</h2>";
+    private static final String[] EMAIL_RECIPIENTS = {"user1@emailtest.com", "user2@emailtest.com", "user3@emailtest.com"};
+
+    private void emailApiTest()
+    {
+        // create the users for this test
+        for (String user : EMAIL_RECIPIENTS)
+            createUser(user, null);
+
+        enableModule(PROJECT_NAME, "Dumbster");
+        addWebPart("Mail Record");
+        checkCheckbox("emailRecordOn");
+        assertTextPresent("Mail Record");
+
+        // test failure cases: no from email
+        setSource(createEmailSource("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertTextPresent("failure");
+
+        // no recipients
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertTextPresent("failure");
+
+        // no message body
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null));
+        assertTextPresent("failure");
+
+        // user not in system
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@testEmail.com"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertTextPresent("failure");
+
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertTextPresent("success");
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null));
+        assertTextPresent("success");
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+        assertTextPresent("success");
+        setSource(createEmailSource(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+        assertTextPresent("success");
+
+        clickLinkWithText(PROJECT_NAME);
+
+        assertTextPresent(EMAIL_SUBJECT_1);
+        assertTextPresent(EMAIL_SUBJECT_2);
+        assertTextPresent(EMAIL_SUBJECT_3);
+
+        // clear mail record messages
+        uncheckCheckbox("emailRecordOn");
+        checkCheckbox("emailRecordOn");
+        uncheckCheckbox("emailRecordOn");
+    }
+
+    private String createEmailSource(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody)
+    {
+        StringBuilder recipientStr = new StringBuilder();
+        StringBuilder contentStr = new StringBuilder();
+
+        for (String email : recipients)
+        {
+            recipientStr.append("LABKEY.Message.createRecipient(LABKEY.Message.recipientType.to, '");
+            recipientStr.append(email);
+            recipientStr.append("'),");
+        }
+
+        if (plainTxtBody != null)
+        {
+            contentStr.append("LABKEY.Message.createMsgContent(LABKEY.Message.msgType.plain, '");
+            contentStr.append(plainTxtBody);
+            contentStr.append("'),");
+        }
+
+        if (htmlTxtBody != null)
+        {
+            contentStr.append("LABKEY.Message.createMsgContent(LABKEY.Message.msgType.html, '");
+            contentStr.append(htmlTxtBody);
+            contentStr.append("'),");
+        }
+        return String.format(EMAIL_SRC_TEMPLATE, from, StringUtils.trimToEmpty(subject), recipientStr.toString(), contentStr.toString());
     }
 }

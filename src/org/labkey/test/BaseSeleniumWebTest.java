@@ -2710,7 +2710,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Add Users");
 
         if (verifySuccess)
-            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the sytem, but no email was sent."));
+            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system, but no email was sent."));
     }
 
     public void createSiteDeveloper(String userEmail)
