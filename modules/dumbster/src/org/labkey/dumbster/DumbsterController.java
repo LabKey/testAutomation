@@ -17,17 +17,18 @@
 package org.labkey.dumbster;
 
 import org.apache.log4j.Logger;
-import org.labkey.api.action.ApiAction;
-import org.labkey.api.action.ApiResponse;
-import org.labkey.api.action.SpringActionController;
-import org.labkey.api.action.ApiSimpleResponse;
+import org.labkey.api.action.*;
 import org.labkey.api.security.ACL;
 import org.labkey.api.security.RequiresPermission;
+import org.labkey.api.security.RequiresPermissionClass;
+import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.settings.WriteableAppProps;
+import org.labkey.api.view.NavTree;
 import org.labkey.api.view.template.PageConfig;
 import org.labkey.dumbster.model.DumbsterManager;
 import org.springframework.validation.BindException;
+import org.springframework.web.servlet.ModelAndView;
 
 
 /**
@@ -48,6 +49,20 @@ public class DumbsterController extends SpringActionController
     public PageConfig defaultPageConfig()
     {
         return new PageConfig();
+    }
+
+    @RequiresPermissionClass(ReadPermission.class)
+    public class BeginAction extends SimpleViewAction
+    {
+        public ModelAndView getView(Object o, BindException errors) throws Exception
+        {
+            return null;
+        }
+
+        public NavTree appendNavTrail(NavTree root)
+        {
+            return null;
+        }
     }
 
     @RequiresPermission(ACL.PERM_ADMIN)
