@@ -135,8 +135,7 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Import", 0);
         waitForElement(Locator.xpath("//input[@id='ff_label3']"), WAIT_FOR_GWT);
 
-        click(Locator.xpath("//span[@id='button_dataField']"));
-        selenium.select("list_dataField", "label=Sample Id");
+        clickRadioButtonById("button_dataField");
 
         clickNavButton("Save");
         waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_GWT);
