@@ -16,17 +16,16 @@
 
 package org.labkey.test.drt;
 
+import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.*;
-import java.util.Set;
 import java.util.Arrays;
 import java.util.HashSet;
-
-import com.thoughtworks.selenium.SeleniumException;
+import java.util.Set;
 
 /**
  * User: brittp
@@ -35,7 +34,6 @@ import com.thoughtworks.selenium.SeleniumException;
  */
 public class StudyTest extends BaseSeleniumWebTest
 {
-    protected final String STUDY_LABEL = "Study 001";
     protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
 
     private final String CRF_SCHEMAS = getSampleDataPath() + "schema.tsv";
@@ -51,6 +49,11 @@ public class StudyTest extends BaseSeleniumWebTest
     protected String getProjectName()
     {
         return "StudyVerifyProject";
+    }
+
+    protected String getStudyLabel()
+    {
+        return "Study 001";
     }
 
     protected String getFolderName()
@@ -90,72 +93,6 @@ public class StudyTest extends BaseSeleniumWebTest
         }
     }
 
-    protected static final String GRID_VIEW = "create_gridView";
-    protected static final String CROSSTAB_VIEW = "create_crosstabView";
-    protected static final String R_VIEW = "create_rView";
-
-    protected void createReport(String reportType)
-    {
-        // click the create button dropdown
-        String id = ExtHelper.getExtElementId(this, "btn_createView");
-        click(Locator.id(id));
-
-        id = ExtHelper.getExtElementId(this, reportType);
-        click(Locator.id(id));
-        waitForPageToLoad();
-    }
-
-   protected void deleteReport(String reportName)
-    {
-        clickLinkWithText("Manage Views");
-        final Locator report = Locator.tagContainingText("div", reportName);
-
-        // select the report and click the delete button
-        waitForElement(report, 10000);
-        selenium.mouseDown(report.toString());
-
-        String id = ExtHelper.getExtElementId(this, "btn_deleteView");
-        click(Locator.id(id));
-
-        ExtHelper.waitForExtDialog(this, 5000);
-
-        String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
-        click(Locator.id(btnId));
-
-        // make sure the report is deleted
-        waitFor(new Checker() {
-            public boolean check()
-            {
-                return !isElementPresent(report);
-            }
-        }, "Failed to delete report: " + reportName, 5000);
-    }
-
-    protected void clickReportGridLink(String reportName, String linkText)
-    {
-        clickLinkWithText("Manage Views");
-        final Locator report = Locator.tagContainingText("div", reportName);
-
-        waitForElement(report, 10000);
-
-        // click the row to expand it
-        //Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//div[contains(@class, 'x-grid3-row-expander')]");
-        Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']");
-        selenium.click(expander.toString());
-
-        final Locator link = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//..//td//a[contains(text(),'" + linkText + "')]");
-
-        // make sure the row has expanded
-        waitFor(new Checker() {
-            public boolean check()
-            {
-                return isElementPresent(link);
-            }
-        }, "Unable to click the link: " + linkText + " for report: " + reportName, 5000);
-
-        clickAndWait(link);
-    }
-
     protected void doCreateSteps()
     {
         createStudy();
@@ -169,92 +106,14 @@ public class StudyTest extends BaseSeleniumWebTest
     {
         doCreateSteps();
 
-        // verify reports
-/*
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
-        clickLinkWithText("Manage Reports and Views");
-        clickLinkWithText("new enrollment view");
-        selectOptionByText("datasetId", "1: DEM-1: Demographics");
-        waitForPageToLoad();
-        URL lastPageURL = getLastPageURL();
-        //selenium.open(lastPageURL + "?datasetId=1");
-        selectOptionByText("sequenceNum", "Screening");
-//        selectOption("propertyId", "Initial Specimen Coll Dt");
-        clickNavButton("Submit");
-        assertImagePresentWithSrc("timePlot.view?reportId=", true);
-
-        clickLinkWithText(STUDY_LABEL);
-*/
-
         verifyDemographics();
         verifyVisitMapPage();
         verifyManageDatasetsPage();
         verifyHiddenVisits();
         verifyCohorts();
 
-        clickLinkWithText("Dataset: DEM-1: Demographics, All Visits");
-
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", "Views:Create:Crosstab View");
-        selectOptionByValue("rowField",  "DEMsex");
-        selectOptionByValue("colField", "DEMsexor");
-        selectOptionByValue("statField", "SequenceNum");
-        clickNavButton("Submit");
-
-        String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
-        assertTableRowsEqual("report", 3, new String[][] {row3});
-
-        setFormElement("label", "TestReport");
-        selectOptionByText("showWithDataset", "DEM-1: Demographics");
-        clickNavButton("Save");
-
-        clickLinkWithText(STUDY_LABEL);
-        assertTextPresent("TestReport");
-        clickLinkWithText("TestReport");
-
-        assertTableCellTextEquals("report", 2, 0, "Female");
-
-        //Delete the report
-        clickLinkWithText(STUDY_LABEL);
-        clickLinkWithText("Manage Study");
-        deleteReport("TestReport");
-
-        // create new grid view report:
-        String viewName = "DRT Eligibility Query";
-        createReport(GRID_VIEW);
-        setFormElement("label", viewName);
-        selectOptionByText("params", "ECI-1: Eligibility Criteria");
-        clickNavButton("Create View");
-        assertLinkPresentWithText("999320016");
-        //Not sure what we are lookgin for here
-        //assertTextPresent("urn:lsid");
-        assertNavButtonNotPresent("go");
-        clickLinkWithText(STUDY_LABEL);
-        clickLinkWithText("Manage Study");
-        deleteReport(viewName);
-
-        // create new external report
-        clickLinkWithText(STUDY_LABEL);
-        clickLinkWithText("DEM-1: Demographics");
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", "Views:Create:Advanced View");
-        selectOptionByText("queryName", "DEM-1: Demographics");
-        String java = System.getProperty("java.home") + "/bin/java";
-        setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
-        clickNavButton("Submit");
-        assertTextPresent("Female");
-        setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
-        selectOptionByValue("fileExtension", "tsv");
-        clickNavButton("Submit");
-        assertTextPresent("Female");
-        setFormElement("label", "tsv");
-        selectOptionByText("showWithDataset", "DEM-1: Demographics");
-        clickNavButton("Save");
-        clickLinkWithText(STUDY_LABEL);
-        clickLinkWithText("tsv");
-        assertTextPresent("Female");
-
         // test custom assays
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "verifyAssay");
@@ -303,7 +162,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("1.2");
 
         // configure QC state management before our second upload
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage QC States");
         setFormElement("newLabel", "unknown QC");
@@ -316,7 +175,7 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Save");
 
         // return to dataset import page
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("verifyAssay");
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
@@ -341,8 +200,8 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("unknown QC");
 
         // upload specimen data and verify import
-        importSpecimenArchive(new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), STUDY_LABEL, 1);
-        clickLinkWithText(STUDY_LABEL);
+        importSpecimenArchive(new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 1);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Page Size:All");
         assertTextNotPresent("DRT000XX-01");
@@ -388,7 +247,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     private void verifyDemographics()
     {
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Study Navigator");
         clickLinkWithText("24");
         assertTextPresent("This is the demographics dataset, dammit");
@@ -398,9 +257,9 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("right deltoid");
     }
 
-    private void verifyVisitMapPage()
+    protected void verifyVisitMapPage()
     {
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Visits");
 
@@ -439,7 +298,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertSelectOption("dataSetStatus", 8, "REQUIRED");
     }
 
-    private void verifyManageDatasetsPage()
+    protected void verifyManageDatasetsPage()
     {
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
@@ -464,7 +323,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     private void verifyHiddenVisits()
     {
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Study Navigator");
         assertTextNotPresent("Screening Cycle");
         assertTextNotPresent("Cycle 1");
@@ -477,7 +336,7 @@ public class StudyTest extends BaseSeleniumWebTest
 
     private void verifyCohorts()
     {
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Study Navigator");
         clickLinkWithText("24");
 
@@ -519,9 +378,9 @@ public class StudyTest extends BaseSeleniumWebTest
 
         // change study label
         clickLinkWithText("Change Label");
-        setFormElement("label", STUDY_LABEL);
+        setFormElement("label", getStudyLabel());
         clickNavButton("Update");
-        assertTextPresent(STUDY_LABEL);
+        assertTextPresent(getStudyLabel());
 
         // import visit map
         clickLinkWithText("Manage Visits");
@@ -550,14 +409,14 @@ public class StudyTest extends BaseSeleniumWebTest
         clickNavButton("Update Assignments");
 
         // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickNavButton("Save");
 
         // upload data:
-        clickLinkWithText(STUDY_LABEL);
+        clickLinkWithText(getStudyLabel());
         clickLinkWithText("Data Pipeline");
         clickNavButton("Setup");
         setFormElement("path", getPipelinePath());
@@ -648,7 +507,8 @@ public class StudyTest extends BaseSeleniumWebTest
 
     protected void initializeFolder()
     {
-        createProject(getProjectName());
+        if (!isLinkPresentWithText(getProjectName()))
+            createProject(getProjectName());
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 
@@ -756,5 +616,16 @@ public class StudyTest extends BaseSeleniumWebTest
     protected void assertSelectOption(String name, int i, String expected)
     {
         assertEquals(selenium.getSelectedValue(Locator.tagWithName("select", name).index(i).toString()), expected);
+    }
+
+    protected void createReport(String reportType)
+    {
+        // click the create button dropdown
+        String id = ExtHelper.getExtElementId(this, "btn_createView");
+        click(Locator.id(id));
+
+        id = ExtHelper.getExtElementId(this, reportType);
+        click(Locator.id(id));
+        waitForPageToLoad();
     }
 }

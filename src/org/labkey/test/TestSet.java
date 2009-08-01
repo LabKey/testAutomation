@@ -78,7 +78,9 @@ public enum TestSet
         SimpleModuleTest.class,
         JavaClientApiTest.class,
         ProgrammaticQCTest.class,
-        MenuBarTest.class
+        MenuBarTest.class,
+        ReportTest.class,
+        QuerySnapshotTest.class            
     }),
 
     MS2(new Class[]
@@ -128,7 +130,9 @@ public enum TestSet
             StudyBvtTest.class,
             StudyExtraTest.class,
             AssayTest.class,
-            StudyImportTest.class
+            //StudyImportTest.class,
+            ReportTest.class,
+            QuerySnapshotTest.class
     }),
 
     Data(new Class[] {
