@@ -629,9 +629,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         // These should all redirect to the upgrade page
         goToHome();
         assertTextPresent(assertText);
-        beginAt("/nab/home/begin.view");  // A Beehive action
+        beginAt("/nab/home/begin.view");  // A Spring action
         assertTextPresent(assertText);
-        beginAt("/test/begin.view");      // A Spring action
+        beginAt("/test/begin.view");      // Another Spring action
         assertTextPresent(assertText);
         beginAt("/test/permNone.view");   // A Spring action with no permissions
         assertTextPresent(assertText);
