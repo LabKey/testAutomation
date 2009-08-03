@@ -92,7 +92,8 @@ public enum TestSet
 
     Daily(new Class[]
     {
-        UniprotAnnotationTest.class
+        HTTPApiTest.class
+        //UniprotAnnotationTest.class
     }),
 
     Cluster(new Class[]

@@ -573,6 +573,13 @@
         </antcall>
     </target>
 
+    <target name="daily" description="run daily verification tests">
+        <property name="suite" value="Daily"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <property name="linkCheck" value="true"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
     <target name="test" description="runs UI for selecting and running specific tests">
         <property name="suite" value="TEST"/>
         <property name="debug.suspend.selenium" value="n"/>
