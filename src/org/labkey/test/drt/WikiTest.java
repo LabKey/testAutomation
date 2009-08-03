@@ -104,8 +104,8 @@ public class WikiTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE_ALTTITLE);
 
         log("test delete wiki");
-        clickLinkWithText("manage", 0);
-        clickNavButton("Delete Page");
+        clickLinkWithText("edit", 0);
+        waitAndClickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
     }

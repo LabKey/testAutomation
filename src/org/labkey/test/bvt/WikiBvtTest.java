@@ -278,8 +278,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         assertTextPresent(HEADER_CONTENT);
         clickLinkWithText("Header");
-        clickLinkWithText("manage", 0);
-        clickNavButton("Delete Page");
+        clickLinkWithText("edit", 0);
+        waitAndClickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent(HEADER_CONTENT);
 
@@ -320,8 +320,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickTab("Wiki");
         clickLinkWithText("Terms of Use");
         searchFor(PROJECT_NAME, "fight club", 1, "Terms of Use");
-        clickLinkWithText("manage");
-        clickNavButton("Delete Page");
+        clickLinkWithText("edit");
+        waitAndClickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent("Terms of Use");
 
@@ -484,8 +484,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("test delete");
         clickLinkWithText(WIKI_PAGE2_TITLE);
-        clickLinkWithText("manage", 0);
-        clickNavButton("Delete Page");
+        clickLinkWithText("edit", 0);
+        waitAndClickNavButton("Delete Page");
         clickNavButton("Delete");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         //add once bug with caching wiki title is fixed
