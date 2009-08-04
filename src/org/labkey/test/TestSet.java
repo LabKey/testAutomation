@@ -35,52 +35,38 @@ public enum TestSet
         BasicTest.class,
         JUnitTest.class,
         SecurityTest.class,
-        ExpTest.class,
         FlowTest.class,
         XTandemTest.class,
         WikiTest.class,
         StudyTest.class
     }),
 
-    BVT(DRT, new Class[] {
-        MessagesTest.class,
-        NabOldTest.class,
-        IssuesTest.class,
+    BVT(new Class[] {
+        BasicTest.class,
+        JUnitTest.class,
+        SecurityTest.class,
+        ExpTest.class,
+        FlowTest.class,
+        XTandemTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
         AssayTest.class,
-        LuminexTest.class,
         NabAssayTest.class,
-        ListTest.class,
         StudyBvtTest.class,
         StudyExtraTest.class,
-        UserBvtTest.class,
         UserPermissionsTest.class,
         SpecimenTest.class,
         SampleSetTest.class,
-        MS2BvtTest.class,
-        MS1Bvt.class,
         PipelineBvtTest.class,
-        CaBigTest.class,
         FileContentTest.class,
         DataRegionTest.class,
         ClientAPITest.class,
-        WikiBvtTest.class,
-        MessagesBvtTest.class,
         AuditLogTest.class,
-        MicroarrayTest.class,
-        HTTPApiTest.class,
-        TimelineTest.class,
         FieldValidatorTest.class,
-        DbUserSchemaTest.class,
         MissingValueIndicatorsTest.class,
         ModuleAssayTest.class,
-        SimpleModuleTest.class,
-        JavaClientApiTest.class,
         ProgrammaticQCTest.class,
-        MenuBarTest.class,
-        ReportTest.class,
-        QuerySnapshotTest.class            
+        ReportTest.class
     }),
 
     MS2(new Class[]
@@ -92,8 +78,26 @@ public enum TestSet
 
     Daily(new Class[]
     {
-        HTTPApiTest.class
-        //UniprotAnnotationTest.class
+        //UniprotAnnotationTest.class, //requires bootstrap
+        HTTPApiTest.class,
+        MessagesBvtTest.class, //do we need both MessagesTest and MessagesBvtTest?
+        MessagesTest.class,
+        MS2BvtTest.class,
+        WikiBvtTest.class,
+        MS1Bvt.class,
+        ListTest.class,
+        UserBvtTest.class,
+        IssuesTest.class,
+        NabOldTest.class,
+        MicroarrayTest.class,
+        CaBigTest.class,
+        TimelineTest.class,
+        DbUserSchemaTest.class,
+        MenuBarTest.class,
+        LuminexTest.class,
+        SimpleModuleTest.class,
+        JavaClientApiTest.class,
+        QuerySnapshotTest.class
     }),
 
     Cluster(new Class[]
