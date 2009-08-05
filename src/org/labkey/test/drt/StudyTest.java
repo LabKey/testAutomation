@@ -179,6 +179,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
         clickMenuButton("QC State", "QCState:All data");
+        clickButton("QC State", 0);
         assertTextPresent("unknown QC");
         assertTextPresent("1234_B");
 
@@ -253,6 +254,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("Male");
         assertTextPresent("African American or Black");
         clickLinkWithText("999320016");
+        clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
         assertTextPresent("right deltoid");
     }
 
@@ -356,6 +358,7 @@ public class StudyTest extends BaseSeleniumWebTest
         // verify that the participant view respects the cohort filter:
         setSort("Dataset", "ParticipantId", SortDirection.ASC);
         clickLinkWithText("999320518");
+        clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
         clickLinkWithText("Next Participant >");

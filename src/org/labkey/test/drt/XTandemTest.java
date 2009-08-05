@@ -129,16 +129,19 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         selenium.click("exactMatch");
         clickNavButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
+        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
         selenium.type("minimumProbability", "2.0");
         clickNavButton("Search");
+        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
         selenium.type("identifier", "GarbageProteinName");
         selenium.type("minimumProbability", "");
         clickNavButton("Search");
+        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(!(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT)));
         assertTextNotPresent(SEARCH_FIND);
         assertTextPresent("No data to show");
