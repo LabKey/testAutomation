@@ -99,8 +99,7 @@ public enum TestSet
         LuminexTest.class,
         SimpleModuleTest.class,
         JavaClientApiTest.class,
-        QuerySnapshotTest.class,
-        SCHARPStudyTest.class
+        QuerySnapshotTest.class
     }),
 
     Cluster(new Class[]
