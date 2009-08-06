@@ -88,6 +88,7 @@ src/org/labkey/test/bvt/UserPermissionsTest.java -text
 src/org/labkey/test/bvt/WikiBvtTest.java -text
 src/org/labkey/test/daily/FlowImportTest.java -text
 src/org/labkey/test/daily/IDRIParticleSizeTest.java -text
+src/org/labkey/test/daily/SCHARPStudyTest.java -text
 src/org/labkey/test/daily/UniprotAnnotationTest.java -text
 src/org/labkey/test/drt/BasicTest.java -text
 src/org/labkey/test/drt/ExpTest.java -text
