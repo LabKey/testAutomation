@@ -138,7 +138,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickMenuButton("Import MAGE-ML", "Import MAGE-ML:Use " + ASSAY_NAME);
         setFormElement("batchStringField", "BulkProperties");
         
-        assertTextPresent("BulkProperties");
+        assertFormElementEquals("batchStringField", "BulkProperties");
         checkRadioButton("__enableBulkProperties", "on");
         // Try with an invalid sample name first
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
