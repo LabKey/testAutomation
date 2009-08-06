@@ -1693,11 +1693,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.mouseOver(l.toString());
     }
 
+    public void mouseDownAt(Locator l, int x, int y)
+    {
+        selenium.mouseDownAt(l.toString(), x + "," + y);
+    }
+
     public void clickTab(String tabname)
     {
         log("Selecting tab " + tabname);
         assertLinkPresent(getTabLinkId(tabname));
         clickLink(getTabLinkId(tabname));
+    }
+
+    public void clickExtTab(String tabname)
+    {
+        log("Selecting Ext tab " + tabname);
+        mouseDownAt(Locator.xpath("//span[@class = 'x-tab-strip-text' and text() = '" + tabname + "']"), 0, 0);
     }
 
     public void clickImageWithAltText(String altText)
