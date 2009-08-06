@@ -233,7 +233,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
         setFormElement("ff_data", TEST_DATA_TWO_COLUMN_LIST);
         submit();
-        validateTwoColumnData();
+        validateTwoColumnData("query", "name");
     }
 
     private void deleteListData()
@@ -300,7 +300,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
         setFormElement("tsv", TEST_DATA_TWO_COLUMN_DATASET);
         submit();
-        validateTwoColumnData();
+        validateTwoColumnData("Dataset", "ParticipantId");
     }
 
     private void validateSingleColumnData()
@@ -317,7 +317,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         assertTextPresent("17");
     }
 
-    private void validateTwoColumnData()
+    private void validateTwoColumnData(String dataRegionName, String columnName)
     {
         assertNoLabkeyErrors();
         assertMvIndicatorPresent();
@@ -329,7 +329,14 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         assertTextPresent("male");
         assertTextPresent("female");
         assertTextPresent("50");
-        assertTextPresent("25");
+        assertTextNotPresent("'25'");
+        setFilter(dataRegionName, columnName, "Equals", "Zoe");
+        assertTextNotPresent("'25'");
+        assertTextPresent("Zoe");
+        assertTextPresent("female");
+        assertMvIndicatorPresent();
+        selenium.click("//img[@class='labkey-mv-indicator']/../../a");
+        assertTextPresent("'25'");
     }
 
     private void checkAssay()
@@ -377,7 +384,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         clickNavButton("Save and Finish");
         assertNoLabkeyErrors();
         clickLinkWithText(ASSAY_RUN_TWO_COLUMN);
-        validateTwoColumnData();
+        validateTwoColumnData("MVAssay Data", "Properties/ParticipantID");
 
         log("Copy to study");
         clickLinkWithText(PROJECT_NAME);
@@ -437,7 +444,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
             clickNavButton("Save and Finish");
             assertNoLabkeyErrors();
             clickLinkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN);
-            validateTwoColumnData();
+            validateTwoColumnData("MVAssay Data", "Properties/ParticipantID");
         }
     }
 
