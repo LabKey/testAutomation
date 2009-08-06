@@ -484,7 +484,7 @@
     <target name="stopSeleniumServer" depends="init-selenium">
         <echo message="Stopping selenium server." />
         <condition property="selenium.server.shut.down">
-            <http url="http://localhost:${sysprop.selenium.server.port}/selenium-server/driver/?cmd=shutDown"/>
+            <http url="http://localhost:${sysprop.selenium.server.port}/selenium-server/driver/?cmd=shutDownSeleniumServer"/>
         </condition>
     </target>
 
