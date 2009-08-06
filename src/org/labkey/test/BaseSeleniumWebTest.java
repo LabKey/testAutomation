@@ -882,16 +882,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
         String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
-
+        
+        File screenFile = new File(dir, baseName + ".png");
         try
         {
-            File screenFile = new File(dir, baseName + ".png");
             selenium.captureEntirePageScreenshot(screenFile.getAbsolutePath(), "");
         }
         catch (SeleniumException se)
         {
-            // too bad
-            log("Failed to take screenshot: " + se.getMessage());
+            // too bad.
+            log("Failed to take screenshot using selenium.captureEntirePageScreenshot: " + se.getMessage());
+
+            try
+            {
+                selenium.captureScreenshot(screenFile.getAbsolutePath());
+            }
+            catch (SeleniumException se2)
+            {
+                // so sad.
+                log("Failed to take screenshot using selenium.captureScreenshot: " + se2.getMessage());
+            }
         }
 
         FileWriter writer = null;
