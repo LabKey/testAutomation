@@ -19,7 +19,6 @@ package org.labkey.test;
 import org.labkey.test.bvt.*;
 import org.labkey.test.daily.FlowImportTest;
 import org.labkey.test.daily.IDRIParticleSizeTest;
-import org.labkey.test.daily.UniprotAnnotationTest;
 import org.labkey.test.drt.*;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
