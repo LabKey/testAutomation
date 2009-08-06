@@ -895,6 +895,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             try
             {
+                selenium.windowFocus();
+                selenium.windowMaximize();
                 selenium.captureScreenshot(screenFile.getAbsolutePath());
             }
             catch (SeleniumException se2)
