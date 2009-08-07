@@ -772,6 +772,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             try
             {
                 populateLastPageInfo();
+                dump();
             }
             catch (Throwable t)
             {
@@ -878,15 +879,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-    public File dumpHtml(File dir)
+    public void dump()
     {
         FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
         String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
-        
+
+        File dumpDir = Runner.getDumpDir();
+        dumpScreen(dumpDir, baseName);
+        dumpHtml(dumpDir, baseName);
+    }
+
+    public File dumpScreen(File dir, String baseName)
+    {
         File screenFile = new File(dir, baseName + ".png");
         try
         {
             selenium.captureEntirePageScreenshot(screenFile.getAbsolutePath(), "");
+            return screenFile;
         }
         catch (SeleniumException se)
         {
@@ -898,6 +907,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 selenium.windowFocus();
                 selenium.windowMaximize();
                 selenium.captureScreenshot(screenFile.getAbsolutePath());
+                return screenFile;
             }
             catch (SeleniumException se2)
             {
@@ -906,6 +916,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
         }
 
+        return null;
+    }
+
+    public File dumpHtml(File dir, String baseName)
+    {
         FileWriter writer = null;
         try
         {

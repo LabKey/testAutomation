@@ -29,7 +29,6 @@ import java.util.List;
  */
 public interface WebTest
 {
-    File dumpHtml(File failureDumpDir);
     String getResponseText();
     int getResponseCode();
     void beginAt(String url);
