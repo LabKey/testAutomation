@@ -363,7 +363,7 @@
         <antcall target="stopSeleniumServer" />
     </target>
 
-    <target name="runsuite-selenium-tomcat" depends="init-selenium,compile,ensurePassword,deploy-test-modules,set-user-props">
+    <target name="runsuite-selenium-tomcat" depends="stopSeleniumServer,compile,ensurePassword,deploy-test-modules,set-user-props">
         <fail unless="tomcat.home" />
         <echo message="Deleting log files from ${tomcat.home}/logs"/>
         <delete failonerror="false" dir="${tomcat.home}/logs" />
@@ -434,8 +434,10 @@
         <echo message="Starting selenium server on local server, port ${sysprop.selenium.server.port}."/>
         <echo message="Server will stop after successful tests."/>
         <echo message="Or use ant stopSeleniumServer to stop manually."/>
+        <echo message="Setting selenium server's PATH to: ${env.FIREFOX_HOME}:${env.PATH}" level="verbose"/>
         <java spawn="true" fork="true" classname="org.openqa.selenium.server.SeleniumServer">
             <classpath refid="test.lib.classpath" />
+            <env key="PATH" path="${env.FIREFOX_HOME}:${env.PATH}"/>
             <arg value="-port" />
             <arg value="${sysprop.selenium.server.port}" />
             <arg value="-Dcaching=true"/>
