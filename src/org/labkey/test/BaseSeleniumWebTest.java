@@ -772,7 +772,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             try
             {
                 populateLastPageInfo();
-                dump();
+                if (_testFailed)
+                    dump();
             }
             catch (Throwable t)
             {
