@@ -233,7 +233,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
         if (!skipTearDown)
+        {
+            selenium.close();
             selenium.stop();
+        }
     }
 
     public void log(String str)
