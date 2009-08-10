@@ -82,7 +82,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             setFormElement("fileUpload-file", f);
             // move focus to trigger change event
             selenium.focus("//body");
-            waitForText(filename, 1000);
+            waitForText(filename, 10000);
 
             signOut();
 
