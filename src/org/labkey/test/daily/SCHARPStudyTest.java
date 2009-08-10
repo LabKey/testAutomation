@@ -94,8 +94,14 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
         clickNavButton("Import Study");
         setFormElement("studyZip", _zipFilePath);
         clickNavButton("Import Study");
-
         assertTextNotPresent("This file does not appear to be a valid .zip file");
+
+        if (isTextPresent("You must select a .zip file to import"))
+        {
+            setFormElement("studyZip", _zipFilePath);
+            clickNavButton("Import Study");
+        }
+
         assertTextPresent("Data Pipeline");
 
         while(countLinksWithText("COMPLETE") < 2)
