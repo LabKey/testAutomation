@@ -4,6 +4,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
+import java.io.File;
+
 /**
  * Created by IntelliJ IDEA.
  * User: dave
@@ -14,9 +16,9 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
 {
     public static final String PROJECT_NAME="SCHARP Study Test";
 
-    private String _labkeyRoot = getLabKeyRoot().replace("\\", "/");
-    private String _pipelinePathMain = _labkeyRoot + "/sampledata/study";
-    private String _zipFilePath = _labkeyRoot + "/sampledata/study/studyshell.zip";
+    private String _labkeyRoot = getLabKeyRoot();
+    private String _pipelinePathMain = new File(_labkeyRoot, "/sampledata/study").getPath();
+    private String _zipFilePath = new File(_labkeyRoot, "/sampledata/study/studyshell.zip").getPath();
 
     protected static class StatusChecker implements Checker
     {
