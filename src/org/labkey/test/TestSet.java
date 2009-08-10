@@ -79,13 +79,13 @@ public enum TestSet
     Daily(new Class[]
     {
         BasicTest.class,
+        MS1Bvt.class,
         //UniprotAnnotationTest.class, //requires bootstrap
         HTTPApiTest.class,
         MessagesBvtTest.class, //do we need both MessagesTest and MessagesBvtTest?
         MessagesTest.class,
         MS2BvtTest.class,
         WikiBvtTest.class,
-        MS1Bvt.class,
         ListTest.class,
         UserBvtTest.class,
         IssuesTest.class,
