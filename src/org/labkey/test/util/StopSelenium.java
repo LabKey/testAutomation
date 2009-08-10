@@ -44,7 +44,7 @@ public class StopSelenium
         else
             port = DEFAULT_SELENIUM_PORT;
 
-        URL url = new URL("http", server, port, "/selenium-server/driver/?cmd=shutDown");
+        URL url = new URL("http", server, port, "/selenium-server/driver/?cmd=shutDownSeleniumServer");
         InputStream is = (InputStream) url.getContent();
         BufferedReader r = new BufferedReader(new InputStreamReader(is));
         System.out.println(r.readLine());

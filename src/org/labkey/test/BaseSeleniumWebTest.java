@@ -897,7 +897,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
     public void publishArtifact(File file)
     {
-        if (file != null && System.getProperty("teamcity.projectName") != null)
+        if (file != null && System.getProperty("teamcity.buildType.id") != null)
         {
             System.out.println("##teamcity[publishArtifacts '" + file.getAbsolutePath() + "']");
         }
