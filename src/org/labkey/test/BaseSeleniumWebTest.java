@@ -889,8 +889,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
 
         File dumpDir = Runner.getDumpDir();
-        dumpScreen(dumpDir, baseName);
-        dumpHtml(dumpDir, baseName);
+        publishArtifact(dumpScreen(dumpDir, baseName));
+        publishArtifact(dumpHtml(dumpDir, baseName));
+    }
+
+    // Publish artifacts while the build is still in progrss:
+    // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
+    public void publishArtifact(File file)
+    {
+        if (file != null && System.getProperty("teamcity.projectName") != null)
+        {
+            System.out.println("##teamcity[publishArtifacts '" + file.getAbsolutePath() + "']");
+        }
     }
 
     public File dumpScreen(File dir, String baseName)
