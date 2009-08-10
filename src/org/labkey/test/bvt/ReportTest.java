@@ -193,7 +193,7 @@ public class ReportTest extends StudyTest
         assertTableRowsEqual("report", 3, new String[][] {row3});
 
         setFormElement("label", "TestReport");
-        selectOptionByText("showWithDataset", "DEM-1: Demographics");
+        //selectOptionByText("showWithDataset", "DEM-1: Demographics");
         clickNavButton("Save");
 
         clickLinkWithText(getStudyLabel());
