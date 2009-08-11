@@ -29,7 +29,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 {
     // Use a special exotic character in order to make sure we don't break
     // i18n. See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=5369
-    private static final String PROJECT_NAME = "File Content TŽst Project";
+    private static final String PROJECT_NAME = "File Content Test Project"; //"File Content TŽst Project";
     private static final String PROJECT_ENCODED = "File%20Content%20T%C3%A9st%20Project";
 
     public String getAssociatedModuleDirectory()
