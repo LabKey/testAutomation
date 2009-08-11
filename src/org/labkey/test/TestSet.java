@@ -137,7 +137,7 @@ public enum TestSet
             StudyBvtTest.class,
             StudyExtraTest.class,
             AssayTest.class,
-            //StudyImportTest.class,
+            StudyImportTest.class,
             ReportTest.class,
             QuerySnapshotTest.class
     }),

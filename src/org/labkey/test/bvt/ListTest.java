@@ -291,6 +291,11 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Add List");
         ListHelper.createList(this, PROJECT_NAME2, LIST3_NAME, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
+        assertTextPresent("<AUTO> (Wealth)");
+        clickLinkWithText("edit design");
+        selectOptionByText("ff_titleColumn", "Owner");    // Explicitly set to the PK (auto title will pick wealth column)
+        clickButton("Update", defaultWaitForPage);
+        assertTextPresent("Owner", 5);  // Title plus two "Owners" and two "Owner"
 
         log("Upload data to second list");
         ListHelper.uploadData(this, PROJECT_NAME2, LIST3_NAME, LIST3_DATA);
