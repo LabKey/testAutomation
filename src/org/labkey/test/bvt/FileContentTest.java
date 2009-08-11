@@ -80,8 +80,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
             setFormElement("fileUpload-file", f);
-            // move focus to trigger change event
-            selenium.focus("//body");
+            submit(Locator.id("fileUpload-form"));
             waitForText(filename, 10000);
 
             signOut();
