@@ -899,7 +899,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if (file != null && System.getProperty("teamcity.buildType.id") != null)
         {
-            System.out.println("##teamcity[publishArtifacts '" + file.getAbsolutePath() + "']");
+            // relativize path to labkey project root
+            String labkeyRoot = WebTestHelper.getLabKeyRoot();
+            labkeyRoot = new File(labkeyRoot).getAbsolutePath();
+            String strFile = file.getAbsolutePath();
+            if (labkeyRoot != null && strFile.toLowerCase().startsWith(labkeyRoot.toLowerCase()))
+            {
+                String path = strFile.substring(labkeyRoot.length());
+                if (path.startsWith(File.separator))
+                    path = path.substring(1);
+                System.out.println("##teamcity[publishArtifacts '" + path + "']");
+            }
         }
     }
 
