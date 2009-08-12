@@ -58,7 +58,7 @@ public enum TestSet
         SpecimenTest.class,
         SampleSetTest.class,
         PipelineBvtTest.class,
-        FileContentTest.class,
+        //FileContentTest.class,
         DataRegionTest.class,
         ClientAPITest.class,
         AuditLogTest.class,
