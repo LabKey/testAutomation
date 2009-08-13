@@ -40,12 +40,6 @@ public class StudyImportTest extends StudyTest
     }
 
     @Override
-    protected String getSampleDataPath()
-    {
-        return super.getSampleDataPath() + "import/";
-    }
-
-    @Override
     protected void createStudy()
     {
         initializeFolder();
@@ -82,7 +76,7 @@ public class StudyImportTest extends StudyTest
     }
 
     @Override
-    protected void importSpecimenArchive(File archiveFile, File tempDir, String folderName, int completedPipelineJobs)
+    protected void importSpecimenArchive(File pipelineRoot, File archiveFile, File tempDir, String folderName, int completedPipelineJobs)
     {
         // Do nothing -- we already loaded the specimen archive with the initial study load
     }

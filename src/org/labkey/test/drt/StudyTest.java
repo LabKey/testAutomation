@@ -36,8 +36,8 @@ public class StudyTest extends BaseSeleniumWebTest
 {
     protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
 
-    private final String CRF_SCHEMAS = getSampleDataPath() + "schema.tsv";
-    private final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "sample_a.specimens";
+    private final String CRF_SCHEMAS = getSampleDataPath() + "datasets/schema.tsv";
+    private final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
     protected final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
     protected static final int MAX_WAIT_SECONDS = 4*60;
 
@@ -200,7 +200,7 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("unknown QC");
 
         // upload specimen data and verify import
-        importSpecimenArchive(new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 1);
+        importSpecimenArchive(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 1);
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Page Size:All");
@@ -425,12 +425,10 @@ public class StudyTest extends BaseSeleniumWebTest
         submit();
         clickLinkWithText("Pipeline");
         clickNavButton("Process and Import Data");
-        waitForElement(Locator.navButton("Import datasets"),5000);
+        waitAndClick(Locator.fileTreeByName("datasets"));
+        waitForElement(Locator.navButton("Import datasets"), 5000);
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
-        generateFiles();
-        if (!isNavButtonPresent("Import datasets"))
-            fail("Datasets must be generated: run 'makePlates.bat' from within sampledata/study.");
         clickNavButton("Import datasets");
         clickNavButton("Submit");
     }

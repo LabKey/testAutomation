@@ -16,13 +16,10 @@
 
 package org.labkey.test.bvt;
 
-import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.drt.StudyTest;
 
 import java.io.File;
-import java.io.FilenameFilter;
 
 /**
  * User: brittp
@@ -31,7 +28,7 @@ import java.io.FilenameFilter;
  */
 public class StudyBvtTest extends StudyTest
 {
-    private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/sample_b.specimens";
+    private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";
     private final static String DATA_SET = "DEM-1: Demographics";
     private final String DATASET_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/dataset_data.xls";
     private final static String TEST_ADD_ENTRY = "999000000";
@@ -219,7 +216,7 @@ public class StudyBvtTest extends StudyTest
         clickMenuButton("Comments and QC", "Comments:Exit");
 
         // import second archive, verify that that data is merged:
-        importSpecimenArchive(new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 2);
+        importSpecimenArchive(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 2);
 
         // verify that comments remain after second specimen load
         clickLinkWithText(getStudyLabel());

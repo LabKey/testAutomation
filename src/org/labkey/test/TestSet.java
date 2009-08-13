@@ -134,6 +134,7 @@ public enum TestSet
     }),
 
     Study(new Class[] {
+            StudyTest.class,
             StudyBvtTest.class,
             StudyExtraTest.class,
             AssayTest.class,

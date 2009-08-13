@@ -2879,7 +2879,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return (int)((System.currentTimeMillis() - start) / 1000);
     }
 
-    protected void importSpecimenArchive(File specimenArchive, File tempDir, String studyFolderName, int completedPipelineJobs)
+    protected void importSpecimenArchive(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int completedPipelineJobs)
     {
         log("Starting import of specimen archive " + specimenArchive);
         File copiedArchive = new File(tempDir, FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
@@ -2890,17 +2890,36 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText("Data Pipeline");
         assertLinkPresentWithTextCount("COMPLETE", completedPipelineJobs);
         clickNavButton("Process and Import Data");
-        String tempDirShortName = tempDir.getName();
         sleep(1000);
-        waitAndClick(Locator.fileTreeByName(tempDirShortName));
+
+        // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
+        File testDir = tempDir;
+        List<String> dirNames = new ArrayList<String>();
+
+        while (!pipelineRoot.equals(testDir))
+        {
+            dirNames.add(0, testDir.getName());
+            testDir = testDir.getParentFile();
+        }
+
+        log(dirNames.toString());
+
+        // Now navigate to the temp dir
+        for (String dirName : dirNames)
+            waitAndClick(Locator.fileTreeByName(dirName));
+
+        String tempDirShortName = dirNames.get(dirNames.size() - 1);
+
         int seconds = 0;
         sleep(1000);
+
         while (!isNavButtonPresent("Import specimen data") && seconds < 20)
         {
             seconds++;
             click(Locator.fileTreeByName(tempDirShortName));
             sleep(1000);
         }
+
         waitAndClickNavButton("Import specimen data");
         clickNavButton("Start Import");
 
