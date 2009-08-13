@@ -17,7 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
-import org.labkey.test.drt.StudyTest;
+import org.labkey.test.drt.StudyManualTest;
 
 import java.io.File;
 
@@ -26,7 +26,7 @@ import java.io.File;
  * Date: Dec 8, 2006
  * Time: 4:30:24 PM
  */
-public class StudyBvtTest extends StudyTest
+public class StudyBvtTest extends StudyManualTest
 {
     private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";
     private final static String DATA_SET = "DEM-1: Demographics";
@@ -216,7 +216,8 @@ public class StudyBvtTest extends StudyTest
         clickMenuButton("Comments and QC", "Comments:Exit");
 
         // import second archive, verify that that data is merged:
-        importSpecimenArchive(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 2);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 2);
+        importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load
         clickLinkWithText(getStudyLabel());

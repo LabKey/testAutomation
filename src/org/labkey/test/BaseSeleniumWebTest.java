@@ -3431,4 +3431,98 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             super.setCursorPosition(locator, position);
         }
     }
+
+    // This class makes it easier to start a specimen import early in a test and wait for completion later.
+    public class SpecimenImporter
+    {
+        private static final int MAX_WAIT_SECONDS = 4 * 60;
+
+        private final File _pipelineRoot;
+        private final File _specimenArchive;
+        private final File _tempDir;
+        private final String _studyFolderName;
+        private final int _completedPipelineJobs;
+        private final File _copiedArchive;
+
+        public SpecimenImporter(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int completedPipelineJobs)
+        {
+            _pipelineRoot = pipelineRoot;
+            _specimenArchive = specimenArchive;
+            _tempDir = tempDir;
+            _studyFolderName = studyFolderName;
+            _completedPipelineJobs = completedPipelineJobs;
+            _copiedArchive = new File(_tempDir, FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
+        }
+
+        public void importAndWaitForComplete()
+        {
+            startImport();
+            waitForComplete();
+        }
+
+        public void startImport()
+        {
+            log("Starting import of specimen archive " + _specimenArchive);
+
+            // copy the file into its own directory
+            copyFile(_specimenArchive, _copiedArchive);
+
+            clickLinkWithText(_studyFolderName);
+            clickLinkWithText("Data Pipeline");
+            clickNavButton("Process and Import Data");
+            sleep(1000);
+
+            // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
+            File testDir = _tempDir;
+            List<String> dirNames = new ArrayList<String>();
+
+            while (!_pipelineRoot.equals(testDir))
+            {
+                dirNames.add(0, testDir.getName());
+                testDir = testDir.getParentFile();
+            }
+
+            log(dirNames.toString());
+
+            // Now navigate to the temp dir
+            for (String dirName : dirNames)
+                waitAndClick(Locator.fileTreeByName(dirName));
+
+            String tempDirShortName = dirNames.get(dirNames.size() - 1);
+
+            int seconds = 0;
+            sleep(1000);
+
+            while (!isNavButtonPresent("Import specimen data") && seconds < 20)
+            {
+                seconds++;
+                click(Locator.fileTreeByName(tempDirShortName));
+                sleep(1000);
+            }
+
+            waitAndClickNavButton("Import specimen data");
+            clickNavButton("Start Import");
+        }
+
+        public void waitForComplete()
+        {
+            clickLinkWithText(_studyFolderName);
+            clickLinkWithText("Data Pipeline");
+
+            // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.
+            startTimer();
+            while (countLinksWithText("COMPLETE") == _completedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
+            {
+                log("Waiting for specimen import...");
+                sleep(1000);
+                refresh();
+            }
+            // Unfortunately assertNotLinkWithText also picks up the "Errors" link in the header.
+            assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
+            assertLinkPresentWithTextCount("COMPLETE", _completedPipelineJobs + 1);
+
+            if (!_copiedArchive.delete())
+                fail("Couldn't delete copied specimen archive");
+        }
+    }
 }

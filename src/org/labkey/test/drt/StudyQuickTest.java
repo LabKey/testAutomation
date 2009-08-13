@@ -21,8 +21,8 @@ package org.labkey.test.drt;
  * Time: 9:18:32 AM
  */
 // Skips cleanup and initial study creation steps.  Use this class if the verify study is already created, for fast
-// iterative dev of the StudyTest.
-public class StudyQuickTest extends StudyTest
+// iterative dev of the StudyManualTest.
+public class StudyQuickTest extends StudyManualTest
 {
     @Override
     public void doCleanup() throws Exception

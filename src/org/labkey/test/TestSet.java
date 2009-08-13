@@ -37,7 +37,7 @@ public enum TestSet
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
-        StudyTest.class
+        StudyManualTest.class
     }),
 
     BVT(new Class[] {
@@ -134,7 +134,7 @@ public enum TestSet
     }),
 
     Study(new Class[] {
-            StudyTest.class,
+            StudyManualTest.class,
             StudyBvtTest.class,
             StudyExtraTest.class,
             AssayTest.class,

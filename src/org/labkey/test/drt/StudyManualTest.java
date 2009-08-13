@@ -32,12 +32,12 @@ import java.util.Set;
  * Date: Mar 9, 2006
  * Time: 1:54:57 PM
  */
-public class StudyTest extends BaseSeleniumWebTest
+public class StudyManualTest extends BaseSeleniumWebTest
 {
     protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
 
     private final String CRF_SCHEMAS = getSampleDataPath() + "datasets/schema.tsv";
-    private final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
+    protected final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
     protected final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
     protected static final int MAX_WAIT_SECONDS = 4*60;
 
@@ -105,7 +105,13 @@ public class StudyTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         doCreateSteps();
+        verifyStudyAndDatasets();
+        loadSpecimens();
+        verifySpecimens();
+    }
 
+    protected void verifyStudyAndDatasets()
+    {
         verifyDemographics();
         verifyVisitMapPage();
         verifyManageDatasetsPage();
@@ -198,9 +204,17 @@ public class StudyTest extends BaseSeleniumWebTest
         assertTextPresent("new text");
         assertTextPresent("QC State");
         assertTextPresent("unknown QC");
+    }
 
+    protected void loadSpecimens()
+    {
         // upload specimen data and verify import
-        importSpecimenArchive(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 1);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 1);
+        importer.importAndWaitForComplete();
+    }
+
+    protected void verifySpecimens()
+    {
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Page Size:All");

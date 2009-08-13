@@ -22,10 +22,12 @@ import java.io.File;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-public class StudyImportTest extends StudyTest
+public class StudyImportTest extends StudyManualTest
 {
     protected static final String PROJECT_NAME = "ImportStudyVerifyProject";
     protected static final String FOLDER_NAME = "My Import Study";
+
+    private SpecimenImporter _specimenImporter;
 
     @Override
     protected String getProjectName()
@@ -45,9 +47,23 @@ public class StudyImportTest extends StudyTest
         initializeFolder();
         initializePipeline();
 
+        // Import a study.xml to create the study and load all the datasets.  We'll wait for this import to complete
+        // before doing any further tests.
         beginAt("study/" + getProjectName() + "/" + getFolderName() + "/importStudy.view");
         checkRadioButton("source", "pipeline");
         clickButtonContainingText("Import Study");
+
+        // Start importing the specimens as well.  We'll let this load in the background while executing the first set of
+        // verification steps.  Doing this in parallel speeds up the test.
+        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 2);
+        _specimenImporter.startImport();
+    }
+
+    @Override
+    protected void loadSpecimens()
+    {
+        // Already started this load, just need to wait for it to complete.
+        _specimenImporter.waitForComplete();
     }
 
     private void initializePipeline()
@@ -65,19 +81,13 @@ public class StudyImportTest extends StudyTest
     protected void waitForInitialUpload()
     {
         startTimer();
-        while (!isLinkPresentWithTextCount("COMPLETE", 3) && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (!isLinkPresentWithTextCount("COMPLETE", 2) && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             log("Waiting for study import");
             sleep(1000);
             refresh();
         }
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertLinkPresentWithTextCount("COMPLETE", 3);
-    }
-
-    @Override
-    protected void importSpecimenArchive(File pipelineRoot, File archiveFile, File tempDir, String folderName, int completedPipelineJobs)
-    {
-        // Do nothing -- we already loaded the specimen archive with the initial study load
+        assertLinkPresentWithTextCount("COMPLETE", 2);
     }
 }

@@ -17,7 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
-import org.labkey.test.drt.StudyTest;
+import org.labkey.test.drt.StudyManualTest;
 import org.labkey.test.util.ExtHelper;
 
 /**
@@ -25,7 +25,7 @@ import org.labkey.test.util.ExtHelper;
  * User: klum
  * Date: Jul 31, 2009
  */
-public class QuerySnapshotTest extends StudyTest
+public class QuerySnapshotTest extends StudyManualTest
 {
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
     private final String APX_SNAPSHOT = "APX Joined Snapshot";
