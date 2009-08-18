@@ -98,6 +98,7 @@ src/org/labkey/test/drt/JUnitTest.java -text
 src/org/labkey/test/drt/MessagesTest.java -text
 src/org/labkey/test/drt/NabOldTest.java -text
 src/org/labkey/test/drt/SecurityTest.java -text
+src/org/labkey/test/drt/StudyBaseTest.java -text
 src/org/labkey/test/drt/StudyImportTest.java -text
 src/org/labkey/test/drt/StudyManualTest.java -text
 src/org/labkey/test/drt/StudyQuickTest.java -text

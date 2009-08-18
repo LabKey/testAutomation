@@ -29,9 +29,10 @@ import java.io.File;
 public class StudyBvtTest extends StudyManualTest
 {
     private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";
-    private final static String DATA_SET = "DEM-1: Demographics";
+    private static final String DATA_SET = "DEM-1: Demographics";
+    private static final String TEST_ADD_ENTRY = "999000000";
+
     private final String DATASET_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/dataset_data.xls";
-    private final static String TEST_ADD_ENTRY = "999000000";
 
     @Override
     protected void doTestSteps()

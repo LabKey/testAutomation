@@ -3482,8 +3482,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 testDir = testDir.getParentFile();
             }
 
-            log(dirNames.toString());
-
             // Now navigate to the temp dir
             for (String dirName : dirNames)
                 waitAndClick(Locator.fileTreeByName(dirName));

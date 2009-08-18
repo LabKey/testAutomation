@@ -22,24 +22,12 @@ import java.io.File;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-public class StudyImportTest extends StudyManualTest
+public class StudyImportTest extends StudyBaseTest
 {
     protected static final String PROJECT_NAME = "ImportStudyVerifyProject";
     protected static final String FOLDER_NAME = "My Import Study";
 
     private SpecimenImporter _specimenImporter;
-
-    @Override
-    protected String getProjectName()
-    {
-        return "ImportStudyVerifyProject";
-    }
-
-    @Override
-    protected String getFolderName()
-    {
-        return "My Import Study";
-    }
 
     @Override
     protected void createStudy()
@@ -64,6 +52,11 @@ public class StudyImportTest extends StudyManualTest
     {
         // Already started this load, just need to wait for it to complete.
         _specimenImporter.waitForComplete();
+    }
+
+    protected void afterCreateStudy()
+    {
+        // Do nothing -- import handles all creation steps
     }
 
     private void initializePipeline()
