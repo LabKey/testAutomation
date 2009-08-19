@@ -19,7 +19,6 @@ package org.labkey.test.drt;
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -35,6 +34,7 @@ import java.util.Set;
 public class StudyManualTest extends StudyBaseTest
 {
     protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
+    protected SpecimenImporter _importer;
 
     private final String CRF_SCHEMAS = getSampleDataPath() + "datasets/schema.tsv";
 
@@ -46,9 +46,12 @@ public class StudyManualTest extends StudyBaseTest
 
     protected void loadSpecimens()
     {
-        // upload specimen data and verify import
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 1);
-        importer.importAndWaitForComplete();
+        _importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 1);
+    }
+
+    protected void waitForSpecimenLoad()
+    {
+        _importer.importAndWaitForComplete();
     }
 
     protected void createStudy()
@@ -114,7 +117,7 @@ public class StudyManualTest extends StudyBaseTest
         clickNavButton("Submit");
     }
 
-    protected void waitForInitialUpload()
+    protected void waitForStudyLoad()
     {
         // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header,
         // and it picks up the upload of 'FPX-1: Final Complete Physical Exam' as containing complete.
@@ -135,6 +138,8 @@ public class StudyManualTest extends StudyBaseTest
     // Using old visit map format, which does not support default visibility (so we need to set it manually).
     protected void afterCreateStudy()
     {
+        clickLinkWithText(getFolderName());
+
         // Hide visits based on label -- manual create vs. import will result in different indexes for these visits
         hideVisits("Screening Cycle", "Cycle 1");
 
@@ -267,16 +272,5 @@ public class StudyManualTest extends StudyBaseTest
             f.delete();
 
         dir.delete();
-    }
-
-    protected void createReport(String reportType)
-    {
-        // click the create button dropdown
-        String id = ExtHelper.getExtElementId(this, "btn_createView");
-        click(Locator.id(id));
-
-        id = ExtHelper.getExtElementId(this, reportType);
-        click(Locator.id(id));
-        waitForPageToLoad();
     }
 }

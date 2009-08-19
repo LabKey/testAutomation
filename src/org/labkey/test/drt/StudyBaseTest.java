@@ -19,6 +19,7 @@ package org.labkey.test.drt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 
@@ -39,11 +40,13 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
 
     abstract protected void createStudy();
 
+    abstract protected void waitForStudyLoad();
+
     abstract protected void afterCreateStudy();
 
-    abstract protected void waitForInitialUpload();
-
     abstract protected void loadSpecimens();
+
+    abstract protected void waitForSpecimenLoad();
 
     public String getAssociatedModuleDirectory()
     {
@@ -86,17 +89,16 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
     {
         doCreateSteps();
         verifyStudyAndDatasets();
-        loadSpecimens();
+        waitForSpecimenLoad();
         verifySpecimens();
     }
 
     protected void doCreateSteps()
     {
         createStudy();
-        waitForInitialUpload();
-        clickLinkWithText(getFolderName());
+        loadSpecimens();
+        waitForStudyLoad();
         afterCreateStudy();
-        clickLinkWithText(getFolderName());
     }
 
     protected void doCleanup() throws Exception
@@ -265,7 +267,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
 
     protected void verifyManageDatasetsPage()
     {
-        clickLinkWithText("Manage Study");
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Datasets");
 
         clickLinkWithText("489");
@@ -279,10 +281,23 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         assertTableCellTextEquals("details", 5, 1, "true");
         assertTableCellTextEquals("details", 8, 1, "This is the demographics dataset, dammit");
 
-        // "Demographics Data" needs to be false for the rest of the test
+        // "Demographics Data" bit needs to be false for the rest of the test
+        setDemographicsBit("DEM-1: Demographics", false);
+    }
+
+    // Must be on study home page or "manage study" page
+    protected void setDemographicsBit(String datasetName, boolean demographics)
+    {
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText(datasetName);
         clickButtonContainingText("Edit Dataset Definition");
         waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);
-        uncheckCheckbox("demographicData");
+
+        if (demographics)
+            checkCheckbox("demographicData");
+        else
+            uncheckCheckbox("demographicData");
+
         clickNavButton("Save");
     }
 
@@ -332,6 +347,17 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
         clickLinkWithText("Next Participant >");
+    }
+
+    protected void createReport(String reportType)
+    {
+        // click the create button dropdown
+        String id = ExtHelper.getExtElementId(this, "btn_createView");
+        click(Locator.id(id));
+
+        id = ExtHelper.getExtElementId(this, reportType);
+        click(Locator.id(id));
+        waitForPageToLoad();
     }
 
     protected void selectOption(String name, int i, String value)

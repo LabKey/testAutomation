@@ -22,7 +22,7 @@ import java.io.File;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-public class StudyImportTest extends StudyBaseTest
+public class StudyTest extends StudyBaseTest
 {
     protected static final String PROJECT_NAME = "ImportStudyVerifyProject";
     protected static final String FOLDER_NAME = "My Import Study";
@@ -40,7 +40,11 @@ public class StudyImportTest extends StudyBaseTest
         beginAt("study/" + getProjectName() + "/" + getFolderName() + "/importStudy.view");
         checkRadioButton("source", "pipeline");
         clickButtonContainingText("Import Study");
+    }
 
+    @Override
+    protected void loadSpecimens()
+    {
         // Start importing the specimens as well.  We'll let this load in the background while executing the first set of
         // verification steps.  Doing this in parallel speeds up the test.
         _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 2);
@@ -48,7 +52,7 @@ public class StudyImportTest extends StudyBaseTest
     }
 
     @Override
-    protected void loadSpecimens()
+    protected void waitForSpecimenLoad()
     {
         // Already started this load, just need to wait for it to complete.
         _specimenImporter.waitForComplete();
@@ -71,7 +75,7 @@ public class StudyImportTest extends StudyBaseTest
     }
 
     @Override
-    protected void waitForInitialUpload()
+    protected void waitForStudyLoad()
     {
         startTimer();
         while (!isLinkPresentWithTextCount("COMPLETE", 2) && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)

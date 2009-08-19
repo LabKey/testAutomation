@@ -99,9 +99,8 @@ src/org/labkey/test/drt/MessagesTest.java -text
 src/org/labkey/test/drt/NabOldTest.java -text
 src/org/labkey/test/drt/SecurityTest.java -text
 src/org/labkey/test/drt/StudyBaseTest.java -text
-src/org/labkey/test/drt/StudyImportTest.java -text
 src/org/labkey/test/drt/StudyManualTest.java -text
-src/org/labkey/test/drt/StudyQuickTest.java -text
+src/org/labkey/test/drt/StudyTest.java -text
 src/org/labkey/test/drt/WikiTest.java -text
 src/org/labkey/test/drt/XTandemTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text

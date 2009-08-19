@@ -181,11 +181,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Create Snapshot");
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
-        clickLinkWithImage("text_link_arrow", 0); /* click admin drop down */
-        selenium.mouseOver("//a[contains(text(),'Go To Module')]");
-        waitForElement(Locator.xpath("//a[contains(text(),'Query')]"), 2000);
-        selenium.click("//a[contains(text(),'Query')]");
-		selenium.waitForPageToLoad("30000");
+        selectModule("Query");
         clickLinkWithText("Schema Administration");
 		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
@@ -222,12 +218,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER +" Study");
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
-        clickLinkWithImage("text_link_arrow", 0); /* click admin drop down */
-        selenium.mouseOver("//a[contains(text(),'Go To Module')]");
-        waitForElement(Locator.xpath("//a[contains(text(),'Query')]"), 2000);
-        selenium.click("//a[contains(text(),'Query')]");
-        selenium.waitForPageToLoad("30000");
-
+        selectModule("Query");
         clickLinkWithText("Schema Administration");
         clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
@@ -242,7 +233,6 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         assertTextPresent("P1");
         assertTextPresent("V3");
-
 
         clickLinkWithText("VaccineStudy Study");
         clickLinkWithText("Study Navigator");
@@ -282,11 +272,6 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Study Navigator");
         //Make sure our guy picked up the his personal start date
         assertTextPresent("Day 10");
-
-
-//        clickLinkWithText("Manage Assays");
-//        clickNavButton("Create Assay");
-
     }
 
     protected static final String TEST_ASSAY = "TestAssay1";

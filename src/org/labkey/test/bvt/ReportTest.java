@@ -16,10 +16,10 @@
 
 package org.labkey.test.bvt;
 
-import org.labkey.test.drt.StudyManualTest;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.Locator;
 import com.thoughtworks.selenium.SeleniumException;
+import org.labkey.test.Locator;
+import org.labkey.test.drt.StudyTest;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -29,7 +29,7 @@ import java.io.FilenameFilter;
  * User: klum
  * Date: Jul 31, 2009
  */
-public class ReportTest extends StudyManualTest
+public class ReportTest extends StudyTest
 {
     protected static final String GRID_VIEW = "create_gridView";
     protected static final String CROSSTAB_VIEW = "create_crosstabView";
@@ -124,7 +124,15 @@ public class ReportTest extends StudyManualTest
         super.doCreateSteps();
 
         // need this to turn off the demographic bit in the DEM-1 dataset
-        verifyManageDatasetsPage();
+        clickLinkWithText(getFolderName());
+        setDemographicsBit("DEM-1: Demographics", false);
+    }
+
+    @Override
+    protected void loadSpecimens()
+    {
+        // This test doesn't use specimens
+        log("Skipping specimen import");
     }
 
    protected void deleteReport(String reportName)
@@ -273,9 +281,7 @@ public class ReportTest extends StudyManualTest
             {
                 public boolean accept(File dir, String name)
                 {
-                    if ("r.exe".equalsIgnoreCase(name) || "r".equalsIgnoreCase(name))
-                        return true;
-                    return false;
+                    return "r.exe".equalsIgnoreCase(name) || "r".equalsIgnoreCase(name);
                 }
             };
             File[] files = rHomeDir.listFiles(rFilenameFilter);

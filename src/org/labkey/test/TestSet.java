@@ -37,7 +37,7 @@ public enum TestSet
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
-        StudyManualTest.class
+        StudyTest.class
     }),
 
     BVT(new Class[] {
@@ -138,7 +138,7 @@ public enum TestSet
             StudyBvtTest.class,
             StudyExtraTest.class,
             AssayTest.class,
-            StudyImportTest.class,
+            StudyTest.class,
             ReportTest.class,
             QuerySnapshotTest.class
     }),
@@ -148,10 +148,6 @@ public enum TestSet
             DbUserSchemaTest.class,
             ListTest.class,
             IssuesTest.class,
-    }),
-
-    TestDevHepers(new Class[] {
-            StudyQuickTest.class
     }),
 
     IDRI(new Class[] {

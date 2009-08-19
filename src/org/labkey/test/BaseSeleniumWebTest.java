@@ -432,6 +432,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(itemLocator);
     }
 
+    // Click on a module listed on the admin menu
+    public void selectModule(String moduleName)
+    {
+        clickAdminMenuItem("Go To Module", "Query");
+    }
+
     private void waitForStartup()
     {
         boolean hitFirstPage = false;
@@ -2610,11 +2616,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void checkInheritedPermissions()
     {
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        waitForElement(inherited,1000);
+        waitForElement(Locator.permissionRendered(), defaultWaitForPage);
+        waitForElement(inherited, 2000);
         if (!isChecked(inherited))
             click(inheritedParent);
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        waitForElement(Locator.permissionRendered(), defaultWaitForPage);
         assertTrue(isChecked(inherited));
     }
 
@@ -3504,6 +3510,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         public void waitForComplete()
         {
+            log("Waiting for completion of specimen archive " + _specimenArchive + " import");
+
             clickLinkWithText(_studyFolderName);
             clickLinkWithText("Data Pipeline");
 

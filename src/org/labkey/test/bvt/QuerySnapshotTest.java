@@ -17,7 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
-import org.labkey.test.drt.StudyManualTest;
+import org.labkey.test.drt.StudyTest;
 import org.labkey.test.util.ExtHelper;
 
 /**
@@ -25,7 +25,7 @@ import org.labkey.test.util.ExtHelper;
  * User: klum
  * Date: Jul 31, 2009
  */
-public class QuerySnapshotTest extends StudyManualTest
+public class QuerySnapshotTest extends StudyTest
 {
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
     private final String APX_SNAPSHOT = "APX Joined Snapshot";
@@ -55,28 +55,40 @@ public class QuerySnapshotTest extends StudyManualTest
     @Override
     protected void doCreateSteps()
     {
-        // create two study folders: 054 and 065
+        // create two study folders (054 and 065) and start importing a study in each
         setFolderName(FOLDER_1);
         createStudy();
-        waitForInitialUpload();
-
-        // enable advanced study security
-        enterPermissionsUI();
-        clickNavButton("Study Security");
-        selectOptionByValue("securityString", "BASIC_WRITE");
-        selenium.waitForPageToLoad("30000");
 
         setFolderName(FOLDER_2);
         createStudy();
-        waitForInitialUpload();
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+
+        waitForStudyLoad(FOLDER_2);
+    }
+
+    private void waitForStudyLoad(String folderName)
+    {
+        // TODO: not needed: setFolderName(folderName);
+        // Navigate
+        clickLinkWithText(folderName);
+        clickLinkWithText("Data Pipeline");
+        waitForStudyLoad();
 
         // enable advanced study security
         enterPermissionsUI();
         clickNavButton("Study Security");
         selectOptionByValue("securityString", "BASIC_WRITE");
         selenium.waitForPageToLoad("30000");
+
+        // shut off demographics bit to allow for insert
+        clickLinkWithText(folderName);
+        setDemographicsBit("DEM-1: Demographics", false);
+    }
+
+    @Override
+    protected void loadSpecimens()
+    {
+        // This test doesn't use specimens
+        log("Skipping specimen import");
     }
 
     @Override
@@ -206,6 +218,9 @@ public class QuerySnapshotTest extends StudyManualTest
         clickNavButton("Run Query");
         
         createQuerySnapshot(CROSS_STUDY_SNAPSHOT, true, false, "keyField", 3);
+
+        // need to use 054 now... make sure load is complete
+        waitForStudyLoad(FOLDER_1);
 
         // verify refresh from both datasets
         clickLinkWithText(FOLDER_1);
