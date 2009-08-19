@@ -2885,64 +2885,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return (int)((System.currentTimeMillis() - start) / 1000);
     }
 
-    protected void importSpecimenArchive(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int completedPipelineJobs)
-    {
-        log("Starting import of specimen archive " + specimenArchive);
-        File copiedArchive = new File(tempDir, FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
-        // copy the file into its own directory
-        copyFile(specimenArchive, copiedArchive);
-
-        clickLinkWithText(studyFolderName);
-        clickLinkWithText("Data Pipeline");
-        assertLinkPresentWithTextCount("COMPLETE", completedPipelineJobs);
-        clickNavButton("Process and Import Data");
-        sleep(1000);
-
-        // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
-        File testDir = tempDir;
-        List<String> dirNames = new ArrayList<String>();
-
-        while (!pipelineRoot.equals(testDir))
-        {
-            dirNames.add(0, testDir.getName());
-            testDir = testDir.getParentFile();
-        }
-
-        log(dirNames.toString());
-
-        // Now navigate to the temp dir
-        for (String dirName : dirNames)
-            waitAndClick(Locator.fileTreeByName(dirName));
-
-        String tempDirShortName = dirNames.get(dirNames.size() - 1);
-
-        int seconds = 0;
-        sleep(1000);
-
-        while (!isNavButtonPresent("Import specimen data") && seconds < 20)
-        {
-            seconds++;
-            click(Locator.fileTreeByName(tempDirShortName));
-            sleep(1000);
-        }
-
-        waitAndClickNavButton("Import specimen data");
-        clickNavButton("Start Import");
-
-        // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.
-        startTimer();
-        while (countLinksWithText("COMPLETE") == completedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < 4*60)
-        {
-            log("Waiting for specimen import...");
-            sleep(1000);
-            refresh();
-        }
-        // Unfortunately assertNotLinkWithText also picks up the "Errors" link in the header.
-        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertLinkPresentWithTextCount("COMPLETE", completedPipelineJobs + 1);
-        copiedArchive.delete();
-    }
-
     /**
      * Creates a new wiki page, assuming that the [new page] link is available
      * somewhere on the current page. This link is typically displayed above

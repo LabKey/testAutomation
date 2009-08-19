@@ -19,11 +19,9 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.apache.commons.lang.BooleanUtils;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Apr 6, 2009
  * Time: 5:21:53 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ExtHelper
 {
