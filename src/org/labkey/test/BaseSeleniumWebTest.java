@@ -3389,16 +3389,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         private final File _specimenArchive;
         private final File _tempDir;
         private final String _studyFolderName;
-        private final int _completedPipelineJobs;
+        private final int _prevCompletedPipelineJobs;
         private final File _copiedArchive;
 
-        public SpecimenImporter(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int completedPipelineJobs)
+        public SpecimenImporter(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int prevCompletedPipelineJobs)
         {
             _pipelineRoot = pipelineRoot;
             _specimenArchive = specimenArchive;
             _tempDir = tempDir;
             _studyFolderName = studyFolderName;
-            _completedPipelineJobs = completedPipelineJobs;
+            _prevCompletedPipelineJobs = prevCompletedPipelineJobs;
             _copiedArchive = new File(_tempDir, FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
         }
 
@@ -3459,7 +3459,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.
             startTimer();
-            while (countLinksWithText("COMPLETE") == _completedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
+            while (countLinksWithText("COMPLETE") == _prevCompletedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
             {
                 log("Waiting for specimen import...");
                 sleep(1000);
@@ -3467,7 +3467,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
             // Unfortunately assertNotLinkWithText also picks up the "Errors" link in the header.
             assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-            assertLinkPresentWithTextCount("COMPLETE", _completedPipelineJobs + 1);
+            assertLinkPresentWithTextCount("COMPLETE", _prevCompletedPipelineJobs + 1);
 
             if (!_copiedArchive.delete())
                 fail("Couldn't delete copied specimen archive");

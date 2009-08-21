@@ -31,12 +31,11 @@ import java.util.Set;
  * Date: Mar 9, 2006
  * Time: 1:54:57 PM
  */
-public class StudyManualTest extends StudyBaseTest
+public class StudyManualTest extends StudyTest
 {
-    protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
-    protected SpecimenImporter _importer;
-
     private final String CRF_SCHEMAS = getSampleDataPath() + "datasets/schema.tsv";
+
+    protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
 
     @Override
     protected boolean isFileUploadTest()
@@ -44,17 +43,17 @@ public class StudyManualTest extends StudyBaseTest
         return true;
     }
 
-    protected void loadSpecimens()
+    protected void doCreateSteps()
     {
-        _importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 1);
+        createStudyManually();
+        startSpecimenImport(1);
+
+        // wait for datasets (but not specimens) to finish
+        waitForImport(1);
+        afterManualCreate();
     }
 
-    protected void waitForSpecimenLoad()
-    {
-        _importer.importAndWaitForComplete();
-    }
-
-    protected void createStudy()
+    protected void createStudyManually()
     {
         initializeFolder();
 
@@ -101,7 +100,7 @@ public class StudyManualTest extends StudyBaseTest
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickNavButton("Save");
 
-        // upload data:
+        // upload datasets:
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Data Pipeline");
         clickNavButton("Setup");
@@ -117,26 +116,8 @@ public class StudyManualTest extends StudyBaseTest
         clickNavButton("Submit");
     }
 
-    protected void waitForStudyLoad()
-    {
-        // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header,
-        // and it picks up the upload of 'FPX-1: Final Complete Physical Exam' as containing complete.
-        // we exclude the word 'REPLACE' to catch this case:
-        startTimer();
-        while ((!isLinkPresentWithText("COMPLETE") || isLinkPresentWithText("REPLACE")) &&
-                !isLinkPresentWithText("ERROR") &&
-                elapsedSeconds() < MAX_WAIT_SECONDS)
-        {
-            log("Waiting for data import");
-            sleep(1000);
-            refresh();
-        }
-        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertLinkPresentWithTextCount("COMPLETE", 1);
-    }
-
     // Using old visit map format, which does not support default visibility (so we need to set it manually).
-    protected void afterCreateStudy()
+    protected void afterManualCreate()
     {
         clickLinkWithText(getFolderName());
 
@@ -147,13 +128,14 @@ public class StudyManualTest extends StudyBaseTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("DEM-1: Demographics");
         clickButtonContainingText("Edit Dataset Definition");
-        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);        
+        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);
         checkCheckbox("demographicData");
         setFormElement("description", "This is the demographics dataset, dammit");
         clickNavButton("Save");
 
         createCustomAssays();
     }
+
 
     protected void hideVisits(String... visitLabel)
     {
@@ -260,17 +242,5 @@ public class StudyManualTest extends StudyBaseTest
     private void deleteReportFiles()
     {
         deleteDir(new File(getPipelinePath(), "Reports"));
-    }
-
-    private void deleteDir(File dir)
-    {
-        if (!dir.exists())
-            return;
-
-        File[] assayDataFiles = dir.listFiles();
-        for (File f : assayDataFiles)
-            f.delete();
-
-        dir.delete();
     }
 }

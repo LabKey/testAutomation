@@ -35,9 +35,96 @@ public class StudyBvtTest extends StudyManualTest
     private final String DATASET_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/dataset_data.xls";
 
     @Override
-    protected void doTestSteps()
+    protected void doCreateSteps()
     {
-        super.doTestSteps();
+        // manually create a study and load a specimen archive
+        createStudyManually();
+
+        // import the specimens and wait for both datasets & specimens to load
+        SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 1);
+        specimenImporter.importAndWaitForComplete();
+
+        // delete "export" directory, if it exists
+        deleteDir(new File(getPipelinePath() + "export"));
+
+        // export manually created study using "legacy" formats
+        exportStudy(true);
+
+        // set pipeline to the "export" directory (in prep for next import)
+        changePipelineRoot(getPipelinePath() + "export");
+
+        // delete manually created study
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Manage Study");
+        clickNavButton("Delete Study");
+        checkCheckbox("confirm");
+        clickNavButton("Delete");
+
+        // import from exported study (legacy formats)
+        clickNavButton("Import Study");
+        checkRadioButton("source", "pipeline");
+        clickButtonContainingText("Import Study");
+
+        // wait for study & specimen load to complete
+        waitForImport(5);
+
+        // delete "export" directory
+        deleteDir(new File(getPipelinePath() + "export"));
+
+        // change back to original root and export new study using "xml" formats
+        changePipelineRoot(getPipelinePath());
+
+        exportStudy(true);
+
+        // change pipeline root to "export" directory
+        changePipelineRoot(getPipelinePath() + "export");
+
+        // delete imported study
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Manage Study");
+        clickNavButton("Delete Study");
+        checkCheckbox("confirm");
+        clickNavButton("Delete");
+
+        // import from exported study (xml formats)
+        clickNavButton("Import Study");
+        checkRadioButton("source", "pipeline");
+        clickButtonContainingText("Import Study");
+
+        // wait for study & specimen load
+        waitForImport(8);
+
+        // Should be able to move this earlier (into manual study creation or after legacy format import), since all
+        // the settings should roundtrip through XML formats.  However, something in specimen requests fails if this
+        // is moved to after legacy import right now.  TODO: investigate & fix.
+        afterManualCreate();
+
+        changePipelineRoot(getPipelinePath());
+    }
+
+
+    private void exportStudy(boolean useXmlFormat)
+    {
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Manage Study");
+        clickNavButton("Export Study");
+
+        checkRadioButton("format", useXmlFormat ? "new" : "old");
+        checkRadioButton("location", "0");  // Pipeline root as individual files
+        clickNavButton("Export");
+    }
+
+
+    @Override
+    protected void waitForSpecimenImport()
+    {
+        // specimen import is complete
+    }
+
+    @Override
+    protected void verifySpecimens()
+    {
+        super.verifySpecimens();
 
         // verify that we correctly warn when specimen tracking hasn't been configured
         clickLinkWithText(getStudyLabel());
@@ -217,7 +304,7 @@ public class StudyBvtTest extends StudyManualTest
         clickMenuButton("Comments and QC", "Comments:Exit");
 
         // import second archive, verify that that data is merged:
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 2);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 8);
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load

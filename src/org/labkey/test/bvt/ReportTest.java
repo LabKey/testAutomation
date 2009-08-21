@@ -18,18 +18,17 @@ package org.labkey.test.bvt;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
-import org.labkey.test.drt.StudyTest;
+import org.labkey.test.drt.StudyBaseTest;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Jul 31, 2009
  */
-public class ReportTest extends StudyTest
+public class ReportTest extends StudyBaseTest
 {
     protected static final String GRID_VIEW = "create_gridView";
     protected static final String CROSSTAB_VIEW = "create_crosstabView";
@@ -105,11 +104,19 @@ public class ReportTest extends StudyTest
         super.doCleanup();
     }
 
-    @Override
-    protected void doTestSteps()
+    protected void doCreateSteps()
     {
-        doCreateSteps();
+        // import study and wait; no specimens needed
+        importStudy();
+        waitForImport(2);
 
+        // need this to turn off the demographic bit in the DEM-1 dataset
+        clickLinkWithText(getFolderName());
+        setDemographicsBit("DEM-1: Demographics", false);
+    }
+
+    protected void doVerifySteps()
+    {
         doCreateCharts();
         doCreateRReports();
 
@@ -118,24 +125,7 @@ public class ReportTest extends StudyTest
         doReportSecurity();
     }
 
-    @Override
-    protected void doCreateSteps()
-    {
-        super.doCreateSteps();
-
-        // need this to turn off the demographic bit in the DEM-1 dataset
-        clickLinkWithText(getFolderName());
-        setDemographicsBit("DEM-1: Demographics", false);
-    }
-
-    @Override
-    protected void loadSpecimens()
-    {
-        // This test doesn't use specimens
-        log("Skipping specimen import");
-    }
-
-   protected void deleteReport(String reportName)
+    protected void deleteReport(String reportName)
     {
         clickLinkWithText("Manage Views");
         final Locator report = Locator.tagContainingText("div", reportName);

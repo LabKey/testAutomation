@@ -17,15 +17,14 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
-import org.labkey.test.drt.StudyTest;
+import org.labkey.test.drt.StudyBaseTest;
 import org.labkey.test.util.ExtHelper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Jul 31, 2009
  */
-public class QuerySnapshotTest extends StudyTest
+public class QuerySnapshotTest extends StudyBaseTest
 {
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
     private final String APX_SNAPSHOT = "APX Joined Snapshot";
@@ -46,32 +45,30 @@ public class QuerySnapshotTest extends StudyTest
             "FROM Project.\"065\".study.\"DEM-1: Demographics\" ds2";
 
     @Override
-    protected void doTestSteps()
-    {
-        doCreateSteps();
-        doQuerySnapshotTest();
-    }
-
-    @Override
     protected void doCreateSteps()
     {
         // create two study folders (054 and 065) and start importing a study in each
         setFolderName(FOLDER_1);
-        createStudy();
+        importStudy();
 
         setFolderName(FOLDER_2);
-        createStudy();
+        importStudy();
 
         waitForStudyLoad(FOLDER_2);
     }
 
+    @Override
+    protected void doVerifySteps()
+    {
+        doQuerySnapshotTest();
+    }
+
     private void waitForStudyLoad(String folderName)
     {
-        // TODO: not needed: setFolderName(folderName);
         // Navigate
         clickLinkWithText(folderName);
         clickLinkWithText("Data Pipeline");
-        waitForStudyLoad();
+        waitForImport(2);
 
         // enable advanced study security
         enterPermissionsUI();
@@ -82,13 +79,6 @@ public class QuerySnapshotTest extends StudyTest
         // shut off demographics bit to allow for insert
         clickLinkWithText(folderName);
         setDemographicsBit("DEM-1: Demographics", false);
-    }
-
-    @Override
-    protected void loadSpecimens()
-    {
-        // This test doesn't use specimens
-        log("Skipping specimen import");
     }
 
     @Override
