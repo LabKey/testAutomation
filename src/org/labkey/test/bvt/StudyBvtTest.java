@@ -44,9 +44,6 @@ public class StudyBvtTest extends StudyManualTest
         SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 1);
         specimenImporter.importAndWaitForComplete();
 
-        // delete "export" directory, if it exists
-        deleteDir(new File(getPipelinePath() + "export"));
-
         // export manually created study using "legacy" formats
         exportStudy(true);
 
@@ -459,5 +456,13 @@ public class StudyBvtTest extends StudyManualTest
 
         assertTextPresent("kevin");
         assertTextPresent("chimpanzee");
+    }
+
+    @Override
+    protected void doCleanup() throws Exception
+    {
+        super.doCleanup();
+
+        deleteDir(new File(getPipelinePath() + "export"));
     }
 }

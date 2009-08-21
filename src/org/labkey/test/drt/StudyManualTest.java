@@ -20,8 +20,6 @@ import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -219,28 +217,5 @@ public class StudyManualTest extends StudyTest
         assertTextPresent("1234");
         assertTextPresent("2006-02-01");
         assertTextPresent("1.2");
-    }
-
-    private void deleteLogFiles()
-    {
-        File dataRoot = new File(getPipelinePath());
-        File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
-            public boolean accept(File dir, String name)
-            {
-                return name.endsWith(".log");
-            }
-        });
-        for (File f : logFiles)
-            f.delete();
-    }
-
-    private void deleteAssayUploadFiles()
-    {
-        deleteDir(new File(getPipelinePath(), "assaydata"));
-    }
-
-    private void deleteReportFiles()
-    {
-        deleteDir(new File(getPipelinePath(), "Reports"));
     }
 }

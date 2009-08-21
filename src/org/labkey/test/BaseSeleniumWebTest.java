@@ -3459,7 +3459,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.
             startTimer();
-            while (countLinksWithText("COMPLETE") == _prevCompletedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
+            while (countLinksWithText("COMPLETE") <= _prevCompletedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
             {
                 log("Waiting for specimen import...");
                 sleep(1000);
