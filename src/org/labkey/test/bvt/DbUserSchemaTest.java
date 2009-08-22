@@ -61,7 +61,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             clickLinkWithText("define new schema");
             setFormElement("userSchemaName", USER_SCHEMA_NAME);
             setFormElement("dbSchemaName", DB_SCHEMA_NAME);
-            setFormElement("metaData", getFileContents("server/modules/core/src/META-INF/test.xml"));
+            setFormElement("metaData", getFileContents("server/modules/core/resources/schemas/test.xml"));
             checkCheckbox("editable");
             clickNavButton("Create");
         }
