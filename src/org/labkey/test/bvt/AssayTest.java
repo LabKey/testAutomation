@@ -96,7 +96,7 @@ public class AssayTest extends AbstractAssayTest
             //delete user accounts
             deleteUser(TEST_ASSAY_USR_PI1);
             deleteUser(TEST_ASSAY_USR_TECH1);
-            deleteFile(getTestTempDir());
+            deleteDir(getTestTempDir());
         }
         catch(Throwable T) {/* ignore */}
     } //doCleanup()

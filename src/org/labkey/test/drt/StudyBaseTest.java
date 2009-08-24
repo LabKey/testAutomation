@@ -16,13 +16,12 @@
 
 package org.labkey.test.drt;
 
-import org.apache.commons.io.FileUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FilenameFilter;
 
 /*
 * User: adam
@@ -95,6 +94,25 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
     protected void doCleanup() throws Exception
     {
         try { deleteProject(getProjectName()); } catch (Throwable e) {}
+
+        deleteLogFiles(".");
+        deleteLogFiles("datasets");
+        deleteDir(new File(getPipelinePath(), "assaydata"));
+        deleteDir(new File(getPipelinePath(), "reports_temp"));
+    }
+
+    private void deleteLogFiles(String directoryName)
+    {
+        File dataRoot = new File(getPipelinePath() + directoryName);
+        File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
+            public boolean accept(File dir, String name)
+            {
+                return name.endsWith(".log");
+            }
+        });
+        for (File f : logFiles)
+            if (!f.delete())
+                log("WARNING: couldn't delete log file " + f.getAbsolutePath());
     }
 
     protected void importStudy()
@@ -165,29 +183,14 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
 
         startTimer();
 
-        while (!isLinkPresentWithTextCount("COMPLETE", completeJobs) && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (countLinksWithText("COMPLETE") < completeJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             log("Waiting for data import");
             sleep(1000);
             refresh();
         }
+
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
         assertLinkPresentWithTextCount("COMPLETE", completeJobs);
-    }
-
-    // Move to BaseSeleniumTest?
-    protected void deleteDir(File dir)
-    {
-        if (!dir.exists())
-            return;
-
-        try
-        {
-            FileUtils.deleteDirectory(dir);
-        }
-        catch (IOException e)
-        {
-            log("WARNING: Exception deleting directory -- " + e.getMessage());
-        }
     }
 }

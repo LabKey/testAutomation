@@ -20,6 +20,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.TestCase;
 import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.io.FileUtils;
 import static org.labkey.test.WebTestHelper.*;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PasswordUtil;
@@ -433,9 +434,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // Click on a module listed on the admin menu
-    public void selectModule(String moduleName)
+    public void goToModule(String moduleName)
     {
-        clickAdminMenuItem("Go To Module", "Query");
+        clickAdminMenuItem("Go To Module", moduleName);
     }
 
     private void waitForStartup()
@@ -1174,23 +1175,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkPresentWithText(child);
     }
 
-    public void deleteFile(File parent)
+    protected void deleteDir(File dir)
     {
-        if (parent.exists())
+        if (!dir.exists())
+            return;
+
+        try
         {
-            File[] children = parent.listFiles();
-            if (children != null)
-            {
-                for (File child : children)
-                {
-                    deleteFile(child);
-                }
-            }
-            if (!parent.delete())
-            {
-                log("Could not delete file " + parent);
-                fail("Could not delete file " + parent);
-            }
+            FileUtils.deleteDirectory(dir);
+        }
+        catch (IOException e)
+        {
+            log("WARNING: Exception deleting directory -- " + e.getMessage());
         }
     }
 

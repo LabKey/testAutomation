@@ -22,7 +22,6 @@ import org.labkey.test.Locator;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Mark Igra
  * Date: Jun 7, 2007
  * Time: 5:40:36 PM
@@ -181,7 +180,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Create Snapshot");
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
-        selectModule("Query");
+        goToModule("Query");
         clickLinkWithText("Schema Administration");
 		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
@@ -218,7 +217,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER +" Study");
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
-        selectModule("Query");
+        goToModule("Query");
         clickLinkWithText("Schema Administration");
         clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");

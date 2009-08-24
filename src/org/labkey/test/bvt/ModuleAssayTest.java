@@ -48,10 +48,11 @@ public class ModuleAssayTest extends AbstractAssayTest
         try
         {
             deleteProject(PROJECT_NAME);
-            deleteFile(getTestTempDir());
 //            ModuleUtil.deleteModule(MODULE_NAME);
         }
         catch (Throwable t) { }
+
+        deleteDir(getTestTempDir());
     }
 
     protected void doTestSteps() throws Exception

@@ -257,9 +257,10 @@ public class NabAssayTest extends AbstractAssayTest
             try
             {
                 deleteProject(TEST_ASSAY_PRJ_NAB);
-                deleteFile(getTestTempDir());
             }
             catch(Throwable T) {}
+
+            deleteDir(getTestTempDir());
         }
     } //doCleanup()
 

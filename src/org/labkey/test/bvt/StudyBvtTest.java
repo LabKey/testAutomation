@@ -70,6 +70,9 @@ public class StudyBvtTest extends StudyManualTest
 
         // change back to original root and export new study using "xml" formats
         changePipelineRoot(getPipelinePath());
+        hideSceeningVisit();
+        setDemographicsDescription();
+        createCustomAssays();
 
         exportStudy(true);
 
@@ -91,10 +94,10 @@ public class StudyBvtTest extends StudyManualTest
         // wait for study & specimen load
         waitForImport(8);
 
-        // Should be able to move this earlier (into manual study creation or after legacy format import), since all
-        // the settings should roundtrip through XML formats.  However, something in specimen requests fails if this
-        // is moved to after legacy import right now.  TODO: investigate & fix.
-        afterManualCreate();
+        // Should be able to move this earlier (after legacy format import), since this setting should roundtrip through
+        // XML formats.  However, something in specimen requests fails if this is moved there right now.
+        // TODO: investigate & fix.
+        setDemographicsBit();
 
         changePipelineRoot(getPipelinePath());
     }

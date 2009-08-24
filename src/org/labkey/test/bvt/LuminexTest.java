@@ -236,9 +236,10 @@ public class LuminexTest extends AbstractAssayTest
         try
         {
             deleteProject(TEST_ASSAY_PRJ_LUMINEX);
-            deleteFile(getTestTempDir());
         }
         catch(Throwable T) {/* ignore */}
+
+        deleteDir(getTestTempDir());
     } //doCleanup()
 
     protected boolean isFileUploadTest()

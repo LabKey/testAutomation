@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import com.thoughtworks.selenium.DefaultSelenium;
-
 public class FileContentTest extends BaseSeleniumWebTest
 {
     // Use a special exotic character in order to make sure we don't break
@@ -45,7 +43,7 @@ public class FileContentTest extends BaseSeleniumWebTest
     protected void doCleanup() throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-        try {deleteFile(getTestTempDir()); } catch (Throwable t) {}
+        deleteDir(getTestTempDir());
     }
 
     protected void doTestSteps() throws Exception

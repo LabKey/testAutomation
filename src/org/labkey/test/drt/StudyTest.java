@@ -18,7 +18,6 @@ package org.labkey.test.drt;
 import org.labkey.test.SortDirection;
 
 import java.io.File;
-import java.io.FilenameFilter;
 
 /**
  * User: adam
@@ -290,23 +289,6 @@ public class StudyTest extends StudyBaseTest
     {
         super.doCleanup();
 
-        deleteLogFiles(".");
-        deleteLogFiles("datasets");
         deleteDir(new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR));
-        deleteDir(new File(getPipelinePath(), "assaydata"));
-        deleteDir(new File(getPipelinePath(), "report_temp"));
-    }
-
-    private void deleteLogFiles(String directoryName)
-    {
-        File dataRoot = new File(getPipelinePath() + directoryName);
-        File[] logFiles = dataRoot.listFiles(new FilenameFilter(){
-            public boolean accept(File dir, String name)
-            {
-                return name.endsWith(".log");
-            }
-        });
-        for (File f : logFiles)
-            f.delete();
     }
 }

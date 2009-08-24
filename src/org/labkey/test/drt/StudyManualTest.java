@@ -117,24 +117,40 @@ public class StudyManualTest extends StudyTest
     // Using old visit map format, which does not support default visibility (so we need to set it manually).
     protected void afterManualCreate()
     {
-        clickLinkWithText(getFolderName());
-
-        // Hide visits based on label -- manual create vs. import will result in different indexes for these visits
-        hideVisits("Screening Cycle", "Cycle 1");
-
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("DEM-1: Demographics");
-        clickButtonContainingText("Edit Dataset Definition");
-        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);
-        checkCheckbox("demographicData");
-        setFormElement("description", "This is the demographics dataset, dammit");
-        clickNavButton("Save");
-
+        hideSceeningVisit();
+        setDemographicsDescription();
+        setDemographicsBit();
         createCustomAssays();
     }
 
 
+    protected void hideSceeningVisit()
+    {
+        clickLinkWithText(getFolderName());
+        hideVisits("Screening Cycle", "Cycle 1");
+    }
+
+
+    protected void setDemographicsDescription()
+    {
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("DEM-1: Demographics");
+        clickButtonContainingText("Edit Dataset Definition");
+        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+        setFormElement("description", "This is the demographics dataset, dammit");
+        clickNavButton("Save");
+    }
+
+
+    protected void setDemographicsBit()
+    {
+        clickLinkWithText(getFolderName());
+        setDemographicsBit("DEM-1: Demographics", true);
+    }
+
+
+    // Hide visits based on label -- manual create vs. import will result in different indexes for these visits
     protected void hideVisits(String... visitLabel)
     {
         clickLinkWithText("Manage Study");
@@ -174,7 +190,7 @@ public class StudyManualTest extends StudyTest
 
     protected void createCustomAssays()
     {
-        clickLinkWithText(getStudyLabel());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "verifyAssay");
