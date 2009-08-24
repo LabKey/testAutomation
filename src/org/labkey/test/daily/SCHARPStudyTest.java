@@ -86,7 +86,8 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
         // For now, only include the default visible columns, as Flow has a number of queries that
         // will fail to validate if we include all the columns. There is an open bug on this.
         // see https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=8439
-        clickRadioButtonById("rb-include-defvis");
+        // bug is now fixed.
+        //clickRadioButtonById("rb-include-defvis");
 
         selenium.click(Locator.id("btn-validate").toString());
         waitFor(new StatusChecker("Validation complete.", this), "Queries took to long to validate!", 30000);
