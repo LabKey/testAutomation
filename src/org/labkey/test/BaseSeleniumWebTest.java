@@ -799,22 +799,36 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void cleanup() throws Exception
     {
-        log("========= Cleaning up " + getClass().getSimpleName() + " =========");
-        // explicitly go back to the site, just in case we're on a 404 or crash page:
-        beginAt("");
-        signIn();
-        doCleanup();
+        boolean tearDown = false;
+        try
+        {
+            log("========= Cleaning up " + getClass().getSimpleName() + " =========");
+            if (selenium == null)
+            {
+                setUp();
+                tearDown = true;
+            }
 
-        beginAt("");
+            // explicitly go back to the site, just in case we're on a 404 or crash page:
+            beginAt("");
+            signIn();
+            doCleanup();
 
-        // The following checks verify that the test deleted all projects and folders that it created.
-        for (FolderIdentifier folder : _createdFolders)
-            assertLinkNotPresentWithText(folder.getFolderName());
+            beginAt("");
 
-        for (String projectName : _createdProjects)
-            assertLinkNotPresentWithText(projectName);
+            // The following checks verify that the test deleted all projects and folders that it created.
+            for (FolderIdentifier folder : _createdFolders)
+                assertLinkNotPresentWithText(folder.getFolderName());
 
-        log("========= " + getClass().getSimpleName() + " cleanup complete =========");
+            for (String projectName : _createdProjects)
+                assertLinkNotPresentWithText(projectName);
+            log("========= " + getClass().getSimpleName() + " cleanup complete =========");
+        }
+        finally
+        {
+            if (tearDown)
+                tearDown();
+        }
     }
 
     private boolean skipCleanup()

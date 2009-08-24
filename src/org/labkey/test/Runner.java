@@ -200,6 +200,7 @@ public class Runner extends TestSuite
             {
                 System.out.println("WARNING: failure cleaning test: " + t.getMessage());
                 System.out.println("Failures may be expected if the test was already cleaned.");
+                t.printStackTrace(System.out);
                 // fall through
             }
         }

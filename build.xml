@@ -48,11 +48,14 @@
         <echo message="drt                run developer regression tests (short suite)" />
         <echo message="quick              run developer regression tests only for modules that have been modified" />
         <echo message="bvt                run build verification tests (long suite)" />
+        <echo message="daily              run daily test suite" />
         <echo message="continue           continue running a suite after a failure, starting with the test that failed" />
         <echo message="drt-debug          run drt, but suspend until debugger attaches" />
         <echo message="bvt-debug          run bvt, but suspend until debugger attaches" />
+        <echo message="daily-debug        run daily, but suspend until debugger attaches" />
         <echo message="drt-clean          clean up after drt tests"/>
         <echo message="bvt-clean          clean up after bvt tests"/>
+        <echo message="daily-clean        clean up after daily tests"/>
         <echo message="setPassword        reset your stored password" />
         <echo message="ms2t               run MS2 tests" />
         <echo message="cluster            run MS2 cluster pipeline tests" />
@@ -549,9 +552,7 @@
     <target name="drt-clean">
         <property name="suite" value="DRT"/>
         <property name="cleanonly" value="true"/>
-        <antcall inheritall="true" target="runsuite">
-            <param name="debug.suspend" value="n" />
-        </antcall>
+        <antcall target="sub-selenium"/>
     </target>
 
     <target name="bvt" description="run build verification tests">
@@ -564,15 +565,14 @@
     <target name="bvt-debug" description="run bvt, suspend until debugger attaches">
         <property name="suite" value="BVT"/>
         <property name="debug.suspend.selenium" value="y"/>
-        <antcall target="sub-selenium"/>
         <property name="linkCheck" value="true"/>
+        <antcall target="sub-selenium"/>
     </target>
 
     <target name="bvt-clean">
         <property name="suite" value="BVT"/>
-        <antcall inheritall="true" target="runsuite">
-            <param name="debug.suspend" value="n" />
-        </antcall>
+        <property name="cleanonly" value="true"/>
+        <antcall target="sub-selenium"/>
     </target>
 
     <target name="daily" description="run daily verification tests">
@@ -580,6 +580,19 @@
         <property name="debug.suspend.selenium" value="n"/>
         <property name="linkCheck" value="true"/>
         <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="daily-debug" description="run daily verification tests">
+        <property name="suite" value="Daily"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <property name="linkCheck" value="true"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="daily-clean" description="run daily verification tests">
+        <property name="suite" value="Daily"/>
+        <property name="cleanonly" value="true"/>
+        <antcall inheritall="true" target="sub-selenium"/>
     </target>
 
     <target name="test" description="runs UI for selecting and running specific tests">
