@@ -40,14 +40,9 @@ public enum TestSet
         StudyTest.class
     }),
 
-    BVT(new Class[] {
-        BasicTest.class,
+    BVT(DRT, new Class[] {
         WikiTest.class,
-        JUnitTest.class,
-        SecurityTest.class,
         ExpTest.class,
-        FlowTest.class,
-        XTandemTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
         AssayTest.class,
