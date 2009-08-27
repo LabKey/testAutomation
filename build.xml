@@ -29,7 +29,7 @@
     <property name="test.log.output.dir" value="${test.build.home}/logs" />
     <property name="javaclient.dir" value="${project.root}/remoteapi/java"/>
     <property name="javaclient.build.xml" value="${javaclient.dir}/build.xml"/>
-    <property name="javaclientjar.dir" value="${javaclient.dir}/build/jar"/>
+    <property name="javaclientjar.dir" value="${project.root}/build/client-api/java/jar"/>
     <property name="javaclientlib.dir" value="${javaclient.dir}/lib"/>
 
     <property name="staging.modules.dir" value="${project.root}/build/staging/modules"/>
@@ -133,7 +133,7 @@
             <include name="commons-logging-1.1.jar" />
         </fileset>
         <fileset dir="${javaclientjar.dir}">
-            <include name="labkey-remote-api-${product.version}.jar"/>
+            <include name="labkey-client-api-${product.version}.jar"/>
         </fileset>
         <fileset dir="${javaclientlib.dir}">
             <include name="*.jar"/>
