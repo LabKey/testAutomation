@@ -1386,9 +1386,27 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return (source.indexOf(text1) < source.indexOf(text2));
     }
 
+    // Searches only the displayed text in the body of the page, not the HTML source.
+    public void assertTextPresentInThisOrder(String... text)
+    {
+        String source = selenium.getBodyText();
+        int previousIndex = -1;
+        String previousString = null;
+
+        for (String s : text)
+        {
+            int index = source.indexOf(s);
+
+            assertTrue("'" + s + "' is not present", index > -1);
+            assertTrue("'" + previousString + "' appears after '" + s + "'", index > previousIndex);
+            previousIndex = index;
+            previousString = s;
+        }
+    }
+
     public void assertTextBefore(String text1, String text2)
     {
-        assertTrue("'" + text1 + "' is not before '" + text2 + "'", isTextBefore(text1, text2));
+        assertTextPresentInThisOrder(text1, text2);
     }
 
     public void waitForPageToLoad(int millis)
