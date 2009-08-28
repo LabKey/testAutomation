@@ -132,8 +132,8 @@ public class ExpTest extends BaseSeleniumWebTest
         selenium.click("//span" + Locator.navButton("OK").getPath());
 
         // Make it a lookup into our custom query
-        int fieldCount = selenium.getXpathCount("//img[contains(@src, 'partdown')]").intValue();
-        click(Locator.id("partdown_" + (fieldCount - 1)));
+        int fieldCount = selenium.getXpathCount("//div[contains(@id, 'partdown_lookup')]").intValue();
+        mouseClick(Locator.id("partdown_lookup" + (fieldCount - 1)).toString());
         setFormElement("schema", "exp");
         setFormElement("table", "dataCustomQuery");
         clickNavButton("Close", 0);
