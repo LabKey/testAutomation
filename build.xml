@@ -216,6 +216,7 @@
           <include name="simpletest.module"/>
         </fileset>
       </copy>
+      <ant antfile="${project.root}/server/customModules/idriParticleSize/build.xml" inheritall="false" target="deploy"/>
     </target>
 
     <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module">

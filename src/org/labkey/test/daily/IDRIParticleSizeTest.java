@@ -15,51 +15,124 @@
  */
 package org.labkey.test.daily;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
+import org.labkey.test.bvt.AbstractAssayTest;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
 
 /**
  * User: jgarms
  * Date: May 19, 2009
  */
-public class IDRIParticleSizeTest extends BaseSeleniumWebTest
+public class IDRIParticleSizeTest extends AbstractAssayTest
 {
-    private static final String PROJECT_NAME = "Particle Size";
+    private static final String PROJECT_NAME = "IDRI Module Validation";
+    private static final String ASSAY_NAME = "IDRI";
+    private static final String Z_AVE_GRAPH = "Views:Z-Ave Graph";
 
-    private static final String DATA_DIRECTORY = "c:/temp/IDRI";
+    private final ListHelper.ListColumn _expCol1 = new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "name");
+    private final ListHelper.ListColumn _formulationCol1 = new ListHelper.ListColumn("Formulation", "Formulation", ListHelper.ListColumnType.String, "formulation", new ListHelper.LookupInfo(null, "Samples", "Formulations"));
+    private final ListHelper.ListColumn _formulationCol2 = new ListHelper.ListColumn("Experiment", "Experiment", ListHelper.ListColumnType.String, "expriment", new ListHelper.LookupInfo(null, "lists", "IDRI Experiments"));
+    private final ListHelper.ListColumn _formulationCol3 = new ListHelper.ListColumn("Assignment", "Assignment", ListHelper.ListColumnType.Double, "assignment");
 
-    private static final String FORMULATIONS_DATA = "Batch\tDM\tBatchSize\tNB_Pg\tAdjuvant\tSqualene_Oil\tPC\tFailure\tUsedInExperiments\n" +
-            "TD100\t1-Jan-2004\t25ml\t150-1\tMPL\tShark - Sigma\tEgg - Avanti\t\t\n" +
-            "TD101\t1-Jan-2005\t50ml\t150-2\tMPL\tShark - Sigma\tEgg - Avanti\t\t\n";
+    private static final String WIKI_FORMULATIONS_PAGE =
+            "<a href=\"%s/particleSize/" + PROJECT_NAME + "/populateFormulations.view\">Populate Formulations Table</a><p/>\n" +
+            "<a href=\"%s/particleSize/" + PROJECT_NAME + "/formulations.view\">Formulations and IDRI Experiments</a><p/>";
 
-    /**
-     * Assumes that you already have a project named "Particle Size" with a particle size assay definition, and that
-     * it has a run list web part on its portal page. It also assumes that you have defined a Formulations sample set.
-     *
-     * It iterates through all input files and upload them, and moving them to subdirectories based on the result.
-     */
+    protected void doCleanup() throws Exception
+    {
+        deleteProject(PROJECT_NAME);
+    }
+
     protected void doTestSteps() throws Exception
     {
-//        defineProject();
-//        clickLinkWithText("IDRI Particle Size Assay");
-        clickLinkWithText("Particle Size Database");
-        clickButtonContainingText("Import Data");
+        createProject(PROJECT_NAME);
 
-        File root = new File(DATA_DIRECTORY);
-        File emptyDir = new File(root, "empty");
-        File errorDir = new File(root, "error");
-        File successDir = new File(root, "success");
+        // module settings
+        clickLinkWithText("Folder Settings");
+        toggleCheckboxByTitle("Experiment");
+        toggleCheckboxByTitle("ParticleSize");
+        clickNavButton("Update Folder");
 
-        emptyDir.mkdirs();
-        errorDir.mkdirs();
-        successDir.mkdirs();
+        setupPipeline(PROJECT_NAME);
 
+        uploadSampleSet();
+        defineParticleSizeAssay();
+        uploadRuns();
+
+        doFormulationsTest();
+    }
+
+    private void uploadSampleSet() throws Exception
+    {
+        log("Upload the sample set");
+
+        clickLinkWithText(PROJECT_NAME);
+        addWebPart("Sample Sets");
+
+        clickLinkWithText("Sample Sets");
+        clickNavButton("Import Sample Set");
+
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = null;
+        File file = new File(getLabKeyRoot(), "/sampledata/particleSize/formulations.txt");
+        try {
+            if (file.exists())
+            {
+                br = new BufferedReader(new FileReader(file));
+                String l;
+                while ((l = br.readLine()) != null)
+                {
+                    sb.append(l);
+                    sb.append("\n");
+                }
+            }
+        }
+        finally
+        {
+            if (br != null)
+                try {br.close();} catch(IOException ioe) {}
+        }
+
+        setFormElement("name", "Formulations");
+        setFormElement("data", sb.toString());
+        clickNavButton("Submit");
+    }
+
+    private void defineParticleSizeAssay()
+    {
+        log("Defining a Particle Size assay at the project level");
+
+        clickLinkWithText(PROJECT_NAME);
+        addWebPart("Assay List");
+
+        clickLinkWithText("Manage Assays");
+        clickNavButton("New Assay Design");
+        checkRadioButton("providerName", "IDRI Particle Size");
+        clickNavButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+
+        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
+
+        clickNavButton("Save", 0);
+        waitForText("Save successful.", 20000);
+    }
+
+    private void uploadRuns()
+    {
+        log("uploading runs");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("Assay List");
+        clickLinkWithText(ASSAY_NAME);
+
+        clickNavButton("Import Data");
 
         // Look for TDxxx.xls files
-        File[] allFiles = root.listFiles(new FilenameFilter()
+        File dataRoot = new File(getLabKeyRoot(), "/sampledata/particleSize");
+        File[] allFiles = dataRoot.listFiles(new FilenameFilter()
         {
             public boolean accept(File dir, String name)
             {
@@ -83,26 +156,7 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
                 seconds++;
                 sleep(1000);
             }
-            
-            if (isTextPresent("The data file " + file.getName() + " contains no rows") ||
-                isTextPresent("Failure when communicating with the server: Data file contained zero data rows"))
-            {
-                click(getButtonLocator("OK"));
-                file.renameTo(new File(emptyDir, file.getName()));
-            }
-            else if (isTextPresent("Failure when communicating with the server"))
-            {
-                click(getButtonLocator("OK"));
-                file.renameTo(new File(errorDir, file.getName()));
-            }
-            else
-            {
-                assertTextPresent(file.getName());
-                file.renameTo(new File(successDir, file.getName()));
-            }
-            
             clickNavButton("Done");
-
             clickLinkWithText("Import Data");
             sleep(1000);
         }
@@ -115,54 +169,24 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
         }
 
         log("Excel files uploaded");
+
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("Manage Assays");
+        clickLinkWithText(ASSAY_NAME);
+        clickLinkWithText("TD220.xls");
+
+        assertTextPresent("pass 10");
+        assertTextPresent("Thu, Nov 30, 2006 at 03:55:39 PM");
+        assertTextPresent("6.57E-4");
+        assertTextPresent("dm+4 1");
+
+        ExtHelper.clickMenuButton(this, "Views", null, Z_AVE_GRAPH);
     }
 
     private boolean isMaterialPopupVisible()
     {
         String divClass = selenium.getEval("this.browserbot.getCurrentWindow().document.getElementById('material').className");
         return !divClass.equals("x-hidden");
-    }
-
-    protected void doCleanup() throws Exception
-    {
-        // IMPORTANT: don't do this in production!
-//        deleteProject(PROJECT_NAME);
-    }
-
-    private void defineProject() throws Exception
-    {
-        if (isTextPresent(PROJECT_NAME))
-        {
-            clickLinkWithText(PROJECT_NAME);
-            return;
-        }
-        createProject(PROJECT_NAME);
-        enableModule(PROJECT_NAME, "ParticleSize");
-        enableModule(PROJECT_NAME, "Experiment");
-        enableModule(PROJECT_NAME, "Pipeline");
-
-        setupPipeline();
-        addWebPart("Assay List");
-        addWebPart("Sample Sets");
-
-        log("Import formulations");
-        clickButtonContainingText("Import Sample Set");
-        selenium.type("name","Formulations");
-        selenium.type("textbox", FORMULATIONS_DATA);
-        submit();
-
-        log("Create assay design");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Manage Assays");
-
-        clickButtonContainingText("New Assay Design");
-        click(Locator.xpath("//input[@type='radio' and @value='IDRI Particle Size']"));
-
-        clickButtonContainingText("Next");
-
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
-        selenium.type("AssayDesignerName", "IDRI Particle Size Assay");
-        clickButtonContainingText("Save & Close");
     }
 
     public String getAssociatedModuleDirectory()
@@ -176,18 +200,45 @@ public class IDRIParticleSizeTest extends BaseSeleniumWebTest
         return true;
     }
 
-    private void setupPipeline()
+    private void doFormulationsTest()
     {
-        addWebPart("Data Pipeline");
-        clickNavButton("Setup");
-        File dir = getTestTempDir();
-        dir.mkdirs();
+        // create the IDRI experiment list and the formulations list
+        ListHelper.createList(this, PROJECT_NAME, "IDRI Experiments", ListHelper.ListColumnType.AutoInteger, "Key", _expCol1);
+        ListHelper.createList(this, PROJECT_NAME, "FormulationExpMap", ListHelper.ListColumnType.AutoInteger, "Key", _formulationCol1, _formulationCol2, _formulationCol3);
 
-        setFormElement("path", dir.getAbsolutePath());
-        clickNavButton("Set");
-
-        //make sure it was set
-        assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath() + "'.");
+        // create a wiki page with links to the views included in the module
         clickLinkWithText(PROJECT_NAME);
+        addWebPart("Wiki TOC");
+        clickLinkWithText("new page");
+
+        Locator.XPathLocator loc = Locator.xpath("//td[@id='wiki-tab-source']");
+        click(loc);
+        sleep(2000);
+        
+        setFormElement("name", "formulations");
+        setFormElement("title", "Formulations");
+
+        String wikiText = String.format(WIKI_FORMULATIONS_PAGE, getContextPath(), getContextPath());
+        setFormElement("body", wikiText);
+
+        clickNavButton("Save & Close");
+
+        // add this new page to a wiki web part
+        clickLinkWithText(PROJECT_NAME);
+        addWebPart("Wiki");
+        clickLinkWithText("Choose an existing page to display");
+        selectOptionByValue("name", "formulations");
+        clickNavButton("Submit");        
+        
+        clickLinkWithText("Populate Formulations Table");
+
+        Locator.XPathLocator button = Locator.xpath("//input[@type='button' and contains(@value, 'populate tables')]");
+        click(button);
+
+        Locator.XPathLocator progress = Locator.xpath("//span[@id='progressText' and text() = 'Initial Population Completed']");
+        waitForElement(progress, 90000);
+
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("Formulations and IDRI Experiments");
     }
 }
