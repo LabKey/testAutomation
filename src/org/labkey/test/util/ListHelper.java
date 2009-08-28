@@ -324,7 +324,7 @@ public class ListHelper
             LookupInfo lookup = col.getLookup();
             if (lookup != null)
             {
-                test.click(Locator.id("partdown_" + i));
+                test.mouseClick(Locator.id("partdown_lookup" + i).toString());
                 if (lookup.getFolder() != null)
                 {
                     test.setFormElement("folder", lookup.getFolder());

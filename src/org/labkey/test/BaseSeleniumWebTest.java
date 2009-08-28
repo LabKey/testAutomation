@@ -1450,6 +1450,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return isElementPresent(engine);
     }
 
+    public void mouseClick(String locator)
+    {
+        selenium.mouseClick(locator);
+    }
+
     public interface Checker
     {
         public boolean check();
@@ -3201,6 +3206,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             log("Sending key up " + keySequence + " on element " + locator);
             super.keyUp(locator, keySequence);
+        }
+
+        public void mouseClick(String locator)
+        {
+            log("MouseClick: " + locator);
+            super.mouseOver(locator);
+            super.mouseDown(locator);
+            super.mouseUp(locator);
         }
 
         @Override

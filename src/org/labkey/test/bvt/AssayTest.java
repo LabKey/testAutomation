@@ -449,7 +449,7 @@ public class AssayTest extends AbstractAssayTest
         waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']"), WAIT_FOR_GWT);
         selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
         selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_label5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
-        click(Locator.raw(getPropertyXPath("Data Fields") + "//td/img[@id='partdelete_4']"));
+        selenium.mouseClick(getPropertyXPath("Data Fields") + "//div[@id='partdelete_4']");
         waitForElement(Locator.raw("//td/img[@id='partdeleted_4']"), WAIT_FOR_GWT);
         clickNavButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_GWT);
