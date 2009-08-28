@@ -229,8 +229,7 @@ public class ListTest extends BaseSeleniumWebTest
         
         log("Check Customize View worked");
         assertTextPresent(TEST_DATA[0][3]);
-        assertTextBefore(TEST_DATA[0][0], TEST_DATA[0][1]);
-        assertTextBefore(TEST_DATA[0][2], TEST_DATA[0][1]);
+        assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
         assertTextNotPresent(TEST_DATA[0][0]);
         assertTextNotPresent(_listCol3.getLabel());
 
@@ -251,8 +250,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Export", 0);
         clickLinkContainingText("Export All to Text");
         assertTextPresent(TEST_DATA[0][3]);
-        assertTextBefore(TEST_DATA[0][0], TEST_DATA[0][1]);
-        assertTextBefore(TEST_DATA[0][2], TEST_DATA[0][1]);
+        assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
         assertTextNotPresent(TEST_DATA[0][0]);
         assertTextNotPresent(_listCol3.getLabel());
         popLocation();
