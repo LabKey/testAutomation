@@ -97,7 +97,6 @@ public class PipelineBvtTest extends PipelineWebTestBase
         _testSetMS2.verifyClean();
         _testSetMS1.verifyClean();
 
-        setupSite(true);
         _testSetMS2.setup();
 
         EmailRecordTable emailTable = new EmailRecordTable(this);

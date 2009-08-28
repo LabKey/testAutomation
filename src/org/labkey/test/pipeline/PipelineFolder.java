@@ -16,12 +16,9 @@
 package org.labkey.test.pipeline;
 
 import junit.framework.Assert;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
-import java.util.Arrays;
-
-import org.labkey.test.Locator;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * <code>PipelineFolder</code>
@@ -34,7 +31,7 @@ public class PipelineFolder
     protected static final String USER_KEY = "/sampledata/pipeline/globus/userkey.pem";
     protected static final String USER_KEY_PASSWORD = "";
 
-    public enum Type { mini, perl, enterprise }
+    public enum Type { mini, enterprise }
 
     protected PipelineWebTestBase _test;
     protected String _folderName;
@@ -137,14 +134,6 @@ public class PipelineFolder
             _test.setFormElement("keyFile", new File(pathLabKey + USER_KEY));
             _test.setFormElement("keyPassword", USER_KEY_PASSWORD);
             _test.setFormElement("certFile", new File(pathLabKey + USER_CERT));
-        }
-        else if (getPipelineType() == Type.perl)
-        {
-            _test.checkCheckbox("perlPipeline");
-        }
-        else if (_test.isElementPresent(Locator.name("perlPipeline")))
-        {
-            _test.uncheckCheckbox("perlPipeline");
         }
         _test.submit();
 

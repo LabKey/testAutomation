@@ -51,7 +51,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
         MS2PipelineFolder folder = new MS2PipelineFolder(this,
                 "Pipeline",
                 "T:/edi/pipeline/Test/regression",
-                (USE_GLOBUS ? PipelineFolder.Type.enterprise : PipelineFolder.Type.perl));
+                PipelineFolder.Type.enterprise);
         folder.setFastaPath("T:/data/databases");
 
         testSet.setFolder(folder);
@@ -89,7 +89,6 @@ public class MS2ClusterTest extends PipelineWebTestBase
         {
             testSet.verifyClean();
 
-            setupSite(true);
             testSet.setup();
         }
         else

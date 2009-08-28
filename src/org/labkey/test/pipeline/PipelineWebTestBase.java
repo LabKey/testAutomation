@@ -38,19 +38,4 @@ abstract public class PipelineWebTestBase extends BaseSeleniumWebTest
     {
         try {deleteProject(_projectName); } catch (Throwable t) {}        
     }
-
-    protected void setupSite(boolean perl)
-    {
-        if (perl)
-            log("Set cluster checkbox");
-        else
-            log("Clear cluster checkbox");
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("site settings");
-        if (perl)
-            checkCheckbox("perlPipelineEnabled");
-        else
-            uncheckCheckbox("perlPipelineEnabled");            
-        clickNavButton("Save");
-    }
 }
