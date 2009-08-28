@@ -62,12 +62,6 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        log("Set params checkbox");
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("site settings");
-        uncheckCheckbox("perlPipelineEnabled");
-        clickNavButton("Save");
-
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "MS2", new String[] { });
 
