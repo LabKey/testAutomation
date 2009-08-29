@@ -54,15 +54,6 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         return getLabKeyRoot() + getSampleDataPath();
     }
 
-    protected void changePipelineRoot(String path)
-    {
-        clickLinkWithText(getFolderName());
-        clickLinkWithText("Data Pipeline");
-        clickNavButton("Setup");
-        setFormElement("path", path);
-        submit();
-    }
-
     protected String getProjectName()
     {
         return "StudyVerifyProject";
@@ -123,9 +114,8 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         // Start importing study.xml to create the study and load all the datasets.  We'll wait for this import to
         // complete before doing any further tests.
         clickLinkWithText(getFolderName());
-        clickNavButton("Import Study");
-        checkRadioButton("source", "pipeline");
-        clickButtonContainingText("Import Study");
+        clickNavButton("Process and Import Data");
+        waitAndClickNavButton("Import Study");
     }
 
     private void initializePipeline()

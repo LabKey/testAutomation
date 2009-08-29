@@ -47,9 +47,6 @@ public class StudyBvtTest extends StudyManualTest
         // export manually created study using "legacy" formats
         exportStudy(true);
 
-        // set pipeline to the "export" directory (in prep for next import)
-        changePipelineRoot(getPipelinePath() + "export");
-
         // delete manually created study
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
@@ -59,8 +56,9 @@ public class StudyBvtTest extends StudyManualTest
 
         // import from exported study (legacy formats)
         clickNavButton("Import Study");
-        checkRadioButton("source", "pipeline");
-        clickButtonContainingText("Import Study");
+        clickNavButton("Import From Pipeline");
+        waitAndClick(Locator.fileTreeByName("export"));
+        waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load to complete
         waitForImport(5);
@@ -68,16 +66,12 @@ public class StudyBvtTest extends StudyManualTest
         // delete "export" directory
         deleteDir(new File(getPipelinePath() + "export"));
 
-        // change back to original root and export new study using "xml" formats
-        changePipelineRoot(getPipelinePath());
+        // export new study using "xml" formats
         hideSceeningVisit();
         setDemographicsDescription();
         createCustomAssays();
 
         exportStudy(true);
-
-        // change pipeline root to "export" directory
-        changePipelineRoot(getPipelinePath() + "export");
 
         // delete imported study
         clickLinkWithText(getStudyLabel());
@@ -88,8 +82,9 @@ public class StudyBvtTest extends StudyManualTest
 
         // import from exported study (xml formats)
         clickNavButton("Import Study");
-        checkRadioButton("source", "pipeline");
-        clickButtonContainingText("Import Study");
+        clickNavButton("Import From Pipeline");
+        waitAndClick(Locator.fileTreeByName("export"));
+        waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load
         waitForImport(8);
@@ -98,8 +93,6 @@ public class StudyBvtTest extends StudyManualTest
         // XML formats.  However, something in specimen requests fails if this is moved there right now.
         // TODO: investigate & fix.
         setDemographicsBit();
-
-        changePipelineRoot(getPipelinePath());
     }
 
 

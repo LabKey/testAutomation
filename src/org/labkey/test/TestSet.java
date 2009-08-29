@@ -129,11 +129,11 @@ public enum TestSet
     }),
 
     Study(new Class[] {
-            StudyManualTest.class,
+            StudyTest.class,
             StudyBvtTest.class,
+            StudyManualTest.class,
             StudyExtraTest.class,
             AssayTest.class,
-            StudyTest.class,
             ReportTest.class,
             QuerySnapshotTest.class
     }),
