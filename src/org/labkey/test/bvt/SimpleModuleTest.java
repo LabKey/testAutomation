@@ -16,7 +16,16 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.Maps;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.Connection;
+
+import java.util.Map;
+import java.util.Arrays;
 
 /*
 * User: Dave
@@ -29,6 +38,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 {
     public static final String PROJECT_NAME = "Simple Module Verfiy Project";
     public static final String MODULE_NAME = "simpletest";
+    public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String LIST_NAME = "People";
     public static final String LIST_DATA = "Name\tAge\tCrazy\n" +
             "Dave\t39\tTrue\n" +
@@ -44,12 +54,65 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         enableModule(PROJECT_NAME, "Query");
 
         clickLinkWithText(PROJECT_NAME);
+        doTestSchemas();
         doTestViews();
         doTestWebParts();
         createList();
         doTestQueries();
         doTestQueryViews();
         doTestReports();
+    }
+
+    private void doTestSchemas() throws Exception
+    {
+        log("Testing schemas in modules...");
+        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        log("Inserting new Manufacturers via java client api...");
+        InsertRowsCommand insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
+        insertCmd.getRows().addAll(Arrays.asList(
+                Maps.<String, Object>of("Name", "Ford"),
+                Maps.<String, Object>of("Name", "Toyota"),
+                Maps.<String, Object>of("Name", "Honda")
+        ));
+        SaveRowsResponse insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
+
+        Long fordId = null;
+        Long toyotaId = null;
+        Long hondaId = null;
+
+        for (Map<String, Object> row : insertResp.getRows())
+        {
+            Long rowId = (Long)row.get("RowId");
+            String name = (String)row.get("Name");
+            assertNotNull("Expected response row to have a Name column", name);
+            assertNotNull("Expected response row to have a RowId column", rowId);
+            if (name.equalsIgnoreCase("Ford"))
+                fordId = rowId;
+            else if (name.equalsIgnoreCase("Toyota"))
+                toyotaId = rowId;
+            else if (name.equalsIgnoreCase("Honda"))
+                hondaId = rowId;
+        }
+        assertTrue("Expected rowids for all Manufacturers", fordId != null && toyotaId != null && hondaId != null);
+
+        log("Inserting new Models via javas client api...");
+        insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
+        insertCmd.getRows().addAll(Arrays.asList(
+                Maps.<String, Object>of("ManufacturerId", toyotaId,
+                                        "Name", "Prius"),
+                Maps.<String, Object>of("ManufacturerId", toyotaId,
+                                        "Name", "Camry"),
+                Maps.<String, Object>of("ManufacturerId", fordId,
+                                        "Name", "Focus"),
+                Maps.<String, Object>of("ManufacturerId", fordId,
+                                        "Name", "F150")
+        ));
+        insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        assertEquals("Expected to insert 4 rows.", 4, insertResp.getRowsAffected().intValue());
     }
 
     private void doTestViews()
@@ -62,6 +125,15 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         //navigate to other view
         clickLinkWithText("other view");
         assertTextPresent("This is another view in the simple test module");
+
+        log("Testing vehicle.Model url link...");
+        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        clickLinkWithText("Models");
+        clickLinkWithText("Prius");
+        assertTextPresent("Hooray!");
+        String rowidStr = getText(Locator.id("model.rowid"));
+        int rowid = Integer.parseInt(rowidStr);
+        assertTrue("Expected rowid on model.html page", rowid > 0);
     }
 
     private void doTestWebParts()
@@ -108,6 +180,13 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("Dave");
         assertTextPresent("Josh");
         assertTextNotPresent("Britt");
+
+        log("Testing query of vehicle schema...");
+        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        clickLinkWithText("Toyotas");
+
+        assertTextPresent("Prius");
+        assertTextPresent("Camry");
     }
 
     private void doTestQueryViews()

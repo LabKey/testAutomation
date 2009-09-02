@@ -32,11 +32,17 @@ cruisecontrol/xsl/pmd-details.xsl -text
 cruisecontrol/xsl/pmd.xsl -text
 cruisecontrol/xsl/testdetails.xsl -text
 cruisecontrol/xsl/unittests.xsl -text
+modules/simpletest/config/module.xml -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text
+modules/simpletest/queries/vehicle/Toyotas.sql -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
+modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-0.10.sql -text
+modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-0.10.sql -text
+modules/simpletest/schemas/vehicle.xml -text
 modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
+modules/simpletest/views/model.html -text
 modules/simpletest/views/other.html -text
 modules/simpletest/views/webpart.html -text
 /resetDRT.cmd -text
@@ -147,6 +153,7 @@ src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/ExperimentRunTable.java -text
 src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/ListHelper.java -text
+src/org/labkey/test/util/Maps.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
