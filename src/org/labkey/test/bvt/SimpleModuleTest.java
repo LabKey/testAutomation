@@ -182,7 +182,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextNotPresent("Britt");
 
         log("Testing query of vehicle schema...");
-        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
         clickLinkWithText("Toyotas");
 
         assertTextPresent("Prius");
