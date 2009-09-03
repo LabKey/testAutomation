@@ -61,7 +61,7 @@ public class StudyBvtTest extends StudyManualTest
         waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load to complete
-        waitForImport(5);
+        waitForImport(3);
 
         // delete "export" directory
         deleteDir(new File(getPipelinePath() + "export"));
@@ -87,7 +87,7 @@ public class StudyBvtTest extends StudyManualTest
         waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load
-        waitForImport(8);
+        waitForImport(4);
 
         // Should be able to move this earlier (after legacy format import), since this setting should roundtrip through
         // XML formats.  However, something in specimen requests fails if this is moved there right now.
@@ -298,7 +298,7 @@ public class StudyBvtTest extends StudyManualTest
         clickMenuButton("Comments and QC", "Comments:Exit");
 
         // import second archive, verify that that data is merged:
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 8);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 4);
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load

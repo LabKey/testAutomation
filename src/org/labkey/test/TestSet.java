@@ -135,7 +135,8 @@ public enum TestSet
             StudyExtraTest.class,
             AssayTest.class,
             ReportTest.class,
-            QuerySnapshotTest.class
+            QuerySnapshotTest.class,
+            SCHARPStudyTest.class
     }),
 
     Data(new Class[] {

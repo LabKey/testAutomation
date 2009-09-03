@@ -130,14 +130,14 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
 
         assertTextPresent("Data Pipeline");
 
-        while(countLinksWithText("COMPLETE") < 2)
+        while(countLinksWithText("COMPLETE") < 1)
         {
             if (countLinksWithText("ERROR") > 0)
             {
                 fail("Job in ERROR state found in the list");
             }
 
-            log("Wating for study to finish loading...");
+            log("Waiting for study to finish loading...");
             sleep(3000);
             refresh();
         }

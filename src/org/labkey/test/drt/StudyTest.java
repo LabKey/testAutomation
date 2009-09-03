@@ -42,10 +42,10 @@ public class StudyTest extends StudyBaseTest
     protected void doCreateSteps()
     {
         importStudy();
-        startSpecimenImport(2);
+        startSpecimenImport(1);
 
         // wait for study (but not specimens) to finish loading
-        waitForImport(2);
+        waitForImport(1);
     }
 
     protected void doVerifySteps()
