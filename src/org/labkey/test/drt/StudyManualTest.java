@@ -138,7 +138,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText("DEM-1: Demographics");
         clickButtonContainingText("Edit Dataset Definition");
         waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);
-        setFormElement("description", "This is the demographics dataset, dammit");
+        setFormElement("description", DEMOGRAPHICS_DESCRIPTION);
         clickNavButton("Save");
     }
 

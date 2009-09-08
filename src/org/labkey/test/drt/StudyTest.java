@@ -29,6 +29,7 @@ public class StudyTest extends StudyBaseTest
     protected static final String PROJECT_NAME = "ImportStudyVerifyProject";
     protected static final String FOLDER_NAME = "My Import Study";
     protected static final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
+    protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some ‘special symbols’ – they help test that we're roundtripping in UTF-8.";
 
     protected String _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
         "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\n" +
@@ -167,7 +168,8 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("Study Navigator");
         clickLinkWithText("24");
-        assertTextPresent("This is the demographics dataset, dammit");
+        assertTextPresent(DEMOGRAPHICS_DESCRIPTION);
+        assertTextPresent("Here are some ‘special symbols’ – they help test that we're roundtripping in UTF-8");
         assertTextPresent("Male");
         assertTextPresent("African American or Black");
         clickLinkWithText("999320016");
@@ -230,7 +232,7 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("DEM-1: Demographics");
         assertTableCellTextEquals("details", 5, 1, "true");
-        assertTableCellTextEquals("details", 8, 1, "This is the demographics dataset, dammit");
+        assertTableCellTextEquals("details", 8, 1, DEMOGRAPHICS_DESCRIPTION);
 
         // "Demographics Data" bit needs to be false for the rest of the test
         setDemographicsBit("DEM-1: Demographics", false);
