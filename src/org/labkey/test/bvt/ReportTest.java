@@ -106,6 +106,9 @@ public class ReportTest extends StudyBaseTest
 
     protected void doCreateSteps()
     {
+        // fail fast if R is not configured 
+        checkRSetup();
+
         // import study and wait; no specimens needed
         importStudy();
         waitForImport(1);
@@ -316,8 +319,15 @@ public class ReportTest extends StudyBaseTest
                 }
             }
         }
-        //log("Failed R configuration, skipping R tests");
+
         log("Environment info: " + System.getenv());
+
+        if (null == rHome)
+        {
+            log("");   // Blank line helps make the following message more readable
+            log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
+        }
+
         fail("R is not configured on this system. Failed R tests.");
         return false;
     }
@@ -325,7 +335,6 @@ public class ReportTest extends StudyBaseTest
     protected void doCreateRReports()
     {
         log("Create an R Report");
-        checkRSetup();
 
         click(Locator.linkWithText("Projects"));
         clickLinkWithText(getProjectName());
