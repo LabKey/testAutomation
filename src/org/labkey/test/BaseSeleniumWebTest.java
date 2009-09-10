@@ -62,6 +62,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private boolean _fileUploadAvailable;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
+    protected static final int MAX_WAIT_SECONDS = 4 * 60;
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
@@ -1861,6 +1862,52 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 assertTableCellTextEquals(tableName, row + startRow, col, cellValues[row][col]);
     }
 
+    // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
+    public List<String> getPipelineStatusValues()
+    {
+        List<String> statusValues = getTableColumnValues("dataregion_StatusFiles", 1);
+        statusValues.remove(0);  // Remove the header
+
+        return statusValues;
+    }
+
+    // Returns true if any status value is "ERROR"
+    public boolean hasError(List<String> statusValues)
+    {
+        return statusValues.contains("ERROR");
+    }
+
+    // Returns count of "COMPLETE"
+    public int countComplete(List<String> statusValues)
+    {
+        int complete = 0;
+
+        for (String statusValue : statusValues)
+            if ("COMPLETE".equals(statusValue))
+                complete++;
+
+        return complete;
+    }
+
+    // Returns the value of all cells in the specified column
+    public List<String> getTableColumnValues(String tableName, int column)
+    {
+        int rowCount = getTableRowCount(tableName);
+
+        List<String> values = new ArrayList<String>(rowCount);
+
+        for (int i = 0; i < rowCount; i++)
+            values.add(getTableCellText(tableName, i, column));
+
+        return values;
+    }
+
+    // Returns the number of rows (both <tr> and <th>) in the specified table
+    public int getTableRowCount(String tableName)
+    {
+        return selenium.getXpathCount("//table[@id='" + tableName + "']/thead").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
+    }
+
     public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
     {
         clickAndWait(Locator.imageMapLinkByTitle(imageMapName, areaTitle), defaultWaitForPage);
@@ -3424,22 +3471,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // This class makes it easier to start a specimen import early in a test and wait for completion later.
     public class SpecimenImporter
     {
-        private static final int MAX_WAIT_SECONDS = 4 * 60;
-
         private final File _pipelineRoot;
         private final File _specimenArchive;
         private final File _tempDir;
         private final String _studyFolderName;
-        private final int _prevCompletedPipelineJobs;
+        private final int _completeJobsExpected;
         private final File _copiedArchive;
 
-        public SpecimenImporter(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int prevCompletedPipelineJobs)
+        public SpecimenImporter(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int completeJobsExpected)
         {
             _pipelineRoot = pipelineRoot;
             _specimenArchive = specimenArchive;
             _tempDir = tempDir;
             _studyFolderName = studyFolderName;
-            _prevCompletedPipelineJobs = prevCompletedPipelineJobs;
+            _completeJobsExpected = completeJobsExpected;
             _copiedArchive = new File(_tempDir, FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
         }
 
@@ -3498,20 +3543,33 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickLinkWithText(_studyFolderName);
             clickLinkWithText("Data Pipeline");
 
-            // Unfortunately isLinkWithTextPresent also picks up the "Errors" link in the header.
-            startTimer();
-            while (countLinksWithText("COMPLETE") <= _prevCompletedPipelineJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
-            {
-                log("Waiting for specimen import...");
-                sleep(1000);
-                refresh();
-            }
-            // Unfortunately assertNotLinkWithText also picks up the "Errors" link in the header.
-            assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-            assertLinkPresentWithTextCount("COMPLETE", _prevCompletedPipelineJobs + 1);
+            waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import");
 
             if (!_copiedArchive.delete())
                 fail("Couldn't delete copied specimen archive");
         }
+    }
+
+
+    // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
+    protected void waitForPipelineJobsToComplete(int completeJobsExpected, String description)
+    {
+        List<String> statusValues = getPipelineStatusValues();
+
+        // Short circuit in case we already have too many COMPLETE jobs
+        assertTrue("Number of COMPLETE jobs already exceeds desired count", countComplete(statusValues) <= completeJobsExpected);
+
+        startTimer();
+
+        while (countComplete(statusValues) < completeJobsExpected && !hasError(statusValues) && elapsedSeconds() < MAX_WAIT_SECONDS)
+        {
+            log("Waiting for " + description);
+            sleep(1000);
+            refresh();
+            statusValues = getPipelineStatusValues();
+        }
+
+        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
+        assertEquals(countComplete(statusValues), completeJobsExpected);
     }
 }

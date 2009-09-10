@@ -44,10 +44,10 @@ public class StudyManualTest extends StudyTest
     protected void doCreateSteps()
     {
         createStudyManually();
-        startSpecimenImport(1);
+        startSpecimenImport(2);
 
         // wait for datasets (but not specimens) to finish
-        waitForImport(1);
+        waitForPipelineJobsToComplete(1, "study import");
         afterManualCreate();
     }
 

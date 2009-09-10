@@ -33,8 +33,6 @@ import java.io.FilenameFilter;
 // verification steps.
 public abstract class StudyBaseTest extends BaseSeleniumWebTest
 {
-    protected static final int MAX_WAIT_SECONDS = 4*60;
-
     abstract protected void doCreateSteps();
 
     abstract protected void doVerifySteps();
@@ -164,23 +162,5 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
     protected void assertSelectOption(String name, int i, String expected)
     {
         assertEquals(selenium.getSelectedValue(Locator.tagWithName("select", name).index(i).toString()), expected);
-    }
-
-    protected void waitForImport(int completeJobs)
-    {
-        // Short circuit in case we already have too many COMPLETE jobs
-        assertTrue("COMPLETE jobs already exceeds desired count", countLinksWithText("COMPLETE") <= completeJobs);
-
-        startTimer();
-
-        while (countLinksWithText("COMPLETE") < completeJobs && !isLinkPresentWithText("ERROR") && elapsedSeconds() < MAX_WAIT_SECONDS)
-        {
-            log("Waiting for data import");
-            sleep(1000);
-            refresh();
-        }
-
-        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertLinkPresentWithTextCount("COMPLETE", completeJobs);
     }
 }

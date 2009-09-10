@@ -38,6 +38,7 @@ public class StudyBvtTest extends StudyManualTest
     protected void doCreateSteps()
     {
         // manually create a study and load a specimen archive
+        log("Creating study manually");
         createStudyManually();
 
         // import the specimens and wait for both datasets & specimens to load
@@ -54,14 +55,14 @@ public class StudyBvtTest extends StudyManualTest
         checkCheckbox("confirm");
         clickNavButton("Delete");
 
-        // import from exported study (legacy formats)
+        log("Importing exported study (legacy formats)");
         clickNavButton("Import Study");
         clickNavButton("Import From Pipeline");
         waitAndClick(Locator.fileTreeByName("export"));
         waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load to complete
-        waitForImport(3);
+        waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)");
 
         // delete "export" directory
         deleteDir(new File(getPipelinePath() + "export"));
@@ -80,14 +81,14 @@ public class StudyBvtTest extends StudyManualTest
         checkCheckbox("confirm");
         clickNavButton("Delete");
 
-        // import from exported study (xml formats)
+        log("Importing exported study (xml formats)");
         clickNavButton("Import Study");
         clickNavButton("Import From Pipeline");
         waitAndClick(Locator.fileTreeByName("export"));
         waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load
-        waitForImport(4);
+        waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)");
 
         // Should be able to move this earlier (after legacy format import), since this setting should roundtrip through
         // XML formats.  However, something in specimen requests fails if this is moved there right now.

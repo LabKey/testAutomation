@@ -111,7 +111,7 @@ public class ReportTest extends StudyBaseTest
 
         // import study and wait; no specimens needed
         importStudy();
-        waitForImport(1);
+        waitForPipelineJobsToComplete(1, "study import");
 
         // need this to turn off the demographic bit in the DEM-1 dataset
         clickLinkWithText(getFolderName());

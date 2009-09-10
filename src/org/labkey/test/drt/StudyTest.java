@@ -44,10 +44,10 @@ public class StudyTest extends StudyBaseTest
     protected void doCreateSteps()
     {
         importStudy();
-        startSpecimenImport(1);
+        startSpecimenImport(2);
 
         // wait for study (but not specimens) to finish loading
-        waitForImport(1);
+        waitForPipelineJobsToComplete(1, "study import");
     }
 
     protected void doVerifySteps()
@@ -57,11 +57,11 @@ public class StudyTest extends StudyBaseTest
         verifySpecimens();
     }
 
-    protected void startSpecimenImport(int prevCompletedPipelineJobs)
+    protected void startSpecimenImport(int completeJobsExpected)
     {
         // Start importing the specimens as well.  We'll let this load in the background while executing the first set of
         // verification steps.  Doing this in parallel speeds up the test.
-        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), prevCompletedPipelineJobs);
+        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
         _specimenImporter.startImport();
     }
 
