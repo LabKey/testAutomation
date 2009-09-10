@@ -3221,8 +3221,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isExtTreeNodeExpanded(schemaName))
             click(loc);
         else
+        {
             selenium.doubleClick(loc.toString());
-        sleep(20);
+            sleep(1000);
+            click(loc);
+        }
+        waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaName + "']"), 1000);
     }
 
     public boolean isQueryPresent(String schemaName, String queryName)
@@ -3249,7 +3253,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         Locator loc = Locator.queryTreeNode(schemaName, queryName);
         waitForElement(loc, 5000);
         click(loc);
-        sleep(20);
+        waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
     }
 
     public void viewQueryData(String schemaName, String queryName)
@@ -3260,6 +3264,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String href = getAttribute(loc, "href");
         log("Navigating to " + href);
         selenium.open(href);
+    }
+
+    public void editQueryProperties(String schemaName, String queryName)
+    {
+        selectQuery(schemaName, queryName);
+        Locator loc = Locator.linkWithText("edit properties");
+        waitForElement(loc, 5000);
+        clickAndWait(loc);
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium

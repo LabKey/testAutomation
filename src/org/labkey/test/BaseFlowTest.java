@@ -108,7 +108,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         String queryURL = "query/" + container + "/begin.view?schemaName=flow";
         beginAt(queryURL);
-        clickNavButton("Create New Query");
+        selectSchema("flow");
+        clickExtToolbarButton("Create New Query");
         setFormElement("ff_newQueryName", name);
         clickNavButton("Create and edit SQL");
         setFormElement("ff_queryText", sql);
@@ -117,7 +118,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         if (inheritable)
         {
             beginAt(queryURL);
-            clickAndWait(Locator.raw("//td[contains(text(), '" + name + "')]/.." + Locator.navButton("Properties").getPath()));
+            editQueryProperties("flow", name);
             selectOptionByValue("inheritable", "true");
             submit();
         }

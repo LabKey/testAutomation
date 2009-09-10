@@ -84,8 +84,8 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Write a simple custom query that wraps the data table
         clickTab("Query");
-        clickLinkWithText("exp");
-        clickLinkWithText("create new query");
+        selectSchema("exp");
+        clickExtToolbarButton("Create New Query");
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Datas");
         clickNavButton("Create and edit SQL");
@@ -125,7 +125,8 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Add a new wrapped column to the exp.Datas table
         clickLinkWithText("exp Schema");
-        click(Locator.raw("//a[contains(text(), 'Datas')]/../..//a[contains(text(), 'customize display')]"));
+        selectQuery("exp", "Datas");
+        clickLinkWithText("customize display");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Alias Field").getPath());
         selectOptionByText("sourceColumn", "RowId");
@@ -155,6 +156,7 @@ public class ExpTest extends BaseSeleniumWebTest
         // Since this metadata is shared, clear it out 
         clickMenuButton("Query", "Query:EditQuery");
         clickNavButton("Edit Metadata with GUI");
+        waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Reset to Default").getPath());
         selenium.click("//span" + Locator.navButton("OK").getPath());
         waitForText("Reset successful", 10000);
