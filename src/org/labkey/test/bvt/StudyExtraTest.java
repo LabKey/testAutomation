@@ -181,19 +181,19 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
         goToModule("Query");
-        clickLinkWithText("Schema Administration");
+        clickExtToolbarButton("Define External Schemas");
 		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
 		setFormElement("dbSchemaName", "verifysnapshot");
         clickNavButton("Create");
 		assertTextPresent("VerifySnapshot");
         clickLinkWithText("Query start page");
-        clickLinkWithText("VerifySnapshot");
-		assertTrue(isTextPresent("List1") || isTextPresent("list1"));
-        if (isLinkPresentWithText("Subjects"))
-            clickLinkWithText("Subjects");
-        else if (isLinkPresentWithText("subjects"))
-            clickLinkWithText("subjects");
+        selectSchema("VerifySnapshot");
+		assertTrue(isQueryPresent("VerifySnapshot", "List1", 3000) || isQueryPresent("VerifySnapshot", "list1"));
+        if (isQueryPresent("VerifySnapshot", "Subjects"))
+            viewQueryData("VerifySnapshot", "Subjects");
+        else if (isQueryPresent("VerifySnapshot", "subjects"))
+            viewQueryData("VerifySnapshot", "subjects");
         else
             fail("Missing subjects table");
         assertTextPresent("Vaccine2");
@@ -218,15 +218,15 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
         goToModule("Query");
-        clickLinkWithText("Schema Administration");
+        clickExtToolbarButton("Define External Schemas");
         clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
         clickLinkWithText("Query start page");
-        clickLinkWithText("VerifySnapshot");
-        if (isTextPresent("TestAssay1"))
-            clickLinkWithText("TestAssay1");
-        else if (isTextPresent("testassay1"))
-            clickLinkWithText("testassay1");
+        selectSchema("VerifySnapshot");
+        if (isQueryPresent("VerifySnapshot", "TestAssay1"))
+            viewQueryData("VerifySnapshot", "TestAssay1");
+        else if (isQueryPresent("VerifySnapshot", "testassay1"))
+            viewQueryData("VerifySnapshot", "testassay1");
         else
             fail("TestAssay1 table not present");
 

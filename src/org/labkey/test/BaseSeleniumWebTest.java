@@ -19,6 +19,7 @@ package org.labkey.test;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.TestCase;
+import junit.framework.AssertionFailedError;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.commons.io.FileUtils;
 import static org.labkey.test.WebTestHelper.*;
@@ -1802,6 +1803,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         mouseDownAt(Locator.xpath("//span[@class = 'x-tab-strip-text' and text() = '" + tabname + "']"), 0, 0);
     }
 
+    public void clickExtToolbarButton(String caption)
+    {
+        log("Clicking Ext button with caption: " + caption);
+        Locator loc = Locator.xpath("//button[contains(./@class, 'x-btn-text') and text()='" + caption + "']");
+        waitForElement(loc, 5000);
+        clickAndWait(loc, defaultWaitForPage);
+    }
+
     public void clickImageWithAltText(String altText)
     {
         log("Clicking first image with alt text " + altText );
@@ -3185,7 +3194,73 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 	{
 		return selenium.getHtmlSource();
 	}
-	
+
+    public boolean isExtTreeNodeSelected(String nodeCaption)
+    {
+        Locator loc = Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + nodeCaption + "']");
+        return isElementPresent(loc);
+    }
+
+    public boolean isExtTreeNodeExpanded(String nodeCaption)
+    {
+        Locator loc = Locator.xpath("//div[contains(./@class,'x-tree-node-expanded')]/a/span[text()='" + nodeCaption + "']");
+        return isElementPresent(loc);
+    }
+
+    // Helper methods for interacting with the query schema browser
+    public void selectSchema(String schemaName)
+    {
+        if (isExtTreeNodeSelected(schemaName))
+            return;
+        
+        log("Selecting schema " + schemaName + " in the schema browser...");
+        Locator loc = Locator.schemaTreeNode(schemaName);
+
+        //first load of schemas might a few seconds
+        waitForElement(loc, 30000);
+        if (isExtTreeNodeExpanded(schemaName))
+            click(loc);
+        else
+            selenium.doubleClick(loc.toString());
+        sleep(20);
+    }
+
+    public boolean isQueryPresent(String schemaName, String queryName)
+    {
+        return isQueryPresent(schemaName, queryName, 0);
+    }
+
+    public boolean isQueryPresent(String schemaName, String queryName, int wait)
+    {
+        selectSchema(schemaName);
+        Locator loc = Locator.queryTreeNode(schemaName, queryName);
+        try
+        {
+            waitForElement(loc, wait);
+        }
+        catch(AssertionFailedError ignore){}
+        return isElementPresent(loc);
+    }
+
+    public void selectQuery(String schemaName, String queryName)
+    {
+        log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
+        selectSchema(schemaName);
+        Locator loc = Locator.queryTreeNode(schemaName, queryName);
+        waitForElement(loc, 5000);
+        click(loc);
+        sleep(20);
+    }
+
+    public void viewQueryData(String schemaName, String queryName)
+    {
+        selectQuery(schemaName, queryName);
+        Locator loc = Locator.xpath("//div[@class='lk-qd-name']/a[text()='" + schemaName + "." + queryName + "']");
+        waitForElement(loc, 5000);
+        String href = getAttribute(loc, "href");
+        log("Navigating to " + href);
+        selenium.open(href);
+    }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium
     {

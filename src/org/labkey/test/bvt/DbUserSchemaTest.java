@@ -135,7 +135,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
 
         log("Create DbUserSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + PROJECT_NAME + "/begin.view");
-        clickLinkWithText("Schema Administration");
+        clickExtToolbarButton("Define External Schemas");
         if (!isTextPresent("reload"))
         {
             clickLinkWithText("define new schema");

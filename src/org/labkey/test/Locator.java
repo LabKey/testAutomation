@@ -376,6 +376,16 @@ public class Locator
         return xpath("//a[@class='x-tree-node-anchor']/span[text()=" + xq(name) + "]");
     }
 
+    public static XPathLocator schemaTreeNode(String schemaName)
+    {
+        return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + schemaName + "']");
+    }
+
+    public static XPathLocator queryTreeNode(String schemaName, String queryName)
+    {
+        return xpath("//li[@class='x-tree-node']/div/a/span[text()='" + schemaName + "']/../../..//span[text()='" + queryName + "']");
+    }
+
 
 //    public static XPathLocator fileTreeByPath(String path)
 //    {
