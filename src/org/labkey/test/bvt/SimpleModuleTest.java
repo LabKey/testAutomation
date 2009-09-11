@@ -128,7 +128,9 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("Testing vehicle.Model url link...");
         beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
-        clickLinkWithText("Models");
+        selectQuery(VEHICLE_SCHEMA, "Models");
+        waitForElement(Locator.linkWithText("view data"), 5000); //on Ext panel
+        clickLinkWithText("view data");
         clickLinkWithText("Prius");
         assertTextPresent("Hooray!");
         String rowidStr = getText(Locator.id("model.rowid"));
@@ -173,8 +175,9 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         //go to query module portal
         clickLinkWithText(PROJECT_NAME);
         clickTab("Query");
-        clickLinkWithText("lists");
-        clickLinkWithText("TestQuery");
+        selectQuery("lists", "TestQuery");
+        waitForElement(Locator.linkWithText("view data"), 5000); //on Ext panel
+        clickLinkWithText("view data");
 
         assertTextPresent("Adam");
         assertTextPresent("Dave");
@@ -183,7 +186,9 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("Testing query of vehicle schema...");
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
-        clickLinkWithText("Toyotas");
+        selectQuery(VEHICLE_SCHEMA, "Toyotas");
+        waitForElement(Locator.linkWithText("view data"), 5000); //on Ext panel
+        clickLinkWithText("view data");
 
         assertTextPresent("Prius");
         assertTextPresent("Camry");
