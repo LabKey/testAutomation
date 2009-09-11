@@ -169,7 +169,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         createReport(GRID_VIEW);
 
         clickLinkWithText("Modify Dataset List (Advanced)");
-        clickNavButton("Create New Query");
+        clickExtToolbarButton("Create New Query");
 
         setFormElement("ff_newQueryName", "APX: Custom Query");
         selectOptionByText("ff_baseTableName", "APX-1: Abbreviated Physical Exam");
@@ -199,8 +199,10 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // create a custom query for a cross study scenario
         clickAdminMenuItem("Go To Module", "Query");
-        clickLinkWithText("study");
-        clickLinkWithText("create new query");
+        clickLinkWithText("study", false);
+        // Give it a little time to finish making the schema selection
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
+        clickExtToolbarButton("Create New Query");
 
         setFormElement("ff_newQueryName", "cross study query");
         clickNavButton("Create and edit SQL");
