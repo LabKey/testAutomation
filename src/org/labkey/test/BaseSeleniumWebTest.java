@@ -1887,7 +1887,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // Returns count of "COMPLETE"
-    public int countComplete(List<String> statusValues)
+    public int getCompleteCount(List<String> statusValues)
     {
         int complete = 0;
 
@@ -3641,14 +3641,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
     protected void waitForPipelineJobsToComplete(int completeJobsExpected, String description)
     {
+        log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
         List<String> statusValues = getPipelineStatusValues();
 
         // Short circuit in case we already have too many COMPLETE jobs
-        assertTrue("Number of COMPLETE jobs already exceeds desired count", countComplete(statusValues) <= completeJobsExpected);
+        assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(statusValues) <= completeJobsExpected);
 
         startTimer();
 
-        while (countComplete(statusValues) < completeJobsExpected && !hasError(statusValues) && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (getCompleteCount(statusValues) < completeJobsExpected && !hasError(statusValues) && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             log("Waiting for " + description);
             sleep(1000);
@@ -3657,6 +3658,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
 
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertEquals(countComplete(statusValues), completeJobsExpected);
+        assertEquals(getCompleteCount(statusValues), completeJobsExpected);
     }
 }

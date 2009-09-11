@@ -42,7 +42,7 @@ public class StudyBvtTest extends StudyManualTest
         createStudyManually();
 
         // import the specimens and wait for both datasets & specimens to load
-        SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 1);
+        SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 2);
         specimenImporter.importAndWaitForComplete();
 
         // export manually created study using "legacy" formats
@@ -299,7 +299,7 @@ public class StudyBvtTest extends StudyManualTest
         clickMenuButton("Comments and QC", "Comments:Exit");
 
         // import second archive, verify that that data is merged:
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 4);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 5);
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load
