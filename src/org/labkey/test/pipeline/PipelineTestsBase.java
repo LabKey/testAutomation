@@ -15,15 +15,12 @@
  */
 package org.labkey.test.pipeline;
 
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PipelineStatusTable;
 
-import java.util.*;
 import java.io.File;
 import java.io.IOException;
-
-import com.thoughtworks.selenium.SeleniumException;
+import java.util.*;
 
 /**
  * MS2TestsBase class
