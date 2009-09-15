@@ -124,6 +124,15 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         int rowid = Integer.parseInt(rowidStr);
         assertTrue("Expected rowid on model.html page", rowid > 0);
 
+        log("Testing query of vehicle schema...");
+        beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
+        selectQuery(VEHICLE_SCHEMA, "Toyotas");
+        waitForElement(Locator.linkWithText("view data"), 5000); //on Ext panel
+        clickLinkWithText("view data");
+
+        assertTextPresent("Prius");
+        assertTextPresent("Camry");
+
         log("Selecting all Models");
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Models");
         selectCmd.setMaxRows(-1);
@@ -203,15 +212,6 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("Dave");
         assertTextPresent("Josh");
         assertTextNotPresent("Britt");
-
-        log("Testing query of vehicle schema...");
-        beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
-        selectQuery(VEHICLE_SCHEMA, "Toyotas");
-        waitForElement(Locator.linkWithText("view data"), 5000); //on Ext panel
-        clickLinkWithText("view data");
-
-        assertTextPresent("Prius");
-        assertTextPresent("Camry");
     }
 
     private void doTestQueryViews()
