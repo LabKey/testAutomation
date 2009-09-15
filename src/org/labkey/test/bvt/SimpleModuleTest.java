@@ -20,8 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.Maps;
-import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
 
 import java.util.Map;
@@ -113,6 +112,38 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         ));
         insertResp = insertCmd.execute(cn, PROJECT_NAME);
         assertEquals("Expected to insert 4 rows.", 4, insertResp.getRowsAffected().intValue());
+
+        log("Testing vehicle.Model url link...");
+        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        selectQuery(VEHICLE_SCHEMA, "Models");
+        waitForElement(Locator.linkWithText("view data"), 5000); //on Ext panel
+        clickLinkWithText("view data");
+        clickLinkWithText("Prius");
+        assertTextPresent("Hooray!");
+        String rowidStr = getText(Locator.id("model.rowid"));
+        int rowid = Integer.parseInt(rowidStr);
+        assertTrue("Expected rowid on model.html page", rowid > 0);
+
+        log("Selecting all Models");
+        SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Models");
+        selectCmd.setMaxRows(-1);
+        SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
+        assertTrue("Expected to select >0 rows.", selectResp.getRowCount().intValue() > 0);
+
+        log("Deleting all Models");
+        DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Models");
+        deleteCmd.setRows(selectResp.getRows());
+        SaveRowsResponse deleteResp = deleteCmd.execute(cn, PROJECT_NAME);
+        assertEquals("Expected to delete all rows", selectResp.getRowCount().intValue(), deleteResp.getRowsAffected().intValue());
+        assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, PROJECT_NAME).getRowCount().intValue());
+
+        log("Deleting all Manufacturers");
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
+        selectCmd.setMaxRows(-1);
+        deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
+        deleteCmd.setRows(selectCmd.execute(cn, PROJECT_NAME).getRows());
+        deleteCmd.execute(cn, PROJECT_NAME);
+        assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, PROJECT_NAME).getRowCount().intValue());
     }
 
     private void doTestViews()
@@ -125,17 +156,6 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         //navigate to other view
         clickLinkWithText("other view");
         assertTextPresent("This is another view in the simple test module");
-
-        log("Testing vehicle.Model url link...");
-        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
-        selectQuery(VEHICLE_SCHEMA, "Models");
-        waitForElement(Locator.linkWithText("view data"), 5000); //on Ext panel
-        clickLinkWithText("view data");
-        clickLinkWithText("Prius");
-        assertTextPresent("Hooray!");
-        String rowidStr = getText(Locator.id("model.rowid"));
-        int rowid = Integer.parseInt(rowidStr);
-        assertTrue("Expected rowid on model.html page", rowid > 0);
     }
 
     private void doTestWebParts()

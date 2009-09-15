@@ -63,7 +63,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             {
                 Calendar c = Calendar.getInstance();
                 c.set(2008, 9, 25);
-                c.clear(Calendar.MILLISECOND);
+                c.clear(Calendar.MILLISECOND); // milliseconds aren't serialized in JSON
                 this.dateTimeNotNull = c.getTime();
             }
         }
@@ -225,7 +225,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         {
             Map<String, Object> row = resp.getRows().get(i);
             Long rowid = (Long)row.get("RowId");
-            assertEquals(rowid.intValue(), pks[i]);
+            assertEquals("Expected requested rowid and selected rowid to be the same", rowid.intValue(), pks[i]);
             
             String text = (String)row.get("Text");
             int intNotNull = ((Number)row.get("IntNotNull")).intValue();
