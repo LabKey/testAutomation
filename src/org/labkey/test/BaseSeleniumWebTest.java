@@ -1805,10 +1805,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickExtToolbarButton(String caption)
     {
+        clickExtToolbarButton(caption, defaultWaitForPage);
+    }
+
+    public void clickExtToolbarButton(String caption, int wait)
+    {
         log("Clicking Ext button with caption: " + caption);
         Locator loc = Locator.xpath("//button[contains(./@class, 'x-btn-text') and text()='" + caption + "']");
         waitForElement(loc, 5000);
-        clickAndWait(loc, defaultWaitForPage);
+        if (wait > 0)
+            clickAndWait(loc, wait);
+        else
+            click(loc);
     }
 
     public void clickImageWithAltText(String altText)
@@ -3272,6 +3280,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         Locator loc = Locator.linkWithText("edit properties");
         waitForElement(loc, 5000);
         clickAndWait(loc);
+    }
+
+    public void createNewQuery(String schemaName)
+    {
+        selectSchema(schemaName);
+        String url = selenium.getEval("selenium.browserbot.getCurrentWindow()._browser.getCreateQueryUrl('" + schemaName + "')");
+        if (null == url || url.length() == 0)
+            fail("Could not get the URL for creating a new query in schema " + schemaName);
+        selenium.open(url);
+    }
+
+    public void validateQueries()
+    {
+        String url = selenium.getEval("selenium.browserbot.getCurrentWindow()._browser.getValidateQueriesUrl()");
+        if (null == url || url.length() == 0)
+            fail("Could not get the URL for validating queries!");
+        selenium.open(url);
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium

@@ -356,7 +356,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("schemaName", "issues");
         submit();
         clickLinkWithText("Issues Queries");
-        clickExtToolbarButton("Create New Query");
+        createNewQuery("issues");
         setFormElement("ff_newQueryName", "xxyzzy");
         clickNavButton("Create and edit SQL");
         clickNavButton("Run Query");

@@ -72,7 +72,7 @@ public class FlowTest extends BaseFlowTest
         init();
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
         beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
-        clickExtToolbarButton("Create New Query");
+        createNewQuery("flow");
         setFormElement(Locator.nameOrId("ff_newQueryName"), "DRTQuery1");
         selectOptionByText("identifier=ff_baseTableName", "FCSAnalyses");
         submit();

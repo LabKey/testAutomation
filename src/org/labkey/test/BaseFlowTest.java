@@ -108,8 +108,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         String queryURL = "query/" + container + "/begin.view?schemaName=flow";
         beginAt(queryURL);
-        selectSchema("flow");
-        clickExtToolbarButton("Create New Query");
+        createNewQuery("flow");
         setFormElement("ff_newQueryName", name);
         clickNavButton("Create and edit SQL");
         setFormElement("ff_queryText", sql);

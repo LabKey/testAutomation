@@ -76,7 +76,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
 
         log("navigating to validation page...");
         clickAdminMenuItem("Go To Module", "Query");
-        clickExtToolbarButton("Validate Queries");
+        validateQueries();
 
         log("waiting for queries to load...");
         waitFor(new StatusChecker("All queries loaded.", this), "Queries did not load on validation page!", 10000);

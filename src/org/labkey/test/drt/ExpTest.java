@@ -84,8 +84,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Write a simple custom query that wraps the data table
         clickTab("Query");
-        selectSchema("exp");
-        clickExtToolbarButton("Create New Query");
+        createNewQuery("exp");
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Datas");
         clickNavButton("Create and edit SQL");
