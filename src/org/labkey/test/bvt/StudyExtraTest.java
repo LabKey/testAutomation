@@ -187,7 +187,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		setFormElement("dbSchemaName", "verifysnapshot");
         clickNavButton("Create");
 		assertTextPresent("VerifySnapshot");
-        clickLinkWithText("Query start page");
+        clickLinkWithText("Query Schema Browser");
         selectSchema("VerifySnapshot");
 		assertTrue(isQueryPresent("VerifySnapshot", "List1", 3000) || isQueryPresent("VerifySnapshot", "list1"));
         if (isQueryPresent("VerifySnapshot", "Subjects"))
@@ -221,7 +221,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickExtToolbarButton("Define External Schemas");
         clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
-        clickLinkWithText("Query start page");
+        clickLinkWithText("Query Schema Browser");
         selectSchema("VerifySnapshot");
         if (isQueryPresent("VerifySnapshot", "TestAssay1"))
             viewQueryData("VerifySnapshot", "TestAssay1");
