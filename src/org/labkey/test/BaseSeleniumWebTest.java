@@ -2440,6 +2440,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isChecked(checkBoxLocator))
             click(checkBoxLocator);
         logJavascriptAlerts();
+        assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
     }
 
     public void checkRadioButton(String name, int index)

@@ -35,7 +35,7 @@ import java.util.Arrays;
 */
 public class SimpleModuleTest extends BaseSeleniumWebTest
 {
-    public static final String PROJECT_NAME = "Simple Module Verfiy Project";
+    public static final String PROJECT_NAME = "Simple Module Verify Project";
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String LIST_NAME = "People";

@@ -142,7 +142,11 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             setFormElement("userSchemaName", USER_SCHEMA_NAME);
             setFormElement("dbSchemaName", DB_SCHEMA_NAME);
             setFormElement("metaData", getFileContents("server/modules/core/resources/schemas/test.xml"));
-            checkCheckbox("editable");
+
+            // Ext 2.2 checkboxes are broken; see #8601.  For now, click the inner checkbox directly.
+            // TODO: move back to standard check box code: checkCheckbox("editable")
+            click(Locator.xpath("//div[@class='x-form-check-wrap-inner']"));
+
             clickNavButton("Create");
         }
     }
@@ -331,8 +335,8 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     {
         log("Deleting pks=" + join(",", pk) + "...");
         beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
-        for (int i = 0; i < pk.length; i++)
-            checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(pk[i])));
+        for (int aPk : pk)
+            checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
         assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
@@ -342,7 +346,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         assertTitleEquals(TABLE_NAME + ": /" + PROJECT_NAME);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        for (int i = 0; i < pk.length; i++)
-            assertEquals("Expected row '" + pk + "' to be deleted.", -1, table.getRow(String.valueOf(pk)));
+        for (int aPk : pk)
+            assertEquals("Expected row '" + aPk + "' to be deleted.", -1, table.getRow(String.valueOf(aPk)));
     }
 }
