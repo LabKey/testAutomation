@@ -31,8 +31,6 @@
     <property name="javaclient.build.xml" value="${javaclient.dir}/build.xml"/>
     <property name="javaclientjar.dir" value="${project.root}/build/client-api/java/jar"/>
     <property name="javaclientlib.dir" value="${javaclient.dir}/lib"/>
-    <property name="deploy.dir" value="${project.root}/build/deploy" />
-    <property name="deploy.webapp.dir" value="${deploy.dir}/labkeyWebapp" />
 
     <property name="staging.modules.dir" value="${project.root}/build/staging/modules"/>
     <property name="deploy.modules.dir" value="${project.root}/build/deploy/modules"/>
@@ -141,9 +139,7 @@
         <fileset dir="${javaclientlib.dir}">
             <include name="*.jar"/>
         </fileset>
-        <fileset dir="${deploy.webapp.dir}/WEB-INF/lib">
-            <include name="schemas.jar"/>
-        </fileset>
+        <pathelement path="${project.root}/build/xb"/>
     </path>
 
     <path id="test.build.classpath">
