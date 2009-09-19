@@ -15,9 +15,9 @@
  */
 package org.labkey.test.bvt;
 
-import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
+
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +25,7 @@ import org.labkey.test.util.ListHelper;
  * Date: Jul 2, 2008
  * Time: 2:03:39 PM
  */
-public class HTTPApiTest extends BaseSeleniumWebTest
+public class HTTPApiTest extends SimpleApiTest
 {
     private static final String PROJECT_NAME = "HTTPApiVerifyProject";
     private static final String LIST_NAME = "Test List";
@@ -46,6 +46,16 @@ public class HTTPApiTest extends BaseSeleniumWebTest
     private final String LIST_DATA = "Color\t" + COL1.getName() +
             "\t" + COL2.getName() + "\t" + COL3.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3 + "\n" + LIST_ROW4;
 
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    protected File[] getTestFiles()
+    {
+        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/http-api.xml")};
+    }
+
     public String getAssociatedModuleDirectory()
     {
         return "query";
@@ -56,7 +66,7 @@ public class HTTPApiTest extends BaseSeleniumWebTest
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
-    protected void doTestSteps()
+    protected void doTestSteps() throws Exception
     {
         log("Create Project");
         createProject(PROJECT_NAME);
@@ -77,185 +87,6 @@ public class HTTPApiTest extends BaseSeleniumWebTest
         selectOptionByValue("schemaName", "lists");
         submit();
 
-        beginAt("/query/" + PROJECT_NAME + "/apiTest.view?");
-
-        // Begin query tests
-        checkPostResponsePresent(getQueryURL("insertRows"),
-                "{ \"schemaName\": \"lists\",\n" +
-                        " \"queryName\": \"Test List\",\n" +
-                        " \"command\": \"insert\",\n" +
-                        " \"rowsAffected\": 1,\n" +
-                        " \"rows\": [ {\n" +
-                        "    \"Color\": \"Purple\",\n" +
-                        "    \"Like\": \"Magenta\",\n" +
-                        "    \"Month\": \"2000-01-01\",\n" +
-                        "    \"Good\": \"4\"}\n" +
-                        " ]\n" +
-                        "}", 
-                "Magenta", "Purple", "4");
-
-        checkGetResponsePresent(getQueryURL("selectRows"),
-                "Purple", "Magenta");
-
-        checkPostResponsePresent(getQueryURL("insertRows"),
-                "{ \"schemaName\": \"lists\",\n" +
-                        " \"queryName\": \"Test List\",\n" +
-                        " \"command\": \"insert\",\n" +
-                        " \"rowsAffected\": 3,\n" +
-                        " \"rows\": [ {\n" +
-                        "    \"Color\": \"Pink\",\n" +
-                        "    \"Like\": \"Rose\",\n" +
-                        "    \"Month\": \"2000-02-01\",\n" +
-                        "    \"Good\": \"7\"},\n{\n" +
-                        "    \"Color\": \"Fuscia\",\n" +
-                        "    \"Like\": \"Red\",\n" +
-                        "    \"Month\": \"2000-03-01\",\n" +
-                        "    \"Good\": \"1\"},\n{\n" +
-                        "    \"Color\": \"Gray\",\n" +
-                        "    \"Like\": \"Black\",\n" +
-                        "    \"Month\": \"2000-04-01\",\n" +
-                        "    \"Good\": \"2\"}\n" +
-                        " ]\n" +
-                        "}",
-                "Pink", "Fuscia", "Gray");
-        
-        checkGetResponsePresent(getQueryURL("selectRows"), 
-                "Pink", "Fuscia", "Gray");
-
-        checkPostResponsePresent(getQueryURL("updateRows"),
-                "{ \"schemaName\": \"lists\",\n" +
-                        " \"queryName\": \"Test List\",\n" +
-                        " \"command\": \"insert\",\n" +
-                        " \"rowsAffected\": 2,\n" +
-                        " \"rows\": [ {\n" +
-                        "    \"Color\": \"Green\",\n" +
-                        "    \"Like\": \"Jungle Green\",\n" +
-                        "    \"Month\": \"2000-01-11\",\n" +
-                        "    \"Good\": \"2\"},\n{\n" +
-                        "    \"Color\": \"Fuscia\",\n" +
-                        "    \"Like\": \"Crimson\"}]\n" +
-                        "}",
-                "Jungle Green", "Crimson");
-
-        checkGetResponsePresent(getQueryURL("selectRows"), 
-                "Jungle Green", "Crimson");
-        
-        checkPostResponsePresent(getQueryURL("deleteRows"),
-                "{ \"schemaName\": \"lists\",\n" +
-                        " \"queryName\": \"Test List\",\n" +
-                        " \"command\": \"delete\",\n" +
-                        " \"rowsAffected\": 3,\n" +
-                        " \"rows\": [ " +
-                        "{\n \"Color\": \"Green\"},\n" +
-                        "{\n \"Color\": \"Blue\"},\n" +
-                        "{\n \"Color\": \"Pink\"}]\n" +
-                        "}",
-                "Green", "Blue", "Pink");
-
-        checkGetResponseNotPresent(getQueryURL("selectRows"),
-                "Green", "Blue", "Pink");
-
-    }
-
-    /**
-     * If executed at the apiTest.view page, this will check the response section for the Strings provided after
-     * executing a GET on the url.
-     * @param url
-     * @param expectedResponse
-     */
-    private void checkGetResponsePresent(String url, String... expectedResponse)
-    {
-        checkGetResponse(url, true, expectedResponse);
-    }
-
-    /**
-     * If executed at the apiTest.view page, this will check that the response section does not contain the Strings provided after
-     * executing a GET on the url.
-     * @param url
-     * @param unexpectedResponse
-     */
-    private void checkGetResponseNotPresent(String url, String... unexpectedResponse)
-    {
-        checkGetResponse(url, false, unexpectedResponse);
-    }
-
-    /**
-     * If executed at the apiTest.view page, this will check that the response section contains the Strings provided after
-     * executing a POST on the url with the given POST body.
-     * @param url
-     * @param postBody
-     * @param expectedResponse
-     */
-    private void checkPostResponsePresent(String url, String postBody, String... expectedResponse)
-    {
-        checkPostResponse(url, postBody, true, expectedResponse);
-    }
-
-    /**
-     * If executed at the apiTest.view page, this will check that the response section does not contain the Strings provided after
-     * executing a POST on the url with the given POST body.
-     * @param url
-     * @param postBody
-     * @param unexpectedResponse
-     */
-    private void checkPostResponseNotPresent(String url, String postBody, String... unexpectedResponse)
-    {
-        checkPostResponse(url, postBody, false, unexpectedResponse);
-    }
-
-    private void checkGetResponse(String url, boolean responsesPresent, String[] expectedResponses)
-    {
-        setFormElement("txtUrlGet", url);
-        click(Locator.raw("//input[@id='btnGet']"));
-        checkSuccess(responsesPresent, expectedResponses);
-        // clear get url
-        setFormElement("txtUrlGet", "");
-    }
-
-    private void checkPostResponse(String url, String postBody, boolean responsesPresent, String[] expectedResponses)
-    {
-        setFormElement("txtUrlPost", url);
-        setFormElement("txtPost", postBody);
-        click(Locator.raw("//input[@id='btnPost']"));
-        checkSuccess(responsesPresent, expectedResponses);
-        // clear get url
-        setFormElement("txtUrlPost", "");
-        setFormElement("txtPost", "");
-    }
-
-    private void checkSuccess(boolean responsesPresent, String[] expectedResponses)
-    {
-        assertElementNotPresent(Locator.raw("//div[@id='lblStatus' and contains(text(), 'ERROR')]"));
-        waitForText("Request Complete", defaultWaitForPage);
-        // Once response has loaded, check it, also check 'Request Complete'
-        if (expectedResponses.length > 0)
-        {
-            if (responsesPresent)
-            {
-                waitForElement(Locator.raw("//pre[@id='lblResponse' and contains(text(), '" + expectedResponses[0] + "')]"), defaultWaitForPage);
-            }
-            checkResponses(responsesPresent, expectedResponses);
-            assertTextPresent("Request Complete.");
-        }
-    }
-
-    private void checkResponses(boolean responsesPresent, String[] responses)
-    {
-        for (int i = 0; i < responses.length; i++)
-        {
-            if (responsesPresent)
-            {
-                assertElementPresent(Locator.raw("//pre[@id='lblResponse' and contains(text(), '" + responses[i] + "')]"));
-            }
-            else
-            {
-                assertElementNotPresent(Locator.raw("//pre[@id='lblResponse' and contains(text(), '" + responses[i] + "')]"));
-            }
-        }
-    }
-
-    private String getQueryURL(String query)
-    {
-        return getBaseURL() + "/query/" + PROJECT_NAME + "/" + query + ".api?schemaName=lists&query.queryName=" + LIST_NAME_URL;
+        super.doTestSteps();
     }
 }

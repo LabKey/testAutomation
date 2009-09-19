@@ -1,0 +1,688 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="recorded test case" type="post">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/insertRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <formData>{ "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "insert",
+            "rowsAffected": 1,
+            "rows": [ {
+            "Color": "Purple",
+            "Like": "Magenta",
+            "Month": "2000-01-01",
+            "Good": "4"}
+            ]
+            }
+        </formData>
+        <response>{
+            "containerPath": "/HTTPApiVerifyProject",
+            "rowsAffected": 1,
+            "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "insert",
+            "rows": [{
+            "Good": 4,
+            "Like": "Magenta",
+            "Month": "1 Jan 2000 00:00:00 -0800",
+            "EntityId": "25456da4-86d2-102c-ad58-95b8b56cdcaa",
+            "Color": "Purple"
+            }]
+            }
+        </response>
+    </test>
+
+    <test name="recorded test case" type="get">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <response><![CDATA[{"schemaName":"lists",
+"queryName":"Test List",
+"formatVersion":8.3,
+"metaData":{
+    "id": "Color",
+    "totalProperty": "rowCount",
+    "root": "rows",
+    "fields": [
+        {
+            "mvEnabled": false,
+            "name": "Color",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Like",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Month",
+            "type": "date"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Good",
+            "type": "int"
+        }
+    ]
+},
+"columnModel":[
+    {
+        "scale": 30,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Color",
+        "required": true,
+        "editable": true,
+        "header": "Color"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Like",
+        "required": false,
+        "editable": true,
+        "header": "Like",
+        "tooltip": "What the color is like"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 90,
+        "dataIndex": "Month",
+        "required": false,
+        "editable": true,
+        "header": "Month to Wear",
+        "tooltip": "When to wear the color"
+    },
+    {
+        "scale": 10,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 60,
+        "dataIndex": "Good",
+        "required": false,
+        "editable": true,
+        "header": "Quality",
+        "tooltip": "How nice the color is"
+    }
+],
+"rows":[{
+    "Good": 10,
+    "Like": "Zany",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Blue",
+    "Month": "1 Jan 2000 00:00:00 -0800",
+    "Color": "Blue"
+},
+{
+    "Good": 9,
+    "Like": "Robust",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Green",
+    "Month": "4 Apr 2000 00:00:00 -0700",
+    "Color": "Green"
+},
+{
+    "Good": 4,
+    "Like": "Magenta",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Purple",
+    "Month": "1 Jan 2000 00:00:00 -0800",
+    "Color": "Purple"
+},
+{
+    "Good": 8,
+    "Like": "Mellow",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Red",
+    "Month": "3 Mar 2000 00:00:00 -0800",
+    "Color": "Red"
+},
+{
+    "Good": 7,
+    "Like": "Light",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Yellow",
+    "Month": "2 Feb 2000 00:00:00 -0800",
+    "Color": "Yellow"
+}],
+"rowCount":5}]]></response>
+    </test>
+
+
+    <test name="recorded test case" type="post">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/insertRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <formData>{ "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "insert",
+            "rowsAffected": 3,
+            "rows": [ {
+            "Color": "Pink",
+            "Like": "Rose",
+            "Month": "2000-02-01",
+            "Good": "7"},
+            {
+            "Color": "Fuscia",
+            "Like": "Red",
+            "Month": "2000-03-01",
+            "Good": "1"},
+            {
+            "Color": "Gray",
+            "Like": "Black",
+            "Month": "2000-04-01",
+            "Good": "2"}
+            ]
+            }
+        </formData>
+        <response>{
+            "containerPath": "/HTTPApiVerifyProject",
+            "rowsAffected": 3,
+            "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "insert",
+            "rows": [
+            {
+            "Good": 7,
+            "Like": "Rose",
+            "Month": "1 Feb 2000 00:00:00 -0800",
+            "EntityId": "25456ddc-86d2-102c-ad58-95b8b56cdcaa",
+            "Color": "Pink"
+            },
+            {
+            "Good": 1,
+            "Like": "Red",
+            "Month": "1 Mar 2000 00:00:00 -0800",
+            "EntityId": "25456ddf-86d2-102c-ad58-95b8b56cdcaa",
+            "Color": "Fuscia"
+            },
+            {
+            "Good": 2,
+            "Like": "Black",
+            "Month": "1 Apr 2000 00:00:00 -0800",
+            "EntityId": "25456de2-86d2-102c-ad58-95b8b56cdcaa",
+            "Color": "Gray"
+            }
+            ]
+            }
+        </response>
+    </test>
+
+    <test name="recorded test case" type="get">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <response><![CDATA[{"schemaName":"lists",
+"queryName":"Test List",
+"formatVersion":8.3,
+"metaData":{
+    "id": "Color",
+    "totalProperty": "rowCount",
+    "root": "rows",
+    "fields": [
+        {
+            "mvEnabled": false,
+            "name": "Color",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Like",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Month",
+            "type": "date"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Good",
+            "type": "int"
+        }
+    ]
+},
+"columnModel":[
+    {
+        "scale": 30,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Color",
+        "required": true,
+        "editable": true,
+        "header": "Color"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Like",
+        "required": false,
+        "editable": true,
+        "header": "Like",
+        "tooltip": "What the color is like"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 90,
+        "dataIndex": "Month",
+        "required": false,
+        "editable": true,
+        "header": "Month to Wear",
+        "tooltip": "When to wear the color"
+    },
+    {
+        "scale": 10,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 60,
+        "dataIndex": "Good",
+        "required": false,
+        "editable": true,
+        "header": "Quality",
+        "tooltip": "How nice the color is"
+    }
+],
+"rows":[{
+    "Good": 10,
+    "Like": "Zany",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Blue",
+    "Month": "1 Jan 2000 00:00:00 -0800",
+    "Color": "Blue"
+},
+{
+    "Good": 1,
+    "Like": "Red",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Fuscia",
+    "Month": "1 Mar 2000 00:00:00 -0800",
+    "Color": "Fuscia"
+},
+{
+    "Good": 2,
+    "Like": "Black",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Gray",
+    "Month": "1 Apr 2000 00:00:00 -0800",
+    "Color": "Gray"
+},
+{
+    "Good": 9,
+    "Like": "Robust",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Green",
+    "Month": "4 Apr 2000 00:00:00 -0700",
+    "Color": "Green"
+},
+{
+    "Good": 7,
+    "Like": "Rose",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Pink",
+    "Month": "1 Feb 2000 00:00:00 -0800",
+    "Color": "Pink"
+},
+{
+    "Good": 4,
+    "Like": "Magenta",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Purple",
+    "Month": "1 Jan 2000 00:00:00 -0800",
+    "Color": "Purple"
+},
+{
+    "Good": 8,
+    "Like": "Mellow",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Red",
+    "Month": "3 Mar 2000 00:00:00 -0800",
+    "Color": "Red"
+},
+{
+    "Good": 7,
+    "Like": "Light",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Yellow",
+    "Month": "2 Feb 2000 00:00:00 -0800",
+    "Color": "Yellow"
+}],
+"rowCount":8}]]></response>
+    </test>
+
+    <test name="recorded test case" type="post">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/updateRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <formData>{ "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "insert",
+            "rowsAffected": 2,
+            "rows": [ {
+            "Color": "Green",
+            "Like": "Jungle Green",
+            "Month": "2000-01-11",
+            "Good": "2"},
+            {
+            "Color": "Fuscia",
+            "Like": "Crimson"}]
+            }
+        </formData>
+        <response>{
+            "containerPath": "/HTTPApiVerifyProject",
+            "rowsAffected": 2,
+            "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "update",
+            "rows": [
+            {
+            "Good": 2,
+            "Like": "Jungle Green",
+            "Month": "11 Jan 2000 00:00:00 -0800",
+            "EntityId": "25456dca-86d2-102c-ad58-95b8b56cdcaa",
+            "Color": "Green"
+            },
+            {
+            "Good": 1,
+            "Like": "Crimson",
+            "Month": "1 Mar 2000 00:00:00 -0800",
+            "EntityId": "25456ddf-86d2-102c-ad58-95b8b56cdcaa",
+            "Color": "Fuscia"
+            }
+            ]
+            }
+        </response>
+    </test>
+
+    <test name="recorded test case" type="get">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <response><![CDATA[{"schemaName":"lists",
+"queryName":"Test List",
+"formatVersion":8.3,
+"metaData":{
+    "id": "Color",
+    "totalProperty": "rowCount",
+    "root": "rows",
+    "fields": [
+        {
+            "mvEnabled": false,
+            "name": "Color",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Like",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Month",
+            "type": "date"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Good",
+            "type": "int"
+        }
+    ]
+},
+"columnModel":[
+    {
+        "scale": 30,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Color",
+        "required": true,
+        "editable": true,
+        "header": "Color"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Like",
+        "required": false,
+        "editable": true,
+        "header": "Like",
+        "tooltip": "What the color is like"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 90,
+        "dataIndex": "Month",
+        "required": false,
+        "editable": true,
+        "header": "Month to Wear",
+        "tooltip": "When to wear the color"
+    },
+    {
+        "scale": 10,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 60,
+        "dataIndex": "Good",
+        "required": false,
+        "editable": true,
+        "header": "Quality",
+        "tooltip": "How nice the color is"
+    }
+],
+"rows":[{
+    "Good": 10,
+    "Like": "Zany",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Blue",
+    "Month": "1 Jan 2000 00:00:00 -0800",
+    "Color": "Blue"
+},
+{
+    "Good": 1,
+    "Like": "Crimson",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Fuscia",
+    "Month": "1 Mar 2000 00:00:00 -0800",
+    "Color": "Fuscia"
+},
+{
+    "Good": 2,
+    "Like": "Black",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Gray",
+    "Month": "1 Apr 2000 00:00:00 -0800",
+    "Color": "Gray"
+},
+{
+    "Good": 2,
+    "Like": "Jungle Green",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Green",
+    "Month": "11 Jan 2000 00:00:00 -0800",
+    "Color": "Green"
+},
+{
+    "Good": 7,
+    "Like": "Rose",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Pink",
+    "Month": "1 Feb 2000 00:00:00 -0800",
+    "Color": "Pink"
+},
+{
+    "Good": 4,
+    "Like": "Magenta",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Purple",
+    "Month": "1 Jan 2000 00:00:00 -0800",
+    "Color": "Purple"
+},
+{
+    "Good": 8,
+    "Like": "Mellow",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Red",
+    "Month": "3 Mar 2000 00:00:00 -0800",
+    "Color": "Red"
+},
+{
+    "Good": 7,
+    "Like": "Light",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Yellow",
+    "Month": "2 Feb 2000 00:00:00 -0800",
+    "Color": "Yellow"
+}],
+"rowCount":8}]]></response>
+    </test>
+
+    <test name="recorded test case" type="post">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/deleteRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <formData>{ "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "delete",
+            "rowsAffected": 3,
+            "rows": [ {
+            "Color": "Green"},
+            {
+            "Color": "Blue"},
+            {
+            "Color": "Pink"}]
+            }
+        </formData>
+        <response>{
+            "containerPath": "/HTTPApiVerifyProject",
+            "rowsAffected": 3,
+            "schemaName": "lists",
+            "queryName": "Test List",
+            "command": "delete",
+            "rows": [
+            {"Color": "Green"},
+            {"Color": "Blue"},
+            {"Color": "Pink"}
+            ]
+            }
+        </response>
+    </test>
+
+    <test name="recorded test case" type="get">
+        <url>
+            <![CDATA[http://localhost:8080/labkey/query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
+        <response><![CDATA[{"schemaName":"lists",
+"queryName":"Test List",
+"formatVersion":8.3,
+"metaData":{
+    "id": "Color",
+    "totalProperty": "rowCount",
+    "root": "rows",
+    "fields": [
+        {
+            "mvEnabled": false,
+            "name": "Color",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Like",
+            "type": "string"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Month",
+            "type": "date"
+        },
+        {
+            "mvEnabled": false,
+            "name": "Good",
+            "type": "int"
+        }
+    ]
+},
+"columnModel":[
+    {
+        "scale": 30,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Color",
+        "required": true,
+        "editable": true,
+        "header": "Color"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "left",
+        "width": 200,
+        "dataIndex": "Like",
+        "required": false,
+        "editable": true,
+        "header": "Like",
+        "tooltip": "What the color is like"
+    },
+    {
+        "scale": 100,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 90,
+        "dataIndex": "Month",
+        "required": false,
+        "editable": true,
+        "header": "Month to Wear",
+        "tooltip": "When to wear the color"
+    },
+    {
+        "scale": 10,
+        "hidden": false,
+        "sortable": true,
+        "align": "right",
+        "width": 60,
+        "dataIndex": "Good",
+        "required": false,
+        "editable": true,
+        "header": "Quality",
+        "tooltip": "How nice the color is"
+    }
+],
+"rows":[{
+    "Good": 1,
+    "Like": "Crimson",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Fuscia",
+    "Month": "1 Mar 2000 00:00:00 -0800",
+    "Color": "Fuscia"
+},
+{
+    "Good": 2,
+    "Like": "Black",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Gray",
+    "Month": "1 Apr 2000 00:00:00 -0800",
+    "Color": "Gray"
+},
+{
+    "Good": 4,
+    "Like": "Magenta",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Purple",
+    "Month": "1 Jan 2000 00:00:00 -0800",
+    "Color": "Purple"
+},
+{
+    "Good": 8,
+    "Like": "Mellow",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Red",
+    "Month": "3 Mar 2000 00:00:00 -0800",
+    "Color": "Red"
+},
+{
+    "Good": 7,
+    "Like": "Light",
+    "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Yellow",
+    "Month": "2 Feb 2000 00:00:00 -0800",
+    "Color": "Yellow"
+}],
+"rowCount":5}]]></response>
+    </test>
+
+</ApiTests>

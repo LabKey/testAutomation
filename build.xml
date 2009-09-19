@@ -31,6 +31,8 @@
     <property name="javaclient.build.xml" value="${javaclient.dir}/build.xml"/>
     <property name="javaclientjar.dir" value="${project.root}/build/client-api/java/jar"/>
     <property name="javaclientlib.dir" value="${javaclient.dir}/lib"/>
+    <property name="deploy.dir" value="${project.root}/build/deploy" />
+    <property name="deploy.webapp.dir" value="${deploy.dir}/labkeyWebapp" />
 
     <property name="staging.modules.dir" value="${project.root}/build/staging/modules"/>
     <property name="deploy.modules.dir" value="${project.root}/build/deploy/modules"/>
@@ -131,12 +133,16 @@
             <include name="commons-discovery-0.2.jar" />
             <include name="log4j-1.2.8.jar" />
             <include name="commons-logging-1.1.jar" />
+            <include name="xbean.jar" />
         </fileset>
         <fileset dir="${javaclientjar.dir}">
             <include name="labkey-client-api-${product.version}.jar"/>
         </fileset>
         <fileset dir="${javaclientlib.dir}">
             <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${deploy.webapp.dir}/WEB-INF/lib">
+            <include name="schemas.jar"/>
         </fileset>
     </path>
 
