@@ -24,6 +24,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.labkey.query.xml.ApiTestsDocument;
+import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.PasswordUtil;
@@ -31,6 +33,8 @@ import org.labkey.test.util.PasswordUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +76,6 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         {
             if (testFile.exists())
             {
-/*
                 for (ApiTestCase test : parseTests(testFile))
                 {
                     tests++;
@@ -80,13 +83,11 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                     sendRequestDirect(test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch());
                     log("test case completed");
                 }
-*/
             }
         }
         log("Finished running recorded tests, a total of " + tests + " were completed");
     }
 
-/*
     protected List<ApiTestCase> parseTests(File testFile)
     {
         try {
@@ -141,7 +142,6 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         return testCase;
     }
 
-*/
     public String getAssociatedModuleDirectory()
     {
         return "query";

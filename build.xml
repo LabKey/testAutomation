@@ -31,6 +31,8 @@
     <property name="javaclient.build.xml" value="${javaclient.dir}/build.xml"/>
     <property name="javaclientjar.dir" value="${project.root}/build/client-api/java/jar"/>
     <property name="javaclientlib.dir" value="${javaclient.dir}/lib"/>
+    <property name="deploy.dir" value="${project.root}/build/deploy" />
+    <property name="deploy.webapp.dir" value="${deploy.dir}/labkeyWebapp" />
 
     <property name="staging.modules.dir" value="${project.root}/build/staging/modules"/>
     <property name="deploy.modules.dir" value="${project.root}/build/deploy/modules"/>
@@ -139,7 +141,9 @@
         <fileset dir="${javaclientlib.dir}">
             <include name="*.jar"/>
         </fileset>
-        <pathelement path="${project.root}/build/xb"/>
+        <fileset dir="${deploy.webapp.dir}/WEB-INF/lib">
+            <include name="schemas.jar"/>
+        </fileset>
     </path>
 
     <path id="test.build.classpath">
@@ -431,7 +435,7 @@
         </copy>
 
         <antcall target="stopSeleniumServer" />
-        
+
         <fail message="${sysprop.suiteToUse} FAILED" if="suite.failed" />
     </target>
 
@@ -488,7 +492,7 @@
         <property name="debug.suspend.selenium" value="y"/>
         <antcall target="sub-selenium"/>
     </target>
-    
+
     <target name="stopSeleniumServer" depends="init-selenium">
         <echo message="Stopping selenium server." />
         <condition property="selenium.server.shut.down">
@@ -551,7 +555,7 @@
         <property name="debug.suspend.selenium" value="y"/>
         <antcall target="sub-selenium"/>
     </target>
-    
+
     <target name="drt-clean">
         <property name="suite" value="DRT"/>
         <property name="cleanonly" value="true"/>
@@ -564,7 +568,7 @@
         <property name="linkCheck" value="true"/>
         <antcall target="sub-selenium"/>
     </target>
-    
+
     <target name="bvt-debug" description="run bvt, suspend until debugger attaches">
         <property name="suite" value="BVT"/>
         <property name="debug.suspend.selenium" value="y"/>
