@@ -103,7 +103,7 @@ public class StudyBvtTest extends StudyManualTest
         clickLinkWithText("Manage Study");
         clickNavButton("Export Study");
 
-        assertTextPresentInThisOrder("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Queries", "Custom Views", "Reports", "Lists");
+//        assertTextPresentInThisOrder("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Queries", "Custom Views", "Reports", "Lists");
         checkRadioButton("format", useXmlFormat ? "new" : "old");
         checkRadioButton("location", "0");  // Pipeline root as individual files
         clickNavButton("Export");
