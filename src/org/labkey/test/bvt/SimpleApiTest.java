@@ -16,6 +16,7 @@
 
 package org.labkey.test.bvt;
 
+import org.apache.xmlbeans.XmlObject;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
