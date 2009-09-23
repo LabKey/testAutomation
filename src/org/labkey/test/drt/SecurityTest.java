@@ -350,7 +350,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         ensureAdminMode();
         clickLinkWithText("Admin Console");
         assertTextPresent("Already impersonating; click here to change back to " + testUserDisplayName);
-        deleteUser(TO_BE_DELETED_USER);
+        deleteUser(TO_BE_DELETED_USER, true);
         stopImpersonating();
 
         ensureAdminMode();

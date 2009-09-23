@@ -23,8 +23,11 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
+import static org.labkey.test.util.ListHelper.ListColumnType.*;
 
 import java.io.File;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * User: ulberge
@@ -32,7 +35,7 @@ import java.io.File;
  */
 public class ListTest extends BaseSeleniumWebTest
 {
-    private final static String PROJECT_NAME = "ListVerifyProject";
+    protected final static String PROJECT_NAME = "ListVerifyProject";
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
     private final static String LIST_NAME = "Colors";
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
@@ -443,5 +446,131 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("FooFoo");
         assertTextPresent("BarBar");
         assertTextBefore("FooFoo", "BarBar");
+
+        customizeSteps();
+    }
+
+
+
+    //
+    // CUSTOMIZE URL tests
+    //
+
+    ListHelper.ListColumn col(String name, ListHelper.ListColumnType type)
+    {
+        return new ListHelper.ListColumn(name, "", type, "");
+    }
+
+    ListHelper.ListColumn col(String name, ListHelper.ListColumnType type, String table)
+    {
+        return new ListHelper.ListColumn(name, "", type, "", new ListHelper.LookupInfo(null, "lists", table));
+    }
+    
+    ListHelper.ListColumn colURL(String name, ListHelper.ListColumnType type, String url)
+    {
+        ListColumn c  = new ListHelper.ListColumn(name, "", type, "");
+        c.setURL(url);
+        return c;
+    }
+
+    List<ListColumn> Acolumns = Arrays.asList(
+            col("A", Integer),
+            colURL("title", String, "/junit/echoForm.view?key=${A}&title=${title}&table=A"),
+            col("Bfk", Integer, "B")
+    );
+    String[][] Adata = new String[][]
+    {
+        {"1", "one A", "1"},
+    };
+
+    List<ListHelper.ListColumn> Bcolumns = Arrays.asList(
+            col("B", Integer),
+            colURL("title", String, "org.labkey.core.junit.JunitController$EchoFormAction.class?key=${B}&title=${title}&table=B"),
+            col("Cfk", Integer, "C")
+    );
+    String[][] Bdata = new String[][]
+    {
+        {"1", "one B", "1"},
+    };
+    
+    List<ListHelper.ListColumn> Ccolumns = Arrays.asList(
+            col("C", Integer),
+            colURL("title", String, "/junit/echoForm.view?key=${C}&title=${title}&table=C")
+    );
+    String[][] Cdata = new String[][]
+    {
+        {"1", "one C"},
+    };
+
+
+    String toTSV(List<ListHelper.ListColumn> cols, String[][] data)
+    {
+        StringBuilder sb = new StringBuilder();
+        String tab = "";
+        for (ListHelper.ListColumn c : cols)
+        {
+            sb.append(tab);
+            sb.append(c.getName());
+            tab = "\t";
+        }
+        tab = "\n";
+        for (int row=0 ; row<data.length; row++)
+        {
+            for (int col=0 ; col<data[row].length ; col++)
+            {
+                sb.append(tab);
+                sb.append(data[row][col]);
+                tab = "\t";
+            }
+            tab = "\n";
+        }
+        sb.append(tab);
+        return sb.toString();
+    }
+
+
+    void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
+    {
+        log("Add List");
+        ListHelper.createList(this, PROJECT_NAME, name, cols.get(0).getType(), cols.get(0).getName(),
+                cols.subList(1,cols.size()).toArray(new ListHelper.ListColumn[cols.size()-1]));
+        clickLinkWithText("edit design");
+        selectOptionByText("ff_titleColumn", cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
+        clickButton("Update", defaultWaitForPage);
+        clickLinkWithText("import data");
+        setFormElement("ff_data", toTSV(cols,data));
+        submit();
+    }
+
+
+    Locator inputWithValue(String name, String value)
+    {
+        return Locator.xpath("//input[@name='" + name + "' and @value='" + value + "']");
+    }
+    
+
+    protected void customizeSteps()
+    {
+        createList("C", Ccolumns, Cdata);
+        createList("B", Bcolumns, Bdata);
+        createList("A", Acolumns, Adata);
+        this.pushLocation();
+
+        beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?schemaName=lists&query.queryName=A");
+
+        pushLocation();
+        clickLinkWithText("one A");
+        assertElementPresent(inputWithValue("table","A"));
+        assertElementPresent(inputWithValue("title","one A"));
+        assertElementPresent(inputWithValue("key","1"));
+        popLocation();
+
+        pushLocation();
+        clickLinkWithText("one B");
+        assertLinkPresentWithText("one B");
+        assertLinkPresentWithText("one C");
+        popLocation();
+
+        popLocation();
     }
 }

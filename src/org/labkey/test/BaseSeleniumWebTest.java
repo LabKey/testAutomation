@@ -2894,9 +2894,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void deleteUser(String userEmail)
     {
+        deleteUser(userEmail, false);
+    }
+
+    public void deleteUser(String userEmail, boolean failIfNotFound)
+    {
         ensureAdminMode();
         clickLinkWithText("Site Users");
         String userXPath = "//a[text()=\"details\"]/../../td[text()=\"" + userEmail + "\"]";
+        if (failIfNotFound)
+            assertElementPresent(new Locator(userXPath));
         if (isElementPresent(new Locator(userXPath)))
         {
             checkCheckbox(new Locator(userXPath + "/../td[1]/input"));

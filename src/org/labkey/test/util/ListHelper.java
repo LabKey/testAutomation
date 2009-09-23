@@ -197,8 +197,9 @@ public class ListHelper
         private boolean _mvEnabled;
         private LookupInfo _lookup;
         private FieldValidator _validator;
+        private String _url;
 
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator)
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url)
         {
             _name = name;
             _label = label;
@@ -207,26 +208,27 @@ public class ListHelper
             _format = format;
             _lookup = lookup;
             _validator = validator;
+            _url = url;
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description, LookupInfo lookup)
         {
-            this(name, label, type, description, null, lookup, null);
+            this(name, label, type, description, null, lookup, null, null);
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description, String format)
         {
-            this(name, label, type, description, format, null, null);
+            this(name, label, type, description, format, null, null, null);
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description)
         {
-            this(name, label, type, description, null, null, null);
+            this(name, label, type, description, null, null, null, null);
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description, FieldValidator validator)
         {
-            this(name, label, type, description, null, null, validator);
+            this(name, label, type, description, null, null, validator, null);
         }
 
         public String getName()
@@ -272,6 +274,16 @@ public class ListHelper
         public void setMvEnabled(boolean mvEnabled)
         {
             _mvEnabled = mvEnabled;
+        }
+
+        public void setURL(String url)
+        {
+            _url = url;
+        }
+
+        public String getURL()
+        {
+            return _url;
         }
     }
 
@@ -355,7 +367,13 @@ public class ListHelper
                 }
                 test.clickNavButton("OK", 0);
             }
+
+            if (null != col.getURL())
+            {
+                test.setFormElement("url", col.getURL());
+            }
         }
+
         test.clickNavButton("Save");
 
         test.log("Check that they were added");
