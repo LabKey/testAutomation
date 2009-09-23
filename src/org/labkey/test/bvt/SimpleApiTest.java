@@ -16,7 +16,6 @@
 
 package org.labkey.test.bvt;
 
-import org.apache.xmlbeans.XmlObject;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -29,6 +28,7 @@ import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
@@ -128,7 +128,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
         String url = element.getUrl();
         if (url != null)
-            testCase.setUrl(url);
+            testCase.setUrl(StringUtils.trim(url));
         else
             fail("Test case did not have the required url element");
 
@@ -138,7 +138,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
         String formData = element.getFormData();
         if (formData != null)
-            testCase.setFormData(formData);
+            testCase.setFormData(StringUtils.trim(formData));
 
         return testCase;
     }
@@ -151,13 +151,14 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
     private void sendRequestDirect(String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch) throws UnsupportedEncodingException
     {
         HttpMethod method = null;
+        String requestUrl = WebTestHelper.getBaseURL() + '/' + url;
 
         switch (type) {
             case get:
-                method = new GetMethod(url);
+                method = new GetMethod(requestUrl);
                 break;
             case post:
-                method = new PostMethod(url);
+                method = new PostMethod(requestUrl);
                 ((PostMethod)method).setRequestEntity(new StringRequestEntity(formData, "application/json", "UTF-8"));
                 break;
         }
@@ -165,7 +166,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         if (method != null)
         {
             try {
-                HttpClient client = getHttpClient(url);
+                HttpClient client = getHttpClient(requestUrl);
 
                 int status = client.executeMethod(method);
                 if (status == HttpStatus.SC_OK)
