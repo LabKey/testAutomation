@@ -324,6 +324,12 @@ public class Locator
             return xpath("//img[@src=" + xq(src) + "]");
     }
 
+    public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
+    {
+        String linkText = schemaName + "." + queryName + "." + (null != pkName ? pkName : "");
+        return Locator.xpath("//span[contains(@class, 'labkey-link') and contains(text(), '" + linkText + "')]");
+    }
+
     /**
      *
      * @param label

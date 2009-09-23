@@ -441,6 +441,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAdminMenuItem("Go To Module", moduleName);
     }
 
+    public void goToSchemaBrowser()
+    {
+        clickAdminMenuItem("Developer Links", "Schema Browser");
+    }
+
     private void waitForStartup()
     {
         boolean hitFirstPage = false;
@@ -1795,6 +1800,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Selecting tab " + tabname);
         assertLinkPresent(getTabLinkId(tabname));
         clickLink(getTabLinkId(tabname));
+    }
+
+    public void closeExtTab(String tabName)
+    {
+        log("Closing Ext tab " + tabName);
+        mouseDownAt(Locator.xpath("//a[@class='x-tab-strip-close' and ..//span[@class='x-tab-strip-text' and text()='" + tabName + "']]"), 0, 0);
     }
 
     public void clickExtTab(String tabname)
@@ -3270,6 +3281,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(loc, 5000);
         click(loc);
         waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
+    }
+
+    public boolean isLookupLinkPresent(String schemaName, String queryName, String pkName)
+    {
+        return isElementPresent(Locator.lookupLink(schemaName, queryName, pkName));
+    }
+
+    public void clickLookupLink(String schemaName, String queryName, String pkName)
+    {
+        click(Locator.lookupLink(schemaName, queryName, pkName));
+    }
+
+    public void clickFkExpando(String schemaName, String queryName, String columnName)
+    {
+        String queryLabel = schemaName + "." + queryName;
+        click(Locator.xpath("//div/a[text()='" + queryLabel + "']/../../table/tbody/tr/td/img[(contains(@src, 'plus.gif') or contains(@src, 'minus.gif')) and ../../td[text()='" + columnName + "']]"));
     }
 
     public void viewQueryData(String schemaName, String queryName)

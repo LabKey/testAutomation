@@ -85,6 +85,7 @@ src/org/labkey/test/bvt/ProgrammaticQCTest.java -text
 src/org/labkey/test/bvt/QuerySnapshotTest.java -text
 src/org/labkey/test/bvt/ReportTest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
+src/org/labkey/test/bvt/SchemaBrowserTest.java -text
 src/org/labkey/test/bvt/SimpleApiTest.java -text
 src/org/labkey/test/bvt/SimpleModuleTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text

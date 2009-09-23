@@ -61,7 +61,8 @@ public enum TestSet
         MissingValueIndicatorsTest.class,
         ModuleAssayTest.class,
         ProgrammaticQCTest.class,
-        ReportTest.class
+        ReportTest.class,
+        SchemaBrowserTest.class
     }),
 
     MS2(new Class[]
