@@ -3294,10 +3294,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void validateQueries()
     {
-        String url = selenium.getEval("selenium.browserbot.getCurrentWindow()._browser.getValidateQueriesUrl()");
-        if (null == url || url.length() == 0)
-            fail("Could not get the URL for validating queries!");
-        selenium.open(url);
+        clickExtToolbarButton("Validate Queries", 0);
+        Locator locButton = Locator.xpath("//button[text()='Start Validation']");
+        Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
+        waitForElement(locButton, 5000);
+        click(locButton);
+        waitForElement(locFinishMsg, 120000);
+        //test for success
+        if (!isElementPresent(Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok')]")))
+        {
+            fail("Some queries did not pass validation. See error log for more details.");
+        }
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium

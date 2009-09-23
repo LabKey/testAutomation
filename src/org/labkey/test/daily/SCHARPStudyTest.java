@@ -71,27 +71,13 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
 
         log("importing study...");
         setupPipeline();
-        importStudy();
         createLookupLists();
+        importStudy();
 
         log("navigating to validation page...");
         clickAdminMenuItem("Go To Module", "Query");
-        validateQueries();
-
-        log("waiting for queries to load...");
-        waitFor(new StatusChecker("All queries loaded.", this), "Queries did not load on validation page!", 10000);
-
         log("stating query validation...");
-
-        // For now, only include the default visible columns, as Flow has a number of queries that
-        // will fail to validate if we include all the columns. There is an open bug on this.
-        // see https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=8439
-        // bug is now fixed.
-        //clickRadioButtonById("rb-include-defvis");
-
-        selenium.click(Locator.id("btn-validate").toString());
-        waitFor(new StatusChecker("Validation complete.", this), "Queries took to long to validate!", 30000);
-        waitFor(new StatusChecker("Validation complete. All queries were validated successfully.", this), "Validation of queries failed!", 100);
+        validateQueries();
         log("all queries validated successfully.");
     }
 
@@ -102,6 +88,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Value", "Value", ListHelper.ListColumnType.String, "")
         );
+        clickLinkWithText(PROJECT_NAME);
     }
 
     protected void setupPipeline()
