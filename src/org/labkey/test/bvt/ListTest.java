@@ -408,7 +408,9 @@ public class ListTest extends BaseSeleniumWebTest
 
         doRenameFieldsTest();
         doUploadTest();
+        customizeURLTest();
     }
+    
 
     private void doUploadTest()
     {
@@ -446,8 +448,6 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("FooFoo");
         assertTextPresent("BarBar");
         assertTextBefore("FooFoo", "BarBar");
-
-        customizeSteps();
     }
 
 
@@ -549,7 +549,7 @@ public class ListTest extends BaseSeleniumWebTest
     }
     
 
-    protected void customizeSteps()
+    protected void customizeURLTest()
     {
         createList("C", Ccolumns, Cdata);
         createList("B", Bcolumns, Bdata);
