@@ -443,7 +443,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void goToSchemaBrowser()
     {
-        clickAdminMenuItem("Developer Links", "Schema Browser");
+        goToModule("Query");
     }
 
     private void waitForStartup()
