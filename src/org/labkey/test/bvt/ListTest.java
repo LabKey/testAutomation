@@ -118,6 +118,9 @@ public class ListTest extends BaseSeleniumWebTest
         log("Setup project and list module");
         createProject(PROJECT_NAME);
 
+//        customizeURLTest();
+//        fail();
+
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1, _listCol2);
 
         log("Add description and test edit");
@@ -551,26 +554,49 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void customizeURLTest()
     {
-        createList("C", Ccolumns, Cdata);
-        createList("B", Bcolumns, Bdata);
-        createList("A", Acolumns, Adata);
         this.pushLocation();
+        {
+            createList("C", Ccolumns, Cdata);
+            createList("B", Bcolumns, Bdata);
+            createList("A", Acolumns, Adata);
 
-        beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?schemaName=lists&query.queryName=A");
+            beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?schemaName=lists&query.queryName=A");
 
-        pushLocation();
-        clickLinkWithText("one A");
-        assertElementPresent(inputWithValue("table","A"));
-        assertElementPresent(inputWithValue("title","one A"));
-        assertElementPresent(inputWithValue("key","1"));
-        popLocation();
+            pushLocation();
+            {
+                clickLinkWithText("one A");
+                assertElementPresent(inputWithValue("table","A"));
+                assertElementPresent(inputWithValue("title","one A"));
+                assertElementPresent(inputWithValue("key","1"));
+            }
+            popLocation();
 
-        pushLocation();
-        clickLinkWithText("one B");
-        assertLinkPresentWithText("one B");
-        assertLinkPresentWithText("one C");
-        popLocation();
+            pushLocation();
+            {
+                clickLinkWithText("one B");
+                assertLinkPresentWithText("one B");
+                assertLinkPresentWithText("one C");
+            }
+            popLocation();
 
+            // show all columns
+            clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+            click(Locator.id("expand_Bfk"));
+            click(Locator.id("expand_Bfk/Cfk"));
+            addCustomizeViewColumn("Bfk/B", "Bfk B");
+            addCustomizeViewColumn("Bfk/title", "Bfk Title");
+            addCustomizeViewColumn("Bfk/Cfk", "Bfk Cfk");
+            addCustomizeViewColumn("Bfk/Cfk/C", "Bfk Cfk C");
+            addCustomizeViewColumn("Bfk/Cfk/title", "Bfk Cfk Title");
+            setFormElement("ff_columnListName", "allColumns");
+            clickNavButton("Save");
+
+            clickLinkWithText("one C", 1);
+            assertElementPresent(inputWithValue("key","1"));
+            assertElementPresent(inputWithValue("table","C"));
+            assertElementPresent(inputWithValue("title","one C"));
+            assertTrue(getCurrentRelativeURL().contains("/junit/" + PROJECT_NAME + "/echoForm.view"));
+        }        
         popLocation();
     }
 }
