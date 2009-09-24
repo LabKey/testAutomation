@@ -2859,12 +2859,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         String fakeUser = _impersonationStack.pop();
         log("Ending impersonation");
-        assertTextPresent(fakeUser);
+        assertEquals(fakeUser,getDisplayName());
         clickLinkWithText("Stop Impersonating");
         assertTextPresent("Sign Out");
-        goToHome();        
-        assertTextNotPresent(fakeUser);
+        goToHome();
+        assertFalse(fakeUser.equals(getDisplayName()));
     }
+
 
     public void createUser(String userName, String cloneUserName)
     {
@@ -3212,8 +3213,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Return display name that's currently shown in the header
     public String getDisplayName()
     {
-        String cellText = getText(Locator.xpath("//table[@id='header']/tbody/tr/td[3]"));
-        return cellText.split("\\n")[0].trim();
+        return getText(Locator.id("header.user.friendlyName"));
     }
 
 
