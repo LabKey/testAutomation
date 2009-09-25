@@ -35,7 +35,7 @@ import java.util.*;
  */
 public class Runner extends TestSuite
 {
-    private static final int MAX_TEST_FAILURES = 5;
+    private static final int MAX_TEST_FAILURES = 10;
     private static final TestSet DEFAULT_TEST_SET = TestSet.DRT;
     private static WebTest _currentWebTest;
     private static Map<Test, Long> _testStats = new LinkedHashMap<Test, Long>();

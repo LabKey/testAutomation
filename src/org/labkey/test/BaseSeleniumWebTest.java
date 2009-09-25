@@ -720,7 +720,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         try
         {
-            Runner.setCurrentWebTest(this);
             log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
             signIn();
 			resetErrors();
