@@ -86,7 +86,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             String text = (String)map.get("text");
             Number intNotNull = (Number)map.get("intnotnull");
             String dateStr = (String)map.get("datetimenotnull");
-            SimpleDateFormat fmt = new SimpleDateFormat("d MMM yyyy HH:mm:ss Z");
+            SimpleDateFormat fmt = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
             Date dateNotNull = fmt.parse(dateStr);
             return new Row(rowid.intValue(), text, intNotNull.intValue(), dateNotNull);
         }
