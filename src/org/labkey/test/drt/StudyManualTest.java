@@ -111,7 +111,7 @@ public class StudyManualTest extends StudyTest
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
         clickNavButton("Import datasets");
-        clickNavButton("Submit");
+        clickNavButton("Start Import");
     }
 
     // Using old visit map format, which does not support default visibility (so we need to set it manually).
