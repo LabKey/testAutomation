@@ -2925,6 +2925,67 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    public void assertUserExists(String email)
+    {
+        log("asserting that user " + email + " exists...");
+        ensureAdminMode();
+        clickLinkWithText("Site Users");
+        assertTextPresent(email);
+        log("user " + email + " exists.");
+    }
+
+    public boolean doesGroupExist(String groupName, String projectName)
+    {
+        ensureAdminMode();
+        clickLinkWithText(projectName);
+        enterPermissionsUI();
+        clickExtTab("Groups for project " + projectName);
+        boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup')]//td[text()='" + groupName + "']"));
+        exitPermissionsUI();
+        return ret;
+    }
+
+    public void assertGroupExists(String groupName, String projectName)
+    {
+        log("asserting that group " + groupName + " exists in project " + projectName + "...");
+        if (!doesGroupExist(groupName, projectName))
+            fail("group " + groupName + " does not exist in project " + projectName);
+    }
+
+    public void assertGroupDoesNotExist(String groupName, String projectName)
+    {
+        log("asserting that group " + groupName + " exists in project " + projectName + "...");
+        if (doesGroupExist(groupName, projectName))
+            fail("group " + groupName + " exists in project " + projectName);
+    }
+
+    public boolean isUserInGroup(String email, String groupName, String projectName)
+    {
+        ensureAdminMode();
+        clickLinkWithText(projectName);
+        enterPermissionsUI();
+        clickExtTab("Groups for project " + projectName);
+        click(Locator.xpath("//div[contains(@class, 'pGroup')]//td[text()='" + groupName + "']"));
+        boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
+        click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
+        exitPermissionsUI();
+        return ret;
+    }
+
+    public void assertUserInGroup(String email, String groupName, String projectName)
+    {
+        log("asserting that user " + email + " is in group " + projectName + "/" + groupName + "...");
+        if (!isUserInGroup(email, groupName, projectName))
+            fail("user " + email + " was not in group " + projectName + "/" + groupName);
+    }
+
+    public void assertUserNotInGroup(String email, String groupName, String projectName)
+    {
+        log("asserting that user " + email + " is not in group " + projectName + "/" + groupName + "...");
+        if (isUserInGroup(email, groupName, projectName))
+            fail("user " + email + " was found in group " + projectName + "/" + groupName);
+    }
+
     /**
      * Saves a wiki page that is currently being created or edited. Because
      * the wiki edit page now uses AJAX to save the page, use this function to

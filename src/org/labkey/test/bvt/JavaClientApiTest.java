@@ -16,9 +16,11 @@
 package org.labkey.test.bvt;
 
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.security.*;
 import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -40,14 +42,73 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
 {
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
     public static final String LIST_NAME = "People";
+    public static final String USER_NAME = "testing@nowhere.com";
+    public static final String GROUP_NAME = "TEST GROUP";
 
     protected void doTestSteps() throws Exception
     {
         log("Starting Java client api library test...");
         createProject(PROJECT_NAME);
+        doSecurityTest();
         doQueryTest();
 
         log("Finished Java client api library test.");
+    }
+
+    protected void doSecurityTest() throws Exception
+    {
+        log("Starting security portion of test...");
+        clickLinkWithText(PROJECT_NAME);
+
+        Connection cn = new Connection(getBaseURL());
+        cn.setEmail(PasswordUtil.getUsername());
+        cn.setPassword(PasswordUtil.getPassword());
+        cn.setAcceptSelfSignedCerts(true);
+
+        log("creating a new user...");
+        CreateUserCommand cmdNewUser = new CreateUserCommand(USER_NAME);
+        cmdNewUser.setSendEmail(false);
+        CreateUserResponse respNewUser = cmdNewUser.execute(cn, PROJECT_NAME);
+
+        if (null == respNewUser.getUserId())
+            fail("New user id not returned from create user command!");
+        int userId = respNewUser.getUserId().intValue();
+
+        assertUserExists(USER_NAME);
+
+        //create a new project group and verify
+        log("creating new project group...");
+        CreateGroupCommand cmdNewGroup = new CreateGroupCommand(GROUP_NAME);
+        CreateGroupResponse respNewGroup = cmdNewGroup.execute(cn, PROJECT_NAME);
+        int groupId = respNewGroup.getGroupId().intValue();
+
+        assertGroupExists(GROUP_NAME, PROJECT_NAME);
+
+        //add user to that group and verify
+        log("adding user to group...");
+        AddGroupMembersCommand cmdAddMem = new AddGroupMembersCommand(groupId);
+        cmdAddMem.addPrincipalId(userId);
+        cmdAddMem.execute(cn, PROJECT_NAME);
+
+        assertUserInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
+
+        //remove user from that group and verify
+        log("removing user from group...");
+        RemoveGroupMembersCommand cmdRemMem = new RemoveGroupMembersCommand(groupId);
+        cmdRemMem.addPrincipalId(userId);
+        cmdRemMem.execute(cn, PROJECT_NAME);
+
+        assertUserNotInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
+
+        //delete group and verify
+        log("deleting project group...");
+        DeleteGroupCommand cmdDel = new DeleteGroupCommand(groupId);
+        cmdDel.execute(cn, PROJECT_NAME);
+
+        assertGroupDoesNotExist(GROUP_NAME, PROJECT_NAME);
+
+        //delete the user
+        deleteUser(USER_NAME);
     }
 
     protected void doQueryTest() throws Exception
