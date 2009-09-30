@@ -60,7 +60,8 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
             "id",
             "userId",
             "groupId",
-            "message"
+            "message",
+            "displayName"
     };
 
     enum ActionType {
