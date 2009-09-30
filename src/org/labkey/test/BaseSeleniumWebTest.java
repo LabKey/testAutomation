@@ -1101,6 +1101,31 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(Locator.tagWithText("td",groupName), defaultWaitForPage);
     }
 
+    public void createPermissionsGroup(String groupName, String... memberNames)
+    {
+        log("Creating permissions group " + groupName);
+        if (!isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
+        waitForElement(Locator.permissionRendered(), 5000);
+        setFormElement("newGroupForm$input",groupName);
+        clickButton("Create new group", 0);
+        sleep(500);
+
+        StringBuilder namesList = new StringBuilder();
+        for(String member : memberNames)
+        {
+            namesList.append(member).append("\n");
+        }
+
+        log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
+        waitAndClick(Locator.tagContainingText("a","manage group"));
+        waitForPageToLoad();
+        setFormElement("names", namesList.toString());
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership");
+        enterPermissionsUI();
+    }
+
 
     public void clickManageGroup(String groupName)
     {

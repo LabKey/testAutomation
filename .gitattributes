@@ -33,6 +33,7 @@ cruisecontrol/xsl/pmd.xsl -text
 cruisecontrol/xsl/testdetails.xsl -text
 cruisecontrol/xsl/unittests.xsl -text
 data/api/http-api.xml -text
+data/api/security-api.xml -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text
@@ -98,6 +99,7 @@ src/org/labkey/test/bvt/WikiBvtTest.java -text
 src/org/labkey/test/daily/FlowImportTest.java -text
 src/org/labkey/test/daily/IDRIParticleSizeTest.java -text
 src/org/labkey/test/daily/SCHARPStudyTest.java -text
+src/org/labkey/test/daily/SecurityApiTest.java -text
 src/org/labkey/test/daily/UniprotAnnotationTest.java -text
 src/org/labkey/test/drt/BasicTest.java -text
 src/org/labkey/test/drt/ExpTest.java -text

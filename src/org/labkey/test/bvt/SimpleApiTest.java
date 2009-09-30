@@ -56,7 +56,11 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
             "containerid",
             "rowid",
             "lsid",
-            "_labkeyurl_like"
+            "_labkeyurl_like",
+            "id",
+            "userId",
+            "groupId",
+            "message"
     };
 
     enum ActionType {
