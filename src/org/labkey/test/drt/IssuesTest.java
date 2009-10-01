@@ -358,8 +358,8 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText("Issues Queries");
         createNewQuery("issues");
         setFormElement("ff_newQueryName", "xxyzzy");
-        clickNavButton("Create and edit SQL");
-        clickNavButton("Run Query");
+        clickNavButton("Create and Edit Source");
+        clickNavButton("View Data");
         assertTextPresent("A very serious issue");
         assertTextPresent("Even more serious issue");
         clickLinkWithText(PROJECT_NAME);

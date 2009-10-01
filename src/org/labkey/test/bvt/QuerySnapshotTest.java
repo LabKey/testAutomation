@@ -173,8 +173,8 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         setFormElement("ff_newQueryName", "APX: Custom Query");
         selectOptionByText("ff_baseTableName", "APX-1: Abbreviated Physical Exam");
-        clickNavButton("Create and design");
-        clickNavButton("Run Query");
+        clickNavButton("Create and Design Query");
+        clickNavButton("View Data");
 
         createQuerySnapshot("Custom Query Snapshot", true, true);
         assertTextPresent("Dataset: Custom Query Snapshot");
@@ -202,9 +202,9 @@ public class QuerySnapshotTest extends StudyBaseTest
         createNewQuery("study");
 
         setFormElement("ff_newQueryName", "cross study query");
-        clickNavButton("Create and edit SQL");
+        clickNavButton("Create and Edit Source");
         setFormElement("queryText", CROSS_STUDY_QUERY_SQL);
-        clickNavButton("Run Query");
+        clickNavButton("View Data");
         
         createQuerySnapshot(CROSS_STUDY_SNAPSHOT, true, false, "keyField", 3);
 

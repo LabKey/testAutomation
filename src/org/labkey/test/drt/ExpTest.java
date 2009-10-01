@@ -87,7 +87,7 @@ public class ExpTest extends BaseSeleniumWebTest
         createNewQuery("exp");
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Datas");
-        clickNavButton("Create and edit SQL");
+        clickNavButton("Create and Edit Source");
         setFormElement("ff_queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
                 "Datas.Run AS Run,\n" +
@@ -95,7 +95,7 @@ public class ExpTest extends BaseSeleniumWebTest
                 "substring(Datas.DataFileUrl, 0, 7) AS DataFileUrlPrefix,\n" +
                 "Datas.Created AS Created\n" +
                 "FROM Datas");
-        clickNavButton("Run Query");
+        clickNavButton("View Data");
 
         // Check that it contains the date format we expect
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -103,8 +103,8 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent("file:/", 10);
 
         // Edit the metadata to use a special date format
-        clickMenuButton("Query", "Query:EditQuery");
-        clickNavButton("Edit Metadata with GUI");
+        clickMenuButton("Query", "Query:EditSource");
+        clickNavButton("Edit Metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.type("//td/input[@id='ff_label5']", "editedCreated");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
@@ -112,12 +112,12 @@ public class ExpTest extends BaseSeleniumWebTest
         waitForText("Save successful.", 10000);
 
         // Verify that it ended up in the XML version of the metadata
-        clickNavButton("Edit as XML");
+        clickNavButton("Edit Source");
         assertTextPresent("<ns:columnTitle>editedCreated</ns:columnTitle>");
         assertTextPresent("<ns:formatString>ddd MMM dd yyyy</ns:formatString>");
 
         // Run it and see if we used the format correctly
-        clickNavButton("Run Query");
+        clickNavButton("View Data");
         assertTextPresent("editedCreated");
         dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
         assertTextPresent(dateFormat.format(new Date()), 5);
@@ -142,8 +142,8 @@ public class ExpTest extends BaseSeleniumWebTest
         // Save it
         selenium.click("//span" + Locator.navButton("Save").getPath());
         waitForText("Save successful.", 10000);
-        clickNavButton("Edit as XML");
-        clickNavButton("Run Query");
+        clickNavButton("Edit Source");
+        clickNavButton("View Data");
 
         // Customize the view to add the newly joined column
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
@@ -154,8 +154,8 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent(dateFormat.format(new Date()), 5);
 
         // Since this metadata is shared, clear it out 
-        clickMenuButton("Query", "Query:EditQuery");
-        clickNavButton("Edit Metadata with GUI");
+        clickMenuButton("Query", "Query:EditSource");
+        clickNavButton("Edit Metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Reset to Default").getPath());
         selenium.click("//span" + Locator.navButton("OK").getPath());

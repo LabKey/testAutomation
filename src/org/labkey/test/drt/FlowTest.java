@@ -83,7 +83,7 @@ public class FlowTest extends BaseFlowTest
                 "FCSAnalyses.Run.FilePathRoot,\n" +
                 "FCSAnalyses.FCSFile.Run.WellCount\n" +
                 "FROM FCSAnalyses AS FCSAnalyses");
-        clickNavButton("Run Query");
+        clickNavButton("View Data");
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Set pipeline root");
