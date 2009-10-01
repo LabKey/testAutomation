@@ -142,11 +142,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             setFormElement("userSchemaName", USER_SCHEMA_NAME);
             setFormElement("dbSchemaName", DB_SCHEMA_NAME);
             setFormElement("metaData", getFileContents("server/modules/core/resources/schemas/test.xml"));
-
-            // Ext 2.2 checkboxes are broken; see #8601.  For now, click the inner checkbox directly.
-            // TODO: move back to standard check box code: checkCheckbox("editable")
-            click(Locator.xpath("//div[@class='x-form-check-wrap-inner']"));
-
+            checkCheckbox("editable");
             clickNavButton("Create");
         }
     }

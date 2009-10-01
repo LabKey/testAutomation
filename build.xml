@@ -90,6 +90,11 @@
         <echo message="To skip cleanup for all tests:"/>
         <echo message="    -Dclean=false"/>
         <echo message=""/>
+        <echo message="If a test fails or you've previously used -Dclean=false, you may want to force a test"/>
+        <echo message="(or a group of tests) to perform post-test cleanup."/>
+        <echo message="To perform just the cleanup steps of the specified test(s):"/>
+        <echo message="    -Dcleanonly=true"/>
+        <echo message=""/>
         <echo message="By default, labkey is accessed at context path '/labkey'."/>
         <echo message="To specify a different context path, add:"/>
         <echo message="    -Dlabkey.contextpath={contextpath}"/>
