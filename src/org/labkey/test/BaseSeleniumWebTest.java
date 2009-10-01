@@ -3381,7 +3381,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickFkExpando(String schemaName, String queryName, String columnName)
     {
         String queryLabel = schemaName + "." + queryName;
-        click(Locator.xpath("//div/a[text()='" + queryLabel + "']/../../table/tbody/tr/td/img[(contains(@src, 'plus.gif') or contains(@src, 'minus.gif')) and ../../td[text()='" + columnName + "']]"));
+        click(Locator.xpath("//div/a[text()='" + queryLabel + "']/../../../table/tbody/tr/td/img[(contains(@src, 'plus.gif') or contains(@src, 'minus.gif')) and ../../td[text()='" + columnName + "']]"));
     }
 
     public void viewQueryData(String schemaName, String queryName)
