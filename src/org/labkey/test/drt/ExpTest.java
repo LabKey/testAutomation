@@ -124,7 +124,6 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Add a new wrapped column to the exp.Datas table
         clickLinkWithText("exp Schema");
-        selectQuery("exp", "Datas");
         waitForElement(Locator.linkWithText("edit metadata"), 5000); //on Ext panel
         clickLinkWithText("edit metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
@@ -151,7 +150,7 @@ public class ExpTest extends BaseSeleniumWebTest
         addCustomizeViewColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
         clickNavButton("Save");
         // Verify that it was joined and formatted correctly
-        assertTextPresent(dateFormat.format(new Date()), 5);
+        assertTextPresent(dateFormat.format(new Date()), 10);
 
         // Since this metadata is shared, clear it out 
         clickMenuButton("Query", "Query:EditSource");
