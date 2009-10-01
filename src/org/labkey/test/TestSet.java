@@ -42,7 +42,6 @@ public enum TestSet
     }),
 
     BVT(DRT, new Class[] {
-        SecurityApiTest.class,
         WikiTest.class,
         ExpTest.class,
         FlowJoQueryTest.class,
