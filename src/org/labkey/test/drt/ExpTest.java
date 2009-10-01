@@ -125,8 +125,8 @@ public class ExpTest extends BaseSeleniumWebTest
         // Add a new wrapped column to the exp.Datas table
         clickLinkWithText("exp Schema");
         selectQuery("exp", "Datas");
-        waitForElement(Locator.linkWithText("customize display"), 5000); //on Ext panel
-        clickLinkWithText("customize display");
+        waitForElement(Locator.linkWithText("edit metadata"), 5000); //on Ext panel
+        clickLinkWithText("edit metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Alias Field").getPath());
         selectOptionByText("sourceColumn", "RowId");
