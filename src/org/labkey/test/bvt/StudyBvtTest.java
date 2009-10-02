@@ -45,8 +45,8 @@ public class StudyBvtTest extends StudyManualTest
         SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 2);
         specimenImporter.importAndWaitForComplete();
 
-        // export manually created study using "legacy" formats
-        exportStudy(true);
+        // export manually created study to individual files using "legacy" formats
+        exportStudy(false, false);
 
         // delete manually created study
         clickLinkWithText(getStudyLabel());
@@ -67,14 +67,15 @@ public class StudyBvtTest extends StudyManualTest
         // delete "export" directory
         deleteDir(new File(getPipelinePath() + "export"));
 
-        // export new study using "xml" formats
+        // change settings that aren't roundtripped using "legacy" formats 
         hideSceeningVisit();
         setDemographicsDescription();
         createCustomAssays();
 
-        exportStudy(true);
+        // export new study to zip file using "xml" formats
+        exportStudy(true, true);
 
-        // delete imported study
+        // delete the study
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
         clickNavButton("Delete Study");
@@ -97,15 +98,16 @@ public class StudyBvtTest extends StudyManualTest
     }
 
 
-    private void exportStudy(boolean useXmlFormat)
+    private void exportStudy(boolean useXmlFormat, boolean zipFile)
     {
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
         clickNavButton("Export Study");
 
+        // TODO: Re-enable this check -- Matt?
 //        assertTextPresentInThisOrder("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Queries", "Custom Views", "Reports", "Lists");
         checkRadioButton("format", useXmlFormat ? "new" : "old");
-        checkRadioButton("location", "0");  // Pipeline root as individual files
+        checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
         clickNavButton("Export");
     }
 
