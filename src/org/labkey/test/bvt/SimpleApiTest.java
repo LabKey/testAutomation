@@ -34,10 +34,8 @@ import org.labkey.test.util.PasswordUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -49,20 +47,23 @@ import java.util.Map;
 public abstract class SimpleApiTest extends BaseSeleniumWebTest
 {
     private HttpClient _client;
+    private boolean _failedComparisonFatal;
 
-    // json key elements to ignore during the comparison phase
-    static final String[] _ignored = {
-            "entityid",
-            "containerid",
-            "rowid",
-            "lsid",
-            "_labkeyurl_like",
-            "id",
-            "userId",
-            "groupId",
-            "message",
-            "displayName"
+    // json key elements to ignore during the comparison phase, these can be regular expressions
+    static final Pattern[] _ignored = {
+            Pattern.compile("entityid", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("containerid", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("rowid", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("lsid", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("_labkeyurl_.*"),
+            Pattern.compile("id", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("userId", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("groupId", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("message", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("displayName", Pattern.CASE_INSENSITIVE)
     };
+
+    private List<Pattern> _ignoredElements = new ArrayList<Pattern>();
 
     enum ActionType {
         get,
@@ -75,19 +76,33 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
      */
     protected abstract File[] getTestFiles();
 
+    protected Pattern[] getIgnoredElements()
+    {
+        return new Pattern[0];
+    }
+
     protected void doTestSteps() throws Exception
     {
         int tests = 0;
-        for (File testFile : getTestFiles())
+        File[] testFiles = getTestFiles();
+
+        if (testFiles != null)
         {
-            if (testFile.exists())
+            for (File testFile : testFiles)
             {
-                for (ApiTestCase test : parseTests(testFile))
+                if (testFile.exists())
                 {
-                    tests++;
-                    log("Starting new test case: " + StringUtils.trimToEmpty(test.getName()));
-                    sendRequestDirect(test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch());
-                    log("test case completed");
+                    // load up the elements to skip comparisons on
+                    _ignoredElements.addAll(Arrays.asList(_ignored));
+                    _ignoredElements.addAll(Arrays.asList(getIgnoredElements()));
+
+                    for (ApiTestCase test : parseTests(testFile))
+                    {
+                        tests++;
+                        log("Starting new test case: " + StringUtils.trimToEmpty(test.getName()));
+                        sendRequestDirect(test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch());
+                        log("test case completed");
+                    }
                 }
             }
         }
@@ -215,16 +230,18 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         JSONObject response = (JSONObject)JSONValue.parse(responseStr);
         JSONObject expectedResponse = (JSONObject)JSONValue.parse(expectedResponseStr);
 
-        return compareElement(response, expectedResponse);
+        return compareElement(expectedResponse, response);
     }
 
     private boolean compareMap(Map map1, Map map2)
     {
+/*
         if (map1.size() != map2.size())
         {
             logInfo("Comparison of maps failed: sizes are different: " + map1.size() + " and: " + map2.size());
             return false;
         }
+*/
 
         for (Object key : map1.keySet())
         {
@@ -251,6 +268,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         }
 
         // lists are not ordered
+        _failedComparisonFatal = false;
         for (int i=0; i < list1.size(); i++)
         {
             boolean matched = false;
@@ -262,8 +280,13 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                     break;
                 }
             }
-            if (!matched) return false;
+            if (!matched)
+            {
+                _failedComparisonFatal = true;
+                return false;
+            }
         }
+        _failedComparisonFatal = true;
         return true;
     }
 
@@ -287,14 +310,16 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
     private void logInfo(String msg)
     {
-        log(msg);
+        if (_failedComparisonFatal)
+            log(msg);
     }
 
     private boolean skipElement(String element)
     {
-        for (String ignore : _ignored)
-            if (StringUtils.equalsIgnoreCase(element, ignore)) return true;
-
+        for (Pattern ignore : _ignoredElements)
+        {
+            if (ignore.matcher(element).matches()) return true;
+        }
         return false;
     }
 
