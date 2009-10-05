@@ -57,7 +57,7 @@ public class StudyBvtTest extends StudyManualTest
 
         log("Importing exported study (legacy formats)");
         clickNavButton("Import Study");
-        clickNavButton("Import From Pipeline");
+        clickNavButton("Import Study Using Pipeline");
         waitAndClick(Locator.fileTreeByName("export"));
         waitAndClickNavButton("Import Study");
 
@@ -84,7 +84,7 @@ public class StudyBvtTest extends StudyManualTest
 
         log("Importing exported study (xml formats)");
         clickNavButton("Import Study");
-        clickNavButton("Import From Pipeline");
+        clickNavButton("Import Study Using Pipeline");
         waitAndClick(Locator.fileTreeByName("export"));
         waitAndClickNavButton("Import Study");
 
