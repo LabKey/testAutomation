@@ -95,6 +95,7 @@ public class FlowTest extends BaseFlowTest
         waitAndClick(Locator.fileTreeByName("8color"));
         waitAndClickNavButton("Import Multiple Runs");
         // First, just upload the run "8colordata"
+        clickNavButton("Clear All", -1); // no nav
         checkCheckbox("ff_path", "8color/8colordata/");
         clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
