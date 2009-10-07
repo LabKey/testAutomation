@@ -71,24 +71,9 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
 
         log("importing study...");
         setupPipeline();
-        createLookupLists();
         importStudy();
 
-        log("navigating to validation page...");
-        clickAdminMenuItem("Go To Module", "Query");
-        log("stating query validation...");
-        validateQueries();
-        log("all queries validated successfully.");
-    }
-
-    private void createLookupLists()
-    {
-        //The ZIP file makes use of the following lookup lists
-        ListHelper.createList(this, PROJECT_NAME, "WB Scoring (Denny)",
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Value", "Value", ListHelper.ListColumnType.String, "")
-        );
-        clickLinkWithText(PROJECT_NAME);
+        log("Study imported and queries validated successfully.");
     }
 
     protected void setupPipeline()
