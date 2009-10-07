@@ -346,6 +346,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         webpartTest();
 
+        clearTestPage("WebPart Test Complete.");
+
         assayTest();
 
         queryTest();
