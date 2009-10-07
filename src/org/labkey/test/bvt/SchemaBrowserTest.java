@@ -75,6 +75,8 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
         clickFkExpando("lists", "Books", "PublisherId");
         assertTextNotPresent(TEST_DESC_PUBLISHERS);
+
+        validateQueries();
     }
 
     public void createLists()
