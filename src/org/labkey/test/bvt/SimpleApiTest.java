@@ -283,6 +283,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
             if (!matched)
             {
                 _failedComparisonFatal = true;
+                logInfo("Failed to match two specified lists");
                 return false;
             }
         }
