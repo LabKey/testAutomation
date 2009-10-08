@@ -96,7 +96,8 @@ public enum TestSet
         SimpleModuleTest.class,
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
-        SCHARPStudyTest.class
+        SCHARPStudyTest.class,
+        IDRIParticleSizeTest.class
     }),
 
     Cluster(new Class[]
