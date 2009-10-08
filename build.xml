@@ -867,9 +867,9 @@
         <echo>Using SVN to determine modified files</echo>
         <!-- Generate list of modified files in the project.  This will be used to order the tests and/or run only a subset of tests. -->
         <property name="svnModifiedFiles" value="${test.build.home}/svnModified.txt"/>
-        <!--<exec executable="svn" dir="${project.root}" output="${svnModifiedFiles}" failifexecutionfails="false">
+        <exec executable="svn" dir="${project.root}" output="${svnModifiedFiles}" failifexecutionfails="false">
             <arg value="status"/>
-        </exec>-->
+        </exec>
         <!-- Make sure there's actually a file - it won't be created if we can't run the SVN client -->
         <touch file="${svnModifiedFiles}" />
     </target>
