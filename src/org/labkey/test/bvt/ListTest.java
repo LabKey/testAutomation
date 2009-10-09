@@ -45,22 +45,25 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String FAKE_COL1_NAME = "FakeName";
     private ListColumn _listCol1 = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
     private final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
-    private final ListColumn _listCol3 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
-    private final static String[][] TEST_DATA = { { "Blue", "Green", "Red", "Yellow" },
+    private final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
+    private final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
+    private final static String[][] TEST_DATA = {
+            { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
+            { "true", "false", "true", "false"},
             { "1", "4", "3", "2" },
             { "10", "9", "8", "7"} };
     private final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
-    private final static String LIST_ROW1 = TEST_DATA[0][0] + "\t" + TEST_DATA[1][0] + "\t" + CONVERTED_MONTHS[0];
-    private final static String LIST_ROW2 = TEST_DATA[0][1] + "\t" + TEST_DATA[1][1] + "\t" + CONVERTED_MONTHS[1];
-    private final static String LIST_ROW3 = TEST_DATA[0][2] + "\t" + TEST_DATA[1][2] + "\t" + CONVERTED_MONTHS[2];
+    private final static String LIST_ROW1 = TEST_DATA[0][0] + "\t" + TEST_DATA[1][0] + "\t" + TEST_DATA[2][0] + "\t" + CONVERTED_MONTHS[0];
+    private final static String LIST_ROW2 = TEST_DATA[0][1] + "\t" + TEST_DATA[1][1] + "\t" + TEST_DATA[2][1] + "\t" + CONVERTED_MONTHS[1];
+    private final static String LIST_ROW3 = TEST_DATA[0][2] + "\t" + TEST_DATA[1][2] + "\t" + TEST_DATA[2][2] + "\t" + CONVERTED_MONTHS[2];
     private final String LIST_DATA = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME +
-            "\t" + _listCol2.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3;
+            "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3;
     private final String LIST_DATA2 = 
-            LIST_KEY_NAME2 + "\t" + _listCol3.getName() + "\n" +
-            TEST_DATA[0][0] + "\t" + TEST_DATA[3][0] + "\n" +
-            TEST_DATA[0][1] + "\t" + TEST_DATA[3][1] + "\n" +
-            TEST_DATA[0][2] + "\t" + TEST_DATA[3][2];
+            LIST_KEY_NAME2 + "\t" + _listCol4.getName() + "\n" +
+            TEST_DATA[0][0] + "\t" + TEST_DATA[4][0] + "\n" +
+            TEST_DATA[0][1] + "\t" + TEST_DATA[4][1] + "\n" +
+            TEST_DATA[0][2] + "\t" + TEST_DATA[4][2];
     private final String TEST_FAIL2 = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol2.getName() + "\n" +
             LIST_ROW1 + "\t" + "String";
     private final static String TEST_FAIL = "testfail";
@@ -121,7 +124,7 @@ public class ListTest extends BaseSeleniumWebTest
 //        customizeURLTest();
 //        fail();
 
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1, _listCol2);
+        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1, _listCol2, _listCol3);
 
         log("Add description and test edit");
         clickLinkWithText("edit design");
@@ -151,7 +154,25 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(_listCol2.getLabel());
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
-        assertTextPresent(TEST_DATA[2][2]);
+        assertTextPresent(TEST_DATA[3][2]);
+        assertTableCellTextEquals("dataregion_query", 1, 6, "true");
+        assertTableCellTextEquals("dataregion_query", 2, 6, "false");
+        assertTableCellTextEquals("dataregion_query", 3, 6, "true");
+
+        log("Test check/uncheck of checkboxes");
+        // Second row (Green)
+        clickLinkWithText("edit", 1);
+        setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
+        checkCheckbox("quf_JewelTone");
+        submit();
+        // Third row (Red)
+        clickLinkWithText("edit", 2);
+        setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
+        uncheckCheckbox("quf_JewelTone");
+        submit();
+        assertTableCellTextEquals("dataregion_query", 1, 6, "true");
+        assertTableCellTextEquals("dataregion_query", 2, 6, "true");
+        assertTableCellTextEquals("dataregion_query", 3, 6, "false");
 
         log("Test edit and adding new field with imported data present");
         clickLinkWithText("Lists");
@@ -162,15 +183,15 @@ public class ListTest extends BaseSeleniumWebTest
         setFormElement(Locator.id("ff_name0"), _listCol1.getName());
         setFormElement(Locator.id("ff_label0"), _listCol1.getLabel());
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name2"), _listCol3.getName());
-        setFormElement(Locator.id("ff_label2"), _listCol3.getLabel());
-        selectOptionByText("ff_type2", _listCol3.getType().toString());
-        setFormElement(Locator.id("propertyDescription"), _listCol3.getDescription());
+        setFormElement(Locator.id("ff_name3"), _listCol4.getName());
+        setFormElement(Locator.id("ff_label3"), _listCol4.getLabel());
+        selectOptionByText("ff_type3", _listCol4.getType().toString());
+        setFormElement(Locator.id("propertyDescription"), _listCol4.getDescription());
         clickNavButton("Save", 0);
         waitForPageToLoad();
 
         log("Check new field was added correctly");
-        assertTextPresent(_listCol3.getName());
+        assertTextPresent(_listCol4.getName());
 
         log("Set title field of 'Colors' to 'Desc'");
         clickLinkWithText("edit design");
@@ -180,7 +201,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkWithText("view data");
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
-        assertTextPresent(TEST_DATA[2][2]);
+        assertTextPresent(TEST_DATA[3][2]);
 
         log("Add data to existing rows");
         clickLinkWithText("Import Data");
@@ -190,10 +211,10 @@ public class ListTest extends BaseSeleniumWebTest
         log("Check that data was added correctly");
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
-        assertTextPresent(TEST_DATA[2][2]);
-        assertTextPresent(TEST_DATA[3][0]);
-        assertTextPresent(TEST_DATA[3][1]);
         assertTextPresent(TEST_DATA[3][2]);
+        assertTextPresent(TEST_DATA[4][0]);
+        assertTextPresent(TEST_DATA[4][1]);
+        assertTextPresent(TEST_DATA[4][2]);
 
         log("Test inserting new row");
         clickNavButton("Insert New");
@@ -201,7 +222,8 @@ public class ListTest extends BaseSeleniumWebTest
         //assertTextPresent(_listCol3.getDescription(), 1, true);
         setFormElement("quf_" + _listCol1.getName(), TEST_DATA[1][3]);
         setFormElement("quf_" + _listCol2.getName(), "wrong type");
-        setFormElement("quf_" + _listCol3.getName(), TEST_DATA[3][3]);
+        // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
+        setFormElement("quf_" + _listCol4.getName(), TEST_DATA[4][3]);
         submit();
         assertTextPresent("This field is required");
         setFormElement("quf_" + LIST_KEY_NAME2, TEST_DATA[0][3]);
@@ -215,19 +237,20 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[1][3]);
         assertTextPresent(TEST_DATA[2][3]);
         assertTextPresent(TEST_DATA[3][3]);
+        assertTableCellTextEquals("dataregion_query", 4, 6, "false");
 
         log("Test Sort and Filter in Data View");
         setSort("query", _listCol1.getName(), SortDirection.ASC);
         assertTextBefore(TEST_DATA[0][1], TEST_DATA[0][0]);
-        setFilter("query", _listCol3.getName(), "Is Greater Than", "7");
+        setFilter("query", _listCol4.getName(), "Is Greater Than", "7");
         assertTextNotPresent(TEST_DATA[0][3]);
 
         log("Test Customize View");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
 
-        removeCustomizeViewColumn(_listCol3.getLabel());
-        removeCustomizeViewFilter(_listCol3.getLabel());
-        addCustomizeViewFilter(_listCol3.getName(), _listCol3.getLabel(), "Is Less Than", "10");
+        removeCustomizeViewColumn(_listCol4.getLabel());
+        removeCustomizeViewFilter(_listCol4.getLabel());
+        addCustomizeViewFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
         removeCustomizeViewSort(_listCol1.getLabel());
         addCustomizeViewSort(_listCol2.getName(), _listCol2.getLabel(), "ASC");
         setFormElement("ff_columnListName", TEST_VIEW);
@@ -237,7 +260,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
         assertTextNotPresent(TEST_DATA[0][0]);
-        assertTextNotPresent(_listCol3.getLabel());
+        assertTextNotPresent(_listCol4.getLabel());
 
         log("4725: Check Customize View can't remove all fields");
         pushLocation();
@@ -245,6 +268,7 @@ public class ListTest extends BaseSeleniumWebTest
         removeCustomizeViewColumn(LIST_KEY_NAME2);
         removeCustomizeViewColumn(_listCol1.getLabel());
         removeCustomizeViewColumn(_listCol2.getLabel());
+        removeCustomizeViewColumn(_listCol3.getLabel());
         clickNavButton("Save", 0);
         assertAlert("You must select at least one field to display in the grid.");
         popLocation();
@@ -258,7 +282,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
         assertTextNotPresent(TEST_DATA[0][0]);
-        assertTextNotPresent(_listCol3.getLabel());
+        assertTextNotPresent(_listCol4.getLabel());
         popLocation();
 
         log("Filter Test");
@@ -273,18 +297,18 @@ public class ListTest extends BaseSeleniumWebTest
         submit();
 
         log("Test that the right filters are present for each type");
-        runMenuItemHandler("qwp3:" + _listCol3.getName() + ":filter");
+        runMenuItemHandler("qwp3:" + _listCol4.getName() + ":filter");
         assertTrue(!isElementPresent(Locator.raw("//option[@value='startswith']")));
         assertTrue(isElementPresent(Locator.raw("//option[@value='isblank']")));
         clickImgButtonNoNav("Cancel");
 
         log("Test that filters don't affect multiple web parts");
         assertTextPresent(TEST_DATA[1][0], 2);
-        setFilter("qwp3", _listCol3.getName(), "Is Less Than", "10");
+        setFilter("qwp3", _listCol4.getName(), "Is Less Than", "10");
         assertTextPresent(TEST_DATA[1][0], 1);
 
         log("Test that sort only affects one web part");
-        setSort("qwp2", _listCol3.getName(), SortDirection.ASC);
+        setSort("qwp2", _listCol4.getName(), SortDirection.ASC);
         String source = selenium.getHtmlSource();
         int index;
         assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
@@ -322,9 +346,9 @@ public class ListTest extends BaseSeleniumWebTest
         click(Locator.id("expand_Color"));
         addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol1.getName(), _list2Col1.getLabel() + " " +  _listCol1.getLabel());
         addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol2.getName(), _list2Col1.getLabel() + " " +  _listCol2.getLabel());
-        addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol3.getName(), _list2Col1.getLabel() + " " + _listCol3.getLabel());
-        addCustomizeViewFilter(_list2Col1.getName() + "/" +  _listCol3.getName(), _list2Col1.getLabel() + " " + _listCol3.getLabel(), "Is Less Than", "10");
-        addCustomizeViewSort(_list2Col1.getName() + "/" +  _listCol3.getName(), _list2Col1.getLabel() + " " + _listCol3.getLabel(), "ASC");
+        addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
+        addCustomizeViewFilter(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel(), "Is Less Than", "10");
+        addCustomizeViewSort(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel(), "ASC");
         click(Locator.id("expand_Owner"));
         addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col1.getName(), _list3Col1.getLabel() + " " +  _list3Col1.getLabel());
         addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col2.getName(), _list3Col1.getLabel() + " " +  _list3Col2.getLabel());
@@ -335,7 +359,7 @@ public class ListTest extends BaseSeleniumWebTest
         waitForText(_listCol1.getLabel(), WAIT_FOR_GWT);
         assertTextPresent(_listCol1.getLabel());
         assertTextPresent(_listCol2.getLabel());
-        assertTextPresent(_listCol3.getLabel());
+        assertTextPresent(_listCol4.getLabel());
         assertTextPresent(LIST2_FOREIGN_KEY_OUTSIDE);
         assertTextPresent(LIST3_COL2);
         assertTextNotPresent(LIST2_KEY);
@@ -350,7 +374,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkContainingText("Export All to Text");
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol1.getName());
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol2.getName());
-        assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol3.getName());
+        assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol4.getName());
         assertTextPresent(LIST2_FOREIGN_KEY_OUTSIDE);
         assertTextPresent(LIST3_COL2);
         assertTextNotPresent(LIST2_KEY);
