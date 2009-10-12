@@ -101,15 +101,32 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextPresent("TODO");
         setFormElement(Locator.formElement("addType", "keyword"), "AAA");
         clickNavButton("Add Type");
+
         assertTextPresent("AAA");
         //SetKeywordDefaultAction
         clickLinkWithText("set");
-        // UNDONE: check AAA is bold???
+        // check that AAA is bold and [clear] link is on that row
+        assertElementContains(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[1]/b"), "AAA");
+        assertElementContains(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[2]/a[2]"), "clear");
         //SetKeywordDefaultAction
         clickLinkWithText("clear");
-        // UNDONE: check AAA is not bold???
+        // check that AAA is not bold and [set] link is now on that row
+        assertElementNotPresent(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[1]/b"));
+        assertElementContains(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[2]/a[2]"), "set");
         clickLinkWithText("delete");
         assertTextNotPresent("AAA");
+
+        // Check that non-integer priority results in an error message
+        setFormElement(Locator.formElement("addPriority", "keyword"), "ABC");
+        clickNavButton("Add Priority");
+        assertTextPresent("Priority must be an integer");
+        clickNavButton("Back");
+        assertTextNotPresent("ABC");
+        setFormElement(Locator.formElement("addPriority", "keyword"), "1.2");
+        clickNavButton("Add Priority");
+        assertTextPresent("Priority must be an integer");
+        clickNavButton("Back");
+        assertTextNotPresent("1.2");
 
         // AddKeywordAction
         setFormElement(Locator.formElement("addMilestone", "keyword"), "2012");
