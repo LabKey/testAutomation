@@ -76,6 +76,7 @@ public enum TestSet
     Daily(new Class[]
     {
         BasicTest.class,
+        StudySecurityTest.class,
         MS1Bvt.class,
         //UniprotAnnotationTest.class, //requires bootstrap
         HTTPApiTest.class,
