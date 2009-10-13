@@ -55,6 +55,12 @@ public class StudySecurityTest extends StudyBaseTest
         }
     }
 
+    protected enum PerDatasetPerm
+    {
+        Read,
+        Edit
+    }
+
     protected void doCreateSteps()
     {
         //start import--need to wait for completion after setting up security
@@ -115,12 +121,27 @@ public class StudySecurityTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         verifyPerms(LIMITED, none, all, none, all, false);
 
-        //reinstate limited to verify that per-dataset settings were preserved
+        //reinstate read to limited to verify that per-dataset settings were preserved
         adjustGroupDatasetPerms(GROUP_LIMITED, GroupSetting.perDataset);
         verifyPerms(LIMITED, limited, unlimited, none, limited, false);
+
+        //move editors to per-dataset and grant edit only one of the datasets
+        String[] edit = new String[]{"Types"};
+        String[] noEdit = new String[]{"DEM-1: Demographics"};
+        adjustGroupDatasetPerms(GROUP_EDITORS, GroupSetting.perDataset, edit, PerDatasetPerm.Edit);
+        verifyPerms(EDITOR, edit, noEdit, edit, noEdit, false);
+
+        //reset to general edit
+        adjustGroupDatasetPerms(GROUP_EDITORS, GroupSetting.editAll);
+        verifyPerms(EDITOR, all, none, all, none, false);
     }
 
     protected void adjustGroupDatasetPerms(String groupName, GroupSetting setting)
+    {
+        adjustGroupDatasetPerms(groupName, setting, null, null);
+    }
+
+    protected void adjustGroupDatasetPerms(String groupName, GroupSetting setting, String[] datasets, PerDatasetPerm perm)
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
@@ -130,7 +151,22 @@ public class StudySecurityTest extends StudyBaseTest
 
         click(getRadioButtonLocator(groupName, setting));
         clickNavButtonByIndex("Update", 1);
+
+        if (null != datasets && null != perm)
+        {
+            for (String dsName : datasets)
+            {
+                selectOptionByText(getPerDatasetSelectId(dsName), perm.name());
+            }
+            clickNavButton("Save");
+        }
+
         clickLinkWithText(getFolderName());
+    }
+
+    protected String getPerDatasetSelectId(String dsName)
+    {
+        return selenium.getAttribute("//form[@id='datasetSecurityForm']/table/tbody/tr/td[text()='" + dsName + "']/../td/select/@name");
     }
 
     protected void verifyPerms(String userName, String[] dsCanRead, String[] dsCannotRead, String[] dsCanEdit, String[] dsCannotEdit, boolean canSetupPipeline)
