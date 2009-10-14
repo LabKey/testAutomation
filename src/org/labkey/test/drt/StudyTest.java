@@ -145,7 +145,7 @@ public class StudyTest extends StudyBaseTest
 
         clickLinkWithText("Specimens");
         setFilter("SpecimenDetail", "QualityControlFlag", "Equals", "true");
-        setSort("SpecimenDetail", "GlobalUniqueId", SortDirection.ASC);
+        setSort("SpecimenDetail", "globaluniqueid", SortDirection.ASC);
         assertTextPresent("AAA07XK5-02");
         assertTextPresent("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId");
         clickLinkContainingText("history");
