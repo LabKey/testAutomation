@@ -160,14 +160,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isFileUploadTest())
         {
             // IE is currently unable to do a file upload
-
-            if(IE_BROWSER.equals(browser))
+            if (browser.startsWith(IE_BROWSER))
             {
                 log("Warning: Internet Explorer cannot do file uploads!");
                 //browser = IE_UPLOAD_BROWSER;
                 //_fileUploadAvailable = true;
             }
-            if(FIREFOX_BROWSER.equals(browser))
+            else if (browser.startsWith(FIREFOX_BROWSER))
             {
                 browser = FIREFOX_UPLOAD_BROWSER;
                 _fileUploadAvailable = true;
@@ -1484,6 +1483,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void mouseClick(String locator)
     {
         selenium.mouseClick(locator);
+    }
+
+    protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
+    {
+        pushLocation();
+        beginAt("/query" + containerPath + "/internalNewView.view");
+        setFormElement("ff_schemaName", schema);
+        setFormElement("ff_queryName", query);
+        if (viewName != null)
+            setFormElement("ff_viewName", viewName);
+        submit();
+        StringBuilder strFields = new StringBuilder(fields[0]);
+        for (int i = 1; i < fields.length; i ++)
+        {
+            strFields.append("&");
+            strFields.append(fields[i]);
+        }
+        setFormElement("ff_columnList", strFields.toString());
+        submit();
+        popLocation();
     }
 
     public interface Checker

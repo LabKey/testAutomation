@@ -29,26 +29,6 @@ public class FlowTest extends BaseFlowTest
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
 
-    protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
-    {
-        pushLocation();
-        beginAt("/query" + containerPath + "/internalNewView.view");
-        setFormElement("ff_schemaName", schema);
-        setFormElement("ff_queryName", query);
-        if (viewName != null)
-            setFormElement("ff_viewName", viewName);
-        submit();
-        StringBuilder strFields = new StringBuilder(fields[0]);
-        for (int i = 1; i < fields.length; i ++)
-        {
-            strFields.append("&");
-            strFields.append(fields[i]);
-        }
-        setFormElement("ff_columnList", strFields.toString());
-        submit();
-        popLocation();
-    }
-
     private void clickButtonWithText(String text)
     {
         click(Locator.raw("//input[@value = '" + text + "']"));

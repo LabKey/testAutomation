@@ -63,7 +63,8 @@ public enum TestSet
         ModuleAssayTest.class,
         ProgrammaticQCTest.class,
         ReportTest.class,
-        SchemaBrowserTest.class
+        SchemaBrowserTest.class,
+        ViabilityTest.class
     }),
 
     MS2(new Class[]
