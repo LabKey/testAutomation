@@ -63,7 +63,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private boolean _fileUploadAvailable;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
-    protected static final int MAX_WAIT_SECONDS = 4 * 60;
+    protected static final int MAX_WAIT_SECONDS = 10 * 60;
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";

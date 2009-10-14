@@ -144,6 +144,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
 
         clickLinkWithText("Specimens");
+        clickNavButton("Search");
         setFilter("SpecimenDetail", "QualityControlFlag", "Equals", "true");
         setSort("SpecimenDetail", "GlobalUniqueId", SortDirection.ASC);
         assertTextPresent("AAA07XK5-02");
