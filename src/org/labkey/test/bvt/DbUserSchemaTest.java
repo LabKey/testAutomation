@@ -23,6 +23,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.CommandException;
 
 import java.util.*;
 import java.text.SimpleDateFormat;
@@ -130,10 +131,10 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
 
     void ensureDbUserSchema()
     {
-        log("Create project: " + PROJECT_NAME);
+        log("** Create project: " + PROJECT_NAME);
         createProject(PROJECT_NAME);
 
-        log("Create DbUserSchema: " + USER_SCHEMA_NAME);
+        log("** Create DbUserSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + PROJECT_NAME + "/begin.view");
         clickExtToolbarButton("Define External Schemas");
         if (!isTextPresent("reload"))
@@ -142,9 +143,19 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             setFormElement("userSchemaName", USER_SCHEMA_NAME);
             setFormElement("dbSchemaName", DB_SCHEMA_NAME);
             setFormElement("metaData", getFileContents("server/modules/core/resources/schemas/test.xml"));
-            checkCheckbox("editable");
             clickNavButton("Create");
         }
+    }
+
+    void setEditable(boolean editable)
+    {
+        beginAt("/query/" + PROJECT_NAME + "/admin.view");
+        clickLinkWithText("edit");
+        if (editable)
+            checkCheckbox("editable");
+        else
+            uncheckCheckbox("editable");
+        clickNavButton("Update");
     }
 
     protected void doCleanup() throws Exception
@@ -161,8 +172,41 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     {
         ensureDbUserSchema();
 
+        setEditable(false);
+        doTestUneditable();
+
+        setEditable(true);
         doTestViaForm();
         doTestViaJavaApi();
+    }
+
+    void doTestUneditable() throws Exception
+    {
+        log("** Trying to insert via form on uneditable external schema");
+        beginAt("/dbuserschema/" + PROJECT_NAME + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        setFormElement("quf_Text", "Haha!");
+        setFormElement("quf_IntNotNull", String.valueOf(3));
+        setFormElement("quf_DatetimeNotNull", "2008-09-25");
+        submit();
+        assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
+
+        log("** Trying to insert via api on uneditable external schema");
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Row[] rows = new Row[] { Row("A", 3), Row("B", 4) };
+        InsertRowsCommand cmd = new InsertRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
+        for (Row row : rows)
+            cmd.addRow(row.toMap());
+
+        try
+        {
+            SaveRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
+            fail("Expected to throw CommandException");
+        }
+        catch (CommandException ex)
+        {
+            assertEquals("401: User does not have permission to perform this operation", ex.getMessage());
+        }
+
     }
     
     void doTestViaForm()
@@ -195,6 +239,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     
     int[] insertViaJavaApi(Connection cn, Row... rows) throws Exception
     {
+        log("** Inserting via api...");
         InsertRowsCommand cmd = new InsertRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Row row : rows)
             cmd.addRow(row.toMap());
@@ -215,6 +260,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     
     Row[] selectViaJavaApi(Connection cn, int... pks) throws Exception
     {
+        log("** Select via api: " + join(",", pks) + "...");
         SelectRowsCommand cmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         cmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
         SelectRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
@@ -238,6 +284,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     
     Row[] updateViaJavaApi(Connection cn, Row... rows) throws Exception
     {
+        log("** Updating via api...");
         UpdateRowsCommand cmd = new UpdateRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Row row : rows)
             cmd.addRow(row.toMap());
@@ -256,6 +303,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     
     void deleteViaJavaApi(Connection cn, int... pks) throws Exception
     {
+        log("** Deleting via api: pks=" + join(",", pks) + "...");
         DeleteRowsCommand cmd = new DeleteRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Integer pk : pks)
             cmd.addRow(Collections.singletonMap("RowId", (Object) pk));
@@ -280,7 +328,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     
     public int insertViaForm(String text, int intNotNull)
     {
-        log("Inserting text='" + text + "', intNotNull=" + intNotNull + "...");
+        log("** Inserting via form: text='" + text + "', intNotNull=" + intNotNull + "...");
         beginAt("/dbuserschema/" + PROJECT_NAME + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
         setFormElement("quf_Text", text);
         setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
@@ -307,7 +355,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
 
     public void updateViaForm(int pk, String text, int intNotNull)
     {
-        log("Updating pk=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
+        log("** Updating via form: pk=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
         beginAt("/dbuserschema/" + PROJECT_NAME + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&pk=" + pk);
         setFormElement("quf_Text", text);
         setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
@@ -329,7 +377,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
 
     public void deleteViaForm(int[] pk)
     {
-        log("Deleting pks=" + join(",", pk) + "...");
+        log("** Deleting via form: pks=" + join(",", pk) + "...");
         beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
         for (int aPk : pk)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
