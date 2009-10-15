@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 public abstract class SimpleApiTest extends BaseSeleniumWebTest
 {
     private HttpClient _client;
-    private boolean _failedComparisonFatal;
+    private boolean _failedComparisonFatal = true;
 
     // json key elements to ignore during the comparison phase, these can be regular expressions
     static final Pattern[] _ignored = {
@@ -63,13 +63,16 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
             Pattern.compile("displayName", Pattern.CASE_INSENSITIVE)
     };
 
-    private List<Pattern> _ignoredElements = new ArrayList<Pattern>();
+    private static List<Pattern> _ignoredElements = new ArrayList<Pattern>();
 
     enum ActionType {
         get,
         post
     }
 
+    static {
+        _ignoredElements.addAll(Arrays.asList(_ignored));
+    }
     /**
      * Returns the list of files to run tests over. Each test file contains metadata representing
      * test cases, the metadata schema can be found in apiTest.xsd
@@ -88,14 +91,12 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
         if (testFiles != null)
         {
+            // load up the elements to skip comparisons on
+            _ignoredElements.addAll(Arrays.asList(getIgnoredElements()));
             for (File testFile : testFiles)
             {
                 if (testFile.exists())
                 {
-                    // load up the elements to skip comparisons on
-                    _ignoredElements.addAll(Arrays.asList(_ignored));
-                    _ignoredElements.addAll(Arrays.asList(getIgnoredElements()));
-
                     for (ApiTestCase test : parseTests(testFile))
                     {
                         tests++;
