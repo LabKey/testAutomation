@@ -17,7 +17,6 @@
 package org.labkey.test.bvt;
 
 import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -29,7 +28,6 @@ import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -187,7 +185,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         if (method != null)
         {
             try {
-                HttpClient client = getHttpClient(requestUrl);
+                HttpClient client = WebTestHelper.getHttpClient(requestUrl);
 
                 int status = client.executeMethod(method);
                 if (status == HttpStatus.SC_OK)
@@ -208,22 +206,6 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                 method.releaseConnection();
             }
         }
-    }
-
-    private HttpClient getHttpClient(String url) throws URIException
-    {
-        if (_client == null)
-        {
-            _client = new HttpClient(new MultiThreadedHttpConnectionManager());
-            _client.getState().setCredentials(
-                    new AuthScope(new URI(url, false).getHost(),
-                            AuthScope.ANY_PORT, AuthScope.ANY_REALM),
-                    new UsernamePasswordCredentials(PasswordUtil.getUsername(), PasswordUtil.getPassword())
-            );
-            //send basic auth header on first request
-            _client.getParams().setAuthenticationPreemptive(true);
-        }
-        return _client;
     }
 
     private boolean compareResponse(String responseStr, String expectedResponseStr)

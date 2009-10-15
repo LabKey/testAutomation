@@ -16,6 +16,10 @@
 
 package org.labkey.test;
 
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.labkey.test.util.PasswordUtil;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -162,6 +166,19 @@ public class WebTestHelper
     public static String getTabLinkId(String tabName)
     {
         return tabName + "Tab";
+    }
+
+    public static HttpClient getHttpClient(String url) throws URIException
+    {
+        HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
+        client.getState().setCredentials(
+                new AuthScope(new URI(url, false).getHost(),
+                        AuthScope.ANY_PORT, AuthScope.ANY_REALM),
+                new UsernamePasswordCredentials(PasswordUtil.getUsername(), PasswordUtil.getPassword())
+        );
+        //send basic auth header on first request
+        client.getParams().setAuthenticationPreemptive(true);
+        return client;
     }
 
     public static class FolderIdentifier

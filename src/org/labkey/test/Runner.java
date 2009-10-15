@@ -26,6 +26,8 @@ import org.labkey.test.util.Crawler;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -37,7 +39,6 @@ public class Runner extends TestSuite
 {
     private static final int MAX_TEST_FAILURES = 10;
     private static final TestSet DEFAULT_TEST_SET = TestSet.DRT;
-    private static WebTest _currentWebTest;
     private static Map<Test, Long> _testStats = new LinkedHashMap<Test, Long>();
     private static int _testCount;
     private static List<Class> _remainingTests;
@@ -47,17 +48,10 @@ public class Runner extends TestSuite
 
     private Set<TestFailure> _failures = new HashSet<TestFailure>();
     private boolean _cleanOnly;
-    private File _failureDumpDir;
 
-    private Runner(File failureDumpDir, boolean cleanOnly)
+    private Runner(boolean cleanOnly)
     {
         _cleanOnly = cleanOnly;
-        _failureDumpDir = failureDumpDir;
-    }
-
-    public static void setCurrentWebTest(WebTest currentWebTest)
-    {
-        _currentWebTest = currentWebTest;
     }
 
     private void updateRemainingTests(Test test, boolean failed, boolean errored)
@@ -169,7 +163,6 @@ public class Runner extends TestSuite
     public void runTest(Test test, TestResult testResult)
     {
         long startTimeMs = System.currentTimeMillis();
-        _currentWebTest = null;
         if (_cleanOnly)
         {
             try
@@ -315,11 +308,11 @@ public class Runner extends TestSuite
     }
 
 
-    private static TestSuite getSuite(List<Class> testClasses, File dumpDir, boolean cleanOnly, boolean modifiedOnly)
+    private static TestSuite getSuite(List<Class> testClasses, boolean cleanOnly, boolean modifiedOnly)
     {
         // Remove duplicate tests (e.g., don't run "basic" test twice if bvt & drt are selected via ant test) but keep the order
         Set<Class> testClassesCopy = new LinkedHashSet<Class>(testClasses);
-        TestSuite suite = new Runner(dumpDir, cleanOnly);
+        TestSuite suite = new Runner(cleanOnly);
 
         List<String> moduleDirs = getModifiedModuleDirectories();
 
@@ -330,6 +323,8 @@ public class Runner extends TestSuite
 
             for (Class testClass : testClassesCopy)
             {
+                if (!WebTest.class.isAssignableFrom(testClass))
+                    continue;
                 try
                 {
                     Constructor<WebTest> c = testClass.getConstructor();
@@ -337,7 +332,7 @@ public class Runner extends TestSuite
                     String directory = test.getAssociatedModuleDirectory();
 
                     if (null == directory || 0 == directory.length())
-                        System.out.println("ERROR: Invalid module directory \"" + directory + "\" specified by " + testClass);                        
+                        System.out.println("ERROR: Invalid module directory \"" + directory + "\" specified by " + testClass);
 
                     if (!"none".equals(directory))
                     {
@@ -380,11 +375,68 @@ public class Runner extends TestSuite
 
         if (!modifiedOnly)
         {
-            for (Class testClass : testClassesCopy)
-                suite.addTest(new JUnit4TestAdapter(testClass));
+            addTests(suite, testClassesCopy);
         }
 
         return suite;
+    }
+
+    private static void addTests(TestSuite suite, Set<Class> testClasses)
+    {
+        for (Class testClass : testClasses)
+        {
+            Test test = null;
+            try
+            {
+                Method suiteMethod = testClass.getMethod("suite");
+                test = (TestSuite)suiteMethod.invoke(null);
+            }
+            catch (NoSuchMethodException e)
+            {
+                // ok
+            }
+            catch (InvocationTargetException e)
+            {
+                test = new ErrorTest(testClass.getName(), e.getCause());
+            }
+            catch (IllegalAccessException e)
+            {
+                test = new ErrorTest(testClass.getName(), e.getCause());
+            }
+
+            if (test == null)
+            {
+                test = new JUnit4TestAdapter(testClass);
+            }
+
+            suite.addTest(test);
+        }
+    }
+
+    // for error reporting
+    private static class ErrorTest extends TestCase
+    {
+        Throwable t;
+
+        ErrorTest(String name, Throwable t)
+        {
+            super(name);
+            this.t = t;
+        }
+
+        @Override
+        public String toString()
+        {
+            return getName();
+        }
+
+        @Override
+        public void run(TestResult testResult)
+        {
+            testResult.startTest(this);
+            testResult.addError(this, t);
+            testResult.endTest(this);
+        }
     }
 
 
@@ -684,11 +736,10 @@ public class Runner extends TestSuite
             set.setTests(getAllTests());
         }
 
-        File dumpDir = getDumpDir();
         boolean modifiedOnly = "true".equals(System.getProperty("quick"));
 
         List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
-        TestSuite suite = getSuite(testClasses, dumpDir, cleanOnly, modifiedOnly);
+        TestSuite suite = getSuite(testClasses, cleanOnly, modifiedOnly);
 
         if (suite.testCount() == 0)
         {
