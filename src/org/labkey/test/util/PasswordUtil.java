@@ -63,6 +63,8 @@ public class PasswordUtil
         }
         else if ("ensure".equals(args[0]))
             ensureCredentials();
+        else if ("echo".equals(args[0]))
+            echoCredentials();
         else
             util.outputUsage();
     }
@@ -76,6 +78,8 @@ public class PasswordUtil
         System.out.println("  Prompts for and stores a password on this machine.");
         System.out.println("PasswordUtil ensure");
         System.out.println("  Checks for a stored password, and prompts if one does not exist.");
+        System.out.println("PasswordUtil echo");
+        System.out.println("  Echos the stored credentials.");
     }
 
     private static File verifyDir(String dirName)
@@ -162,6 +166,20 @@ public class PasswordUtil
         if (file != null && file.exists())
             file.delete();
         return file;
+    }
+
+    public static void echoCredentials()
+    {
+        Credentials credentials = getCredentials();
+        if (credentials == null)
+        {
+            System.out.println("No stored credentials");
+        }
+        else
+        {
+            System.out.println("Username: " + credentials.getUsername());
+            System.out.println("Password: " + credentials.getPassword());
+        }
     }
 
     private static Credentials getCredentials()
