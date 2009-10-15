@@ -21,6 +21,7 @@ import org.labkey.test.Runner;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONValue;
 import junit.framework.TestSuite;
 import junit.framework.TestResult;
@@ -78,8 +79,14 @@ public class JUnitTest extends TestSuite
                 TestSuite remotesuite = new JUnitTest();
 
                 String response = method.getResponseBodyAsString();
+                if (StringUtils.isEmpty(response))
+                    throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
-                Map<String, List<String>> obj = (Map<String, List<String>>)JSONValue.parse(response);
+                Object json = JSONValue.parse(response);
+                if (json == null || !(json instanceof Map))
+                    throw new AssertionFailedError("Can't parse or cast json response: " + response);
+
+                Map<String, List<String>> obj = (Map<String, List<String>>)json;
                 for (Map.Entry<String, List<String>> entry : obj.entrySet())
                 {
                     String suiteName = entry.getKey();
