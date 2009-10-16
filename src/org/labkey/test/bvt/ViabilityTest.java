@@ -17,7 +17,6 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -28,9 +27,9 @@ import java.io.File;
  */
 public class ViabilityTest extends AbstractAssayTest
 {
-    public static final String PROJECT_NAME = "\u2603 Viability ?";
+    public static final String PROJECT_NAME = "Viability";
     public static final String FOLDER_NAME = "Viability Folder";
-    private static final String ASSAY_NAME = "\u262D Guava Assay";
+    private static final String ASSAY_NAME = "Guava Assay";
 
 
     public String getAssociatedModuleDirectory()
@@ -112,8 +111,10 @@ public class ViabilityTest extends AbstractAssayTest
         selectOptionByText("targetStudy", "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
         clickNavButton("Next");
 
-        setFormElement("uploadedFile", new File(getLabKeyRoot() + "/sampledata/viability/small.VIA.CSV"));
-        clickNavButton("Next");
+        File guavaFile = new File(getLabKeyRoot() + "/sampledata/viability/small.VIA.csv");
+        assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
+        setFormElement("uploadedFile", guavaFile);
+        clickNavButton("Next", 8000);
 
         log("** Check form field values");
         assertFormElementEquals("_pool_1604505335_0_ParticipantID", "160450533");
@@ -135,9 +136,9 @@ public class ViabilityTest extends AbstractAssayTest
         log("** Got confirmation: " + actualConfirmation);
         assertEquals(expectConfirmation, actualConfirmation);
 
-        clickLinkWithText("small.VIA.CSV"); // run name
+        clickLinkWithText("small.VIA.csv"); // run name
         DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
-        assertEquals("small.VIA.CSV", table.getDataAsText(0, "Run"));
+        assertEquals("small.VIA.csv", table.getDataAsText(0, "Run"));
         assertEquals("160450533", table.getDataAsText(0, "Participant ID"));
         assertEquals("5.0", table.getDataAsText(0, "Visit ID"));
         assertEquals("160450533-5", table.getDataAsText(0, "Pool ID"));

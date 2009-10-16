@@ -64,7 +64,7 @@ public enum TestSet
         ProgrammaticQCTest.class,
         ReportTest.class,
         SchemaBrowserTest.class,
-        //ViabilityTest.class
+        ViabilityTest.class
     }),
 
     MS2(new Class[]
