@@ -244,14 +244,6 @@ public class Runner extends TestSuite
             if (!_failures.contains(failure))
             {
                 _failures.add(failure);
-//                if (_currentWebTest != null)
-//                {
-//                    File f = _currentWebTest.dumpHtml(_failureDumpDir);
-//                    String message = "Test failed.";
-//                    if (f != null)
-//                        message += "  Page html dumped to:\n    " + f.getPath();
-//                    System.out.println(message);
-//                }
                 System.out.println();
                 System.out.println(failure.failedTest());
                 System.out.println(BaseTestRunner.getFilteredTrace(failure.trace()));

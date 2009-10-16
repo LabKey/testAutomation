@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.Runner;
+import org.labkey.test.BaseSeleniumWebTest;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -65,6 +66,35 @@ public class JUnitTest extends TestSuite
         return getClass().getName();
     }
 
+    private static class UpgradeHelper extends BaseSeleniumWebTest
+    {
+        public void unfail()
+        {
+            _testFailed = false;
+        }
+        protected void doTestSteps() throws Exception { }
+        protected void doCleanup() throws Exception { }
+        public String getAssociatedModuleDirectory() { return null; }
+    }
+
+    // uck. use BaseSeleniumWebTest to ensure we're upgraded
+    private static void upgradeHelper() throws Exception
+    {
+        UpgradeHelper helper = new UpgradeHelper();
+        try
+        {
+            helper.setUp();
+            // sign in performs upgrade if necessary
+            helper.signIn();
+            helper.assertLinkPresentWithText("Projects");
+            helper.unfail();
+        }
+        finally
+        {
+            helper.tearDown();
+        }
+    }
+
     public static TestSuite suite() throws Exception
     {
         GetMethod method = null;
@@ -83,6 +113,13 @@ public class JUnitTest extends TestSuite
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
                 Object json = JSONValue.parse(response);
+                if (json == null && response.contains("<title>Upgrade Status</title>") || response.contains("This server is being upgraded to a new version of LabKey Server."))
+                {
+                    // perform upgrade then try to fetch the list again
+                    upgradeHelper();
+                    return suite();
+                }
+
                 if (json == null || !(json instanceof Map))
                     throw new AssertionFailedError("Can't parse or cast json response: " + response);
 
