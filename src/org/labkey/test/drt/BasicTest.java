@@ -77,6 +77,9 @@ public class BasicTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         
+        log("Test firefox version");
+        assertTrue("The LabKey test suite requires Firefox 3.0", getHtmlSource().contains("Firefox/3.0"));
+
         log("Test webpart buttons");
         clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));
         assertTextPresent("Customize");
