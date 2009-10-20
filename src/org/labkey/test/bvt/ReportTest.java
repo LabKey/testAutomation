@@ -667,12 +667,12 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink("participant chart", "permissions");
         selenium.click("useExplicit");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
-        clickNavButton("save");
+        clickNavButton("Save");
 
         clickReportGridLink(TEST_GRID_VIEW, "permissions");
         selenium.click("useExplicit");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
-        clickNavButton("save");
+        clickNavButton("Save");
 
         click(Locator.linkWithText("Manage Site"));
         sleep(3000);
