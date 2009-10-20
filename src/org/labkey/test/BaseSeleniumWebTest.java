@@ -177,7 +177,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     static String getStreamContentsAsString(InputStream is) throws IOException
     {
-        StringBuffer contents = new StringBuffer();
+        StringBuilder contents = new StringBuilder();
         BufferedReader input = null;
 
         try
