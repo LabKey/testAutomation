@@ -135,11 +135,13 @@ public class ViabilityTest extends AbstractAssayTest
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
         addSpecimenIds("_pool_1614000065_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_1614016435_3_SpecimenIDs", "xyzzy"); // specimen doesn't exist
+        addSpecimenIds("_pool_1614016435_3_SpecimenIDs", "xyzzy");
 
         clickNavButton("Save and Finish");
-        // XXX: should say "sample number 33" but checkRunUploadForm() doesn't work under selenium for some reason
-        String expectConfirmation = "Missing SpecimenIDs value for sample number 1.  Save anyway?";
+        String expectConfirmation = "Some values are missing for the following pools:\n\n" +
+                "  Sample number 33: SpecimenIDs\n" +
+                "  Sample number 34: SpecimenIDs\n\n" +
+                "Save anyway?";
         String actualConfirmation = selenium.getConfirmation();
         log("** Got confirmation: " + actualConfirmation);
         assertEquals(expectConfirmation, actualConfirmation);
@@ -198,12 +200,21 @@ public class ViabilityTest extends AbstractAssayTest
             String value = values[i];
             addSpecimenId(id, value, i+1);
         }
+
+        // additional tab for the last input
+        String xpath = "//input[@name='" + id + "'][" + (values.length+1) + "]";
+        pressTab(xpath);
     }
 
     public void addSpecimenId(String id, String value, int index)
     {
         String xpath = "//input[@name='" + id + "'][" + index + "]";
         setFormElement(xpath, value);
-        selenium.keyPress(xpath, "\\9"); // press tab
+        pressTab(xpath);
+    }
+
+    public void pressTab(String xpath)
+    {
+        selenium.keyPress(xpath, "\\9");
     }
 }
