@@ -32,10 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -715,6 +712,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         	beginAt("/admin/resetErrorMark.view");
     }
 
+    /**
+     * Override this method to skip running this test for a given database version.
+     * @param info
+     * @return true to run the test, false to skip.
+     */
+    protected boolean isDatabaseSupported(DatabaseInfo info)
+    {
+        return true;
+    }
+
     public void testSteps() throws Exception
     {
         try
@@ -722,6 +729,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
             signIn();
 			resetErrors();
+
+            DatabaseInfo info = getDatabaseInfo();
+            if (!isDatabaseSupported(info))
+            {
+                log("** Skipping " + getClass().getSimpleName() + " test for unsupported database: " + info.productName + " " + info.productVersion);
+                return;
+            }
 
             try
             {
@@ -3194,6 +3208,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         beginAt("/project/home/begin.view");
     }
 
+    public void goToAdmin()
+    {
+        beginAt("/admin/showAdmin.view");
+    }
+
 
     public void goToPipelineItem(String item)
     {
@@ -3830,5 +3849,28 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
         assertEquals(getCompleteCount(statusValues), completeJobsExpected);
+    }
+
+    public DatabaseInfo getDatabaseInfo()
+    {
+        pushLocation();
+        ensureAdminMode();
+        goToAdmin();
+        assertElementPresent(Locator.id("databaseProductName"));
+
+        DatabaseInfo info = new DatabaseInfo();
+        info.serverURL = getText(Locator.id("databaseServerURL"));
+        info.productName = getText(Locator.id("databaseProductName"));
+        info.productVersion = getText(Locator.id("databaseProductVersion"));
+        info.driverName = getText(Locator.id("databaseDriverName"));
+        info.driverVersion = getText(Locator.id("databaseDriverVersion"));
+
+        popLocation();
+        return info;
+    }
+
+    public static class DatabaseInfo
+    {
+        public String serverURL, productName, productVersion, driverName, driverVersion;
     }
 }

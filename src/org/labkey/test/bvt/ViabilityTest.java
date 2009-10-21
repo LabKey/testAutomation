@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * User: kevink
@@ -35,6 +36,12 @@ public class ViabilityTest extends AbstractAssayTest
     public String getAssociatedModuleDirectory()
     {
         return "viability";
+    }
+
+    @Override
+    protected boolean isDatabaseSupported(DatabaseInfo info)
+    {
+        return info.productName.equals("Microsoft SQL Server") && !info.productVersion.startsWith("08.00");
     }
 
     @Override
