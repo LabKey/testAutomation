@@ -124,7 +124,7 @@ public class ViabilityTest extends AbstractAssayTest
         assertFormElementEquals("_pool_1604505335_0_Viability", "84.5%");
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial1", "vial2", "vial3", "foobar");
+        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
         addSpecimenIds("_pool_1614000065_2_SpecimenIDs", "vial2");
         addSpecimenIds("_pool_1614016435_3_SpecimenIDs", "xyzzy"); // specimen doesn't exist
@@ -152,7 +152,7 @@ public class ViabilityTest extends AbstractAssayTest
         assertEquals("84.5%", table.getDataAsText(0, "Viability"));
         assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
 
-        assertEquals("vial1,vial2,vial3,foobar", table.getDataAsText(0, "Specimen IDs"));
+        assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
         //assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches")); // enable when SqlServer supports SpecimenMatches column
         assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
         assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
