@@ -124,7 +124,7 @@ public class ViabilityTest extends AbstractAssayTest
         assertFormElementEquals("_pool_1604505335_0_Viability", "84.5%");
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial1", "vial2", "vial3");
+        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial1", "vial2", "vial3", "foobar");
         addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
         addSpecimenIds("_pool_1614000065_2_SpecimenIDs", "vial2");
         addSpecimenIds("_pool_1614016435_3_SpecimenIDs", "xyzzy"); // specimen doesn't exist
@@ -136,6 +136,11 @@ public class ViabilityTest extends AbstractAssayTest
         log("** Got confirmation: " + actualConfirmation);
         assertEquals(expectConfirmation, actualConfirmation);
 
+        setSelectedFields("/" + PROJECT_NAME + "/" + FOLDER_NAME, "assay", ASSAY_NAME + " Data", null,
+                new String[] { "Run", "ParticipantID", "VisitID", "PoolID",
+                        "TotalCells", "ViableCells", "Viability", "OriginalCells", "Recovery",
+                        "SpecimenIDs", "SpecimenCount", "SpecimenMatchCount", "SpecimenMatches"});
+
         clickLinkWithText("small.VIA.csv"); // run name
         DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
         assertEquals("small.VIA.csv", table.getDataAsText(0, "Run"));
@@ -146,22 +151,31 @@ public class ViabilityTest extends AbstractAssayTest
         assertEquals("3.127E7", table.getDataAsText(0, "Viable Cells"));
         assertEquals("84.5%", table.getDataAsText(0, "Viability"));
         assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
-        assertEquals("3", table.getDataAsText(0, "Specimen ID Count"));
 
-        assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
-        assertEquals("3", table.getDataAsText(0, "SpecimenIDCount"));
+        assertEquals("vial1,vial2,vial3,foobar", table.getDataAsText(0, "Specimen IDs"));
+        //assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches")); // enable when SqlServer supports SpecimenMatches column
+        assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
+        assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
         assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
 
         assertEquals("vial1", table.getDataAsText(1, "Specimen IDs"));
+        assertEquals("1", table.getDataAsText(1, "SpecimenCount"));
+        assertEquals("1", table.getDataAsText(1, "SpecimenMatchCount"));
         assertEquals("115.67%", table.getDataAsText(1, "Recovery"));
 
         assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
+        assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
+        assertEquals("1", table.getDataAsText(2, "SpecimenMatchCount"));
         assertEquals("105.78%", table.getDataAsText(2, "Recovery"));
 
         assertEquals("xyzzy", table.getDataAsText(3, "Specimen IDs"));
+        assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
+        assertEquals("", table.getDataAsText(3, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(3, "Recovery"));
         
         assertEquals("", table.getDataAsText(4, "Specimen IDs"));
+        assertEquals("0", table.getDataAsText(4, "SpecimenCount"));
+        assertEquals("", table.getDataAsText(4, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(4, "Recovery"));
 
 //        beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?schema=assay&query.queryName=" + ASSAY_NAME + " ResultSpecimens");
