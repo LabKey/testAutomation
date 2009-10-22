@@ -28,6 +28,7 @@ import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.Diff;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,7 +100,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                     {
                         tests++;
                         log("Starting new test case: " + StringUtils.trimToEmpty(test.getName()));
-                        sendRequestDirect(test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch());
+                        sendRequestDirect(testFile.getName(), test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch());
                         log("test case completed");
                     }
                 }
@@ -167,7 +168,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         return "query";
     }
 
-    private void sendRequestDirect(String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch) throws UnsupportedEncodingException
+    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch) throws UnsupportedEncodingException
     {
         HttpMethod method = null;
         String requestUrl = WebTestHelper.getBaseURL() + '/' + url;
@@ -192,9 +193,14 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                 {
                     String response = method.getResponseBodyAsString();
                     if (compareResponse(response, expectedResponse))
+                    {
                         log("response matched");
+                    }
                     else
-                        fail("The response: " + response + "\ndid not match the expected response: " + expectedResponse);
+                    {
+                        String diff = Diff.diff(expectedResponse, response);
+                        fail("FAILED: test " + name + "\n" + diff);
+                    }
                 }
             }
             catch (IOException e)
