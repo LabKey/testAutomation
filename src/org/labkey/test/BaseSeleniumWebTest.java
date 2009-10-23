@@ -1361,10 +1361,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return selenium.getText(elementLocator.toString());
     }
 
-    public void assertTextPresent(String text)
+    /** Verifies that all the strings are present in the page */
+    public void assertTextPresent(String... texts)
     {
-        text = text.replace("&nbsp;", " ");
-        assertTrue("Text '" + text + "' was not present", isTextPresent(text));
+        for (String text : texts)
+        {
+            text = text.replace("&nbsp;", " ");
+            assertTrue("Text '" + text + "' was not present", isTextPresent(text));
+        }
     }
 
     public void assertTextPresent(String text, int amount)
@@ -1930,14 +1934,66 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return selenium.getTable(tableName + "." + row + "." + column);
     }
 
+    public String getTableCellText(String tableName, int row, String columnTitle)
+    {
+        return getTableCellText(tableName, row, getColumnIndex(tableName, columnTitle));
+    }
+
     public boolean isTableCellEqual(String tableName, int row, int column, String value)
     {
         return value.equals(getTableCellText(tableName, row, column));
     }
 
+    public boolean isTableCellEqual(String tableName, int row, String columnTitle, String value)
+    {
+        return value.equals(getTableCellText(tableName, row, columnTitle));
+    }
+
+    public boolean areTableCellsEqual(String tableNameA, int rowA, int columnA, String tableNameB, int rowB, int columnB)
+    {
+        return getTableCellText(tableNameA, rowA, columnA).equals(getTableCellText(tableNameB, rowB, columnB));
+    }
+
     public void assertTableCellTextEquals(String tableName, int row, int column, String value)
     {
-        assertTrue(isTableCellEqual(tableName, row, column, value));
+        assertTrue(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", isTableCellEqual(tableName, row, column, value));
+    }
+
+    public void assertTableCellTextEquals(String tableName, int row, String columnTitle, String value)
+    {
+        assertTableCellTextEquals(tableName, row, getColumnIndex(tableName, columnTitle), value);
+    }
+
+    public void assertTableCellsEqual(String tableName, int rowA, int columnA, int rowB, int columnB)
+    {
+        assertTableCellsEqual(tableName, rowA, columnA, tableName, rowB, columnB);
+    }
+
+    public void assertTableCellsEqual(String tableName, int rowA, String columnTitleA, int rowB, String columnTitleB)
+    {
+        assertTableCellsEqual(tableName, rowA, getColumnIndex(tableName, columnTitleA), tableName, rowB, getColumnIndex(tableName, columnTitleB));
+    }
+
+    public void assertTableCellsEqual(String tableNameA, int rowA, String columnTitleA, String tableNameB, int rowB, String columnTitleB)
+    {
+        assertTableCellsEqual(tableNameA, rowA, getColumnIndex(tableNameA, columnTitleA), tableNameB, rowB, getColumnIndex(tableNameB, columnTitleB));
+    }
+
+    public void assertTableCellsEqual(String tableNameA, int rowA, int columnA, String tableNameB, int rowB, int columnB)
+    {
+        assertTrue("Table cells not equal: " + tableNameA + "." + String.valueOf(rowA) + "." + String.valueOf(columnA) + " & " + tableNameB + "." + String.valueOf(rowB) + "." + String.valueOf(columnB), areTableCellsEqual(tableNameA, rowA, columnA, tableNameB, rowB, columnB));
+    }
+
+    public int getColumnIndex(String tableName, String columnTitle)
+    {
+        for(int col = 0; col < 100; col++) // TODO: Find out how wide the table is.
+        {
+            if(getTableCellText(tableName, 0, col).equals(columnTitle))
+            {
+                return col;
+            }
+        }
+        return -1;
     }
 
     public void assertTableRowsEqual(String tableName, int startRow, String[][] cellValues)
