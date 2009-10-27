@@ -762,7 +762,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if (enableLinkCheck())
             {
 				boolean injectTest = enableInjectCheck();
-                Crawler crawler = new Crawler(this);
+                Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
                 crawler.crawlAllLinks(injectTest);
 				if (!injectTest)
 					checkLeaksAndErrors();

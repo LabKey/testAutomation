@@ -20,7 +20,6 @@ import org.labkey.test.bvt.*;
 import org.labkey.test.daily.FlowImportTest;
 import org.labkey.test.daily.IDRIParticleSizeTest;
 import org.labkey.test.daily.SCHARPStudyTest;
-import org.labkey.test.daily.SecurityApiTest;
 import org.labkey.test.drt.*;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
@@ -74,7 +73,7 @@ public enum TestSet
         SequestTest.class
     }),
 
-    Daily(new Class[]
+    Daily(600000, new Class[]
     {
         BasicTest.class,
         StudySecurityTest.class,
@@ -174,28 +173,51 @@ public enum TestSet
 
 
     public Class[] tests;
+    private static final int DEFAULT_CRAWLER_TIMEOUT = 90000;
+    private int crawlerTimeout;
 
-    TestSet(TestSet set, Class... tests)
+    TestSet(int timeout, TestSet set, Class... tests)
     {
         Class[] all = new Class[set.tests.length + tests.length];
         System.arraycopy(set.tests, 0, all, 0, set.tests.length);
         System.arraycopy(tests, 0, all, set.tests.length, tests.length);
-        setTests(all);
+        setTests(timeout, all);
+    }
+
+    TestSet(TestSet set, Class... tests)
+    {
+        this(DEFAULT_CRAWLER_TIMEOUT, set, tests);
+    }
+
+    TestSet(int timeout, Class... tests)
+    {
+        setTests(timeout, tests);
     }
 
     TestSet(Class... tests)
     {
-        setTests(tests);
+        setTests(DEFAULT_CRAWLER_TIMEOUT, tests);
     }
 
     void setTests(Class... tests)
     {
+        setTests(DEFAULT_CRAWLER_TIMEOUT, tests);
+    }
+
+    void setTests(int timeout, Class... tests)
+    {
         this.tests = tests;
+        crawlerTimeout = timeout;
     }
 
     public boolean isSuite()
     {
         return true;
+    }
+
+    public int getCrawlerTimeout()
+    {
+        return crawlerTimeout;
     }
 
     public List<Class> getTestList()

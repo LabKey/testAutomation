@@ -90,14 +90,21 @@ public class Crawler
     private ArrayList<UrlToCheck> _urlsToCheck = new ArrayList<UrlToCheck>();
 
     private static int _alwaysFollowDepth = 3;
-    private int MAX_CRAWL_TIME = 90000;
+    private int _maxCrawlTime;
+    private static final int DEFAULT_CRAWL_TIME = 90000;
 
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<String, CrawlStats>();
     private BaseSeleniumWebTest _test;
 
     public Crawler(BaseSeleniumWebTest test)
     {
+        this(test, DEFAULT_CRAWL_TIME);
+    }
+
+    public Crawler(BaseSeleniumWebTest test, int crawlTime)
+    {
         _test = test;
+        _maxCrawlTime = crawlTime;
     }
 
     private void saveCrawlStats(BaseSeleniumWebTest test, int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
@@ -360,7 +367,7 @@ public class Crawler
             _urlsToCheck.add(new UrlToCheck(startPageURL, url, 1, inject));
 
         // Loop through links in list until its empty or time runs out
-        while ((!_urlsToCheck.isEmpty()) && (_crawlTime < MAX_CRAWL_TIME))
+        while ((!_urlsToCheck.isEmpty()) && (_crawlTime < _maxCrawlTime))
         {
             _urlToCheck = _urlsToCheck.remove(0);
             String urlText = _urlToCheck.getUrlText();
