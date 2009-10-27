@@ -77,7 +77,7 @@
         <echo message="MS2, ms2, and MS2Test."/>
         <echo message=""/>
         <echo message="To continue to run all tests even if there is a failure, add:"/>
-        <echo message="    -Dhaltonerror=false"/>
+        <echo message="    -DhaltOnError=false"/>
         <echo message=""/>
         <echo message="To run tests in an infinite loop, add:"/>
         <echo message="    -Dloop=true"/>
@@ -93,7 +93,7 @@
         <echo message="If a test fails or you've previously used -Dclean=false, you may want to force a test"/>
         <echo message="(or a group of tests) to perform post-test cleanup."/>
         <echo message="To perform just the cleanup steps of the specified test(s):"/>
-        <echo message="    -Dcleanonly=true"/>
+        <echo message="    -DcleanOnly=true"/>
         <echo message=""/>
         <echo message="By default, labkey is accessed at context path '/labkey'."/>
         <echo message="To specify a different context path, add:"/>
@@ -123,7 +123,7 @@
         <mkdir dir="${test.log.output.dir}" />
     </target>
 
-    <path id="test.lib.classpath">
+    <path id="test.lib.classPath">
         <fileset dir="${test.lib.home}">
             <include name="*.jar"/>
         </fileset>
@@ -151,12 +151,12 @@
         </fileset>
     </path>
 
-    <path id="test.build.classpath">
-        <path refid="test.lib.classpath" />
+    <path id="test.build.classPath">
+        <path refid="test.lib.classPath" />
     </path>
 
-    <path id="test.run.classpath">
-        <path refid="test.build.classpath"/>
+    <path id="test.run.classPath">
+        <path refid="test.build.classPath"/>
         <pathelement location="${test.build.home}/classes" />
     </path>
 
@@ -176,7 +176,7 @@
                deprecation="${test.compile.deprecation}"
                optimize="${test.compile.optimize}"
                source="1.5"
-               classpathref="test.build.classpath">
+               classPathref="test.build.classPath">
         </javac>
         <copy todir="${test.build.home}/classes" >
             <fileset dir="${test.src.home}">
@@ -192,14 +192,14 @@
 
     <target name="setPassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil">
-            <classpath refid="test.run.classpath"/>
+            <classpath refid="test.run.classPath"/>
             <arg id="action" value="set"/>
         </java>
     </target>
 
     <target name="setCruiseControlPassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil">
-            <classpath refid="test.run.classpath"/>
+            <classpath refid="test.run.classPath"/>
             <arg id="action" value="set"/>
             <arg id="username" value="cruisecontrol@labkey.com"/>
             <arg id="password" value="cruisecontrol"/>
@@ -208,14 +208,14 @@
 
     <target name="ensurePassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
-            <classpath refid="test.run.classpath"/>
+            <classpath refid="test.run.classPath"/>
             <arg id="action" value="ensure"/>
         </java>
     </target>
 
     <target name="deletePassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
-            <classpath refid="test.run.classpath"/>
+            <classpath refid="test.run.classPath"/>
             <arg id="action" value="delete"/>
         </java>
     </target>
@@ -405,9 +405,9 @@
         <junit fork="true" forkmode="once" maxmemory="128m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="false" haltonerror="false" showoutput="true">
-            <classpath refid="test.run.classpath"/>
+            <classpath refid="test.run.classPath"/>
             <sysproperty key="suite" value="${sysprop.suiteToUse}"/>
-            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
             <sysproperty key="quick" value="${sysprop.quick}"/>
@@ -431,9 +431,9 @@
                 todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
         </junit>
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
-        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${servertype}/" />
-        <mkdir dir="${test.log.output.dir}/${servertype}" />
-        <copy todir="${test.log.output.dir}/${servertype}">
+        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${serverType}/" />
+        <mkdir dir="${test.log.output.dir}/${serverType}" />
+        <copy todir="${test.log.output.dir}/${serverType}">
             <fileset dir="${tomcat.home}/logs/">
                 <size value="0" units="k" when="more" />
             </fileset>
@@ -451,7 +451,7 @@
         <echo message="Or use ant stopSeleniumServer to stop manually."/>
         <echo message="Setting selenium server's PATH to: ${env.FIREFOX_HOME}:${env.PATH}" level="verbose"/>
         <java spawn="true" fork="true" classname="org.openqa.selenium.server.SeleniumServer">
-            <classpath refid="test.lib.classpath" />
+            <classpath refid="test.lib.classPath" />
             <env key="PATH" path="${env.FIREFOX_HOME}:${env.PATH}"/>
             <arg value="-port" />
             <arg value="${sysprop.selenium.server.port}" />
@@ -563,7 +563,7 @@
 
     <target name="drt-clean">
         <property name="suite" value="DRT"/>
-        <property name="cleanonly" value="true"/>
+        <property name="cleanOnly" value="true"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -583,7 +583,7 @@
 
     <target name="bvt-clean">
         <property name="suite" value="BVT"/>
-        <property name="cleanonly" value="true"/>
+        <property name="cleanOnly" value="true"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -603,7 +603,7 @@
 
     <target name="daily-clean" description="run daily verification tests">
         <property name="suite" value="Daily"/>
-        <property name="cleanonly" value="true"/>
+        <property name="cleanOnly" value="true"/>
         <antcall inheritall="true" target="sub-selenium"/>
     </target>
 
@@ -620,12 +620,12 @@
     </target>
 
     <target name="runsuite-tomcat-sqlserver">
-        <property name="servertype" value="sqlserver"/>
+        <property name="serverType" value="sqlserver"/>
         <antcall inheritall="true" target="runsuite-selenium-tomcat"/>
     </target>
 
     <target name="runsuite-tomcat-postgres">
-        <property name="servertype" value="postgres"/>
+        <property name="serverType" value="postgres"/>
         <antcall inheritall="true" target="runsuite-selenium-tomcat"/>
     </target>
 
@@ -648,22 +648,22 @@
             <isset property="quick"/>
         </condition>
 
-        <!-- Set property sysprop.cleanonly: true or false -->
-        <condition property="sysprop.cleanonly" value="false">
-            <not><isset property="cleanonly"/></not>
+        <!-- Set property sysprop.cleanOnly: true or false -->
+        <condition property="sysprop.cleanOnly" value="false">
+            <not><isset property="cleanOnly"/></not>
         </condition>
-        <condition property="sysprop.cleanonly" value="${cleanonly}">
-            <isset property="cleanonly"/>
+        <condition property="sysprop.cleanOnly" value="${cleanOnly}">
+            <isset property="cleanOnly"/>
         </condition>
 
-        <!-- Set property sysprop.haltonerror: true or false -->
-        <condition property="sysprop.haltonerror" value="true">
+        <!-- Set property sysprop.haltOnError: true or false -->
+        <condition property="sysprop.haltOnError" value="true">
             <not>
-                <isset property="haltonerror"/>
+                <isset property="haltOnError"/>
             </not>
         </condition>
-        <condition property="sysprop.haltonerror" value="${haltonerror}">
-            <isset property="haltonerror"/>
+        <condition property="sysprop.haltOnError" value="${haltOnError}">
+            <isset property="haltOnError"/>
         </condition>
 
         <!-- Set property sysprop.loop: true or false -->
@@ -801,8 +801,8 @@
         <echo message="    tests: ${sysprop.test}"/>
         <echo message="    quick: ${sysprop.quick}"/>
         <echo message="    clean up after test: ${sysprop.clean}"/>
-        <echo message="    clean up only: ${sysprop.cleanonly}"/>
-        <echo message="    halt on error: ${sysprop.haltonerror}"/>
+        <echo message="    clean up only: ${sysprop.cleanOnly}"/>
+        <echo message="    halt on error: ${sysprop.haltOnError}"/>
         <echo message="    loop forever: ${sysprop.loop}"/>
         <echo message="    link check: ${sysprop.linkCheck}"/>
         <echo message="    memory check: ${sysprop.memCheck}"/>
@@ -828,14 +828,14 @@
     <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,modifiedFiles,waitfor-labkey-started">
         <junit fork="true" forkmode="once" maxmemory="128m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
-                haltonfailure="${sysprop.haltonerror}"
-                haltonerror="${sysprop.haltonerror}">
+                haltonfailure="${sysprop.haltOnError}"
+                haltonerror="${sysprop.haltOnError}">
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
             <jvmarg value="-Djava.compiler=NONE" />
-            <classpath refid="test.run.classpath" />
+            <classpath refid="test.run.classPath" />
             <sysproperty key="suite" value="${sysprop.suite}"/>
-            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
             <sysproperty key="quick" value="${sysprop.quick}"/>
@@ -882,9 +882,9 @@
             <jvmarg value="-Xms256m"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
             <jvmarg value="-Djava.compiler=NONE" />
-            <classpath refid="test.run.classpath" />
+            <classpath refid="test.run.classPath" />
             <sysproperty key="suite" value="${sysprop.suite}"/>
-            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
             <sysproperty key="quick" value="${sysprop.quick}"/>
@@ -916,9 +916,9 @@
         <junit fork="true" forkmode="once" maxmemory="128m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="false" showoutput="true">
-            <classpath refid="test.run.classpath"/>
+            <classpath refid="test.run.classPath"/>
             <sysproperty key="suite" value="${sysprop.suite}"/>
-            <sysproperty key="cleanonly" value="${sysprop.cleanonly}"/>
+            <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
             <sysproperty key="quick" value="${sysprop.quick}"/>
@@ -940,9 +940,9 @@
                 todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
         </junit>
         <ant inheritall="true" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
-        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${servertype}/" />
-        <mkdir dir="${test.log.output.dir}/${servertype}" />
-        <copy todir="${test.log.output.dir}/${servertype}">
+        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${serverType}/" />
+        <mkdir dir="${test.log.output.dir}/${serverType}" />
+        <copy todir="${test.log.output.dir}/${serverType}">
             <fileset dir="${tomcat.home}/logs/">
                 <size value="0" units="k" when="more" />
             </fileset>
@@ -953,7 +953,7 @@
     <!-- for testing the TestHelper ui -->
     <target name="testhelper-test" depends="compile,set-user-props">
         <java classname="org.labkey.test.testpicker.TestHelper" fork="true">
-            <classpath refid="test.run.classpath"/>
+            <classpath refid="test.run.classPath"/>
         </java>
     </target>
 
@@ -966,7 +966,7 @@
                deprecation="${test.compile.deprecation}"
                optimize="${test.compile.optimize}"
                source="1.5"
-               classpathref="test.build.classpath">
+               classPathref="test.build.classPath">
         </javac>
 
         <mkdir dir="${project.root}/sampledata/qc"/>

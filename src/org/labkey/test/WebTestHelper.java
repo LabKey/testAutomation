@@ -152,7 +152,7 @@ public class WebTestHelper
                     _contextPath = DEFAULT_CONTEXT_PATH;
                 }
                 else
-                    log("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextpath'.");
+                    log("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
             }
             return _contextPath;
         }

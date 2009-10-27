@@ -711,12 +711,12 @@ public class Runner extends TestSuite
 
     public static TestSuite suite(List<String> testNames, TestSet set)
     {
-        boolean cleanOnly = "true".equals(System.getProperty("cleanonly"));
+        boolean cleanOnly = "true".equals(System.getProperty("cleanOnly"));
         boolean skipClean = "false".equals(System.getProperty("clean"));
 
         if (cleanOnly && skipClean)
         {
-            throw new RuntimeException("Invalid parameters: cannot specify both 'cleanonly=true' and 'clean=false'.");
+            throw new RuntimeException("Invalid parameters: cannot specify both 'cleanOnly=true' and 'clean=false'.");
         }
 
         if (TestSet.CONTINUE == set)
@@ -728,7 +728,7 @@ public class Runner extends TestSuite
             set.setTests(getAllTests());
         }
 
-        boolean modifiedOnly = "true".equals(System.getProperty("quick"));
+        boolean modifiedOnly = "true".equals(System.getProperty("quick")); //TODO: remove modifiedOnly target
 
         List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
         TestSuite suite = getSuite(testClasses, cleanOnly, modifiedOnly);

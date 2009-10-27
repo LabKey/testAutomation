@@ -623,8 +623,8 @@ public class TestHelper
     private void loadUserProps()
     {
         _clean.setSelected(Boolean.valueOf(System.getProperty("clean")));
-        _clean.setEnabled(!Boolean.valueOf(System.getProperty("cleanonly")));
-        _cleanOnly.setSelected(Boolean.valueOf(System.getProperty("cleanonly")));
+        _clean.setEnabled(!Boolean.valueOf(System.getProperty("cleanOnly")));
+        _cleanOnly.setSelected(Boolean.valueOf(System.getProperty("cleanOnly")));
         _loop.setSelected(Boolean.valueOf(System.getProperty("loop")));
         _linkCheck.setSelected(Boolean.valueOf(System.getProperty("linkCheck")));
         _memCheck.setSelected(Boolean.valueOf(System.getProperty("memCheck")));
@@ -773,7 +773,7 @@ public class TestHelper
             System.setProperty("linkCheck", String.valueOf(_linkCheck.isSelected()));
             System.setProperty("memCheck", String.valueOf(_memCheck.isSelected()));
             System.setProperty("loop", String.valueOf(_loop.isSelected()));
-            System.setProperty("cleanonly", String.valueOf(_cleanOnly.isSelected()));
+            System.setProperty("cleanOnly", String.valueOf(_cleanOnly.isSelected()));
             System.setProperty("labkey.port", _port.getText().trim());
             System.setProperty("labkey.contextpath", _contextPath.getText().trim());
             System.setProperty("labkey.server", _server.getText().trim());
