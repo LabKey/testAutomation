@@ -36,6 +36,7 @@ public abstract class AbstractAssayValidator
         runDataFile,
         runDataUploadedFile,
         errorsFile,
+        transformedRunPropertiesFile,
     }
 
     public String getEmail() {
@@ -157,7 +158,7 @@ public abstract class AbstractAssayValidator
     protected List<Map<String, String>> parseRunData(File data)
     {
         BufferedReader br = null;
-        Map<Integer, String> columnMap = new HashMap<Integer, String>();
+        Map<Integer, String> columnMap = new LinkedHashMap<Integer, String>();
         List<Map<String, String>> dataMap = new ArrayList<Map<String, String>>();
 
         try {
@@ -190,7 +191,7 @@ public abstract class AbstractAssayValidator
 
     protected Map<String, String> parseDataRow(String row, Map<Integer, String> columnMap)
     {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new LinkedHashMap<String, String>();
         int i=0;
         for (String col : row.split("\t"))
         {

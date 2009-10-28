@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,6 +40,26 @@ public class AssayTransform extends AbstractAssayValidator
             setHost(host);
             parseRunProperties(inputFile);
 
+            String type = getRunProperties().get(Props.assayType.name());
+
+            if ("General".equalsIgnoreCase(type))
+                runGPATTest();
+            else if ("TZM-bl Neutralization (NAb)".equalsIgnoreCase(type))
+                runNAbTest();
+            else if ("Luminex".equalsIgnoreCase(type))
+                runLuminexTest();
+            else
+                throw new IllegalArgumentException("Test does not exist for assay type: " + type);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void runGPATTest()
+    {
+        try {
             if (getRunProperties().containsKey(Props.runDataFile.name()))
             {
                 String runDataFile = getRunProperties().get(Props.runDataFile.name());
@@ -94,6 +114,139 @@ public class AssayTransform extends AbstractAssayValidator
                         }
                     }
                     insertLog("Programmatic Data Transform was run and " + getErrors().size() + " errors were found");
+                }
+                finally
+                {
+                    pw.close();
+                }
+            }
+            else
+                writeError("Unable to locate the runDataFile", "runDataFile");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void runNAbTest()
+    {
+        try {
+            if (getRunProperties().containsKey(Props.transformedRunPropertiesFile.name()))
+            {
+                String runPropertiesFile = getRunProperties().get(Props.transformedRunPropertiesFile.name());
+                File transformFile = new File(runPropertiesFile);
+
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
+                try {
+                    pw.write("FileID" + "\t" + "transformed FileID\n");
+                }
+                finally
+                {
+                    pw.close();
+                }
+            }
+            if (getRunProperties().containsKey(Props.runDataFile.name()))
+            {
+                String runDataFile = getRunProperties().get(Props.runDataFile.name());
+                List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
+                File transformFile = new File(getTransformFile().get(runDataFile));
+
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
+
+                try {
+                    // transform the fit error column
+                    StringBuilder sb = new StringBuilder();
+                    boolean header = true;
+
+                    // transform the data, adding a new column
+                    for (Map<String, String> row : dataMap)
+                    {
+                        sb.setLength(0);
+                        String delim = "";
+
+                        for (Map.Entry<String, String> entry : row.entrySet())
+                        {
+                            sb.append(delim);
+                            if (header)
+                                sb.append(entry.getValue());
+                            else
+                            {
+                                if ("Fit Error".equalsIgnoreCase(entry.getKey()))
+                                    sb.append("0.0");
+                                else
+                                {
+                                    String value = entry.getValue();
+                                    if (value != null)
+                                        sb.append(value);
+                                }
+                            }
+                            delim = "\t";
+                        }
+                        header = false;
+                        sb.append('\n');
+                        pw.write(sb.toString());
+                    }
+                }
+                finally
+                {
+                    pw.close();
+                }
+            }
+            else
+                writeError("Unable to locate the runDataFile", "runDataFile");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void runLuminexTest()
+    {
+        try {
+            if (getRunProperties().containsKey(Props.runDataFile.name()))
+            {
+                String runDataFile = getRunProperties().get(Props.runDataFile.name());
+                List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
+                File transformFile = new File(getTransformFile().get(runDataFile));
+
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
+
+                try {
+                    // transform the fit error column
+                    List<String> columns = new ArrayList<String>();
+                    StringBuilder sb = new StringBuilder();
+                    boolean header = true;
+
+                    // transform the data, adding a new column
+                    for (Map<String, String> row : dataMap)
+                    {
+                        sb.setLength(0);
+                        String delim = "";
+
+                        for (Map.Entry<String, String> entry : row.entrySet())
+                        {
+                            sb.append(delim);
+                            if (header)
+                                sb.append(entry.getValue());
+                            else
+                            {
+                                if ("Description".equalsIgnoreCase(entry.getKey()))
+                                    sb.append("Transformed");
+                                else
+                                {
+                                    String value = entry.getValue();
+                                    if (value != null)
+                                        sb.append(value);
+                                }
+                            }
+                            delim = "\t";
+                        }
+                        header = false;
+                        sb.append('\n');
+                        pw.write(sb.toString());
+                    }
                 }
                 finally
                 {
