@@ -30,7 +30,7 @@ import java.io.*;
  * Time: 4:39:49 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ProgrammaticQCTest extends AbstractAssayTest
+public class ProgrammaticQCTest extends AbstractQCAssayTest
 {
     protected final static String TEST_PROGRAMMATIC_QC_PRJ = "Programmatic QC Test";
     protected final static String QC_ASSAY = "QC Assay";
@@ -75,7 +75,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
     protected void doTestSteps() throws Exception
     {
-        prepare();
+        prepareProgrammaticQC();
 
         createProject(TEST_PROGRAMMATIC_QC_PRJ);
         setupPipeline(TEST_PROGRAMMATIC_QC_PRJ);
@@ -100,130 +100,6 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         catch (Throwable t) {}
     }
 
-    protected void prepare()
-    {
-        ensureAdminMode();
-
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("views and scripting");
-        log("setup a java engine");
-
-        if (!isEngineConfigured())
-        {
-            // add a new r engine configuration
-            String id = ExtHelper.getExtElementId(this, "btn_addEngine");
-            click(Locator.id(id));
-
-            id = ExtHelper.getExtElementId(this, "add_externalEngine");
-            click(Locator.id(id));
-
-            id = ExtHelper.getExtElementId(this, "btn_submit");
-            waitForElement(Locator.id(id), 10000);
-
-            id = ExtHelper.getExtElementId(this, "editEngine_exePath");
-
-            String javaHome = System.getProperty("java.home");
-            File javaExe = new File(javaHome + "/bin/java.exe");
-            if (!javaExe.exists())
-            {
-                javaExe = new File(javaHome + "/bin/java");
-                if (!javaExe.exists())
-                    fail("unable to setup the java engine");
-            }
-            setFormElement(Locator.id(id), javaExe.getAbsolutePath());
-
-            id = ExtHelper.getExtElementId(this, "editEngine_name");
-            setFormElement(Locator.id(id), "Java");
-
-            id = ExtHelper.getExtElementId(this, "editEngine_languageName");
-            setFormElement(Locator.id(id), "java");
-
-            id = ExtHelper.getExtElementId(this, "editEngine_extensions");
-            setFormElement(Locator.id(id), "jar");
-
-            id = ExtHelper.getExtElementId(this, "editEngine_exeCommand");
-            setFormElement(Locator.id(id), "-jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
-
-            id = ExtHelper.getExtElementId(this, "btn_submit");
-            click(Locator.id(id));
-
-            // wait until the dialog has been dismissed
-            int cnt = 3;
-            while (isElementPresent(Locator.id(id)) && cnt > 0)
-            {
-                sleep(1000);
-                cnt--;
-            }
-
-            if (!isEngineConfigured())
-                fail("unable to setup the java engine");
-        }
-
-        // ensure the .netrc file exists
-        try {
-            File netrcFile = new File(System.getProperty("user.home") + "/" + "_netrc");
-
-            if (!netrcFile.exists())
-                netrcFile = new File(System.getProperty("user.home") + "/" + ".netrc");
-
-            if (!netrcFile.exists())
-            {
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(netrcFile)));
-                try {
-                    pw.append("machine localhost:8080");
-                    pw.append('\n');
-                    pw.append("login " + PasswordUtil.getUsername());
-                    pw.append('\n');
-                    pw.append("password " + PasswordUtil.getPassword());
-                    pw.append('\n');
-                }
-                finally
-                {
-                    pw.close();
-                }
-            }
-        }
-        catch (IOException ioe)
-        {
-            log("failed trying to create a .netrc file " + ioe.getMessage());
-        }
-    }
-
-    protected boolean isEngineConfigured()
-    {
-        // need to allow time for the server to return the engine list and the ext grid to render
-        Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
-        int time = 0;
-        while (!isElementPresent(engine) && time < 5000)
-        {
-            sleep(100);
-            time += 100;
-        }
-        return isElementPresent(engine);
-    }
-
-    protected void deleteEngine()
-    {
-        ensureAdminMode();
-
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("views and scripting");
-
-        if (isEngineConfigured())
-        {
-            Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
-            selenium.mouseDown(engine.toString());
-
-            String id = ExtHelper.getExtElementId(this, "btn_deleteEngine");
-            click(Locator.id(id));
-
-            ExtHelper.waitForExtDialog(this, 5000);
-
-            String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
-            click(Locator.id(btnId));
-        }
-    }
-
     private void defineQCAssay()
     {
         log("Defining a QC test assay at the project level");
@@ -240,11 +116,7 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
 
-        File qcScript = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar");
-        if (qcScript.exists())
-            selenium.type("//input[@id='AssayDesignerQCScript']", qcScript.getAbsolutePath());
-        else
-            fail("unable to locate the QC script");
+        addValidationScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
@@ -275,20 +147,9 @@ public class ProgrammaticQCTest extends AbstractAssayTest
 
         selenium.type("//input[@id='AssayDesignerName']", assayName);
 
-        File transformScript = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar");
-        if (transformScript.exists())
-            selenium.type("//input[@id='AssayDesignerTransformScript']", transformScript.getAbsolutePath());
-        else
-            fail("unable to locate the Transform script");
-
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         if (addQCScript)
-        {
-            File qcScript = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar");
-            if (qcScript.exists())
-                selenium.type("//input[@id='AssayDesignerQCScript']", qcScript.getAbsolutePath());
-            else
-                fail("unable to locate the QC script");
-        }
+            addValidationScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
