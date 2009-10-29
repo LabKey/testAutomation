@@ -300,75 +300,13 @@ public class Runner extends TestSuite
     }
 
 
-    private static TestSuite getSuite(List<Class> testClasses, boolean cleanOnly, boolean modifiedOnly)
+    private static TestSuite getSuite(List<Class> testClasses, boolean cleanOnly)
     {
         // Remove duplicate tests (e.g., don't run "basic" test twice if bvt & drt are selected via ant test) but keep the order
         Set<Class> testClassesCopy = new LinkedHashSet<Class>(testClasses);
         TestSuite suite = new Runner(cleanOnly);
 
-        List<String> moduleDirs = getModifiedModuleDirectories();
-
-        // If svnModified.txt exists then order the tests starting from most recently modified
-        if (null != moduleDirs)
-        {
-            TestMap tm = new TestMap();
-
-            for (Class testClass : testClassesCopy)
-            {
-                if (!WebTest.class.isAssignableFrom(testClass))
-                    continue;
-                try
-                {
-                    Constructor<WebTest> c = testClass.getConstructor();
-                    WebTest test = c.newInstance();
-                    String directory = test.getAssociatedModuleDirectory();
-
-                    if (null == directory || 0 == directory.length())
-                        System.out.println("ERROR: Invalid module directory \"" + directory + "\" specified by " + testClass);
-
-                    if (!"none".equals(directory))
-                    {
-                        File testDir = new File(WebTestHelper.getLabKeyRoot(), "/server/modules/" + directory);
-
-                        if (!testDir.exists())
-                        {
-                            System.out.println("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
-                            System.exit(1);
-                        }
-                    }
-
-                    tm.put(directory, testClass);
-                }
-                catch(Exception e)
-                {
-                    System.out.println("Error: " + e);
-                }
-            }
-
-            for (String moduleDir : moduleDirs)
-            {
-                Collection<Class> associatedTests = tm.get(moduleDir);
-
-                if (null != associatedTests)
-                {
-                    for (Class testClass : associatedTests)
-                    {
-                        suite.addTest(new JUnit4TestAdapter(testClass));
-                        testClassesCopy.remove(testClass);
-                    }
-                }
-            }
-        }
-        else if (modifiedOnly)
-        {
-            System.out.println("Invalid combination: quick=true but svnModified.txt was not found");
-            System.exit(1);
-        }
-
-        if (!modifiedOnly)
-        {
-            addTests(suite, testClassesCopy);
-        }
+        addTests(suite, testClassesCopy);
 
         return suite;
     }
@@ -556,68 +494,6 @@ public class Runner extends TestSuite
         return result.toString();
     }
 
-    // Return a list of modified module directories, ordered starting with most recently modified.
-    // If svnModified.txt can't be accessed or parsed then return an empty list.
-    private static List<String> getModifiedModuleDirectories()
-    {
-        String labkeyRoot = WebTestHelper.getLabKeyRoot();
-        File svnModifiedFilelist = new File(labkeyRoot, "server/test/build/svnModified.txt");
-        String sep = File.separator;
-        String modulePrefix = "server" + sep + "modules" + sep;
-        Map<String, Long> moduleDirs = new HashMap<String, Long>(10);
-
-        if (svnModifiedFilelist.exists())
-        {
-            BufferedReader reader = null;
-            try
-            {
-                reader = new BufferedReader(new FileReader(svnModifiedFilelist));
-                String line;
-
-                while ((line = reader.readLine()) != null)
-                {
-                    if (line.length() > 0 && line.charAt(0) != '?' && line.charAt(0) != '-')
-                    {
-                        String path = line.substring(7, line.length());
-
-                        // If path starts with "server/modules" then find the end index of module name.  If path doesn't
-                        //  start with module prefix or the next separator is missing, set index to -1
-                        int i = (path.startsWith(modulePrefix) ? path.indexOf(sep, modulePrefix.length()) : -1);
-
-                        // Anything outside "server/modules" is labeled "none"
-                        String moduleDir = (-1 == i ? "none" : path.substring(modulePrefix.length(), i));
-
-                        // Note: We don't have a modification date for deleted or renamed files.  They end up with lastModified == 0 and are treated as the oldest modifications.
-                        long lastModified = new File(labkeyRoot, path).lastModified();
-                        Long mostRecent = moduleDirs.get(moduleDir);
-
-                        if (null == mostRecent || lastModified > mostRecent)
-                            moduleDirs.put(moduleDir, lastModified);
-                    }
-                }
-
-                // Now sort modules by most recent file modification date
-                Map<Long, String> orderedModuleDirs = new TreeMap<Long, String>();
-
-                for (String moduleDir : moduleDirs.keySet())
-                    orderedModuleDirs.put(-moduleDirs.get(moduleDir), moduleDir);  // Start with most recent change
-
-                return new ArrayList<String>(orderedModuleDirs.values());
-            }
-            catch(IOException e)
-            {
-                System.err.print(e.getMessage());
-            }
-            finally
-            {
-                if (reader != null) { try { reader.close(); } catch (IOException e) {} }
-                svnModifiedFilelist.delete();
-            }
-        }
-
-        return Collections.emptyList();
-    }
-
     public static Class[] getAllTests()
     {
         List<Class> tests = new ArrayList<Class>();
@@ -714,6 +590,22 @@ public class Runner extends TestSuite
         boolean cleanOnly = "true".equals(System.getProperty("cleanOnly"));
         boolean skipClean = "false".equals(System.getProperty("clean"));
 
+        System.out.println("--Debug--");
+        System.out.println(System.getProperty("teamcity.tests.runRiskGroupTestsFirst"));
+        System.out.println(System.getProperty("teamcity.tests.recentlyFailedTests.file"));
+        System.out.println(System.getProperty("teamcity.build.changedFiles.file"));
+        System.out.println(System.getProperty("teamcity.build.checkoutDir"));
+        System.out.println(System.getProperty("teamcity.tests.runRiskGroupTestsFirst.recentlyFailed"));
+        System.out.println(System.getProperty("teamcity.tests.runRiskGroupTestsFirst.newAndModified"));
+        System.out.println("--Debug--");
+        System.out.println(System.getenv("teamcity.tests.runRiskGroupTestsFirst"));
+        System.out.println(System.getenv("teamcity.tests.recentlyFailedTests.file"));
+        System.out.println(System.getenv("teamcity.build.changedFiles.file"));
+        System.out.println(System.getenv("teamcity.build.checkoutDir"));
+        System.out.println(System.getenv("teamcity.tests.runRiskGroupTestsFirst.recentlyFailed"));
+        System.out.println(System.getenv("teamcity.tests.runRiskGroupTestsFirst.newAndModified"));
+        System.out.println("--Debug--");
+
         if (cleanOnly && skipClean)
         {
             throw new RuntimeException("Invalid parameters: cannot specify both 'cleanOnly=true' and 'clean=false'.");
@@ -727,11 +619,19 @@ public class Runner extends TestSuite
         {
             set.setTests(getAllTests());
         }
-
-        boolean modifiedOnly = "true".equals(System.getProperty("quick")); //TODO: remove modifiedOnly target
+        else if (testNames.isEmpty())
+        {
+            //put previously failed and unrun tests at the front of the test queue.
+            Class[] remainingTests = readClasses(getRemainingTestsFile());
+            Class[] all = new Class[set.tests.length + remainingTests.length];
+            System.arraycopy(remainingTests, 0, all, 0, remainingTests.length);
+            System.arraycopy(set.tests, 0, all, remainingTests.length, set.tests.length);
+            prioritizeTest(all, "BasicTest");
+            set.setTests(set.getCrawlerTimeout(), all);
+        }
 
         List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
-        TestSuite suite = getSuite(testClasses, cleanOnly, modifiedOnly);
+        TestSuite suite = getSuite(testClasses, cleanOnly);
 
         if (suite.testCount() == 0)
         {
@@ -754,6 +654,23 @@ public class Runner extends TestSuite
         }
 
         return suite;
+    }
+
+    private static void prioritizeTest(Class[] testList, String priorityTest)
+    {
+        for(int i = 0; i < testList.length; i++)
+        {
+            if(testList[i].getSimpleName().equals(priorityTest))
+            {
+                Class temp;
+                for(int j = i; j > 0; j--)
+                {
+                    temp = testList[j];
+                    testList[j] = testList[j-1];
+                    testList[j-1] = temp;
+                }
+            }
+        }
     }
 
     private static Class getTestClass(Test test)

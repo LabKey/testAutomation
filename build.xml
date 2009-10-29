@@ -48,7 +48,6 @@
     <target name="usage">
         <echo message="Valid Test Targets:" />
         <echo message="drt                run developer regression tests (short suite)" />
-        <echo message="quick              run developer regression tests only for modules that have been modified" />
         <echo message="bvt                run build verification tests (long suite)" />
         <echo message="daily              run daily test suite" />
         <echo message="continue           continue running a suite after a failure, starting with the test that failed" />
@@ -112,6 +111,9 @@
         <echo message=""/>
         <echo message="Add javascript error checking (firefox only):"/>
         <echo message="    -DscriptCheck=true"/>
+        <echo message=""/>
+        <echo message="Put previously failed and errored tests at the front of the queue."/>
+        <echo message="    -DfrontloadFailures=true"/>
     </target>
 
     <target name="clean">
@@ -272,7 +274,6 @@
         <property name="suite" value="CONTINUE"/>
         <antcall inheritall="true" target="sub-selenium">
             <param name="debug.suspend.selenium" value="n" />
-            <param name="skipModifiedFiles" value="true" />
         </antcall>
     </target>
 
@@ -367,10 +368,6 @@
         </condition>
         <fail if="no.selenium.server" message="Could not find selenium server ${sysprop.selenium.server} port ${sysprop.selenium.server.port}"/>
 
-        <condition property="skipModifiedFiles" value="true">
-            <isset property="test"/>
-        </condition>
-
         <antcall inheritall="true" target="runsuite">
             <param name="debug.suspend" value="${debug.suspend.selenium}" />
         </antcall>
@@ -410,7 +407,6 @@
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
-            <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
@@ -481,11 +477,6 @@
         <antcall target="sub-selenium"/>
     </target>
 
-    <target name="quick" description="Run quick DRT">
-        <property name="quick" value="true"/>
-        <ant inheritall="true" target="drt"/>
-    </target>
-
     <target name="selenium-tomcat">
         <property name="debug.suspend.selenium" value="n"/>
         <property name="sysprop.close.on.fail" value="true" />
@@ -509,7 +500,6 @@
         <property name="suite" value="Module"/>
         <property name="debug.suspend.selenium" value="n"/>
         <antcall target="sub-selenium">
-            <param name="skipModifiedFiles" value="true"/>
         </antcall>
     </target>
 
@@ -636,16 +626,6 @@
         </condition>
         <condition property="sysprop.test" value="${test}">
             <isset property="test"/>
-        </condition>
-
-        <!-- Set property sysprop.quick: empty string if not provided, user string otherwise -->
-        <condition property="sysprop.quick" value="">
-            <not>
-                <isset property="quick"/>
-            </not>
-        </condition>
-        <condition property="sysprop.quick" value="${quick}">
-            <isset property="quick"/>
         </condition>
 
         <!-- Set property sysprop.cleanOnly: true or false -->
@@ -799,7 +779,6 @@
         <echo message="User property overrides:" />
         <echo message="    suite: ${sysprop.suite}"/>
         <echo message="    tests: ${sysprop.test}"/>
-        <echo message="    quick: ${sysprop.quick}"/>
         <echo message="    clean up after test: ${sysprop.clean}"/>
         <echo message="    clean up only: ${sysprop.cleanOnly}"/>
         <echo message="    halt on error: ${sysprop.haltOnError}"/>
@@ -825,7 +804,7 @@
       </waitfor>
     </target>
 
-    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,modifiedFiles,waitfor-labkey-started">
+    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started">
         <junit fork="true" forkmode="once" maxmemory="128m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltOnError}"
@@ -838,7 +817,6 @@
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
-            <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
@@ -863,17 +841,6 @@
         </junit>
     </target>
 
-    <target name="modifiedFiles" unless="skipModifiedFiles">
-        <echo>Using SVN to determine modified files</echo>
-        <!-- Generate list of modified files in the project.  This will be used to order the tests and/or run only a subset of tests. -->
-        <property name="svnModifiedFiles" value="${test.build.home}/svnModified.txt"/>
-        <exec executable="svn" dir="${project.root}" output="${svnModifiedFiles}" failifexecutionfails="false">
-            <arg value="status"/>
-        </exec>
-        <!-- Make sure there's actually a file - it won't be created if we can't run the SVN client -->
-        <touch file="${svnModifiedFiles}" />
-    </target>
-
     <target name="runsuite-perf" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started">
         <junit fork="true" forkmode="once" maxmemory="256m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
@@ -887,7 +854,6 @@
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
-            <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
@@ -921,7 +887,6 @@
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
             <sysproperty key="clean" value="${sysprop.clean}"/>
-            <sysproperty key="quick" value="${sysprop.quick}"/>
             <sysproperty key="loop" value="${sysprop.loop}"/>
             <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>

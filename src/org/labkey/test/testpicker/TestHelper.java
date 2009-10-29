@@ -365,21 +365,10 @@ public class TestHelper
             }
         });
 
-        JButton quickButton = new JButton("Quick");
-        quickButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e)
-            {
-                System.setProperty("quick", "true");
-                setResult(TestSet.DRT, new ArrayList<String>());
-                _window.dispose();
-            }
-        });
-
         buttonBarBottom.add(runButton, gbc);
         buttonBarBottom.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonBarBottom.add(continueButton, gbc);
         buttonBarBottom.add(Box.createRigidArea(new Dimension(10, 0)));
-        buttonBarBottom.add(quickButton, gbc);
 
         JPanel buttonBar = new JPanel(new BorderLayout());
 
