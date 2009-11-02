@@ -766,24 +766,29 @@
             <isset property="selenium.browser.path"/>
         </condition>
 
-        <!-- Set property sysprop.teamcity.tests.recentlyFailedTests.file -->
+        <!-- Set property sysprop.teamcity.tests.recentlyFailedTests.file : Absolute path -->
         <condition property="sysprop.teamcity.tests.recentlyFailedTests.file" value="${teamcity.tests.recentlyFailedTests.file}" else="">
             <isset property="teamcity.tests.recentlyFailedTests.file"/>
         </condition>
 
-        <!-- Set property sysprop.teamcity.build.changedFiles.file -->
+        <!-- Set property sysprop.teamcity.build.changedFiles.file : Absolute path -->
         <condition property="sysprop.teamcity.build.changedFiles.file" value="${teamcity.build.changedFiles.file}" else="">
             <isset property="teamcity.build.changedFiles.file"/>
         </condition>
 
-        <!-- Set property testRecentlyFailed : true of false (determined in TeamCity) -->
-        <condition property="sysprop.testRecentlyFailed" value="true" else="false">
-            <contains string="${teamcity.tests.runRiskGroupTestsFirst}" substring="recentlyFailed" />
+        <!-- Set property sysprop.teamcity.tests.runRiskGroupTestsFirst : recentlyFailed, newAndModified, or both/neither -->
+        <condition property="sysprop.teamcity.tests.runRiskGroupTestsFirst"  value="${teamcity.tests.runRiskGroupTestsFirst}" else="">
+            <isset property="teamcity.tests.runRiskGroupTestsFirst" />
         </condition>
 
-        <!-- Set property testNewModified : true of false (determined in TeamCity) -->
+        <!-- Set property testRecentlyFailed : true of false (set in TeamCity) -->
+        <condition property="sysprop.testRecentlyFailed" value="true" else="false">
+            <contains string="${sysprop.teamcity.tests.runRiskGroupTestsFirst}" substring="recentlyFailed" />
+        </condition>
+
+        <!-- Set property testNewModified : true of false (set in TeamCity) -->
         <condition property="sysprop.testNewAndModified" value="true" else="false">
-            <contains string="${teamcity.tests.runRiskGroupTestsFirst}" substring="newAndModified" />
+            <contains string="${sysprop.teamcity.tests.runRiskGroupTestsFirst}" substring="newAndModified" />
         </condition>
 
 
