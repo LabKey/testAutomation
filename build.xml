@@ -746,7 +746,7 @@
             <isset property="close.on.fail"/>
         </condition>
 
-        <!-- Set property sysprop.selnim.browser -->
+        <!-- Set property sysprop.selenium.browser -->
         <condition property="sysprop.selenium.browser" value="*firefox">
             <not>
                 <isset property="selenium.browser"/>
@@ -756,7 +756,7 @@
             <isset property="selenium.browser"/>
         </condition>
 
-        <!-- Set property sysprop.selnim.browser -->
+        <!-- Set property sysprop.selenium.browser -->
         <condition property="sysprop.selenium.browser.path" value="">
             <not>
                 <isset property="selenium.browser.path"/>
@@ -766,6 +766,25 @@
             <isset property="selenium.browser.path"/>
         </condition>
 
+        <!-- Set property sysprop.teamcity.tests.recentlyFailedTests.file -->
+        <condition property="sysprop.teamcity.tests.recentlyFailedTests.file" value="${teamcity.tests.recentlyFailedTests.file}" else="">
+            <isset property="teamcity.tests.recentlyFailedTests.file"/>
+        </condition>
+
+        <!-- Set property sysprop.teamcity.build.changedFiles.file -->
+        <condition property="sysprop.teamcity.build.changedFiles.file" value="${teamcity.build.changedFiles.file}" else="">
+            <isset property="teamcity.build.changedFiles.file"/>
+        </condition>
+
+        <!-- Set property testRecentlyFailed : true of false (determined in TeamCity) -->
+        <condition property="sysprop.testRecentlyFailed" value="true" else="false">
+            <contains string="${teamcity.tests.runRiskGroupTestsFirst}" substring="recentlyFailed" />
+        </condition>
+
+        <!-- Set property testNewModified : true of false (determined in TeamCity) -->
+        <condition property="sysprop.testNewAndModified" value="true" else="false">
+            <contains string="${teamcity.tests.runRiskGroupTestsFirst}" substring="newAndModified" />
+        </condition>
 
 
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
@@ -832,6 +851,10 @@
             <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
             <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
             <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
+            <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
+            <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
+            <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
+            <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -864,6 +887,10 @@
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
             <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
+            <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
+            <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
+            <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
+            <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
 
             <formatter type="plain"/>
 
@@ -897,6 +924,10 @@
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
             <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
+            <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
+            <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
+            <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
+            <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
 
             <formatter type="brief"/>
             <formatter type="xml"/>

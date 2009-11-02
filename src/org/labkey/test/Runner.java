@@ -589,22 +589,8 @@ public class Runner extends TestSuite
     {
         boolean cleanOnly = "true".equals(System.getProperty("cleanOnly"));
         boolean skipClean = "false".equals(System.getProperty("clean"));
-
-        System.out.println("--Debug--");
-        System.out.println(System.getProperty("teamcity.tests.runRiskGroupTestsFirst"));
-        System.out.println(System.getProperty("teamcity.tests.recentlyFailedTests.file"));
-        System.out.println(System.getProperty("teamcity.build.changedFiles.file"));
-        System.out.println(System.getProperty("teamcity.build.checkoutDir"));
-        System.out.println(System.getProperty("teamcity.tests.runRiskGroupTestsFirst.recentlyFailed"));
-        System.out.println(System.getProperty("teamcity.tests.runRiskGroupTestsFirst.newAndModified"));
-        System.out.println("--Debug--");
-        System.out.println(System.getenv("teamcity.tests.runRiskGroupTestsFirst"));
-        System.out.println(System.getenv("teamcity.tests.recentlyFailedTests.file"));
-        System.out.println(System.getenv("teamcity.build.changedFiles.file"));
-        System.out.println(System.getenv("teamcity.build.checkoutDir"));
-        System.out.println(System.getenv("teamcity.tests.runRiskGroupTestsFirst.recentlyFailed"));
-        System.out.println(System.getenv("teamcity.tests.runRiskGroupTestsFirst.newAndModified"));
-        System.out.println("--Debug--");
+        boolean testRecentlyFailed = "true".equals(System.getProperty("testRecentlyFailed"));
+        String recentlyFailedTestsFile = System.getProperty("teamcity.tests.recentlyFailedTests.file");
 
         if (cleanOnly && skipClean)
         {
@@ -619,15 +605,18 @@ public class Runner extends TestSuite
         {
             set.setTests(getAllTests());
         }
-        else if (testNames.isEmpty())
+        else if (testNames.isEmpty() && testRecentlyFailed && !recentlyFailedTestsFile.isEmpty())
         {
             //put previously failed and unrun tests at the front of the test queue.
-            Class[] remainingTests = readClasses(getRemainingTestsFile());
-            Class[] all = new Class[set.tests.length + remainingTests.length];
-            System.arraycopy(remainingTests, 0, all, 0, remainingTests.length);
-            System.arraycopy(set.tests, 0, all, remainingTests.length, set.tests.length);
-            prioritizeTest(all, "BasicTest");
-            set.setTests(set.getCrawlerTimeout(), all);
+            Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile));
+            if(recentlyFailedTests.length > 0)
+            {
+                Class[] all = new Class[set.tests.length + recentlyFailedTests.length];
+                System.arraycopy(recentlyFailedTests, 0, all, 0, recentlyFailedTests.length);
+                System.arraycopy(set.tests, 0, all, recentlyFailedTests.length, set.tests.length);
+                prioritizeTest(all, "BasicTest");
+                set.setTests(set.getCrawlerTimeout(), all);
+            }
         }
 
         List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
