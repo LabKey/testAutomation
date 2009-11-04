@@ -589,8 +589,11 @@ public class Runner extends TestSuite
     {
         boolean cleanOnly = "true".equals(System.getProperty("cleanOnly"));
         boolean skipClean = "false".equals(System.getProperty("clean"));
+        boolean shuffleTests = "true".equals(System.getProperty("shuffleTests"));
         boolean testRecentlyFailed = "true".equals(System.getProperty("testRecentlyFailed"));
+        boolean testNewAndModified = "true".equals(System.getProperty("testNewAndModified"));
         String recentlyFailedTestsFile = System.getProperty("teamcity.tests.recentlyFailedTests.file");
+        String changedFilesFile = System.getProperty("teamcity.build.changedFiles.file");
 
         if (cleanOnly && skipClean)
         {
@@ -600,26 +603,43 @@ public class Runner extends TestSuite
         if (TestSet.CONTINUE == set)
         {
             set.setTests(readClasses(getRemainingTestsFile()));
+            if (shuffleTests)
+            {
+                randomizeTests(set.tests);
+            }
         }
         else if (TestSet.TEST == set && !testNames.isEmpty())
         {
             set.setTests(getAllTests());
         }
-        else if (testNames.isEmpty() && testRecentlyFailed && !recentlyFailedTestsFile.isEmpty())
+        else if (testNames.isEmpty())
         {
-            //put previously failed and unrun tests at the front of the test queue.
-            Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile));
-            if(recentlyFailedTests.length > 0)
+            if (shuffleTests)
             {
-                Class[] all = new Class[set.tests.length + recentlyFailedTests.length];
-                System.arraycopy(recentlyFailedTests, 0, all, 0, recentlyFailedTests.length);
-                System.arraycopy(set.tests, 0, all, recentlyFailedTests.length, set.tests.length);
-                prioritizeTest(all, "BasicTest");
-                set.setTests(set.getCrawlerTimeout(), all);
+                randomizeTests(set.tests);
+            }
+            if (testNewAndModified)
+            {
+                frontLoadTestsOfModifiedModules(set.tests, changedFilesFile);
+            }
+            if (testRecentlyFailed && !recentlyFailedTestsFile.isEmpty())
+            {
+                //put previously failed tests at the front of the test queue (determined by TeamCity).
+                Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile));
+                if (recentlyFailedTests.length > 0)
+                {
+                    Class[] all = new Class[set.tests.length + recentlyFailedTests.length];
+                    System.arraycopy(recentlyFailedTests, 0, all, 0, recentlyFailedTests.length);
+                    System.arraycopy(set.tests, 0, all, recentlyFailedTests.length, set.tests.length);
+                    set.setTests(set.getCrawlerTimeout(), all);
+                }
             }
         }
 
+        prioritizeTest("BasicTest", set.tests, 0); // Always start with BasicTest (if present)
+
         List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
+
         TestSuite suite = getSuite(testClasses, cleanOnly);
 
         if (suite.testCount() == 0)
@@ -645,21 +665,160 @@ public class Runner extends TestSuite
         return suite;
     }
 
-    private static void prioritizeTest(Class[] testList, String priorityTest)
+    private static void randomizeTests(Class[] tests)
     {
-        for(int i = 0; i < testList.length; i++)
+        java.util.Random rand = new java.util.Random();
+
+        for (int i = 0; i < tests.length; i++)
         {
-            if(testList[i].getSimpleName().equals(priorityTest))
+            Class temp;
+            int j = Math.abs(rand.nextInt()) % tests.length;
+            temp = tests[i];
+            tests[i] = tests[j];
+            tests[j] = temp;
+        }
+    }
+
+    private static void frontLoadTestsOfModifiedModules(Class[] testClasses, String changedFilesFile)
+    {
+        List<String> moduleDirs = getModifiedModuleDirectories(changedFilesFile);
+
+        // If changedFilesFile exists where TeamCity indicates then order the tests starting from most recently modified
+        if (null != moduleDirs)
+        {
+            TestMap tm = new TestMap(); // Stores Tests, keyed by associated module directory.
+
+            // Record the associated module directories for all selected tests.
+            for (Class testClass : testClasses)
+            {
+                if (!WebTest.class.isAssignableFrom(testClass))
+                    continue;
+                try
+                {
+                    Constructor<WebTest> c = testClass.getConstructor();
+                    WebTest test = c.newInstance();
+                    String directory = test.getAssociatedModuleDirectory();
+
+                    if (null == directory || 0 == directory.length())
+                        System.out.println("ERROR: Invalid module directory \"" + directory + "\" specified by " + testClass);
+
+                    if (!"none".equals(directory))
+                    {
+                        File testDir = new File(WebTestHelper.getLabKeyRoot(), "/server/modules/" + directory);
+
+                        if (!testDir.exists())
+                        {
+                            System.out.println("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
+                            System.exit(1);
+                        }
+                    }
+
+                    tm.put(directory, testClass);
+                }
+                catch(Exception e)
+                {
+                    System.out.println("Error: " + e);
+                }
+            }
+
+            // Reorder tests by associated modules' modification date.
+            int movedTests = 0;
+            for (String moduleDir : moduleDirs)
+            {
+                Collection<Class> associatedTests = tm.get(moduleDir);
+
+                if (null != associatedTests)
+                {
+                    for (Class test : associatedTests)
+                    {
+                        // Bubble up associated Test, if present.
+                        if (prioritizeTest(test.getSimpleName(), testClasses, movedTests))
+                        {
+                            movedTests++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Return a list of modified module directories, ordered starting with most recently modified.
+    private static List<String> getModifiedModuleDirectories(String changedFilesFile)
+    {
+        String labkeyRoot = WebTestHelper.getLabKeyRoot();
+        File changedFiles = new File(changedFilesFile);
+        Map<String, Long> moduleDirs = new HashMap<String, Long>(10);
+        String modulePrefix = "server/modules/";
+
+        if (changedFiles.exists())
+        {
+            BufferedReader reader = null;
+            try
+            {
+                reader = new BufferedReader(new FileReader(changedFiles));
+                String line;
+
+                while ((line = reader.readLine()) != null)
+                {
+                    if (line.length() > 0 && line.charAt(0) != '?' && line.charAt(0) != '-')
+                    {
+                        String path = line.substring(0, line.indexOf(':') - 1);
+
+                        // If path starts with "server/modules/" then find the end index of module name.  If path doesn't
+                        //  start with module prefix or the next separator is missing, set index to -1
+                        int i = (path.startsWith(modulePrefix) ? path.indexOf("/", modulePrefix.length()) : -1);
+
+                        // Anything outside "server/modules/" is labeled "none"
+                        String moduleDir = (-1 == i ? "none" : path.substring(modulePrefix.length(), i));
+
+                        // Note: We don't have a modification date for deleted or renamed files.  They end up with lastModified == 0 and are treated as the oldest modifications.
+                        long lastModified = new File(labkeyRoot, path).lastModified();
+                        Long mostRecent = moduleDirs.get(moduleDir);
+
+                        if (null == mostRecent || lastModified > mostRecent)
+                            moduleDirs.put(moduleDir, lastModified);
+                    }
+                }
+
+                // Now sort modules by most recent file modification date
+                Map<Long, String> orderedModuleDirs = new TreeMap<Long, String>();
+
+                for (String moduleDir : moduleDirs.keySet())
+                    orderedModuleDirs.put(-moduleDirs.get(moduleDir), moduleDir);  // Start with most recent change
+
+                return new ArrayList<String>(orderedModuleDirs.values());
+            }
+            catch(IOException e)
+            {
+                System.err.print(e.getMessage());
+            }
+            finally
+            {
+                if (reader != null) { try { reader.close(); } catch (IOException e) {} }
+            }
+        }
+
+        return Collections.emptyList();
+    }
+
+    // Move the named test to the Nth position in the list, maintaining the order of all other tests.     
+    private static boolean prioritizeTest(String priorityTest, Class[] testList, int N)
+    {
+        for(int i = N; i < testList.length; i++)
+        {
+            if (testList[i].getSimpleName().equals(priorityTest))
             {
                 Class temp;
-                for(int j = i; j > 0; j--)
+                for(int j = i; j > N; j--)
                 {
                     temp = testList[j];
                     testList[j] = testList[j-1];
                     testList[j-1] = temp;
                 }
+                return true;
             }
         }
+        return false;
     }
 
     private static Class getTestClass(Test test)

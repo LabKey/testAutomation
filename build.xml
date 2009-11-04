@@ -112,8 +112,8 @@
         <echo message="Add javascript error checking (firefox only):"/>
         <echo message="    -DscriptCheck=true"/>
         <echo message=""/>
-        <echo message="Put previously failed and errored tests at the front of the queue."/>
-        <echo message="    -DfrontloadFailures=true"/>
+        <echo message="Randomize test order."/>
+        <echo message="    -DshuffleTests=true"/>
     </target>
 
     <target name="clean">
@@ -791,6 +791,11 @@
             <contains string="${sysprop.teamcity.tests.runRiskGroupTestsFirst}" substring="newAndModified" />
         </condition>
 
+        <!-- Set property sysprop.shuffleTests: true or false -->
+        <condition property="sysprop.shuffleTests" value="${shuffleTests}" else="false">
+            <isset property="shuffleTests"/>
+        </condition>
+
 
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
         <condition property="sysprop.suite" value="DRT">
@@ -813,6 +818,9 @@
         <echo message="    labkey.port: ${sysprop.labkey.port}"/>
         <echo message="    target server ${sysprop.labkey.server}"/>
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
+        <echo message="    shuffleTests: ${sysprop.shuffleTests}" />
+        <echo message="    recently failed tests first (TeamCity only): ${sysprop.testRecentlyFailed}" />
+        <echo message="    test modified modules first (TeamCity only): ${sysprop.testNewAndModified}" />
     </target>
 
     <target name="waitfor-labkey-started">
@@ -860,6 +868,7 @@
             <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
+            <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -896,6 +905,7 @@
             <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
+            <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
 
             <formatter type="plain"/>
 
@@ -933,6 +943,7 @@
             <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
+            <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
 
             <formatter type="brief"/>
             <formatter type="xml"/>
