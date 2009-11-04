@@ -200,7 +200,7 @@ public class StudyManualTest extends StudyTest
 
         checkRadioButton("additionalKey", 1);
 
-        clickNavButton("Import Schema", 0);
+        clickNavButton("Import Fields", 0);
         waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_GWT);
 
         setFormElement("schemaImportBox", "Property\tLabel\tRangeURI\tNotNull\tDescription\n" +

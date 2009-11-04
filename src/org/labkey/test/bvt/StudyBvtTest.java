@@ -104,8 +104,7 @@ public class StudyBvtTest extends StudyManualTest
         clickLinkWithText("Manage Study");
         clickNavButton("Export Study");
 
-        // NOTE: The statement below is sensitive to module load order -- if this become problematic we should create a new method "assertAllTextPresent(String...)"
-        assertTextPresentInThisOrder("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Queries", "Custom Views", "Reports", "Lists");
+        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Queries", "Custom Views", "Reports", "Lists");
 
         checkRadioButton("format", useXmlFormat ? "new" : "old");
         checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files

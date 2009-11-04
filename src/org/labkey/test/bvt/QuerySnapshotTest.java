@@ -257,10 +257,10 @@ public class QuerySnapshotTest extends StudyBaseTest
             clickNavButton("Edit Dataset Definition");
             waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
 
-            String xpath = getPropertyXPath("Dataset Schema") + "//span" + Locator.navButton("Add Field").getPath();
+            String xpath = getPropertyXPath("Dataset Fields") + "//span" + Locator.navButton("Add Field").getPath();
             selenium.click(xpath);
-            setFormElement(getPropertyXPath("Dataset Schema") + "//td/input[@id='ff_name" + index + "']", keyField);
-            selectOptionByText(getPropertyXPath("Dataset Schema") + "//td/select[@id='ff_type" + index + "']", "Integer");
+            setFormElement(getPropertyXPath("Dataset Fields") + "//td/input[@id='ff_name" + index + "']", keyField);
+            selectOptionByText(getPropertyXPath("Dataset Fields") + "//td/select[@id='ff_type" + index + "']", "Integer");
 
             sleep(1000);
             clickRadioButtonById("button_managedField");

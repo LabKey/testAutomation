@@ -97,6 +97,11 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite() throws Exception
     {
+        return suite(false);
+    }
+
+    public static TestSuite suite(boolean secondAttempt) throws Exception
+    {
         GetMethod method = null;
         try
         {
@@ -113,11 +118,17 @@ public class JUnitTest extends TestSuite
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
                 Object json = JSONValue.parse(response);
-                if (json == null && response.contains("<title>Upgrade Status</title>") || response.contains("This server is being upgraded to a new version of LabKey Server."))
+                if (json == null &&
+                        response.contains("<title>Upgrade Status</title>") ||
+                        response.contains("<title>Register First User</title>") ||
+                        response.contains("This server is being upgraded to a new version of LabKey Server."))
                 {
+                    if (secondAttempt)
+                        throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + response);
+
                     // perform upgrade then try to fetch the list again
                     upgradeHelper();
-                    return suite();
+                    return suite(true);
                 }
 
                 if (json == null || !(json instanceof Map))

@@ -248,7 +248,6 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             runTransformTest();
         }
-
     } //doTestSteps()
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton)

@@ -188,8 +188,10 @@ public class ViabilityTest extends AbstractAssayTest
         assertEquals("", table.getDataAsText(4, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(4, "Recovery"));
 
-//        beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?schema=assay&query.queryName=" + ASSAY_NAME + " ResultSpecimens");
-//        setSelectedFields("/" + PROJECT_NAME + "/" + FOLDER_NAME, "assay", ASSAY_NAME + " ResultSpecimens", null, new String[] { "Result", "Specimen", "SpecimenIndex", "Specimen/Volume", "Result/Recovert" });
+        log("** Checking ResultSpecimens lookups");
+        beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?schema=assay&query.queryName=" + ASSAY_NAME + " ResultSpecimens");
+        setSelectedFields("/" + PROJECT_NAME + "/" + FOLDER_NAME, "assay", ASSAY_NAME + " ResultSpecimens", null,
+                new String[] { "Result", "Result/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits"});
 
     }
 
