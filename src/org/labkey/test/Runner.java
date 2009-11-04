@@ -114,7 +114,12 @@ public class Runner extends TestSuite
 
                 while ((line = reader.readLine()) != null)
                     if (null != StringUtils.trimToNull(line))
-                        testClasses.add(Class.forName(line));
+                    {
+                        if (line.contains("$")) // Prevent exception for Junit tests.
+                            testClasses.add(Class.forName(line.substring(0, line.indexOf('$'))));
+                        else
+                            testClasses.add(Class.forName(line));
+                    }
             }
             catch(IOException e)
             {
