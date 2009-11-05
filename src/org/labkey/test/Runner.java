@@ -102,7 +102,7 @@ public class Runner extends TestSuite
     private static Class[] readClasses(File file)
     {
         List<Class> testClasses = new ArrayList<Class>(20);
-
+        System.out.println("readClasses:");
         if (file.exists())
         {
             BufferedReader reader = null;
@@ -113,6 +113,8 @@ public class Runner extends TestSuite
                 reader = new BufferedReader(new FileReader(file));
 
                 while ((line = reader.readLine()) != null)
+                {
+                    System.out.println(line);
                     if (null != StringUtils.trimToNull(line))
                     {
                         if (line.contains("$")) // Prevent exception for Junit tests.
@@ -120,6 +122,7 @@ public class Runner extends TestSuite
                         else
                             testClasses.add(Class.forName(line));
                     }
+                }
             }
             catch(IOException e)
             {
@@ -600,6 +603,13 @@ public class Runner extends TestSuite
         String recentlyFailedTestsFile = System.getProperty("teamcity.tests.recentlyFailedTests.file");
         String changedFilesFile = System.getProperty("teamcity.build.changedFiles.file");
 
+        System.out.println("/-Debug-\\");
+        System.out.println("recentlyFailedTests.file: " + recentlyFailedTestsFile + "\n" +
+                           "changedFiles.file: " + changedFilesFile + "\n" +
+                           "testRecentlyModified: " + testRecentlyFailed + "\n" +
+                           "testNewAndModified: " + testNewAndModified + "\n" +
+                           "shuffleTests: " + shuffleTests);
+
         if (cleanOnly && skipClean)
         {
             throw new RuntimeException("Invalid parameters: cannot specify both 'cleanOnly=true' and 'clean=false'.");
@@ -621,16 +631,19 @@ public class Runner extends TestSuite
         {
             if (shuffleTests)
             {
+                System.out.println("randomizeTests");
                 randomizeTests(set.tests);
             }
             if (testNewAndModified)
             {
+                System.out.println("frontLoadTests");
                 frontLoadTestsOfModifiedModules(set.tests, changedFilesFile);
             }
             if (testRecentlyFailed && !recentlyFailedTestsFile.isEmpty())
             {
                 //put previously failed tests at the front of the test queue (determined by TeamCity).
                 Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile));
+                System.out.println("recentlyFailedTests: " + recentlyFailedTests.length);
                 if (recentlyFailedTests.length > 0)
                 {
                     Class[] all = new Class[set.tests.length + recentlyFailedTests.length];
@@ -640,6 +653,8 @@ public class Runner extends TestSuite
                 }
             }
         }
+
+        System.out.println("\\-Debug-/");
 
         prioritizeTest("BasicTest", set.tests, 0); // Always start with BasicTest (if present)
 
@@ -755,6 +770,8 @@ public class Runner extends TestSuite
         Map<String, Long> moduleDirs = new HashMap<String, Long>(10);
         String modulePrefix = "server/modules/";
 
+        System.out.println("getModifiedModuleDirs");
+
         if (changedFiles.exists())
         {
             BufferedReader reader = null;
@@ -765,6 +782,7 @@ public class Runner extends TestSuite
 
                 while ((line = reader.readLine()) != null)
                 {
+                    System.out.println(line);
                     if (line.length() > 0 && line.charAt(0) != '?' && line.charAt(0) != '-')
                     {
                         String path = line.substring(0, line.indexOf(':') - 1);
