@@ -675,7 +675,10 @@ public class TestHelper
     {
         TreeNode[] parentPath = new TreeNode[path.length-1];
         System.arraycopy(path, 0, parentPath, 0, path.length - 1);
-        _testTree.expandPath(new TreePath(parentPath));
+        if (parentPath.length > 0)
+        {
+            _testTree.expandPath(new TreePath(parentPath));
+        }
     }
 
     private static File verifyDir(String dirName)
