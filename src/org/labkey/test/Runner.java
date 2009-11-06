@@ -148,6 +148,32 @@ public class Runner extends TestSuite
         return testClasses.toArray(new Class[testClasses.size()]);
     }
 
+    private static Class[] readClasses(File recentlyFailedTestsFile, Class[] tests)
+    {
+        Class[] recentlyFailedTests = readClasses(recentlyFailedTestsFile);
+        ArrayList<Class> filteredRecentlyFailedTests = new ArrayList<Class>();
+
+        for (Class item: recentlyFailedTests)
+        {
+            if (arrayContains(tests, item))
+            {
+                filteredRecentlyFailedTests.add(item);
+            }
+        }
+        
+        return filteredRecentlyFailedTests.toArray(new Class[filteredRecentlyFailedTests.size()]);
+    }
+
+    private static boolean arrayContains(Class[] array, Class clazz)
+    {
+        for(Class item : array)
+        {
+            if(item.equals(clazz))
+                return true;
+        }
+        return false;
+    }
+
     private static File getRemainingTestsFile()
     {
         String labkeyRoot = WebTestHelper.getLabKeyRoot();
@@ -630,7 +656,7 @@ public class Runner extends TestSuite
             if (testRecentlyFailed && !recentlyFailedTestsFile.isEmpty())
             {
                 //put previously failed tests at the front of the test queue (determined by TeamCity).
-                Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile));
+                Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile), set.tests);
                 if (recentlyFailedTests.length > 0)
                 {
                     Class[] all = new Class[set.tests.length + recentlyFailedTests.length];
