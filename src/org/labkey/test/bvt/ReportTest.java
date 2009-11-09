@@ -184,7 +184,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("DEM-1: Demographics");
 
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", "Views:Create:Crosstab View");
+        clickMenuButton("Views", "Views:Create:Crosstab View", "Views:Create");
         selectOptionByValue("rowField",  "DEMsex");
         selectOptionByValue("colField", "DEMsexor");
         selectOptionByValue("statField", "SequenceNum");
@@ -225,7 +225,7 @@ public class ReportTest extends StudyBaseTest
         // create new external report
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("DEM-1: Demographics");
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", "Views:Create:Advanced View");
+        clickMenuButton("Views", "Views:Create:Advanced View", "Views:Create");
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
@@ -340,7 +340,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
+        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
 
         log("Execute bad scripts");
         clickNavButton("Execute Script");
@@ -387,7 +387,7 @@ public class ReportTest extends StudyBaseTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
+        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
         setFormElement(Locator.id("script"), "labkey.data");
         clickNavButton("Execute Script");
         assertTextNotPresent(R_REMCOL);
@@ -416,7 +416,7 @@ public class ReportTest extends StudyBaseTest
         popLocation();
 
         log("Create second R script");
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
+        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
             if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
@@ -489,7 +489,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_R_MENU);
+        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
@@ -618,7 +618,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_CHART_MENU);
+        clickMenuButton("Views", CREATE_CHART_MENU, "Views:Create");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
@@ -632,7 +632,7 @@ public class ReportTest extends StudyBaseTest
         waitForElement(Locator.navButton("Views"), 5000);
 
         clickMenuButton("Views", "Views:default");
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_CHART_MENU);
+        clickMenuButton("Views", CREATE_CHART_MENU, "Views:Create");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
 
         // create a non-participant chart

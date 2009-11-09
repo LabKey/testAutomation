@@ -181,7 +181,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // edit snapshot then delete
         log("edit the snapshot");
-        ExtHelper.clickMenuButton(this, "Views", null, EDIT_SNAPSHOT_MENU);
+        clickMenuButton("Views", EDIT_SNAPSHOT_MENU);
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickNavButton("Save");
         assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
@@ -190,7 +190,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
-        ExtHelper.clickMenuButton(this, "Views", null, EDIT_SNAPSHOT_MENU);
+        clickMenuButton("Views", EDIT_SNAPSHOT_MENU);
         clickNavButton("Delete Snapshot");
         selenium.getConfirmation();
 
@@ -246,7 +246,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic, String keyField, int index)
     {
-        ExtHelper.clickMenuButton(this, "Views", "Views:Create", CREATE_SNAPSHOT_MENU);
+        clickMenuButton("Views", CREATE_SNAPSHOT_MENU, "Views:Create");
 
         setFormElement("snapshotName", snapshotName);
         if (autoUpdate)

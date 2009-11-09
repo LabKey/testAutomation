@@ -180,7 +180,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         assertTextPresent("6.57E-4");
         assertTextPresent("dm+4 1");
 
-        ExtHelper.clickMenuButton(this, "Views", null, Z_AVE_GRAPH);
+        clickMenuButton("Views", Z_AVE_GRAPH);
     }
 
     private boolean isMaterialPopupVisible()

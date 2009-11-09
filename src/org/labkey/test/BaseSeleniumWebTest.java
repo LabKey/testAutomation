@@ -2447,11 +2447,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
-     * Clicks the ext menu item specified by the ext object id
+     * Clicks the ext menu item and optional submenu id's (for cascading menus)
      */
-    public void clickMenuButton(String buttonName, String extId)
+    public void clickMenuButton(String buttonName, String extId, String ... subMenusIds)
     {
-        ExtHelper.clickMenuButton(this, buttonName, null, extId);
+        ExtHelper.clickMenuButton(this, buttonName, extId, subMenusIds);
     }
 
     public void dataRegionPageFirst(String dataRegionName)

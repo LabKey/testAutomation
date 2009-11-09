@@ -28,19 +28,22 @@ public class ExtHelper
     /**
      * Clicks the ext menu item from the submenu specified by the ext object id
      */
-    public static void clickMenuButton(BaseSeleniumWebTest test, String buttonName, String subMenuId, String itemId)
+    public static void clickMenuButton(BaseSeleniumWebTest test, String buttonName, String itemId, String ... subMenuIds)
     {
         test.clickNavButton(buttonName, 0);
         // allow the DOM to be updated
         test.sleep(1000);
-        if (subMenuId != null)
+        if (subMenuIds != null)
         {
-            String id = ExtHelper.getExtElementId(test, subMenuId);
-            if (id != null)
+            for (String id : subMenuIds)
             {
-                // render the submenu
-                test.getWrapper().mouseOver("//a[@id='" + id + "']");
-                test.sleep(1000);
+                String elementId = ExtHelper.getExtElementId(test, id);
+                if (elementId != null)
+                {
+                    // render the submenu
+                    test.getWrapper().mouseOver("//a[@id='" + elementId + "']");
+                    test.sleep(1000);
+                }
             }
         }
         String menuItemId = ExtHelper.getExtElementId(test, itemId);

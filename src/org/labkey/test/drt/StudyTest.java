@@ -15,6 +15,7 @@
  */
 package org.labkey.test.drt;
 
+import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 
 import java.io.File;
@@ -40,7 +41,13 @@ public class StudyTest extends StudyBaseTest
 
     private SpecimenImporter _specimenImporter;
 
-
+    // specimen comment constants
+    private static final String PARTICIPANT_CMT_DATASET = "Participant Comments";
+    private static final String PARTICIPANT_VISIT_CMT_DATASET = "Participant Visit Comments";
+    private static final String COMMENT_FIELD_NAME = "comment";
+    private static final String PARTICIPANT_COMMENT_LABEL = "participant comment";
+    private static final String PARTICIPANT_VISIT_COMMENT_LABEL = "participant visit comment";
+    
     protected void doCreateSteps()
     {
         importStudy();
@@ -55,6 +62,7 @@ public class StudyTest extends StudyBaseTest
         verifyStudyAndDatasets();
         waitForSpecimenImport();
         verifySpecimens();
+        verifyParticipantComments();
     }
 
     protected void startSpecimenImport(int completeJobsExpected)
@@ -163,6 +171,111 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("return to vial view");
         assertTextNotPresent("AAA07XK5-02");
         assertTextPresent("KBH00S5S-01");
+    }
+
+    private void verifyParticipantComments()
+    {
+        log("creating the participant/visit comment dataset");
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Create New Dataset");
+
+        setFormElement("typeName", PARTICIPANT_CMT_DATASET);
+        clickNavButton("Next");
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+
+        // set the demographic data checkbox
+        checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
+
+        // add a comment field
+        setFormElement(Locator.id("ff_name" + 0),  COMMENT_FIELD_NAME);
+        setFormElement(Locator.id("ff_label" + 0), PARTICIPANT_COMMENT_LABEL);
+        selectOptionByText("ff_type" + 0, "Multi-Line Text");
+        clickNavButton("Save");
+
+        log("creating the participant/visit comment dataset");
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Create New Dataset");
+
+        setFormElement("typeName", PARTICIPANT_VISIT_CMT_DATASET);
+        clickNavButton("Next");
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+
+        // add a comment field
+        setFormElement(Locator.id("ff_name" + 0),  COMMENT_FIELD_NAME);
+        setFormElement(Locator.id("ff_label" + 0), PARTICIPANT_VISIT_COMMENT_LABEL);
+        selectOptionByText("ff_type" + 0, "Multi-Line Text");
+        clickNavButton("Save");
+
+        log("configure comments");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Comments");
+        assertTextPresent("Comments can only be configured for studies with editable datasets");
+        
+        log("configure editable datasets");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Security");
+        selectOptionByText("securityString", "Basic security with editable datasets");
+        waitForPageToLoad();
+        clickNavButton("Update");
+        
+        log("configure comments");
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Comments");
+
+        selectOptionByText("participantCommentDataSetId", PARTICIPANT_CMT_DATASET);
+        waitForPageToLoad();
+        selectOptionByText("participantCommentProperty", PARTICIPANT_COMMENT_LABEL);
+
+        selectOptionByText("participantVisitCommentDataSetId", PARTICIPANT_VISIT_CMT_DATASET);
+        waitForPageToLoad();
+        selectOptionByText("participantVisitCommentProperty", PARTICIPANT_VISIT_COMMENT_LABEL);
+        clickNavButton("Save");
+
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Blood (Whole)");
+        clickNavButton("Enable Comments/QC");
+        log("manage participant comments directly");
+        clickMenuButton("Comments and QC", "Comments:SetParticipant");
+
+        clickNavButton("Insert New");
+        setFormElement("quf_participantid", "999320812");
+        setFormElement("quf_" + COMMENT_FIELD_NAME, "Participant Comment");
+        clickNavButton("Submit");
+
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Blood (Whole)");
+        setFilter("SpecimenDetail", "ParticipantId", "Equals", "999320812");
+
+        assertTextPresent("Participant Comment");
+        clearAllFilters("SpecimenDetail", "ParticipantId");
+
+        log("verify copying and moving vial comments");
+        setFilter("SpecimenDetail", "GlobalUniqueId", "Equals", "AAA07XK5-01");
+        selenium.click(".toggle");
+        clickNavButton("Enable Comments/QC");
+        clickMenuButton("Comments and QC", "Comments:Set");
+        setFormElement("comments", "Vial Comment");
+        clickNavButton("Save Changes");
+
+        selenium.click(".toggle");
+        clickMenuButton("Comments and QC", "Comments:Set");
+        clickMenuButton("Copy or Move Comment(s)", "CopyPtid:999320812", "Comment:Copy", "Copy:ToParticipant");
+        setFormElement("quf_" + COMMENT_FIELD_NAME, "Copied PTID Comment");
+        clickNavButton("Submit");
+        assertTextPresent("Copied PTID Comment");
+
+        selenium.click(".toggle");
+        clickMenuButton("Comments and QC", "Comments:Set");
+        clickMenuButton("Copy or Move Comment(s)", "MovePtid:999320812", "Comment:Move", "Move:ToParticipant");
+        selenium.getConfirmation();
+        setFormElement("quf_" + COMMENT_FIELD_NAME, "Moved PTID Comment");
+        clickNavButton("Submit");
+        assertTextPresent("Moved PTID Comment");
+        assertTextNotPresent("Participant Comment");
+        assertTextNotPresent("Vial Comment");
     }
 
     private void verifyDemographics()
