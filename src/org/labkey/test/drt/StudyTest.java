@@ -211,20 +211,20 @@ public class StudyTest extends StudyBaseTest
         log("configure comments");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Comments");
-        assertTextPresent("Comments can only be configured for studies with editable datasets");
-        
-        log("configure editable datasets");
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Security");
-        selectOptionByText("securityString", "Basic security with editable datasets");
-        waitForPageToLoad();
-        clickNavButton("Update");
-        
-        log("configure comments");
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Comments");
+        if (isTextPresent("Comments can only be configured for studies with editable datasets"))
+        {
+            log("configure editable datasets");
+            clickLinkWithText("Manage Study");
+            clickLinkWithText("Manage Security");
+            selectOptionByText("securityString", "Basic security with editable datasets");
+            waitForPageToLoad();
+            clickNavButton("Update");
 
+            log("configure comments");
+            clickLinkWithText(getStudyLabel());
+            clickLinkWithText("Manage Study");
+            clickLinkWithText("Manage Comments");
+        }
         selectOptionByText("participantCommentDataSetId", PARTICIPANT_CMT_DATASET);
         waitForPageToLoad();
         selectOptionByText("participantCommentProperty", PARTICIPANT_COMMENT_LABEL);
