@@ -319,9 +319,8 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Add List");
         ListHelper.createList(this, PROJECT_NAME2, LIST3_NAME, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
-        assertTextPresent("<AUTO> (Wealth)");
+        assertTextPresent("<AUTO> (Owner)");
         clickLinkWithText("edit design");
-        selectOptionByText("ff_titleColumn", "Owner");    // Explicitly set to the PK (auto title will pick wealth column)
         clickButton("Update", defaultWaitForPage);
         assertTextPresent("Owner", 5);  // Title plus two "Owners" and two "Owner"
 
@@ -463,12 +462,13 @@ public class ListTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
         clickLinkWithText("edit fields");
+        waitForElement(Locator.navButton("Save"), WAIT_FOR_GWT);
         setFormElement(Locator.id("ff_name0"), "FooFoo");
         clickNavButton("Save");
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
         clickLinkWithText("edit fields");
-        waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+        waitForElement(Locator.id("button_Add Field"), WAIT_FOR_GWT);
         clickNavButton("Add Field", 0);
         setFormElement(Locator.id("ff_name1"), "BarBar");
         clickNavButton("Save");
@@ -541,12 +541,12 @@ public class ListTest extends BaseSeleniumWebTest
             tab = "\t";
         }
         tab = "\n";
-        for (int row=0 ; row<data.length; row++)
+        for (String[] row : data)
         {
-            for (int col=0 ; col<data[row].length ; col++)
+            for (String cell : row)
             {
                 sb.append(tab);
-                sb.append(data[row][col]);
+                sb.append(cell);
                 tab = "\t";
             }
             tab = "\n";

@@ -22,9 +22,11 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.Maps;
 import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.CommandException;
 
 import java.util.Map;
 import java.util.Arrays;
+import java.util.Date;
 
 /*
 * User: Dave
@@ -64,12 +66,12 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
     private void doTestSchemas() throws Exception
     {
-        log("Testing schemas in modules...");
+        log("** Testing schemas in modules...");
         beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
 
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
-        log("Inserting new Manufacturers via java client api...");
+        log("** Inserting new Manufacturers via java client api...");
         InsertRowsCommand insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.<String, Object>of("Name", "Ford"),
@@ -98,7 +100,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         }
         assertTrue("Expected rowids for all Manufacturers", fordId != null && toyotaId != null && hondaId != null);
 
-        log("Inserting new Models via javas client api...");
+        log("** Inserting new Models via javas client api...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.<String, Object>of("ManufacturerId", toyotaId,
@@ -113,7 +115,22 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         insertResp = insertCmd.execute(cn, PROJECT_NAME);
         assertEquals("Expected to insert 4 rows.", 4, insertResp.getRowsAffected().intValue());
 
-        log("Testing vehicle.Model url link...");
+        Long priusId = null;
+        Long f150Id = null;
+
+        for (Map<String, Object> row : insertResp.getRows())
+        {
+            Long rowId = (Long)row.get("RowId");
+            String name = (String)row.get("Name");
+            if (name.equalsIgnoreCase("Prius"))
+                priusId = rowId;
+            else if (name.equalsIgnoreCase("F150"))
+                f150Id = rowId;
+        }
+        assertNotNull(priusId);
+        assertNotNull(f150Id);
+
+        log("** Testing vehicle.Model url link...");
         beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickLinkWithText("Prius");
@@ -122,33 +139,113 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         int rowid = Integer.parseInt(rowidStr);
         assertTrue("Expected rowid on model.html page", rowid > 0);
 
-        log("Testing query of vehicle schema...");
+        log("** Testing query of vehicle schema...");
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Toyotas");
 
         assertTextPresent("Prius");
         assertTextPresent("Camry");
 
-        log("Selecting all Models");
-        SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Models");
+        log("** Inserting colors...");
+        insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
+        insertCmd.getRows().addAll(Arrays.asList(
+                Maps.<String, Object>of("Name", "Red", "Hex", "FF0000"),
+                Maps.<String, Object>of("Name", "Green", "Hex", "00FF00"),
+                Maps.<String, Object>of("Name", "Blue", "Hex", "0000FF")
+        ));
+        insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
+
+        log("** Inserting vechicles...");
+        insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        insertCmd.getRows().addAll(Arrays.asList(
+                Maps.<String, Object>of(
+                        "ModelId", priusId,
+                        "Color", "Green",
+                        "ModelYear", Integer.valueOf(2000),
+                        "Milage", Integer.valueOf(3),
+                        "LastService", new Date(2009, 9, 9)
+                ),
+                Maps.<String, Object>of(
+                        "ModelId", f150Id,
+                        "Color", "Red",
+                        "ModelYear", Integer.valueOf(2001),
+                        "Milage", Integer.valueOf(4),
+                        "LastService", new Date(2009, 11, 9)
+                )
+        ));
+        insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
+
+        Long[] vehicleIds = new Long[2];
+        vehicleIds[0] = (Long)(insertResp.getRows().get(0).get("RowId"));
+        vehicleIds[1] = (Long)(insertResp.getRows().get(1).get("RowId"));
+
+        log("** Trying to update Vehicle from wrong container...");
+        UpdateRowsCommand updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        updateCmd.getRows().addAll(Arrays.asList(
+                Maps.<String, Object>of(
+                        "RowId", vehicleIds[1],
+                        "Milage", Integer.valueOf(4),
+                        "LastService", new Date(2009, 9, 10)
+                )
+        ));
+        try
+        {
+            SaveRowsResponse updateRows = updateCmd.execute(cn, "Home");
+            fail("Expected to throw CommandException");
+        }
+        catch (CommandException ex)
+        {
+            assertEquals("The row is from the wrong container.", ex.getMessage());
+        }
+
+        log("** Updating vehicles...");
+        SaveRowsResponse updateRows = updateCmd.execute(cn, PROJECT_NAME);
+        assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
+        assertEquals(4, ((Number)(updateRows.getRows().get(0).get("Milage"))).intValue());
+
+        SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
         assertTrue("Expected to select >0 rows.", selectResp.getRowCount().intValue() > 0);
 
-        log("Deleting all Models");
-        DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Models");
+        DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         deleteCmd.setRows(selectResp.getRows());
-        SaveRowsResponse deleteResp = deleteCmd.execute(cn, PROJECT_NAME);
-        assertEquals("Expected to delete all rows", selectResp.getRowCount().intValue(), deleteResp.getRowsAffected().intValue());
-        assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, PROJECT_NAME).getRowCount().intValue());
+        try
+        {
+            log("** Trying to delete Vehicles from a different container");
+            SaveRowsResponse deleteResp = deleteCmd.execute(cn, "Home");
+            fail("Expected to throw CommandException");
+        }
+        catch (CommandException ex)
+        {
+            assertEquals("The row is from the wrong container.", ex.getMessage());
+        }
+    }
 
-        log("Deleting all Manufacturers");
-        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
+    private void cleanupSchema(Connection cn) throws Exception
+    {
+        cleanupTable(cn, "Vehicles");
+        cleanupTable(cn, "Models");
+        cleanupTable(cn, "Manufacturers");
+        cleanupTable(cn, "Colors");
+    }
+
+    private void cleanupTable(Connection cn, String tableName) throws Exception
+    {
+        log("** Deleting all " + tableName);
+        SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, tableName);
         selectCmd.setMaxRows(-1);
-        deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
-        deleteCmd.setRows(selectCmd.execute(cn, PROJECT_NAME).getRows());
-        deleteCmd.execute(cn, PROJECT_NAME);
-        assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, PROJECT_NAME).getRowCount().intValue());
+        SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
+
+        if (selectResp.getRowCount().intValue() > 0)
+        {
+            DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, tableName);
+            deleteCmd.setRows(selectResp.getRows());
+            deleteCmd.execute(cn, PROJECT_NAME);
+            assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, PROJECT_NAME).getRowCount().intValue());
+        }
     }
 
     private void doTestViews()
@@ -253,6 +350,9 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        cleanupSchema(cn);
+
         try
         {
             deleteProject(PROJECT_NAME);

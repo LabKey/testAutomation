@@ -21,13 +21,16 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.CommandException;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.io.IOException;
 
 /**
  * User: kevink
@@ -36,6 +39,8 @@ import java.text.ParseException;
 public class DbUserSchemaTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "DbUserSchemaProject";
+    private static final String FOLDER_NAME = "SubFolder";
+
     private static final String DB_SCHEMA_NAME = "test";
     private static final String USER_SCHEMA_NAME = "Test";
     private static final String TABLE_NAME = "testtable";
@@ -129,13 +134,17 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         assertEquals(row1.text, row2.text);
     }
 
-    void ensureDbUserSchema()
+    void createProject()
     {
         log("** Create project: " + PROJECT_NAME);
         createProject(PROJECT_NAME);
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
+    }
 
+    void ensureDbUserSchema(String containerPath)
+    {
         log("** Create DbUserSchema: " + USER_SCHEMA_NAME);
-        beginAt("/query/" + PROJECT_NAME + "/begin.view");
+        beginAt("/query/" + containerPath + "/begin.view");
         clickExtToolbarButton("Define External Schemas");
         if (!isTextPresent("reload"))
         {
@@ -147,9 +156,9 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         }
     }
 
-    void setEditable(boolean editable)
+    void setEditable(String containerPath, boolean editable)
     {
-        beginAt("/query/" + PROJECT_NAME + "/admin.view");
+        beginAt("/query/" + containerPath + "/admin.view");
         clickLinkWithText("edit");
         if (editable)
             checkCheckbox("editable");
@@ -170,12 +179,18 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws Exception
     {
-        ensureDbUserSchema();
+        createProject();
+        ensureDbUserSchema(PROJECT_NAME);
+        doTestContainer();
 
-        setEditable(false);
+        setEditable(PROJECT_NAME, false);
         doTestUneditable();
 
-        setEditable(true);
+        // set up an additional db user schema in the sub-folder so we can check container perms
+        ensureDbUserSchema(PROJECT_NAME + "/" + FOLDER_NAME);
+        setEditable(PROJECT_NAME, true);
+        setEditable(PROJECT_NAME + "/" + FOLDER_NAME, true);
+
         doTestViaForm();
         doTestViaJavaApi();
     }
@@ -183,12 +198,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     void doTestUneditable() throws Exception
     {
         log("** Trying to insert via form on uneditable external schema");
-        beginAt("/dbuserschema/" + PROJECT_NAME + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
-        setFormElement("quf_Text", "Haha!");
-        setFormElement("quf_IntNotNull", String.valueOf(3));
-        setFormElement("quf_DatetimeNotNull", "2008-09-25");
-        submit();
-        assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
+        insertViaFormNoPerms(PROJECT_NAME, "Haha!", 3);
 
         log("** Trying to insert via api on uneditable external schema");
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
@@ -208,43 +218,89 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         }
 
     }
-    
-    void doTestViaForm()
+
+    void doTestContainer()
     {
-        int pk1 = insertViaForm("A", 3);
-        int pk2 = insertViaForm("B", 4);
+        log("** Trying to visit schema in container where it hasn't been configured");
+        beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        assertTitleEquals("404: Error Page -- Could not find schema: Test");
+    }
+    
+    void doTestViaForm() throws Exception
+    {
+        String containerPath = StringUtils.join(Arrays.asList(PROJECT_NAME, FOLDER_NAME), "/");
 
-        updateViaForm(pk1, "AA", 30);
-        updateViaForm(pk2, "BB", 40);
+        log("** Insert via form");
+        int pk1 = insertViaForm(containerPath, "A", 3);
+        int pk2 = insertViaForm(containerPath, "B", 4);
 
-        deleteViaForm(new int[] { pk1, pk2});
+        log("** Update via form");
+        updateViaForm(containerPath, pk1, "AA", 30);
+        updateViaForm(containerPath, pk2, "BB", 40);
+
+        // XXX: update form doesn't render correctly for mis-matched container
+//        log("** Trying to update via form from a different container");
+//        updateViaFormNoPerms(PROJECT_NAME, pk1, "Haha!", 3);
+
+        log("** Trying to delete via form from a different container");
+        deleteViaFormNoPerms(PROJECT_NAME, new int[] { pk1 });
+
+        log("** Delete via form");
+        deleteViaForm(containerPath, new int[] { pk1, pk2});
     }
     
     void doTestViaJavaApi() throws Exception
     {
+        String containerPath = StringUtils.join(Arrays.asList(PROJECT_NAME, FOLDER_NAME), "/");
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
+        log("** Insert via api");
         Row[] inserted = new Row[] { Row("A", 3), Row("B", 4) };
-        int[] pks = insertViaJavaApi(cn, inserted);
+        int[] pks = insertViaJavaApi(containerPath, cn, inserted);
         
-        Row[] selected = selectViaJavaApi(cn, pks);
+        log("** Select via api");
+        Row[] selected = selectViaJavaApi(containerPath, cn, pks);
         for (int i = 0; i < inserted.length; i++)
             assertEquals(inserted[i], selected[i]);
         
+        log("** Update via api");
         Row[] updated = new Row[] { Row(pks[0], "AA", 30), Row(pks[1], "BB", 40) };
-        updateViaJavaApi(cn, updated);
+        updateViaJavaApi(containerPath, cn, updated);
+
+        try
+        {
+            log("** Try to update via api from a different container");
+            Row[] updateFail = new Row[] { Row(pks[0], "Should not update", 300) };
+            updateViaJavaApi(PROJECT_NAME, cn, updateFail);
+            fail("expected exception when trying to update from another container");
+        }
+        catch (Exception ex)
+        {
+            assertEquals("The row is from the wrong container.", ex.getMessage());
+        }
         
-        deleteViaJavaApi(cn, pks);
+        try
+        {
+            log("** Try to delete via api from a different container");
+            deleteViaJavaApi(PROJECT_NAME, cn, pks);
+            fail("expected exception when trying to delete from another container");
+        }
+        catch (Exception ex)
+        {
+            assertEquals("The row is from the wrong container.", ex.getMessage());
+        }
+        
+        deleteViaJavaApi(containerPath, cn, pks);
     }
     
-    int[] insertViaJavaApi(Connection cn, Row... rows) throws Exception
+    int[] insertViaJavaApi(String containerPath, Connection cn, Row... rows) throws Exception
     {
         log("** Inserting via api...");
         InsertRowsCommand cmd = new InsertRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Row row : rows)
             cmd.addRow(row.toMap());
         
-        SaveRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
+        SaveRowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to insert " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
         
         int[] pks = new int[rows.length];
@@ -258,12 +314,12 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         return pks;
     }
     
-    Row[] selectViaJavaApi(Connection cn, int... pks) throws Exception
+    Row[] selectViaJavaApi(String containerPath, Connection cn, int... pks) throws Exception
     {
         log("** Select via api: " + join(",", pks) + "...");
         SelectRowsCommand cmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         cmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
-        SelectRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
+        SelectRowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expectd to select " + pks.length + " rows", pks.length, resp.getRowCount().intValue());
 
         List<Row> rows = new ArrayList<Row>(pks.length);
@@ -282,13 +338,13 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         return rows.toArray(new Row[rows.size()]);
     }
     
-    Row[] updateViaJavaApi(Connection cn, Row... rows) throws Exception
+    Row[] updateViaJavaApi(String containerPath, Connection cn, Row... rows) throws Exception
     {
         log("** Updating via api...");
         UpdateRowsCommand cmd = new UpdateRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Row row : rows)
             cmd.addRow(row.toMap());
-        SaveRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
+        SaveRowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expectd to update " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
 
         Row[] updated = new Row[rows.length];
@@ -301,19 +357,19 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         return updated;
     }
     
-    void deleteViaJavaApi(Connection cn, int... pks) throws Exception
+    void deleteViaJavaApi(String containerPath, Connection cn, int... pks) throws Exception
     {
         log("** Deleting via api: pks=" + join(",", pks) + "...");
         DeleteRowsCommand cmd = new DeleteRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Integer pk : pks)
             cmd.addRow(Collections.singletonMap("RowId", (Object) pk));
         
-        SaveRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
+        SaveRowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expectd to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
         
         SelectRowsCommand selectCmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         selectCmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
-        SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
+        SelectRowsResponse selectResp = selectCmd.execute(cn, containerPath);
         assertEquals("Expected to select 0 rows", 0, selectResp.getRowCount().intValue());
     }
 
@@ -325,18 +381,29 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             buf.append(sep).append(pks[i]);
         return buf.toString();
     }
-    
-    public int insertViaForm(String text, int intNotNull)
+
+    private void _insertViaForm(String containerPath, String text, int intNotNull)
     {
         log("** Inserting via form: text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/dbuserschema/" + PROJECT_NAME + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        beginAt("/dbuserschema/" + containerPath + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
         setFormElement("quf_Text", text);
         setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
         setFormElement("quf_DatetimeNotNull", "2008-09-25");
         submit();
+    }
+
+    public void insertViaFormNoPerms(String containerPath, String text, int intNotNull)
+    {
+        _insertViaForm(containerPath, text, intNotNull);
+        assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
+    }
+
+    public int insertViaForm(String containerPath, String text, int intNotNull)
+    {
+        _insertViaForm(containerPath, text, intNotNull);
 
         // assume no errors if we end up back on the grid view
-        assertTitleEquals(TABLE_NAME + ": /" + PROJECT_NAME);
+        assertTitleEquals(TABLE_NAME + ": /" + containerPath);
 
         DataRegionTable table = new DataRegionTable("query", this);
         table.setSort("RowId", SortDirection.DESC);
@@ -353,17 +420,28 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         return Integer.parseInt(rowidStr);
     }
 
-    public void updateViaForm(int pk, String text, int intNotNull)
+    private void _updateViaForm(String containerPath, int pk, String text, int intNotNull)
     {
         log("** Updating via form: pk=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/dbuserschema/" + PROJECT_NAME + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&pk=" + pk);
+        beginAt("/dbuserschema/" + containerPath + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&pk=" + pk);
         setFormElement("quf_Text", text);
         setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
         setFormElement("quf_DatetimeNotNull", "2008-09-25");
         submit();
+    }
+
+    public void updateViaFormNoPerms(String containerPath, int pk, String text, int intNotNull) throws IOException
+    {
+        _updateViaForm(containerPath, pk, text, intNotNull);
+        assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
+    }
+
+    public void updateViaForm(String containerPath, int pk, String text, int intNotNull)
+    {
+        _updateViaForm(containerPath, pk, text, intNotNull);
 
         // assume no errors if we end up back on the grid view
-        assertTitleEquals(TABLE_NAME + ": /" + PROJECT_NAME);
+        assertTitleEquals(TABLE_NAME + ": /" + containerPath);
 
         DataRegionTable table = new DataRegionTable("query", this);
         int row = table.getRow(String.valueOf(pk));
@@ -375,19 +453,34 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
                 String.valueOf(intNotNull), table.getDataAsText(row, table.getColumn("IntNotNull")));
     }
 
-    public void deleteViaForm(int[] pk)
+    private void _deleteViaForm(String containerPath, int[] pk, boolean showSubFolders)
     {
         log("** Deleting via form: pks=" + join(",", pk) + "...");
-        beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        beginAt("/query/" + containerPath + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+
+        if (showSubFolders)
+            ExtHelper.clickMenuButton(this, "Views", "Views:Folder Filter", "Views:Folder Filter:Current folder and subfolders");
+
         for (int aPk : pk)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
         assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
         waitForPageToLoad();
+    }
+
+    public void deleteViaFormNoPerms(String containerPath, int[] pk)
+    {
+        _deleteViaForm(containerPath, pk, true);
+        assertTextPresent("The row is from the wrong container.");
+    }
+
+    public void deleteViaForm(String containerPath, int[] pk)
+    {
+        _deleteViaForm(containerPath, pk, false);
 
         // assume no errors if we end up back on the grid view
-        assertTitleEquals(TABLE_NAME + ": /" + PROJECT_NAME);
+        assertTitleEquals(TABLE_NAME + ": /" + containerPath);
 
         DataRegionTable table = new DataRegionTable("query", this);
         for (int aPk : pk)
