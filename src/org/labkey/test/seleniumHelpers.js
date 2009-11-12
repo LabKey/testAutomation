@@ -57,9 +57,13 @@ selenium.getExtElementId = function (id) {
     var ext = selenium.browserbot.getCurrentWindow().Ext;
     //if (!ext) return false;
     var cmp = ext.getCmp(id);
-    if (!cmp) return null;
-
-    return cmp.getEl().id;
+    if (cmp)
+    {
+        var el = cmp.getEl();
+        if (el)
+            return el.id;
+    }
+    return null;
 };
 
 // firefox error console listener

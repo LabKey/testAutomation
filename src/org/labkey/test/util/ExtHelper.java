@@ -57,10 +57,17 @@ public class ExtHelper
      */
     public static String getExtElementId(BaseSeleniumWebTest test, String extId)
     {
-        String id = test.getWrapper().getEval("selenium.getExtElementId('" + extId + "');");
-        test.log("Element id for ext component id: " + extId + " is: " + id);
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            String id = test.getWrapper().getEval("selenium.getExtElementId('" + extId + "');");
+            test.log("Element id for ext component id: " + extId + " is: " + id);
+            if (id != null)
+                return id;
+            test.sleep(500);
+        }
 
-        return id;
+        test.fail("Failed to get element id for Ext component '" + extId + "'");
+        return null;
     }
 
     public static void waitForExtDialog(BaseSeleniumWebTest test, int timeout)
