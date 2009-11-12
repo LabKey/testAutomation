@@ -1268,13 +1268,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Deleting project " + project);
         clickLinkWithText(project);
-        ensureAdminMode();
         //Delete even if terms of use is required
         if (isElementPresent(Locator.name("approvedTermsOfUse")))
         {
             clickCheckbox("approvedTermsOfUse");
             clickNavButton("Agree");
         }
+        ensureAdminMode();
 
         clickLinkWithText("Folders");
         clickNavButton("Delete");
