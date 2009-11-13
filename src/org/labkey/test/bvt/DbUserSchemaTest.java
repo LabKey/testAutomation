@@ -459,7 +459,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         beginAt("/query/" + containerPath + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
 
         if (showSubFolders)
-            ExtHelper.clickMenuButton(this, "Views", "Views:Folder Filter", "Views:Folder Filter:Current folder and subfolders");
+            ExtHelper.clickMenuButton(this, "Views", "Views:Folder Filter:Current folder and subfolders", "Views:Folder Filter");
 
         for (int aPk : pk)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
