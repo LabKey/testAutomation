@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.lang.Math;
 
 /**
  * User: Mark Igra
@@ -70,6 +71,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     private static boolean _checkedLeaksAndErrors = false;
+    private static final String ACTION_SUMMARY_TABLE_NAME = "springActions";
 
     public BaseSeleniumWebTest()
     {
@@ -759,6 +761,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             checkLeaksAndErrors();
 
+            checkActionCoverage();
+
             if (enableLinkCheck())
             {
 				boolean injectTest = enableInjectCheck();
@@ -923,6 +927,61 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
+    private void checkActionCoverage()
+    {
+        int rowCount, coveredActions, totalActions;
+        Double actionCoveragePercent;
+        String actionCoveragePercentString;
+        beginAt("/admin/actions.view");
+
+        rowCount = getTableRowCount(ACTION_SUMMARY_TABLE_NAME);
+        if (getTableCellText(ACTION_SUMMARY_TABLE_NAME, rowCount - 1, 0).equals("Total"))
+        {
+            totalActions = Integer.parseInt(getTableCellText(ACTION_SUMMARY_TABLE_NAME, rowCount - 1, 1));
+            coveredActions = Integer.parseInt(getTableCellText(ACTION_SUMMARY_TABLE_NAME, rowCount - 1, 2));
+            actionCoveragePercentString = getTableCellText(ACTION_SUMMARY_TABLE_NAME, rowCount - 1, 3);
+            actionCoveragePercent =  Double.parseDouble(actionCoveragePercentString.substring(0, actionCoveragePercentString.length() - 1 ));
+            writeActionStatistics(totalActions, coveredActions, actionCoveragePercent);
+        }
+
+        // Download full action coverage table and add to TeamCity artifacts.
+        beginAt("/admin/exportActions.view?asWebPage=true");
+        publishArtifact(saveTsv(Runner.getDumpDir(), "ActionCoverage"));
+    }
+
+    private void writeActionStatistics(int totalActions, int coveredActions, Double actionCoveragePercent)
+    {
+        // TODO: Create static class for managing teamcity-info.xml file.
+        FileWriter writer = null;
+        try
+        {
+            File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
+            xmlFile.createNewFile();
+            writer = new FileWriter(xmlFile);
+
+            writer.write("<build>\n");
+            writer.write("\t<statisticValue key=\"totalActions\" value=\"" + totalActions + "\"/>\n");
+            writer.write("\t<statisticValue key=\"coveredActions\" value=\"" + coveredActions + "\"/>\n");
+            writer.write("\t<statisticValue key=\"actionCoveragePercent\" value=\"" + actionCoveragePercent + "\"/>\n");
+            writer.write("</build>");
+        }
+        catch (IOException e)
+        {
+            return;
+        }
+        finally
+        {
+            if (writer != null)
+                try
+                {
+                    writer.close();
+                }
+                catch (IOException e)
+                {
+                }
+        }
+    }
+
     public void dump()
     {
         FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
@@ -992,6 +1051,33 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             writer = new FileWriter(htmlFile);
             writer.write(getLastPageText());
             return htmlFile;
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+        finally
+        {
+            if (writer != null)
+                try
+                {
+                    writer.close();
+                }
+                catch (IOException e)
+                {
+                }
+        }
+    }
+
+    public File saveTsv(File dir, String baseName)
+    {
+        FileWriter writer = null;
+        try
+        {
+            File tsvFile = new File(dir, baseName + ".tsv");
+            writer = new FileWriter(tsvFile);
+            writer.write(selenium.getBodyText());
+            return tsvFile;
         }
         catch (IOException e)
         {
@@ -1986,6 +2072,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public int getColumnIndex(String tableName, String columnTitle)
     {
+        assertTextPresent(columnTitle);
         for(int col = 0; col < 100; col++) // TODO: Find out how wide the table is.
         {
             if(getTableCellText(tableName, 0, col).equals(columnTitle))
@@ -2048,7 +2135,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         return selenium.getXpathCount("//table[@id='" + tableName + "']/thead").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
     }
-
+    
+//TODO: getTableColumnCount.
+    
     public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
     {
         clickAndWait(Locator.imageMapLinkByTitle(imageMapName, areaTitle), defaultWaitForPage);

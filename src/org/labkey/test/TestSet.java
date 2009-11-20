@@ -17,9 +17,7 @@
 package org.labkey.test;
 
 import org.labkey.test.bvt.*;
-import org.labkey.test.daily.FlowImportTest;
-import org.labkey.test.daily.IDRIParticleSizeTest;
-import org.labkey.test.daily.SCHARPStudyTest;
+import org.labkey.test.daily.*;
 import org.labkey.test.drt.*;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
@@ -152,6 +150,13 @@ public enum TestSet
 
     IDRI(new Class[] {
             IDRIParticleSizeTest.class
+    }),
+
+    BVTnDaily(BVT, Daily.tests),
+
+    Weekly(BVTnDaily, new Class[] {
+            // Add special test classes, not in daily or BVT.
+            //UniprotAnnotationTest.class, //requires bootstrap.  Long unused, probably needs updating.
     }),
 
     CONTINUE(new Class[] {})
