@@ -133,7 +133,7 @@ public abstract class AbstractAssayValidator
                 String[] parts = l.split("\t");
                 _runProperties.put(parts[0], parts[1]);
 
-                if (Props.runDataFile.name().equals(parts[0]))
+                if (Props.runDataFile.name().equals(parts[0]) && parts.length >= 4)
                 {
                     _transformFile.put(parts[1], parts[3]);
                 }
