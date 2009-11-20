@@ -1054,6 +1054,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (IOException e)
         {
+            e.printStackTrace();
             return null;
         }
         finally
@@ -1065,6 +1066,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
                 catch (IOException e)
                 {
+                    e.printStackTrace();
                 }
         }
     }
@@ -1081,6 +1083,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (IOException e)
         {
+            e.printStackTrace();
             return null;
         }
         finally
@@ -1092,6 +1095,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
                 catch (IOException e)
                 {
+                    e.printStackTrace();
                 }
         }
     }
