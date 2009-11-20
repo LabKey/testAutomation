@@ -307,6 +307,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "   msgSubject: '%s',\n" +
             "   msgRecipients: [%s],\n" +
             "   msgContent: [%s],\n" +
+            "   allowUnregisteredUser: '%s',\n" +
             "   successCallback: onSuccess,\n" +
             "   errorCallback: errorHandler,\n" +
             "});";
@@ -723,28 +724,30 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("Mail Record");
 
         // test failure cases: no from email
-        setSource(createEmailSource("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        setSource(createEmailSource("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
         assertTextPresent("failure");
 
         // no recipients
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
         assertTextPresent("failure");
 
         // no message body
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null, false));
         assertTextPresent("failure");
 
         // user not in system
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@testEmail.com"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@testEmail.com"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
         assertTextPresent("failure");
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@testEmail.com"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, true));
+        assertTextPresent("success");
 
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
         assertTextPresent("success");
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null, true));
         assertTextPresent("success");
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, false));
         assertTextPresent("success");
-        setSource(createEmailSource(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+        setSource(createEmailSource(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, true));
         assertTextPresent("success");
 
         clickLinkWithText(PROJECT_NAME);
@@ -759,7 +762,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         uncheckCheckbox("emailRecordOn");
     }
 
-    private String createEmailSource(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody)
+    private String createEmailSource(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody, boolean allowUnregisteredUser)
     {
         StringBuilder recipientStr = new StringBuilder();
         StringBuilder contentStr = new StringBuilder();
@@ -784,6 +787,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             contentStr.append(htmlTxtBody);
             contentStr.append("'),");
         }
-        return String.format(EMAIL_SRC_TEMPLATE, from, StringUtils.trimToEmpty(subject), recipientStr.toString(), contentStr.toString());
+        return String.format(EMAIL_SRC_TEMPLATE, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
+                contentStr.toString(), String.valueOf(allowUnregisteredUser));
     }
 }
