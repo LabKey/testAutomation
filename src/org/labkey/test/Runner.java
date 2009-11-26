@@ -653,7 +653,7 @@ public class Runner extends TestSuite
             {
                 frontLoadTestsOfModifiedModules(set.tests, changedFilesFile);
             }
-            if (testRecentlyFailed && !recentlyFailedTestsFile.isEmpty())
+            if (testRecentlyFailed && 0<recentlyFailedTestsFile.length())
             {
                 //put previously failed tests at the front of the test queue (determined by TeamCity).
                 Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile), set.tests);
