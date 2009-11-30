@@ -43,7 +43,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
             "  <note label=\"pipeline prophet, min protein probability\" type=\"input\">0</note> \n" +
             "  <note label=\"spectrum, minimum peaks\" type=\"input\">10</note> \n" +
             "  <note label=\"mzxml2search, charge\" type=\"input\">1,3</note> \n" +
-        "  </bioml>";
+        "</bioml>";
     protected static final int MAX_WAIT_SECONDS = 60*5;
 
     protected final String _pipelinePath = getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
