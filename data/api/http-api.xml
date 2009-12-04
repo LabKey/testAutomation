@@ -44,23 +44,39 @@
     "fields": [
         {
             "mvEnabled": false,
+            "hidden": false,
             "name": "Color",
-            "type": "string"
+            "type": "string",
+            "shownInUpdateView": true,
+            "shownInDetailsView": true,
+            "shownInInsertView": true
         },
         {
             "mvEnabled": false,
+            "hidden": false,
             "name": "Like",
-            "type": "string"
+            "type": "string",
+            "shownInUpdateView": true,
+            "shownInDetailsView": true,
+            "shownInInsertView": true
         },
         {
             "mvEnabled": false,
+            "hidden": false,
             "name": "Month",
-            "type": "date"
+            "type": "date",
+            "shownInUpdateView": true,
+            "shownInDetailsView": true,
+            "shownInInsertView": true
         },
         {
             "mvEnabled": false,
+            "hidden": false,
             "name": "Good",
-            "type": "int"
+            "type": "int",
+            "shownInUpdateView": true,
+            "shownInDetailsView": true,
+            "shownInInsertView": true
         }
     ]
 },
