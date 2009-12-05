@@ -38,6 +38,7 @@ public class Crawler
             new ControllerActionId("admin", "defineWebThemes"),
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "setAdminMode"),
+            new ControllerActionId("admin", "dumpHeap"),
             new ControllerActionId("Experiment", "showFile"),
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("login", "logout"),
