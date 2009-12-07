@@ -774,14 +774,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 					resetErrors();
             }
 
+
             _testFailed = false;
 
             try
             {
                 if (!skipCleanup())
+                {
+                    goToHome();
                     doCleanup();
+                }
                 else
+                {
                     log("Skipping test cleanup as requested.");
+                }
             }
             catch (Throwable t)
             {
