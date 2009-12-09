@@ -18,9 +18,8 @@ package org.labkey.dumbster;
 
 import org.apache.log4j.Logger;
 import org.labkey.api.action.*;
-import org.labkey.api.security.ACL;
-import org.labkey.api.security.RequiresPermission;
 import org.labkey.api.security.RequiresPermissionClass;
+import org.labkey.api.security.permissions.*;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.settings.WriteableAppProps;
@@ -65,7 +64,7 @@ public class DumbsterController extends SpringActionController
         }
     }
 
-    @RequiresPermission(ACL.PERM_ADMIN)
+    @RequiresPermissionClass(AdminPermission.class)
     public class SetRecordEmailAction extends ApiAction<RecordEmailForm>
     {
         public ApiResponse execute(RecordEmailForm form, BindException errors) throws Exception
