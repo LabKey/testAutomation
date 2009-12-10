@@ -1563,6 +1563,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForPageToLoad(defaultWaitForPage);
     }
 
+
+    public void waitForExtReady()
+    {
+        waitForElement(Locator.id("seleniumExtReady"), defaultWaitForPage);
+    }
+
     public void waitFor(Checker checker, String failMessage, int wait)
     {
         int time = 0;

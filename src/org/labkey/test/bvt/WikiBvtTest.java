@@ -224,12 +224,14 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check that discussion board works");
         clickLinkWithText(WIKI_PAGE1_TITLE);
+        waitForExtReady();
         clickLinkWithText("discuss this", false);
-        clickLinkWithText("Start new discussion");
+        waitAndClick(100,Locator.linkWithText("Start new discussion"),defaultWaitForPage);
         setFormElement("title", DISC1_TITLE);
         setFormElement("body", DISC1_BODY);
         submit();
-        assertTextPresent("see discussions (1)");
+        waitForExtReady();
+        clickLinkWithText("see discussions (1)", false);
         clickLinkWithText(DISC1_TITLE);
         assertTextPresent(DISC1_TITLE);
         assertTextPresent(DISC1_BODY);
