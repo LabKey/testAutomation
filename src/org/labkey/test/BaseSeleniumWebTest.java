@@ -880,6 +880,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return "true".equals(System.getProperty("scriptCheck"));
     }
 
+    public boolean enableDevMode()
+    {
+        return "true".equals(System.getProperty("devMode"));
+    }
+
     public boolean skipLeakCheck()
     {
         return "false".equals(System.getProperty("memCheck"));

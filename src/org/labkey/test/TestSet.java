@@ -156,7 +156,6 @@ public enum TestSet
 
     Weekly(BVTnDaily, new Class[] {
             // Add special test classes, not in daily or BVT.
-            //UniprotAnnotationTest.class, //requires bootstrap.  Long unused, probably needs updating.
     }),
 
     CONTINUE(new Class[] {})

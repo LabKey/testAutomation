@@ -125,7 +125,7 @@
         <mkdir dir="${test.log.output.dir}" />
     </target>
 
-    <path id="test.lib.classPath">
+    <path id="test.lib.classpath">
         <fileset dir="${test.lib.home}">
             <include name="*.jar"/>
         </fileset>
@@ -153,12 +153,12 @@
         </fileset>
     </path>
 
-    <path id="test.build.classPath">
-        <path refid="test.lib.classPath" />
+    <path id="test.build.classpath">
+        <path refid="test.lib.classpath" />
     </path>
 
-    <path id="test.run.classPath">
-        <path refid="test.build.classPath"/>
+    <path id="test.run.classpath">
+        <path refid="test.build.classpath"/>
         <pathelement location="${test.build.home}/classes" />
     </path>
 
@@ -178,7 +178,7 @@
                deprecation="${test.compile.deprecation}"
                optimize="${test.compile.optimize}"
                source="1.5"
-               classPathref="test.build.classPath">
+               classpathref="test.build.classpath">
         </javac>
         <copy todir="${test.build.home}/classes" >
             <fileset dir="${test.src.home}">
@@ -194,14 +194,14 @@
 
     <target name="setPassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil">
-            <classpath refid="test.run.classPath"/>
+            <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
         </java>
     </target>
 
     <target name="setCruiseControlPassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil">
-            <classpath refid="test.run.classPath"/>
+            <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
             <arg id="username" value="cruisecontrol@labkey.com"/>
             <arg id="password" value="cruisecontrol"/>
@@ -210,14 +210,14 @@
 
     <target name="ensurePassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
-            <classpath refid="test.run.classPath"/>
+            <classpath refid="test.run.classpath"/>
             <arg id="action" value="ensure"/>
         </java>
     </target>
 
     <target name="deletePassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
-            <classpath refid="test.run.classPath"/>
+            <classpath refid="test.run.classpath"/>
             <arg id="action" value="delete"/>
         </java>
     </target>
@@ -402,7 +402,7 @@
         <junit fork="true" forkmode="once" maxmemory="128m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="false" haltonerror="false" showoutput="true">
-            <classpath refid="test.run.classPath"/>
+            <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suiteToUse}"/>
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
@@ -424,6 +424,8 @@
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
+            <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
+            <sysproperty key="devMode" value="${sysprop.devMode}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -452,7 +454,7 @@
         <echo message="Or use ant stopSeleniumServer to stop manually."/>
         <echo message="Setting selenium server's PATH to: ${env.FIREFOX_HOME}:${env.PATH}" level="verbose"/>
         <java spawn="true" fork="true" classname="org.openqa.selenium.server.SeleniumServer">
-            <classpath refid="test.lib.classPath" />
+            <classpath refid="test.lib.classpath" />
             <env key="PATH" path="${env.FIREFOX_HOME}:${env.PATH}"/>
             <arg value="-port" />
             <arg value="${sysprop.selenium.server.port}" />
@@ -801,6 +803,16 @@
             <isset property="shuffleTests"/>
         </condition>
 
+        <!-- Set property sysprop.disableAssertions: true or false -->
+        <condition property="sysprop.disableAssertions" value="${disableAssertions}" else="false">
+            <isset property="disableAssertions"/>
+        </condition>
+
+        <!-- Set property sysprop.devMode: true or false -->
+        <condition property="sysprop.devMode" value="${devMode}" else="true">
+            <isset property="devMode"/>
+        </condition>
+
 
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
         <condition property="sysprop.suite" value="DRT">
@@ -849,7 +861,7 @@
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
             <jvmarg value="-Djava.compiler=NONE" />
-            <classpath refid="test.run.classPath" />
+            <classpath refid="test.run.classpath" />
             <sysproperty key="suite" value="${sysprop.suite}"/>
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
@@ -859,6 +871,8 @@
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
+            <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
+            <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -891,7 +905,7 @@
             <jvmarg value="-Xms256m"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=5005" />
             <jvmarg value="-Djava.compiler=NONE" />
-            <classpath refid="test.run.classPath" />
+            <classpath refid="test.run.classpath" />
             <sysproperty key="suite" value="${sysprop.suite}"/>
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
@@ -901,6 +915,8 @@
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
+            <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
+            <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -929,7 +945,7 @@
         <junit fork="true" forkmode="once" maxmemory="128m"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="false" showoutput="true">
-            <classpath refid="test.run.classPath"/>
+            <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suite}"/>
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
             <sysproperty key="test" value="${sysprop.test}"/>
@@ -939,6 +955,8 @@
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
+            <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
+            <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -970,7 +988,7 @@
     <!-- for testing the TestHelper ui -->
     <target name="testhelper-test" depends="compile,set-user-props">
         <java classname="org.labkey.test.testpicker.TestHelper" fork="true">
-            <classpath refid="test.run.classPath"/>
+            <classpath refid="test.run.classpath"/>
         </java>
     </target>
 
@@ -983,7 +1001,7 @@
                deprecation="${test.compile.deprecation}"
                optimize="${test.compile.optimize}"
                source="1.5"
-               classPathref="test.build.classPath">
+               classpathref="test.build.classpath">
         </javac>
 
         <mkdir dir="${project.root}/sampledata/qc"/>

@@ -618,6 +618,8 @@ public class Runner extends TestSuite
 
     public static TestSuite suite(List<String> testNames, TestSet set)
     {
+        boolean skipLeakCheck = "false".equals(System.getProperty("memCheck"));
+        boolean disableAssertions = "true".equals(System.getProperty("disableAssertions"));
         boolean cleanOnly = "true".equals(System.getProperty("cleanOnly"));
         boolean skipClean = "false".equals(System.getProperty("clean"));
         boolean shuffleTests = "true".equals(System.getProperty("shuffleTests"));
@@ -631,6 +633,11 @@ public class Runner extends TestSuite
             throw new RuntimeException("Invalid parameters: cannot specify both 'cleanOnly=true' and 'clean=false'.");
         }
 
+        if (!skipLeakCheck && disableAssertions)
+        {
+            throw new RuntimeException("Invalid parameters: 'memCheck = true' and 'disableAssertions = true'.  Unable to do leak check with assertions disabled.");
+        }
+        
         if (TestSet.CONTINUE == set)
         {
             set.setTests(readClasses(getRemainingTestsFile()));
