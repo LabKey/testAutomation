@@ -392,14 +392,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view");
 
-        assertTitleEquals("Sign In");
-        assertFormPresent("login");
-        setText("email", PasswordUtil.getUsername());
-        setText("password", PasswordUtil.getPassword());
-        clickLinkWithText("Sign In");
+        // Sign in if browser isn't already signed in.  Otherwise, we'll be on the home page.
+        if (isTitleEqual("Sign In"))
+        {
+            assertTitleEquals("Sign In");
+            assertFormPresent("login");
+            setText("email", PasswordUtil.getUsername());
+            setText("password", PasswordUtil.getPassword());
+            clickLinkWithText("Sign In");
 
-        if (isTextPresent("Type in your email address and password"))
-            fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+            if (isTextPresent("Type in your email address and password"))
+                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+        }
+
         assertTextPresent("Sign Out");
         assertTextPresent("My Account");
     }
@@ -517,7 +522,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             selenium.goBack();
             waitForPageToLoad();
-            assertTextPresent("Type in a new password twice");
+            assertTextPresent("Choose a password you'll use to access this server.");
             assertTitleEquals("Choose a Password");
 
             log("Testing bad passwords");
@@ -553,7 +558,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (bootstrapped || isTitleEqual("Sign In"))
         {
             // if the logout page takes us to the sign-in page, then we may have a schema update to do:
-            simpleSignIn();
+            if (isTitleEqual("Sign In"))
+                simpleSignIn();
 
             String upgradeButtonText = (isNavButtonPresent("Install") ? "Install" : (isNavButtonPresent("Upgrade") ? "Upgrade" : null));
 
