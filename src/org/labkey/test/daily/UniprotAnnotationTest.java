@@ -17,6 +17,7 @@
 package org.labkey.test.daily;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 /**
  * User: jeckels
@@ -64,27 +65,41 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         uncheckCheckbox("restrictProteins");
         clickNavButton("Search");
 
+        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
         assertTextPresent("Peptidyl-prolyl cis-trans isomerase A");
-        clickLinkWithText("Ppia");
-        
+
+        selenium.openWindow("", "prot");
+        clickLinkWithText("PPIA_MOUSE", false);
+        //opens in separate window
+        selenium.waitForPopUp("prot", "10000");
+        selenium.selectWindow("prot");
+        assertTextPresent("PPIA_MOUSE");
         assertTextPresent("Q9CWJ5");
         assertTextPresent("Q9R137");
-        assertTextPresent("PPIA_MOUSE");
         assertTextPresent("Mus musculus");
+        selenium.close();
+        selenium.selectWindow(null);
 
         clickLinkWithText(PROJECT_NAME);
         setFormElement("identifier", "Defa1");
         uncheckCheckbox("restrictProteins");
         clickNavButton("Search");
 
+        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
         assertTextPresent("Defensin-1 precursor");
-        clickLinkWithText("Defa1");
 
+        selenium.openWindow("", "prot");
+        clickLinkWithText("DEF1_MOUSE", false);
+        //opens in separate window
+        selenium.waitForPopUp("prot", "10000");
+        selenium.selectWindow("prot");
         assertTextPresent("P11477");
         assertTextPresent("Q61448");
         assertTextPresent("DEF1_MOUSE");
         assertTextPresent("ENSMUSG00000074440");
         assertTextPresent("Mus musculus");
+        selenium.close();
+        selenium.selectWindow(null);
     }
 
     protected void doCleanup() throws Exception

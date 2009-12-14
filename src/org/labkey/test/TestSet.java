@@ -76,7 +76,7 @@ public enum TestSet
         BasicTest.class,
         StudySecurityTest.class,
         MS1Bvt.class,
-        //UniprotAnnotationTest.class, //requires bootstrap
+        UniprotAnnotationTest.class, //requires bootstrap
         HTTPApiTest.class,
         MessagesBvtTest.class, //do we need both MessagesTest and MessagesBvtTest?
         MessagesTest.class,
