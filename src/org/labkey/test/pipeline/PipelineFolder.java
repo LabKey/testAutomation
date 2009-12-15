@@ -125,7 +125,7 @@ public class PipelineFolder
         _test.clickNavButton("Setup");
 
         _test.log("Set pipeline root.");
-        _test.setFormElement("path", _pipelinePath);
+        _test.setPipelineRoot(_pipelinePath);
 
         if (getPipelineType() == Type.enterprise)
         {

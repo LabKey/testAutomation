@@ -102,8 +102,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Data Pipeline");
         clickNavButton("Setup");
-        setFormElement("path", getPipelinePath());
-        submit();
+        setPipelineRoot(getPipelinePath());
         clickLinkWithText("Pipeline");
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("datasets"));

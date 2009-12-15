@@ -98,9 +98,11 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickCheckbox(".toggle");
         clickNavButton("Derive Samples");
 
-        clickLinkContainingText("valid pipeline root");
-        setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
-        clickNavButton("Set");
+        if (isLinkPresentWithText("valid pipeline root"))
+        {
+            clickLinkContainingText("valid pipeline root");
+            setPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
+        }
 
         clickLinkWithText(FOLDER_NAME);
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);

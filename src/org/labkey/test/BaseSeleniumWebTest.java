@@ -2126,6 +2126,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return statusValues;
     }
 
+    public void setPipelineRoot(String rootPath)
+    {
+        setPipelineRoot(rootPath, false);
+    }
+
+    public void setPipelineRoot(String rootPath, boolean inherit)
+    {
+        if (isLinkPresentWithText("override"))
+        {
+            if (inherit)
+                clickLinkWithText("modify the setting for all folders");
+            else
+                clickLinkWithText("override");
+        }
+        clickRadioButtonById("pipeOptionProjectSpecified");
+        setFormElement("path", rootPath);
+
+        submit();
+    }
+
     // Returns true if any status value is "ERROR"
     public boolean hasError(List<String> statusValues)
     {

@@ -31,6 +31,16 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         return "flow";
     }
 
+    protected void setFlowPipelineRoot(String rootPath)
+    {
+        if (isLinkPresentWithText("Set pipeline root"))
+            clickLinkWithText("Set pipeline root");
+        else
+            clickLinkWithText("Change pipeline root");
+
+        setPipelineRoot(rootPath);
+    }
+
     protected File getPipelineWorkDirectory()
     {
         return new File(getLabKeyRoot() + "/sampledata/flow/work");

@@ -66,9 +66,7 @@ public class FlowTest extends BaseFlowTest
         clickNavButton("View Data");
 
         clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Set pipeline root");
-        setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
-        submit();
+        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for FCS files to be loaded");
 

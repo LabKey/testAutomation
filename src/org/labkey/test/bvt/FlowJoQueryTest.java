@@ -41,9 +41,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         init();
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
-        clickLinkWithText("Set pipeline root");
-        setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
-        submit();
+        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
         importAnalysis(containerPath, "/flowjoquery/Workspaces/PV1-public.xml", null, "FlowJoAnalysis");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);

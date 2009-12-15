@@ -32,9 +32,7 @@ public class FlowImportTest extends BaseFlowTest
         init();
 
         // set pipeline root
-        clickLinkWithText("Set pipeline root");
-        setFormElement("path", getLabKeyRoot() + PIPELINE_PATH);
-        submit();
+        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
 
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();

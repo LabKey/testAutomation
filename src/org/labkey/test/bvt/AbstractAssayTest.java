@@ -63,8 +63,7 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         File dir = getTestTempDir();
         dir.mkdirs();
 
-        setFormElement("path", dir.getAbsolutePath());
-        clickNavButton("Set");
+        setPipelineRoot(dir.getAbsolutePath());
 
         //make sure it was set
         assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath() + "'.");

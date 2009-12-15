@@ -69,13 +69,11 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         clickNavButton("Setup");
 
         log("Set bad pipeline root.");
-        setFormElement("path", "/bogus");
-        submit();
+        setPipelineRoot("/bogus");
         assertTextPresent("does not exist");
 
         log("Set good pipeline root.");
-        setFormElement("path", _pipelinePath);
-        submit();
+        setPipelineRoot(_pipelinePath);
     }
 
     protected void deleteViews(String... viewNames)

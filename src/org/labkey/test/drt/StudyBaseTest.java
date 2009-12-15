@@ -123,8 +123,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         submit();
         addWebPart("Data Pipeline");
         clickNavButton("Setup");
-        setFormElement("path", getPipelinePath());
-        submit();
+        setPipelineRoot(getPipelinePath());
     }
 
     // Must be on study home page or "manage study" page

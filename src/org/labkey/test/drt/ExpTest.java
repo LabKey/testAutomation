@@ -55,8 +55,7 @@ public class ExpTest extends BaseSeleniumWebTest
         addWebPart("Data Pipeline");
         addWebPart("Run Groups");
         clickNavButton("Setup");
-        setFormElement("path", getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
-        submit();
+        setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
         waitAndClickNavButton("Import Experiment");
