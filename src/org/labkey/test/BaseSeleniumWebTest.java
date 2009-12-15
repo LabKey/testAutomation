@@ -3143,9 +3143,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
         clickLinkWithText("Site Users");
         String userXPath = "//a[text()=\"details\"]/../../td[text()=\"" + userEmail + "\"]";
+
+        boolean isPresent = isElementPresent(new Locator(userXPath));
+
+        // If we didn't find the user and we have more than one page, then show all pages and try again
+        if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
+        {
+            clickNavButton("Page Size", 0);
+            clickLinkWithText("Show All");
+            isPresent = isElementPresent(new Locator(userXPath));
+        }
+
         if (failIfNotFound)
-            assertElementPresent(new Locator(userXPath));
-        if (isElementPresent(new Locator(userXPath)))
+            assertTrue(userEmail + " was not present", isPresent);
+
+        if (isPresent)
         {
             checkCheckbox(new Locator(userXPath + "/../td[1]/input"));
             clickNavButton("Delete");

@@ -160,7 +160,17 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickLinkWithText("Site Users");
 
         Locator userAccessLink = Locator.xpath("//td[text()='" + userName + "']/..//td/a[contains(@href,'userAccess.view')]");
-        if (isElementPresent(userAccessLink))
+        boolean isPresent = isElementPresent(userAccessLink);
+
+        // If user is not found but paging indicators are, then show all 
+        if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
+        {
+            clickNavButton("Page Size", 0);
+            clickLinkWithText("Show All");
+            isPresent = isElementPresent(userAccessLink);
+        }
+
+        if (isPresent)
         {
             clickLink(userAccessLink);
             Locator groupMembershipLink = Locator.xpath("//td[@id='bodypanel']//td/a[text()='SecurityVerifyProject']/../../td[3]/a");
