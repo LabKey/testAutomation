@@ -30,16 +30,9 @@
     MailPage pageInfo = me.getModelBean();
     SmtpMessage[] messages = pageInfo.getMessages();
     boolean recorder = pageInfo.isEnableRecorder();
-    boolean devmode = AppProps.getInstance().isDevMode();
 
-    if (!devmode)
-    {
-        %><p class="labkey-error">Server must be in devmode to use the email recorder.</p><%
-    }
-    else
-    {
-        %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
-    }
+    %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
+
 %>
 <script type="text/javascript">
 function toggleBody(id)
@@ -153,7 +146,7 @@ function toggleRecorder(checkbox)
     <tr id="emailRecordEmpty" style="display: <%=messages.length > 0 ? "none" : ""%>;"><td colspan="3">No email recorded.</td></tr>
 </table>
 <%
-    if (devmode && context.getUser().isAdministrator())
+    if (context.getUser().isAdministrator())
     {
 %>
         <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);" <%=recorder ? "checked" : ""%>> Record email messages sent
