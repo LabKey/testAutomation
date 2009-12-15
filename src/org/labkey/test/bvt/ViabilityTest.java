@@ -21,7 +21,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * User: kevink
@@ -196,7 +195,9 @@ public class ViabilityTest extends AbstractQCAssayTest
         runTransformTest();
 
         log("** Checking ResultSpecimens lookups");
-        beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?schema=assay&query.queryName=" + ASSAY_NAME + " ResultSpecimens");
+        beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?schemaName=assay&query.queryName=" + ASSAY_NAME + " ResultSpecimens");
+        assertTextPresent("foobar", "vial1", "xyzzy", "160450533-5", "161400006-5");
+
         setSelectedFields("/" + PROJECT_NAME + "/" + FOLDER_NAME, "assay", ASSAY_NAME + " ResultSpecimens", null,
                 new String[] { "Result", "Result/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits"});
     }

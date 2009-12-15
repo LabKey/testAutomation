@@ -347,7 +347,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("Empty script, a script must be provided.");
         if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
-                fail("Their was an error running the script");
+                fail("There was an error running the script");
         assertTextPresent("Error executing command");
 //        assertTextPresent("Error: object \"badString\" not found");
         // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
@@ -361,7 +361,7 @@ public class ReportTest extends StudyBaseTest
         log("Execute and save a script");
         if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
-                fail("Their was an error running the script");
+                fail("There was an error running the script");
         log("Check that the script executed properly");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
@@ -420,7 +420,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
             if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
-                fail("Their was an error running the script");
+                fail("There was an error running the script");
         clickLinkWithText("Source");
         checkCheckbox("shareReport");
         checkCheckbox("runInBackground");
@@ -494,7 +494,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
             if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
-                fail("Their was an error running the script");
+                fail("There was an error running the script");
         assertTextPresent(R_SCRIPT2_TEXT1);
         clickLinkWithText("Source");
         clickNavButton("Save View", 0);
@@ -507,7 +507,7 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink(R_SCRIPTS[0], "source");
         if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
-                fail("Their was an error running the script");
+                fail("There was an error running the script");
         clickLinkWithText("Source");
         clickNavButton("Save View");
 

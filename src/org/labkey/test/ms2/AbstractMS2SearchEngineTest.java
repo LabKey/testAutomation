@@ -110,9 +110,24 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 //                return isTextPresent(SAMPLE_BASE_NAME + " (test2)");
 //            }
 //        },"Text '" + SAMPLE_BASE_NAME + " (test2)' was not present",GWT_WAIT);
-         assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
+
+        assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
         clickLinkWithText("Data Pipeline");
-        waitForText("COMPLETE", defaultWaitForPage);
+
+        String test2LocatorText = "//td[contains(text(),'" + SAMPLE_BASE_NAME + " (test2)" + "')]/../td[2]/a";
+        seconds = 0;
+
+        while (getText(Locator.raw(test2LocatorText)).compareTo("COMPLETE") != 0 && seconds++ < MAX_WAIT_SECONDS)
+        {
+            sleep(1000);
+            assertTextNotPresent("ERROR");
+            refresh(longWaitForPage);
+        }
+
+        if (getText(Locator.raw(test2LocatorText)).compareTo("COMPLETE") != 0)
+            fail("All tasks did not complete.");
+
+//        waitForText("COMPLETE", defaultWaitForPage);
         clickAndWait(Locator.raw("//td[contains(text(), 'test2')]/../td/a"));
 
         log("View log file.");
@@ -126,18 +141,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         clickLinkWithText("Pipeline");
 
-        seconds = 0;
-        while (getText(Locator.raw("//td[contains(text(),'" + SAMPLE_BASE_NAME + " (test2)" + "')]/../td[2]/a")).compareTo("COMPLETE") != 0
-                && seconds++ < MAX_WAIT_SECONDS)
-        {
-            sleep(1000);
-            assertTextNotPresent("ERROR");
-            refresh(longWaitForPage);
-        }
-
-        if (getText(Locator.raw("//td[contains(text(),'" + SAMPLE_BASE_NAME + " (test2)" + "')]/../td[2]/a")).compareTo("COMPLETE") != 0)
-            fail("All tasks did not complete.");
-
         log("Analyze again.");
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
@@ -147,7 +150,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Make sure new protocol is listed.");
         waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_GWT);
-        assertEquals("test2",getSelectedOptionText("protocol"));
+        assertEquals("test2", getSelectedOptionText("protocol"));
 
   //      waitForPageToLoad();
         if (!isLinkPresentWithText("running") && isLinkPresentWithText("completed"))
