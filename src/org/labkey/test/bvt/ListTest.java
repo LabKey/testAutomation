@@ -277,8 +277,7 @@ public class ListTest extends BaseSeleniumWebTest
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
         waitForElement(Locator.navButton("Export"), WAIT_FOR_GWT);
-        clickNavButton("Export", 0);
-        clickLinkContainingText("Export All to Text");
+        clickExportToText();
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
         assertTextNotPresent(TEST_DATA[0][0]);
@@ -369,8 +368,7 @@ public class ListTest extends BaseSeleniumWebTest
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
         waitForElement(Locator.navButton("Export"), WAIT_FOR_GWT);
-        clickNavButton("Export", 0);
-        clickLinkContainingText("Export All to Text");
+        clickExportToText();
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol1.getName());
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol2.getName());
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol4.getName());
@@ -436,7 +434,6 @@ public class ListTest extends BaseSeleniumWebTest
         doUploadTest();
         customizeURLTest();
     }
-    
 
     private void doUploadTest()
     {

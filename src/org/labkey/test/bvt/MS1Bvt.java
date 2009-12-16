@@ -267,8 +267,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
-        clickNavButton("Export", 0);
-        clickLinkContainingText("Export All to Text");
+        clickExportToText();
         assertTextPresent("K.GAGAFGYFEVTHDITR.Y");
         popLocation();
 
@@ -422,8 +421,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         log("Testing export...");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        clickNavButton("Export", 0);
-        clickLinkContainingText("Export All to Text");
+        clickExportToText();
         assertTextPresent("Scan");
         assertTextPresent("1948");
         assertTextPresent("1585");

@@ -1636,6 +1636,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         popLocation();
     }
 
+    protected void clickExportToText()
+    {
+        clickNavButton("Export", 0);
+        selenium.mouseDown("//a//span[contains(text(), \"Text\")]");
+        clickNavButton("Export to Text");
+    }
+
     public interface Checker
     {
         public boolean check();

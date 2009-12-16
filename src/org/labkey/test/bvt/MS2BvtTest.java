@@ -1050,8 +1050,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test exporting Compare Runs in Query");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        clickNavButton("Export", 0);
-        clickLinkContainingText("Export All to Text");
+        clickExportToText();
         assertTextPresent("Mass");
         assertTextNotPresent("gi|34849400|");
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|15828808|ref|NP_326168.1|");
