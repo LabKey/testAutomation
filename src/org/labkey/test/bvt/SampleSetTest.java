@@ -98,7 +98,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickCheckbox(".toggle");
         clickNavButton("Derive Samples");
 
-        if (isLinkPresentWithText("valid pipeline root"))
+        if (isLinkPresentWithText("configure a valid pipeline root for this folder"))
         {
             clickLinkContainingText("valid pipeline root");
             setPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
