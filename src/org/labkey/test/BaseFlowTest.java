@@ -33,11 +33,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void setFlowPipelineRoot(String rootPath)
     {
-        if (isLinkPresentWithText("Set pipeline root"))
-            clickLinkWithText("Set pipeline root");
-        else
-            clickLinkWithText("Change pipeline root");
-
         setPipelineRoot(rootPath);
     }
 

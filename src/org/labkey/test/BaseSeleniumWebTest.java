@@ -2140,6 +2140,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setPipelineRoot(String rootPath, boolean inherit)
     {
+        clickAdminMenuItem("Go To Module", "More Modules", "Pipeline");
+        clickNavButton("Setup");
+        
         if (isLinkPresentWithText("override"))
         {
             if (inherit)
@@ -2148,7 +2151,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 clickLinkWithText("override");
         }
         clickRadioButtonById("pipeOptionProjectSpecified");
-        setFormElement("path", rootPath);
+        setFormElement("pipeProjectRootPath", rootPath);
 
         submit();
     }

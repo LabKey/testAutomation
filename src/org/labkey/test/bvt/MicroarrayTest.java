@@ -90,9 +90,8 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickNavButton("Save & Close");
         
         log("Setup the pipeline");
-        clickLinkWithText("setup pipeline");
-        setFormElement("path", getLabKeyRoot() + "/sampledata/Microarray");
-        clickNavButton("Set");
+
+        setPipelineRoot(getLabKeyRoot() + "/sampledata/Microarray");
         assertTextPresent("The pipeline root was set to");
         clickLinkWithText("Microarray Dashboard");
 

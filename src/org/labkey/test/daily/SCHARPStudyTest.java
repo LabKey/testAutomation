@@ -78,9 +78,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
     protected void setupPipeline()
     {
         log("Setting pipeline root to " + _pipelinePathMain + "...");
-        clickNavButton("Pipeline Setup");
-        setFormElement("path", _pipelinePathMain);
-        clickNavButton("Set");
+        setPipelineRoot(_pipelinePathMain);
         assertTextPresent("The pipeline root was set");
         clickLinkWithText(PROJECT_NAME);
     }
