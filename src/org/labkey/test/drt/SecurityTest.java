@@ -82,7 +82,9 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         addWebPart("Messages");
         assertLinkPresentWithText("new message");
+        pushLocation();
         signOut();
+        popLocation();
         clickLinkWithText(PROJECT_NAME);
         assertLinkNotPresentWithText("new message");
         signIn();
