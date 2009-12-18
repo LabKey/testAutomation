@@ -412,13 +412,13 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
             checkRadioButton("dataCollectorName", "File upload");
 
             File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
-            setFormElement("uploadedFile", file);
+            setFormElement("__primaryFile__", file);
             clickNavButton("Save and Finish");
             assertLabkeyErrorPresent();
 
             checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
-            setFormElement("uploadedFile", file);
+            setFormElement("__primaryFile__", file);
             clickNavButton("Save and Finish");
             assertNoLabkeyErrors();
             clickLinkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN);
@@ -434,13 +434,13 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
             selenium.type("name", ASSAY_EXCEL_RUN_TWO_COLUMN);
             checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
-            setFormElement("uploadedFile", file);
+            setFormElement("__primaryFile__", file);
             clickNavButton("Save and Finish");
             assertLabkeyErrorPresent();
 
             checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
-            setFormElement("uploadedFile", file);
+            setFormElement("__primaryFile__", file);
             clickNavButton("Save and Finish");
             assertNoLabkeyErrors();
             clickLinkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN);

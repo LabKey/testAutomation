@@ -263,7 +263,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         setFormElement("dataCollectorName", "File upload");
         File file1 = new File(filePath);
-        setFormElement("uploadedFile", file1);
+        setFormElement("__primaryFile__", file1);
         clickNavButton(finalButton, 60000);
     }
 

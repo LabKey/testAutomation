@@ -125,7 +125,7 @@ public class ViabilityTest extends AbstractQCAssayTest
 
         File guavaFile = new File(getLabKeyRoot() + "/sampledata/viability/small.VIA.csv");
         assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
-        setFormElement("uploadedFile", guavaFile);
+        setFormElement("__primaryFile__", guavaFile);
         clickNavButton("Next", 8000);
 
         log("** Check form field values");
@@ -253,7 +253,7 @@ public class ViabilityTest extends AbstractQCAssayTest
         setFormElement("name", "transformed assayId");
         File guavaFile = new File(getLabKeyRoot() + "/sampledata/viability/small.VIA.csv");
         assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
-        setFormElement("uploadedFile", guavaFile);
+        setFormElement("__primaryFile__", guavaFile);
         clickNavButton("Next", 8000);
 
         log("** Check form field values");

@@ -121,7 +121,7 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Next");
             setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
             File file1 = new File(TEST_ASSAY_LUM_FILE1);
-            setFormElement("uploadedFile", file1);
+            setFormElement("__primaryFile__", file1);
             clickNavButton("Next", 60000);
             clickNavButton("Save and Import Another Run");
             clickLinkWithText(TEST_ASSAY_LUM);
@@ -131,7 +131,7 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
             clickNavButton("Next");
             setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
-            setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE2));
+            setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE2));
             clickNavButton("Next", 60000);
             selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]", "StandardName1b");
             selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']", "StandardName2");
@@ -151,7 +151,7 @@ public class LuminexTest extends AbstractQCAssayTest
                     "3\tSpecimenID3\tParticipantID3\t1.3\n" +
                     "4\tSpecimenID4\tParticipantID4\t1.4");
             clickNavButton("Next");
-            setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
+            setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE3));
             clickNavButton("Next", 60000);
             assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
             assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
@@ -174,7 +174,7 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Close", 0);
             clickNavButton("Next");
             setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
-            setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE3));
+            setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE3));
             clickNavButton("Next", 60000);
             assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
             assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
@@ -275,7 +275,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
         clickNavButton("Next");
         setFormElement("name", "transformed assayId");
-        setFormElement("uploadedFile", new File(TEST_ASSAY_LUM_FILE1));
+        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE1));
         clickNavButton("Next", 60000);
         clickNavButton("Save and Finish");
 

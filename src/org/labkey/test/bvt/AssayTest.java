@@ -17,7 +17,6 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 

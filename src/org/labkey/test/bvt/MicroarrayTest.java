@@ -112,7 +112,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         assertTextPresent(MAGEML_FILE1);
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), defaultWaitForPage);
         setFormElement("runIntegerField", "115468001");
-        clickNavButton("Save and Import Another Run");
+        clickNavButton("Save and Import Next File");
 
         log("Import second run");
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), defaultWaitForPage);
