@@ -304,7 +304,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         }
         else
         {
-            int split = 0;
+            int split = 1;
             while (_test.isLinkPresentWithText("COMPLETE", split))
             {
                 _test.pushLocation();
