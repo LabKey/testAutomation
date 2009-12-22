@@ -1888,9 +1888,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickLinkContainingText(String text)
     {
+        clickLinkContainingText(text, defaultWaitForPage);
+    }
+
+    public void clickLinkContainingText(String text, int millis)
+    {
         log("Clicking link containing text: " + text);
         Locator l  = Locator.linkContainingText(text);
-        clickAndWait(l, defaultWaitForPage);
+        clickAndWait(l, millis);
     }
 
     public int countLinksWithText(String text)

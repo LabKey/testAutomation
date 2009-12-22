@@ -28,6 +28,7 @@ public class UserBvtTest extends SecurityTest
 {
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile", "Pager",
                 "IM", "Description"};
+    private static final String TEST_PASSWORD = "testPassword";
 
     protected void doTestSteps()
     {
@@ -35,6 +36,7 @@ public class UserBvtTest extends SecurityTest
 
         siteUsersTest();
         requiredFieldsTest();
+        passwordTest();
     }
 
     protected void doCleanup()
@@ -100,6 +102,40 @@ public class UserBvtTest extends SecurityTest
         assertTextPresent("This field is required");
 
         clickNavButton("Show All Users");
+    }
+
+    private void passwordTest()
+    {
+        enableModule(PROJECT_NAME, "Dumbster");
+        addWebPart("Mail Record");
+        checkCheckbox("emailRecordOn");
+
+        clickLinkWithText("Site Users");
+        clickLinkWithText(NORMAL_USER);
+        pushLocation();
+        clickButtonContainingText("Reset Password");
+        popLocation();
+        // View reset password email.
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkContainingText("Reset Password Notification", 0); // Expand message.
+
+        clickLinkContainingText("setPassword"); // Set Password URL
+        assertTextPresent(NORMAL_USER);
+        setFormElement("password", TEST_PASSWORD);
+        setFormElement("password2", TEST_PASSWORD);
+
+        clickButton("Set Password", 0);
+
+        signOut();
+        clickLinkWithText("Sign In");
+        setFormElement("email", NORMAL_USER);
+        setFormElement("password", TEST_PASSWORD);
+        clickButton("Sign In", 0);
+        waitForPageToLoad();
+        assertTextPresent("Sign Out");
+
+        signOut();
+        simpleSignIn();
     }
 
     private void checkRequiredField(String name, boolean select)
