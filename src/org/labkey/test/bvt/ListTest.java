@@ -313,6 +313,16 @@ public class ListTest extends BaseSeleniumWebTest
         assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
                 source.indexOf(TEST_DATA[1][1], index) < source.indexOf(TEST_DATA[1][2], index));
 
+        log("Test single list web part");
+        addWebPart("Single List");
+        setText("title", "This is my single list web part title");
+        submit();
+        assertTextPresent("Import Data");
+        assertTextPresent("View Design");
+        clickLinkContainingText("This is my single list web part title");
+        assertTextPresent("Colors");
+        assertTextPresent("Views");
+
         log("Create second project");
         createProject(PROJECT_NAME2);
 
