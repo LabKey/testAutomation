@@ -39,6 +39,7 @@ public class Crawler
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("admin", "dumpHeap"),
+            new ControllerActionId("admin", "setPassword"),
             new ControllerActionId("Experiment", "showFile"),
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("login", "logout"),
