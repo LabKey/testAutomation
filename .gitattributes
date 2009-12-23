@@ -3,6 +3,7 @@
 lib/dumbster-1.6.jar -text
 lib/dumbster-src.zip -text
 /module.properties -text
+src/META-INF/dumbster/jars.txt -text
 src/org/labkey/dumbster/DumbsterController.java -text
 src/org/labkey/dumbster/DumbsterModule.java -text
 src/org/labkey/dumbster/model/DumbsterManager.java -text
