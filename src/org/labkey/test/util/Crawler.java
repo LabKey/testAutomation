@@ -379,7 +379,7 @@ public class Crawler
                     urlText.startsWith("javascript:") ||
                     urlText.startsWith("ftp://"))
             {
-                if (!urlText.contains(WebTestHelper.getBaseURL()))
+                if (!urlText.contains(WebTestHelper.getBaseURL()) || urlText.equals(WebTestHelper.getBaseURL()))
                     continue;
                 else
                 {
