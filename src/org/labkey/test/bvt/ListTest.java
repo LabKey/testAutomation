@@ -101,7 +101,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "experiment";
+        return "list";
     }
 
     protected void doCleanup()
@@ -429,6 +429,7 @@ public class ListTest extends BaseSeleniumWebTest
         popLocation();
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent("Query '" + LIST_NAME + "' has errors");
+        assertTextPresent("List does not exist");
 
         log("Test exporting a nonexistent list returns a 404");
         selenium.open(WebTestHelper.getBaseURL() + "/query/" + PROJECT_NAME + "/exportRowsTsv.view?schemaName=lists&query.queryName=" + LIST_NAME);
