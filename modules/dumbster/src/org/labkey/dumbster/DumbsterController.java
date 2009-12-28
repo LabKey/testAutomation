@@ -28,7 +28,7 @@ import org.labkey.api.view.template.PageConfig;
 import org.labkey.dumbster.model.DumbsterManager;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
-
+import org.labkey.dumbster.view.MailWebPart;
 
 /**
  * View action is like MultiActionController, but each action is a class not a method
@@ -55,12 +55,12 @@ public class DumbsterController extends SpringActionController
     {
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
-            return null;
+            return new MailWebPart();
         }
 
         public NavTree appendNavTrail(NavTree root)
         {
-            return null;
+            return root;
         }
     }
 
