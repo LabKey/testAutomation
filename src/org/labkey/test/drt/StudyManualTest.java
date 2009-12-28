@@ -213,6 +213,9 @@ public class StudyManualTest extends StudyTest
 
         clickRadioButtonById("button_dataField");
 
+        addField("Dataset Fields", 4, "otherData", "Other Data", "Text (String)");
+        setFormElement(Locator.id("importAliases"), "aliasedColumn");
+
         clickNavButton("Save");
         waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_GWT);
         clickNavButton("View Dataset Data");
@@ -232,5 +235,6 @@ public class StudyManualTest extends StudyTest
         assertTextPresent("1234");
         assertTextPresent("2006-02-01");
         assertTextPresent("1.2");
+        assertTextPresent("aliasedData");
     }
 }

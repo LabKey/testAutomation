@@ -42,8 +42,10 @@ public class AssayTest extends AbstractAssayTest
     protected static final String[] TEST_ASSAY_RUN_PROP_TYPES = { "Text (String)", "Boolean", "Number (Double)", "Integer", "DateTime" };
     protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
+    protected static final String TEST_ASSAY_DATA_ALIASED_PROP_NAME = "testAssayAliasedData";
+    protected static final String ALIASED_DATA = "aliasedData";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
-    protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = { "Boolean", "Integer", "DateTime" };
+    protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = { "Boolean", "Integer", "DateTime", "Text (String)" };
     protected static final String TEST_RUN1 = "FirstRun";
     protected static final String TEST_RUN1_COMMENTS = "First comments";
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
@@ -64,13 +66,13 @@ public class AssayTest extends AbstractAssayTest
             "AAA07XK5-05\t\t\ttrue\t20\t\n" +
             "AAA07XMC-02\t\t\ttrue\t19\t\n" +
             "AAA07XMC-04\t\t\ttrue\t18\t";
-    protected static final String TEST_RUN1_DATA4 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
-            "AAA07XK5-05\t\t\ttrue\t\t2000-01-01\n" +
-            "AAA07XMC-02\t\t\ttrue\t\t2000-02-02\n" +
-            "AAA07XMC-04\t\t\ttrue\t\t2000-03-03\n" +
-            "AAA07XSF-02\t\t\tfalse\t\t2000-04-04\n" +
-            "AssayTestControl1\te\t5\tfalse\t\t2000-05-05\n" +
-            "AssayTestControl2\tf\t6\tfalse\t\t2000-06-06";
+    protected static final String TEST_RUN1_DATA4 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\t" + TEST_ASSAY_DATA_ALIASED_PROP_NAME + "\n" +
+            "AAA07XK5-05\t\t\ttrue\t\t2000-01-01\t"+ALIASED_DATA+"\n" +
+            "AAA07XMC-02\t\t\ttrue\t\t2000-02-02\t"+ALIASED_DATA+"\n" +
+            "AAA07XMC-04\t\t\ttrue\t\t2000-03-03\t"+ALIASED_DATA+"\n" +
+            "AAA07XSF-02\t\t\tfalse\t\t2000-04-04\t"+ALIASED_DATA+"\n" +
+            "AssayTestControl1\te\t5\tfalse\t\t2000-05-05\t"+ALIASED_DATA+"\n" +
+            "AssayTestControl2\tf\t6\tfalse\t\t2000-06-06\t"+ALIASED_DATA;
     protected static final String TEST_RUN2 = "SecondRun";
     protected static final String TEST_RUN2_COMMENTS = "Second comments";
     protected static final String TEST_RUN2_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "4\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
@@ -172,6 +174,9 @@ public class AssayTest extends AbstractAssayTest
 
         selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2) + "']");
         selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='required']");
+
+        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 3) + "']");
+        setFormElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td/input[@id='importAliases']"), TEST_ASSAY_DATA_ALIASED_PROP_NAME);
 
         sleep(1000);
         clickNavButton("Save", 0);
@@ -304,6 +309,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("2000-06-06");
         assertTextPresent("0.0");
         assertTextPresent("f");
+        assertTextPresent(ALIASED_DATA);
 
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         click(Locator.raw("expand_Properties"));

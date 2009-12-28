@@ -33,9 +33,9 @@ public class StudyTest extends StudyBaseTest
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit.";
 //    protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some ‘special symbols’ – they help test that we're roundtripping in UTF-8.";
 
-    protected String _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
-        "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\n" +
-        "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t1.2\ttext\t\n";
+    protected String _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\taliasedColumn\n" +
+        "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\taliasedData\n" +
+        "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t1.2\ttext\t\taliasedData\n";
 
     protected static final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
 

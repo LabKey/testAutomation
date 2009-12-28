@@ -43,16 +43,21 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String LIST_KEY_NAME2 = "Color";
     private final static String LIST_DESCRIPTION = "A list of colors and what they are like";
     private final static String FAKE_COL1_NAME = "FakeName";
+    private final static String ALIASED_KEY_NAME = "Material";
+    private final static String HIDDEN_TEXT = "Hidden";
     private ListColumn _listCol1 = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
     private final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
-    private final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
     private final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
+    private final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
+    private final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
+    private final ListColumn _listCol6 = new ListColumn("AliasedColumn", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
     private final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
             { "true", "false", "true", "false"},
             { "1", "4", "3", "2" },
-            { "10", "9", "8", "7"} };
+            { "10", "9", "8", "7"},
+            { "Water", "Earth", "Fire", "Air"}};
     private final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
     private final static String LIST_ROW1 = TEST_DATA[0][0] + "\t" + TEST_DATA[1][0] + "\t" + TEST_DATA[2][0] + "\t" + CONVERTED_MONTHS[0];
     private final static String LIST_ROW2 = TEST_DATA[0][1] + "\t" + TEST_DATA[1][1] + "\t" + TEST_DATA[2][1] + "\t" + CONVERTED_MONTHS[1];
@@ -60,10 +65,10 @@ public class ListTest extends BaseSeleniumWebTest
     private final String LIST_DATA = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME +
             "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3;
     private final String LIST_DATA2 = 
-            LIST_KEY_NAME2 + "\t" + _listCol4.getName() + "\n" +
-            TEST_DATA[0][0] + "\t" + TEST_DATA[4][0] + "\n" +
-            TEST_DATA[0][1] + "\t" + TEST_DATA[4][1] + "\n" +
-            TEST_DATA[0][2] + "\t" + TEST_DATA[4][2];
+            LIST_KEY_NAME2 + "\t" + _listCol4.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listCol5.getName() + "\n" +
+            TEST_DATA[0][0] + "\t" + TEST_DATA[4][0] + "\t" + TEST_DATA[5][0] + "\t" + HIDDEN_TEXT + "\n" +
+            TEST_DATA[0][1] + "\t" + TEST_DATA[4][1] + "\t" + TEST_DATA[5][1] + "\t" + HIDDEN_TEXT + "\n" +
+            TEST_DATA[0][2] + "\t" + TEST_DATA[4][2] + "\t" + TEST_DATA[5][2] + "\t" + HIDDEN_TEXT;
     private final String TEST_FAIL2 = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol2.getName() + "\n" +
             LIST_ROW1 + "\t" + "String";
     private final static String TEST_FAIL = "testfail";
@@ -187,6 +192,25 @@ public class ListTest extends BaseSeleniumWebTest
         setFormElement(Locator.id("ff_label3"), _listCol4.getLabel());
         selectOptionByText("ff_type3", _listCol4.getType().toString());
         setFormElement(Locator.id("propertyDescription"), _listCol4.getDescription());
+
+        // Create "Hidden Field" and remove from all views.
+        clickNavButton("Add Field", 0);
+        setFormElement(Locator.id("ff_name4"), _listCol5.getName());
+        setFormElement(Locator.id("ff_label4"), _listCol5.getLabel());
+        selectOptionByText("ff_type4", _listCol5.getType().toString());
+        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
+        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
+        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
+        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
+
+        clickNavButton("Add Field", 0);
+        setFormElement(Locator.id("ff_name5"), _listCol6.getName());
+        setFormElement(Locator.id("ff_label5"), _listCol6.getLabel());
+        selectOptionByText("ff_type5", _listCol6.getType().toString());
+        setFormElement(Locator.id("importAliases"), ALIASED_KEY_NAME);
+
+        mouseClick(Locator.id("partdown_1").toString());
+
         clickNavButton("Save", 0);
         waitForPageToLoad();
 
@@ -202,6 +226,10 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
         assertTextPresent(TEST_DATA[3][2]);
+        
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
+        assertTableCellTextEquals("dataregion_query", 0, 5, _listCol3.getLabel()); // Colummns...
+        assertTableCellTextEquals("dataregion_query", 0, 6, _listCol2.getLabel()); // ...swapped.
 
         log("Add data to existing rows");
         clickLinkWithText("Import Data");
@@ -215,11 +243,27 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[4][0]);
         assertTextPresent(TEST_DATA[4][1]);
         assertTextPresent(TEST_DATA[4][2]);
+        assertTextPresent(TEST_DATA[5][0]);
+        assertTextPresent(TEST_DATA[5][1]);
+        assertTextPresent(TEST_DATA[5][2]);
+
+        log("Check that hidden column is hidden.");
+        clickLinkWithText("details");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
+        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
+        clickNavButton("Edit");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
+        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
+        clickNavButton("Cancel");
+        clickNavButton("Show Grid");
 
         log("Test inserting new row");
         clickNavButton("Insert New");
-        //assertTextPresent(_listCol1.getDescription(), 1, true);     // Field descriptions appear pop-ups -- need to check HTML source
-        //assertTextPresent(_listCol3.getDescription(), 1, true);
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
+        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
+        String html = selenium.getHtmlSource();
+        assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
+        assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
         setFormElement("quf_" + _listCol1.getName(), TEST_DATA[1][3]);
         setFormElement("quf_" + _listCol2.getName(), "wrong type");
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
@@ -237,7 +281,103 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[1][3]);
         assertTextPresent(TEST_DATA[2][3]);
         assertTextPresent(TEST_DATA[3][3]);
-        assertTableCellTextEquals("dataregion_query", 4, 6, "false");
+        assertTableCellTextEquals("dataregion_query", 4, 5, "false");
+
+        log("Check hidden field is hidden only where specified.");
+        clickNavButton("View Design", 0);
+        waitForPageToLoad();
+        clickLinkWithText("edit fields");
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
+
+        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        checkCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
+        mouseClick(Locator.id("partdown_1").toString());
+        clickNavButton("Save", 0);
+        waitForPageToLoad();
+
+        log("Check that hidden column is hidden.");
+        clickLinkWithText("view data");
+        assertTextPresent(HIDDEN_TEXT); // Not hidden from grid view.
+        clickLinkWithText("details");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
+        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        clickNavButton("Edit");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
+        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        clickNavButton("Cancel");
+        clickNavButton("Show Grid");
+        clickNavButton("Insert New");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
+        assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
+        clickNavButton("Cancel");
+
+        clickNavButton("View Design", 0);
+        waitForPageToLoad();
+        clickLinkWithText("edit fields");
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
+
+        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
+        checkCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
+        clickNavButton("Save", 0);
+        waitForPageToLoad();
+
+        clickLinkWithText("view data");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
+        clickLinkWithText("details");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
+        clickNavButton("Edit");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
+        clickNavButton("Cancel");
+        clickNavButton("Show Grid");
+        clickNavButton("Insert New");
+        assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
+        clickNavButton("Cancel");
+
+        clickNavButton("View Design", 0);
+        waitForPageToLoad();
+        clickLinkWithText("edit fields");
+
+        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
+        checkCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
+        clickNavButton("Save", 0);
+        waitForPageToLoad();
+
+        clickLinkWithText("view data");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
+        clickLinkWithText("details");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
+        clickNavButton("Edit");
+        assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
+        clickNavButton("Cancel");
+        clickNavButton("Show Grid");
+        clickNavButton("Insert New");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
+        clickNavButton("Cancel");
+
+        clickNavButton("View Design", 0);
+        waitForPageToLoad();
+        clickLinkWithText("edit fields");
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
+
+        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
+        checkCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
+        clickNavButton("Save", 0);
+        waitForPageToLoad();
+
+        clickLinkWithText("view data");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
+        clickLinkWithText("details");
+        assertTextPresent(HIDDEN_TEXT); // Not hidden from details view.
+        clickNavButton("Edit");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
+        clickNavButton("Cancel");
+        clickNavButton("Show Grid");
+        clickNavButton("Insert New");
+        assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
+        clickNavButton("Cancel");
 
         log("Test Sort and Filter in Data View");
         setSort("query", _listCol1.getName(), SortDirection.ASC);
@@ -269,6 +409,7 @@ public class ListTest extends BaseSeleniumWebTest
         removeCustomizeViewColumn(_listCol1.getLabel());
         removeCustomizeViewColumn(_listCol2.getLabel());
         removeCustomizeViewColumn(_listCol3.getLabel());
+        removeCustomizeViewColumn(_listCol6.getLabel());
         clickNavButton("Save", 0);
         assertAlert("You must select at least one field to display in the grid.");
         popLocation();
