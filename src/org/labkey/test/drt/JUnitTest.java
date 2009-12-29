@@ -80,6 +80,7 @@ public class JUnitTest extends TestSuite
     // uck. use BaseSeleniumWebTest to ensure we're upgraded
     private static void upgradeHelper() throws Exception
     {
+        // TODO: remove upgrade helper from JUnitTest and run before suite starts.
         UpgradeHelper helper = new UpgradeHelper();
         try
         {
@@ -88,6 +89,16 @@ public class JUnitTest extends TestSuite
             helper.signIn();
             helper.assertLinkPresentWithText("Projects");
             helper.unfail();
+        }
+        catch (Exception e)
+        {
+            helper.dump();
+            throw e;
+        }
+        catch (AssertionError a)
+        {
+            helper.dump();
+            throw a;
         }
         finally
         {

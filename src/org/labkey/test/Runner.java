@@ -331,7 +331,7 @@ public class Runner extends TestSuite
     }
 
 
-    private static TestSuite getSuite(List<Class> testClasses, boolean cleanOnly)
+    private static TestSuite getSuite(List<Class> testClasses, boolean cleanOnly) throws Exception
     {
         // Remove duplicate tests (e.g., don't run "basic" test twice if bvt & drt are selected via ant test) but keep the order
         Set<Class> testClassesCopy = new LinkedHashSet<Class>(testClasses);
@@ -342,7 +342,7 @@ public class Runner extends TestSuite
         return suite;
     }
 
-    private static void addTests(TestSuite suite, Set<Class> testClasses)
+    private static void addTests(TestSuite suite, Set<Class> testClasses) throws Exception
     {
         for (Class testClass : testClasses)
         {
@@ -356,6 +356,8 @@ public class Runner extends TestSuite
             {
                 // ok
             }
+            /* TODO: reinstate once upgradeHelper is removed from JUnitTest
+            // For now, fail suite if JUnit test fails to get its test list.
             catch (InvocationTargetException e)
             {
                 test = new ErrorTest(testClass.getName(), e.getCause());
@@ -364,6 +366,7 @@ public class Runner extends TestSuite
             {
                 test = new ErrorTest(testClass.getName(), e.getCause());
             }
+            */
 
             if (test == null)
             {
@@ -616,7 +619,7 @@ public class Runner extends TestSuite
         }
     }
 
-    public static TestSuite suite(List<String> testNames, TestSet set)
+    public static TestSuite suite(List<String> testNames, TestSet set) throws Exception
     {
         boolean skipLeakCheck = "false".equals(System.getProperty("memCheck"));
         boolean disableAssertions = "true".equals(System.getProperty("disableAssertions"));
