@@ -337,6 +337,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("View Design", 0);
         waitForPageToLoad();
         clickLinkWithText("edit fields");
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
 
         setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
