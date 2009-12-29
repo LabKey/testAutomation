@@ -455,6 +455,24 @@ public class ListTest extends BaseSeleniumWebTest
         assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
                 source.indexOf(TEST_DATA[1][1], index) < source.indexOf(TEST_DATA[1][2], index));
 
+        log("Test list history");
+        clickLinkWithText("manage lists");
+        clickLinkWithText("view history");
+        assertTextPresent(":History");
+        assertTextPresent("modified", 13);
+        assertTextPresent("inserted", 4);
+        assertTextPresent("created", 1);
+        assertEquals("details Links", 9, countLinksWithText("details"));
+        assertEquals("Project Links", 18 + 3, countLinksWithText(PROJECT_NAME)); // Table links + header & sidebar links
+        assertEquals("List Links", 18 + 1, countLinksWithText(LIST_NAME)); // Table links + header link
+        clickLinkWithText("details");
+        assertTextPresent("List Item Details");
+        assertTextNotPresent("No details available for this event.");  
+        assertTextNotPresent("Unable to find the audit history detail for this event");
+
+        clickNavButton("Done");
+        clickLinkWithText(PROJECT_NAME, 3);
+
         log("Test single list web part");
         addWebPart("Single List");
         setText("title", "This is my single list web part title");
