@@ -3500,6 +3500,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Signing out");
         beginAt("/login/logout.view");
+        waitForPageToLoad();
         assertLinkPresentWithText("Sign In");
     }
 
