@@ -87,7 +87,7 @@ public class ExtHelper
         Locator file = Locator.xpath("//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
 
         test.waitForElement(file, 60000);
-        test.mouseClick(file.toString());
+        test.mouseDown(file);
     }
 
     public static void selectAllFileBrowserFiles(BaseSeleniumWebTest test)
