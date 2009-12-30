@@ -17,6 +17,7 @@ package org.labkey.test.ms1.params;
 
 import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 
@@ -42,6 +43,15 @@ public class PepMatchTestParams extends AbstractInspectTestParams
 
     public void clickActionButton()
     {
+        String[] names = getSampleNames();
+        if (names.length != 0)
+        {
+            for (String name : names)
+            {
+                ExtHelper.selectFileBrowserFile(getTest(), name + ".pep.xml");
+                getTest().sleep(1000);
+            }
+        }
         _test.log("msInspect & pepmatch run");
         _test.waitAndClickNavButton("msInspect Find Features and Match Peptides");
     }

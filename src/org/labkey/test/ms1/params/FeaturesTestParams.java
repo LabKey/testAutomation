@@ -16,6 +16,7 @@
 package org.labkey.test.ms1.params;
 
 import org.labkey.test.pipeline.PipelineWebTestBase;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * InspectTestParams class
@@ -34,6 +35,15 @@ public class FeaturesTestParams extends AbstractInspectTestParams
 
     public void clickActionButton()
     {
+        String[] names = getSampleNames();
+        if (names.length != 0)
+        {
+            for (String name : names)
+            {
+                ExtHelper.selectFileBrowserFile(getTest(), name + ".mzXML");
+                getTest().sleep(1000);
+            }
+        }
         _test.log("msInspect run");
         _test.waitAndClickNavButton("msInspect Find Features");
     }
