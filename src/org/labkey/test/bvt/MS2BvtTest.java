@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.ms2.MS2TestBase;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,6 +79,7 @@ public class MS2BvtTest extends MS2TestBase
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
         waitAndClick(Locator.fileTreeByName(TEST));
+        ExtHelper.selectFileBrowserFile(this, SAMPLE_BASE_NAME + ".search.xar.xml");
         waitAndClickNavButton("Import Experiment");
 
         log("Going to the list of all pipeline jobs");
@@ -817,6 +819,7 @@ public class MS2BvtTest extends MS2TestBase
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
         waitAndClick(Locator.fileTreeByName(TEST2));
+        ExtHelper.selectFileBrowserFile(this, SAMPLE_BASE_NAME + ".search.xar.xml");
         waitAndClickNavButton("Import Experiment");
 
         log("Verify upload finished.");

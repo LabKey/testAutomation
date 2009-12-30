@@ -1976,6 +1976,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.mouseOver(l.toString());
     }
 
+    public void mouseDown(Locator l)
+    {
+        selenium.mouseDown(l.toString());
+    }
+    
     public void mouseDownAt(Locator l, int x, int y)
     {
         selenium.mouseDownAt(l.toString(), x + "," + y);
@@ -4029,6 +4034,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 sleep(1000);
             }
 
+            ExtHelper.selectFileBrowserFile(BaseSeleniumWebTest.this, _copiedArchive.getName());
             waitAndClickNavButton("Import specimen data");
             clickNavButton("Start Import");
         }

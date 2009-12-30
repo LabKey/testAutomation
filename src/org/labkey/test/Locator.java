@@ -159,6 +159,11 @@ public class Locator
         return xpath("//button[@class='x-btn-text' and text() = " + xq(text) + "]");
     }
 
+    public static XPathLocator extMenuItem(String text)
+    {
+        return xpath("//a[@class='x-menu-item' and text() = " + xq(text) + "]");
+    }
+
     public static XPathLocator extButton(String text, int index)
     {
         return xpath("(//button[@class='x-btn-text' and text() = " + xq(text) + "])[" + (index + 1) + "]");

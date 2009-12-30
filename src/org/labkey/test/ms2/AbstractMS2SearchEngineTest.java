@@ -17,6 +17,7 @@
 package org.labkey.test.ms2;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.IOException;
 
@@ -46,8 +47,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClick(5000, Locator.navButton("Describe Samples"), 0);
-        clickMenuButton("Describe Samples", "Describe Samples:Create Assay Definition");
+        click(Locator.extButton("More Actions"));
+        waitAndClick(5000, Locator.extButton("Describe Samples"), 0);
+        waitAndClick(5000, Locator.extMenuItem("Create New Assay Design"), 5000);
 
         log("Create a new MS2 sample prep assay definition.");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
@@ -64,8 +66,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClick(5000, Locator.navButton("Describe Samples"), 0);
-        clickMenuButton("Describe Samples", "Describe Samples:Use " + TEST_ASSAY_NAME);
+        ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
+        click(Locator.extButton("More Actions"));
+        waitAndClick(5000, Locator.extButton("Describe Samples"), 0);
+        waitAndClick(5000, Locator.extMenuItem("Use " + TEST_ASSAY_NAME), 5000);
 
         log("Describe MS2 run.");
         clickNavButton("Next");
@@ -91,6 +95,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertLinkPresentWithText(ANNOTATION_RUN_NAME);
 
         clickNavButton("Process and Import Data");
+        waitAndClick(Locator.fileTreeByName("bov_sample"));
         setupEngine();
 
         waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_GWT);

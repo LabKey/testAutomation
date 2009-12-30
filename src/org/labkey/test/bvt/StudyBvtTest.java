@@ -17,6 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.drt.StudyManualTest;
 
 import java.io.File;
@@ -59,6 +60,7 @@ public class StudyBvtTest extends StudyManualTest
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
         waitAndClick(Locator.fileTreeByName("export"));
+        ExtHelper.selectFileBrowserFile(this, "study.xml");
         waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load to complete
@@ -86,6 +88,7 @@ public class StudyBvtTest extends StudyManualTest
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
         waitAndClick(Locator.fileTreeByName("export"));
+        ExtHelper.selectAllFileBrowserFiles(this);
         waitAndClickNavButton("Import Study");
 
         // wait for study & specimen load

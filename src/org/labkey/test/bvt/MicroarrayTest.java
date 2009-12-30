@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * User: Erik
@@ -106,7 +107,14 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
         waitForText("Import MAGE-ML",5000);
-        clickMenuButton("Import MAGE-ML", "Import MAGE-ML:Use " + ASSAY_NAME);
+
+        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
+        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
+
+        click(Locator.extButton("More Actions"));
+        waitAndClick(5000, Locator.extButton("Import MAGE-ML"), 0);
+        waitAndClick(5000, Locator.extMenuItem("Use " + ASSAY_NAME), 5000);
+
         setFormElement("batchStringField", "SingleRunProperties");
         clickNavButton("Next");
         assertTextPresent(MAGEML_FILE1);
@@ -134,7 +142,14 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         // Start the upload wizard again
         clickNavButton("Import Data");
         waitForText("Import MAGE-ML",5000);
-        clickMenuButton("Import MAGE-ML", "Import MAGE-ML:Use " + ASSAY_NAME);
+
+        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
+        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
+
+        click(Locator.extButton("More Actions"));
+        waitAndClick(5000, Locator.extButton("Import MAGE-ML"), 0);
+        waitAndClick(5000, Locator.extMenuItem("Use " + ASSAY_NAME), 5000);
+
         setFormElement("batchStringField", "BulkProperties");
         
         assertFormElementEquals("batchStringField", "BulkProperties");

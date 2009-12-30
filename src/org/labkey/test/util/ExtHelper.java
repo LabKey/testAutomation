@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.apache.commons.lang.BooleanUtils;
 
 /**
@@ -79,5 +80,24 @@ public class ExtHelper
             test.sleep(500);
         }
         test.fail("Failed waiting for Ext dialog to appear");
+    }
+
+    public static void selectFileBrowserFile(BaseSeleniumWebTest test, String fileName)
+    {
+        Locator file = Locator.xpath("//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
+
+        test.waitForElement(file, 60000);
+        test.mouseClick(file.toString());
+    }
+
+    public static void selectAllFileBrowserFiles(BaseSeleniumWebTest test)
+    {
+        Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
+        test.waitForElement(file, 60000);
+        test.sleep(1000);
+        test.mouseClick(file.toString());
+
+        file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-inner x-grid3-hd-checker x-grid3-hd-checker-on']");
+        test.waitForElement(file, 60000);
     }
 }

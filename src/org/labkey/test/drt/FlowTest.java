@@ -19,6 +19,7 @@ package org.labkey.test.drt;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.ExtHelper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,6 +72,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for FCS files to be loaded");
 
         waitAndClick(Locator.fileTreeByName("8color"));
+        ExtHelper.selectFileBrowserFile(this, "quv-analysis.xml");
         waitAndClickNavButton("Import Multiple Runs");
         // First, just upload the run "8colordata"
         clickNavButton("Clear All", -1); // no nav
@@ -211,6 +213,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for more FCS files to be loaded");
 
         waitAndClick(Locator.fileTreeByName("8color"));
+        ExtHelper.selectFileBrowserFile(this, "quv-analysis.xml");
         waitAndClickNavButton("Import Multiple Runs");
         assertTextNotPresent("8colordata");
         clickImgButtonNoNav("Select All");

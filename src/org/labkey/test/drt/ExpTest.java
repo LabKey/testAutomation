@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -58,6 +59,9 @@ public class ExpTest extends BaseSeleniumWebTest
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
+
+        ExtHelper.selectFileBrowserFile(this, "experiment.xar.xml");
+
         waitAndClickNavButton("Import Experiment");
         clickLinkWithText("Data Pipeline");
         assertLinkNotPresentWithText("ERROR");

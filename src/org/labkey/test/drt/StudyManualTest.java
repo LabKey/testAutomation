@@ -19,6 +19,7 @@ package org.labkey.test.drt;
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -106,7 +107,8 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText("Pipeline");
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("datasets"));
-        waitForElement(Locator.navButton("Import datasets"), 5000);
+        ExtHelper.selectFileBrowserFile(this, "Study001.dataset");
+        //waitForElement(Locator.navButton("Import datasets"), 5000);
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
         clickNavButton("Import datasets");
