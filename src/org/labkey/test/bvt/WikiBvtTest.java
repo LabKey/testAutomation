@@ -488,7 +488,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE2_TITLE);
         clickLinkWithText("edit", 0);
         waitAndClickNavButton("Delete Page");
-        clickNavButton("Delete");
+        waitAndClickNavButton("Delete");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         //add once bug with caching wiki title is fixed
         //assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);

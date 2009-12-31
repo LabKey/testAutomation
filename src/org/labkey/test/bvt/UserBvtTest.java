@@ -126,13 +126,14 @@ public class UserBvtTest extends SecurityTest
 
         clickButton("Set Password", 0);
 
-        signOut();
-        clickLinkWithText("Sign In");
-        setFormElement("email", NORMAL_USER);
-        setFormElement("password", TEST_PASSWORD);
+        waitAndClick(Locator.linkWithText("Sign Out"));
+        waitAndClick(Locator.linkWithText("Sign In"));
+        setText("email", NORMAL_USER);
+        setText("password", TEST_PASSWORD);
         clickButton("Sign In", 0);
         waitForPageToLoad();
-        assertTextPresent("Sign Out");
+        assertTextPresent("Sign Out", NORMAL_USER);
+        assertTextNotPresent("Sign In");
 
         signOut();
         simpleSignIn();
