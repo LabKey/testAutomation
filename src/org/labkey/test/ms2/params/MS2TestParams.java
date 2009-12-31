@@ -63,4 +63,10 @@ public class MS2TestParams extends AbstractPipelineTestParams
         _test.selectOptionByText("grouping", grouping);
         _test.clickAndWait(Locator.id("viewTypeSubmitButton"));
     }
+
+    @Override
+    protected void clickSubmitButton()
+    {
+        _test.submit();
+    }
 }

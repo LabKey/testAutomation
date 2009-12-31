@@ -50,6 +50,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
     public static final String PIPELINE_MS1PEP_DIR = "ms1peptides";
     public static final String PIPELINE_INSPECT_DIR = "inspect";
     public static final String PIPELINE_FIND_FEATURES_PROTOCOL = "Find Features";
+    public static final String PIPELINE_MORE_ACTIONS_BUTTON = "More Actions";
     public static final String PIPELINE_IMPORT_EXPR_BUTTON = "Import Experiment";
     public static final String PIPELINE_PROCESS_AND_IMPORT_BUTTON = "Process and Import Data";
     public static final String PIPELINE_IMPORT_MS1_FEATURES_BUTTON = "Import";
@@ -104,16 +105,14 @@ public class MS1Bvt extends BaseSeleniumWebTest
         log("Importing sample data...");
 
         //two x-tandem peptide experiments
-        importXtandemExp(project, xProtocol, 0);
-        importXtandemExp(project, xProtocol, 1);
+        importXtandemExps(project, xProtocol);
 
         //and two features+peaks experiments
-        importFeaturesExp(project, xProtocol, featuresProtocol, 0);
-        importFeaturesExp(project, xProtocol, featuresProtocol, 1);
+        importFeaturesExp(project, xProtocol, featuresProtocol);
 
         //add a simple features tsv with no peptide identifications
         //import it into the subfolder
-        importPepTsvFile(project, PIPELINE_FIND_FEATURES_PROTOCOL, 0);
+        importPepTsvFile(project, PIPELINE_FIND_FEATURES_PROTOCOL);
 
         //go back to the portal/data pipeline page and wait for all four experiments to be complete
         clickLinkWithText(project);
@@ -147,7 +146,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         log("System maintenance task complete.");
     }
 
-    protected void importXtandemExp(String project, String xProtocol, int index)
+    protected void importXtandemExps(String project, String xProtocol)
     {
         //go back to the portal page
         clickLinkWithText(project);
@@ -161,11 +160,11 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(xProtocol));
         }
 
-        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),5000);
-        clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
+        clickNavButton(PIPELINE_MORE_ACTIONS_BUTTON, 0);
+        waitAndClickNavButton(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
-    protected void importFeaturesExp(String project, String xProtocol, String featuresProtocol, int index)
+    protected void importFeaturesExp(String project, String xProtocol, String featuresProtocol)
     {
         //go back to the portal page
         clickLinkWithText(project);
@@ -186,11 +185,11 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(featuresProtocol));
         }
 
-        sleep(3000);
-        waitAndClick(5000, Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index), defaultWaitForPage);
+        clickNavButton(PIPELINE_MORE_ACTIONS_BUTTON, 0);
+        waitAndClickNavButton(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
-    protected void importPepTsvFile(String project, String protocol, int index)
+    protected void importPepTsvFile(String project, String protocol)
     {
         //go back to the portal page
         clickLinkWithText(project);
@@ -206,8 +205,8 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(protocol));
         }
 
-        waitForElement(Locator.navButton(PIPELINE_IMPORT_EXPR_BUTTON, index),10000);
-        clickNavButtonByIndex(PIPELINE_IMPORT_EXPR_BUTTON, index);
+        clickNavButton(PIPELINE_MORE_ACTIONS_BUTTON, 0);
+        waitAndClickNavButton(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
     protected void testViews(String project)

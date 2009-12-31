@@ -18,6 +18,7 @@ package org.labkey.test.ms1.params;
 import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,6 +83,12 @@ abstract public class AbstractInspectTestParams extends AbstractPipelineTestPara
             for (String ext : _cacheExtensions)
                 delete(new File(cacheDir, sampleName + ext));
         }
+    }
+
+    @Override
+    protected void clickSubmitButton()
+    {
+        _test.click(Locator.id("submitButton"));
     }
 
     public void verifyClean(File rootDir)

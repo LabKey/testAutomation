@@ -255,9 +255,11 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _test.sleep(wait);
 
         _test.log("Start data processing");
-        _test.submit();
+        clickSubmitButton();
         _test.sleep(wait);
     }
+
+    protected abstract void clickSubmitButton();
 
     public void remove()
     {
