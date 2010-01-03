@@ -151,7 +151,7 @@ public class Locator
 
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "]");
+        return xpath("//a[normalize-space(@class)='labkey-button' or normalize-space(@class)='labkey-menu-button']/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator extButton(String text)
@@ -176,22 +176,22 @@ public class Locator
 
     public static XPathLocator navButtonDisabled(String text)
     {
-        return xpath("//a[@class='labkey-disabled-button' or @class='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");
+        return xpath("//a[normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator navButtonContainingText(String text)
     {
-        return xpath("//a[@class='labkey-button' or @class='labkey-menu-button']/span[contains(text(),  " + xq(text) + ")]");
+        return xpath("//a[normalize-space(@class)='labkey-button' or normalize-space(@class)='labkey-menu-button']/span[contains(text(),  " + xq(text) + ")]");
     }
 
     public static XPathLocator navButton(String text, int index)
     {
-        return xpath("(//a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
+        return xpath("(//a[normalize-space(@class)='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator navSubmitButton(String text)
     {
-        return xpath("//span[@class='labkey-button' or @class='labkey-menu-button']/input[@type='submit' and @value=" + xq(text) + "]");
+        return xpath("//span[normalize-space(@class)='labkey-button' or @class='labkey-menu-button']/input[@type='submit' and @value=" + xq(text) + "]");
     }
 
     public static XPathLocator navSubmitButtonContainingText(String text)
