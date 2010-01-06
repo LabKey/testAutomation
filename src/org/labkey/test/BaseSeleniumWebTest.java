@@ -609,6 +609,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if (isNavButtonPresent("Next"))
             {
                 clickNavButton("Next");
+
+                // check for any additional upgrade pages inserted after module upgrade
+                if (isNavButtonPresent("Next"))
+                    clickNavButton("Next");
+
                 // Save the default site config properties
                 clickNavButton("Save");
             }
