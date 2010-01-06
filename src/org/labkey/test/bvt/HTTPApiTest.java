@@ -66,7 +66,7 @@ public class HTTPApiTest extends SimpleApiTest
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
-    protected void doTestSteps() throws Exception
+    protected void runUITests() throws Exception
     {
         log("Create Project");
         createProject(PROJECT_NAME);

@@ -19,6 +19,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.Locator;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 /**
  * User: jeckels
@@ -108,7 +109,7 @@ public class AssayTest extends AbstractAssayTest
      *  defines an Assay at the project level; uploads run data as a labtech; publishes
      *  as a PI, and tests to make sure that security is properly enforced
      */
-    protected void doTestSteps()
+    protected void runUITests()
     {
         log("Starting Assay security scenario tests");
         setupEnvironment();

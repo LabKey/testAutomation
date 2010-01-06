@@ -80,7 +80,7 @@ public class ViabilityTest extends AbstractQCAssayTest
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 
-    protected void doTestSteps() throws Exception
+    protected void runUITests() throws Exception
     {
         // setup a scripting engine to run a java transform script
         prepareProgrammaticQC();

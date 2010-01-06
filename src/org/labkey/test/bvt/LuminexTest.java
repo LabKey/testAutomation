@@ -57,7 +57,7 @@ public class LuminexTest extends AbstractQCAssayTest
     /**
      * Performs Luminex designer/upload/publish.
      */
-    protected void doTestSteps()
+    protected void runUITests()
     {
         log("Starting Assay BVT Test");
 

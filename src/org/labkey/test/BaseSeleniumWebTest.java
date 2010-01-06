@@ -23,6 +23,7 @@ import junit.framework.AssertionFailedError;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.commons.io.FileUtils;
 import static org.labkey.test.WebTestHelper.*;
+import org.labkey.test.bvt.SimpleApiTest;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ExtHelper;
@@ -1153,6 +1154,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
         }
         selenium.open(getBaseURL() + relativeURL, millis);
+    }
+
+    public void assertConfirmation(String msg)
+    {
+        assertEquals(msg, selenium.getConfirmation());
     }
 
     public void assertAlert(String msg)
@@ -2432,9 +2438,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFormElement(String elementName, String text)
     {
+        setFormElement(elementName, text, false);
+    }
+
+    public void setFormElement(String elementName, String text, boolean suppressValueLogging)
+    {
         try
         {
-            selenium.type(elementName, text);
+            selenium.type(elementName, text, suppressValueLogging);
         }
         catch (SeleniumException e)
         {
@@ -2451,6 +2462,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFormElement(Locator element, String text)
     {
         setFormElement(element.toString(), text);
+    }
+
+    public void setFormElement(Locator element, String text, boolean suppressValueLogging)
+    {
+        setFormElement(element.toString(), text, suppressValueLogging);
     }
 
     public void setFormElement(String formElementName, String[] values)
@@ -3829,7 +3845,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         @Override
         public void type(String locator, String value)
         {
-            log("Set value of element " + locator + " to "+ value);
+            type(locator, value, false);
+        }
+
+        public void type(String locator, String value, boolean suppressValueLogging)
+        {
+            log("Set value of element " + locator + " to "+ (suppressValueLogging ? "[logging suppressed]" : value));
             super.type(locator, value);
         }
 

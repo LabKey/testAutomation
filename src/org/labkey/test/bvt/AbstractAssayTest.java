@@ -20,12 +20,13 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 /**
  * User: jeckels
  * Date: Nov 20, 2007
  */
-public abstract class AbstractAssayTest extends BaseSeleniumWebTest
+public abstract class AbstractAssayTest extends SimpleApiTest
 {
     protected final static int WAIT_FOR_GWT = 5000;
 
@@ -268,4 +269,9 @@ public abstract class AbstractAssayTest extends BaseSeleniumWebTest
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
     } //addUserToProjGroup()
+
+    protected File[] getTestFiles()
+    {
+        return new File[0];
+    }
 }

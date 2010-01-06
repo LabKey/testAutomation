@@ -38,7 +38,7 @@ public class SecurityApiTest extends SimpleApiTest
     }
 
     @Override
-    protected void doTestSteps() throws Exception
+    protected void runUITests() throws Exception
     {
         //setup the project, users and groups
         createUser(USER_1, null);
@@ -50,9 +50,6 @@ public class SecurityApiTest extends SimpleApiTest
         setPermissions(GROUP_1, "Editor");
         setPermissions(GROUP_2, "Reader");
         exitPermissionsUI();
-
-        //run test files
-        super.doTestSteps();
     }
 
     protected void doCleanup() throws Exception

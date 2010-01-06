@@ -18,8 +18,11 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.SortDirection;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * User: jeckels
@@ -78,6 +81,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static final String CURVE_IC80_POLY_STUDY_COL_TITLE = "CurveIC90_poly";
 
     private static final boolean CONTINUE = false;
+    private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
 
     public String getAssociatedModuleDirectory()
     {
@@ -87,7 +91,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     /**
      * Performs Luminex designer/upload/publish.
      */
-    protected void doTestSteps()
+    protected void runUITests()
     {
         log("Starting Assay BVT Test");
         //revert to the admin user
@@ -134,7 +138,62 @@ public class NabAssayTest extends AbstractQCAssayTest
             sleep(1000);
             clickNavButton("Save", 0);
             waitForText("Save successful.", 20000);
+
+            clickLinkWithText("configure templates");
+
+            clickLinkWithText("new NAb Default template");
+
+            waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_GWT);
+
+            setText("templateName", PLATE_TEMPLATE_NAME);
+
+            // select the specimen wellgroup tab
+            click(Locator.tagWithText("div", "SPECIMEN"));
+
+            // select the first specimen group
+            click(Locator.tagWithText("label", "Specimen 1"));
+            // set reversed dilution direction to true:
+            selenium.type("//input[@id='property-ReverseDilutionDirection']", "true");
+
+            // select the second specimen group
+            click(Locator.tagWithText("label", "Specimen 2"));
+            // set reversed dilution direction to false:
+            selenium.type("//input[@id='property-ReverseDilutionDirection']", "false");
+
+            // select the third specimen group
+            click(Locator.tagWithText("label", "Specimen 3"));
+            // set reversed dilution direction to a nonsense value:
+            selenium.type("//input[@id='property-ReverseDilutionDirection']", "invalid boolean value");
+
+            // note that we're intentionally leaving the fourth and fifth direction specifiers null, which should default to 'false'
+
+            clickNavButton("Save & Close");
+
+            assertTextPresent(PLATE_TEMPLATE_NAME);
+            assertTextPresent("NAb: 5 specimens in duplicate");
+
+            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            clickLinkWithText(TEST_ASSAY_NAB);
+
+            click(Locator.linkWithText("manage assay design >>"));
+            clickLinkWithText("edit assay design");
+            waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_GWT);
+
+            selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
+
+            clickNavButton("Save", 0);
+            waitForText("Save successful.", 20000);
+
+            clickLinkWithText("configure templates");
+
+            clickLinkWithText("delete", 0);
+
+            assertConfirmation("Permanently delete this plate template?");
+
+            assertTextPresent(PLATE_TEMPLATE_NAME);
+            assertTextNotPresent("NAb: 5 specimens in duplicate");
         }
+
         clickLinkWithText(TEST_ASSAY_PRJ_NAB);
         clickLinkWithText(TEST_ASSAY_FLDR_NAB);
         addWebPart("Assay List");
@@ -183,7 +242,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextPresent("561");
 
             // test creating a custom details view via a "magic" named run-level view:
-            clickLinkWithText("view runs");
+            clickLinkWithText("View Runs");
             clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
             removeCustomizeViewColumn("Virus Name");
             setFormElement("ff_columnListName", "CustomDetailsView");
@@ -192,7 +251,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickLinkWithText("details", 1);
             assertNabData(true);
 
-            clickLinkWithText("view results");
+            clickLinkWithText("View Results");
 
             assertAUCColumnsHidden();
             addAUCColumns();
@@ -202,18 +261,18 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextPresent("ptid 1 C");
             String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
 
-            setFilter(TEST_ASSAY_NAB + " Data", "Properties/SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. 'a;b;c')", "ptid 1 A;ptid 1 B");
+            setFilter(TEST_ASSAY_NAB + " Data", "Properties/SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. 'a;b;c')", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
             assertTextPresent("ptid 1 A");
             assertTextPresent("ptid 1 B");
             assertTextNotPresent("ptid 1 C");
-            assertTextNotPresent("ptid 2");
+            assertTextNotPresent("ptid 5");
             checkAllOnPage(TEST_ASSAY_NAB + " Data");
             clickNavButton("Copy to Study");
 
             selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
             clickNavButton("Next");
             clickNavButton("Copy to Study");
-            assertStudyData();
+            assertStudyData(4);
 
             assertAliasedAUCStudyData();
             
@@ -236,7 +295,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
             clickLinkWithText("Study Navigator");
             clickLinkWithText("2");
-            assertStudyData();
+            assertStudyData(1);
             clickLinkWithText("assay");
             assertNabData(false); // CustomDetailsView not enabled for all users so "Virus Name" is present
 
@@ -267,14 +326,46 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickNavButton(finalButton, 60000);
     }
 
-    private void assertStudyData()
+    private void assertStudyData(int ptidCount)
     {
         assertTextPresent("Dataset: " + TEST_ASSAY_NAB);
-        assertTextPresent("ptid 1 A");
-        assertTextPresent("ptid 1 B");
-        assertTextPresent("CurveIC50");
-        assertTextPresent("1353");
-        assertTextPresent("Specimen 1", 2);
+
+        if (ptidCount >= 1)
+        {
+            // reversed dilution direction:
+            assertTextPresent("ptid 1 A");
+            assertTextPresent("ptid 1 B");
+            assertTextPresent("CurveIC50");
+            assertTextPresent("493");
+            assertTextPresent("Specimen 1", 2);
+        }
+        if (ptidCount >= 2)
+        {
+            // standard dilution direction
+            assertTextPresent("ptid 2 A");
+            assertTextPresent("ptid 2 B");
+            assertTextPresent("CurveIC50");
+            assertTextPresent("134");
+            assertTextPresent("Specimen 2", 2);
+        }
+        if (ptidCount >= 3)
+        {
+            // invalid dilution direction
+            assertTextPresent("ptid 3 A");
+            assertTextPresent("ptid 3 B");
+            assertTextPresent("CurveIC50");
+            assertTextPresent("436");
+            assertTextPresent("Specimen 3", 2);
+        }
+        if (ptidCount >= 4)
+        {
+            // unspecified dilution direction
+            assertTextPresent("ptid 4 A");
+            assertTextPresent("ptid 4 B");
+            assertTextPresent("CurveIC50");
+            assertTextPresent("277.9");
+            assertTextPresent("Specimen 4", 2);
+        }
     }
 
     private void assertNabData(boolean hasCustomView)
@@ -368,6 +459,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Checking data in aliased AUC columns in Study");
         // check copied AUC data.
+        setSort("Dataset", "ParticipantId", SortDirection.ASC);
         assertTableCellsEqual("dataregion_Dataset",  1, AUC_STUDY_COL_TITLE, 1, AUC_POLY_STUDY_COL_TITLE); //AUC = AUC_poly
         assertTableCellsEqual("dataregion_Dataset",  2, AUC_STUDY_COL_TITLE, 2, AUC_4PL_STUDY_COL_TITLE); //AUC = AUC_4pl
         assertTableCellsEqual("dataregion_Dataset",  1, CURVE_IC50_STUDY_COL_TITLE, 1, CURVE_IC50_POLY_STUDY_COL_TITLE); //CurveIC50 = CurveIC50_poly
@@ -427,7 +519,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         uploadFile(TEST_ASSAY_NAB_FILE1, "E", "Save and Finish");
 
         // verify the run property FileID was generated by the transform script
-        clickLinkWithText("view runs");
+        clickLinkWithText("View Runs");
         assertTextPresent("transformed FileID");
 
         // verify the fit error was generated by the transform script
@@ -436,5 +528,27 @@ public class NabAssayTest extends AbstractQCAssayTest
         {
             assertTableCellTextEquals("dataregion_" + TEST_ASSAY_NAB + " Data",  i, "Fit Error", "0.0");
         }
+    }
+
+    @Override
+    protected Pattern[] getIgnoredElements()
+    {
+        return new Pattern[] {
+            Pattern.compile("RunProperties", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("RunGroups", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Input", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Output", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Links", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("runId", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("assayId", Pattern.CASE_INSENSITIVE)
+        };
+    }
+
+    @Override
+    protected File[] getTestFiles()
+    {
+        return new File[] {
+            new File(getLabKeyRoot() + "/server/test/data/api/nab-api.xml")
+        };
     }
 }

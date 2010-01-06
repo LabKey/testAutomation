@@ -73,7 +73,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             setFormElement(Locator.id(id), "jar");
 
             id = ExtHelper.getExtElementId(this, "editEngine_exeCommand");
-            setFormElement(Locator.id(id), "-jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
+            setFormElement(Locator.id(id), "-jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"", true);
 
             // add -Xdebug and -Xrunjdwp parameters to the engine command in order to attach a debugger to you transform script
             //setFormElement(Locator.id(id), "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006 -jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");

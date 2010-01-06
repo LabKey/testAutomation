@@ -46,7 +46,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         deleteProject(PROJECT_NAME);
     }
 
-    protected void doTestSteps() throws Exception
+    protected void runUITests() throws Exception
     {
         createProject(PROJECT_NAME);
 

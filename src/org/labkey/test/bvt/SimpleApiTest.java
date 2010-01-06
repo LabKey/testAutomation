@@ -45,33 +45,31 @@ import java.util.regex.Pattern;
  */
 public abstract class SimpleApiTest extends BaseSeleniumWebTest
 {
-    private HttpClient _client;
     private boolean _failedComparisonFatal = true;
+    private List<Pattern> _ignoredElements = null;
 
     // json key elements to ignore during the comparison phase, these can be regular expressions
-    static final Pattern[] _ignored = {
+    static final Pattern[] _globallyIgnored = {
             Pattern.compile("entityid", Pattern.CASE_INSENSITIVE),
             Pattern.compile("containerid", Pattern.CASE_INSENSITIVE),
             Pattern.compile("rowid", Pattern.CASE_INSENSITIVE),
             Pattern.compile("lsid", Pattern.CASE_INSENSITIVE),
             Pattern.compile("_labkeyurl_.*"),
             Pattern.compile("id", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("objectId", Pattern.CASE_INSENSITIVE),
             Pattern.compile("userId", Pattern.CASE_INSENSITIVE),
             Pattern.compile("groupId", Pattern.CASE_INSENSITIVE),
             Pattern.compile("message", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("created", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("FilePathRoot", Pattern.CASE_INSENSITIVE),
             Pattern.compile("displayName", Pattern.CASE_INSENSITIVE)
     };
-
-    private static List<Pattern> _ignoredElements = new ArrayList<Pattern>();
 
     enum ActionType {
         get,
         post
     }
 
-    static {
-        _ignoredElements.addAll(Arrays.asList(_ignored));
-    }
     /**
      * Returns the list of files to run tests over. Each test file contains metadata representing
      * test cases, the metadata schema can be found in apiTest.xsd
@@ -83,7 +81,15 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         return new Pattern[0];
     }
 
-    protected void doTestSteps() throws Exception
+    protected final void doTestSteps() throws Exception
+    {
+        runUITests();
+        runApiTests();
+    }
+
+    protected abstract void runUITests() throws Exception;
+
+    public void runApiTests() throws Exception
     {
         int tests = 0;
         File[] testFiles = getTestFiles();
@@ -91,6 +97,8 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         if (testFiles != null)
         {
             // load up the elements to skip comparisons on
+            _ignoredElements = new ArrayList<Pattern>();
+            _ignoredElements.addAll(Arrays.asList(_globallyIgnored));
             _ignoredElements.addAll(Arrays.asList(getIgnoredElements()));
             for (File testFile : testFiles)
             {

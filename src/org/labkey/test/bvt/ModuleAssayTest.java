@@ -55,7 +55,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         deleteDir(getTestTempDir());
     }
 
-    protected void doTestSteps() throws Exception
+    protected void runUITests() throws Exception
     {
         if (!isFileUploadAvailable())
             return;
