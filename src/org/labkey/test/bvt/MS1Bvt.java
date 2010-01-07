@@ -84,17 +84,13 @@ public class MS1Bvt extends BaseSeleniumWebTest
     {
         log("Setting up pipeline for project " + project + "...");
         clickLinkWithText(project);
-        clickNavButton("Setup");
 
         //test invalid path
-        setFormElement("path", path + "-invalid");
-        submit();
+        setPipelineRoot(path + "-invalid");
         assertTextPresent("-invalid' does not exist");
 
         //set to valid path
-        setFormElement("path", path);
-        submit();
-
+        setPipelineRoot(path);
         assertTextPresent("The pipeline root was set to");
         assertTextNotPresent("does not exist");
         log("Pipeline successfully setup.");

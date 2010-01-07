@@ -106,12 +106,12 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         // First try importing the runs individually
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
+        clickNavButton("More Actions", 0);
         waitForText("Import MAGE-ML",5000);
 
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        click(Locator.extButton("More Actions"));
         waitAndClick(5000, Locator.extButton("Import MAGE-ML"), 0);
         waitAndClick(5000, Locator.extMenuItem("Use " + ASSAY_NAME), 5000);
 
@@ -141,12 +141,12 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         // Start the upload wizard again
         clickNavButton("Import Data");
+        click(Locator.extButton("More Actions"));
         waitForText("Import MAGE-ML",5000);
 
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        click(Locator.extButton("More Actions"));
         waitAndClick(5000, Locator.extButton("Import MAGE-ML"), 0);
         waitAndClick(5000, Locator.extMenuItem("Use " + ASSAY_NAME), 5000);
 
