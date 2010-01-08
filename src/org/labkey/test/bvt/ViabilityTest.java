@@ -105,7 +105,7 @@ public class ViabilityTest extends AbstractQCAssayTest
         checkRadioButton("providerName", "Viability");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
 
@@ -238,7 +238,7 @@ public class ViabilityTest extends AbstractQCAssayTest
         click(Locator.linkWithText("manage assay design >>"));
         clickLinkWithText("edit assay design");
         selenium.getConfirmation();
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         clickNavButton("Save & Close");

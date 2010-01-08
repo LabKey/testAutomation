@@ -17,9 +17,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.*;
 
@@ -112,7 +110,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
 
@@ -143,7 +141,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", assayName);
 

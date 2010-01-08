@@ -247,7 +247,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
         clickActionButton();
 
-        int wait = BaseSeleniumWebTest.WAIT_FOR_GWT;
+        int wait = BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT;
         _test.log("Choose existing protocol " + getProtocolName());
         _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ),
                 wait * 12);

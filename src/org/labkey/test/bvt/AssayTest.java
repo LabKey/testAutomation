@@ -19,7 +19,6 @@ package org.labkey.test.bvt;
 import org.labkey.test.Locator;
 
 import java.io.File;
-import java.util.regex.Pattern;
 
 /**
  * User: jeckels
@@ -140,7 +139,7 @@ public class AssayTest extends AbstractAssayTest
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
@@ -452,14 +451,14 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY);
         click(Locator.linkWithText("manage assay design >>"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']"), WAIT_FOR_GWT);
+        waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
         selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_label5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
         selenium.mouseClick(getPropertyXPath("Data Fields") + "//div[@id='partdelete_4']");
         clickNavButton("OK", 0); // Confirm the deletion
-        waitForElement(Locator.raw("//td/img[@id='partdeleted_4']"), WAIT_FOR_GWT);
+        waitForElement(Locator.raw("//td/img[@id='partdeleted_4']"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Save", 0);
-        waitForText("Save successful.", WAIT_FOR_GWT);
+        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
 
         //ensure that label has changed in run data in Lab 1 folder
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);

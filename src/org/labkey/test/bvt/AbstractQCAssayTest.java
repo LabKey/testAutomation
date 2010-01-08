@@ -18,7 +18,6 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
@@ -128,7 +127,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         // need to allow time for the server to return the engine list and the ext grid to render
         Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
         int time = 0;
-        while (!isElementPresent(engine) && time < 5000)
+        while (!isElementPresent(engine) && time < WAIT_FOR_JAVASCRIPT)
         {
             sleep(100);
             time += 100;
@@ -151,7 +150,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             String id = ExtHelper.getExtElementId(this, "btn_deleteEngine");
             click(Locator.id(id));
 
-            ExtHelper.waitForExtDialog(this, 5000);
+            ExtHelper.waitForExtDialog(this, WAIT_FOR_JAVASCRIPT);
 
             String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
             click(Locator.id(btnId));

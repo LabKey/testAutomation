@@ -23,7 +23,6 @@ import junit.framework.AssertionFailedError;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.commons.io.FileUtils;
 import static org.labkey.test.WebTestHelper.*;
-import org.labkey.test.bvt.SimpleApiTest;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ExtHelper;
@@ -57,7 +56,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
     protected boolean _testFailed = true;
     protected int defaultWaitForPage = 60000;
-    public final static int WAIT_FOR_GWT = 5000;
+    public final static int WAIT_FOR_JAVASCRIPT = 5000;
     protected int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
 
@@ -1224,7 +1223,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Creating permissions group " + groupName);
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
-        waitForElement(Locator.permissionRendered(), 5000);
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create new group", 0);
         sleep(500);
@@ -1237,7 +1236,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Creating permissions group " + groupName);
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
-        waitForElement(Locator.permissionRendered(), 5000);
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create new group", 0);
         sleep(500);
@@ -1614,7 +1613,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         // need to allow time for the server to return the engine list and the ext grid to render
         Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
         int time = 0;
-        while (!isElementPresent(engine) && time < 5000)
+        while (!isElementPresent(engine) && time < WAIT_FOR_JAVASCRIPT)
         {
             sleep(100);
             time += 100;
@@ -2025,7 +2024,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Clicking Ext button with caption: " + caption);
         Locator loc = Locator.xpath("//button[contains(./@class, 'x-btn-text') and text()='" + caption + "']");
-        waitForElement(loc, 5000);
+        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         if (wait > 0)
             clickAndWait(loc, wait);
         else
@@ -2980,7 +2979,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertNoPermission(String groupName, String permissionSetting)
     {
         String role = toRole(permissionSetting);
-        waitForElement(Locator.permissionRendered(), 5000);
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         assertElementNotPresent(Locator.permissionButton(groupName,role));
     }
 
@@ -3002,7 +3001,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 return;
             }
             log("Checking permission setting for group " + groupName + " equals " + role);
-            waitForElement(Locator.permissionRendered(), 5000);
+            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             assertElementPresent(Locator.permissionButton(groupName,role));
             //assertEquals("'" + groupName + "' is not in role '" + role + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
         }
@@ -3079,7 +3078,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
             log("Setting permissions for group " + groupName + " to " + role);
 
-            waitForElement(Locator.permissionRendered(), 5000);
+            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             String input = "$add$" + role;
             String combo = "$combo$" + role;
             //selenium.type(name, groupName + "\n");
@@ -3109,7 +3108,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         String role = toRole(permissionString);
 
-        waitForElement(Locator.permissionRendered(), 5000);
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         Locator close = Locator.closePermissionButton(groupName,role);
         if (isElementPresent(close))
         {
@@ -3470,7 +3469,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             refresh();
         }
         clickAndWait(Locator.raw("//td[contains(text(),'" + item + "')]/../td[2]/a"));
-        waitForElement(Locator.raw("//input[@value='Data']"), 5000);
+        waitForElement(Locator.raw("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Data");
     }
 
@@ -3647,7 +3646,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         Locator loc = Locator.queryTreeNode(schemaName, queryName);
-        waitForElement(loc, 5000);
+        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         click(loc);
         waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
     }
@@ -3672,7 +3671,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         selectQuery(schemaName, queryName);
         Locator loc = Locator.xpath("//div[@class='lk-qd-name']/a[text()='" + schemaName + "." + queryName + "']");
-        waitForElement(loc, 5000);
+        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         log("Navigating to " + href);
         selenium.open(href);
@@ -3682,7 +3681,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         selectQuery(schemaName, queryName);
         Locator loc = Locator.linkWithText("edit properties");
-        waitForElement(loc, 5000);
+        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         clickAndWait(loc);
     }
 
@@ -3700,7 +3699,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickExtToolbarButton("Validate Queries", 0);
         Locator locButton = Locator.xpath("//button[text()='Start Validation']");
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
-        waitForElement(locButton, 5000);
+        waitForElement(locButton, WAIT_FOR_JAVASCRIPT);
         click(locButton);
         waitForElement(locFinishMsg, 120000);
         //test for success

@@ -90,15 +90,15 @@ public class MenuBarTest extends BaseSeleniumWebTest
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
-        waitForElement(Locator.id("AssayDesignerName"), 5000);
+        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("AssayDesignerName"), "Test Assay");
         clickNavButton("Save", 0);
-        waitForText("Save successful.", WAIT_FOR_GWT);
+        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
         clickLinkWithText(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");
         mouseOver(Locator.menuBarItem("Assays"));
-        waitForText("Test Assay", 5000);
+        waitForText("Test Assay", WAIT_FOR_JAVASCRIPT);
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
         clickNavButton("Create Study");
@@ -107,7 +107,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
 
         mouseOver(Locator.menuBarItem("Studies"));
-        waitForText("StudyFolder Study", 5000);
+        waitForText("StudyFolder Study", WAIT_FOR_JAVASCRIPT);
     }
 
     protected void doCleanup()

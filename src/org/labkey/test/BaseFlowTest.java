@@ -261,7 +261,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             }
 
             Locator l = Locator.xpath(xpath);
-            waitForElement(l, 5000);
+            waitForElement(l, WAIT_FOR_JAVASCRIPT);
             click(l);
         }
     }

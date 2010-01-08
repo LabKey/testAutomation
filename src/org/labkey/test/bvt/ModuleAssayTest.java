@@ -145,7 +145,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         checkRadioButton("providerName", "Simple");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         log("Setting up simple assay");
         selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);

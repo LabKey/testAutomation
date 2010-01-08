@@ -183,7 +183,7 @@ public class StudyTest extends StudyBaseTest
 
         setFormElement("typeName", PARTICIPANT_CMT_DATASET);
         clickNavButton("Next");
-        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         // set the demographic data checkbox
         checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
@@ -200,7 +200,7 @@ public class StudyTest extends StudyBaseTest
 
         setFormElement("typeName", PARTICIPANT_VISIT_CMT_DATASET);
         clickNavButton("Next");
-        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         // add a comment field
         setFormElement(Locator.id("ff_name" + 0),  COMMENT_FIELD_NAME);

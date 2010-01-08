@@ -317,7 +317,7 @@ public class ListHelper
         for (int i = 0; i < cols.length; i++)
         {
             ListColumn col = cols[i];
-            test.waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+            test.waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             test.clickNavButton("Add Field", 0);
             test.setFormElement(Locator.id("ff_name" + i),  col.getName());
             test.setFormElement(Locator.id("ff_label" + i), col.getLabel());
@@ -379,7 +379,7 @@ public class ListHelper
         test.log("Check that they were added");
         if (cols.length > 0)
         {
-            test.waitForText(cols[0].getName(), BaseSeleniumWebTest.WAIT_FOR_GWT);
+            test.waitForText(cols[0].getName(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             for (ListColumn col : cols)
             {
                 test.assertTextPresent(col.getName());
@@ -405,11 +405,11 @@ public class ListHelper
 
         test.clickNavButton("Create List");
 
-        test.waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+        test.waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         test.setFormElement("uploadFormElement", inputFile);
 
-        test.waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+        test.waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         test.clickNavButton("Import");
 

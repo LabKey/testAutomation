@@ -16,11 +16,9 @@
 
 package org.labkey.test.bvt;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
-import java.util.regex.Pattern;
 
 /**
  * User: jeckels
@@ -28,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractAssayTest extends SimpleApiTest
 {
-    protected final static int WAIT_FOR_GWT = 5000;
+    // protected final static int WAIT_FOR_JAVASCRIPT = 5000;  uncomment to override base class
 
     //constants added for security tests
     protected final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role

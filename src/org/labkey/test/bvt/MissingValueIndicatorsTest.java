@@ -478,7 +478,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
 

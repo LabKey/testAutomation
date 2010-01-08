@@ -183,7 +183,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkWithText("Lists");
         clickLinkWithText("view design");
         clickLinkWithText("edit fields");
-        waitForElement(Locator.id("button_Add Field"), WAIT_FOR_GWT);
+        waitForElement(Locator.id("button_Add Field"), WAIT_FOR_JAVASCRIPT);
         _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
         setFormElement(Locator.id("ff_name0"), _listCol1.getName());
         setFormElement(Locator.id("ff_label0"), _listCol1.getLabel());
@@ -287,7 +287,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("View Design", 0);
         waitForPageToLoad();
         clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
 
         setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
         checkCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
@@ -314,7 +314,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("View Design", 0);
         waitForPageToLoad();
         clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
 
         setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
@@ -337,7 +337,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("View Design", 0);
         waitForPageToLoad();
         clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
 
         setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
@@ -360,7 +360,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("View Design", 0);
         waitForPageToLoad();
         clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_GWT);
+        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
 
         setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
@@ -418,7 +418,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test Export");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        waitForElement(Locator.navButton("Export"), WAIT_FOR_GWT);
+        waitForElement(Locator.navButton("Export"), WAIT_FOR_JAVASCRIPT);
         clickExportToText();
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
@@ -524,7 +524,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Save");
 
         log("Check adding referenced fields worked");
-        waitForText(_listCol1.getLabel(), WAIT_FOR_GWT);
+        waitForText(_listCol1.getLabel(), WAIT_FOR_JAVASCRIPT);
         assertTextPresent(_listCol1.getLabel());
         assertTextPresent(_listCol2.getLabel());
         assertTextPresent(_listCol4.getLabel());
@@ -537,7 +537,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test export");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        waitForElement(Locator.navButton("Export"), WAIT_FOR_GWT);
+        waitForElement(Locator.navButton("Export"), WAIT_FOR_JAVASCRIPT);
         clickExportToText();
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol1.getName());
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol2.getName());
@@ -630,13 +630,13 @@ public class ListTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
         clickLinkWithText("edit fields");
-        waitForElement(Locator.navButton("Save"), WAIT_FOR_GWT);
+        waitForElement(Locator.navButton("Save"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("ff_name0"), "FooFoo");
         clickNavButton("Save");
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
         clickLinkWithText("edit fields");
-        waitForElement(Locator.id("button_Add Field"), WAIT_FOR_GWT);
+        waitForElement(Locator.id("button_Add Field"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Add Field", 0);
         setFormElement(Locator.id("ff_name1"), "BarBar");
         clickNavButton("Save");

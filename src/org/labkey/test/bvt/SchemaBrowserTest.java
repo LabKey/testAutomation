@@ -38,7 +38,7 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
         goToSchemaBrowser();
         selectQuery("lists", "Books");
 
-        waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_BOOKS + "')]"), 5000);
+        waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_BOOKS + "')]"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Title");
         assertTextPresent("Subtitle");
         assertTextPresent("AuthorId");
@@ -47,14 +47,14 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
         //test lookup links, tab management
         clickLookupLink("lists", "Authors", "AuthorId");
-        waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_AUTHORS + "')]"), 5000);
+        waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_AUTHORS + "')]"), WAIT_FOR_JAVASCRIPT);
 
         closeExtTab("lists.Authors");
         sleep(500);
         assertTextNotPresent(TEST_DESC_AUTHORS);
 
         clickLookupLink("lists", "Publishers", "PublisherId");
-        waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_PUBLISHERS + "')]"), 5000);
+        waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_PUBLISHERS + "')]"), WAIT_FOR_JAVASCRIPT);
 
         closeExtTab("lists.Publishers");
         sleep(500);
@@ -62,12 +62,12 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
         //test in-place fk expansion
         clickFkExpando("lists", "Books", "AuthorId");
-        waitForText("AuthorId/FirstName", 5000);
+        waitForText("AuthorId/FirstName", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("AuthorId/LastName");
         assertTextPresent(TEST_DESC_AUTHORS);
 
         clickFkExpando("lists", "Books", "PublisherId");
-        waitForText("PublisherId/Name", 5000);
+        waitForText("PublisherId/Name", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(TEST_DESC_PUBLISHERS);
 
         clickFkExpando("lists", "Books", "AuthorId");

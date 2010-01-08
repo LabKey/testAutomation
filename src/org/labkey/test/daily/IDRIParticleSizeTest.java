@@ -16,7 +16,6 @@
 package org.labkey.test.daily;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.bvt.AbstractAssayTest;
 
@@ -113,7 +112,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         checkRadioButton("providerName", "IDRI Particle Size");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
 

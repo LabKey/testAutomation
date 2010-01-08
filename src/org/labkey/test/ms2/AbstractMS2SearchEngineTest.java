@@ -48,11 +48,11 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         click(Locator.extButton("More Actions"));
-        waitAndClick(5000, Locator.extButton("Describe Samples"), 0);
-        waitAndClick(5000, Locator.extMenuItem("Create New Assay Design"), 5000);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Describe Samples"), 0);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Create New Assay Design"), WAIT_FOR_JAVASCRIPT);
 
         log("Create a new MS2 sample prep assay definition.");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAME);
 
         addField("Run Fields", 0, "IntegerField", "IntegerField", "Integer");
@@ -68,8 +68,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
         click(Locator.extButton("More Actions"));
-        waitAndClick(5000, Locator.extButton("Describe Samples"), 0);
-        waitAndClick(5000, Locator.extMenuItem("Use " + TEST_ASSAY_NAME), 5000);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Describe Samples"), 0);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Use " + TEST_ASSAY_NAME), WAIT_FOR_JAVASCRIPT);
 
         log("Describe MS2 run.");
         clickNavButton("Next");
@@ -98,7 +98,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         setupEngine();
 
-        waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_JAVASCRIPT);
         log("Set analysis parameters.");
         setFormElement("protocolName", "test2");
         setFormElement("protocolDescription", "This is a test protocol for Verify.");
@@ -108,7 +108,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("configureXml", INPUT_XML);
         submit();
         log("View the analysis log.");
-        sleep(WAIT_FOR_GWT);
+        sleep(WAIT_FOR_JAVASCRIPT);
 //        waitFor(new Checker(){
 //            public boolean check()
 //            {
@@ -154,7 +154,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setupEngine();
 
         log("Make sure new protocol is listed.");
-        waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_JAVASCRIPT);
         assertEquals("test2", getSelectedOptionText("protocol"));
 
   //      waitForPageToLoad();

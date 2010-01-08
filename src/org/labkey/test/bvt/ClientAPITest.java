@@ -618,7 +618,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);

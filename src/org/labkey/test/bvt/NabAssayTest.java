@@ -21,7 +21,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -129,7 +128,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
             clickNavButton("Next");
 
-            waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+            waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
             log("Setting up NAb assay");
             selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAB);
@@ -143,7 +142,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             clickLinkWithText("new NAb Default template");
 
-            waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_GWT);
+            waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
 
             setText("templateName", PLATE_TEMPLATE_NAME);
 
@@ -177,7 +176,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             click(Locator.linkWithText("manage assay design >>"));
             clickLinkWithText("edit assay design");
-            waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_GWT);
+            waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
 
             selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
 
@@ -502,7 +501,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_NAB);
         click(Locator.linkWithText("manage assay design >>"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         clickNavButton("Save & Close");

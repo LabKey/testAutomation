@@ -241,10 +241,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "Simple");
         clickNavButton("Next");
-        waitForElement(Locator.raw("ff_name0"), WAIT_FOR_GWT);
+        waitForElement(Locator.raw("ff_name0"), WAIT_FOR_JAVASCRIPT);
         selenium.type("ff_name0", "Value");
         clickNavButton("Save");
-        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_GWT);
+        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("View Dataset Data");
         clickNavButton("Import Data");
         selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
@@ -281,7 +281,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
     protected static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
     protected static final String[] TEST_ASSAY_DATA_PROP_NAMES = {"Value" };
     protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = {"Integer" };
-    protected final static int WAIT_FOR_GWT = 5000;
+    // protected final static int WAIT_FOR_JAVASCRIPT = 5000;  uncomment to override base class
 
     /**
      * Sets up the data pipeline for the specified project. This can be called from any page.
@@ -319,7 +319,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);

@@ -90,7 +90,7 @@ public class LuminexTest extends AbstractQCAssayTest
         checkRadioButton("providerName", "Luminex");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         log("Setting up Luminex assay");
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
@@ -167,7 +167,7 @@ public class LuminexTest extends AbstractQCAssayTest
             assertEquals("on", selenium.getValue("//input[@name='ThawListType' and @value='Text']"));
             assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
             setFormElement("ThawListType", "List");
-            waitForElement(Locator.id("button_Choose list..."), BaseSeleniumWebTest.WAIT_FOR_GWT);
+            waitForElement(Locator.id("button_Choose list..."), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             clickNavButton("Choose list...", 0);
             setFormElement("schema", "lists");
             setFormElement("table", THAW_LIST_NAME);
@@ -264,7 +264,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_LUM);
         click(Locator.linkWithText("manage assay design >>"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         clickNavButton("Save & Close");

@@ -107,13 +107,13 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
         clickNavButton("More Actions", 0);
-        waitForText("Import MAGE-ML",5000);
+        waitForText("Import MAGE-ML", WAIT_FOR_JAVASCRIPT);
 
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        waitAndClick(5000, Locator.extButton("Import MAGE-ML"), 0);
-        waitAndClick(5000, Locator.extMenuItem("Use " + ASSAY_NAME), 5000);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Import MAGE-ML"), 0);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Use " + ASSAY_NAME), WAIT_FOR_JAVASCRIPT);
 
         setFormElement("batchStringField", "SingleRunProperties");
         clickNavButton("Next");
@@ -142,13 +142,13 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         // Start the upload wizard again
         clickNavButton("Import Data");
         click(Locator.extButton("More Actions"));
-        waitForText("Import MAGE-ML",5000);
+        waitForText("Import MAGE-ML", WAIT_FOR_JAVASCRIPT);
 
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        waitAndClick(5000, Locator.extButton("Import MAGE-ML"), 0);
-        waitAndClick(5000, Locator.extMenuItem("Use " + ASSAY_NAME), 5000);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Import MAGE-ML"), 0);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Use " + ASSAY_NAME), WAIT_FOR_JAVASCRIPT);
 
         setFormElement("batchStringField", "BulkProperties");
         

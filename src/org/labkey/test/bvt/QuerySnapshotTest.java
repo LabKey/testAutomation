@@ -18,7 +18,6 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.drt.StudyBaseTest;
-import org.labkey.test.util.ExtHelper;
 
 /**
  * User: klum
@@ -255,7 +254,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         if (keyField != null)
         {
             clickNavButton("Edit Dataset Definition");
-            waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+            waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
             String xpath = getPropertyXPath("Dataset Fields") + "//span" + Locator.navButton("Add Field").getPath();
             selenium.click(xpath);
@@ -265,7 +264,7 @@ public class QuerySnapshotTest extends StudyBaseTest
             sleep(1000);
             clickRadioButtonById("button_managedField");
             selectOptionByText("list_managedField", keyField);
-            clickNavButton("Save", 5000);
+            clickNavButton("Save", WAIT_FOR_JAVASCRIPT);
         }
         clickNavButton("Create Snapshot");
     }

@@ -140,7 +140,7 @@ public class ReportTest extends StudyBaseTest
         String id = ExtHelper.getExtElementId(this, "btn_deleteView");
         click(Locator.id(id));
 
-        ExtHelper.waitForExtDialog(this, 5000);
+        ExtHelper.waitForExtDialog(this, WAIT_FOR_JAVASCRIPT);
 
         String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
         click(Locator.id(btnId));
@@ -151,7 +151,7 @@ public class ReportTest extends StudyBaseTest
             {
                 return !isElementPresent(report);
             }
-        }, "Failed to delete report: " + reportName, 5000);
+        }, "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
     }
 
     protected void clickReportGridLink(String reportName, String linkText)
@@ -174,7 +174,7 @@ public class ReportTest extends StudyBaseTest
             {
                 return isElementPresent(link);
             }
-        }, "Unable to click the link: " + linkText + " for report: " + reportName, 5000);
+        }, "Unable to click the link: " + linkText + " for report: " + reportName, WAIT_FOR_JAVASCRIPT);
 
         clickAndWait(link);
     }
@@ -619,7 +619,7 @@ public class ReportTest extends StudyBaseTest
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
         clickMenuButton("Views", CREATE_CHART_MENU, "Views:Create");
-        waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
         checkCheckbox("participantChart");
@@ -629,11 +629,11 @@ public class ReportTest extends StudyBaseTest
         setFormElement("reportName", "participant chart");
         clickNavButton("OK", 0);
 
-        waitForElement(Locator.navButton("Views"), 5000);
+        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
         clickMenuButton("Views", "Views:default");
         clickMenuButton("Views", CREATE_CHART_MENU, "Views:Create");
-        waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
         // create a non-participant chart
         selectOptionByText("columnsX", "1. Weight");
@@ -646,11 +646,11 @@ public class ReportTest extends StudyBaseTest
         checkCheckbox("shareReport");
         clickNavButton("OK", 0);
 
-        waitForElement(Locator.navButton("Views"), 5000);
+        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
         // create grid view
         clickLinkWithText(getFolderName());
-        waitForElement(Locator.linkWithText("Manage Views"), 5000);
+        waitForElement(Locator.linkWithText("Manage Views"), WAIT_FOR_JAVASCRIPT);
         clickLinkWithText("Manage Views");
 
         createReport(GRID_VIEW);

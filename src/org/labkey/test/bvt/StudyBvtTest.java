@@ -446,12 +446,12 @@ public class StudyBvtTest extends StudyManualTest
         clickCheckbox("fileImport");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), WAIT_FOR_JAVASCRIPT);
 
         File datasetFile = new File(DATASET_DATA_FILE);
         setFormElement("uploadFormElement", datasetFile);
 
-        waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_JAVASCRIPT);
 
         clickNavButton("Import");
 

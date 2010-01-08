@@ -108,7 +108,7 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("datasets"));
         ExtHelper.selectFileBrowserFile(this, "Study001.dataset");
-        //waitForElement(Locator.navButton("Import datasets"), 5000);
+        //waitForElement(Locator.navButton("Import datasets"), WAIT_FOR_JAVASCRIPT);
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
         clickNavButton("Import datasets");
@@ -138,7 +138,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("DEM-1: Demographics");
         clickButtonContainingText("Edit Dataset Definition");
-        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_GWT);
+        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setFormElement("description", DEMOGRAPHICS_DESCRIPTION);
         clickNavButton("Save");
     }
@@ -197,12 +197,12 @@ public class StudyManualTest extends StudyTest
         setFormElement("typeName", "verifyAssay");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         checkRadioButton("additionalKey", 1);
 
         clickNavButton("Import Fields", 0);
-        waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_JAVASCRIPT);
 
         setFormElement("schemaImportBox", "Property\tLabel\tRangeURI\tNotNull\tDescription\n" +
                 "SampleId\tSample Id\txsd:string\ttrue\tstring\n" +
@@ -211,7 +211,7 @@ public class StudyManualTest extends StudyTest
                 "TextField\tTextField\txsd:string\tfalse\tThis is a text field");
 
         clickNavButton("Import", 0);
-        waitForElement(Locator.xpath("//input[@id='ff_label3']"), WAIT_FOR_GWT);
+        waitForElement(Locator.xpath("//input[@id='ff_label3']"), WAIT_FOR_JAVASCRIPT);
 
         clickRadioButtonById("button_dataField");
 
@@ -219,7 +219,7 @@ public class StudyManualTest extends StudyTest
         setFormElement(Locator.id("importAliases"), "aliasedColumn");
 
         clickNavButton("Save");
-        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_GWT);
+        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("View Dataset Data");
         clickNavButton("Import Data");
 
