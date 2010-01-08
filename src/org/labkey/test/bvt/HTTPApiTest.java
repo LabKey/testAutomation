@@ -90,7 +90,5 @@ public class HTTPApiTest extends SimpleApiTest
         setFormElement("title", "Query");
         selectOptionByValue("schemaName", "lists");
         submit();
-
-        super.doTestSteps();
     }
 }
