@@ -19,6 +19,8 @@ package org.labkey.test.drt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
+import java.awt.*;
+
 /**
  * User: tamram
  * Date: May 15, 2006
@@ -58,6 +60,11 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        boolean indexerRunningAtStartOfTest = false;
+        beginAt(getContextPath() + "/search/admin.view");
+        if (isButtonPresent("PAUSE"))
+            indexerRunningAtStartOfTest = true;
+        
         initProject();
         
         clickLinkWithText("view open issues");
@@ -215,9 +222,14 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         // SearchAction
         clickLinkWithText("view grid");
-        setText("search","hype");
+        pushLocation();
+        String index = getContextPath() + "/search/" + PROJECT_NAME + "/index.view?wait=1";
+        log(index);
+        beginAt(index, 5*defaultWaitForPage);
+        popLocation();
+        setText("q","hype");
         clickNavButton("Search");
-        assertLinkPresentWithText(ISSUE_TITLE_0);
+        assertLinkPresentContainingText(ISSUE_TITLE_0);
 
         // SearchWebPart
         searchFor(PROJECT_NAME, "2012", 1, ISSUE_TITLE_0);
@@ -230,6 +242,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         requiredFieldsTest();
         viewSelectedDetailsTest();
         entryTypeNameTest();
+
+        beginAt(getContextPath() + "/search/admin.view");
+        if (isButtonPresent("PAUSE") && !indexerRunningAtStartOfTest)
+            clickButton("PAUSE", defaultWaitForPage);
         
         // UNDONE test these actions
         // CompleteUserAction
