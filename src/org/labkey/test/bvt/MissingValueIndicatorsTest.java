@@ -279,7 +279,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
         log("Test inserting a single row");
         clickNavButton("Insert New");
-        setFormElement("quf_participantid", "Sid");
+        setFormElement("quf_ParticipantId", "Sid");
         setFormElement("quf_SequenceNum", "1");
         selectOptionByValue("quf_AgeMVIndicator", "Z");
         setFormElement("quf_Sex", "male");

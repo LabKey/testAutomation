@@ -294,12 +294,12 @@ public class StudyBvtTest extends StudyManualTest
         setFormElement("comments", "These vials are very important.");
         clickNavButton("Save Changes");
         assertTextPresent("These vials are very important.", 25);
-        setFilter("SpecimenDetail", "ParticipantId", "Equals", "999320824");
+        setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
         clickMenuButton("Comments and QC", "Comments:Clear");
         selenium.getConfirmation();
         assertTextNotPresent("These vials are very important.");
-        clearFilter("SpecimenDetail", "ParticipantId");
+        clearFilter("SpecimenDetail", "MouseId");
         assertTextPresent("These vials are very important.", 23);
         clickMenuButton("Comments and QC", "Comments:Exit");
 
@@ -386,7 +386,7 @@ public class StudyBvtTest extends StudyManualTest
         clickNavButton("Insert New");
         clickNavButton("Submit");
         assertTextPresent("This field is required");
-        setFormElement("quf_participantid", TEST_ADD_ENTRY);
+        setFormElement("quf_MouseId", TEST_ADD_ENTRY);
         setFormElement("quf_SequenceNum", "123");
         clickNavButton("Submit");
         clickMenuButton("QC State", "QCState:All data");

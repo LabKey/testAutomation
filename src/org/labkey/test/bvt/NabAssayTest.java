@@ -536,6 +536,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             Pattern.compile("RunProperties", Pattern.CASE_INSENSITIVE),
             Pattern.compile("RunGroups", Pattern.CASE_INSENSITIVE),
             Pattern.compile("Input", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Batch", Pattern.CASE_INSENSITIVE),
             Pattern.compile("Output", Pattern.CASE_INSENSITIVE),
             Pattern.compile("Links", Pattern.CASE_INSENSITIVE),
             Pattern.compile("runId", Pattern.CASE_INSENSITIVE),

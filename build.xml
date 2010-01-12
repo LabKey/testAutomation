@@ -61,6 +61,7 @@
         <echo message="ms2t               run MS2 tests" />
         <echo message="cluster            run MS2 cluster pipeline tests" />
         <echo message="xtandem            run X! Tandem tests" />
+        <echo message="study              run study tests" />
         <echo message="mascot             run Mascot tests" />
         <echo message="sequest            run Sequest tests" />
         <echo message="perf               run perf tests" />

@@ -418,8 +418,8 @@ public class ReportTest extends StudyBaseTest
         log("Create second R script");
         clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
-        if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
-            if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
+        if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
+            if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 fail("There was an error running the script");
         clickLinkWithText("Source");
         checkCheckbox("shareReport");
@@ -492,8 +492,8 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
-        if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "participantId"), R_SCRIPT2_TEXT1))
-            if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "participantid"), R_SCRIPT2_TEXT1))
+        if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
+            if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 fail("There was an error running the script");
         assertTextPresent(R_SCRIPT2_TEXT1);
         clickLinkWithText("Source");

@@ -37,10 +37,10 @@ public class QuerySnapshotTest extends StudyBaseTest
     private String _folderName;
 
     private static final String CROSS_STUDY_QUERY_SQL =
-            "SELECT 1 as sequenceNum, '054' as protocol, ds1.ParticipantId, ds1.demsex, ds1.demsexor\n" +
+            "SELECT 1 as sequenceNum, '054' as protocol, ds1.MouseId, ds1.demsex, ds1.demsexor\n" +
             "FROM Project.\"054\".study.\"DEM-1: Demographics\" ds1\n" +
             "UNION \n" +
-            "SELECT 2 as sequenceNum, '065' as protocol, ds2.ParticipantId, ds2.demsex, ds2.demsexor\n" +
+            "SELECT 2 as sequenceNum, '065' as protocol, ds2.MouseId, ds2.demsex, ds2.demsexor\n" +
             "FROM Project.\"065\".study.\"DEM-1: Demographics\" ds2";
 
     @Override
@@ -118,7 +118,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("DEM-1: Demographics");
         clickNavButton("Insert New");
-        setFormElement("quf_participantid", "999121212");
+        setFormElement("quf_MouseId", "999121212");
         setFormElement("quf_SequenceNum", "101");
         setFormElement("quf_DEMraco", "Armenian");
 
@@ -136,12 +136,12 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
 
-        click(Locator.xpath("//img[@id='expand_ParticipantId']"));
-        click(Locator.xpath("//img[@id='expand_ParticipantId/DataSet']"));
-        click(Locator.xpath("//img[@id='expand_ParticipantId/DataSet/DEM-1: Demographics']"));
-        click(Locator.xpath("//img[@id='expand_ParticipantId/DataSet/DEM-1: Demographics/seq101']"));
+        click(Locator.xpath("//img[@id='expand_MouseId']"));
+        click(Locator.xpath("//img[@id='expand_MouseId/DataSet']"));
+        click(Locator.xpath("//img[@id='expand_MouseId/DataSet/DEM-1: Demographics']"));
+        click(Locator.xpath("//img[@id='expand_MouseId/DataSet/DEM-1: Demographics/seq101']"));
 
-        addCustomizeViewColumn("ParticipantId/DataSet/DEM-1: Demographics/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
+        addCustomizeViewColumn("MouseId/DataSet/DEM-1: Demographics/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
         setFormElement("ff_columnListName", "APX Joined View");
         clickNavButton("Save");
 
@@ -214,7 +214,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickLinkWithText(FOLDER_1);
         clickLinkWithText("DEM-1: Demographics");
         clickNavButton("Insert New");
-        setFormElement("quf_participantid", "999121212");
+        setFormElement("quf_MouseId", "999121212");
         setFormElement("quf_SequenceNum", "101");
         setFormElement("quf_DEMsex", "Unknown");
 
@@ -227,7 +227,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickLinkWithText(FOLDER_2);
         clickLinkWithText("DEM-1: Demographics");
         clickNavButton("Insert New");
-        setFormElement("quf_participantid", "999151515");
+        setFormElement("quf_MouseId", "999151515");
         setFormElement("quf_SequenceNum", "104");
         setFormElement("quf_DEMsexor", "Undecided");
 

@@ -42,11 +42,11 @@ public class StudyTest extends StudyBaseTest
     private SpecimenImporter _specimenImporter;
 
     // specimen comment constants
-    private static final String PARTICIPANT_CMT_DATASET = "Participant Comments";
-    private static final String PARTICIPANT_VISIT_CMT_DATASET = "Participant Visit Comments";
+    private static final String PARTICIPANT_CMT_DATASET = "Mouse Comments";
+    private static final String PARTICIPANT_VISIT_CMT_DATASET = "Mouse Visit Comments";
     private static final String COMMENT_FIELD_NAME = "comment";
-    private static final String PARTICIPANT_COMMENT_LABEL = "participant comment";
-    private static final String PARTICIPANT_VISIT_COMMENT_LABEL = "participant visit comment";
+    private static final String PARTICIPANT_COMMENT_LABEL = "mouse comment";
+    private static final String PARTICIPANT_VISIT_COMMENT_LABEL = "mouse visit comment";
     
     protected void doCreateSteps()
     {
@@ -114,8 +114,8 @@ public class StudyTest extends StudyBaseTest
         setFormElement("tsv", _tsv);
         clickNavButton("Import Data");
         assertTextPresent("Duplicates were found");
-        //Now explicitly replace
-        _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
+        //Now explicitly replace, using 'mouseid' instead of 'participantid'
+        _tsv = "mouseid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
         setFormElement("tsv", _tsv);
@@ -241,16 +241,16 @@ public class StudyTest extends StudyBaseTest
         clickMenuButton("Comments and QC", "Comments:SetParticipant");
 
         clickNavButton("Insert New");
-        setFormElement("quf_participantid", "999320812");
-        setFormElement("quf_" + COMMENT_FIELD_NAME, "Participant Comment");
+        setFormElement("quf_MouseId", "999320812");
+        setFormElement("quf_" + COMMENT_FIELD_NAME, "Mouse Comment");
         clickNavButton("Submit");
 
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Blood (Whole)");
-        setFilter("SpecimenDetail", "ParticipantId", "Equals", "999320812");
+        setFilter("SpecimenDetail", "MouseId", "Equals", "999320812");
 
-        assertTextPresent("Participant Comment");
-        clearAllFilters("SpecimenDetail", "ParticipantId");
+        assertTextPresent("Mouse Comment");
+        clearAllFilters("SpecimenDetail", "MouseId");
 
         log("verify copying and moving vial comments");
         setFilter("SpecimenDetail", "GlobalUniqueId", "Equals", "AAA07XK5-01");
@@ -274,7 +274,7 @@ public class StudyTest extends StudyBaseTest
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Moved PTID Comment");
         clickNavButton("Submit");
         assertTextPresent("Moved PTID Comment");
-        assertTextNotPresent("Participant Comment");
+        assertTextNotPresent("Mouse Comment");
         assertTextNotPresent("Vial Comment");
     }
 
@@ -386,18 +386,18 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("999320518");
 
         // verify that the participant view respects the cohort filter:
-        setSort("Dataset", "ParticipantId", SortDirection.ASC);
+        setSort("Dataset", "MouseId", SortDirection.ASC);
         clickLinkWithText("999320518");
         clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Participant >");
+        clickLinkWithText("Next Mouse >");
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Participant >");
+        clickLinkWithText("Next Mouse >");
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Participant >");
+        clickLinkWithText("Next Mouse >");
     }
 
     @Override
