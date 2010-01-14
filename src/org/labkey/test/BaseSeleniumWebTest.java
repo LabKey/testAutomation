@@ -527,22 +527,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             log("Testing bad passwords");
             clickLinkWithText("Set Password");
-            assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
+            assertTextPresent("You must enter two passwords.");
+
+            setFormElement("password", "LongEnough");
+            clickLinkWithText("Set Password");
+            assertTextPresent("You must enter two passwords.");
+
+            setFormElement("password2", "LongEnough");
+            clickLinkWithText("Set Password");
+            assertTextPresent("You must enter two passwords.");
 
             setFormElement("password", "short");
             setFormElement("password2", "short");
             clickLinkWithText("Set Password");
-            assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
-
-            setFormElement("password", "short");
-            setFormElement("password2", "short");
-            clickLinkWithText("Set Password");
-            assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
+            assertTextPresent("Your password must be six characters or more.");
 
             setFormElement("password", PasswordUtil.getUsername());
             setFormElement("password2", PasswordUtil.getUsername());
             clickLinkWithText("Set Password");
-            assertTextPresent("Enter a valid password. Passwords must be six characters or more and can't match your email address.");
+            assertTextPresent("Your password can't match your email address.");
 
             setFormElement("password", "LongEnough");
             setFormElement("password2", "ButDontMatch");
@@ -1006,12 +1009,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void dump()
     {
-        FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
-        String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
+        try
+        {
+            FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
+            String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
 
-        File dumpDir = Runner.getDumpDir();
-        publishArtifact(dumpScreen(dumpDir, baseName));
-        publishArtifact(dumpHtml(dumpDir, baseName));
+            File dumpDir = Runner.getDumpDir();
+            publishArtifact(dumpScreen(dumpDir, baseName));
+            publishArtifact(dumpHtml(dumpDir, baseName));
+        }
+        catch (Exception e)
+        {
+            log("Error executing dump()");
+        }
     }
 
     // Publish artifacts while the build is still in progrss:
