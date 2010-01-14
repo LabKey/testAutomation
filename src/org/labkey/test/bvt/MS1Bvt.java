@@ -50,7 +50,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
     public static final String PIPELINE_MS1PEP_DIR = "ms1peptides";
     public static final String PIPELINE_INSPECT_DIR = "inspect";
     public static final String PIPELINE_FIND_FEATURES_PROTOCOL = "Find Features";
-    public static final String PIPELINE_MORE_ACTIONS_BUTTON = "More Actions";
+    public static final String PIPELINE_MORE_ACTIONS_BUTTON = "Import Data";
     public static final String PIPELINE_IMPORT_EXPR_BUTTON = "Import Experiment";
     public static final String PIPELINE_PROCESS_AND_IMPORT_BUTTON = "Process and Import Data";
     public static final String PIPELINE_IMPORT_MS1_FEATURES_BUTTON = "Import";
@@ -156,7 +156,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(xProtocol));
         }
 
-        clickNavButton(PIPELINE_MORE_ACTIONS_BUTTON, 0);
+        waitAndClick(Locator.extButton(PIPELINE_MORE_ACTIONS_BUTTON));
         waitAndClickNavButton(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
