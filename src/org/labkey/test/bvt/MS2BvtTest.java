@@ -80,8 +80,9 @@ public class MS2BvtTest extends MS2TestBase
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
         waitAndClick(Locator.fileTreeByName(TEST));
         ExtHelper.selectFileBrowserFile(this, SAMPLE_BASE_NAME + ".search.xar.xml");
-        clickNavButton("Import Data", 0);
-        waitAndClickNavButton("Import Experiment");
+
+        selectImportDataAction("Import Experiment");
+        waitForPageToLoad();
 
         log("Going to the list of all pipeline jobs");
         clickLinkWithText("All");

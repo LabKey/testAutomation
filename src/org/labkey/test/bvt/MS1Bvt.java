@@ -50,7 +50,6 @@ public class MS1Bvt extends BaseSeleniumWebTest
     public static final String PIPELINE_MS1PEP_DIR = "ms1peptides";
     public static final String PIPELINE_INSPECT_DIR = "inspect";
     public static final String PIPELINE_FIND_FEATURES_PROTOCOL = "Find Features";
-    public static final String PIPELINE_MORE_ACTIONS_BUTTON = "Import Data";
     public static final String PIPELINE_IMPORT_EXPR_BUTTON = "Import Experiment";
     public static final String PIPELINE_PROCESS_AND_IMPORT_BUTTON = "Process and Import Data";
     public static final String PIPELINE_IMPORT_MS1_FEATURES_BUTTON = "Import";
@@ -156,8 +155,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(xProtocol));
         }
 
-        waitAndClick(Locator.extButton(PIPELINE_MORE_ACTIONS_BUTTON));
-        waitAndClickNavButton(PIPELINE_IMPORT_EXPR_BUTTON);
+        selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
     protected void importFeaturesExp(String project, String xProtocol, String featuresProtocol)
@@ -181,8 +179,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(featuresProtocol));
         }
 
-        clickNavButton(PIPELINE_MORE_ACTIONS_BUTTON, 0);
-        waitAndClickNavButton(PIPELINE_IMPORT_EXPR_BUTTON);
+        selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
     protected void importPepTsvFile(String project, String protocol)
@@ -201,8 +198,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
             waitAndClick(Locator.fileTreeByName(protocol));
         }
 
-        clickNavButton(PIPELINE_MORE_ACTIONS_BUTTON, 0);
-        waitAndClickNavButton(PIPELINE_IMPORT_EXPR_BUTTON);
+        selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
     protected void testViews(String project)

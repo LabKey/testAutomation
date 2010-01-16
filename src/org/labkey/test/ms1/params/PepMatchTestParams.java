@@ -53,6 +53,6 @@ public class PepMatchTestParams extends AbstractInspectTestParams
             }
         }
         _test.log("msInspect & pepmatch run");
-        _test.waitAndClickNavButton("msInspect Find Features and Match Peptides");
+        _test.selectImportDataAction("msInspect Find Features and Match Peptides");
     }
 }

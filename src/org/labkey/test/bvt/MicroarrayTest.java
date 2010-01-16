@@ -30,6 +30,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
     private static final String PROJECT_NAME = "MicroarrayBVTProject";
     private static final String EXTRACTION_SERVER = "http://www.google.com";
     private static final String ASSAY_NAME = "Test Assay 1";
+    private static final String IMPORT_MAGEML = "Import MAGE-ML";
     private static final String ASSAY_DESCRIPTION = "Test Assay 1 Description";
     private static final String MAGEML_FILE1 = "test1_MAGEML.xml";
     private static final String MAGEML_FILE2 = "test2_MAGEML.xml";
@@ -106,14 +107,12 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         // First try importing the runs individually
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.extButton("Import Data"));
-        waitForText("Import MAGE-ML", WAIT_FOR_JAVASCRIPT);
 
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Import MAGE-ML"), 0);
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Use " + ASSAY_NAME), WAIT_FOR_JAVASCRIPT);
+        selectImportDataAction(IMPORT_MAGEML + ":Use " + ASSAY_NAME);
+        waitForPageToLoad();
 
         setFormElement("batchStringField", "SingleRunProperties");
         clickNavButton("Next");
@@ -141,14 +140,12 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         // Start the upload wizard again
         clickNavButton("Import Data");
-        waitAndClick(Locator.extButton("Import Data"));
-        waitForText("Import MAGE-ML", WAIT_FOR_JAVASCRIPT);
 
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Import MAGE-ML"), 0);
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Use " + ASSAY_NAME), WAIT_FOR_JAVASCRIPT);
+        selectImportDataAction(IMPORT_MAGEML + ":Use " + ASSAY_NAME);
+        waitForPageToLoad();
 
         setFormElement("batchStringField", "BulkProperties");
         

@@ -4113,6 +4113,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertEquals(getCompleteCount(statusValues), completeJobsExpected);
     }
 
+    /**
+     * For invoking pipeline actions from the file web part. Displays the import data
+     * dialog and selects and submits the specified action.
+     *
+     * @param actionName
+     */
+    public void selectImportDataAction(String actionName)
+    {
+        clickNavButton("Import Data", 0);
+
+        waitAndClick(Locator.radioButtonByNameAndValue("importAction", actionName));
+        String id = ExtHelper.getExtElementId(this, "btn_submit");
+        click(Locator.id(id));
+    }
+
     public DatabaseInfo getDatabaseInfo()
     {
         pushLocation();

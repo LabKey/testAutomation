@@ -45,7 +45,6 @@ public class FeaturesTestParams extends AbstractInspectTestParams
             }
         }
         _test.log("msInspect run");
-        _test.clickNavButton("Import Data", 0);
-        _test.waitAndClickNavButton("msInspect Find Features");
+        _test.selectImportDataAction("msInspect Find Features");
     }
 }

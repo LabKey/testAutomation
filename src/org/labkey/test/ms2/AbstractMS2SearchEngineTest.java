@@ -47,9 +47,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
-        click(Locator.extButton("Import Data"));
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Describe Samples"), 0);
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Create New Assay Design"), WAIT_FOR_JAVASCRIPT);
+        selectImportDataAction("Describe Samples:Create Assay Definition");
+        waitForPageToLoad();
 
         log("Create a new MS2 sample prep assay definition.");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -67,9 +66,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
-        click(Locator.extButton("Import Data"));
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extButton("Describe Samples"), 0);
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.extMenuItem("Use " + TEST_ASSAY_NAME), WAIT_FOR_JAVASCRIPT);
+        selectImportDataAction("Describe Samples:Use " + TEST_ASSAY_NAME);
+        waitForPageToLoad();
 
         log("Describe MS2 run.");
         clickNavButton("Next");
