@@ -2159,7 +2159,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public List<String> getPipelineStatusValues()
     {
         List<String> statusValues = getTableColumnValues("dataregion_StatusFiles", 1);
-        statusValues.remove(0);  // Remove the header
+        if (!statusValues.isEmpty())
+            statusValues.remove(0);  // Remove the header
 
         return statusValues;
     }
