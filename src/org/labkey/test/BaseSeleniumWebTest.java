@@ -545,7 +545,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             setFormElement("password", PasswordUtil.getUsername());
             setFormElement("password2", PasswordUtil.getUsername());
             clickLinkWithText("Set Password");
-            assertTextPresent("Your password can't match your email address.");
+            assertTextPresent("Your password must not match your email address.");
 
             setFormElement("password", "LongEnough");
             setFormElement("password2", "ButDontMatch");
