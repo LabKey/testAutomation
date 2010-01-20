@@ -121,15 +121,13 @@ public class Runner extends TestSuite
                             testClasses.add(Class.forName(line));
                     }
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 System.out.println("Error reading " + file.getAbsolutePath());
-                System.exit(1);
             }
-            catch(ClassNotFoundException e)
+            catch (ClassNotFoundException e)
             {
-                System.out.println("Can't find class " + line);
-                System.exit(1);
+                System.out.println("Can't find class '" + line + "'");
             }
             finally
             {
