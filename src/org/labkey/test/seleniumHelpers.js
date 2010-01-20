@@ -78,7 +78,8 @@ if (browserVersion.isChrome) {
                 dump("Log : " + msg.message);
                 if (msg.message != null &&
                     msg.message.indexOf("[JavaScript Error:") == 0 &&
-                    msg.message.indexOf("{file: \"chrome://") == -1)
+                    msg.message.indexOf("{file: \"chrome://") == -1 &&
+                    msg.message.indexOf("XULElement.selectedIndex") == -1) // Ignore known Firefox Issue
                 {
                     LOG.error("JsErrorChecker: " + msg.message);
 
