@@ -138,8 +138,9 @@ public class ViabilityTest extends AbstractQCAssayTest
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_1614000065_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_1614016435_3_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
         clickNavButton("Save and Finish");
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
@@ -177,29 +178,38 @@ public class ViabilityTest extends AbstractQCAssayTest
         assertEquals("1", table.getDataAsText(1, "SpecimenMatchCount"));
         assertEquals("115.67%", table.getDataAsText(1, "Recovery"));
 
+        assertEquals("161400006", table.getDataAsText(2, "Participant ID"));
+        assertEquals("5.0", table.getDataAsText(2, "Visit ID"));
+        assertEquals("161400006.10-5", table.getDataAsText(2, "Pool ID"));
         assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
         assertEquals("1", table.getDataAsText(2, "SpecimenMatchCount"));
         assertEquals("105.78%", table.getDataAsText(2, "Recovery"));
 
-        assertEquals("xyzzy", table.getDataAsText(3, "Specimen IDs"));
-        assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
-        assertEquals("", table.getDataAsText(3, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(3, "Recovery"));
-        
-        assertEquals("", table.getDataAsText(4, "Specimen IDs"));
-        assertEquals("0", table.getDataAsText(4, "SpecimenCount"));
+        assertEquals("161400006", table.getDataAsText(3, "Participant ID"));
+        assertEquals("5.0", table.getDataAsText(3, "Visit ID"));
+        assertEquals("161400006.11-5", table.getDataAsText(3, "Pool ID"));
+
+        assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
+        assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
         assertEquals("", table.getDataAsText(4, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(4, "Recovery"));
+        
+        assertEquals("", table.getDataAsText(5, "Specimen IDs"));
+        assertEquals("0", table.getDataAsText(5, "SpecimenCount"));
+        assertEquals("", table.getDataAsText(5, "SpecimenMatchCount"));
+        assertEquals("", table.getDataAsText(5, "Recovery"));
 
         runTransformTest();
 
         log("** Checking ResultSpecimens lookups");
         beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?schemaName=assay&query.queryName=" + ASSAY_NAME + " ResultSpecimens");
-        assertTextPresent("foobar", "vial1", "xyzzy", "160450533-5", "161400006-5");
+        assertTextPresent("foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
 
         setSelectedFields("/" + PROJECT_NAME + "/" + FOLDER_NAME, "assay", ASSAY_NAME + " ResultSpecimens", null,
-                new String[] { "Result", "Result/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits"});
+                new String[] { "ResultID", "ResultID/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits"});
+        assertTextNotPresent("foobar");
+        assertTextPresent("161400006.11-5", "105.78%", "20,000,000.0", "CEL");
     }
 
     public void addSpecimenIds(String id, String... values)
@@ -266,8 +276,9 @@ public class ViabilityTest extends AbstractQCAssayTest
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_1614000065_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_1614016435_3_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
         clickNavButton("Save and Finish");
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
