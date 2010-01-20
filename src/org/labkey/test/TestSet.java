@@ -141,6 +141,10 @@ public enum TestSet
             SCHARPStudyTest.class
     }),
 
+    UnitTests(new Class[] {
+        JUnitTest.class
+    }),
+
     Data(new Class[] {
             DataRegionTest.class,
             DbUserSchemaTest.class,

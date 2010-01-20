@@ -486,6 +486,13 @@
         <antcall target="sub-selenium"/>
     </target>
 
+
+    <target name="unit-tests" description="run junit tests">
+        <property name="debug.suspend.selenium" value="n"/>
+        <property name="suite" value="UnitTests"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
     <target name="selenium-tomcat">
         <property name="debug.suspend.selenium" value="n"/>
         <property name="sysprop.close.on.fail" value="true" />
