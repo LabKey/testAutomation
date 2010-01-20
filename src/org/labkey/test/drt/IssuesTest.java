@@ -60,11 +60,6 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        boolean indexerRunningAtStartOfTest = false;
-        beginAt(getContextPath() + "/search/admin.view");
-        if (isButtonPresent("PAUSE"))
-            indexerRunningAtStartOfTest = true;
-        
         initProject();
         
         clickLinkWithText("view open issues");
@@ -243,10 +238,6 @@ public class IssuesTest extends BaseSeleniumWebTest
         viewSelectedDetailsTest();
         entryTypeNameTest();
 
-        beginAt(getContextPath() + "/search/admin.view");
-        if (isButtonPresent("PAUSE") && !indexerRunningAtStartOfTest)
-            clickButton("PAUSE", defaultWaitForPage);
-        
         // UNDONE test these actions
         // CompleteUserAction
         // EmailPrefsAction
@@ -393,8 +384,8 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("ff_newQueryName", "xxyzzy");
         clickNavButton("Create and Edit Source");
         clickNavButton("View Data");
-        assertTextPresent("A very serious issue");
-        assertTextPresent("Even more serious issue");
+        assertTextPresent(ISSUE_TITLE_0);
+        assertTextPresent(ISSUE_TITLE_1);
         clickLinkWithText(PROJECT_NAME);
     }
 }
