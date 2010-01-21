@@ -822,7 +822,9 @@ public class MS2BvtTest extends MS2TestBase
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
         waitAndClick(Locator.fileTreeByName(TEST2));
         ExtHelper.selectFileBrowserFile(this, SAMPLE_BASE_NAME + ".search.xar.xml");
-        waitAndClickNavButton("Import Experiment");
+
+        selectImportDataAction("Import Experiment");
+        waitForPageToLoad();
 
         log("Verify upload finished.");
         seconds = 0;

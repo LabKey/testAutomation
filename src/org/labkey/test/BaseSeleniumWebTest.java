@@ -4064,15 +4064,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             int seconds = 0;
             sleep(1000);
 
+/*
             while (!isNavButtonPresent("Import specimen data") && seconds < 20)
             {
                 seconds++;
                 click(Locator.fileTreeByName(tempDirShortName));
                 sleep(1000);
             }
+*/
 
             ExtHelper.selectFileBrowserFile(BaseSeleniumWebTest.this, _copiedArchive.getName());
-            waitAndClickNavButton("Import specimen data");
+            selectImportDataAction("Import specimen data");
+            waitForPageToLoad();
             clickNavButton("Start Import");
         }
 
@@ -4122,6 +4125,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void selectImportDataAction(String actionName)
     {
+        waitForElement(Locator.extButton("Import Data"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Import Data", 0);
 
         waitAndClick(Locator.radioButtonByNameAndValue("importAction", actionName));
