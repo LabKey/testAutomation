@@ -73,11 +73,13 @@ public class FlowTest extends BaseFlowTest
 
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.selectFileBrowserFile(this, "quv-analysis.xml");
-        waitAndClickNavButton("Import Multiple Runs");
+        selectImportDataAction("Import Multiple Runs");
+        waitForPageToLoad();
         // First, just upload the run "8colordata"
         clickNavButton("Clear All", -1); // no nav
         checkCheckbox("ff_path", "8color/8colordata/");
         clickNavButton("Import Selected Runs");
+        waitForPageToLoad();
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
         // Drill into the run, and see that it was uploaded, and keywords were read.
@@ -214,7 +216,8 @@ public class FlowTest extends BaseFlowTest
 
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.selectFileBrowserFile(this, "quv-analysis.xml");
-        waitAndClickNavButton("Import Multiple Runs");
+        selectImportDataAction("Import Multiple Runs");
+        waitForPageToLoad();
         assertTextNotPresent("8colordata");
         clickImgButtonNoNav("Select All");
         clickNavButton("Import Selected Runs");
