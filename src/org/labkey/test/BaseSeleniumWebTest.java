@@ -27,12 +27,16 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ExtHelper;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.lang.Math;
@@ -1015,6 +1019,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
 
             File dumpDir = Runner.getDumpDir();
+            publishArtifact(dumpFullScreen(dumpDir, baseName));
             publishArtifact(dumpScreen(dumpDir, baseName));
             publishArtifact(dumpHtml(dumpDir, baseName));
         }
@@ -1069,6 +1074,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 // so sad.
                 log("Failed to take screenshot using selenium.captureScreenshot: " + se2.getMessage());
             }
+        }
+
+        return null;
+    }
+
+    public File dumpFullScreen(File dir, String baseName)
+    {
+        File screenFile = new File(dir, baseName + "Fullscreen.png");
+
+        try
+        {
+            // capture entire screen
+            BufferedImage fullscreen = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+            ImageIO.write(fullscreen, "png", screenFile);
+
+            return screenFile;
+        }
+        catch (Exception e)
+        {
+            log("Failed to take full screenshot: " + e.getMessage());
         }
 
         return null;
@@ -2001,7 +2026,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         selenium.mouseDown(l.toString());
     }
-    
+
     public void mouseDownAt(Locator l, int x, int y)
     {
         selenium.mouseDownAt(l.toString(), x + "," + y);
@@ -2115,6 +2140,38 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTableCellTextEquals(tableName, row, getColumnIndex(tableName, columnTitle), value);
     }
 
+    public void assertTableCellContains(String tableName, int row, int column, String... strs)
+    {
+        String cellAddress = tableName + "." + String.valueOf(row) +  "." + String.valueOf(column);
+        String cellText = selenium.getTable(cellAddress);
+
+        for (String str : strs)
+        {
+            assertTrue(cellAddress + " should contain \'" + str + "\'", cellText.contains(str));
+        }
+    }
+
+    public void assertTableCellContains(String tableName, int row, String columnTitle, String... strs)
+    {
+        assertTableCellContains(tableName, row, getColumnIndex(tableName, columnTitle), strs);
+    }
+
+    public void assertTableCellNotContains(String tableName, int row, int column, String... strs)
+    {
+        String cellAddress = tableName + "." + String.valueOf(row) +  "." + String.valueOf(column);
+        String cellText = selenium.getTable(cellAddress);
+
+        for (String str : strs)
+        {
+            assertFalse(cellAddress + " should not contain \'" + str + "\'", cellText.contains(str));
+        }
+    }
+
+    public void assertTableCellNotContains(String tableName, int row, String columnTitle, String... strs)
+    {
+        assertTableCellNotContains(tableName, row, getColumnIndex(tableName, columnTitle), strs);
+    }
+
     public void assertTableCellsEqual(String tableName, int rowA, int columnA, int rowB, int columnB)
     {
         assertTableCellsEqual(tableName, rowA, columnA, tableName, rowB, columnB);
@@ -2174,7 +2231,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         clickAdminMenuItem("Go To Module", "More Modules", "Pipeline");
         clickNavButton("Setup");
-        
+
         if (isLinkPresentWithText("override"))
         {
             if (inherit)
@@ -2224,9 +2281,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         return selenium.getXpathCount("//table[@id='" + tableName + "']/thead").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
     }
-    
+
 //TODO: getTableColumnCount.
-    
+
     public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
     {
         clickAndWait(Locator.imageMapLinkByTitle(imageMapName, areaTitle), defaultWaitForPage);
@@ -2265,9 +2322,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickButtonByIndex(String text, int index)
     {
+        clickButtonByIndex(text, index, defaultWaitForPage);
+    }
+
+    public void clickButtonByIndex(String text, int index, int wait)
+    {
         Locator.XPathLocator buttonLocator = getButtonLocator(text, index);
         if (buttonLocator != null)
-            clickAndWait(buttonLocator, defaultWaitForPage);
+            clickAndWait(buttonLocator, wait);
         else
             fail("No button found with text \"" + text + "\" at index " + index);
     }
@@ -2358,6 +2420,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickNavButton(String buttonText, int waitMillis)
     {
         clickButton(buttonText, waitMillis);
+    }
+
+    public void clickNavButtonByIndex(String buttonText, int index, int wait)
+    {
+        clickButtonByIndex(buttonText, index, wait);
     }
 
     public void clickNavButtonByIndex(String buttonText, int index)
@@ -3051,10 +3118,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Save", 0);
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
     }
-    
+
     public void setPermissions(String groupName, String permissionString)
     {
-        _setPermissions(groupName, permissionString, "pGroup");    
+        _setPermissions(groupName, permissionString, "pGroup");
     }
 
     public void setSiteGroupPermissions(String groupName, String permissionString)
@@ -3081,7 +3148,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             if (!isElementPresent(Locator.permissionRendered()))
                 enterPermissionsUI();
-            
+
             String role = toRole(permissionString);
             if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
             {
@@ -3619,7 +3686,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if (isExtTreeNodeSelected(schemaName))
             return;
-        
+
         log("Selecting schema " + schemaName + " in the schema browser...");
         Locator loc = Locator.schemaTreeNode(schemaName);
 
