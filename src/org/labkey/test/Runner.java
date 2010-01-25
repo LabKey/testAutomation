@@ -27,7 +27,6 @@ import org.labkey.test.util.Crawler;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -867,5 +866,4 @@ public class Runner extends TestSuite
         else
             return test.getClass();
     }
-
 }
