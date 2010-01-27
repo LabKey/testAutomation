@@ -350,9 +350,9 @@ public class ListHelper
             if (validator != null)
             {
                 if (validator instanceof RegExValidator)
-                    test.clickNavButton("Add New Regular Expression", 0);
+                    test.clickNavButton("Add Regular Expression Validator", 0);
                 else
-                    test.clickNavButton("Add New Range", 0);
+                    test.clickNavButton("Add Range Validator", 0);
                 test.setFormElement("name", validator.getName());
                 test.setFormElement("description", validator.getDescription());
                 test.setFormElement("errorMessage", validator.getMessage());
