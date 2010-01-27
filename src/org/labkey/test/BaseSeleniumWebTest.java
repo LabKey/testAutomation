@@ -4197,7 +4197,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         waitAndClick(Locator.radioButtonByNameAndValue("importAction", actionName));
         String id = ExtHelper.getExtElementId(this, "btn_submit");
-        click(Locator.id(id));
+        clickAndWait(Locator.id(id));
     }
 
     public DatabaseInfo getDatabaseInfo()
