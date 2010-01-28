@@ -72,6 +72,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for FCS files to be loaded");
 
         waitAndClick(Locator.fileTreeByName("8color"));
+        waitForElement(Locator.extButton("Import Data"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectFileBrowserFile(this, "quv-analysis.xml");
         selectImportDataAction("Import Multiple Runs");
         waitForPageToLoad();
