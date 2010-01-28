@@ -326,7 +326,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         for (int i = 0; i < pks.length; i++)
         {
             Map<String, Object> row = resp.getRows().get(i);
-            Long rowid = (Long)row.get("RowId");
+            Integer rowid = (Integer)row.get("RowId");
             assertEquals("Expected requested rowid and selected rowid to be the same", rowid.intValue(), pks[i]);
             
             String text = (String)row.get("Text");
