@@ -310,6 +310,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Test Comparing Peptides");
         clickLinkWithText("MS2 Dashboard");
         click(Locator.name(".toggle"));
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
         clickLinkWithText("Peptide");
         selectOptionByText("viewParams", VIEW);

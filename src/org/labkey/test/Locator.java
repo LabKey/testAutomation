@@ -134,24 +134,9 @@ public class Locator
     }
 
 
-    public static XPathLocator gwtNavButton(String text)
-    {
-        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[text() = " + xq(text) + "]");
-    }
-
-    public static XPathLocator gwtNavButtonContainingText(String text)
-    {
-        return xpath("//div[@class='html-face']/a[@class='labkey-button']/span[contains(text(), " + xq(text) + ")]");
-    }
-
-    public static XPathLocator gwtNavButton(String text, int index)
-    {
-        return xpath("(//div[@class='html-face']/a[@class='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
-    }
-
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a[normalize-space(@class)='labkey-button' or normalize-space(@class)='labkey-menu-button']/span[text() = " + xq(text) + "]");
+        return xpath("//a[contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator extButton(String text)

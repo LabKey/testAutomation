@@ -877,6 +877,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test Protein Prophet Compare");
 
         searchRunsTable.checkAllOnPage();
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
         clickLinkWithText("ProteinProphet");
         selectOptionByText("viewParams", VIEW3);
@@ -896,6 +897,7 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
 
         searchRunsTable.checkAllOnPage();
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
         clickLinkWithText("ProteinProphet");
         checkCheckbox("light2HeavyRatioMean");
@@ -908,6 +910,7 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
 
         searchRunsTable.checkAllOnPage();
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
         clickLinkWithText("Search Engine Protein");
         selectOptionByText("viewParams", VIEW2);
@@ -927,6 +930,7 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
 
         searchRunsTable.checkAllOnPage();
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
         clickLinkWithText("Peptide");
         selectOptionByText("viewParams", VIEW2);
@@ -1019,6 +1023,7 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test that the compare run groups works");
         searchRunsTable.checkAllOnPage();
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
         clickLinkWithText("ProteinProphet (Query)");
         clickNavButton("Go");
@@ -1091,6 +1096,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test Compare Runs using Query Peptides");
         clickLinkWithText("MS2 Dashboard");
         click(Locator.name(".toggle"));
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare");
         checkCheckbox("column", "QueryPeptides", true);
         clickNavButton("Go");
