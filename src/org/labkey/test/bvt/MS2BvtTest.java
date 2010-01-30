@@ -966,13 +966,12 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         assertTextPresent(RUN_GROUP1_NAME1);
         
-        clickNavButton("Add to run group", 0);
-        clickLinkWithText("Create new run group...");
+        clickLinkWithText("Run Groups");
+        clickNavButton("Create Run Group");
         clickNavButton("Submit");
         setFormElement("name", RUN_GROUP3_NAME);
         clickNavButton("Submit");
 
-        clickLinkWithText("Run Groups");
         clickNavButton("Create Run Group");
         setFormElement("name", RUN_GROUP2_NAME);
         clickNavButton("Submit");
