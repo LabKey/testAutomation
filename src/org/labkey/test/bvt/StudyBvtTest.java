@@ -198,7 +198,7 @@ public class StudyBvtTest extends StudyManualTest
         assertTextPresent("BAQ00051-09");
         assertTextNotPresent("KAQ0003Q-01");
         selectOptionByText("destinationSite", "Duke University");
-        setFormElement("inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
+        setFormElements("textarea", "inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
         clickNavButton("Create and View Details");
 
         assertTextPresent("This request has not been submitted");
@@ -221,9 +221,9 @@ public class StudyBvtTest extends StudyManualTest
         clickNavButton("Create New Request");
         String inputs = selenium.getValue("inputs");
         System.out.println(inputs);
-        assertFormElementNotEquals(Locator.dom("document.forms[0].inputs[1]"), "Duke University, NC");
+        assertFormElementNotEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
         selectOptionByText("destinationSite", "Duke University");
-        assertFormElementEquals(Locator.dom("document.forms[0].inputs[1]"), "Duke University, NC");
+        assertFormElementEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
         clickNavButton("Cancel");
 
         // manage new request

@@ -1718,9 +1718,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
+    protected final String firstForm = "//td[@id='bodypanel']//form[1]";
+
     public void submit()
     {
-        submit(Locator.dom("document.forms[0]"));
+        selenium.submit(firstForm);
+        waitForPageToLoad();
     }
 
     public void submit(Locator formLocator)
@@ -1800,7 +1803,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public boolean isFormElementPresent(String elementName)
     {
-        return isElementPresent(Locator.dom("document.forms[0]['" + elementName + "']"));
+        return isElementPresent(Locator.dom(firstForm + "['" + elementName + "']"));
     }
 
     public void assertFormElementPresent(String elementName)
@@ -2552,10 +2555,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement(element.toString(), text, suppressValueLogging);
     }
 
-    public void setFormElement(String formElementName, String[] values)
+    public void setFormElements(String tagName, String formElementName, String[] values)
     {
         for (int i = 0; i < values.length; i++)
-            setFormElement(Locator.dom("document.forms[0][\"" + formElementName + "\"][" + i + "]"), values[i]);
+        {
+            //  (//td[@id='bodypanel']//form[1]//.[@name='inputs'])[2] BROKEN?
+            //  //td[@id='bodypanel']//form[1]//descendant::textarea[@name='inputs'][1]
+            setFormElement(Locator.xpath("//descendant::" + tagName + "[@name='" + formElementName + "'][" + (i+1) + "]"), values[i]);
+        }
     }
 
     public void setSort(String regionName, String columnName, SortDirection direction)

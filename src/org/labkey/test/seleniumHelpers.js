@@ -33,7 +33,11 @@ selenium.countLinksWithText = function (txt) {
 
 selenium.appendToFormField = function (fieldName, txt) {
     var doc = selenium.browserbot.getCurrentWindow().document;
-    doc.forms[0][fieldName].value = doc.forms[0][fieldName].value + txt;
+    var i = 0;
+    if (doc.getElementById('headerSearchForm'))
+        i++;
+    var form = doc.forms[i];
+    form[fieldName].value = form[fieldName].value + txt;
     return "OK";
 };
 
