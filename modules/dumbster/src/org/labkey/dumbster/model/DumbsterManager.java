@@ -116,6 +116,10 @@ public class DumbsterManager implements ShutdownListener
             ContextListener.removeShutdownListener(this);
         }
     }
+    
+    public void shutdownPre(ServletContextEvent servletContextEvent)
+    {
+    }
 
     public void shutdownStarted(ServletContextEvent servletContextEvent)
     {
