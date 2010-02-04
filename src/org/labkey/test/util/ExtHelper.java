@@ -82,9 +82,14 @@ public class ExtHelper
         test.fail("Failed waiting for Ext dialog to appear");
     }
 
+    public static Locator locateBrowserFile(String fileName)
+    {
+        return Locator.xpath("//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
+    }
+
     public static void selectFileBrowserFile(BaseSeleniumWebTest test, String fileName)
     {
-        Locator file = Locator.xpath("//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
+        Locator file = locateBrowserFile(fileName);
 
         test.waitForElement(file, 60000);
         test.mouseDown(file);
