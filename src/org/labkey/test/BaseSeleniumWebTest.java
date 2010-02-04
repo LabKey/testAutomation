@@ -3204,6 +3204,27 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    /**
+     * Adds a new or existing user to an existing group within an existing project
+     *
+     * @param userName new or existing user name
+     * @param projectName existing project name
+     * @param groupName existing group within the project to which we should add the user
+     */
+    protected void addUserToProjGroup(String userName, String projectName, String groupName)
+    {
+        if (isElementPresent(Locator.permissionRendered()))
+        {
+            exitPermissionsUI();
+            clickLinkWithText(projectName);
+        }
+        enterPermissionsUI();
+        clickManageGroup(groupName);
+        setFormElement("names", userName );
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership");
+    } //addUserToProjGroup()
+
     public void enterPermissionsUI()
     {
         //if the following assert triggers, you were already in the permissions UI when this was called

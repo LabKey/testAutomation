@@ -18,8 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-
-import java.awt.*;
+import org.labkey.test.util.PasswordUtil;
 
 /**
  * User: tamram
@@ -150,8 +149,21 @@ public class IssuesTest extends BaseSeleniumWebTest
         // ListAction (empty)
         clickNavButton("Back to Issues");
 
+        // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list
+        clickNavButton("New Issue");
+        String assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
+        assertEquals(assignedToText, "");
+
+        // Add to group so user appears
+        clickLinkWithText("IssuesVerifyProject");
+        addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, "testers");
+        clickLinkWithText("IssuesVerifyProject");
+        clickLinkWithText("view open issues");
+
         // InsertAction
         clickNavButton("New Issue");
+        assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
+        assertEquals(assignedToText, getDisplayName());
         setFormElement("title", ISSUE_TITLE_0);
         selectOptionByText("type", "UFO");
         selectOptionByText("area", "Area51");
