@@ -71,10 +71,8 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for FCS files to be imported");
 
-        waitAndClick(Locator.fileTreeByName("8color"));
-        waitForElement(Locator.extButton("Import Data"), WAIT_FOR_JAVASCRIPT);
-
         // Should allow for import all directories containing FCS Files
+        waitAndClick(Locator.fileTreeByName("8color"));
         selectImportDataAction("Directory of FCS Files");
         waitForPageToLoad();
         assertTextPresent("The following directories within '8color'");
@@ -83,6 +81,7 @@ public class FlowTest extends BaseFlowTest
         clickNavButton("Cancel"); // go back to file-browser
 
         // Entering 8colordata directory should allow import of current directory
+        waitAndClick(Locator.fileTreeByName("8color"));
         waitAndClick(Locator.fileTreeByName("8colordata"));
         selectImportDataAction("Current directory of 11 FCS Files");
         waitForPageToLoad();
