@@ -69,16 +69,26 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Flow Dashboard");
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Browse for FCS files to be loaded");
+        clickLinkWithText("Browse for FCS files to be imported");
 
         waitAndClick(Locator.fileTreeByName("8color"));
         waitForElement(Locator.extButton("Import Data"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.selectFileBrowserFile(this, "quv-analysis.xml");
-        selectImportDataAction("Import Multiple Runs");
+
+        // Should allow for import all directories containing FCS Files
+        selectImportDataAction("Directory of FCS Files");
         waitForPageToLoad();
-        // First, just upload the run "8colordata"
-        clickNavButton("Clear All", -1); // no nav
-        checkCheckbox("ff_path", "8color/8colordata/");
+        assertTextPresent("The following directories within '8color'");
+        assertTextPresent("8colordata (11 fcs files)");
+        assertTextPresent("run2 (1 fcs files)");
+        clickNavButton("Cancel"); // go back to file-browser
+
+        // Entering 8colordata directory should allow import of current directory
+        waitAndClick(Locator.fileTreeByName("8colordata"));
+        selectImportDataAction("Current directory of 11 FCS Files");
+        waitForPageToLoad();
+        assertTextPresent("The following directories within '8color/8colordata'");
+        assertTextPresent("Current Directory (11 fcs files)");
+        assertTextNotPresent("run2");
         clickNavButton("Import Selected Runs");
         waitForPageToLoad();
         waitForPipeline(containerPath);
@@ -213,14 +223,13 @@ public class FlowTest extends BaseFlowTest
 
         // Now, let's add another run:
         clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Browse for more FCS files to be loaded");
+        clickLinkWithText("Browse for more FCS files to be imported");
 
         waitAndClick(Locator.fileTreeByName("8color"));
-        ExtHelper.selectFileBrowserFile(this, "quv-analysis.xml");
-        selectImportDataAction("Import Multiple Runs");
+        selectImportDataAction("Directory of FCS Files");
         waitForPageToLoad();
         assertTextNotPresent("8colordata");
-        clickImgButtonNoNav("Select All");
+        assertTextPresent("run2");
         clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
 

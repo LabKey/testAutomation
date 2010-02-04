@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,17 +130,24 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         beginAt(queryURL);
     }
 
-    protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, String analysisName)
+    protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, String analysisName, boolean viaPipeline)
     {
-        importAnalysis(containerPath, workspacePath, fcsPath, false, analysisName, false);
+        importAnalysis(containerPath, workspacePath, fcsPath, false, analysisName, false, viaPipeline);
     }
 
     protected void importAnalysis(String containerPath, String workspacePath,
                                   String fcsPath, boolean existingKeywordRun,
-                                  String analysisName, boolean existingAnalysisFolder)
+                                  String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)
     {
-        importAnalysis_begin(containerPath);
-        importAnalysis_uploadWorkspace(containerPath, workspacePath);
+        if (viaPipeline)
+        {
+            importAnalysis_viaPipeline(workspacePath);
+        }
+        else
+        {
+            importAnalysis_begin(containerPath);
+            importAnalysis_uploadWorkspace(containerPath, workspacePath);
+        }
         importAnalysis_FCSFiles(containerPath, fcsPath, existingKeywordRun);
         if (fcsPath == null)
         {
@@ -160,13 +168,42 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         importAnalysis_confirm(containerPath, workspacePath, fcsPath, existingKeywordRun, analysisName, existingAnalysisFolder);
     }
 
+    protected void importAnalysis_viaPipeline(String workspacePath)
+    {
+        log("browse pipeline to begin import analysis wizard");
+        if (!selenium.getTitle().startsWith("Flow Dashboard:"))
+            clickLinkWithText("Flow Dashboard");
+        clickLinkContainingText("FCS files to be imported");
+
+        if (workspacePath.startsWith("/"))
+            workspacePath = workspacePath.substring(1);
+        String[] parts = workspacePath.split("/");
+
+        for (int i = 0; i < parts.length; i++)
+        {
+            if (i == parts.length - 1)
+            {
+                // workaround for import button enable/disable state bug in pipeline browser
+                ExtHelper.selectFileBrowserFile(this, parts[i]);
+                ExtHelper.selectFileBrowserFile(this, parts[i]);
+                ExtHelper.selectFileBrowserFile(this, parts[i]);
+            }
+            else
+                waitAndClick(Locator.fileTreeByName(parts[i]));
+        }
+
+        waitForElement(Locator.extButton("Import Data"), WAIT_FOR_JAVASCRIPT);
+        selectImportDataAction("FlowJo Workspace");
+        waitForPageToLoad();
+    }
+
     protected void importAnalysis_begin(String containerPath)
     {
         log("begin import analysis wizard");
         if (!selenium.getTitle().startsWith("Flow Dashboard:"))
             clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Import FlowJo Workspace Analysis");
-        assertTitleEquals("Import Analysis: " + containerPath);
+        assertTitleEquals("Import Analysis: Start: " + containerPath);
         clickNavButton("Begin");
     }
 

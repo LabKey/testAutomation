@@ -43,7 +43,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
-        importAnalysis(containerPath, "/flowjoquery/Workspaces/PV1-public.xml", null, "FlowJoAnalysis");
+        importAnalysis(containerPath, "/flowjoquery/Workspaces/PV1-public.xml", null, "FlowJoAnalysis", true);
         clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
         clearCustomizeViewColumns();
         addCustomizeViewColumn("Name");
@@ -77,7 +77,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 //        waitForPageToLoad();
 
         clickLinkWithText("Flow Dashboard");
-        importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", "FlowJoAnalysis");
+        importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", "FlowJoAnalysis", false);
 
         int runId = -1;
         String currentURL = getCurrentRelativeURL();
