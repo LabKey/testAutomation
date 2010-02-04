@@ -149,7 +149,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         // ListAction (empty)
         clickNavButton("Back to Issues");
 
-        // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list
+        // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list yet
         clickNavButton("New Issue");
         String assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
         assertEquals(assignedToText, "");
