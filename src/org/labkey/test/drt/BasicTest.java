@@ -59,10 +59,9 @@ public class BasicTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("MS2 Experiment Runs");
 
         addWebPart("Search");
-        //assertTextPresent("Search fcs files, wiki pages, messages, and issues in this folder and all subfolders"); //removed for bug 4678
-        setFormElement("search", "labkey");
+        setFormElement("query", "labkey");
         clickNavButton("Search");
-        assertTextPresent("Searched in 1 folder for \"labkey\" and found no results."); //altered for bug fix 4678
+        assertTextPresent("Found 0 results");
 
         clickLinkWithText("Admin Console");
 

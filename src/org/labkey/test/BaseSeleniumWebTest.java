@@ -3643,18 +3643,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
         clickLinkWithText(projectName);
-        assertElementPresent(Locator.name("search"));
-        setFormElement("search", searchFor);
+        assertElementPresent(Locator.name("query"));
+        setFormElement("query", searchFor);
         clickNavButton("Search");
-
-        if(expectedResults == 0)
-        {
-            assertTextPresent("found no result");
-        }
-        else
-        {
-            assertTextPresent("found " + expectedResults + " result");
-        }
+        assertTextPresent("Found " + expectedResults + " result");
 
         log("found \"" + expectedResults + "\" result of " + searchFor);
         if (titleName != null)
