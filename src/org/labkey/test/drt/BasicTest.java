@@ -58,6 +58,11 @@ public class BasicTest extends BaseSeleniumWebTest
         addWebPart("MS2 Experiment Runs");
         assertLinkPresentWithText("MS2 Experiment Runs");
 
+        addWebPart("Search");
+        setFormElement("query", "labkey");
+        clickNavButton("Search");
+        assertTextPresent("Found", "results");  // just make sure we get the results page
+
         clickLinkWithText("Admin Console");
 
         if(enableDevMode()) assertTextNotPresent("Production"); // Verify that we're running in dev mode
