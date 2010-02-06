@@ -3652,11 +3652,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             assertTextPresent("Found " + expectedResults + " result");
 
             log("found \"" + expectedResults + "\" result of " + searchFor);
-            if (titleName != null)
-            {
-                clickLinkWithText(titleName);
-                assertTextPresent(searchFor);
-            }
+        }
+
+        if (titleName != null)
+        {
+            clickLinkWithText(titleName);
+            assertTextPresent(searchFor);
         }
     }
 
