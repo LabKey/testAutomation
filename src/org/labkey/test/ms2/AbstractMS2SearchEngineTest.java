@@ -47,7 +47,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
-        selectImportDataAction("Describe Samples:Create Assay Definition");
+        ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
+        selectImportDataAction("Create New Assay Design");
         waitForPageToLoad();
 
         log("Create a new MS2 sample prep assay definition.");
@@ -66,7 +67,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
-        selectImportDataAction("Describe Samples:Use " + TEST_ASSAY_NAME);
+        selectImportDataAction("Use " + TEST_ASSAY_NAME);
         waitForPageToLoad();
 
         log("Describe MS2 run.");

@@ -4217,10 +4217,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void selectImportDataAction(String actionName)
     {
-        waitForElement(Locator.extButton("Import Data"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.extButtonEnabled("Import Data"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Import Data", 0);
 
-        waitAndClick(Locator.radioButtonByNameAndValue("importAction", actionName));
+        waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction']/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = ExtHelper.getExtElementId(this, "btn_submit");
         clickAndWait(Locator.id(id));
     }

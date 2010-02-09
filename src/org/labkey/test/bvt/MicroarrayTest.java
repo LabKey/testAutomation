@@ -111,7 +111,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        selectImportDataAction(IMPORT_MAGEML + ":Use " + ASSAY_NAME);
+        selectImportDataAction("Use " + ASSAY_NAME);
         waitForPageToLoad();
 
         setFormElement("batchStringField", "SingleRunProperties");
@@ -145,7 +145,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 
-        selectImportDataAction(IMPORT_MAGEML + ":Use " + ASSAY_NAME);
+        selectImportDataAction("Use " + ASSAY_NAME);
         waitForPageToLoad();
 
         setFormElement("batchStringField", "BulkProperties");

@@ -144,6 +144,11 @@ public class Locator
         return xpath("//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
     }
 
+    public static XPathLocator extButtonEnabled(String text)
+    {
+        return xpath("//table[contains(@class, 'x-btn-wrap') and not (contains(@class, 'x-item-disabled'))]//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
+    }
+
     public static XPathLocator extMenuItem(String text)
     {
         return xpath("//a[@class='x-menu-item' and text() = " + xq(text) + "]");
