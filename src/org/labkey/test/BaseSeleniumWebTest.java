@@ -4166,7 +4166,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 */
 
             ExtHelper.selectFileBrowserFile(BaseSeleniumWebTest.this, _copiedArchive.getName());
-            selectImportDataAction("Import specimen data");
+            selectImportDataAction("Import Specimen Data");
             waitForPageToLoad();
             clickNavButton("Start Import");
         }

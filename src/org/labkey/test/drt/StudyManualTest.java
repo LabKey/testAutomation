@@ -114,7 +114,7 @@ public class StudyManualTest extends StudyTest
         //waitForElement(Locator.navButton("Import datasets"), WAIT_FOR_JAVASCRIPT);
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
-        selectImportDataAction("Import datasets");
+        selectImportDataAction("Import Datasets");
         waitForPageToLoad();
         clickNavButton("Start Import");
     }
