@@ -477,6 +477,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         
         addWebPart("Assay Runs");
+        selectOptionByText("viewProtocolId", "General: TestAssay1");
         // assay runs has a details page that needs to be submitted
         clickButton("Submit", defaultWaitForPage);
 
