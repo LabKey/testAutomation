@@ -48,7 +48,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
-        selectImportDataAction("Create New Assay Design");
+        selectImportDataAction("Create New Mass Spec Metadata Assay Design");
         waitForPageToLoad();
 
         log("Create a new MS2 sample prep assay definition.");
