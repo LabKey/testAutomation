@@ -96,7 +96,8 @@ public enum TestSet
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
-        IDRIParticleSizeTest.class
+        IDRIParticleSizeTest.class,
+        CohortTest.class
     }),
 
     Cluster(new Class[]
@@ -135,6 +136,7 @@ public enum TestSet
             StudyBvtTest.class,
             StudyManualTest.class,
             StudyExtraTest.class,
+            CohortTest.class,
             AssayTest.class,
             ReportTest.class,
             QuerySnapshotTest.class,
