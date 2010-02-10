@@ -110,6 +110,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText("Pipeline");
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("datasets"));
+        ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.selectFileBrowserFile(this, "Study001.dataset");
         //waitForElement(Locator.navButton("Import datasets"), WAIT_FOR_JAVASCRIPT);
         if (isNavButtonPresent("Delete log"))

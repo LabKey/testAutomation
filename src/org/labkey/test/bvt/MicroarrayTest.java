@@ -108,6 +108,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickLinkWithText("Microarray Dashboard");
         clickNavButton("Process and Import Data");
 
+        ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
         ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
 

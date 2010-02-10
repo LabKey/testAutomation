@@ -174,6 +174,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         if (!selenium.getTitle().startsWith("Flow Dashboard:"))
             clickLinkWithText("Flow Dashboard");
         clickLinkContainingText("FCS files to be imported");
+        ExtHelper.waitForImportDataEnabled(this);
 
         if (workspacePath.startsWith("/"))
             workspacePath = workspacePath.substring(1);
@@ -192,7 +193,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 waitAndClick(Locator.fileTreeByName(parts[i]));
         }
 
-        waitForElement(Locator.extButton("Import Data"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("FlowJo Workspace");
         waitForPageToLoad();
     }

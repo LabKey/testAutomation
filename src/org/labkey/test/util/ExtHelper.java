@@ -95,6 +95,11 @@ public class ExtHelper
         test.mouseDown(file);
     }
 
+    public static void waitForImportDataEnabled(BaseSeleniumWebTest test)
+    {
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), test.WAIT_FOR_JAVASCRIPT);
+    }
+    
     public static void selectAllFileBrowserFiles(BaseSeleniumWebTest test)
     {
         Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
