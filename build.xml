@@ -121,6 +121,11 @@
         <delete dir="${test.build.home}" />
     </target>
 
+    <target name="delete_logs">
+        <delete dir="${test.log.output.dir}" />
+        <delete file="../teamcity-info.xml"/>
+    </target>
+
     <target name="prepare">
         <mkdir dir="${test.build.home}/classes" />
         <mkdir dir="${test.log.output.dir}" />
