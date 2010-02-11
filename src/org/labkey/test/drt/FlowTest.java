@@ -73,6 +73,7 @@ public class FlowTest extends BaseFlowTest
 
         // Should allow for import all directories containing FCS Files
         waitAndClick(Locator.fileTreeByName("8color"));
+        ExtHelper.waitForImportDataEnabled(this);
         waitForElement(ExtHelper.locateBrowserFile("run2"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Directory of FCS Files");
         waitForPageToLoad();
@@ -226,6 +227,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for more FCS files to be imported");
 
+        ExtHelper.waitForImportDataEnabled(this);
         waitAndClick(Locator.fileTreeByName("8color"));
         selectImportDataAction("Directory of FCS Files");
         waitForPageToLoad();
