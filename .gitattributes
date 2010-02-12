@@ -76,6 +76,7 @@ src/org/labkey/test/bvt/ListTest.java -text
 src/org/labkey/test/bvt/LuminexTest.java -text
 src/org/labkey/test/bvt/MS1Bvt.java -text
 src/org/labkey/test/bvt/MS2BvtTest.java -text
+src/org/labkey/test/bvt/MS2BvtTestGZ.java -text
 src/org/labkey/test/bvt/MenuBarTest.java -text
 src/org/labkey/test/bvt/MessagesBvtTest.java -text
 src/org/labkey/test/bvt/MicroarrayTest.java -text

@@ -81,6 +81,7 @@ public enum TestSet
         MessagesBvtTest.class, //do we need both MessagesTest and MessagesBvtTest?
         MessagesTest.class,
         MS2BvtTest.class,
+        MS2BvtTestGZ.class,           
         WikiBvtTest.class,
         ListTest.class,
         UserBvtTest.class,

@@ -27,8 +27,12 @@ import java.io.IOException;
 
 public class MS2BvtTest extends MS2TestBase
 {
-    protected static final String TEST = "DRT1";
-    protected static final String TEST2 = "DRT2";
+
+    protected void doTestSteps()
+    {
+        goTestIt("DRT1","DRT2");
+    }
+
     protected static final String VIEW2 = "proteinView";
     protected static final String VIEW3 = "proteinGroupView";
     protected static final String VIEW4 = "queryView1";
@@ -42,7 +46,6 @@ public class MS2BvtTest extends MS2TestBase
     protected static final String SEARCH_NAME2 = "X!Tandem";
     protected static final String SEARCH_BUTTON = "X%21Tandem";
     protected static final String SEARCH_NAME3 = "X! Tandem";
-    protected static final String RAW_PEP_XML = ".pep.xml";
     protected static final String ENZYME = "trypsin";
     protected static final String MASS_SPEC = "ThermoFinnigan";
     protected static final String RUN_GROUP1_NAME1 = "Test Run Group 1";
@@ -60,7 +63,7 @@ public class MS2BvtTest extends MS2TestBase
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
-    protected void doTestSteps()
+    protected void goTestIt(String TEST, String TEST2)
     {
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
@@ -68,7 +71,7 @@ public class MS2BvtTest extends MS2TestBase
             fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         super.doTestSteps();
-        
+
         DataRegionTable peptidesTable = new DataRegionTable("MS2Peptides", this);
         DataRegionTable proteinGroupsTable = new DataRegionTable("ProteinGroups", this);
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
@@ -967,7 +970,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent(RUN_GROUP1_COMMENTS);
         clickLinkWithText("MS2 Dashboard");
         assertTextPresent(RUN_GROUP1_NAME1);
-        
+
         clickLinkWithText("Run Groups");
         clickNavButton("Create Run Group");
         clickNavButton("Submit");
@@ -1143,5 +1146,6 @@ public class MS2BvtTest extends MS2TestBase
         popLocation();
 */
     }
+
 
 }
