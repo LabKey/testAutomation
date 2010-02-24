@@ -49,6 +49,7 @@ public enum TestSet
         MissingValueIndicatorsTest.class,
         ReportTest.class,
         SchemaBrowserTest.class,
+        MicroarrayTest.class,
         ViabilityTest.class
     }),
 
@@ -88,7 +89,6 @@ public enum TestSet
         UserBvtTest.class,
         IssuesTest.class,
         NabOldTest.class,
-        MicroarrayTest.class,
         CaBigTest.class,
         TimelineTest.class,
         DbUserSchemaTest.class,
