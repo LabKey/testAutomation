@@ -243,8 +243,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent(RESP1_TITLE);
         assertTextPresent(RESP1_BODY);
-        clickNavButton("Delete Message");
-        clickNavButton("Delete");
+        waitAndClickNavButton("Delete Message");
+        waitAndClickNavButton("Delete");
         assertTextNotPresent(DISC1_TITLE);
         assertTextNotPresent(DISC1_BODY);
 
@@ -268,7 +268,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         //test deleting via edit page
         clickLinkWithText("edit");
         waitAndClickNavButton("Delete Page");
-        clickNavButton("Delete");
+        waitAndClickNavButton("Delete");
         assertLinkPresentWithText("Home");
 
         createNewWikiPage("HTML");
@@ -282,7 +282,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText("Header");
         clickLinkWithText("edit", 0);
         waitAndClickNavButton("Delete Page");
-        clickNavButton("Delete");
+        waitAndClickNavButton("Delete");
         assertTextNotPresent(HEADER_CONTENT);
 
         log("Return to where we were...");
@@ -324,7 +324,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         searchFor(PROJECT_NAME, "fight club", 1, "Terms of Use");
         clickLinkWithText("edit");
         waitAndClickNavButton("Delete Page");
-        clickNavButton("Delete");
+        waitAndClickNavButton("Delete");
         assertTextNotPresent("Terms of Use");
 
         log("test copy wiki");
