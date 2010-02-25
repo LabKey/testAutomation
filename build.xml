@@ -131,6 +131,12 @@
         <mkdir dir="${test.log.output.dir}" />
     </target>
 
+    <path id="test.lib.selenium.classpath">
+        <fileset dir="${test.lib.home}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
     <path id="test.lib.classpath">
         <fileset dir="${test.lib.home}">
             <include name="*.jar"/>
@@ -461,7 +467,7 @@
         <echo message="Or use ant stopSeleniumServer to stop manually."/>
         <echo message="Setting selenium server's PATH to: ${env.FIREFOX_HOME}:${env.PATH}" level="verbose"/>
         <java spawn="true" fork="true" classname="org.openqa.selenium.server.SeleniumServer">
-            <classpath refid="test.lib.classpath" />
+            <classpath refid="test.lib.selenium.classpath" />
             <env key="PATH" path="${env.FIREFOX_HOME}:${env.PATH}"/>
             <arg value="-port" />
             <arg value="${sysprop.selenium.server.port}" />
