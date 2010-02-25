@@ -829,12 +829,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             try
             {
                 populateLastPageInfo();
-                if (_testFailed)
-                    dump();
             }
             catch (Throwable t)
             {
                 System.out.println("Unable to determine information about the last page: server not started or -Dlabkey.port incorrect?");
+            }
+            finally
+            {
+                if (_testFailed)
+                    dump();
             }
             log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
@@ -1416,6 +1419,27 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkNotPresentWithText(folderName);
     }
 
+    public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
+    {
+        log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
+        clickLinkWithText(project);
+        ensureAdminMode();
+        clickLinkWithText("Folders");
+        // click index 1, since this text appears in the nav tree as well as the folder management tree:
+        clickLinkWithText(folderName, 1);
+        clickNavButton("Rename");
+        setText("name", newFolderName);
+        if (createAlias)
+            checkCheckbox("addAlias");
+        else
+            uncheckCheckbox("addAlias");
+        // confirm rename:
+        clickNavButton("Rename");
+        // verify that we're not on an error page with a check for a new folder link:
+        assertLinkPresentWithText(newFolderName);
+        assertLinkNotPresentWithText(folderName);
+    }
+
     public void deleteProject(String project)
     {
         log("Deleting project " + project);
@@ -1923,11 +1947,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, defaultWaitForPage);
     }
 
-    /** Find a nth link with the exact text specified, clicks it, optionally waiting for the page to load */
+    /** Find a link with the exact text specified, clicks it, optionally waiting for the page to load */
     public void clickLinkWithText(String text, boolean wait)
     {
+        clickLinkWithText(text, 0, wait);
+    }
+
+    /** Find a nth link with the exact text specified, clicks it, optionally waiting for the page to load */
+    public void clickLinkWithText(String text, int index, boolean wait)
+    {
         log("Clicking link with text '" + text + "'");
-        Locator l = Locator.linkWithText(text);
+        Locator l;
+
+        if(index > 0)
+            l = Locator.linkWithText(text, index);
+        else
+            l = Locator.linkWithText(text);
+
         assertElementPresent(l);
         if (wait)
             clickAndWait(l, defaultWaitForPage);

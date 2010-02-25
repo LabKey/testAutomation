@@ -28,6 +28,7 @@ public class BasicTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "BasicVerifyProject";
     private static final String FOLDER_NAME = "childfolder";
+    private static final String FOLDER_RENAME = "renamedfolder";
 
     protected void doCleanup()
     {
@@ -75,7 +76,13 @@ public class BasicTest extends BaseSeleniumWebTest
         ensureAdminMode();
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        
+
+        log("Test folder aliasing");
+        pushLocation();
+        renameFolder(PROJECT_NAME, FOLDER_NAME, FOLDER_RENAME, true);
+        popLocation();
+        assertTextPresent(FOLDER_RENAME);
+
         log("Test firefox version");
         String source = getHtmlSource();
         assertTrue("The LabKey test suite requires Firefox 2.0, 3.0, or 3.5", source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0"));
