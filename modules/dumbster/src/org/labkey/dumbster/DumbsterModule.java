@@ -40,7 +40,7 @@ public class DumbsterModule extends DefaultModule
 
     public double getVersion()
     {
-        return 1.00;
+        return 10.09;
     }
 
     protected void init()
