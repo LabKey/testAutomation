@@ -50,7 +50,7 @@ public class Locator
     {
         return new Locator("identifier=" + str);
     }
-    
+
     public static Locator id(String id)
     {
         return new Locator("id=" + id);
@@ -120,7 +120,7 @@ public class Locator
 
     public static XPathLocator tagWithText(String tag, String text)
     {
-        return xpath("//" + tag + "[text() = " + xq(text) + "]");        
+        return xpath("//" + tag + "[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator tagContainingText(String tag, String text)
@@ -204,9 +204,19 @@ public class Locator
         return new Locator("link=" + text);
     }
 
+    public static XPathLocator linkWithText(String text, int index)
+    {
+        return xpath("(//a[text() = " + xq(text) + "])[" + (index + 1) + "]");
+    }
+
     public static XPathLocator linkContainingText(String text)
     {
         return xpath("//a[contains(text(), " + xq(text) + ")]");
+    }
+
+    public static XPathLocator linkContainingText(String text, int index)
+    {
+        return xpath("(//a[contains(text(), " + xq(text) + ")])[" + (index + 1) + "]");
     }
 
     public static XPathLocator menuItem(String text)
@@ -219,12 +229,6 @@ public class Locator
         return xpath("//table[@id='menubar']//a/span[contains(text(), " + xq(text) + ")]");
     }
 
-
-    public static XPathLocator linkWithText(String text, int index)
-    {
-        return xpath("(//a[contains(text(), " + xq(text) + ")])[" + (index + 1) + "]");
-    }
-
     public static XPathLocator linkWithTitle(String title)
     {
         return xpath("//a[@title=" + xq(title) + "]");
@@ -232,7 +236,7 @@ public class Locator
 
     public static XPathLocator linkWithHref(String url)
     {
-        return xpath("//a[contains(@href, " + xq(url) + ")]");        
+        return xpath("//a[contains(@href, " + xq(url) + ")]");
     }
 
     public static XPathLocator bodyLinkWithText(String text)
@@ -260,7 +264,7 @@ public class Locator
     {
         return tagWithAttribute("input", "value", value);
     }
-    
+
     public static Locator formElement(String formName, String elementName)
     {
         return dom("document['" + formName + "']['" +elementName + "']");
@@ -370,7 +374,7 @@ public class Locator
         String inputId = "$add$" + role;
         return xpath("//input[@id="+ xq(inputId) +"]");
     }
-    
+
 
     public static XPathLocator fileTreeByName(String name)
     {
