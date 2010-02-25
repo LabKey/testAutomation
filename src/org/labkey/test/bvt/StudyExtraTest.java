@@ -244,8 +244,8 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         waitForElement(Locator.raw("ff_name0"), WAIT_FOR_JAVASCRIPT);
         selenium.type("ff_name0", "Value");
         clickNavButton("Save");
-        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("View Dataset Data");
+        waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("View Data");
         clickNavButton("Import Data");
         selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
         submit();
@@ -314,7 +314,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         addWebPart("Assay List");
 
         //copied from old test
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "General");
         clickNavButton("Next");

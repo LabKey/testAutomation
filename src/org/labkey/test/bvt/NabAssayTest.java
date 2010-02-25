@@ -123,7 +123,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             addWebPart("Assay List");
 
             //create a new nab assay
-            clickLinkWithText("Manage Assays");
+            clickNavButton("Manage Assays");
             clickNavButton("New Assay Design");
             checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
             clickNavButton("Next");

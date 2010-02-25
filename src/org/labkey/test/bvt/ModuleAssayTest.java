@@ -140,7 +140,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(PROJECT_NAME);
 
         addWebPart("Assay List");
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "Simple");
         clickNavButton("Next");

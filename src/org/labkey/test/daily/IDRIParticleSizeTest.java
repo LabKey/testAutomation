@@ -107,7 +107,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Assay List");
 
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "IDRI Particle Size");
         clickNavButton("Next");
@@ -170,7 +170,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         log("Excel files uploaded");
 
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickLinkWithText(ASSAY_NAME);
         clickLinkWithText("TD220.xls");
 

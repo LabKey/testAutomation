@@ -133,7 +133,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
     {
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(datasetName);
-        clickButtonContainingText("Edit Dataset Definition");
+        clickButtonContainingText("Edit Definition");
         waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         if (demographics)

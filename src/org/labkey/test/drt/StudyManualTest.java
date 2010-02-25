@@ -142,7 +142,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("DEM-1: Demographics");
-        clickButtonContainingText("Edit Dataset Definition");
+        clickButtonContainingText("Edit Definition");
         waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setFormElement("description", DEMOGRAPHICS_DESCRIPTION);
         clickNavButton("Save");
@@ -224,8 +224,8 @@ public class StudyManualTest extends StudyTest
         setFormElement(Locator.id("importAliases"), "aliasedColumn");
 
         clickNavButton("Save");
-        waitForElement(Locator.navButton("View Dataset Data"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("View Dataset Data");
+        waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("View Data");
         clickNavButton("Import Data");
 
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";

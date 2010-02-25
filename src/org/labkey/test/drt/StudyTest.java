@@ -340,13 +340,13 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("489");
         assertTextPresent("ESIdt");
         assertTextPresent("Form Completion Date");
-        assertTableCellTextEquals("details", 5, 1, "false");     // "Demographics Data" should be false
+        assertTableCellTextEquals("details", 4, 1, "false");     // "Demographics Data" should be false
 
         // Verify that "Demographics Data" is checked and description is set
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("DEM-1: Demographics");
-        assertTableCellTextEquals("details", 5, 1, "true");
-        assertTableCellTextEquals("details", 8, 1, DEMOGRAPHICS_DESCRIPTION);
+        assertTableCellTextEquals("details", 4, 1, "true");
+        assertTableCellTextEquals("details", 3, 3, DEMOGRAPHICS_DESCRIPTION);
 
         // "Demographics Data" bit needs to be false for the rest of the test
         setDemographicsBit("DEM-1: Demographics", false);

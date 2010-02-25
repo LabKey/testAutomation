@@ -17,6 +17,7 @@ package org.labkey.test.daily;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,7 +28,7 @@ import org.labkey.test.Locator;
 public class CohortTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "Cohort Test Project";
-    private static final String COHORT_STUDY_ZIP = "\\sampledata\\study\\CohortStudy.zip";
+    private static final String COHORT_STUDY_ZIP = "/sampledata/study/CohortStudy.zip";
     private static final String XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE = "//td[@id='bodypanel']/div[2]/table[1]";
     private static final String XPATH_SPECIMEN_REPORT_TABLE_POSITIVE = "//td[@id='bodypanel']/div[2]/table[2]";
     private static final String XPATH_SPECIMEN_REPORT_TABLE_UNASSIGNED = "//td[@id='bodypanel']/div[2]/table[3]";
@@ -52,7 +53,7 @@ public class CohortTest extends BaseSeleniumWebTest
     {
         log("Check advanced cohort features.");
         createProject(PROJECT_NAME, "Study");
-        importStudy(getLabKeyRoot() + COHORT_STUDY_ZIP);
+        importStudy(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
         waitForPipelineJobsToComplete(1, "Study import");
         clickLinkWithText(PROJECT_NAME);
 
@@ -213,16 +214,16 @@ public class CohortTest extends BaseSeleniumWebTest
         // Check all cohorts after manipulation.
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Blood");
-        assertTextPresent("Count: 25"); // 5 participants x 5 visits (one of which is now undefined)
+        assertTextPresent("Count: 20"); // 5 participants x 4 visits (was five visits, but one was just deleted)
 
         clickMenuButton("Cohorts", "Cohorts:Initial cohort:Negative", "Cohorts:Initial cohort");
-        assertTextPresent("Count: 20"); // One participant has no cohorts.
+        assertTextPresent("Count: 16"); // One participant has no cohorts.
         clickMenuButton("Cohorts", "Cohorts:Initial cohort:Positive", "Cohorts:Initial cohort");
         assertTextPresent("Count: 0"); // All participants initially negative
         clickMenuButton("Cohorts", "Cohorts:Current cohort:Negative", "Cohorts:Current cohort");
-        assertTextPresent("Count: 5"); // Final visit (where Infected4 joins Positive cohort) has been deleted.
+        assertTextPresent("Count: 4"); // Final visit (where Infected4 joins Positive cohort) has been deleted.
         clickMenuButton("Cohorts", "Cohorts:Current cohort:Positive", "Cohorts:Current cohort");
-        assertTextPresent("Count: 15");
+        assertTextPresent("Count: 12");
         clickMenuButton("Cohorts", "Cohorts:Cohort as of data collection:Negative", "Cohorts:Cohort as of data collection");
         assertTextPresent("Count: 10");
         clickMenuButton("Cohorts", "Cohorts:Cohort as of data collection:Positive", "Cohorts:Cohort as of data collection");

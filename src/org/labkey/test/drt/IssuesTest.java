@@ -234,10 +234,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         log(index);
         beginAt(index, 5*defaultWaitForPage);
         popLocation();
-        setText("q","hype");
-        clickNavButton("Search");
-        assertLinkPresentContainingText(ISSUE_TITLE_0);
+        // UNDONE: test grid search box
 
+        // SearchWebPart
+        searchFor(PROJECT_NAME, "hype", 1, ISSUE_TITLE_0);
         // SearchWebPart
         searchFor(PROJECT_NAME, "2012", 1, ISSUE_TITLE_0);
 

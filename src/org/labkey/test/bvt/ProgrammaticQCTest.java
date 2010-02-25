@@ -105,7 +105,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
         addWebPart("Assay List");
 
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
@@ -136,7 +136,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
         addWebPart("Assay List");
 
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "General");
         clickNavButton("Next");

@@ -263,7 +263,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
         log("Import dataset data");
         clickLinkWithText("MV Dataset");
-        clickNavButton("View Dataset Data");
+        clickNavButton("View Data");
         clickNavButton("Import Data");
 
         setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
@@ -473,7 +473,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         addWebPart("Assay List");
 
         //copied from old test
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "General");
         clickNavButton("Next");

@@ -85,7 +85,7 @@ public class LuminexTest extends AbstractQCAssayTest
         addWebPart("Assay List");
 
         //create a new luminex assay
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "Luminex");
         clickNavButton("Next");

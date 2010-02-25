@@ -100,7 +100,7 @@ public class ViabilityTest extends AbstractQCAssayTest
         log("** Create viability assay");
         clickLinkWithText(getFolderName());
         addWebPart("Assay List");
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "Viability");
         clickNavButton("Next");

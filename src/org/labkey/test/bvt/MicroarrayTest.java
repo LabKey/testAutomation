@@ -75,7 +75,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         submit();
 
         log("Create an assay");
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "Microarray");
         clickNavButton("Next");

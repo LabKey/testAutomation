@@ -121,7 +121,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("test the search module on messages");
         clickLinkWithText(PROJECT_NAME);
-        searchFor(PROJECT_NAME, "Banana", 1, RESP1_TITLE);
+        searchFor(PROJECT_NAME, "Banana", 1, MSG1_TITLE);
 
         log("test delete message works and is recognized");
         clickNavButton("Delete Message");

@@ -3639,24 +3639,31 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     /*
      * This assumes that you have added the "search" webpart to your project
      */
-    // Disabled -- unreliable test, since indexing doesn't happen immediately.  TODO: Re-enable or replace with search tests.
     public void searchFor(String projectName, String searchFor, int expectedResults, String titleName)
     {
-        if (false)
+        log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
+        clickLinkWithText(projectName);
+        assertElementPresent(Locator.name("q"));
+        setFormElement("query", searchFor);
+        clickNavButton("Search");
+        long wait = 0;
+        while (wait < defaultWaitForPage)
         {
-            log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
-            clickLinkWithText(projectName);
-            assertElementPresent(Locator.name("q"));
-            setFormElement("query", searchFor);
-            clickNavButton("Search");
+            if ((titleName == null && isTextPresent("Found " + expectedResults + " result")) ||
+                (titleName != null && isLinkPresentContainingText(titleName)))
+                break;
+            sleep(500);
+            wait += 500;
+            refresh();
+        }
+        if (titleName == null)
+        {
             assertTextPresent("Found " + expectedResults + " result");
-
             log("found \"" + expectedResults + "\" result of " + searchFor);
         }
-
-        if (titleName != null)
+        else
         {
-            clickLinkWithText(titleName);
+            clickLinkContainingText(titleName);
             assertTextPresent(searchFor);
         }
     }

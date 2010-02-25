@@ -169,10 +169,10 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         saveWikiPage();
 
-        pushLocation();
-        //because we replace the body with the content
-        searchFor(PROJECT_NAME, "More HTML", 0);
-        popLocation();
+//        pushLocation();
+//        //because we replace the body with the content
+//        searchFor(PROJECT_NAME, "More HTML", 0);
+//        popLocation();
 
         log("test change renderer type");
         assertTextPresent("Some HTML content");

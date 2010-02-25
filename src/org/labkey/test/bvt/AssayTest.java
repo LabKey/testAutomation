@@ -134,7 +134,7 @@ public class AssayTest extends AbstractAssayTest
         addWebPart("Assay List");
 
         //copied from old test
-        clickLinkWithText("Manage Assays");
+        clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
