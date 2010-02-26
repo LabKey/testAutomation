@@ -117,7 +117,7 @@ public class UserBvtTest extends SecurityTest
         popLocation();
         // View reset password email.
         clickLinkWithText(PROJECT_NAME);
-        clickLinkContainingText("Reset Password Notification", 0); // Expand message.
+        clickLinkContainingText("Reset Password Notification", false); // Expand message.
 
         clickLinkContainingText("setPassword"); // Set Password URL
         assertTextPresent(NORMAL_USER);

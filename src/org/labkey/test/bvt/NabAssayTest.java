@@ -247,7 +247,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             setFormElement("ff_columnListName", "CustomDetailsView");
             clickNavButton("Save");
 
-            clickLinkWithText("details", 1);
+            clickLinkContainingText("details", 1);
             assertNabData(true);
 
             clickLinkWithText("View Results");

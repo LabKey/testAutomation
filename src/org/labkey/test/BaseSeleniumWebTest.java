@@ -1973,14 +1973,32 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickLinkContainingText(String text)
     {
-        clickLinkContainingText(text, defaultWaitForPage);
+        clickLinkContainingText(text, true);
     }
 
-    public void clickLinkContainingText(String text, int millis)
+    public void clickLinkContainingText(String text, int index)
+    {
+        clickLinkContainingText(text, index, true);
+    }
+
+    public void clickLinkContainingText(String text, int index, boolean wait)
+    {
+        log("Clicking link " + index + " containing text: " + text);
+        Locator l  = Locator.linkContainingText(text, index);
+        if ( wait )
+            clickAndWait(l, defaultWaitForPage);
+        else
+            click(l);
+    }
+
+    public void clickLinkContainingText(String text, boolean wait)
     {
         log("Clicking link containing text: " + text);
         Locator l  = Locator.linkContainingText(text);
-        clickAndWait(l, millis);
+        if ( wait )
+            clickAndWait(l, defaultWaitForPage);
+        else
+            click(l);
     }
 
     public int countLinksWithText(String text)
@@ -2030,7 +2048,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void click(Locator l)
     {
-        selenium.click(l.toString());
+        clickAndWait(l, 0);
     }
 
     public void clickAndWait(Locator l)
@@ -2041,7 +2059,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickAndWait(Locator l, int millis)
     {
         assertElementPresent(l);
-        click(l);
+        selenium.click(l.toString());
         if (millis > 0)
             waitForPageToLoad(millis);
     }
@@ -3238,6 +3256,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             savePermissions();
             assertNoPermission(groupName, role);
         }
+    }
+
+    protected void createProjectGroup(String projectName, String groupName)
+    {
+        
     }
 
     /**
