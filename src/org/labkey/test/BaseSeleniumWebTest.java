@@ -596,8 +596,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                     }
                     Thread.sleep(2000);
                     waitMs -= 2000;
-                    if (isTextPresent("error occurred"))
-                        fail("A script failure occurred.");
+                    if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
+                        fail("A startup failure occurred.");
                 }
                 catch (InterruptedException e)
                 {
