@@ -150,7 +150,7 @@
             <include name="wsdl4j-1.5.1.jar" />
             <include name="jaxrpc.jar" />
             <include name="commons-discovery-0.2.jar" />
-            <include name="log4j-1.2.8.jar" />
+            <include name="log4j-1.2.15.jar" />
             <include name="commons-logging-1.1.jar" />
             <include name="xbean.jar" />
         </fileset>
