@@ -20,8 +20,6 @@ import org.apache.log4j.Logger;
 import org.labkey.api.data.Container;
 import org.labkey.api.view.HttpView;
 import org.labkey.api.view.JspView;
-import org.labkey.api.view.ActionURL;
-import org.labkey.api.settings.AppProps;
 import org.labkey.dumbster.model.DumbsterManager;
 
 import javax.servlet.ServletException;

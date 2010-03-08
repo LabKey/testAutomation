@@ -17,25 +17,19 @@ package org.labkey.dumbster.model;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import org.apache.log4j.Logger;
+import org.labkey.api.util.ContextListener;
+import org.labkey.api.util.MailHelper;
+import org.labkey.api.util.ShutdownListener;
 
 import javax.mail.Session;
-import javax.mail.NoSuchProviderException;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
-import java.util.List;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
-import java.net.ServerSocket;
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.labkey.api.util.MailHelper;
-import org.labkey.api.util.ContextListener;
-import org.labkey.api.util.ShutdownListener;
-import org.labkey.api.util.UnexpectedException;
 
 /**
  * <code>DumbsterManager</code>

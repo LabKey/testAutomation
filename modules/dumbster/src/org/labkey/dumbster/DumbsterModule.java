@@ -16,7 +16,6 @@
 
 package org.labkey.dumbster;
 
-import org.apache.log4j.Logger;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.settings.AppProps;
@@ -30,9 +29,6 @@ import java.util.Collection;
 
 public class DumbsterModule extends DefaultModule
 {
-    private static final Logger _log = Logger.getLogger(DumbsterModule.class);
-    public static final String NAME = "Dumbster";
-
     public String getName()
     {
         return "Dumbster";
