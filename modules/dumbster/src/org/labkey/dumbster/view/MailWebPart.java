@@ -16,9 +16,6 @@
 
 package org.labkey.dumbster.view;
 
-import org.apache.log4j.Logger;
-import org.labkey.api.data.Container;
-import org.labkey.api.view.HttpView;
 import org.labkey.api.view.JspView;
 import org.labkey.dumbster.model.DumbsterManager;
 
@@ -26,15 +23,7 @@ import javax.servlet.ServletException;
 
 public class MailWebPart extends JspView<MailPage>
 {
-    static Logger _log = Logger.getLogger(MailWebPart.class);
-
     public MailWebPart()
-    {
-        this(HttpView.currentContext().getContainer());
-    }
-
-
-    public MailWebPart(Container c)
     {
         super("/org/labkey/dumbster/view/mailWebPart.jsp", new MailPage());
         setTitle("Mail Record");
