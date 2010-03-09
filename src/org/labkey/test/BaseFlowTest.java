@@ -192,7 +192,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 waitAndClick(Locator.fileTreeByName(parts[i]));
         }
 
-        selectImportDataAction("FlowJo Workspace");
+        selectImportDataAction("Import FlowJo Workspace");
         waitForPageToLoad();
     }
 

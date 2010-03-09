@@ -75,7 +75,7 @@ public class FlowTest extends BaseFlowTest
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.waitForImportDataEnabled(this);
         waitForElement(ExtHelper.locateBrowserFile("run2"), WAIT_FOR_JAVASCRIPT);
-        selectImportDataAction("Directory of FCS Files");
+        selectImportDataAction("Import Directory of FCS Files");
         waitForPageToLoad();
         assertTextPresent("The following directories within '8color'");
         assertTextPresent("8colordata (11 fcs files)");
@@ -228,7 +228,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for more FCS files to be imported");
 
         waitAndClick(Locator.fileTreeByName("8color"));
-        selectImportDataAction("Directory of FCS Files");
+        selectImportDataAction("Import Directory of FCS Files");
         waitForPageToLoad();
         assertTextNotPresent("8colordata");
         assertTextPresent("run2");
