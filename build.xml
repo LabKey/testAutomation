@@ -189,7 +189,7 @@
                debug="${test.compile.debug}"
                deprecation="${test.compile.deprecation}"
                optimize="${test.compile.optimize}"
-               source="1.5"
+               source="1.6"
                classpathref="test.build.classpath">
         </javac>
         <copy todir="${test.build.home}/classes" >
@@ -1023,7 +1023,7 @@
                debug="${test.compile.debug}"
                deprecation="${test.compile.deprecation}"
                optimize="${test.compile.optimize}"
-               source="1.5"
+               source="1.6"
                classpathref="test.build.classpath">
         </javac>
 
