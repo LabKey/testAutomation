@@ -31,7 +31,7 @@ public class StudyTest extends StudyBaseTest
     protected static final String FOLDER_NAME = "My Import Study";
     protected static final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit.";
-//    protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some ‘special symbols’ – they help test that we're roundtripping in UTF-8.";
+//    protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some â€˜special symbolsâ€™ â€“ they help test that we're roundtripping in UTF-8.";
 
     protected String _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\taliasedColumn\n" +
         "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\taliasedData\n" +
