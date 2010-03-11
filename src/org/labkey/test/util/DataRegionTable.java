@@ -116,7 +116,7 @@ public class DataRegionTable
 
     public void clickLink(int row, int col)
     {
-        _test.clickAndWait(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+3) + "]/td[" + (col+1) + "]/a[1]"));
+        _test.clickAndWait(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+4) + "]/td[" + (col+1) + "]/a[1]"));
     }
 
     public int getColumn(String name)
