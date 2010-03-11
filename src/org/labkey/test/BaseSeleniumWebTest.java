@@ -2254,7 +2254,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTextPresent(columnTitle);
         for(int col = 0; col < 100; col++) // TODO: Find out how wide the table is.
         {
-            if(getTableCellText(tableName, 0, col).equals(columnTitle))
+            if(getTableCellText(tableName, 2, col).equals(columnTitle))
             {
                 return col;
             }
@@ -2328,7 +2328,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         List<String> values = new ArrayList<String>(rowCount);
 
         for (int i = 0; i < rowCount; i++)
-            values.add(getTableCellText(tableName, i, column));
+        {
+            try
+            {
+                values.add(getTableCellText(tableName, i, column));
+            }
+            catch(Exception ignore) {}
+        }
 
         return values;
     }

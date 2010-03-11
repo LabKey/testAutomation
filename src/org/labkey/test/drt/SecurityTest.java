@@ -372,10 +372,10 @@ public class SecurityTest extends BaseSeleniumWebTest
         selectOptionByText("view", "User events");
         waitForPageToLoad();
 
-        String createdBy = getTableCellText("dataregion_audit", 3, 1);
-        String impersonatedBy = getTableCellText("dataregion_audit", 3, 2);
-        String user = getTableCellText("dataregion_audit", 3, 3);
-        String comment = getTableCellText("dataregion_audit", 3, 4);
+        String createdBy = getTableCellText("dataregion_audit", 5, 1);
+        String impersonatedBy = getTableCellText("dataregion_audit", 5, 2);
+        String user = getTableCellText("dataregion_audit", 5, 3);
+        String comment = getTableCellText("dataregion_audit", 5, 4);
 
         assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");

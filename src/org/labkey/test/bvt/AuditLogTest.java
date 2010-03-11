@@ -116,7 +116,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
         instance.log("searching for audit entry: " + msg);
         DataRegionTable table = new DataRegionTable("audit", instance);
         int i = table.getColumn(column);
-        assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch));
+        assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
     }
 
     public static boolean findTextInDataRegion(DataRegionTable table, int column, String txt, int rowsToSearch)

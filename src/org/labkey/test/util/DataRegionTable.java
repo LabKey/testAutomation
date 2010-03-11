@@ -116,7 +116,7 @@ public class DataRegionTable
 
     public void clickLink(int row, int col)
     {
-        _test.clickAndWait(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+1) + "]/td[" + (col+1) + "]/a[1]"));
+        _test.clickAndWait(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+3) + "]/td[" + (col+1) + "]/a[1]"));
     }
 
     public int getColumn(String name)
@@ -131,7 +131,7 @@ public class DataRegionTable
             int sel = (_selectors ? 1 : 0);
             for (int col = 0; getDataAsText(0, col) != null; col++)
             {
-                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/thead/tr[1]/th[" + (col+sel+1) + "]/div"));
+                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[3]/td[" + (col+sel+1) + "]/div"));
                 String headerName = header.split("\n")[0];
                 headerName = headerName.replaceAll(" ", "");
                 if (!StringUtils.isEmpty(headerName))
@@ -165,7 +165,7 @@ public class DataRegionTable
         {
             while (true)
             {
-                String value = _test.getAttribute(Locator.xpath("//table[@id='dataregion_query']//tr[" + (row+1) + "]//input[@name='.select']/"), "value");
+                String value = _test.getAttribute(Locator.xpath("//table[@id='dataregion_query']//tr[" + (row+3) + "]//input[@name='.select']/"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;
@@ -182,7 +182,12 @@ public class DataRegionTable
 
     public String getDataAsText(int row, int column)
     {
-        return _test.getTableCellText(getHtmlName(), row + 1, column + (_selectors ? 1 : 0));
+        String ret = null;
+        try
+        {
+            ret = _test.getTableCellText(getHtmlName(), row + 3, column + (_selectors ? 1 : 0));
+        } catch(Exception ignore) {}
+        return ret;
     }
 
     public String getDataAsText(int row, String columnName)
