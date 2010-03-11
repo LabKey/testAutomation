@@ -44,7 +44,7 @@ public enum TestSet
         AssayTest.class,
         StudyBvtTest.class,
         PipelineBvtTest.class,
-        //FileContentTest.class,
+        FileContentTest.class,
         ClientAPITest.class,
         MissingValueIndicatorsTest.class,
         ReportTest.class,
