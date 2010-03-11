@@ -33,6 +33,7 @@ cruisecontrol/xsl/pmd.xsl -text
 cruisecontrol/xsl/testdetails.xsl -text
 cruisecontrol/xsl/unittests.xsl -text
 data/api/http-api.xml -text
+data/api/rlabkey-api.xml -text
 data/api/security-api.xml -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
@@ -87,6 +88,7 @@ src/org/labkey/test/bvt/PipelineBvtTest.java -text
 src/org/labkey/test/bvt/ProgrammaticQCTest.java -text
 src/org/labkey/test/bvt/QuerySnapshotTest.java -text
 src/org/labkey/test/bvt/ReportTest.java -text
+src/org/labkey/test/bvt/RlabkeyTest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
 src/org/labkey/test/bvt/SchemaBrowserTest.java -text
 src/org/labkey/test/bvt/SimpleApiTest.java -text
@@ -168,5 +170,6 @@ src/org/labkey/test/util/Maps.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
+src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/StopSelenium.java -text
 /upgrade_stress_test.cmd -text

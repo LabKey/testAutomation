@@ -1,0 +1,189 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="list schemas" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                scobj <- getSchema(s, "lists")
+                scobj   # shows available queries
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Available queries:
+                AllTypesCategories
+                AllTypes
+                AllTypesComments
+                AllTypesCategoryGroups
+            ]]>
+        </response>
+    </test>
+    <test name="get rows" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                scobj <- getSchema(s, "lists")
+                lkdata<- getRows(s, scobj$AllTypes)  # shorthand for labkey.selectRows, all the same args apply
+                lkdata
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                DisplayFld             TextFld IntFld DoubleFld DateTimeFld
+                Row 2 Empty Vals
+                Inserted from R        how its done     98    12.345  2010-03-01
+                The quick brown fox jumped over the fence.
+                AttachmentFld            RequiredText RequiredInt Category
+                lots of words for empty         456    EMPTY
+                Veni, vidi, vici           0  LOOKUP2
+            ]]>
+        </response>
+    </test>
+    <test name="get lookups" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                scobj <- getSchema(s, "lists")
+                lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
+                lucols
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                fieldName             caption        type            key
+                Category/TextKey      Text Key       Text (String)
+                Category/Category     Category       Text (String)
+                Category/CategorySort Sort Ordinal   Number (Double)
+                Category/Group        Category Group Text (String)
+                Category/EntityId     Entity Id      Text (String)
+                lookup to lists.AllTypesCategoryGroups
+            ]]>
+        </response>
+    </test>
+    <test name="get rows with options" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                scobj <- getSchema(s, "lists")
+                lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
+                cols <- c(names(scobj$AllTypes)[2:6], names(lucols)[2:4])
+                simpledf <- getRows(s, scobj$AllTypes, colSelect=paste(cols, sep=","))
+                simpledf
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                TextFld IntFld DoubleFld DateTimeFld BooleanFld
+                some text here     99   987.654  2010-02-14      FALSE
+                More plane values    -34 98123.450  1999-01-01      FALSE
+                null NULL NA and na    123    44.330  2002-02-20      FALSE
+                how its done     98    12.345  2010-03-01      FALSE
+                Category/Category Category/CategorySort Category/Group
+                Basic functional test                     1    Punctuation
+                Empty Values Test                     4      TypeRange
+                2nd level lookup                     3      BasicTest
+            ]]>
+        </response>
+    </test>
+    <test name="get folders" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                lsFolders(getSession(baseUrl="http://localhost:8080/labkey", "/RlabkeyVerifyProject"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                "/RlabkeyVerifyProject"
+                "/RlabkeyVerifyProject/test"
+            ]]>
+        </response>
+    </test>
+    <test name="insert row" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                ## insert, update and delete functions
+                newrow <- data.frame(
+                    DisplayFld="Inserted via Rlabkey"
+                    , TextFld="how its done"
+                    , IntFld= 98
+                    , DoubleFld = 12.345
+                    , DateTimeFld = "03/01/2010"
+                    , BooleanFld= FALSE
+                    , LongTextFld = "Four score and seven years ago"
+                    , RequiredText = "I"
+                    , RequiredInt = 0
+                    , Category = "LOOKUP2"
+                    , stringsAsFactors=FALSE)
+
+                insertedRow <- labkey.insertRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toInsert=newrow)
+                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                        , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Inserted via Rlabkey")))
+                selectedRow
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                DisplayName   Text Field Integer Field Double Field DateTime Field
+                Inserted via Rlabkey how its done            98       12.345     2010-03-01
+                Boolean Field                Long Text Field Attachment Required Text
+                FALSE Four score and seven years ago
+                Required Integer Category Lookup
+                1                0         LOOKUP2
+            ]]>
+        </response>
+    </test>
+    <test name="update row" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                        ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Inserted via Rlabkey")))
+                updaterow=data.frame(
+                    RowId=selectedRow[1, "Row Id"]
+                    , DisplayFld="Updated via Rlabkey"
+                    , TextFld="how to update"
+                    , IntFld= 777
+                    , stringsAsFactors=FALSE)
+
+                updatedRow <- labkey.updateRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toUpdate=updaterow)
+                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                        , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
+                selectedRow
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Updated via Rlabkey
+            ]]>
+        </response>
+    </test>
+    <test name="delete row" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                        ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
+                selectedRow[1,"Row Id"]
+
+                deleterow <- data.frame(RowId=selectedRow[1, "Row Id"], stringsAsFactors=FALSE)
+                labkey.deleteRows(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject", schemaName="lists", queryName="AllTypes",  toDelete=deleterow)
+
+                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                        ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))            
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Empty data frame was returned. Query may be too restrictive.
+            ]]>
+        </response>
+    </test>
+</ApiTests>

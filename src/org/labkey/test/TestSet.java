@@ -99,7 +99,8 @@ public enum TestSet
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
         IDRIParticleSizeTest.class,
-        CohortTest.class
+        CohortTest.class,
+        RlabkeyTest.class
     }),
 
     Cluster(new Class[]

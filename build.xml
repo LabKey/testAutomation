@@ -244,7 +244,7 @@
       <ant antfile="${project.root}/server/customModules/idriParticleSize/build.xml" inheritall="false" target="deploy"/>
     </target>
 
-    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module">
+    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-rlabkey">
     </target>
 
     <target name="stage-simpletest-module">
@@ -1052,6 +1052,17 @@
                 <attribute name="Main-Class" value="org.labkey.AssayTransform"/>
             </manifest>
         </jar>
+    </target>
+
+    <target name="stage-rlabkey">
+        <mkdir dir="${project.root}/sampledata/rlabkey"/>
+        <copy todir="${project.root}/sampledata/rlabkey">
+            <fileset dir="${project.root}/remoteapi/r/test">
+                <include name="listArchive.zip"/>
+                <include name="vignette.R"/>
+          </fileset>
+        </copy>
+        <copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.zip" overwrite="true" file="${project.root}/remoteapi/r/build/Rlabkey_latest.zip"/>
     </target>
 </project>
 

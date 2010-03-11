@@ -415,4 +415,26 @@ public class ListHelper
 
         test.waitForPageToLoad();
     }
+
+    public static void importListArchive(BaseSeleniumWebTest test, String folderName, File inputFile)
+    {
+        test.clickLinkWithText(folderName);
+        test.waitForPageToLoad();
+        if (!test.isLinkPresentWithText("Lists"))
+        {
+            test.addWebPart("Lists");
+        }
+
+        test.clickLinkWithText("manage lists");
+
+        test.log("Import List Archive");
+        test.clickNavButton("Import List Archive");
+        test.waitForElement(Locator.xpath("//input[@name='listZip']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
+        test.setFormElement("listZip", inputFile);
+        test.clickNavButton("Import List Archive");
+
+        test.waitForPageToLoad();
+    }
+
 }

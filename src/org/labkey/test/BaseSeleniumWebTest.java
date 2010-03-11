@@ -1668,7 +1668,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return new File(buildDir, "testTemp");
     }
 
-    protected boolean isREngineConfigured()
+    public boolean isREngineConfigured()
     {
         // need to allow time for the server to return the engine list and the ext grid to render
         Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");

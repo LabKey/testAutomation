@@ -16,13 +16,10 @@
 
 package org.labkey.test.bvt;
 
-import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
 import org.labkey.test.drt.StudyBaseTest;
 import org.labkey.test.util.ExtHelper;
-
-import java.io.File;
-import java.io.FilenameFilter;
+import org.labkey.test.util.RReportHelper;
 
 /**
  * User: klum
@@ -107,7 +104,7 @@ public class ReportTest extends StudyBaseTest
     protected void doCreateSteps()
     {
         // fail fast if R is not configured 
-        checkRSetup();
+        RReportHelper.ensureRConfig(this);
 
         // import study and wait; no specimens needed
         importStudy();
@@ -243,95 +240,6 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("Female");
     }
 
-    protected boolean checkRSetup()
-    {
-        ensureAdminMode();
-        // user need to be added to the site develpers group
-        // createSiteDeveloper(PasswordUtil.getUsername());
-
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("views and scripting");
-        log("Check if it already is configured");
-
-        try
-        {
-            if (isREngineConfigured())
-                return true;
-        }
-        catch (SeleniumException e)
-        {
-            log("Ignoring Selenium Error");
-            log(e.getMessage());
-        }
-
-        log("Try configuring R");
-        String rHome = System.getenv("R_HOME");
-        if (rHome != null)
-        {
-            log("R_HOME is set to: " + rHome + " searching for the R application");
-            File rHomeDir = new File(rHome);
-            FilenameFilter rFilenameFilter = new FilenameFilter()
-            {
-                public boolean accept(File dir, String name)
-                {
-                    return "r.exe".equalsIgnoreCase(name) || "r".equalsIgnoreCase(name);
-                }
-            };
-            File[] files = rHomeDir.listFiles(rFilenameFilter);
-
-            if (files == null || files.length == 0)
-            {
-                files = new File(rHome, "bin").listFiles(rFilenameFilter);
-            }
-
-            if (files != null)
-            {
-                for (File file : files)
-                {
-                    // add a new r engine configuration
-                    String id = ExtHelper.getExtElementId(this, "btn_addEngine");
-                    click(Locator.id(id));
-
-                    id = ExtHelper.getExtElementId(this, "add_rEngine");
-                    click(Locator.id(id));
-
-                    id = ExtHelper.getExtElementId(this, "btn_submit");
-                    waitForElement(Locator.id(id), 10000);
-
-                    id = ExtHelper.getExtElementId(this, "editEngine_exePath");
-                    setFormElement(Locator.id(id), file.getAbsolutePath());
-
-                    id = ExtHelper.getExtElementId(this, "btn_submit");
-                    click(Locator.id(id));
-
-                    // wait until the dialog has been dismissed
-                    int cnt = 3;
-                    while (isElementPresent(Locator.id(id)) && cnt > 0)
-                    {
-                        sleep(1000);
-                        cnt--;
-                    }
-
-                    if (isREngineConfigured())
-                        return true;
-
-                    refresh();
-                }
-            }
-        }
-
-        log("Environment info: " + System.getenv());
-
-        if (null == rHome)
-        {
-            log("");   // Blank line helps make the following message more readable
-            log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
-        }
-
-        fail("R is not configured on this system. Failed R tests.");
-        return false;
-    }
-
     protected void doCreateRReports()
     {
         log("Create an R Report");
@@ -345,8 +253,8 @@ public class ReportTest extends StudyBaseTest
         log("Execute bad scripts");
         clickNavButton("Execute Script");
         assertTextPresent("Empty script, a script must be provided.");
-        if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
-            if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
+        if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
+            if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
                 fail("There was an error running the script");
         assertTextPresent("Error executing command");
 //        assertTextPresent("Error: object \"badString\" not found");
@@ -359,8 +267,8 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent(R_SCRIPT1_PDF);
 
         log("Execute and save a script");
-        if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
-            if (!tryScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
+        if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
+            if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 fail("There was an error running the script");
         log("Check that the script executed properly");
         assertTextPresent(R_SCRIPT1_TEXT1);
@@ -418,8 +326,8 @@ public class ReportTest extends StudyBaseTest
         log("Create second R script");
         clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
-        if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
-            if (!tryScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
+        if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
+            if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 fail("There was an error running the script");
         clickLinkWithText("Source");
         checkCheckbox("shareReport");
@@ -492,8 +400,8 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
-        if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
-            if (!tryScript(R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
+        if (!RReportHelper.executeScript(this, R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
+            if (!RReportHelper.executeScript(this, R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 fail("There was an error running the script");
         assertTextPresent(R_SCRIPT2_TEXT1);
         clickLinkWithText("Source");
@@ -505,8 +413,8 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickReportGridLink(R_SCRIPTS[0], "source");
-        if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
-            if (!tryScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
+        if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
+            if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 fail("There was an error running the script");
         clickLinkWithText("Source");
         clickNavButton("Save View");
@@ -544,20 +452,6 @@ public class ReportTest extends StudyBaseTest
             }
             assertTextNotPresent(script);
         }
-    }
-
-    protected boolean tryScript(String script, String verify)
-    {
-        log("Try script");
-
-        if (!isLinkPresentWithText("Download input data") && isLinkPresentWithText("Source"))
-        {
-            clickLinkWithText("Source");
-        }
-        setFormElement(Locator.id("script"), script);
-        clickNavButton("Execute Script");
-        waitForPageToLoad();
-        return (isTextPresent(verify));
     }
 
     protected void cleanPipelineItem(String item)
