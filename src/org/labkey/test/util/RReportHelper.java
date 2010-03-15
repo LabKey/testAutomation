@@ -19,7 +19,6 @@ import java.io.FilenameFilter;
 public class RReportHelper
 {
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
-    private static final String INSTALL_RLABKEY_VERIFY = "package 'Rlabkey' successfully unpacked and MD5 sums checked";
     private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
 
     /**
@@ -27,6 +26,15 @@ public class RReportHelper
      * @return - true if the test result was present
      */
     public static boolean executeScript(BaseSeleniumWebTest test, String script, String verify)
+    {
+        return executeScript(test, script, verify, false);
+    }
+
+    /**
+     * Execute an R script and verify the specified text is present.
+     * @return - true if the test result was present
+     */
+    public static boolean executeScript(BaseSeleniumWebTest test, String script, String verify, boolean failOnError)
     {
         test.log("execute script");
 
@@ -39,12 +47,22 @@ public class RReportHelper
         test.clickNavButton("Execute Script");
         test.waitForPageToLoad();
 
+        Locator l = Locator.xpath("//div[@id='tabContent']//pre");
+        String html = test.getText(l);
+
+        if (failOnError)
+        {
+            if (html.contains("javax.script.ScriptException"))
+            {
+                test.log("Error: the script failed with an error:\n" + html);
+                return false;
+            }
+        }
+
         if (!StringUtils.isEmpty(verify))
         {
             // split string on newlines to make the comparison more reliable
             String [] parts = verify.split("\n");
-            Locator l = Locator.xpath("//div[@id='tabContent']//pre");
-            String html = test.getText(l);
 
             for (String part : parts)
             {
@@ -65,7 +83,7 @@ public class RReportHelper
      */
     public static void installRlabkey(BaseSeleniumWebTest test, boolean local)
     {
-        if (executeScript(test, INSTALL_RLABKEY, INSTALL_RLABKEY_VERIFY))
+        if (executeScript(test, INSTALL_RLABKEY, null, true))
         {
             if (local)
             {
@@ -76,7 +94,7 @@ public class RReportHelper
 
                 String cmd = String.format(INSTALL_LOCAL_RLABKEY, rPackage.getAbsolutePath());
                 cmd = cmd.replaceAll("\\\\", "/");
-                if (!executeScript(test, cmd, INSTALL_RLABKEY_VERIFY))
+                if (!executeScript(test, cmd, null, true))
                     test.fail("Unable to install the local Rlabkey package.");
             }
         }
