@@ -30,13 +30,13 @@
         </url>
         <response>
             <![CDATA[
-                DisplayFld             TextFld IntFld DoubleFld DateTimeFld
+                DisplayFld TextFld IntFld DoubleFld DateTimeFld
                 Row 2 Empty Vals
-                Inserted from R        how its done     98    12.345  2010-03-01
+                Inserted from R how its done 98 12.345 2010-03-01
                 The quick brown fox jumped over the fence.
-                AttachmentFld            RequiredText RequiredInt Category
-                lots of words for empty         456    EMPTY
-                Veni, vidi, vici           0  LOOKUP2
+                AttachmentFld RequiredText RequiredInt Category
+                lots of words for empty 456 EMPTY
+                Veni, vidi, vici 0 LOOKUP2
             ]]>
         </response>
     </test>
@@ -52,12 +52,12 @@
         </url>
         <response>
             <![CDATA[
-                fieldName             caption        type            key
-                Category/TextKey      Text Key       Text (String)
-                Category/Category     Category       Text (String)
-                Category/CategorySort Sort Ordinal   Number (Double)
-                Category/Group        Category Group Text (String)
-                Category/EntityId     Entity Id      Text (String)
+                fieldName caption type key
+                Category/TextKey Text Key Text (String)
+                Category/Category Category Text (String)
+                Category/CategorySort Sort Ordinal Number (Double)
+                Category/Group Category Group Text (String)
+                Category/EntityId Entity Id Text (String)
                 lookup to lists.AllTypesCategoryGroups
             ]]>
         </response>
@@ -77,14 +77,14 @@
         <response>
             <![CDATA[
                 TextFld IntFld DoubleFld DateTimeFld BooleanFld
-                some text here     99   987.654  2010-02-14      FALSE
-                More plane values    -34 98123.450  1999-01-01      FALSE
-                null NULL NA and na    123    44.330  2002-02-20      FALSE
-                how its done     98    12.345  2010-03-01      FALSE
+                some text here 99 987.654 2010-02-14 FALSE
+                More plane values -34 98123.450 1999-01-01 FALSE
+                null NULL NA and na 123 44.330 2002-02-20 FALSE
+                how its done 98 12.345 2010-03-01 FALSE
                 Category/Category Category/CategorySort Category/Group
-                Basic functional test                     1    Punctuation
-                Empty Values Test                     4      TypeRange
-                2nd level lookup                     3      BasicTest
+                Basic functional test 1 Punctuation
+                Empty Values Test 4 TypeRange
+                2nd level lookup 3 BasicTest
             ]]>
         </response>
     </test>
@@ -129,12 +129,12 @@
         </url>
         <response>
             <![CDATA[
-                DisplayName   Text Field Integer Field Double Field DateTime Field
-                Inserted via Rlabkey how its done            98       12.345     2010-03-01
-                Boolean Field                Long Text Field Attachment Required Text
+                DisplayName Text Field Integer Field Double Field DateTime Field
+                Inserted via Rlabkey how its done 98 12.345 2010-03-01
+                Boolean Field Long Text Field Attachment Required Text
                 FALSE Four score and seven years ago
                 Required Integer Category Lookup
-                1                0         LOOKUP2
+                1 0 LOOKUP2
             ]]>
         </response>
     </test>

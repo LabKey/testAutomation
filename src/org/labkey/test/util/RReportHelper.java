@@ -43,12 +43,14 @@ public class RReportHelper
         {
             // split string on newlines to make the comparison more reliable
             String [] parts = verify.split("\n");
-            String html = test.getHtmlSource();
+            Locator l = Locator.xpath("//div[@id='tabContent']//pre");
+            String html = test.getText(l);
+
             for (String part : parts)
             {
                 if (!html.contains(part.trim()))
                 {
-                    test.log("Error: could not find expected text: " + part + " on the page.");
+                    test.log("Error: could not find expected text: " + part + ".\nfrom value:\n" + html);
                     return false;
                 }
             }
