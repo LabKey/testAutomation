@@ -1062,8 +1062,11 @@
                 <include name="vignette.R"/>
           </fileset>
         </copy>
+        <condition property="r.path" value="${env.R_HOME}/R" else="R">
+            <isset property="env.R_HOME"/>
+        </condition>
         <copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true" file="${project.root}/remoteapi/r/build/Rlabkey_latest.tar.gz"/>
-        <exec executable="R" dir="${project.root}/sampledata/rlabkey">
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
             <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
         </exec>
     </target>
