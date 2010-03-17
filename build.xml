@@ -123,7 +123,7 @@
 
     <target name="delete_logs">
         <delete dir="${test.log.output.dir}" />
-        <delete file="../teamcity-info.xml"/>
+        <delete file="${basedir}/../teamcity-info.xml"/>
     </target>
 
     <target name="prepare">

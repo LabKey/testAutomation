@@ -26,6 +26,9 @@ import static org.labkey.test.WebTestHelper.*;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ExtHelper;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
+import org.tmatesoft.svn.core.wc.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -63,6 +66,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public final static int WAIT_FOR_JAVASCRIPT = 5000;
     protected int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
+    protected long _startTime;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -747,6 +751,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         try
         {
             log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
+
+            _startTime = System.currentTimeMillis();
+
             signIn();
 			resetErrors();
 
@@ -837,9 +844,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             finally
             {
                 if (_testFailed)
+                {
                     dump();
+                    dumpPipelineLogFiles(getLabKeyRoot() + "/sampledata");
+                }
+                log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
             }
-            log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
     }
 
@@ -1021,7 +1031,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
             String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
 
-            File dumpDir = Runner.getDumpDir();
+            File dumpDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
+            if ( !dumpDir.exists() )
+                dumpDir.mkdirs();
+
             publishArtifact(dumpFullScreen(dumpDir, baseName));
             publishArtifact(dumpScreen(dumpDir, baseName));
             publishArtifact(dumpHtml(dumpDir, baseName));
@@ -2282,6 +2295,56 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setPipelineRoot(String rootPath)
     {
         setPipelineRoot(rootPath, false);
+    }
+
+    private void dumpPipelineLogFiles(String path)
+    {
+        ArrayList<File> files = listFilesRecursive(new File(path), new NonSVNFilter());
+        for (File file : files)
+        {
+            if ( file.isFile() )
+            {
+                File dest = new File( Runner.getDumpDir() + "/" + getClass().getSimpleName() + "/" + file.getParent().substring(path.length()));
+                if (!dest.exists())
+                    dest.mkdirs();
+                file.renameTo(new File(dest, file.getName()));
+            }
+        }
+    }
+
+    private ArrayList<File> listFilesRecursive(File path, FilenameFilter filter)
+    {
+        File[] files = path.listFiles(filter);
+        ArrayList<File> allFiles = new ArrayList<File>();
+        for (File file : files)
+        {
+            if ( file.isDirectory() )
+                allFiles.addAll(listFilesRecursive(file, filter));
+            else // file.isFile()
+                allFiles.add(file);
+        }
+        return allFiles;
+    }
+
+    private class NonSVNFilter implements FilenameFilter
+    {
+        SVNStatusClient svn = new SVNStatusClient((ISVNAuthenticationManager)null, null);
+
+        public NonSVNFilter() { }
+
+        public boolean accept(File directory, String filename)
+        {
+            File file = new File(directory, filename);
+            try
+            {
+                return (!file.isHidden() && file.isDirectory() ||
+                        _startTime < file.lastModified() && svn.doStatus(file, false).getContentsStatus().equals(SVNStatusType.STATUS_UNVERSIONED));
+            }
+            catch (SVNException e)
+            {
+                return false;
+            }
+        }
     }
 
     public void setPipelineRoot(String rootPath, boolean inherit)
