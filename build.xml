@@ -1062,7 +1062,10 @@
                 <include name="vignette.R"/>
           </fileset>
         </copy>
-        <copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.zip" overwrite="true" file="${project.root}/remoteapi/r/build/Rlabkey_latest.zip"/>
+        <copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true" file="${project.root}/remoteapi/r/build/Rlabkey_latest.tar.gz"/>
+        <exec executable="R" dir="${project.root}/sampledata/rlabkey">
+            <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
+        </exec>
     </target>
 </project>
 

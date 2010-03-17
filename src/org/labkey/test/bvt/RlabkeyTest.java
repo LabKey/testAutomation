@@ -19,6 +19,7 @@ public class RlabkeyTest extends SimpleApiTest
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
     private static final String LIST_NAME = "AllTypes";
     private static final String CREATE_R_MENU = "Views:Create:R View";
+    private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")\n";
 
     @Override
     public void runUITests() throws Exception
@@ -39,12 +40,14 @@ public class RlabkeyTest extends SimpleApiTest
 
         RReportHelper.ensureRConfig(this);
 
+/*
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(LIST_NAME);
         clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
 
         RReportHelper.installRlabkey(this, true);
         RReportHelper.saveReport(this, "dummy");
+*/
     }
 
     @Override
@@ -62,10 +65,14 @@ public class RlabkeyTest extends SimpleApiTest
                 clickLinkWithText(LIST_NAME);
                 clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
 
+                // we want to load the Rlabkey package from the override location
+                File libPath = new File(getLabKeyRoot() + "/sampledata/rlabkey");
+                String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
+
                 try {
                     for (ApiTestCase test : tests)
                     {
-                        String cmd = test.getUrl().trim();
+                        String cmd = pathCmd + test.getUrl().trim();
                         String verify = test.getReponse().trim();
 
                         if (!RReportHelper.executeScript(this, cmd, verify))
@@ -75,7 +82,7 @@ public class RlabkeyTest extends SimpleApiTest
                 finally
                 {
                     // restore latest version of R from web
-                    RReportHelper.installRlabkey(this, false);
+//                    RReportHelper.installRlabkey(this, false);
                     RReportHelper.saveReport(this, "dummy2");
                 }
             }
