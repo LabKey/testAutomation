@@ -3,7 +3,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                s<-getSession(baseUrl="%baseUrl%", folderPath="/RlabkeyVerifyProject")
                 scobj <- getSchema(s, "lists")
                 scobj   # shows available queries
             ]]>
@@ -22,7 +22,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                s<-getSession(baseUrl="%baseUrl%", folderPath="/RlabkeyVerifyProject")
                 scobj <- getSchema(s, "lists")
                 lkdata<- getRows(s, scobj$AllTypes)  # shorthand for labkey.selectRows, all the same args apply
                 lkdata
@@ -44,7 +44,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                s<-getSession(baseUrl="%baseUrl%", folderPath="/RlabkeyVerifyProject")
                 scobj <- getSchema(s, "lists")
                 lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
                 lucols
@@ -66,7 +66,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                s<-getSession(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject")
+                s<-getSession(baseUrl="%baseUrl%", folderPath="/RlabkeyVerifyProject")
                 scobj <- getSchema(s, "lists")
                 lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
                 cols <- c(names(scobj$AllTypes)[2:6], names(lucols)[2:4])
@@ -92,7 +92,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                lsFolders(getSession(baseUrl="http://localhost:8080/labkey", "/RlabkeyVerifyProject"))
+                lsFolders(getSession(baseUrl="%baseUrl%", "/RlabkeyVerifyProject"))
             ]]>
         </url>
         <response>
@@ -121,8 +121,8 @@
                     , Category = "LOOKUP2"
                     , stringsAsFactors=FALSE)
 
-                insertedRow <- labkey.insertRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toInsert=newrow)
-                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                insertedRow <- labkey.insertRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toInsert=newrow)
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
                         , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Inserted via Rlabkey")))
                 selectedRow
             ]]>
@@ -143,7 +143,7 @@
             <![CDATA[
                 library(Rlabkey)
 
-                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
                         ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Inserted via Rlabkey")))
                 updaterow=data.frame(
                     RowId=selectedRow[1, "Row Id"]
@@ -152,8 +152,8 @@
                     , IntFld= 777
                     , stringsAsFactors=FALSE)
 
-                updatedRow <- labkey.updateRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toUpdate=updaterow)
-                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                updatedRow <- labkey.updateRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toUpdate=updaterow)
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
                         , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
                 selectedRow
             ]]>
@@ -169,14 +169,14 @@
             <![CDATA[
                 library(Rlabkey)
 
-                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
                         ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
                 selectedRow[1,"Row Id"]
 
                 deleterow <- data.frame(RowId=selectedRow[1, "Row Id"], stringsAsFactors=FALSE)
-                labkey.deleteRows(baseUrl="http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject", schemaName="lists", queryName="AllTypes",  toDelete=deleterow)
+                labkey.deleteRows(baseUrl="%baseUrl%", folderPath="/RlabkeyVerifyProject", schemaName="lists", queryName="AllTypes",  toDelete=deleterow)
 
-                selectedRow<-labkey.selectRows("http://localhost:8080/labkey", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
                         ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))            
             ]]>
         </url>

@@ -19,7 +19,7 @@ public class RlabkeyTest extends SimpleApiTest
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
     private static final String LIST_NAME = "AllTypes";
     private static final String CREATE_R_MENU = "Views:Create:R View";
-    private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")\n";
+    private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")";
 
     @Override
     public void runUITests() throws Exception
@@ -39,15 +39,6 @@ public class RlabkeyTest extends SimpleApiTest
         createSubfolder(PROJECT_NAME, "test", new String[0]);
 
         RReportHelper.ensureRConfig(this);
-
-/*
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(LIST_NAME);
-        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
-
-        RReportHelper.installRlabkey(this, true);
-        RReportHelper.saveReport(this, "dummy");
-*/
     }
 
     @Override
@@ -72,18 +63,19 @@ public class RlabkeyTest extends SimpleApiTest
                 try {
                     for (ApiTestCase test : tests)
                     {
-                        String cmd = pathCmd + test.getUrl().trim();
+                        StringBuilder sb = new StringBuilder(pathCmd);
+
+                        sb.append('\n');
+                        sb.append(test.getUrl().trim().replaceAll("%baseUrl%", WebTestHelper.getBaseURL()));
                         String verify = test.getReponse().trim();
 
-                        if (!RReportHelper.executeScript(this, cmd, verify))
+                        if (!RReportHelper.executeScript(this, sb.toString(), verify))
                             fail("Failed executing R script for test case: " + test.getName());
                     }
                 }
                 finally
                 {
-                    // restore latest version of R from web
-//                    RReportHelper.installRlabkey(this, false);
-                    RReportHelper.saveReport(this, "dummy2");
+                    RReportHelper.saveReport(this, "dummy");
                 }
             }
         }
