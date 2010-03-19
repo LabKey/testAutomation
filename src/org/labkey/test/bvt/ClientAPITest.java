@@ -534,7 +534,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         // delete the row below Billy (which should contain Jane)
         selenium.click("delete-records-button");
         sleep(50);
-        selenium.click("//div[@class='x-window x-window-plain x-window-dlg']//button[text()='Delete']");
+        selenium.click("//div[contains(@class, 'x-window-dlg')]//button[text()='Delete']");
         sleep(50);
         //selenium.click("refresh-button");
 
@@ -548,7 +548,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextNotPresent("Jane");
 
         //test paging
-        selenium.click("//button[@class='x-btn-text x-tbar-page-next']");
+        selenium.click("//button[contains(@class, 'x-tbar-page-next')]");
 
         limit = 30;
         while (!isTextPresent("Norbert") && limit-- > 0)
@@ -558,7 +558,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("Penny");
         assertTextPresent("Yak");
 
-        selenium.click("//button[@class='x-btn-text x-tbar-page-prev']");
+        selenium.click("//button[contains(@class, 'x-tbar-page-prev')]");
         limit = 30;
         while (!isTextPresent("Abe") && limit-- > 0)
             sleep(1000);
@@ -568,7 +568,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("Johnson");
 
         //test sorting
-        selenium.click("//div[@class='x-grid3-hd-inner x-grid3-hd-2']");
+        selenium.click("//div[contains(@class, 'x-grid3-hd-2')]");
         limit = 30;
         while (!isTextPresent("Yak") && limit-- > 0)
             sleep(1000);

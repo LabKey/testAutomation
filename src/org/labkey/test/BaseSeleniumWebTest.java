@@ -3226,7 +3226,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(Locator.permissionRendered(), defaultWaitForPage);
         waitForElement(inherited, 2000);
         if (!isChecked(inherited))
-            click(inheritedParent);
+            click(inherited);
         waitForElement(Locator.permissionRendered(), defaultWaitForPage);
         assertTrue(isChecked(inherited));
     }
@@ -3237,7 +3237,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
         waitForElement(inherited,1000);
         if (isChecked(inherited))
-            click(inheritedParent);
+            click(inherited);
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
         assertFalse(isChecked(inherited));
     }
