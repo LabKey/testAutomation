@@ -110,6 +110,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickMenuButton("Query", "Query:EditSource");
         clickNavButton("Edit Metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
+        waitForElement(Locator.raw("//td/input[@id='ff_label5']"), defaultWaitForPage);
         selenium.type("//td/input[@id='ff_label5']", "editedCreated");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
         selenium.click("//span" + Locator.navButton("Save").getPath());
