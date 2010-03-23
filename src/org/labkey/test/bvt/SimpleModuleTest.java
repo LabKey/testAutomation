@@ -311,7 +311,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(LIST_NAME);
 
-        clickMenuButton("Views", "Views:Crazy People");
+        clickMenuButton("Views", "Crazy People");
         assertTextPresent("Adam");
         assertTextPresent("Dave");
         assertTextPresent("Josh");
@@ -335,7 +335,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("Testing module-based reports...");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(LIST_NAME);
-        clickMenuButton("Views", "Views:Super Cool R Report");
+        clickMenuButton("Views", "Super Cool R Report");
         assertTextPresent("\"name\"");
         assertTextPresent("\"age\"");
         assertTextPresent("\"crazy\"");

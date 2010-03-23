@@ -282,31 +282,31 @@ public class StudyBvtTest extends StudyManualTest
         // set the QC state 
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        clickMenuButton("QC State", "QCState:All data");
+        clickMenuButton("QC State", "All data");
         checkAllOnPage("Dataset");
-        clickMenuButton("QC State", "QCState:updateSelected");
+        clickMenuButton("QC State", "updateSelected");
         selectOptionByText("newState", "clean");
         setFormElement("comments", "This data is clean.");
         clickNavButton("Update Status");
-        clickMenuButton("QC State", "QCState:clean");
+        clickMenuButton("QC State", "clean");
 
         // test specimen comments
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Plasma, Unknown Processing");
         clickNavButton("Enable Comments/QC");
         checkAllOnPage("SpecimenDetail");
-        clickMenuButton("Comments and QC", "Comments:Set");
+        clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         setFormElement("comments", "These vials are very important.");
         clickNavButton("Save Changes");
         assertTextPresent("These vials are very important.", 25);
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
-        clickMenuButton("Comments and QC", "Comments:Clear");
+        clickMenuButton("Comments and QC", "Clear Vial Comments for Selected");
         selenium.getConfirmation();
         assertTextNotPresent("These vials are very important.");
         clearFilter("SpecimenDetail", "MouseId");
         assertTextPresent("These vials are very important.", 23);
-        clickMenuButton("Comments and QC", "Comments:Exit");
+        clickMenuButton("Comments and QC", "Exit Comments and QC mode");
 
         // import second archive, verify that that data is merged:
         SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 5);
@@ -320,7 +320,7 @@ public class StudyBvtTest extends StudyManualTest
         // check to see that data in the specimen archive was merged correctly:
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("By Vial");
-        clickMenuButton("Page Size", "Page Size:All");
+        clickMenuButton("Page Size", "Show All");
         assertTextPresent("DRT000XX-01");
         clickLinkWithText("Search");
         clickLinkWithText("Search by specimen");
@@ -384,7 +384,7 @@ public class StudyBvtTest extends StudyManualTest
         clickLinkWithText("edit");
         setFormElement("quf_DEMbdt", "2001-11-11");
         clickNavButton("Submit");
-        clickMenuButton("QC State", "QCState:unknown QC");
+        clickMenuButton("QC State", "unknown QC");
         assertTextPresent("2001-11-11");
 
         log("Test adding a row to a dataset");
@@ -394,7 +394,7 @@ public class StudyBvtTest extends StudyManualTest
         setFormElement("quf_MouseId", TEST_ADD_ENTRY);
         setFormElement("quf_SequenceNum", "123");
         clickNavButton("Submit");
-        clickMenuButton("QC State", "QCState:All data");
+        clickMenuButton("QC State", "All data");
         assertTextPresent(TEST_ADD_ENTRY);
 
         log("Test deleting rows in a dataset");

@@ -103,7 +103,7 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("verifyAssay");
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
-        clickMenuButton("QC State", "QCState:All data");
+        clickMenuButton("QC State", "All data");
         clickButton("QC State", 0);
         assertTextPresent("unknown QC");
         assertTextPresent("1234_B");
@@ -129,7 +129,7 @@ public class StudyTest extends StudyBaseTest
     {
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Blood (Whole)");
-        clickMenuButton("Page Size", "Page Size:All");
+        clickMenuButton("Page Size", "Show All");
         assertTextNotPresent("DRT000XX-01");
         assertTextPresent("GAA082NH-01");
         clickLinkWithText("Hide Vial Info");
@@ -237,7 +237,7 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("Blood (Whole)");
         clickNavButton("Enable Comments/QC");
         log("manage participant comments directly");
-        clickMenuButton("Comments and QC", "Comments:SetParticipant");
+        clickMenuButton("Comments and QC", "Manage Mouse Comments");
 
         clickNavButton("Insert New");
         setFormElement("quf_MouseId", "999320812");
@@ -255,20 +255,20 @@ public class StudyTest extends StudyBaseTest
         setFilter("SpecimenDetail", "GlobalUniqueId", "Equals", "AAA07XK5-01");
         selenium.click(".toggle");
         clickNavButton("Enable Comments/QC");
-        clickMenuButton("Comments and QC", "Comments:Set");
+        clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         setFormElement("comments", "Vial Comment");
         clickNavButton("Save Changes");
 
         selenium.click(".toggle");
-        clickMenuButton("Comments and QC", "Comments:Set");
-        clickMenuButton("Copy or Move Comment(s)", "CopyPtid:999320812", "Comment:Copy", "Copy:ToParticipant");
+        clickMenuButton("Comments and QC", "Set");
+        clickMenuButton("Copy or Move Comment(s)", "Copy", "To Mouse", "999320812");
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Copied PTID Comment");
         clickNavButton("Submit");
         assertTextPresent("Copied PTID Comment");
 
         selenium.click(".toggle");
-        clickMenuButton("Comments and QC", "Comments:Set");
-        clickMenuButton("Copy or Move Comment(s)", "MovePtid:999320812", "Comment:Move", "Move:ToParticipant");
+        clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
+        clickMenuButton("Copy or Move Comment(s)", "Move", "To Mouse", "999320812");
         selenium.getConfirmation();
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Moved PTID Comment");
         clickNavButton("Submit");
@@ -374,12 +374,12 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("999320016");
         assertTextPresent("999320518");
 
-        clickMenuButton("Cohorts", "Cohorts:Group 1");
+        clickMenuButton("Cohorts", "Group 1");
         waitForPageToLoad();
         assertTextPresent("999320016");
         assertTextNotPresent("999320518");
 
-        clickMenuButton("Cohorts", "Cohorts:Group 2");
+        clickMenuButton("Cohorts", "Group 2");
         waitForPageToLoad();
         assertTextNotPresent("999320016");
         assertTextPresent("999320518");

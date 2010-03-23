@@ -18,10 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.DataRegionTable;
 
-import java.net.URL;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -44,7 +41,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
         importAnalysis(containerPath, "/flowjoquery/Workspaces/PV1-public.xml", null, "FlowJoAnalysis", true);
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         clearCustomizeViewColumns();
         addCustomizeViewColumn("Name");
         addCustomizeViewColumn("AnalysisScript", "Analysis Script");
@@ -67,7 +64,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), "", true);
         clickLinkWithText(getFolderName());
         clickLinkWithText("1 run");
-        clickMenuButton("Query", "Query:PassFailQuery");
+        clickMenuButton("Query", "PassFailQuery");
         waitForPageToLoad();
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
@@ -111,7 +108,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("LabKeyAnalysis");
-        clickMenuButton("Query", "Query:Comparison");
+        clickMenuButton("Query", "Comparison");
         waitForPageToLoad(longWaitForPage);
         assertTextNotPresent("No data to show");
         setFilterAndWait("query", "AbsDifference", "Is Greater Than or Equal To", "25", longWaitForPage);

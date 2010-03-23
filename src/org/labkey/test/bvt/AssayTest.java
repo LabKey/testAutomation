@@ -311,7 +311,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("f");
         assertTextPresent(ALIASED_DATA);
 
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         click(Locator.raw("expand_Properties"));
         click(Locator.raw("expand_Properties/SpecimenID"));
         click(Locator.raw("expand_Properties/SpecimenID/Specimen"));
@@ -482,13 +482,13 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Submit", defaultWaitForPage);
 
         // Set the container filter to include subfolders
-        clickMenuButton("Views", "Views:Folder Filter:Current folder and subfolders", "Views:Folder Filter");
+        clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
 
         log("Setting the customized view to include subfolders");
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
 
         clickCheckbox("ff_saveFilter");
         clickNavButton("Save");

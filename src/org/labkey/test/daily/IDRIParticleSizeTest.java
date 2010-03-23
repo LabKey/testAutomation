@@ -29,7 +29,6 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
 {
     private static final String PROJECT_NAME = "IDRI Module Validation";
     private static final String ASSAY_NAME = "IDRI";
-    private static final String Z_AVE_GRAPH = "Views:Z-Ave Graph";
 
     private final ListHelper.ListColumn _expCol1 = new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "name");
     private final ListHelper.ListColumn _formulationCol1 = new ListHelper.ListColumn("Formulation", "Formulation", ListHelper.ListColumnType.String, "formulation", new ListHelper.LookupInfo(null, "Samples", "Formulations"));
@@ -179,7 +178,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         assertTextPresent("6.57E-4");
         assertTextPresent("dm+4 1");
 
-        clickMenuButton("Views", Z_AVE_GRAPH);
+        clickMenuButton("Views", "Z-Ave Graph");
     }
 
     private boolean isMaterialPopupVisible()

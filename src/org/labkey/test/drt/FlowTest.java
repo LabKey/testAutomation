@@ -254,18 +254,18 @@ public class FlowTest extends BaseFlowTest
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("FlowExperiment2");
-        clickMenuButton("Query", "Query:DRTQuery1");
+        clickMenuButton("Query", "DRTQuery1");
         waitForPageToLoad();
         assertTextPresent("File Path Root");
 
         setSelectedFields(containerPath, "flow", "DRTQuery1", "MostColumns", new String[] {"RowId", "Count","WellCount"});
         setSelectedFields(containerPath, "flow", "DRTQuery1", "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
         //setWorkingForm("view");
-        clickMenuButton("Views", "Views:MostColumns");
+        clickMenuButton("Views", "MostColumns");
         waitForPageToLoad();
         assertTextNotPresent("File Path Root");
         //setWorkingForm("view");
-        clickMenuButton("Views", "Views:AllColumns");
+        clickMenuButton("Views", "AllColumns");
         waitForPageToLoad();
         assertTextPresent("File Path Root");
 

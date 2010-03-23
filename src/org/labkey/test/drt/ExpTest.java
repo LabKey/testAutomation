@@ -107,7 +107,7 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent("file:/", 10);
 
         // Edit the metadata to use a special date format
-        clickMenuButton("Query", "Query:EditSource");
+        clickMenuButton("Query", "Edit Source");
         clickNavButton("Edit Metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         waitForElement(Locator.raw("//td/input[@id='ff_label5']"), defaultWaitForPage);
@@ -151,7 +151,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickNavButton("View Data");
 
         // Customize the view to add the newly joined column
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         click(Locator.raw("expand_WrappedRowId"));
         addCustomizeViewColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
         clickNavButton("Save");
@@ -159,7 +159,7 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent(dateFormat.format(new Date()), 5);
 
         // Since this metadata is shared, clear it out 
-        clickMenuButton("Query", "Query:EditSource");
+        clickMenuButton("Query", "Edit Source");
         clickNavButton("Edit Metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Reset to Default").getPath());

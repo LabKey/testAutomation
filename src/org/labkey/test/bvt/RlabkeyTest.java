@@ -33,7 +33,6 @@ public class RlabkeyTest extends SimpleApiTest
 {
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
     private static final String LIST_NAME = "AllTypes";
-    private static final String CREATE_R_MENU = "Views:Create:R View";
     private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")";
 
     @Override
@@ -69,7 +68,7 @@ public class RlabkeyTest extends SimpleApiTest
             {
                 clickLinkWithText(PROJECT_NAME);
                 clickLinkWithText(LIST_NAME);
-                clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
+                clickMenuButton("Views", "Create", "R View");
 
                 // we want to load the Rlabkey package from the override location
                 File libPath = new File(getLabKeyRoot() + "/sampledata/rlabkey");

@@ -75,7 +75,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
     public final static String IE_BROWSER = "*iexplore";
     //protected final static String IE_UPLOAD_BROWSER = "*iehta";
-    public static final String CUSTOMIZE_VIEW_ID = "Views:Customize View";
+    public static final String CUSTOMIZE_VIEW = "Customize View";
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     private static boolean _checkedLeaksAndErrors = false;
@@ -427,9 +427,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void hideNavigationBar()
     {
         clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
-        waitForElement(Locator.linkContainingText("Navigation Bar"), 1000);
-        if (isLinkPresentWithText("Hide Navigation Bar"))
-            clickLinkWithText("Hide Navigation Bar");
+        waitForElement(Locator.tagContainingText("span", "Navigation Bar"), 1000);
+        if (isElementPresent(Locator.tagContainingText("span", "Hide Navigation Bar")))
+            clickAndWait(Locator.tagContainingText("span", "Hide Navigation Bar"));
     }
     
     public void clickAdminMenuItem(String... items)
@@ -2118,7 +2118,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickExtTab(String tabname)
     {
         log("Selecting Ext tab " + tabname);
-        mouseDownAt(Locator.xpath("//span[@class = 'x-tab-strip-text' and text() = '" + tabname + "']"), 0, 0);
+        mouseDownAt(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']"), 0, 0);
     }
 
     public void clickExtToolbarButton(String caption)
@@ -2832,11 +2832,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
-     * Clicks the ext menu item and optional submenu id's (for cascading menus)
+     * Clicks the ext menu item and optional submenu labels's (for cascading menus)
      */
-    public void clickMenuButton(String buttonName, String extId, String ... subMenusIds)
+    public void clickMenuButton(String MenusLabel, String ... subMenusLabels)
     {
-        ExtHelper.clickMenuButton(this, buttonName, extId, subMenusIds);
+        ExtHelper.clickMenuButton(this, true, MenusLabel, subMenusLabels);
+    }
+
+    /**
+     * Clicks the ext menu item and optional submenu labels's (for cascading menus)
+     * Does not wait for page load.
+     */
+    public void clickMenuButtonAndContinue(String MenusLabel, String ... subMenusLabels)
+    {
+        ExtHelper.clickMenuButton(this, false, MenusLabel, subMenusLabels);
     }
 
     public void dataRegionPageFirst(String dataRegionName)
@@ -3325,11 +3334,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             savePermissions();
             assertNoPermission(groupName, role);
         }
-    }
-
-    protected void createProjectGroup(String projectName, String groupName)
-    {
-        
     }
 
     /**

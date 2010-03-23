@@ -28,13 +28,11 @@ import org.labkey.test.util.RReportHelper;
 public class ReportTest extends StudyBaseTest
 {
     protected static final String GRID_VIEW = "create_gridView";
-    protected static final String CROSSTAB_VIEW = "create_crosstabView";
     protected static final String R_VIEW = "create_rView";
     private final static String DATA_SET = "DEM-1: Demographics";
     private final static String DATA_BASE_PREFIX = "DEM";
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
     private final static String R_SCRIPT1_EDIT_FUNC = "length(x) * 2";
-    private static final String CREATE_R_MENU = "Views:Create:R View";
     protected static final String TEST_GROUP = "firstGroup";
     protected static final String TEST_USER = "user1@test.com";
     private static final String TEST_GRID_VIEW = "Test Grid View";
@@ -69,7 +67,6 @@ public class ReportTest extends StudyBaseTest
     private final static String R_SCRIPT2_METHOD = "func2";
     private final static String[] R_SCRIPTS = { "rScript1", "rScript2", "rScript3", "rScript4" };
     private final static String R_SCRIPT1_METHOD = "func1";
-    private static final String CREATE_CHART_MENU = "Views:Create:Chart View";
 
     private String R_SCRIPT2(String database, String colName)
     {
@@ -181,7 +178,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("DEM-1: Demographics");
 
-        clickMenuButton("Views", "Views:Create:Crosstab View", "Views:Create");
+        clickMenuButton("Views", "Create", "Crosstab View");
         selectOptionByValue("rowField",  "DEMsex");
         selectOptionByValue("colField", "DEMsexor");
         selectOptionByValue("statField", "SequenceNum");
@@ -222,7 +219,7 @@ public class ReportTest extends StudyBaseTest
         // create new external report
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("DEM-1: Demographics");
-        clickMenuButton("Views", "Views:Create:Advanced View", "Views:Create");
+        clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
@@ -248,7 +245,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
+        clickMenuButton("Views", "Create", "R View");
 
         log("Execute bad scripts");
         clickNavButton("Execute Script");
@@ -281,7 +278,7 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Save");
 
         log("Create view");
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         removeCustomizeViewColumn(R_REMCOL);
         addCustomizeViewFilter(R_FILTER, "3.Latino/a or Hispanic?", "Does Not Equal", "Yes");
         addCustomizeViewSort(R_SORT, "2.What is your sex?", "DESC");
@@ -295,7 +292,7 @@ public class ReportTest extends StudyBaseTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
+        clickMenuButton("Views", "Create", "R View");
         setFormElement(Locator.id("script"), "labkey.data");
         clickNavButton("Execute Script");
         assertTextNotPresent(R_REMCOL);
@@ -310,11 +307,11 @@ public class ReportTest extends StudyBaseTest
         popLocation();
 
         log("Check saved R script");
-        clickMenuButton("Views", "Views:default");
+        clickMenuButton("Views", "default");
         pushLocation();
         //clickNavButton("Reports >>", 0);
         //clickLinkWithText(R_SCRIPTS[0]);
-        clickMenuButton("Views", "Views:" + R_SCRIPTS[0]);
+        clickMenuButton("Views", R_SCRIPTS[0]);
         assertTextPresent("null device");
         assertTextNotPresent("Error executing command");
         assertTextPresent(R_SCRIPT1_TEXT1);
@@ -324,7 +321,7 @@ public class ReportTest extends StudyBaseTest
         popLocation();
 
         log("Create second R script");
-        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
+        clickMenuButton("Views", "Create", "R View");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
@@ -373,7 +370,7 @@ public class ReportTest extends StudyBaseTest
         //assertTextNotPresent(R_SCRIPTS[0]);
         assertElementNotPresent(Locator.raw("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
 
-        clickMenuButton("Views", "Views:" + R_SCRIPTS[1]);
+        clickMenuButton("Views", R_SCRIPTS[1]);
         //goToPipelineItem(R_SCRIPTS[1]);
         //assertTextPresent(R_SCRIPT2_TEXT1);
         popLocation();
@@ -397,7 +394,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        clickMenuButton("Views", CREATE_R_MENU, "Views:Create");
+        clickMenuButton("Views", "Create", "R View");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!RReportHelper.executeScript(this, R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
@@ -512,7 +509,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        clickMenuButton("Views", CREATE_CHART_MENU, "Views:Create");
+        clickMenuButton("Views", "Create", "Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
@@ -525,8 +522,8 @@ public class ReportTest extends StudyBaseTest
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
-        clickMenuButton("Views", "Views:default");
-        clickMenuButton("Views", CREATE_CHART_MENU, "Views:Create");
+        clickMenuButton("Views", "default");
+        clickMenuButton("Views", "Create", "Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
         // create a non-participant chart
@@ -582,7 +579,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(TEST_GRID_VIEW);
         assertTextPresent("999320016");
         pushLocation();
-        clickMenuButton("Views", "Views:default");
+        clickMenuButton("Views", "default");
         assertTextPresent("User does not have read permission on this dataset.");
 /*
         no longer showing the query button by default.

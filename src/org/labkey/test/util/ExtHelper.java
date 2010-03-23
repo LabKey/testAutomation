@@ -27,29 +27,23 @@ import org.apache.commons.lang.BooleanUtils;
 public class ExtHelper
 {
     /**
-     * Clicks the ext menu item from the submenu specified by the ext object id
+     * Clicks the ext menu item from the submenu specified by the ext object's text
      */
-    public static void clickMenuButton(BaseSeleniumWebTest test, String buttonName, String itemId, String ... subMenuIds)
+    public static void clickMenuButton(BaseSeleniumWebTest test, boolean wait, String MenusLabel, String ... subMenuLabels)
     {
-        test.clickNavButton(buttonName, 0);
-        // allow the DOM to be updated
-        test.sleep(1000);
-        if (subMenuIds != null)
+        test.clickAndWait(Locator.navButton(MenusLabel), 0);
+        for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            for (String id : subMenuIds)
-            {
-                String elementId = ExtHelper.getExtElementId(test, id);
-                if (elementId != null)
-                {
-                    // render the submenu
-                    test.getWrapper().mouseOver("//a[@id='" + elementId + "']");
-                    test.sleep(1000);
-                }
-            }
+            Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
+            test.waitForElement(parentLocator, 1000);
+            test.mouseOver(parentLocator);
         }
-        String menuItemId = ExtHelper.getExtElementId(test, itemId);
-        if (menuItemId != null)
-            test.clickLink(menuItemId);
+        Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
+        test.waitForElement(itemLocator, 1000);
+        if(wait)
+            test.clickAndWait(itemLocator);
+        else
+            test.click(itemLocator);
     }
 
     /**

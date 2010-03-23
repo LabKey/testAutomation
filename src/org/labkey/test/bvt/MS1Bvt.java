@@ -251,7 +251,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         popLocation();
 
         //test measure filtering
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         addCustomizeViewFilter("CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
         clickNavButton("Save");
         assertLinkNotPresentWithText("1");
@@ -263,7 +263,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         popLocation();
 
         //test fk table column filtering
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         click(Locator.raw("expand_CTAGG_MIN_FeatureId"));
         addCustomizeViewFilter("CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
         clickNavButton("Save");
@@ -371,7 +371,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         //test customize view
         log("Testing customize view...");
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         removeCustomizeViewColumn("Related Peptide");
         removeCustomizeViewColumn("Related Peptide Fraction Run Description");
         addCustomizeViewColumn("KL");
@@ -382,12 +382,12 @@ public class MS1Bvt extends BaseSeleniumWebTest
         assertTextNotPresent("K.AVVQDPALKPLALVYGEATSR.R");
 
         //reset view
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         clickNavButton("Reset my default view");
 
         //add other columns from peptide data
         //and test saving under a name
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         click(Locator.raw("expand_RelatedPeptide"));
         addCustomizeViewColumn("RelatedPeptide/PeptideProphet", "Related Peptide PepProphet");
         addCustomizeViewColumn("RelatedPeptide/Protein", "Related Peptide Protein");
@@ -402,7 +402,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         assertTextBefore("0.9956", "0.9862");
 
         //switch back to default view
-        clickMenuButton("Views", "Views:default");
+        clickMenuButton("Views", "default");
         waitForPageToLoad();
         assertTextNotPresent("Related Peptide PepProphet");
         assertTextNotPresent("Related Peptide Protein");

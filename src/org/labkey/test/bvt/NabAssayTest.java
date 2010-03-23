@@ -242,7 +242,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // test creating a custom details view via a "magic" named run-level view:
             clickLinkWithText("View Runs");
-            clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+            clickMenuButton("Views", CUSTOMIZE_VIEW);
             removeCustomizeViewColumn("Virus Name");
             setFormElement("ff_columnListName", "CustomDetailsView");
             clickNavButton("Save");
@@ -411,7 +411,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Adding AUC columns to custom view");
         // add AUC columns. ORDER MATTERS!
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
         click(Locator.id("expand_Properties"));
         addCustomizeViewColumn("Properties/AUC_4pl", "AUC 4pl");
         addCustomizeViewColumn("Properties/AUC_5pl", "AUC 5pl");

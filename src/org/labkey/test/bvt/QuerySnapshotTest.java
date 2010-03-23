@@ -28,8 +28,6 @@ public class QuerySnapshotTest extends StudyBaseTest
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
     private final String APX_SNAPSHOT = "APX Joined Snapshot";
     private final String CROSS_STUDY_SNAPSHOT = "Cross study query snapshot";
-    private static final String CREATE_SNAPSHOT_MENU = "Views:Create:Query Snapshot";
-    private static final String EDIT_SNAPSHOT_MENU = "Views:Edit Snapshot";
     protected static final String GRID_VIEW = "create_gridView";
     private static final String FOLDER_1 = "054";
     private static final String FOLDER_2 = "065";
@@ -126,7 +124,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         clickLinkWithText(getStudyLabel());
         clickLinkWithText(DEMOGRAPHICS_SNAPSHOT);
-        clickMenuButton("QC State", "QCState:All data");
+        clickMenuButton("QC State", "All data");
         waitForSnapshotUpdate("Armenian");
 
         // snapshot over a custom view
@@ -134,7 +132,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         log("create a snapshot over a custom view");
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        clickMenuButton("Views", CUSTOMIZE_VIEW_ID);
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
 
         click(Locator.xpath("//img[@id='expand_MouseId']"));
         click(Locator.xpath("//img[@id='expand_MouseId/DataSet']"));
@@ -157,7 +155,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         clickLinkWithText(getStudyLabel());
         clickLinkWithText(APX_SNAPSHOT);
-        clickMenuButton("QC State", "QCState:All data");
+        clickMenuButton("QC State", "All data");
 
         waitForSnapshotUpdate("Slovakian");
 
@@ -180,7 +178,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // edit snapshot then delete
         log("edit the snapshot");
-        clickMenuButton("Views", EDIT_SNAPSHOT_MENU);
+        clickMenuButton("Views", "Edit Snapshot");
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickNavButton("Save");
         assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
@@ -189,7 +187,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
-        clickMenuButton("Views", EDIT_SNAPSHOT_MENU);
+        clickMenuButton("Views", "Edit Snapshot");
         clickNavButton("Delete Snapshot");
         selenium.getConfirmation();
 
@@ -245,7 +243,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic, String keyField, int index)
     {
-        clickMenuButton("Views", CREATE_SNAPSHOT_MENU, "Views:Create");
+        clickMenuButton("Views", "Create", "Query Snapshot");
 
         setFormElement("snapshotName", snapshotName);
         if (autoUpdate)
