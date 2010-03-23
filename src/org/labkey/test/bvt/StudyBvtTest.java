@@ -284,7 +284,7 @@ public class StudyBvtTest extends StudyManualTest
         clickLinkWithText(DATA_SET);
         clickMenuButton("QC State", "All data");
         checkAllOnPage("Dataset");
-        clickMenuButton("QC State", "updateSelected");
+        clickMenuButton("QC State", "Update state of selected rows");
         selectOptionByText("newState", "clean");
         setFormElement("comments", "This data is clean.");
         clickNavButton("Update Status");
