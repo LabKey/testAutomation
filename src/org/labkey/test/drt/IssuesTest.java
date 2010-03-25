@@ -29,10 +29,16 @@ public class IssuesTest extends BaseSeleniumWebTest
     protected static final String PROJECT_NAME = "IssuesVerifyProject";
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
+    private static final String ISSUE_TITLE_2 = "A not so serious issue";
+    private static final String USER1 = "user1@issues.test";
+    private static final String USER2 = "user2@issues.test";
+    private static final String USER3 = "user3@issues.test";
+    private static final String EMAILRECORD_TABLE = "dataregion_EmailRecord";
 
     private static final String[] REQUIRED_FIELDS = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",
                 "NotifyList", "String1", "Int1"};
-    
+    private static final String TEST_GROUP = "testers";
+
     public String getAssociatedModuleDirectory()
     {
         return "issues";
@@ -40,29 +46,44 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     protected void doCleanup()
     {
+        deleteUser(USER1);
+        deleteUser(USER2);
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {/* */}
     }
 
     protected void initProject()
     {
         createProject(PROJECT_NAME);
-        createPermissionsGroup("testers");
-        assertPermissionSetting("testers", "No Permissions");
-        setPermissions("testers", "Editor");
+        createPermissionsGroup(TEST_GROUP);
+        assertPermissionSetting(TEST_GROUP, "No Permissions");
+        setPermissions(TEST_GROUP, "Editor");
         clickNavButton("Save and Finish");
+
+        enableModule(PROJECT_NAME, "Dumbster");
 
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Issues");
         addWebPart("Search");
         assertTextPresent("Open");
+
+        log("Record emails");
+        addWebPart("Mail Record");
+        uncheckCheckbox("emailRecordOn");
+        checkCheckbox("emailRecordOn");
     }
 
     protected void doTestSteps()
     {
         initProject();
-        
+
         clickLinkWithText("view open issues");
         assertNavButtonPresent("New Issue");
+
+//        pushLocation();
+//        clickNavButton("Email Preferences");
+//        checkCheckbox("emailPreference", "8");
+//        clickNavButton("Update");
+//        popLocation();
 
         // quick security test
         // TODO push lots of locations as we go and move this test to end
@@ -156,7 +177,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         // Add to group so user appears
         clickLinkWithText("IssuesVerifyProject");
-        addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, "testers");
+        addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, TEST_GROUP);
         clickLinkWithText("IssuesVerifyProject");
         clickLinkWithText("view open issues");
 
@@ -246,16 +267,76 @@ public class IssuesTest extends BaseSeleniumWebTest
         // back to grid view
         clickLinkWithText("Issues Summary");
 
-        requiredFieldsTest();
-        viewSelectedDetailsTest();
-        entryTypeNameTest();
+        emailTest();//todo: move down
+//        requiredFieldsTest();
+//        viewSelectedDetailsTest();
+//        entryTypeNameTest();
 
         // UNDONE test these actions
         // CompleteUserAction
-        // EmailPrefsAction
         // ExportTsvAction
         // PurgeAction
         // RssAction
+    }
+
+    private void emailTest()
+    {
+        log("Test notification emails");
+
+        addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
+        createUser(USER2, "", false);
+        
+        clickLinkWithText(PROJECT_NAME);
+        assertTextPresent("No email recorded.");
+
+        // EmailPrefsAction
+        clickLinkWithText("Issues Summary");
+        clickNavButton("Email Preferences");
+        checkCheckbox("emailPreference", "8"); // self enter/edit an issue
+        clickNavButton("Update");
+
+        impersonate(USER1);
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("Issues Summary");
+        clickNavButton("Email Preferences");
+        uncheckCheckbox("emailPreference", "2"); // issue assigned to me is modified
+        clickNavButton("Update");
+        stopImpersonating();
+
+        clickLinkWithText(PROJECT_NAME);
+        uncheckCheckbox("emailRecordOn");
+        checkCheckbox("emailRecordOn");
+
+        clickLinkWithText("Issues Summary");
+        clickNavButton("New Issue");
+        setFormElement("title", ISSUE_TITLE_2);
+        selectOptionByText("assignedTo", USER1);
+        selectOptionByText("priority", "4");
+        selectOptionByText("milestone", "2012");
+        setFormElement("notifyList", USER2);
+        setFormElement("comment", "No big whup");
+        clickNavButton("Submit");
+
+        clickLinkWithText(PROJECT_NAME);
+        assertTableCellContains(EMAILRECORD_TABLE, 3, 0, PasswordUtil.getUsername(), USER1, USER2);
+        assertTableCellContains(EMAILRECORD_TABLE, 3, 2, ISSUE_TITLE_2);
+
+        impersonate(USER1);
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("Issues Summary");
+        clickLinkWithText(ISSUE_TITLE_2);
+        clickLinkWithText("update");
+        selectOptionByText("priority", "0");
+        setFormElement("notifyList", USER3);
+        setFormElement("comment", "Oh Noez!");
+        clickNavButton("Submit");
+
+        clickLinkWithText(PROJECT_NAME);
+        assertTableCellContains(EMAILRECORD_TABLE, 3, 0, PasswordUtil.getUsername(), USER3);
+        assertTableCellNotContains(EMAILRECORD_TABLE, 3, 0, USER1, USER2);
+        assertTableCellContains(EMAILRECORD_TABLE, 3, 2, ISSUE_TITLE_2);
+
+        stopImpersonating();
     }
 
     private void entryTypeNameTest()
@@ -347,7 +428,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextPresent("don't believe the hype");
         clickLinkWithText("view grid");
     }
-    
+
     public void testLastFilter(int issueId)
     {
         log("Testing .lastFilter");
