@@ -16,21 +16,20 @@
 
 package org.labkey.test.bvt;
 
+import org.apache.commons.lang.StringUtils;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.remoteapi.query.*;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.CommandException;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * User: kevink
@@ -146,6 +145,7 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         log("** Create DbUserSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/begin.view");
         clickExtToolbarButton("Define External Schemas");
+
         if (!isTextPresent("reload"))
         {
             clickLinkWithText("define new schema");
@@ -154,6 +154,9 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
             setFormElement("metaData", getFileContents("server/modules/core/resources/schemas/test.xml"));
             clickNavButton("Create");
         }
+
+        assertTextPresent(USER_SCHEMA_NAME);
+        assertTextPresent("reload all schemas");
     }
 
     void setEditable(String containerPath, boolean editable)
