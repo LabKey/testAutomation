@@ -2342,7 +2342,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
             catch (SVNException e)
             {
-                return false;
+                return e.getMessage().contains("is not a working copy");
             }
         }
     }
