@@ -191,7 +191,7 @@ public class ModuleAssayTest extends AbstractAssayTest
             {
                 sleep(1500);
                 String runCountStr = selenium.getText(Locator.id("batch_runCount_div").toString());
-                if (runCountStr != null && Integer.parseInt(runCountStr) == i+1)
+                if (runCountStr != null && !runCountStr.equals("") && Integer.parseInt(runCountStr) == i+1)
                     break;
             } while (--count > 0);
             assertElementContains(Locator.id("batch_runCount_div"), String.valueOf(i+1));
