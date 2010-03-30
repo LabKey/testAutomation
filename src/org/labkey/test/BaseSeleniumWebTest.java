@@ -18,17 +18,17 @@ package org.labkey.test;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleniumException;
-import junit.framework.TestCase;
 import junit.framework.AssertionFailedError;
-import org.apache.commons.lang.time.FastDateFormat;
+import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
-import static org.labkey.test.WebTestHelper.*;
+import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.wc.*;
+import org.tmatesoft.svn.core.wc.SVNStatusClient;
+import org.tmatesoft.svn.core.wc.SVNStatusType;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -38,11 +38,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.lang.Math;
+
+import static org.labkey.test.WebTestHelper.*;
 
 /**
  * User: Mark Igra
@@ -256,6 +259,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private static final Pattern LABKEY_ERROR_TITLE_PATTERN = Pattern.compile("\\d\\d\\d\\D.*Error.*", Pattern.CASE_INSENSITIVE);
     private static final Pattern TOMCAT_ERROR_PATTERN = Pattern.compile("HTTP Status\\s*(\\d\\d\\d)\\D");
+
     public int getResponseCode()
     {
         //We can't seem to get response codes via javascript, so we rely on default titles for error pages

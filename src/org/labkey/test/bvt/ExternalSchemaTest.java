@@ -35,9 +35,9 @@ import java.util.*;
  * User: kevink
  * Date: Oct 29, 2008 3:52:53 PM
  */
-public class DbUserSchemaTest extends BaseSeleniumWebTest
+public class ExternalSchemaTest extends BaseSeleniumWebTest
 {
-    private static final String PROJECT_NAME = "DbUserSchemaProject";
+    private static final String PROJECT_NAME = "ExternalSchemaProject";
     private static final String FOLDER_NAME = "SubFolder";
 
     private static final String DB_SCHEMA_NAME = "test";
@@ -140,9 +140,9 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
         createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
     }
 
-    void ensureDbUserSchema(String containerPath)
+    void ensureExternalSchema(String containerPath)
     {
-        log("** Create DbUserSchema: " + USER_SCHEMA_NAME);
+        log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/begin.view");
         clickExtToolbarButton("Define External Schemas");
 
@@ -183,14 +183,14 @@ public class DbUserSchemaTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         createProject();
-        ensureDbUserSchema(PROJECT_NAME);
+        ensureExternalSchema(PROJECT_NAME);
         doTestContainer();
 
         setEditable(PROJECT_NAME, false);
         doTestUneditable();
 
         // set up an additional db user schema in the sub-folder so we can check container perms
-        ensureDbUserSchema(PROJECT_NAME + "/" + FOLDER_NAME);
+        ensureExternalSchema(PROJECT_NAME + "/" + FOLDER_NAME);
         setEditable(PROJECT_NAME, true);
         setEditable(PROJECT_NAME + "/" + FOLDER_NAME, true);
 

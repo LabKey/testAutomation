@@ -91,7 +91,7 @@ public enum TestSet
         NabOldTest.class,
         CaBigTest.class,
         TimelineTest.class,
-        DbUserSchemaTest.class,
+        ExternalSchemaTest.class,
         MenuBarTest.class,
         LuminexTest.class,
         SimpleModuleTest.class,
@@ -152,7 +152,7 @@ public enum TestSet
 
     Data(new Class[] {
             DataRegionTest.class,
-            DbUserSchemaTest.class,
+            ExternalSchemaTest.class,
             ListTest.class,
             IssuesTest.class,
     }),
