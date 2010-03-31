@@ -35,6 +35,8 @@ import java.util.Arrays;
  */
 public class ListTest extends BaseSeleniumWebTest
 {
+    boolean INCREMENTALTEST=false;  // for test development only
+    
     protected final static String PROJECT_NAME = "ListVerifyProject";
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
     private final static String LIST_NAME = "Colors";
@@ -45,7 +47,8 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String FAKE_COL1_NAME = "FakeName";
     private final static String ALIASED_KEY_NAME = "Material";
     private final static String HIDDEN_TEXT = "Hidden";
-    private ListColumn _listCol1 = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
+    private ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
+    private ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
     private final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
     private final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
     private final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
@@ -111,6 +114,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void doCleanup()
     {
+        if (INCREMENTALTEST) return;
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME2); } catch (Throwable t) {}
     }
@@ -123,35 +127,34 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+if (!INCREMENTALTEST){
         log("Setup project and list module");
         createProject(PROJECT_NAME);
 
-//        customizeURLTest();
-//        fail();
-
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1, _listCol2, _listCol3);
+        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
-        clickLinkWithText("edit design");
+        clickEditDesign();
         setFormElement("ff_description", LIST_DESCRIPTION);
-        setFormElement("ff_keyName", LIST_KEY_NAME2);
-        clickNavButton("Update");
+        //setFormElement("ff_keyName", LIST_KEY_NAME2);
+        setFormElement("ff_name0", LIST_KEY_NAME2);
+        clickSave();
 
         log("Check that edit list definition worked");
         assertTextPresent(LIST_KEY_NAME2);
         assertTextPresent(LIST_DESCRIPTION);
 
         log("Test upload data");
-        clickLinkWithText("import data");
+        clickImportData();
         submit();
         assertTextPresent("Form contains no data");
         setFormElement("ff_data", TEST_FAIL);
         submit();
         assertTextPresent(TEST_FAIL);
-        assertTextPresent("could not be matched to an existing field");
+        assertTextPresent("could not be matched to a field");
         setFormElement("ff_data", TEST_FAIL2);
         submit();
-        assertTextPresent("could not be matched to an existing field");
+        assertTextPresent("could not be matched to a field");
         setFormElement("ff_data", LIST_DATA);
         submit();
 
@@ -182,45 +185,42 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test edit and adding new field with imported data present");
         clickLinkWithText("Lists");
         clickLinkWithText("view design");
-        clickLinkWithText("edit fields");
-        waitForElement(Locator.id("button_Add Field"), WAIT_FOR_JAVASCRIPT);
-        _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
-        setFormElement(Locator.id("ff_name0"), _listCol1.getName());
-        setFormElement(Locator.id("ff_label0"), _listCol1.getLabel());
+        clickEditDesign();
+        setFormElement(Locator.id("ff_name1"), _listCol1.getName());
+        setFormElement(Locator.id("ff_label1"), _listCol1.getLabel());
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name3"), _listCol4.getName());
-        setFormElement(Locator.id("ff_label3"), _listCol4.getLabel());
-        selectOptionByText("ff_type3", _listCol4.getType().toString());
+        setFormElement(Locator.id("ff_name4"), _listCol4.getName());
+        setFormElement(Locator.id("ff_label4"), _listCol4.getLabel());
+        selectOptionByText("ff_type4", _listCol4.getType().toString());
         setFormElement(Locator.id("propertyDescription"), _listCol4.getDescription());
 
         // Create "Hidden Field" and remove from all views.
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name4"), _listCol5.getName());
-        setFormElement(Locator.id("ff_label4"), _listCol5.getLabel());
-        selectOptionByText("ff_type4", _listCol5.getType().toString());
+        setFormElement(Locator.id("ff_name5"), _listCol5.getName());
+        setFormElement(Locator.id("ff_label5"), _listCol5.getLabel());
+        selectOptionByText("ff_type5", _listCol5.getType().toString());
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
 
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name5"), _listCol6.getName());
-        setFormElement(Locator.id("ff_label5"), _listCol6.getLabel());
-        selectOptionByText("ff_type5", _listCol6.getType().toString());
+        setFormElement(Locator.id("ff_name6"), _listCol6.getName());
+        setFormElement(Locator.id("ff_label6"), _listCol6.getLabel());
+        selectOptionByText("ff_type6", _listCol6.getType().toString());
         setFormElement(Locator.id("importAliases"), ALIASED_KEY_NAME);
 
-        mouseClick(Locator.id("partdown_1").toString());
+        mouseClick(Locator.id("partdown_2").toString());
 
-        clickNavButton("Save", 0);
-        waitForPageToLoad();
+        clickSave();
 
         log("Check new field was added correctly");
         assertTextPresent(_listCol4.getName());
 
         log("Set title field of 'Colors' to 'Desc'");
-        clickLinkWithText("edit design");
-        selectOptionByValue("ff_titleColumn", "Desc");
-        submit();
+        clickEditDesign();
+        selectOptionByText("ff_titleColumn", "Desc");
+        clickDone();
 
         clickLinkWithText("view data");
         assertTextPresent(TEST_DATA[0][0]);
@@ -232,7 +232,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTableCellTextEquals("dataregion_query", 2, 6, _listCol2.getLabel()); // ...swapped.
 
         log("Add data to existing rows");
-        clickLinkWithText("Import Data");
+        clickImportData();
         setFormElement("ff_data", LIST_DATA2);
         submit();
 
@@ -284,16 +284,12 @@ public class ListTest extends BaseSeleniumWebTest
         assertTableCellTextEquals("dataregion_query", 6, 5, "false");
 
         log("Check hidden field is hidden only where specified.");
-        clickNavButton("View Design", 0);
-        waitForPageToLoad();
-        clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
+        dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
         checkCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
-        mouseClick(Locator.id("partdown_1").toString());
-        clickNavButton("Save", 0);
-        waitForPageToLoad();
+        mouseClick(Locator.id("partdown_2").toString());
+        clickDone();
 
         log("Check that hidden column is hidden.");
         clickLinkWithText("view data");
@@ -311,16 +307,12 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickNavButton("Cancel");
 
-        clickNavButton("View Design", 0);
-        waitForPageToLoad();
-        clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
+        dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
         checkCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
-        clickNavButton("Save", 0);
-        waitForPageToLoad();
+        clickDone();
 
         clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
@@ -334,16 +326,12 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickNavButton("Cancel");
 
-        clickNavButton("View Design", 0);
-        waitForPageToLoad();
-        clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
+        dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
         checkCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
-        clickNavButton("Save", 0);
-        waitForPageToLoad();
+        clickDone();
 
         clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
@@ -357,16 +345,12 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickNavButton("Cancel");
 
-        clickNavButton("View Design", 0);
-        waitForPageToLoad();
-        clickLinkWithText("edit fields");
-        waitForElement(Locator.id("ff_name4"), WAIT_FOR_JAVASCRIPT);
+        dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name4"), _listCol5.getName()); // Select Hidden field.
+        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
         checkCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
-        clickNavButton("Save", 0);
-        waitForPageToLoad();
+        clickDone();
 
         clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
@@ -489,9 +473,6 @@ public class ListTest extends BaseSeleniumWebTest
         log("Add List");
         ListHelper.createList(this, PROJECT_NAME2, LIST3_NAME, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
         assertTextPresent("<AUTO> (Owner)");
-        clickLinkWithText("edit design");
-        clickButton("Update", defaultWaitForPage);
-        assertTextPresent("Owner", 5);  // Title plus two "Owners" and two "Owner"
 
         log("Upload data to second list");
         ListHelper.uploadData(this, PROJECT_NAME2, LIST3_NAME, LIST3_DATA);
@@ -576,7 +557,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkWithText("Lists");
         click(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/../td[3]/a"));
         waitForPageToLoad();
-        clickLinkWithText("delete list");
+        clickDeleteList();
         clickNavButton("OK");
 
         log("Test that deletion happened");
@@ -603,6 +584,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         doRenameFieldsTest();
         doUploadTest();
+/* INCREMENTAL */ } else beginAt("http://localhost:8080/labkey/list/ListVerifyProject/begin.view?");
         customizeURLTest();
     }
 
@@ -629,17 +611,16 @@ public class ListTest extends BaseSeleniumWebTest
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
         ListHelper.createList(this, PROJECT_NAME, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
-        clickLinkWithText("edit fields");
-        waitForElement(Locator.navButton("Save"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("ff_name0"), "FooFoo");
-        clickNavButton("Save");
+        clickEditDesign();
+        setFormElement(Locator.id("ff_name1"), "FooFoo");
+        setFormElement(Locator.id("ff_label1"), "");
+        clickSave();
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
-        clickLinkWithText("edit fields");
-        waitForElement(Locator.id("button_Add Field"), WAIT_FOR_JAVASCRIPT);
+        clickEditDesign();
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name1"), "BarBar");
-        clickNavButton("Save");
+        setFormElement(Locator.id("ff_name2"), "BarBar");
+        clickSave();
         assertTextPresent("FooFoo");
         assertTextPresent("BarBar");
         assertTextBefore("FooFoo", "BarBar");
@@ -729,10 +710,10 @@ public class ListTest extends BaseSeleniumWebTest
         log("Add List");
         ListHelper.createList(this, PROJECT_NAME, name, cols.get(0).getType(), cols.get(0).getName(),
                 cols.subList(1,cols.size()).toArray(new ListHelper.ListColumn[cols.size()-1]));
-        clickLinkWithText("edit design");
+        clickEditDesign();
         selectOptionByText("ff_titleColumn", cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
-        clickButton("Update", defaultWaitForPage);
-        clickLinkWithText("import data");
+        clickSave();
+        clickImportData();
         setFormElement("ff_data", toTSV(cols,data));
         submit();
     }
@@ -790,5 +771,41 @@ public class ListTest extends BaseSeleniumWebTest
             assertTrue(getCurrentRelativeURL().contains("/junit/" + PROJECT_NAME + "/echoForm.view"));
         }        
         popLocation();
+    }
+
+
+
+    void dataregionToEditDesign()
+    {
+        clickNavButton("View Design", 0);
+        waitForPageToLoad();
+        clickEditDesign();
+    }
+
+    void clickDone()
+    {
+        if (isElementPresent(Locator.navButton("Save")))
+            clickSave();
+        clickNavButton("Done");
+    }
+
+    void clickImportData()
+    {
+        ListHelper.clickImportData(this);
+    }
+
+    void clickEditDesign()
+    {
+        ListHelper.clickEditDesign(this);
+    }
+
+    void clickSave()
+    {
+        ListHelper.clickSave(this);
+    }
+
+    void clickDeleteList()
+    {
+        ListHelper.clickDeleteList(this);
     }
 }

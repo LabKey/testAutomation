@@ -66,6 +66,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
     protected boolean _testFailed = true;
     protected int defaultWaitForPage = 60000;
+    public final static int WAIT_FOR_PAGE = 60000;
     public final static int WAIT_FOR_JAVASCRIPT = 5000;
     protected int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;

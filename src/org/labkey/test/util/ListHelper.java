@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -304,19 +305,21 @@ public class ListHelper
         test.setFormElement("ff_name", listName);
         test.selectOptionByText("ff_keyType", listKeyType.toString());
         test.setFormElement("ff_keyName", listKeyName);
-        test.clickNavButton("Create List");
+        test.clickNavButton("Create List", 0);
+        test.waitForElement(Locator.id("ff_description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.id("ff_name0"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         test.log("Check that list was created correctly");
-        test.assertTextPresent(listName);
-        test.assertTextPresent(listKeyType.toString());
-        test.assertTextPresent(listKeyName);
+        test.assertFormElementEquals("ff_name", listName);
+        test.assertFormElementEquals("ff_name0", listKeyName);
 
         test.log("Add columns");
-        test.clickLinkWithText("edit fields");
+//        test.clickLinkWithText("edit fields");
 
-        for (int i = 0; i < cols.length; i++)
+        // i==0 is the key column
+        for (int i = 1; i <= cols.length; i++)
         {
-            ListColumn col = cols[i];
+            ListColumn col = cols[i-1];
             test.waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             test.clickNavButton("Add Field", 0);
             test.setFormElement(Locator.id("ff_name" + i),  col.getName());
@@ -374,15 +377,17 @@ public class ListHelper
             }
         }
 
-        test.clickNavButton("Save");
+        clickSave(test);
 
         test.log("Check that they were added");
         if (cols.length > 0)
         {
-            test.waitForText(cols[0].getName(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            test.waitForElement(Locator.navButton("Export Fields"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             for (ListColumn col : cols)
             {
                 test.assertTextPresent(col.getName());
+                if (!StringUtils.isEmpty(col.getLabel()) && !col.getName().equals(col.getLabel()))
+                    test.assertTextPresent(col.getLabel());
             }
         }
     }
@@ -401,9 +406,11 @@ public class ListHelper
         test.log("Add List");
         test.clickNavButton("Create New List");
         test.setFormElement("ff_name", listName);
-        test.clickCheckbox("fileImport");
 
-        test.clickNavButton("Create List");
+        test.click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
+        //test.clickCheckbox("fileImport");
+
+        test.clickNavButton("Create List", 0);
 
         test.waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
@@ -437,4 +444,30 @@ public class ListHelper
         test.waitForPageToLoad();
     }
 
+
+
+    public static void clickImportData(BaseSeleniumWebTest test)
+    {
+        test.waitAndClick(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Import Data"), BaseSeleniumWebTest.WAIT_FOR_PAGE);
+    }
+
+    public static void clickEditDesign(BaseSeleniumWebTest test)
+    {
+        test.waitAndClick(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Edit Design"), 0);
+        test.waitForElement(Locator.navButton("Cancel"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.id("ff_description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.navButton("Add Field"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static void clickSave(BaseSeleniumWebTest test)
+    {
+        test.waitAndClick(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Save"), 0);
+        test.waitForElement(Locator.navButton("Edit Design"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.navButton("Done"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static void clickDeleteList(BaseSeleniumWebTest test)
+    {
+        test.waitAndClick(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Delete List"), BaseSeleniumWebTest.WAIT_FOR_PAGE);
+    }
 }
