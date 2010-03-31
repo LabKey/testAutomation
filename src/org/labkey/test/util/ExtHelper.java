@@ -76,6 +76,19 @@ public class ExtHelper
         test.fail("Failed waiting for Ext dialog to appear");
     }
 
+    public static void waitForExtDialog(final BaseSeleniumWebTest test, String title, int timeout)
+    {
+        final Locator locator = Locator.xpath("//span[normalize-space(@class) = 'x-window-header-text' and string() = '" + title + "']");
+        
+        test.waitFor(new BaseSeleniumWebTest.Checker()
+        {
+            public boolean check()
+            {
+                return test.isElementPresent(locator);
+            }
+        }, "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
+    }
+
     public static Locator locateBrowserFile(String fileName)
     {
         return Locator.xpath("//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
