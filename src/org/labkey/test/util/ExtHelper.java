@@ -65,17 +65,6 @@ public class ExtHelper
         return null;
     }
 
-    public static void waitForExtDialog(BaseSeleniumWebTest test, int timeout)
-    {
-        for (int time=0; time < timeout; time+= 500)
-        {
-            if (BooleanUtils.toBoolean(test.getWrapper().getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().isVisible();")))
-                return;
-            test.sleep(500);
-        }
-        test.fail("Failed waiting for Ext dialog to appear");
-    }
-
     public static void waitForExtDialog(final BaseSeleniumWebTest test, String title, int timeout)
     {
         final Locator locator = Locator.xpath("//span[normalize-space(@class) = 'x-window-header-text' and string() = '" + title + "']");

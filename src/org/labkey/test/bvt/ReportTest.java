@@ -134,7 +134,7 @@ public class ReportTest extends StudyBaseTest
         String id = ExtHelper.getExtElementId(this, "btn_deleteView");
         click(Locator.id(id));
 
-        ExtHelper.waitForExtDialog(this, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.waitForExtDialog(this, "Delete Views", WAIT_FOR_JAVASCRIPT);
 
         String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
         click(Locator.id(btnId));
