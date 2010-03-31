@@ -390,7 +390,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             }
         }
 
-        clickLinkWithText("import data");
+        ListHelper.clickImportData(this);
         setFormElement("ff_data", data.toString());
         submit();
         for (String[] rowData : TEST_DATA)
