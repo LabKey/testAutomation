@@ -201,7 +201,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
-        clickLinkWithText("import data");
+        ListHelper.clickImportData(this);
         setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_LIST_BAD);
         submit();
         assertLabkeyErrorPresent();
