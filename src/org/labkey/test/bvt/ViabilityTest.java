@@ -234,7 +234,7 @@ public class ViabilityTest extends AbstractQCAssayTest
 
     public void pressTab(String xpath)
     {
-        selenium.keyPress(xpath, "\\9");
+        selenium.keyDown(xpath, "\\9");
     }
 
     protected void runTransformTest()
