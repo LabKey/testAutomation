@@ -171,7 +171,7 @@ public class TimelineTest extends BaseSeleniumWebTest
             }
         }
 
-        clickNavButton("import data");
+        clickNavButton("Import Data");
         setFormElement("ff_data", data.toString());
         submit();
         for (String[] rowData : TEST_DATA)

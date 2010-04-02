@@ -81,7 +81,7 @@ public class HTTPApiTest extends SimpleApiTest
         assertTextPresent("Like");
 
         log("Upload data");
-        clickNavButton("import data");
+        clickNavButton("Import Data");
         setFormElement("ff_data", LIST_DATA);
         submit();
         
