@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -158,15 +159,16 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Update Folder");
         addWebPart("Lists");
         clickLinkWithText("manage lists");
+
         clickNavButton("Create New List");
 		setFormElement("ff_name", "List1");
-		clickNavButton("Create List");
-        clickLinkWithText("edit fields");
+		clickNavButton("Create List", 0);
         waitForElement(Locator.navButton("Add Field"),30000);
         clickNavButton("Add Field", 0);
-		selenium.type("ff_name0", "Value");
-        clickNavButton("Save");
-        waitForElement(Locator.linkWithText("view data"), 30000);
+		selenium.type("ff_name1", "Value");
+        clickNavButton("Save", 0);
+        waitForElement(Locator.navButton("Done"), 30000);
+        clickNavButton("Done");
         clickLinkWithText("view data");
         clickNavButton("Insert New");
         //
