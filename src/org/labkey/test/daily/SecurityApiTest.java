@@ -27,8 +27,8 @@ import java.io.File;
 public class SecurityApiTest extends SimpleApiTest
 {
     protected static final String PROJECT_NAME = "Security API Test Project";
-    private static final String USER_1 = "testuser1@securityapitest.com";
-    private static final String USER_2 = "testuser2@securityapitest.com";
+    private static final String USER_1 = "testuser1@securityapi.test";
+    private static final String USER_2 = "testuser2@securityapi.test";
     private static final String GROUP_1 = "testgroup1";
     private static final String GROUP_2 = "testgroup2";
 

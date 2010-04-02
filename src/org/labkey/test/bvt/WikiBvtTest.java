@@ -39,7 +39,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
     private static final String DISC1_BODY = "I don't know how normal this wiki is";
     private static final String RESP1_TITLE = "Let's Keep Talking";
     private static final String RESP1_BODY = "I disagree";
-    private static final String USER1 = "apple@a1b2c1.com";
+    private static final String USER1 = "user1@wikibvt.test";
     private static final String WIKI_PAGE3_WEBPART_TEST = "Best Gene Name";
     private static final int MAX_AJAX_WAIT_CYCLES = 10;
 

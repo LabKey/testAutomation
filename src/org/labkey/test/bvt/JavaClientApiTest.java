@@ -42,7 +42,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
 {
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
     public static final String LIST_NAME = "People";
-    public static final String USER_NAME = "testing@nowhere.com";
+    public static final String USER_NAME = "user1@javaclientapi.test";
     public static final String GROUP_NAME = "TEST GROUP";
 
     protected void doTestSteps() throws Exception

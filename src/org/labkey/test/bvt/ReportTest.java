@@ -34,7 +34,7 @@ public class ReportTest extends StudyBaseTest
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
     private final static String R_SCRIPT1_EDIT_FUNC = "length(x) * 2";
     protected static final String TEST_GROUP = "firstGroup";
-    protected static final String TEST_USER = "user1@test.com";
+    protected static final String TEST_USER = "user1@report.test";
     private static final String TEST_GRID_VIEW = "Test Grid View";
 
     private String R_SCRIPT1(String function, String database)
@@ -81,7 +81,7 @@ public class ReportTest extends StudyBaseTest
             "func2(labkey.data$" + colName + ", labkey.data$" + database + "natam)";
     }
     private final static String R_SCRIPT2_TEXT1 = "999320648";
-    private final static String USER1 = "ruser1@rscripts.com";
+    private final static String R_USER = "r_user@report.test";
     private String R_SCRIPT3(String database, String colName)
     {
         return "source(\"" + R_SCRIPTS[1] + ".R\")\n" +
@@ -94,7 +94,7 @@ public class ReportTest extends StudyBaseTest
     protected void doCleanup() throws Exception
     {
         deleteUser(TEST_USER);
-        deleteUser(USER1);
+        deleteUser(R_USER);
         super.doCleanup();
     }
 
@@ -353,13 +353,13 @@ public class ReportTest extends StudyBaseTest
         log("Test user permissions");
         enterPermissionsUI();
         clickManageGroup("Users");
-        setFormElement("names", USER1);
+        setFormElement("names", R_USER);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
         enterPermissionsUI();
         setPermissions("Users", "Editor");
         exitPermissionsUI();
-        impersonate(USER1);
+        impersonate(R_USER);
 
         log("Access shared R script");
         clickLinkWithText(getProjectName());

@@ -31,7 +31,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
     public static final String ASSAY_AUDIT_EVENT = "Copy-to-Study Assay events";
 
-    private static final String AUDIT_TEST_USER = "audit_test_user@test.com";
+    private static final String AUDIT_TEST_USER = "user1@auditlog.test";
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
 
     public static final String COMMENT_COLUMN = "Comment";

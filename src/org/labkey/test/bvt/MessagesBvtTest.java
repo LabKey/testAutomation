@@ -36,9 +36,9 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
     private static final String RESP1_TITLE = "test response 1";
     private static final String RESP1_BODY = "this is another test, thanks";
     private static final String RESP2_BODY = "third test, thanks";
-    private static final String USER1 = "apple@a1b2c1.com";
-    private static final String USER2 = "orange@a1b2c1.com";
-    private static final String USER3 = "banana@a1b2c1.com";
+    private static final String USER1 = "user1@messages.test";
+    private static final String USER2 = "user2@messages.test";
+    private static final String USER3 = "user3@messages.test";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
             "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
             "queryName='Sequences', allowChooseQuery='true', allowChooseView='true')}</b>\n";
