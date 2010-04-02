@@ -166,8 +166,8 @@ public class LuminexTest extends AbstractQCAssayTest
             assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));
             assertEquals("on", selenium.getValue("//input[@name='ThawListType' and @value='Text']"));
             assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
-            setFormElement("ThawListType", "List");
-            waitForElement(Locator.id("button_Choose list..."), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            checkRadioButton("ThawListType", "List");
+            waitForElement(Locator.id("button_Choose list..."), WAIT_FOR_JAVASCRIPT);
             clickNavButton("Choose list...", 0);
             setFormElement("schema", "lists");
             setFormElement("table", THAW_LIST_NAME);
