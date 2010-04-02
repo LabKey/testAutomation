@@ -75,7 +75,7 @@ public class HTTPApiTest extends SimpleApiTest
 
         log("Create List");
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
-        clickNavButton("edit design");
+        clickNavButton("Edit Design");
         selectOptionByText("ff_titleColumn", "Like");    // Explicitly set to the PK (auto title will pick wealth column)
         clickButton("Update", defaultWaitForPage);
         assertTextPresent("Like");
