@@ -219,10 +219,6 @@ public class ViabilityTest extends AbstractQCAssayTest
             String value = values[i];
             addSpecimenId(id, value, i+1);
         }
-
-        // additional tab for the last input
-        String xpath = "//input[@name='" + id + "'][" + (values.length+1) + "]";
-        pressTab(xpath);
     }
 
     public void addSpecimenId(String id, String value, int index)
@@ -234,7 +230,8 @@ public class ViabilityTest extends AbstractQCAssayTest
 
     public void pressTab(String xpath)
     {
-        selenium.keyDown(xpath, "\\9");
+        selenium.keyDown(xpath, "\\9"); // For Windows
+        selenium.keyPress(xpath, "\\9"); // For Linux
     }
 
     protected void runTransformTest()
