@@ -285,7 +285,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
 
         log("Importing some data...");
-        clickLinkWithText("import data");
+        clickNavButton("import data");
         setFormElement("ff_data", LIST_DATA);
         submit();
     }

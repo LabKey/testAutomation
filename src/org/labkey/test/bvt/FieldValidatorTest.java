@@ -61,7 +61,7 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload data");
-        clickLinkWithText("import data");
+        clickNavButton("import data");
         submit();
         assertTextPresent("Form contains no data");
         setFormElement("ff_data", TEST_DATA_FAIL);
