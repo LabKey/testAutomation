@@ -135,7 +135,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     private void clonePermissionsTest()
     {
         // create admin templates, plus test bogus & duplicate email addresses
-        createUser(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
+        createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
         assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address");
         assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user. Click here to see this user's profile and history.");
 
@@ -155,10 +155,10 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickNavButton("Update Group Membership");
 
         // create users and verify permissions
-        createUser(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
-        createUser(SITE_ADMIN_USER, PasswordUtil.getUsername());
-        createUser(NORMAL_USER, NORMAL_USER_TEMPLATE);
-        createUser(TO_BE_DELETED_USER, NORMAL_USER_TEMPLATE);
+        createUserAndNotify(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
+        createUserAndNotify(SITE_ADMIN_USER, PasswordUtil.getUsername());
+        createUserAndNotify(NORMAL_USER, NORMAL_USER_TEMPLATE);
+        createUserAndNotify(TO_BE_DELETED_USER, NORMAL_USER_TEMPLATE);
 
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators");

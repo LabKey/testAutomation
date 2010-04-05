@@ -3416,7 +3416,30 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Add Users");
 
         setFormElement("newUsers", userName);
-        //uncheckCheckbox("sendMail");
+        uncheckCheckbox("sendMail");
+        if (cloneUserName != null)
+        {
+            checkCheckbox("cloneUserCheck");
+            setFormElement("cloneUser", cloneUserName);
+        }
+        clickNavButton("Add Users");
+
+        if (verifySuccess)
+            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
+    }
+
+    public void createUserAndNotify(String userName, String cloneUserName)
+    {
+        createUserAndNotify(userName, cloneUserName, true);
+    }
+
+    public void createUserAndNotify(String userName, String cloneUserName, boolean verifySuccess)
+    {
+        ensureAdminMode();
+        clickLinkWithText("Site Users");
+        clickNavButton("Add Users");
+
+        setFormElement("newUsers", userName);
         if (cloneUserName != null)
         {
             checkCheckbox("cloneUserCheck");
