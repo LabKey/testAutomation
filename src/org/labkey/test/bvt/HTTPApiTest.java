@@ -15,6 +15,7 @@
  */
 package org.labkey.test.bvt;
 
+import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -75,9 +76,10 @@ public class HTTPApiTest extends SimpleApiTest
 
         log("Create List");
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
-        clickNavButton("Edit Design");
+        clickNavButton("Edit Design", 0);
         selectOptionByText("ff_titleColumn", "Like");    // Explicitly set to the PK (auto title will pick wealth column)
-        clickButton("Update", defaultWaitForPage);
+        clickNavButton("Save", 0);
+        waitForElement(Locator.id("button_Import Data"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Like");
 
         log("Upload data");
