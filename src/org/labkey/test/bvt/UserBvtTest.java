@@ -98,7 +98,6 @@ public class UserBvtTest extends SecurityTest
         clickNavButton("Edit");
         clickNavButton("Submit");
 
-//        assertTextPresent("Field firstName cannot be null.");
         assertTextPresent("This field is required");
 
         clickNavButton("Show All Users");
@@ -108,6 +107,7 @@ public class UserBvtTest extends SecurityTest
     {
         enableModule(PROJECT_NAME, "Dumbster");
         addWebPart("Mail Record");
+        uncheckCheckbox("emailRecordOn");
         checkCheckbox("emailRecordOn");
 
         clickLinkWithText("Site Users");

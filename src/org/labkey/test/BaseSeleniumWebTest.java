@@ -3416,7 +3416,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Add Users");
 
         setFormElement("newUsers", userName);
-        uncheckCheckbox("sendMail");
+        //uncheckCheckbox("sendMail");
         if (cloneUserName != null)
         {
             checkCheckbox("cloneUserCheck");
@@ -3425,7 +3425,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Add Users");
 
         if (verifySuccess)
-            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system, but no email was sent."));
+            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
     }
 
     public void createSiteDeveloper(String userEmail)

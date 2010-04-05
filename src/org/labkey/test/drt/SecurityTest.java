@@ -65,11 +65,21 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        enableModule("Home", "Dumbster");
+        if ( !isElementPresent( Locator.id("dataregion_EmailRecord") ) )
+            addWebPart("Mail Record");
+        uncheckCheckbox("emailRecordOn");
+        checkCheckbox("emailRecordOn");
+
         displayNameTest();
         clonePermissionsTest();
         tokenAuthenticationTest();
         impersonationTest();
         guestTest();
+
+        log("Check welcome emails [6 new users]");
+        assertEquals("Expected 12 notification emails (+4 rows).", getTableRowCount("dataregion_EmailRecord"), 16);
+        assertTextPresent(": Welcome", 6);
     }
 
     private void guestTest()
@@ -134,7 +144,6 @@ public class SecurityTest extends BaseSeleniumWebTest
         createPermissionsGroup("Administrators");
         clickManageGroup("Administrators");
         setFormElement("names", ADMIN_USER_TEMPLATE);
-        uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
         setPermissions("Administrators", "Project Administrator");
 
@@ -143,7 +152,6 @@ public class SecurityTest extends BaseSeleniumWebTest
         setPermissions("Testers", "Editor");
         clickManageGroup("Testers");
         setFormElement("names", NORMAL_USER_TEMPLATE);
-        uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
 
         // create users and verify permissions
