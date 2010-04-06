@@ -34,7 +34,7 @@ public enum TestSet
         JUnitTest.class,
         SecurityTest.class,
         FlowTest.class,
-//        XTandemTest.class,
+        XTandemTest.class,
         StudyTest.class
     }),
 
@@ -43,7 +43,7 @@ public enum TestSet
         ExpTest.class,
         AssayTest.class,
         StudyBvtTest.class,
-//        PipelineBvtTest.class,
+        PipelineBvtTest.class,
         //FileContentTest.class,
         ClientAPITest.class,
         MissingValueIndicatorsTest.class,
