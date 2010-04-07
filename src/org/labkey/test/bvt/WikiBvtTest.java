@@ -226,7 +226,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE1_TITLE);
         waitForExtReady();
         clickLinkWithText("discuss this", false);
-        waitAndClick(100,Locator.linkWithText("Start new discussion"),defaultWaitForPage);
+        waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
+        clickLinkWithText("Start new discussion");
         setFormElement("title", DISC1_TITLE);
         setFormElement("body", DISC1_BODY);
         submit();
@@ -243,8 +244,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent(RESP1_TITLE);
         assertTextPresent(RESP1_BODY);
-        waitAndClickNavButton("Delete Message");
-        waitAndClickNavButton("Delete");
+        clickNavButton("Delete Message");
+        clickNavButton("Delete");
         assertTextNotPresent(DISC1_TITLE);
         assertTextNotPresent(DISC1_BODY);
 
@@ -267,8 +268,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         //test deleting via edit page
         clickLinkWithText("edit");
-        waitAndClickNavButton("Delete Page");
-        waitAndClickNavButton("Delete");
+        clickNavButton("Delete Page");
+        clickNavButton("Delete");
         assertLinkPresentWithText("Home");
 
         createNewWikiPage("HTML");
@@ -281,8 +282,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextPresent(HEADER_CONTENT);
         clickLinkWithText("Header");
         clickLinkWithText("edit", 0);
-        waitAndClickNavButton("Delete Page");
-        waitAndClickNavButton("Delete");
+        clickNavButton("Delete Page");
+        clickNavButton("Delete");
         assertTextNotPresent(HEADER_CONTENT);
 
         log("Return to where we were...");
@@ -323,8 +324,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText("Terms of Use");
         searchFor(PROJECT_NAME, "fight club", 1, "Terms of Use");
         clickLinkWithText("edit");
-        waitAndClickNavButton("Delete Page");
-        waitAndClickNavButton("Delete");
+        clickNavButton("Delete Page");
+        clickNavButton("Delete");
         assertTextNotPresent("Terms of Use");
 
         log("test copy wiki");
@@ -486,9 +487,9 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("test delete");
         clickLinkWithText(WIKI_PAGE2_TITLE);
-        clickLinkWithText("edit", 0);
-        waitAndClickNavButton("Delete Page");
-        waitAndClickNavButton("Delete");
+        clickLinkWithText("edit");
+        clickNavButton("Delete Page");
+        clickNavButton("Delete");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         //add once bug with caching wiki title is fixed
         //assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
