@@ -67,7 +67,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected boolean _testFailed = true;
     protected int defaultWaitForPage = 60000;
     public final static int WAIT_FOR_PAGE = 60000;
-    public final static int WAIT_FOR_JAVASCRIPT = 5000;
+    public final static int WAIT_FOR_JAVASCRIPT = 10000;
     protected int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
     protected long _startTime;
@@ -1381,7 +1381,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (tabsToAdd != null)
         {
             for (String tabname : tabsToAdd)
-                toggleCheckboxByTitle(tabname);
+                checkCheckbox(Locator.checkboxByTitle(tabname));
         }
 
         submit();
@@ -2576,7 +2576,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 return null != getButtonLocator(text);
             }
-        }, failMessage, 10000);
+        }, failMessage, defaultWaitForPage);
         clickNavButton(text);
     }
 
@@ -3403,6 +3403,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertFalse(fakeUser.equals(getDisplayName()));
     }
 
+    public void projectImpersonate(String fakeUser)
+    {
+        log("impersonating user at project level : " + fakeUser);
+        assertTextNotPresent("Stop Impersonating");
+        ensureAdminMode();
+        enterPermissionsUI();
+        clickExtTab("Impersonate");
+        selectOptionByText(Locator.id("email").toString(), fakeUser);
+        clickNavButton("Impersonate");
+        _impersonationStack.push(fakeUser);
+    }
 
     public void createUser(String userName, String cloneUserName)
     {
