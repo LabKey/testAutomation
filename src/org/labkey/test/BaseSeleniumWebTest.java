@@ -3333,9 +3333,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void _removePermission(String groupName, String permissionString, String className)
     {
-        String role = toRole(permissionString);
+        if (!isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
 
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+        String role = toRole(permissionString);
         Locator close = Locator.closePermissionButton(groupName,role);
         if (isElementPresent(close))
         {

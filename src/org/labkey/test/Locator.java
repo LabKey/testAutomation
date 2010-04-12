@@ -391,6 +391,11 @@ public class Locator
         return xpath("//li[@class='x-tree-node']/div/a/span[text()='" + schemaName + "']/../../..//span[text()='" + queryName + "']");
     }
 
+    public static XPathLocator permissionsTreeNode(String folderName)
+    {
+        return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + folderName + "' or text()='" + folderName + "*']");
+    }
+
 
 //    public static XPathLocator fileTreeByPath(String path)
 //    {
