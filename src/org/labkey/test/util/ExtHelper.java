@@ -93,7 +93,7 @@ public class ExtHelper
 
     public static void waitForImportDataEnabled(BaseSeleniumWebTest test)
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), test.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * test.WAIT_FOR_JAVASCRIPT);
     }
     
     public static void selectAllFileBrowserFiles(BaseSeleniumWebTest test)
