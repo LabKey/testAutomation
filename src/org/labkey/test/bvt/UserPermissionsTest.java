@@ -188,10 +188,10 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         clickLinkWithText(GAMMA_SUB_FOLDER_NAME);
         enterPermissionsUI();
         uncheckCheckbox("inheritedCheckbox");
-        clickNavButton("Save",0);
-        waitForExtReady();
-//        clickNavButton("Save and Finish");
-//        clickLinkWithText(DENIED_SUB_FOLDER_NAME);
+        clickNavButton("Save and Finish");
+        clickLinkWithText(DENIED_SUB_FOLDER_NAME);
+        enterPermissionsUI();
+        uncheckCheckbox("inheritedCheckbox");
         removePermission(GAMMA_READER_GROUP_NAME, "Reader");
         clickNavButton("Save and Finish");
 
