@@ -443,12 +443,13 @@ if (!INCREMENTALTEST){
         clickLinkWithText("manage lists");
         clickLinkWithText("view history");
         assertTextPresent(":History");
-        assertTextPresent("modified", 13);
-        assertTextPresent("inserted", 4);
+        assertTextPresent("modified", 10);
+        assertTextPresent("Bulk inserted", 2);
+        assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
-        assertEquals("details Links", 9, countLinksWithText("details"));
-        assertEquals("Project Links", 18 + 3, countLinksWithText(PROJECT_NAME)); // Table links + header & sidebar links
-        assertEquals("List Links", 18 + 1, countLinksWithText(LIST_NAME)); // Table links + header link
+        assertEquals("details Links", 3, countLinksWithText("details"));
+        assertEquals("Project Links", 14 + 3, countLinksWithText(PROJECT_NAME)); // Table links + header & sidebar links
+        assertEquals("List Links", 14 + 1, countLinksWithText(LIST_NAME)); // Table links + header link
         clickLinkWithText("details");
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");  

@@ -2117,7 +2117,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void closeExtTab(String tabName)
     {
         log("Closing Ext tab " + tabName);
-        mouseDownAt(Locator.xpath("//a[contains(@class,'x-tab-strip-close') and ..//span[contains(@class,'x-tab-strip-text') and text()='" + tabName + "']]"), 0, 0);
+        mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 0, 0);
     }
 
     public void clickExtTab(String tabname)
