@@ -114,7 +114,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         clickLinkWithText(getFolderName());
         clickNavButton("Process and Import Data");
         ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.selectFileBrowserFile(this, "study.xml");
+        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
         selectImportDataAction("Import Study");
     }
 

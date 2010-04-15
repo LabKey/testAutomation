@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.apache.commons.lang.BooleanUtils;
 
 /**
  * User: klum
@@ -78,14 +77,31 @@ public class ExtHelper
         }, "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
     }
 
-    public static Locator locateBrowserFile(String fileName)
+    public static Locator locateBrowserFileCheckbox(String fileName)
     {
-        return Locator.xpath("//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
+        return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
     }
 
+    public static Locator locateBrowserFileName(String fileName)
+    {
+        return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + fileName + "']");
+    }
+
+    public static void clickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
+    {
+        Locator file = locateBrowserFileCheckbox(fileName);
+
+        test.waitForElement(file, 60000);
+        test.mouseDown(file);
+    }
+
+    /**
+     * Select a <b>single</b> row in the file browser by clicking on the file name.
+     * Use {@link ExtHelper#clickFileBrowserFileCheckbox(BaseSeleniumWebTest, String)} to click the checkbox for multi-select.
+     */
     public static void selectFileBrowserFile(BaseSeleniumWebTest test, String fileName)
     {
-        Locator file = locateBrowserFile(fileName);
+        Locator file = locateBrowserFileName(fileName);
 
         test.waitForElement(file, 60000);
         test.mouseDown(file);

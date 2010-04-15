@@ -15,7 +15,6 @@
  */
 package org.labkey.test.ms1.params;
 
-import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.util.ExtHelper;
 
@@ -49,7 +48,7 @@ public class PepMatchTestParams extends AbstractInspectTestParams
             ExtHelper.waitForImportDataEnabled(_test);
             for (String name : names)
             {
-                ExtHelper.selectFileBrowserFile(getTest(), name + ".pep.xml");
+                ExtHelper.clickFileBrowserFileCheckbox(getTest(), name + ".pep.xml");
                 getTest().sleep(1000);
             }
         }

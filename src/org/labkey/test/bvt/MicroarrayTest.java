@@ -109,8 +109,8 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickNavButton("Process and Import Data");
 
         ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
-        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
+        ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE1);
+        ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE2);
 
         selectImportDataAction("Use " + ASSAY_NAME);
         waitForPageToLoad();
@@ -143,8 +143,8 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         // Start the upload wizard again
         clickNavButton("Import Data");
 
-        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE1);
-        ExtHelper.selectFileBrowserFile(this, MAGEML_FILE2);
+        ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE1);
+        ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE2);
 
         selectImportDataAction("Use " + ASSAY_NAME);
         waitForPageToLoad();

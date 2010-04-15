@@ -61,7 +61,7 @@ public class StudyBvtTest extends StudyManualTest
         clickNavButton("Import Study Using Pipeline");
         waitAndClick(Locator.fileTreeByName("export"));
         ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.selectFileBrowserFile(this, "study.xml");
+        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
 
         selectImportDataAction("Import Study");
         waitForPageToLoad();

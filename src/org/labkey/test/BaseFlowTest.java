@@ -184,9 +184,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             if (i == parts.length - 1)
             {
                 // workaround for import button enable/disable state bug in pipeline browser
-                ExtHelper.selectFileBrowserFile(this, parts[i]);
-                ExtHelper.selectFileBrowserFile(this, parts[i]);
-                ExtHelper.selectFileBrowserFile(this, parts[i]);
+                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
+                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
+                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
             }
             else
                 waitAndClick(Locator.fileTreeByName(parts[i]));
@@ -210,7 +210,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         assertTitleEquals("Import Analysis: Upload Workspace: " + containerPath);
         sleep(500);
-        selectTreeItem("tree", workspacePath);
+        selectTreeItem(workspacePath);
 //        assertFormElementEquals("workspace.path", workspacePath);
         clickNavButton("Next");
     }
@@ -225,7 +225,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
         else if (fcsPath != null)
         {
-            selectTreeItem("tree", fcsPath);
+            selectTreeItem(fcsPath);
             clickNavButton("Next");
         }
         else
@@ -267,68 +267,25 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         log("finished import analysis wizard");
     }
 
-    protected void selectTreeItem(String treeCmpId, String path)
+    protected void selectTreeItem(String path)
     {
         log("selectTreeItem path: " + path);
-//        String result = selenium.getEval(
-//                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
-//                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
-//                "tree.selectPath('/<root>' + '"+ path + "', 'text');\n" +
-//                "\"OK\"");
-//        assertEquals("OK", result);
-
         if (path.startsWith("/"))
             path = path.substring(1);
         String[] parts = path.split("/");
-        String treeNodeXpath = "//div[contains(@class, 'x-tree-node-el')]/div[@class='x-tree-col']";
         for (int i = 0; i < parts.length; i++)
         {
-            String part = parts[i];
-            String xpath;
             if (i == parts.length - 1)
             {
                 // select last item: click on tree node name
-                xpath = treeNodeXpath + "/a[./span='" + part + "']";
+                ExtHelper.selectFileBrowserFile(this, parts[i]);
             }
             else
             {
                 // expand tree node: click on expand/collapse icon
-                xpath = treeNodeXpath + "/img[contains(@class, 'x-tree-ec-icon') and ../a/span='" + part + "']";
+                waitAndClick(Locator.fileTreeByName(parts[i]));
             }
-
-            Locator l = Locator.xpath(xpath);
-            waitForElement(l, WAIT_FOR_JAVASCRIPT);
-            click(l);
         }
-    }
-
-    protected void expandTreeItem(String treeCmpId, String path)
-    {
-        log("expandtree item '" + path + "'");
-        selenium.getEval(
-                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
-                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
-                "tree.expandPath('/<root>' + '"+ path + "', 'text');");
-        sleep(500);
-    }
-
-    protected void clearTreeSelections(String treeCmpId)
-    {
-        log("clean tree selections");
-        selenium.getEval(
-                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
-                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
-                "tree.getSelectionModel().clearSelections();");
-    }
-
-    protected String getTreeSelection(String treeCmpId)
-    {
-        log("getting tree selection");
-        return selenium.getEval("{\n" +
-                "var ext = selenium.browserbot.getCurrentWindow().Ext;\n" +
-                "var tree = ext.getCmp('" + treeCmpId + "');\n" +
-                "tree.getSelectedValues();\n" +
-                "}");
     }
 
 }

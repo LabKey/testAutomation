@@ -48,7 +48,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
+        ExtHelper.clickFileBrowserFileCheckbox(this, "CAexample_mini.mzXML");
         selectImportDataAction("Create New Mass Spec Metadata Assay Design");
         waitForPageToLoad();
 
@@ -68,7 +68,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.selectFileBrowserFile(this, "CAexample_mini.mzXML");
+        ExtHelper.clickFileBrowserFileCheckbox(this, "CAexample_mini.mzXML");
         selectImportDataAction("Use " + TEST_ASSAY_NAME);
         waitForPageToLoad();
 
