@@ -29,12 +29,15 @@ public class BasicTest extends BaseSeleniumWebTest
     private static final String PROJECT_NAME = "BasicVerifyProject";
     private static final String FOLDER_NAME = "childfolder";
     private static final String FOLDER_RENAME = "renamedfolder";
+    private static final String WIKI_WEBPART_TEXT = "The Wiki web part displays a single wiki page.";
+    private static final String MESSAGES_WEBPART_TEXT = "all messages";
 
     protected void doCleanup()
     {
         try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
+
 
     protected void doTestSteps()
     {
@@ -51,9 +54,32 @@ public class BasicTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("Create a new wiki page");
         addWebPart("Wiki TOC");
         // move messages below wiki:
-        clickLinkWithImage("/_images/partdown.gif");
+        clickLinkWithImage("/_images/partdown.gif", 0);
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return isTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
+            }
+        }, "Web parts failed to reorder", 30000);
+
+        refresh();
+        // Verify that the asynchronous save worked by refreshing:
+        assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
+
         // remove wiki by clicking the first delete link:
-        clickLinkWithImage("/_images/partdelete.gif");
+        clickLinkWithImage("/_images/partdelete.gif", 0);
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return !isTextPresent(WIKI_WEBPART_TEXT);
+            }
+        }, "Web part was not removed correctly.", 30000);
+        refresh();
+        // verify that the web part removal was correctly saved:
+        assertTextNotPresent(WIKI_WEBPART_TEXT);
+
         // verify that messages is still present:
         assertLinkPresentWithText("Messages");
         addWebPart("MS2 Experiment Runs");
@@ -91,11 +117,27 @@ public class BasicTest extends BaseSeleniumWebTest
         clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));
         assertTextPresent("Customize");
         clickNavButton("Cancel");
-        clickAndWait(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"));
+        clickAndWait(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"), 0);
+        waitFor(new Checker() {
+            public boolean check()
+            {
+                return isTextBefore("No data to show", "No messages");
+            }
+        }, "Failed to move web part.", 30000);
+        refresh();
         assertTextBefore("No data to show", "No messages");
-        clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']"));
-        assertElementNotPresent(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']"));
-        isElementPresent(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"));
+
+        final Locator searchLocator = Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']");
+        clickAndWait(searchLocator, 0);
+        waitFor(new Checker() {
+            public boolean check()
+            {
+                return !isElementPresent(searchLocator);
+            }
+        }, "Failed to remove web part.", 30000);
+        refresh();
+        // verify that web part is gone, even after a refresh:
+        assertElementNotPresent(searchLocator);
 
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
