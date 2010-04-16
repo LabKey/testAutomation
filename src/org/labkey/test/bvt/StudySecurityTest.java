@@ -25,10 +25,10 @@ import org.labkey.test.Locator;
 */
 public class StudySecurityTest extends StudyBaseTest
 {
-    protected static final String READER = "dsreader@studysecurity.com";
-    protected static final String EDITOR = "dseditor@studysecurity.com";
-    protected static final String LIMITED = "dslimited@studysecurity.com";
-    protected static final String NONE = "dsnone@studysecurity.com";
+    protected static final String READER = "dsreader@studysecurity.test";
+    protected static final String EDITOR = "dseditor@studysecurity.test";
+    protected static final String LIMITED = "dslimited@studysecurity.test";
+    protected static final String NONE = "dsnone@studysecurity.test";
 
     protected static final String GROUP_READERS = "Readers";
     protected static final String GROUP_EDITORS = "Editors";

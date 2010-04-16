@@ -564,11 +564,11 @@
 
     <!-- note: SecurityApiTest will delete this user in its cleanup steps -->
   <test name="create new user" type="post">
-    <formData>{email: 'api-created-user@securityapitest.com', sendEmail: false}</formData>
+    <formData>{email: 'api-created-user@securityapi.test', sendEmail: false}</formData>
     <url>security/home/createNewUser.view?</url>
     <response><![CDATA[{
     "message": null,
-    "email": "api-created-user@securityapitest.com",
+    "email": "api-created-user@securityapi.test",
     "userId": 1785}]]></response>
   </test>
 

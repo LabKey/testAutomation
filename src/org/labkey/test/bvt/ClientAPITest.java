@@ -710,7 +710,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private static final String EMAIL_SUBJECT_3 = "Testing the email API (html txt body)";
     private static final String EMAIL_BODY_PLAIN = "This is a test message.";
     private static final String EMAIL_BODY_HTML = "<h2>This is a test message.</h2>";
-    private static final String[] EMAIL_RECIPIENTS = {"user1@emailtest.com", "user2@emailtest.com", "user3@emailtest.com"};
+    private static final String[] EMAIL_RECIPIENTS = {"user1@clientapi.test", "user2@clientapi.test", "user3@clientapi.test"};
 
     private void emailApiTest()
     {
@@ -736,9 +736,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("failure");
 
         // user not in system
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@testEmail.com"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
         assertTextPresent("failure");
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@testEmail.com"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, true));
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, true));
         assertTextPresent("success");
 
         setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
