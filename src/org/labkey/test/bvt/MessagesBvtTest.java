@@ -98,7 +98,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         addWebPart("Mail Record");
         uncheckCheckbox("emailRecordOn");
         checkCheckbox("emailRecordOn");
-        clickLinkWithImageByIndex("/_images/partdelete.gif", 3);
+        clickLinkWithImageByIndex("/_images/partdelete.gif", 3, false);
 
         log("Check email preferences");
         clickLinkWithText("email preferences");

@@ -2072,8 +2072,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickLinkWithImageByIndex(String image, int index)
     {
+        clickLinkWithImageByIndex(image, index, true);
+    }
+
+    public void clickLinkWithImageByIndex(String image, int index, boolean wait)
+    {
         log("Clicking link with image: " + image);
-        clickAndWait(Locator.linkWithImage(image, index), defaultWaitForPage);
+        clickAndWait(Locator.linkWithImage(image, index), wait ? defaultWaitForPage : 0);
     }
 
     public void click(Locator l)
