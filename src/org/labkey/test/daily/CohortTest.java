@@ -207,7 +207,6 @@ public class CohortTest extends BaseSeleniumWebTest
         clickNavButton("Delete");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Cohorts");
-        clickNavButton("Update Assignments"); // TODO: Remove once Issue #9670 is resolved.
         selenium.assignId(Locator.xpath(XPATH_COHORT_ASSIGNMENT_TABLE).toString(), COHORT_TABLE);
         assertTableCellTextEquals(COHORT_TABLE, 4, 1, "Negative"); // Infected4
 
