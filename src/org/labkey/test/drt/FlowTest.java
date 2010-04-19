@@ -76,7 +76,6 @@ public class FlowTest extends BaseFlowTest
         ExtHelper.waitForImportDataEnabled(this);
         waitForElement(ExtHelper.locateBrowserFileCheckbox("run2"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
-        waitForPageToLoad();
         assertTextPresent("The following directories within '8color'");
         assertTextPresent("8colordata (11 fcs files)");
         assertTextPresent("run2 (1 fcs files)");
@@ -87,12 +86,10 @@ public class FlowTest extends BaseFlowTest
         waitAndClick(Locator.fileTreeByName("8colordata"));
         waitForElement(ExtHelper.locateBrowserFileCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Current directory of 11 FCS Files");
-        waitForPageToLoad();
         assertTextPresent("The following directories within '8color/8colordata'");
         assertTextPresent("Current Directory (11 fcs files)");
         assertTextNotPresent("run2");
         clickNavButton("Import Selected Runs");
-        waitForPageToLoad();
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
         // Drill into the run, and see that it was uploaded, and keywords were read.
@@ -229,7 +226,6 @@ public class FlowTest extends BaseFlowTest
 
         waitAndClick(Locator.fileTreeByName("8color"));
         selectImportDataAction("Import Directory of FCS Files");
-        waitForPageToLoad();
         assertTextNotPresent("8colordata");
         assertTextPresent("run2");
         clickNavButton("Import Selected Runs");
@@ -255,18 +251,13 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("FlowExperiment2");
         clickMenuButton("Query", "DRTQuery1");
-        waitForPageToLoad();
         assertTextPresent("File Path Root");
 
         setSelectedFields(containerPath, "flow", "DRTQuery1", "MostColumns", new String[] {"RowId", "Count","WellCount"});
         setSelectedFields(containerPath, "flow", "DRTQuery1", "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
-        //setWorkingForm("view");
         clickMenuButton("Views", "MostColumns");
-        waitForPageToLoad();
         assertTextNotPresent("File Path Root");
-        //setWorkingForm("view");
         clickMenuButton("Views", "AllColumns");
-        waitForPageToLoad();
         assertTextPresent("File Path Root");
 
         // upload sample set
