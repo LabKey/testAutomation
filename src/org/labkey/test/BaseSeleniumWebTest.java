@@ -1748,6 +1748,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
+    public void waitForElementToDisappear(final Locator locator, int wait)
+    {
+        String failMessage = "Element with locator " + locator + " was still present after [" + wait + "ms]";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return !isElementPresent(locator);
+            }
+        }, failMessage, wait);
+    }
+
     public void waitForText(final String text, int wait)
     {
         String failMessage = text + " did not appear";

@@ -450,7 +450,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("delete wiki web part");
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Portal");
-        clickLinkWithImage(getContextPath() + "/_images/partdelete.gif");
+        clickLinkWithImage(getContextPath() + "/_images/partdelete.gif", 0);
+        waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.gif"), WAIT_FOR_JAVASCRIPT);
         assertLinkNotPresentWithText("Welcome");
 
         log("test wiki TOC customize link");
