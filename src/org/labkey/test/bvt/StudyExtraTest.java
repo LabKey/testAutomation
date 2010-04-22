@@ -183,7 +183,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
         goToModule("Query");
-        clickExtToolbarButton("Define External Schemas");
+        clickExtToolbarButton("Schema Administration");
 		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
 		setFormElement("dbSchemaName", "verifysnapshot");
@@ -220,7 +220,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
         goToModule("Query");
-        clickExtToolbarButton("Define External Schemas");
+        clickExtToolbarButton("Schema Administration");
         clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
         clickLinkWithText("Query Schema Browser");

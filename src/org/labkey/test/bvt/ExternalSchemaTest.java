@@ -144,7 +144,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     {
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/begin.view");
-        clickExtToolbarButton("Define External Schemas");
+        clickExtToolbarButton("Schema Administration");
 
         if (!isTextPresent("reload"))
         {
@@ -156,13 +156,13 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         }
 
         assertTextPresent(USER_SCHEMA_NAME);
-        assertTextPresent("reload all schemas");
+        assertTextNotPresent("reload all schemas");  // Present only for external schemas > 1
     }
 
     void setEditable(String containerPath, boolean editable)
     {
         beginAt("/query/" + containerPath + "/admin.view");
-        clickLinkWithText("edit");
+        clickLinkWithText("edit definition");
         if (editable)
             checkCheckbox("editable");
         else
