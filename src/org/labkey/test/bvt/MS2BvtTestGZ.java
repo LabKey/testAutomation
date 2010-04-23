@@ -16,21 +16,10 @@
 
 package org.labkey.test.bvt;
 
-import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
-import org.labkey.test.ms2.MS2TestBase;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
-
-import java.io.File;
-import java.io.IOException;
-
 public class MS2BvtTestGZ extends MS2BvtTest
 {
-
     protected void doTestSteps()
     {
         goTestIt("DRT1","DRT3"); // exercises the gzip handling
     }
-
 }
