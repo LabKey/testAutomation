@@ -30,10 +30,21 @@ import java.io.File;
 public class StudyBvtTest extends StudyManualTest
 {
     private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";
-    private static final String DATA_SET = "DEM-1: Demographics";
+    private static final String DEMOGRAPHICS_DATASET = "DEM-1: Demographics";
     private static final String TEST_ADD_ENTRY = "999000000";
 
     private final String DATASET_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/dataset_data.xls";
+    private static final String HIDDEN_DATASET = "URS-1: Screening Urinalysis";
+    private static final String MODIFIED_DATASET = "Quality Control Report"; // Empty dataset.
+    private static final String REORDERED_DATASET1 = "LLS-1: Screening Local Lab Results (Page 1)";
+    private static final String REORDERED_DATASET2 = "LLS-2: Screening Local Lab Results (Page 2)";
+    private static final String CATEGORY = "Test Category";
+    private static final String DATE_FORMAT = "dd/mm hh:mma";
+    private static final String NUMBER_FORMAT = "00.00";
+    private static final String MODIFIED_PARTICIPANT = "999321033";
+    private static final String GROUP_2 = "Group 2";
+    private static final String COLUMN_DESC = "Test Column Description";
+    private static final String MODIFIED_VISIT = "Cycle 2";
 
     @Override
     protected void doCreateSteps()
@@ -72,10 +83,19 @@ public class StudyBvtTest extends StudyManualTest
         // delete "export" directory
         deleteDir(new File(getPipelinePath() + "export"));
 
-        // change settings that aren't roundtripped using "legacy" formats 
-        hideSceeningVisit();
+        // change settings that aren't roundtripped using "legacy" formats
         setDemographicsDescription();
         createCustomAssays();
+        setFormatStrings();
+        setManualCohorts();
+        modifyVisits();
+        changeDatasetOrder("16");
+        setDatasetCategory(MODIFIED_DATASET, CATEGORY);
+        hideDataset(HIDDEN_DATASET);
+        modifyDatasetColumn(MODIFIED_DATASET);
+
+        // TODO: Enable list roundtripping once Issue 10080 is resolved.
+        //ListHelper.importListArchive(this, getFolderName(), new File(getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
 
         // export new study to zip file using "xml" formats
         exportStudy(true, true);
@@ -99,9 +119,7 @@ public class StudyBvtTest extends StudyManualTest
         // wait for study & specimen load
         waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)");
 
-        // Should be able to move this earlier (after legacy format import), since this setting should roundtrip through
-        // XML formats.  However, something in specimen requests fails if this is moved there right now.
-        // TODO: investigate & fix.
+        // TODO: Move this earlier (after legacy format import) once issue 10074 is resolved. 
         setDemographicsBit();
     }
 
@@ -124,6 +142,55 @@ public class StudyBvtTest extends StudyManualTest
     protected void waitForSpecimenImport()
     {
         // specimen import is already complete
+    }
+
+    @Override
+    protected void verifyStudyAndDatasets()
+    {
+        super.verifyStudyAndDatasets();
+
+        // verify reordered, categorized, & hidden datasets.
+        clickLinkWithText(getFolderName());
+        assertTextBefore(REORDERED_DATASET2, REORDERED_DATASET1);
+        assertLinkNotPresentWithText(HIDDEN_DATASET);
+        assertTextBefore(CATEGORY, MODIFIED_DATASET);
+
+        // verify format strings
+        clickLinkWithText("Manage Datasets");
+        assertFormElementEquals(Locator.id("dateFormat"), DATE_FORMAT);
+        assertFormElementEquals(Locator.id("numberFormat"), NUMBER_FORMAT);
+
+        // verify dataset category on dataset management page
+        assertTextPresent(CATEGORY, 1);
+        assertElementContains(Locator.xpath("//tr[./td/a[text() = '" + MODIFIED_DATASET + "']]/td[3]"), CATEGORY);
+
+        // verify dataset columns
+        clickLinkWithText(MODIFIED_DATASET);
+        assertChecked(Locator.xpath("//tr[7]/td[6]/input"));
+        assertElementContains(Locator.xpath("//tr[7]/td[7]"), COLUMN_DESC);
+        assertTextPresent(CATEGORY);
+
+        // TODO: verify lookup
+
+        // verify manual cohorts
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Cohorts");
+        assertFormElementEquals(Locator.id("manualCohortAssignmentEnabled"), "on");
+        clickLinkWithText(getFolderName());
+        clickLinkWithText(DEMOGRAPHICS_DATASET);
+        clickMenuButton("Cohorts", GROUP_2);
+        clickMenuButton("QC State", "All data");
+        assertTextPresent(MODIFIED_PARTICIPANT);
+
+        // verify visit display order
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Visits");
+        assertTextBefore("Cycle 3", MODIFIED_VISIT);
+
+        // verify visit modifications
+        editVisit(MODIFIED_VISIT);
+        assertFormElementEquals("dataSetStatus", "OPTIONAL");
+        assertOptionEquals("cohortId", GROUP_2);
     }
 
     @Override
@@ -185,16 +252,14 @@ public class StudyBvtTest extends StudyManualTest
         waitForPageToLoad();
 
         clickLinkWithText("24");
-        //getDialog().setWorkingForm("Dataset");
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickNavButton("View Specimens");
-        assertTextPresent("999320016");
-        assertTextPresent("999320518");
+        assertLinkPresentWithText("999320016");
+        assertLinkPresentWithText("999320518");
         clickLinkWithText("Show Vial Info");
-        assertTextPresent("999320016");
+        assertLinkPresentWithText("999320016");
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        clickNavButton("Request Options", 0);
-        clickLinkWithText("Create New Request");
+        clickMenuButton("Request Options", "Create New Request");
         assertTextPresent("HAQ0003Y-09");
         assertTextPresent("BAQ00051-09");
         assertTextNotPresent("KAQ0003Q-01");
@@ -281,7 +346,7 @@ public class StudyBvtTest extends StudyManualTest
 
         // set the QC state 
         clickLinkWithText(getFolderName());
-        clickLinkWithText(DATA_SET);
+        clickLinkWithText(DEMOGRAPHICS_DATASET);
         clickMenuButton("QC State", "All data");
         checkAllOnPage("Dataset");
         clickMenuButton("QC State", "Update state of selected rows");
@@ -309,7 +374,7 @@ public class StudyBvtTest extends StudyManualTest
         clickMenuButton("Comments and QC", "Exit Comments and QC mode");
 
         // import second archive, verify that that data is merged:
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 5);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 4);
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load
@@ -436,6 +501,91 @@ public class StudyBvtTest extends StudyManualTest
             }
         }
         return false;
+    }
+
+    private void changeDatasetOrder(String value)
+    {
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Change Display Order");
+        selectOptionByValue("items", value);
+        clickNavButton("Move Down", 0);
+        clickNavButton("Save");
+    }
+
+    protected void hideDataset(String dataset)
+    {
+        clickLinkWithText(getFolderName());
+        setVisibleBit(dataset, false);
+    }
+
+    protected void setDatasetCategory(String dataset, String category)
+    {
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText(dataset);
+        clickNavButton("Edit Definition");
+        waitForElement(Locator.name("dsCategory"), WAIT_FOR_PAGE);
+        setFormElement("dsCategory", category);
+        clickNavButton("Save");
+    }
+
+    private void modifyVisits()
+    {
+        hideSceeningVisit();
+        clickLinkWithText("Change Visit Order");
+        checkCheckbox("explicitDisplayOrder");
+        selectOptionByText("displayOrderItems", MODIFIED_VISIT);
+        clickNavButton("Move Down", 0);
+        clickNavButton("Save");
+        editVisit(MODIFIED_VISIT);
+        selectOption("dataSetStatus", 0, "OPTIONAL");
+        selectOptionByText("cohortId", GROUP_2);
+        clickNavButton("Save");
+        
+    }
+
+    private void modifyDatasetColumn(String dataset)
+    {
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText(dataset);
+        clickNavButton("Edit Definition");
+        waitForElement(Locator.id("ff_name0"), WAIT_FOR_PAGE);
+        click(Locator.id("ff_name0"));
+        checkCheckbox("mvEnabled");
+        setFormElement(Locator.id("propertyDescription"), COLUMN_DESC);
+        // TODO: add lookups for current & other folders
+        clickNavButton("Save");
+    }
+
+    private void setFormatStrings()
+    {
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Datasets");
+        setText("dateFormat", DATE_FORMAT);
+        setText("numberFormat", NUMBER_FORMAT);
+        clickNavButton("Submit");
+    }
+
+    private void setManualCohorts()
+    {
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Cohorts");
+        clickRadioButtonById("manualCohortAssignmentEnabled");
+        waitForPageToLoad();
+        setParticipantCohort(MODIFIED_PARTICIPANT, GROUP_2);
+        clickNavButton("Save");
+    }
+
+    private void setParticipantCohort(String ptid, String cohort)
+    {
+        selectOptionByText(Locator.xpath("//tr[./td = '" + ptid + "']//select"), cohort);
+    }
+
+    protected void editVisit(String visit)
+    {
+        clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
     }
 
     protected void doTestDatasetImport()

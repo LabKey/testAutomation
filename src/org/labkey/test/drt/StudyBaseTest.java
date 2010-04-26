@@ -144,6 +144,22 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         clickNavButton("Save");
     }
 
+    // Must be on study home page or "manage study" page
+    protected void setVisibleBit(String datasetName, boolean showByDefault)
+    {
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText(datasetName);
+        clickButtonContainingText("Edit Definition");
+        waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
+        if (showByDefault)
+            checkCheckbox("showByDefault");
+        else
+            uncheckCheckbox("showByDefault");
+
+        clickNavButton("Save");
+    }
+
     protected void createReport(String reportType)
     {
         // click the create button dropdown

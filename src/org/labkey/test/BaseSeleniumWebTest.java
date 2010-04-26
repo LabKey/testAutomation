@@ -1654,7 +1654,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitForPageToLoad(int millis)
     {
-        selenium.waitForPageToLoad(Integer.toString(millis));
+        if( selenium.isAlertPresent() )
+            fail("ERROR: Unexpected alert.\n" + selenium.getAlert());
+        else
+            selenium.waitForPageToLoad(Integer.toString(millis));
     }
 
     public void waitForPageToLoad()
@@ -3011,14 +3014,24 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         logJavascriptAlerts();
     }
 
+    public void assertChecked(Locator checkBoxLocator)
+    {
+        assertTrue("Checkbox not checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
+    }
+
+    public void assertNotChecked(Locator checkBoxLocator)
+    {
+        assertFalse("Checkbox checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
+    }
+
     public boolean isChecked(Locator checkBoxLocator)
     {
         return selenium.isChecked(checkBoxLocator.toString());
     }
 
-    public void selectOptionByValue(String selectName, String value)
+    public void selectOptionByValue(String selectId, String value)
     {
-        selenium.select(selectName, "value=" + value);
+        selenium.select(selectId, "value=" + value);
     }
 
     public void selectOptionByValue(Locator loc, String value)
@@ -3026,9 +3039,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selectOptionByValue(loc.toString(), value);
     }
 
-    public void selectOptionByText(String selectName, String text)
+    public void selectOptionByText(String selectId, String text)
     {
-        selenium.select(selectName, text);
+        selenium.select(selectId, text);
+    }
+
+    public void selectOptionByText(Locator locator, String text)
+    {
+        selenium.select(locator.toString(), text);
     }
 
     public void addCustomizeViewOption(String tab, String column_name)
