@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.WebTestHelper;
 import org.apache.commons.lang.StringUtils;
@@ -499,26 +500,33 @@ public class Crawler
 			try
 			{
                 String msg = null;
-				_test.beginAt(urlMalicious);
-
-                String html = _test.getHtmlSource();
-                if (html.contains(maliciousScript))
-                    msg = "page contains injected script";
-
-				while (_test.isAlertPresent())
-				{
-					if (_test.getAlert().startsWith(alertText))
-                        msg = " malicious script executed";
-				}
-				
-                // see ConnectionWrapper.java
-                if (html.contains("SQL injection test failed"))
-                    msg = "SQL injection detected";
-
-                if (msg != null)
+                try
                 {
-                    fail(msg + "\n" + urlMalicious);
-               }
+				    _test.beginAt(urlMalicious);
+                }
+                catch (SeleniumException se)
+                {
+                    String html = _test.getHtmlSource();
+                    if (html.contains(maliciousScript))
+                        msg = "page contains injected script";
+
+                    while (_test.isAlertPresent())
+                    {
+                        if (_test.getAlert().startsWith(alertText))
+                            msg = " malicious script executed";
+                    }
+
+                    // see ConnectionWrapper.java
+                    if (html.contains("SQL injection test failed"))
+                        msg = "SQL injection detected";
+
+                    if (msg != null)
+                    {
+                        fail(msg + "\n" + urlMalicious);
+                    }
+                    
+                    throw se;
+                }
 			}
 			catch (RuntimeException re)
 			{
