@@ -302,7 +302,7 @@ public class ListHelper
 
         test.log("Add List");
         test.clickNavButton("Create New List");
-        test.waitForElement(Locator.id("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.name("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.setFormElement("ff_name", listName);
         test.selectOptionByText("ff_keyType", listKeyType.toString());
         test.setFormElement("ff_keyName", listKeyName);
