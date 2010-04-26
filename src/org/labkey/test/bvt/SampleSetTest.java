@@ -122,17 +122,17 @@ public class SampleSetTest extends BaseSeleniumWebTest
         selenium.select("targetSampleSetId", "label=FolderSampleSet in /SampleSetTestProject/SampleSetTestFolder");
         clickNavButton("Next");
 
-        setFormElement("outputSample1_KeyColFolder", "SampleSetBVT15");
-		setFormElement("outputSample2_KeyColFolder", "SampleSetBVT16");
-		selenium.click("outputSample1_IntColFolderCheckBox");
-		setFormElement("outputSample1_IntColFolder", "500a");
-		setFormElement("outputSample1_StringColFolder", "firstOutput");
-		setFormElement("outputSample2_StringColFolder", "secondOutput");
+        setFormElement("outputSample1_Property_KeyColFolder", "SampleSetBVT15");
+		setFormElement("outputSample2_Property_KeyColFolder", "SampleSetBVT16");
+		selenium.click("outputSample1_Property_IntColFolderCheckBox");
+		setFormElement("outputSample1_Property_IntColFolder", "500a");
+		setFormElement("outputSample1_Property_StringColFolder", "firstOutput");
+		setFormElement("outputSample2_Property_StringColFolder", "secondOutput");
         clickNavButton("Submit");
 
         assertTextPresent("must be of type Integer");
-        clickCheckbox("outputSample1_IntColFolderCheckBox");
-        setFormElement("outputSample1_IntColFolder", "500");
+        clickCheckbox("outputSample1_Property_IntColFolderCheckBox");
+        setFormElement("outputSample1_Property_IntColFolder", "500");
         clickNavButton("Submit");
 
         clickLinkContainingText("Derive 2 samples");
@@ -149,15 +149,15 @@ public class SampleSetTest extends BaseSeleniumWebTest
         selenium.select("targetSampleSetId", "label=ProjectSampleSet in /SampleSetTestProject");
         clickNavButton("Next");
 
-        setFormElement("outputSample1_KeyCol", "200");
-        setFormElement("outputSample1_IntCol", "600");
-        setFormElement("outputSample1_StringCol", "String");
-        setFormElement("outputSample1_DateCol", "BadDate");
-        setFormElement("outputSample1_BoolCol", "FALSE");
+        setFormElement("outputSample1_Property_KeyCol", "200");
+        setFormElement("outputSample1_Property_IntCol", "600");
+        setFormElement("outputSample1_Property_StringCol", "String");
+        setFormElement("outputSample1_Property_DateCol", "BadDate");
+        setFormElement("outputSample1_Property_BoolCol", "FALSE");
         clickNavButton("Submit");
 
         assertTextPresent("must be of type Date and Time");
-        setFormElement("outputSample1_DateCol", "1/1/2007");
+        setFormElement("outputSample1_Property_DateCol", "1/1/2007");
         clickNavButton("Submit");
 
         assertLinkPresentWithText("Derive sample from SampleSetBVT16");
