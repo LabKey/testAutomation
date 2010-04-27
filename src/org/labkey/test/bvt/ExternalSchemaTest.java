@@ -257,16 +257,13 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         String containerPath = StringUtils.join(Arrays.asList(PROJECT_NAME, FOLDER_NAME), "/");
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
-        log("** Insert via api");
         Row[] inserted = new Row[] { Row("A", 3), Row("B", 4) };
         int[] pks = insertViaJavaApi(containerPath, cn, inserted);
         
-        log("** Select via api");
         Row[] selected = selectViaJavaApi(containerPath, cn, pks);
         for (int i = 0; i < inserted.length; i++)
             assertEquals(inserted[i], selected[i]);
         
-        log("** Update via api");
         Row[] updated = new Row[] { Row(pks[0], "AA", 30), Row(pks[1], "BB", 40) };
         updateViaJavaApi(containerPath, cn, updated);
 
@@ -323,7 +320,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         SelectRowsCommand cmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         cmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
         SelectRowsResponse resp = cmd.execute(cn, containerPath);
-        assertEquals("Expectd to select " + pks.length + " rows", pks.length, resp.getRowCount().intValue());
+        assertEquals("Expected to select " + pks.length + " rows", pks.length, resp.getRowCount().intValue());
 
         List<Row> rows = new ArrayList<Row>(pks.length);
         for (int i = 0; i < pks.length; i++)
@@ -348,7 +345,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         for (Row row : rows)
             cmd.addRow(row.toMap());
         SaveRowsResponse resp = cmd.execute(cn, containerPath);
-        assertEquals("Expectd to update " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
+        assertEquals("Expected to update " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
 
         Row[] updated = new Row[rows.length];
         for (int i = 0; i < rows.length; i++)
@@ -368,7 +365,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             cmd.addRow(Collections.singletonMap("RowId", (Object) pk));
         
         SaveRowsResponse resp = cmd.execute(cn, containerPath);
-        assertEquals("Expectd to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
+        assertEquals("Expected to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
         
         SelectRowsCommand selectCmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         selectCmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
