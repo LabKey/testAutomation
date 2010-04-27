@@ -1657,7 +1657,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if( selenium.isAlertPresent() )
             fail("ERROR: Unexpected alert.\n" + selenium.getAlert());
         else
+        {
             selenium.waitForPageToLoad(Integer.toString(millis));
+
+            if ( isElementPresent(Locator.linkContainingText("DB connection")) && millis > 1000 )
+            {
+                log("Waiting for DB actions to complete.");
+                refresh(millis - 1000);
+            }
+        }
     }
 
     public void waitForPageToLoad()
