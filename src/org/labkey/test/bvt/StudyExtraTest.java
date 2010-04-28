@@ -154,6 +154,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("manage lists");
 
         clickNavButton("Create New List");
+        waitForElement(Locator.id("ff_name"), defaultWaitForPage);
 		setFormElement("ff_name", "List1");
 		clickNavButton("Create List", 0);
         waitForElement(Locator.navButton("Add Field"),30000);
