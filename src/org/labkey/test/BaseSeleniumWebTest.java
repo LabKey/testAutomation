@@ -1462,7 +1462,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Deleting project " + project);
         clickLinkWithText(project);
-        waitForPageToLoad();
         //Delete even if terms of use is required
         if (isElementPresent(Locator.name("approvedTermsOfUse")))
         {
@@ -2546,6 +2545,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             return locator;
 
         return null;
+    }
+
+    public void clickButton(String text)
+    {
+        clickButton(text, defaultWaitForPage);
     }
 
     public void clickButton(String text, int waitMillis)
@@ -4393,7 +4397,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             ExtHelper.clickFileBrowserFileCheckbox(BaseSeleniumWebTest.this, _copiedArchive.getName());
             selectImportDataAction("Import Specimen Data");
-            waitForPageToLoad();
             clickNavButton("Start Import");
         }
 

@@ -60,7 +60,6 @@ public class RReportHelper
         }
         test.setFormElement(Locator.id("script"), script);
         test.clickNavButton("Execute Script");
-        test.waitForPageToLoad();
 
         Locator l = Locator.xpath("//div[@id='tabContent']//pre");
         String html = test.getText(l);

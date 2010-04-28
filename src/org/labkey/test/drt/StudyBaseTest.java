@@ -167,8 +167,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         click(Locator.id(id));
 
         id = ExtHelper.getExtElementId(this, reportType);
-        click(Locator.id(id));
-        waitForPageToLoad();
+        clickAndWait(Locator.id(id));
     }
 
     protected void selectOption(String name, int i, String value)

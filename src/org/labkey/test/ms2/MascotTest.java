@@ -215,7 +215,6 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
         waitAndClick(Locator.fileTreeByName("test3"));
         selectImportDataAction("Import Results");
-        waitForPageToLoad();
 
         log("Verify upload started.");
         String mascotDatLabel = SAMPLE_BASE_NAME + ".dat (none)";

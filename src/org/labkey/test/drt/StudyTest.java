@@ -375,12 +375,10 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("999320518");
 
         clickMenuButton("Cohorts", "Group 1");
-        waitForPageToLoad();
         assertTextPresent("999320016");
         assertTextNotPresent("999320518");
 
         clickMenuButton("Cohorts", "Group 2");
-        waitForPageToLoad();
         assertTextNotPresent("999320016");
         assertTextPresent("999320518");
 

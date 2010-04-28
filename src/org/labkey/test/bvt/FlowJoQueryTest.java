@@ -65,7 +65,6 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("1 run");
         clickMenuButton("Query", "PassFailQuery");
-        waitForPageToLoad();
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
 //        The DeviationFromMean query does not work on SQL server.

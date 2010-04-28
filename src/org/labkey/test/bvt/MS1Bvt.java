@@ -403,7 +403,6 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         //switch back to default view
         clickMenuButton("Views", "default");
-        waitForPageToLoad();
         assertTextNotPresent("Related Peptide PepProphet");
         assertTextNotPresent("Related Peptide Protein");
         assertTextNotPresent("18protmix|P46406|G3P_RABIT");

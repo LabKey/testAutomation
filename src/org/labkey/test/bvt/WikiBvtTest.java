@@ -199,14 +199,12 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("Check sibling order edit works");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         clickLinkWithText("manage");
-        waitForPageToLoad();
         clickNavButton("Move Down", 0);
         clickNavButton("Save");
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         clickLinkWithText("[next]");
         assertTextPresent("normal normal normal");
         clickLinkWithText("manage");
-        waitForPageToLoad();
         clickNavButton("Move Up", 0);
         clickNavButton("Save");
         clickLinkWithText("[next]");
@@ -536,7 +534,6 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         if (!renderType.equals(getSelectedOptionText("rendererType")))
         {
             selectOptionByText("rendererType", renderType);
-            waitForPageToLoad();
         }
         if ("HTML".equals(renderType) && isNavButtonPresent("Use HTML Source Editor"))
             clickNavButton("Use HTML Source Editor");

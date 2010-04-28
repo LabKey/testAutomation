@@ -193,7 +193,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
 
         selectImportDataAction("Import FlowJo Workspace");
-        waitForPageToLoad();
     }
 
     protected void importAnalysis_begin(String containerPath)

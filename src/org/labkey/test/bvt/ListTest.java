@@ -540,7 +540,6 @@ if (!INCREMENTALTEST){
         submit();
 
         clickMenuButton("Views", "default");
-        waitForPageToLoad();
         assertTextPresent(TEST_DATA[1][1], 2);
 
         log("Test deleting rows");
@@ -556,8 +555,7 @@ if (!INCREMENTALTEST){
 
         log("Test deleting data");
         clickLinkWithText("Lists");
-        click(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/../td[3]/a"));
-        waitForPageToLoad();
+        clickAndWait(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/../td[3]/a"));
         clickDeleteList();
         clickNavButton("OK");
 
@@ -778,8 +776,7 @@ if (!INCREMENTALTEST){
 
     void dataregionToEditDesign()
     {
-        clickNavButton("View Design", 0);
-        waitForPageToLoad();
+        clickNavButton("View Design");
         clickEditDesign();
     }
 

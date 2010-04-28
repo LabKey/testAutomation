@@ -50,7 +50,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, "CAexample_mini.mzXML");
         selectImportDataAction("Create New Mass Spec Metadata Assay Design");
-        waitForPageToLoad();
 
         log("Create a new MS2 sample prep assay definition.");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -70,7 +69,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, "CAexample_mini.mzXML");
         selectImportDataAction("Use " + TEST_ASSAY_NAME);
-        waitForPageToLoad();
 
         log("Describe MS2 run.");
         clickNavButton("Next");
@@ -158,7 +156,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_JAVASCRIPT);
         assertEquals("test2", getSelectedOptionText("protocol"));
 
-  //      waitForPageToLoad();
         if (!isLinkPresentWithText("running") && isLinkPresentWithText("completed"))
             assertTextPresent("running");
 

@@ -87,11 +87,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.type("timepointName", "Pre-immunization");
         click(Locator.tagWithText("button", "OK"));
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/../..//input");
-        clickNavButton("Finished", 0);
+        clickNavButton("Finished");
 
         //Can't simply wait for page load here cause also need to wait for
         //GWT to do its thing.
-        waitForPageToLoad(30000);
         n = 1;
         while (!isTextPresent("This is a very important protocol") && n++ < 10)
             sleep(1000);
@@ -101,8 +100,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Immunogen3|Adjuvant1");
         assertTextPresent("Pre-immunization");
 
-        clickNavButton("Edit", 0);
-        waitForPageToLoad(30000);
+        clickNavButton("Edit");
         n = 1;
         while (!isTextPresent("This is a very important protocol") && n++ < 10)
             sleep(1000);
@@ -111,20 +109,15 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		selenium.type("timepointCount", "8");
         click(Locator.tagWithText("button", "OK"));
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/ancestor::tr/td[5]//input");
-        clickNavButton("Finished", 0);
+        clickNavButton("Finished");
 
         //Can't simply wait for page load here cause also need to wait for
         //GWT to do its thing.
-        waitForPageToLoad(30000);
         n = 1;
         while (!isTextPresent("This is a very important protocol") && n++ < 10)
             sleep(1000);
 
-        click(Locator.navButton("Create Study Folder"));
-        if (selenium.isAlertPresent()) {
-            fail("Unexpected alert:" + selenium.getAlert());
-        }
-        waitForPageToLoad();
+        clickNavButton("Create Study Folder");
         setFormElement("beginDate", "2007-01-01");
         clickNavButton("Next");
         String cohorts = "SubjectId\tCohort\tStartDate\n" +

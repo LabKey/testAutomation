@@ -292,7 +292,6 @@ public class ListHelper
     public static void createList(BaseSeleniumWebTest test, String folderName, String listName, ListHelper.ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
         test.clickLinkWithText(folderName);
-        test.waitForPageToLoad();
         if (!test.isLinkPresentWithText("Lists"))
         {
             test.addWebPart("Lists");
@@ -396,7 +395,6 @@ public class ListHelper
     public static void createListFromFile(BaseSeleniumWebTest test, String folderName, String listName, File inputFile)
     {
         test.clickLinkWithText(folderName);
-        test.waitForPageToLoad();
         if (!test.isLinkPresentWithText("Lists"))
         {
             test.addWebPart("Lists");
@@ -420,14 +418,11 @@ public class ListHelper
         test.waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         test.clickNavButton("Import");
-
-        test.waitForPageToLoad();
     }
 
     public static void importListArchive(BaseSeleniumWebTest test, String folderName, File inputFile)
     {
         test.clickLinkWithText(folderName);
-        test.waitForPageToLoad();
         if (!test.isLinkPresentWithText("Lists"))
         {
             test.addWebPart("Lists");
@@ -441,8 +436,6 @@ public class ListHelper
 
         test.setFormElement("listZip", inputFile);
         test.clickNavButton("Import List Archive");
-
-        test.waitForPageToLoad();
     }
 
 

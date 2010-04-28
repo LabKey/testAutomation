@@ -332,7 +332,6 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Execute Script");
 
         log("Check that R script worked");
-        waitForPageToLoad();
         // Add once issue 3738 is fixed
 //        assertElementNotPresent(Locator.id(R_SCRIPT1_IMG));
 //        assertTextNotPresent(R_SCRIPT1_PDF);
@@ -424,7 +423,6 @@ public class ReportTest extends StudyBaseTest
         checkCheckbox(Locator.name("includedReports"));
         clickNavButton("Execute Script");
         clickNavButton("Start Job");
-        waitForPageToLoad();
         waitForElement(Locator.navButton("Start Job"), 30000);
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);

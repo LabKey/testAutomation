@@ -64,7 +64,6 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         log("Analyze " + SEARCH_NAME + " sample data.");
         sleep(1500);
         selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
-        waitForPageToLoad();
     }
 
     protected void basicChecks()

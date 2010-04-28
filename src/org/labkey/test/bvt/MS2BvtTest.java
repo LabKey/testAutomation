@@ -87,7 +87,6 @@ public class MS2BvtTest extends MS2TestBase
         ExtHelper.clickFileBrowserFileCheckbox(this, SAMPLE_BASE_NAME + ".search.xar.xml");
 
         selectImportDataAction("Import Experiment");
-        waitForPageToLoad();
 
         log("Going to the list of all pipeline jobs");
         clickLinkWithText("All");
@@ -632,7 +631,6 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test default view");
         clickMenuButton("Views", "default");
-        waitForPageToLoad();
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextNotPresent("Next AA");
@@ -643,7 +641,6 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test load saved view");
         clickMenuButton("Views", VIEW4);
-        waitForPageToLoad();
         assertTextNotPresent("R.GGNEESTK.T");
         assertTextBefore(PEPTIDE1, PEPTIDE2);
         assertTextBefore(PEPTIDE3, PEPTIDE4);
@@ -676,7 +673,6 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test delete view");
         clickMenuButton("Views", VIEW4);
-        waitForPageToLoad();
         clickMenuButton("Views", CUSTOMIZE_VIEW);
         clickNavButtonContainingText("Delete my view");
         assertTextPresent("K.LLASMLAK.A");
@@ -809,7 +805,6 @@ public class MS2BvtTest extends MS2TestBase
         ExtHelper.clickFileBrowserFileCheckbox(this, SAMPLE_BASE_NAME + ".search.xar.xml");
 
         selectImportDataAction("Import Experiment");
-        waitForPageToLoad();
 
         log("Verify upload finished.");
         seconds = 0;
@@ -1033,13 +1028,11 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Check default view works");
         clickMenuButton("Views", "default");
-        waitForPageToLoad();
         assertElementNotPresent(Locator.id("query:SeqId/Mass:header"));
         assertTextPresent("gi|34849400|");
 
         log("Check sorting");
         clickMenuButton("Views", VIEW5);
-        waitForPageToLoad();
         setSort("query", "SeqId", SortDirection.ASC);
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|15828808|ref|NP_326168.1|");
 

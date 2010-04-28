@@ -293,7 +293,6 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_ASSAY_SET_PROPERTIES[0]);
         assertTextPresent(TEST_ASSAY_SET_PROPERTIES[3]);
         clickLinkWithText(TEST_RUN1);
-        waitForPageToLoad();
         isTextPresent("2.0");
         assertTextNotPresent("7.0");
         // Make sure that our specimen IDs resolved correctly
@@ -331,7 +330,6 @@ public class AssayTest extends AbstractAssayTest
 
         log("Check out the data for all of the runs");
         clickLinkWithText("view results");
-        waitForPageToLoad();
         clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
         isTextPresent("2.0");
         assertTextPresent("7.0");

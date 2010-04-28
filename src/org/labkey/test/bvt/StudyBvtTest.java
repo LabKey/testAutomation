@@ -75,7 +75,6 @@ public class StudyBvtTest extends StudyManualTest
         ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
 
         selectImportDataAction("Import Study");
-        waitForPageToLoad();
 
         // wait for study & specimen load to complete
         waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)");
@@ -114,7 +113,6 @@ public class StudyBvtTest extends StudyManualTest
         ExtHelper.selectAllFileBrowserFiles(this);
 
         selectImportDataAction("Import Study");
-        waitForPageToLoad();
 
         // wait for study & specimen load
         waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)");
@@ -249,7 +247,6 @@ public class StudyBvtTest extends StudyManualTest
 
         assertLinkNotPresentWithText("24");
         selectOptionByText("QCState", "All data");
-        waitForPageToLoad();
 
         clickLinkWithText("24");
         checkCheckbox(Locator.checkboxByName(".toggle"));
@@ -609,8 +606,6 @@ public class StudyBvtTest extends StudyManualTest
         waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_JAVASCRIPT);
 
         clickNavButton("Import");
-
-        waitForPageToLoad();
 
         assertTextPresent("kevin");
         assertTextPresent("chimpanzee");

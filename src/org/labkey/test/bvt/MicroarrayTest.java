@@ -113,7 +113,6 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE2);
 
         selectImportDataAction("Use " + ASSAY_NAME);
-        waitForPageToLoad();
 
         setFormElement("batchStringField", "SingleRunProperties");
         clickNavButton("Next");
@@ -147,7 +146,6 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE2);
 
         selectImportDataAction("Use " + ASSAY_NAME);
-        waitForPageToLoad();
 
         setFormElement("batchStringField", "BulkProperties");
         

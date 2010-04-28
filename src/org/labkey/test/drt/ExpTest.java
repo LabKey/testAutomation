@@ -63,7 +63,6 @@ public class ExpTest extends BaseSeleniumWebTest
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, "experiment.xar.xml");
         selectImportDataAction("Import Experiment");
-        waitForPageToLoad();
         clickLinkWithText("Data Pipeline");
         assertLinkNotPresentWithText("ERROR");
         int seconds = 0;

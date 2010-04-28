@@ -116,7 +116,6 @@ public class StudyManualTest extends StudyTest
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
         selectImportDataAction("Import Datasets");
-        waitForPageToLoad();
         clickNavButton("Start Import");
     }
 
