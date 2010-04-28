@@ -247,6 +247,7 @@ public class StudyBvtTest extends StudyManualTest
 
         assertLinkNotPresentWithText("24");
         selectOptionByText("QCState", "All data");
+        waitForPageToLoad();
 
         clickLinkWithText("24");
         checkCheckbox(Locator.checkboxByName(".toggle"));
