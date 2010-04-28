@@ -1658,12 +1658,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else
         {
             selenium.waitForPageToLoad(Integer.toString(millis));
-
-            if ( isElementPresent(Locator.linkContainingText("DB connection")) && millis > 1000 )
-            {
-                log("Waiting for DB actions to complete.");
-                refresh(millis - 1000);
-            }
         }
     }
 
