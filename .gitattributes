@@ -33,6 +33,7 @@ src/org/labkey/test/bvt/AbstractAssayTest.java -text
 src/org/labkey/test/bvt/AbstractQCAssayTest.java -text
 src/org/labkey/test/bvt/AssayTest.java -text
 src/org/labkey/test/bvt/AuditLogTest.java -text
+src/org/labkey/test/bvt/ButtonCustomizationTest.java -text
 src/org/labkey/test/bvt/CaBigTest.java -text
 src/org/labkey/test/bvt/ClientAPITest.java -text
 src/org/labkey/test/bvt/DataRegionTest.java -text

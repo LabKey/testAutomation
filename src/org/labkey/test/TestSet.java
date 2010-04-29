@@ -50,7 +50,8 @@ public enum TestSet
         ReportTest.class,
         SchemaBrowserTest.class,
         MicroarrayTest.class,
-        ViabilityTest.class
+        ViabilityTest.class,
+        ButtonCustomizationTest.class
     }),
 
     MS2(new Class[]
