@@ -241,6 +241,7 @@ public class CohortTest extends BaseSeleniumWebTest
         clickLinkWithText("Manage Cohorts");
         clickRadioButtonById("simpleCohorts");
         selenium.getConfirmation();
+        waitForPageToLoad();
 
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Blood");
