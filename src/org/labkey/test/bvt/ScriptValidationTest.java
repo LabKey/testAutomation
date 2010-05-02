@@ -60,7 +60,7 @@ public class ScriptValidationTest extends SimpleModuleTest
 
         clickLinkWithText(getProjectName());
         doTestTransformation();
-//        doTestValidation();
+        doTestValidation();
     }
 
     private void doTestTransformation() throws Exception
@@ -79,25 +79,46 @@ public class ScriptValidationTest extends SimpleModuleTest
         try
         {
             insertColors(Arrays.asList(
-                    new ColorRecord("ShouldError", "not a hex value")
+                    new ColorRecord("Red", "#f00"),
+                    new ColorRecord("Blue", "#0f0"),
+                    new ColorRecord("Glucose", "")
             ));
-            fail("Should throw an exception for invalid hex values");
+            fail("Should throw an exception for Glucose");
         }
         catch (Exception e)
         {
-            assertTrue(e.getMessage().contains("Hex color value must start with '#'"));
+            assertEquals("Row 2 has error: Name: Glucose isn't the name of a color!", e.getMessage());
         }
 
         try
         {
-            insertColors(Arrays.asList(
-                    new ColorRecord("ShouldError", "#still not a hex value")
-            ));
+            insertColors(Arrays.asList(new ColorRecord("ShouldError", "not a hex value")));
             fail("Should throw an exception for invalid hex values");
         }
         catch (Exception e)
         {
-            assertTrue(e.getMessage().contains("Hex color value must be of the form #abc or #aabbcc"));
+            assertTrue("Expected \"Hex color value must start with '#'\", got: \"" + e.getMessage() + "\"",
+                    e.getMessage().contains("Hex color value must start with '#'"));
+        }
+
+        try
+        {
+            insertColors(Arrays.asList(new ColorRecord("ShouldError", "#still not a hex value")));
+            fail("Should throw an exception for invalid hex values");
+        }
+        catch (Exception e)
+        {
+            assertEquals("Hex: Hex color value must be of the form #abc or #aabbcc", e.getMessage());
+        }
+
+        try
+        {
+            insertColors(Arrays.asList(new ColorRecord("Muave", "")));
+            fail("Should throw an exception for invalid hex values");
+        }
+        catch (Exception e)
+        {
+            assertEquals("before_insert validation failed", e.getMessage());
         }
     }
 

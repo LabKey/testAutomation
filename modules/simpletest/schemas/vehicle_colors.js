@@ -44,11 +44,17 @@ function trace(args, oldFn, thiz)
 var hexRe = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 function init_insert(rows, errors) {
+    for (var i in rows) {
+        var row = rows[i];
+        if (row.Name == "Glucose") {
+            errors[i] = { Name : "Glucose isn't the name of a color!" };
+        }
+    }
 }
 
 function before_insert(row, errors) {
     // Throwing a script exception will cancel the insert.
-    if (row.Hex && !row.Hex[0] == "#")
+    if (row.Hex && row.Hex[0] != "#")
         throw new Error("Hex color value must start with '#'");
 
     // Any errors added to the error map will cancel the insert
@@ -64,14 +70,10 @@ function before_insert(row, errors) {
     row.Name = row.Name + "!";
 }
 
-function after_insert(row, errors) {
-}
-
 function complete_insert(rows, errors) {
 }
 
 Debug.addBefore(this, 'init_insert', trace);
 Debug.addBefore(this, 'before_insert', trace);
-Debug.addBefore(this, 'after_insert', trace);
 Debug.addBefore(this, 'complete_insert', trace);
 
