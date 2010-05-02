@@ -37,7 +37,6 @@ import java.util.Date;
 */
 public class SimpleModuleTest extends BaseSeleniumWebTest
 {
-    public static final String PROJECT_NAME = "Simple Module Verify Project";
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String LIST_NAME = "People";
@@ -47,14 +46,19 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
             "Britt\t30\tFalse\n" +
             "Josh\t30\tTrue";
 
+    protected String getProjectName()
+    {
+        return getClass().getSimpleName() + " Project";
+    }
+
     protected void doTestSteps() throws Exception
     {
         assertModuleDeployed(MODULE_NAME);
-        createProject(PROJECT_NAME);
-        enableModule(PROJECT_NAME, MODULE_NAME);
-        enableModule(PROJECT_NAME, "Query");
+        createProject(getProjectName());
+        enableModule(getProjectName(), MODULE_NAME);
+        enableModule(getProjectName(), "Query");
 
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getProjectName());
         doTestSchemas();
         doTestViews();
         doTestWebParts();
@@ -67,7 +71,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     private void doTestSchemas() throws Exception
     {
         log("** Testing schemas in modules...");
-        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
 
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
@@ -78,7 +82,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 Maps.<String, Object>of("Name", "Toyota"),
                 Maps.<String, Object>of("Name", "Honda")
         ));
-        SaveRowsResponse insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
         Long fordId = null;
@@ -112,7 +116,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 Maps.<String, Object>of("ManufacturerId", fordId,
                                         "Name", "F150")
         ));
-        insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 4 rows.", 4, insertResp.getRowsAffected().intValue());
 
         Long priusId = null;
@@ -131,7 +135,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertNotNull(f150Id);
 
         log("** Testing vehicle.Model url link...");
-        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickLinkWithText("Prius");
         assertTextPresent("Hooray!");
@@ -140,7 +144,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTrue("Expected rowid on model.html page", rowid > 0);
 
         log("** Testing query of vehicle schema...");
-        beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Toyotas");
 
         assertTextPresent("Prius");
@@ -149,11 +153,11 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("** Inserting colors...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
         insertCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of("Name", "Red", "Hex", "FF0000"),
-                Maps.<String, Object>of("Name", "Green", "Hex", "00FF00"),
-                Maps.<String, Object>of("Name", "Blue", "Hex", "0000FF")
+                Maps.<String, Object>of("Name", "Red", "Hex", "#FF0000"),
+                Maps.<String, Object>of("Name", "Green", "Hex", "#00FF00"),
+                Maps.<String, Object>of("Name", "Blue", "Hex", "#0000FF")
         ));
-        insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
         log("** Inserting vechicles...");
@@ -161,20 +165,20 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.<String, Object>of(
                         "ModelId", priusId,
-                        "Color", "Green",
+                        "Color", "Green!",
                         "ModelYear", Integer.valueOf(2000),
                         "Milage", Integer.valueOf(3),
                         "LastService", new Date(2009, 9, 9)
                 ),
                 Maps.<String, Object>of(
                         "ModelId", f150Id,
-                        "Color", "Red",
+                        "Color", "Red!",
                         "ModelYear", Integer.valueOf(2001),
                         "Milage", Integer.valueOf(4),
                         "LastService", new Date(2009, 11, 9)
                 )
         ));
-        insertResp = insertCmd.execute(cn, PROJECT_NAME);
+        insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
 
         Long[] vehicleIds = new Long[2];
@@ -201,13 +205,13 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         }
 
         log("** Updating vehicles...");
-        SaveRowsResponse updateRows = updateCmd.execute(cn, PROJECT_NAME);
+        SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName());
         assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
         assertEquals(4, ((Number)(updateRows.getRows().get(0).get("Milage"))).intValue());
 
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
-        SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
+        SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
         assertTrue("Expected to select >0 rows.", selectResp.getRowCount().intValue() > 0);
 
         DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Vehicles");
@@ -237,14 +241,14 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("** Deleting all " + tableName);
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, tableName);
         selectCmd.setMaxRows(-1);
-        SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
+        SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
 
         if (selectResp.getRowCount().intValue() > 0)
         {
             DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, tableName);
             deleteCmd.setRows(selectResp.getRows());
-            deleteCmd.execute(cn, PROJECT_NAME);
-            assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, PROJECT_NAME).getRowCount().intValue());
+            deleteCmd.execute(cn, getProjectName());
+            assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, getProjectName()).getRowCount().intValue());
         }
     }
 
@@ -264,7 +268,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     {
         log("Testing web parts in modules...");
         //go to project portal
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getProjectName());
 
         //add Simple Module Web Part
         addWebPart("Simple Module Web Part");
@@ -274,11 +278,11 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     private void createList()
     {
         //create a list for our query
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getProjectName());
         addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME,
+        ListHelper.createList(this, getProjectName(), LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
@@ -295,7 +299,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("Testing queries in modules...");
 
         //go to query module portal
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getProjectName());
         clickTab("Query");
         viewQueryData("lists", "TestQuery");
 
@@ -308,7 +312,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     private void doTestQueryViews()
     {
         log("Testing module-based custom query views...");
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getProjectName());
         clickLinkWithText(LIST_NAME);
 
         clickMenuButton("Views", "Crazy People");
@@ -333,7 +337,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         }
 
         log("Testing module-based reports...");
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getProjectName());
         clickLinkWithText(LIST_NAME);
         clickMenuButton("Views", "Super Cool R Report");
         assertTextPresent("\"name\"");
@@ -341,7 +345,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("\"crazy\"");
     }
 
-    private void assertModuleDeployed(String moduleName)
+    protected void assertModuleDeployed(String moduleName)
     {
         log("Ensuring that that '" + moduleName + "' module is deployed");
         clickLinkWithText("Admin Console");
@@ -355,7 +359,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         try
         {
-            deleteProject(PROJECT_NAME);
+            deleteProject(getProjectName());
         }
         catch(Throwable ignore) {}
         log("Cleaned up SimpleModuleTest project.");
@@ -367,4 +371,5 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         //as it won't exist until after the test starts running the first time
         return "none";
     }
+
 }

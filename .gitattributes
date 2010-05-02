@@ -12,6 +12,7 @@ modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Repo
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/vehicle.xml -text
+modules/simpletest/schemas/vehicle_colors.js -text
 modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
 modules/simpletest/views/model.html -text
@@ -61,6 +62,7 @@ src/org/labkey/test/bvt/ReportTest.java -text
 src/org/labkey/test/bvt/RlabkeyTest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
 src/org/labkey/test/bvt/SchemaBrowserTest.java -text
+src/org/labkey/test/bvt/ScriptValidationTest.java -text
 src/org/labkey/test/bvt/SimpleApiTest.java -text
 src/org/labkey/test/bvt/SimpleModuleTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text
