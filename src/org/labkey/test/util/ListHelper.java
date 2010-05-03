@@ -291,18 +291,8 @@ public class ListHelper
 
     public static void createList(BaseSeleniumWebTest test, String folderName, String listName, ListHelper.ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        test.clickLinkWithText(folderName);
-        if (!test.isLinkPresentWithText("Lists"))
-        {
-            test.addWebPart("Lists");
-        }
+        beginCreateList(test, folderName, listName);
 
-        test.clickLinkWithText("manage lists");
-
-        test.log("Add List");
-        test.clickNavButton("Create New List");
-        test.waitForElement(Locator.name("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        test.setFormElement("ff_name", listName);
         test.selectOptionByText("ff_keyType", listKeyType.toString());
         test.setFormElement("ff_keyName", listKeyName);
         test.clickNavButton("Create List", 0);
@@ -392,7 +382,9 @@ public class ListHelper
         }
     }
 
-    public static void createListFromFile(BaseSeleniumWebTest test, String folderName, String listName, File inputFile)
+
+    // initial "create list" steps common to both manual and import from file scenarios
+    private static void beginCreateList(BaseSeleniumWebTest test, String folderName, String listName)
     {
         test.clickLinkWithText(folderName);
         if (!test.isLinkPresentWithText("Lists"))
@@ -404,7 +396,14 @@ public class ListHelper
 
         test.log("Add List");
         test.clickNavButton("Create New List");
+        test.waitForElement(Locator.name("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.setFormElement("ff_name", listName);
+    }
+
+
+    public static void createListFromFile(BaseSeleniumWebTest test, String folderName, String listName, File inputFile)
+    {
+        beginCreateList(test, folderName, listName);
 
         test.click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
         //test.clickCheckbox("fileImport");
