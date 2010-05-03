@@ -1458,6 +1458,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkNotPresentWithText(folderName);
     }
 
+    public void moveFolder(String projectName, String folderName, String newParent, boolean createAlias)
+    {
+        log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
+        clickLinkWithText(projectName);
+        ensureAdminMode();
+        clickLinkWithText("Folders");
+        // click index 1, since this text appears in the nav tree as well as the folder management tree:
+        clickLinkWithText(folderName, 1);
+        clickNavButton("Move");
+        if (createAlias)
+            checkCheckbox("addAlias");
+        else
+            uncheckCheckbox("addAlias");
+        // move:
+        clickLinkWithText(newParent, 1);
+        // verify that we're not on an error page with a check for folder link:
+        assertLinkPresentWithText(folderName);
+        assertLinkPresentWithText(newParent);
+    }
+
     public void deleteProject(String project)
     {
         log("Deleting project " + project);
@@ -2792,10 +2812,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String prefix = getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         selenium.click(addField);
-        waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(prefix + "//input[@name='ff_name" + index + "']", name);
-        setFormElement(prefix + "//input[@name='ff_label" + index + "']", label);
-        selectOptionByText(prefix + "//select[@name='ff_type" + index + "']", type);
+        waitForElement(Locator.xpath(prefix + "//input[@id='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(prefix + "//input[@id='ff_name" + index + "']", name);
+        setFormElement(prefix + "//input[@id='ff_label" + index + "']", label);
+        selectOptionByText(prefix + "//select[@id='ff_type" + index + "']", type);
     }
 
     public void setLongTextField(String elementName, String text)
