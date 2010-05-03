@@ -385,7 +385,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     private void _insertViaForm(String containerPath, String text, int intNotNull)
     {
         log("** Inserting via form: text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/dbuserschema/" + containerPath + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        beginAt("/externalschema/" + containerPath + "/insert.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
         setFormElement("quf_Text", text);
         setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
         setFormElement("quf_DatetimeNotNull", "2008-09-25");
@@ -423,7 +423,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     private void _updateViaForm(String containerPath, int pk, String text, int intNotNull)
     {
         log("** Updating via form: pk=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/dbuserschema/" + containerPath + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&pk=" + pk);
+        beginAt("/externalschema/" + containerPath + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&pk=" + pk);
         setFormElement("quf_Text", text);
         setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
         setFormElement("quf_DatetimeNotNull", "2008-09-25");
