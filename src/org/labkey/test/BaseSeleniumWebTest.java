@@ -1284,7 +1284,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickButton("Create new group", 0);
         sleep(500);
         waitAndClick(Locator.xpath("//div[@id='userInfoPopup']//div[contains(@class,'x-tool-close')]"));
-        waitForElement(Locator.tagWithText("td",groupName), defaultWaitForPage);
+        waitForElement(Locator.xpath("//div[@id='groupsFrame']//div[contains(@class,'pGroup') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
     }
 
     public void createPermissionsGroup(String groupName, String... memberNames)
@@ -1316,7 +1316,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickManageGroup(String groupName)
     {
         // warning Adminstrators can apper multiple times
-        waitAndClick(Locator.xpath("//div[@id='groupsFrame']//td[contains(text()," + Locator.xq(groupName) + ")]"));
+        waitAndClick(Locator.xpath("//div[@id='groupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
         sleep(100);
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
@@ -1326,7 +1326,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickManageSiteGroup(String groupName)
     {
         // warning Adminstrators can apper multiple times
-        waitAndClick(Locator.xpath("//div[@id='siteGroupsFrame']//td[contains(text()," + Locator.xq(groupName) + ")]"));
+        waitAndClick(Locator.xpath("//div[@id='siteGroupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
         sleep(100);
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
@@ -2789,11 +2789,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void addField(String areaTitle, int index, String name, String label, String type)
     {
-        String xpath = getPropertyXPath(areaTitle) + "//span" + Locator.navButton("Add Field").getPath();
-        selenium.click(xpath);
-        setFormElement(getPropertyXPath(areaTitle) + "//td/input[@id='ff_name" + index + "']", name);
-        setFormElement(getPropertyXPath(areaTitle) + "//td/input[@id='ff_label" + index + "']", label);
-        selectOptionByText(getPropertyXPath(areaTitle) + "//td/select[@id='ff_type" + index + "']", type);
+        String prefix = getPropertyXPath(areaTitle);
+        String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
+        selenium.click(addField);
+        waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(prefix + "//input[@name='ff_name" + index + "']", name);
+        setFormElement(prefix + "//input[@name='ff_label" + index + "']", label);
+        selectOptionByText(prefix + "//select[@name='ff_type" + index + "']", type);
     }
 
     public void setLongTextField(String elementName, String text)
