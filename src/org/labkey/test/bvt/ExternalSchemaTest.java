@@ -274,9 +274,10 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             updateViaJavaApi(PROJECT_NAME, cn, updateFail);
             fail("expected exception when trying to update from another container");
         }
-        catch (Exception ex)
+        catch (CommandException ex)
         {
             assertEquals("The row is from the wrong container.", ex.getMessage());
+            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
         
         try
@@ -285,9 +286,10 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             deleteViaJavaApi(PROJECT_NAME, cn, pks);
             fail("expected exception when trying to delete from another container");
         }
-        catch (Exception ex)
+        catch (CommandException ex)
         {
             assertEquals("The row is from the wrong container.", ex.getMessage());
+            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
         
         deleteViaJavaApi(containerPath, cn, pks);
