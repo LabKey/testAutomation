@@ -1677,6 +1677,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("ERROR: Unexpected alert.\n" + selenium.getAlert());
         else
         {
+            selenium.setTimeout(Integer.toString(millis));
             selenium.waitForPageToLoad(Integer.toString(millis));
         }
     }
