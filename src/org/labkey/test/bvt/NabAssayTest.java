@@ -185,9 +185,11 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             clickLinkWithText("configure templates");
 
-            clickLinkWithText("delete", 0);
+            clickLinkWithText("delete", 0, false);
 
             assertConfirmation("Permanently delete this plate template?");
+
+            waitForPageToLoad();
 
             assertTextPresent(PLATE_TEMPLATE_NAME);
             assertTextNotPresent("NAb: 5 specimens in duplicate");

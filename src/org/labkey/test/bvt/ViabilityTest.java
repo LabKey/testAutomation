@@ -142,12 +142,12 @@ public class ViabilityTest extends AbstractQCAssayTest
         addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
-        clickNavButton("Save and Finish");
+        clickNavButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = selenium.getConfirmation();
+        String actualConfirmation = getConfirmationAndWait();
         log("** Got confirmation: " + actualConfirmation);
 
         //TODO: uncomment once Issue 10054 is resolved.
@@ -245,8 +245,8 @@ public class ViabilityTest extends AbstractQCAssayTest
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(ASSAY_NAME);
         click(Locator.linkWithText("manage assay design >>"));
-        clickLinkWithText("edit assay design");
-        selenium.getConfirmation();
+        clickLinkWithText("edit assay design", false);
+        getConfirmationAndWait();
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
@@ -279,12 +279,12 @@ public class ViabilityTest extends AbstractQCAssayTest
         addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
-        clickNavButton("Save and Finish");
+        clickNavButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = selenium.getConfirmation();
+        String actualConfirmation = getConfirmationAndWait();
         log("** Got confirmation: " + actualConfirmation);
         //TODO: uncomment once Issue 10054 is resolved.
         //assertEquals(expectConfirmation, actualConfirmation);

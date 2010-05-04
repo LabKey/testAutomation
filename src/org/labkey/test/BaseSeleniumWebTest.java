@@ -1216,6 +1216,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.open(getBaseURL() + relativeURL, millis);
     }
 
+    public String getConfirmationAndWait()
+    {
+        String confirmation = selenium.getConfirmation();
+        waitForPageToLoad();
+        return confirmation;
+    }
+    
     public void assertConfirmation(String msg)
     {
         assertEquals(msg, selenium.getConfirmation());

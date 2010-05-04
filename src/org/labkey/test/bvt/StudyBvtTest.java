@@ -274,8 +274,8 @@ public class StudyBvtTest extends StudyManualTest
         assertNavButtonPresent("Cancel");
         assertNavButtonPresent("Details");
         assertTextPresent("Not Yet Submitted");
-        clickNavButton("Submit");
-        selenium.getConfirmation();
+        clickNavButton("Submit", 0);
+        getConfirmationAndWait();
         clickLinkWithText("Specimen Requests");
         assertNavButtonNotPresent("Submit");
         assertNavButtonPresent("Details");
@@ -364,8 +364,8 @@ public class StudyBvtTest extends StudyManualTest
         assertTextPresent("These vials are very important.", 25);
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
-        clickMenuButton("Comments and QC", "Clear Vial Comments for Selected");
-        selenium.getConfirmation();
+        clickMenuButtonAndContinue("Comments and QC", "Clear Vial Comments for Selected");
+        getConfirmationAndWait();
         assertTextNotPresent("These vials are very important.");
         clearFilter("SpecimenDetail", "MouseId");
         assertTextPresent("These vials are very important.", 23);
@@ -420,8 +420,8 @@ public class StudyBvtTest extends StudyManualTest
         clickLinkWithText("View Existing Requests");
         clickNavButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
-        clickNavButton("Delete missing specimens");
-        selenium.getConfirmation();
+        clickNavButton("Delete missing specimens", 0);
+        getConfirmationAndWait();
         assertTextNotPresent("WARNING: Missing Specimens");
         assertTextPresent("Duke University");
         assertTextPresent("An Assay Plan");
@@ -462,8 +462,8 @@ public class StudyBvtTest extends StudyManualTest
 
         log("Test deleting rows in a dataset");
         checkCheckbox(Locator.raw("//input[contains(@value, '999320529')]"));
-        clickNavButton("Delete");
-        selenium.getConfirmation();
+        clickNavButton("Delete", 0);
+        getConfirmationAndWait();
         assertTextNotPresent("999320529");
 
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:

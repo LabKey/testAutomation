@@ -425,9 +425,8 @@ public class AssayTest extends AbstractAssayTest
 
         clickLinkWithText("details");
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        clickNavButton("Recall Rows");
-        selenium.getConfirmation();
-        waitForPageToLoad();
+        clickNavButton("Recall Rows", 0);
+        getConfirmationAndWait();
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
 
         // verify audit entry was adjusted
