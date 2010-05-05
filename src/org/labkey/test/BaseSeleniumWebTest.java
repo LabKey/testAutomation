@@ -3596,7 +3596,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(projectName);
         enterPermissionsUI();
         clickExtTab("Groups for project " + projectName);
-        boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup')]//td[text()='" + groupName + "']"));
+        boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         exitPermissionsUI();
         return ret;
     }
@@ -3621,7 +3621,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(projectName);
         enterPermissionsUI();
         clickExtTab("Groups for project " + projectName);
-        click(Locator.xpath("//div[contains(@class, 'pGroup')]//td[text()='" + groupName + "']"));
+        click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
         click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
         exitPermissionsUI();
