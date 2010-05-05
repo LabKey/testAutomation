@@ -1,6 +1,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -31,6 +32,10 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
     private static final String METADATA_OVERRIDE_ON_CLICK_MSG = "Metadata Button Clicked!";
     private static final String METADATA_OVERRIDE_LINK_BUTTON = "Standard link";
     private static final String METADATA_OVERRIDE_LINK = "announcements/begin";
+    private static final String METADATA_GET_BUTTON = "GET Button";
+    private static final String METADATA_GET_URL = "project/begin";
+    private static final String METADATA_LINK_BUTTON = "LINK Button";
+    private static final String METADATA_LINK_URL = "project/begin";
 
     private static final String JAVASCRIPT_LINK_BUTTON_TEXT = "JavaScript Link Button";
     private static final String JAVASCRIPT_ONCLICK_BUTTON_TEXT = "JavaScript OnClick Button";
@@ -56,13 +61,32 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         "                <ns:onClick>alert('" + METADATA_OVERRIDE_ON_CLICK_MSG + "');</ns:onClick>\n" +
         "            </ns:item>\n" +
         "            <ns:item text=\"" + METADATA_OVERRIDE_LINK_BUTTON + "\">\n" +
-        "                <ns:url>" + METADATA_OVERRIDE_LINK + "</ns:url>\n" +
+        "                <ns:target>" + METADATA_OVERRIDE_LINK + "</ns:target>\n" +
         "            </ns:item>\n" +
+        "        </ns:item>\n" +
+        "        <ns:item requiresSelection=\"true\" text=\"" + METADATA_GET_BUTTON + "\">\n" +
+        "            <ns:target method=\"GET\">" + METADATA_GET_URL + "</ns:target>\n" +
+        "        </ns:item>\n" +
+        "        <ns:item requiresSelection=\"true\" text=\"" + METADATA_LINK_BUTTON + "\">\n" +
+        "            <ns:target method=\"LINK\">" + METADATA_LINK_URL + "</ns:target>\n" +
         "        </ns:item>\n" +
         "    </ns:buttonBarOptions>  \n" +
         "  </ns:table>\n" +
         "</ns:tables>";
     }
+
+    private static final String PARAM_ECHO_JAVASCRIPT =
+            "<script type=\"text/javascript\">\n" +
+            "Ext.onReady(function()\n" +
+            "{\n" +
+            "    var html = \"\";\n" +
+            "    var parameters = LABKEY.ActionURL.getParameters();\n" +
+            "    for (var parameter in parameters)\n" +
+            "        html += parameter + \": \" + parameters[parameter] + \"<br>\";\n" +
+            "    document.getElementById(\"params\").innerHTML = html;\n" +
+            "});\n" +
+            "</script>\n" +
+            "<div id=\"params\">";
 
     private String getJavaScriptCustomizer()
     {
@@ -123,9 +147,14 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
 
         clickNavButton("Done");
         clickLinkWithText("view data");
-        assertNavButtonPresent("Insert New");
         assertNavButtonNotPresent(METADATA_OVERRIDE_BUTTON);
-
+        clickNavButton("Insert New");
+        setFormElement("quf_name", "Seattle");
+        clickNavButton("Submit");
+        clickNavButton("Insert New");
+        setFormElement("quf_name", "Portland");
+        clickNavButton("Submit");
+        
         // assert custom buttons can be added to the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
         selectQuery("lists", "Cities");
@@ -147,6 +176,8 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         waitForText("Edit Source", 10000);
         clickNavButton("Edit Source");
         setText("ff_metadataText", getMetadataXML(false));
+        clickNavButton("Save");
+        assertTextNotPresent("error");
         clickNavButton("View Data");
         verifyMetadataButtons();
 
@@ -157,6 +188,13 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         setFormElement("name", "buttonTest");
         setFormElement("title", "buttonTest");
         setWikiBody(getJavaScriptCustomizer());
+        clickNavButton("Save & Close");
+
+        addWebPart("Wiki");
+        createNewWikiPage("HTML");
+        setFormElement("name", "paramEcho");
+        setFormElement("title", "Parameter Echo");
+        setWikiBody(PARAM_ECHO_JAVASCRIPT);
         clickNavButton("Save & Close");
 
         waitForText(JAVASCRIPT_LINK_BUTTON_TEXT, 10000);
@@ -177,12 +215,33 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickMenuButtonAndContinue(JAVASCRIPT_MENU_BUTTON_TEXT, JAVASCRIPT_MENU_SUBBUTTON2_TEXT, JAVASCRIPT_MENU_SUBSUBBUTTON_TEXT);
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT3_TEXT);
 
+        assertNavButtonNotPresent(METADATA_GET_BUTTON);
+        assertNavButtonNotPresent(METADATA_LINK_BUTTON);
+
+        checkCheckboxByNameInDataRegion("Portland");
+        // wait for the button to enable:
+        waitForElement(Locator.navButton(METADATA_LINK_BUTTON), 10000);
+
+        // Verify that link buttons don't send parameters at all:
+        clickNavButton(METADATA_LINK_BUTTON);
+        assertTextNotPresent(".select");
+
+        // wait for the button to enable:
+        waitForElement(Locator.navButton(METADATA_GET_BUTTON), 10000);
+        
+        // Verify that GET buttons to send form values as GET parameters:
+        clickNavButton(METADATA_GET_BUTTON);
+        assertTextPresent(".select: 2");
+
         // Verify that the JavaScript button override added to the metadata-defined button bar, rather than replacing it:
         verifyMetadataButtons();
     }
 
     private void verifyMetadataButtons()
     {
+        // The query view webpart populates asynchronously, so we may need to wait for it to appear:
+        waitForElement(Locator.navButton(METADATA_OVERRIDE_BUTTON), 10000);
+
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonNotPresent("Insert New");
 
