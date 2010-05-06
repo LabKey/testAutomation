@@ -104,7 +104,7 @@ public class StudyManualTest extends StudyTest
 
         // upload datasets:
         clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Data Pipeline");
+        clickLinkWithText("Manage Files");
         clickNavButton("Setup");
         setPipelineRoot(getPipelinePath());
         clickLinkWithText("Pipeline");

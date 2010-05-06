@@ -84,7 +84,7 @@ public class StudySecurityTest extends StudyBaseTest
         exitPermissionsUI();
 
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Data Pipeline");
+        clickLinkWithText("Manage Files");
         waitForPipelineJobsToComplete(1, "study import");
     }
 

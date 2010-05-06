@@ -4387,7 +4387,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             copyFile(_specimenArchive, _copiedArchive);
 
             clickLinkWithText(_studyFolderName);
-            clickLinkWithText("Data Pipeline");
+            clickLinkWithText("Manage Files");
             clickNavButton("Process and Import Data");
             sleep(1000);
 
@@ -4429,7 +4429,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Waiting for completion of specimen archive " + _specimenArchive + " import");
 
             clickLinkWithText(_studyFolderName);
-            clickLinkWithText("Data Pipeline");
+            clickLinkWithText("Manage Files");
 
             waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import");
 

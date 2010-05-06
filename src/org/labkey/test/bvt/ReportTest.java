@@ -453,7 +453,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Data Pipeline");
+        clickLinkWithText("Manage Files");
         if (isTextPresent(item))
         {
             checkCheckbox(Locator.raw("//td[contains(text(), '" + item + "')]/../td/input"));

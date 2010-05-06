@@ -127,7 +127,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         selectOptionByValue("securityString", "BASIC_WRITE");
         clickNavButton("Create Study");
         clickLinkWithText(PROJECT_NAME + " Study");
-        clickLinkWithText("Data Pipeline");
+        clickLinkWithText("Manage Files");
         clickNavButton("Setup");
         setFormElement("path", getSampleRoot());
         submit();
