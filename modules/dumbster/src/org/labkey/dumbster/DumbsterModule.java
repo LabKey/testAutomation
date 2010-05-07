@@ -24,6 +24,7 @@ import org.labkey.dumbster.model.DumbsterManager;
 import org.labkey.dumbster.view.MailWebPart;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -45,14 +46,14 @@ public class DumbsterModule extends DefaultModule
         DumbsterManager.setInstance(new DumbsterManager());
     }
 
-    protected Collection<? extends WebPartFactory> createWebPartFactories()
+    protected Collection<WebPartFactory> createWebPartFactories()
     {
-        return Arrays.asList(new BaseWebPartFactory("Mail Record") {
+        return new ArrayList<WebPartFactory>(Arrays.asList(new BaseWebPartFactory("Mail Record") {
                 public WebPartView getWebPartView(ViewContext portalCtx, Portal.WebPart webPart) throws IllegalAccessException, InvocationTargetException
                 {
                     return new MailWebPart();
                 }
-            });
+            }));
     }
 
     public boolean hasScripts()
