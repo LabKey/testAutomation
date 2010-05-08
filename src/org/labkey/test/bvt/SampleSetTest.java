@@ -258,7 +258,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
         clickLinkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME);
         clickNavButton("Import More Samples");
-        clickRadioButtonById("replaceOverwriteChoice");
+        clickRadioButtonById("insertOrUpdateChoice");
         setFormElement("data", REPARENTED_CHILD_SAMPLE_SET_TSV);
         clickNavButton("Submit");
 
