@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -2815,15 +2816,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
     }
 
-    public void addField(String areaTitle, int index, String name, String label, String type)
+    // UNDONE: move usages to use ListHelper
+    public void addField(String areaTitle, int index, String name, String label, ListHelper.ListColumnType type)
     {
         String prefix = getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         selenium.click(addField);
-        waitForElement(Locator.xpath(prefix + "//input[@id='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(prefix + "//input[@id='ff_name" + index + "']", name);
-        setFormElement(prefix + "//input[@id='ff_label" + index + "']", label);
-        selectOptionByText(prefix + "//select[@id='ff_type" + index + "']", type);
+        waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
+        ListHelper.setColumnName(this, prefix, index, name);
+        ListHelper.setColumnLabel(this, prefix, index, label);
+        ListHelper.setColumnType(this, prefix, index, type);
     }
 
     public void setLongTextField(String elementName, String text)

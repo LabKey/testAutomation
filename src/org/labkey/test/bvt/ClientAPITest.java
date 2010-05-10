@@ -624,9 +624,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
 
         selenium.click(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
-        selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_name0']", "RunDate");
-        selenium.type(getPropertyXPath("Run Fields") + "//input[@id='ff_label0']", "Run Date");
-        selenium.select(getPropertyXPath("Run Fields") + "//select[@id='ff_type0']", "DateTime");
+        ListHelper.setColumnName(this, getPropertyXPath("Run Fields"), 0, "RunDate");
+        ListHelper.setColumnLabel(this, getPropertyXPath("Run Fields"), 0, "Run Date");
+        ListHelper.setColumnType(this, getPropertyXPath("Run Fields"), 0, ListHelper.ListColumnType.DateTime);
 
         sleep(1000);
         clickNavButton("Save", 0);
@@ -655,13 +655,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         clickNavButton("Add Field", 0);
 
-        selenium.type("//input[@id='ff_name0']", "species");
-        selenium.type("//input[@id='ff_label0']", "Species");
-
+        ListHelper.setColumnName(this, 0, "species");
+        ListHelper.setColumnLabel(this, 0, "Species");
+        
         clickNavButton("Add Field", 0);
 
-        selenium.type("//input[@id='ff_name1']", "color");
-        selenium.type("//input[@id='ff_label1']", "Color");
+        ListHelper.setColumnName(this, 1, "color");
+        ListHelper.setColumnLabel(this, 1, "Color");
 
         sleep(1000);
         clickNavButton("Save", 10000);

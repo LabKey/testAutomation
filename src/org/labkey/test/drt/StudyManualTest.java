@@ -20,6 +20,7 @@ import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -215,11 +216,13 @@ public class StudyManualTest extends StudyTest
                 "TextField\tTextField\txsd:string\tfalse\tThis is a text field");
 
         clickNavButton("Import", 0);
-        waitForElement(Locator.xpath("//input[@id='ff_label3']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//input[@name='ff_label3']"), WAIT_FOR_JAVASCRIPT);
 
         clickRadioButtonById("button_dataField");
 
-        addField("Dataset Fields", 4, "otherData", "Other Data", "Text (String)");
+        addField("Dataset Fields", 4, "otherData", "Other Data", ListHelper.ListColumnType.String);
+        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
+        waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), "aliasedColumn");
 
         clickNavButton("Save");

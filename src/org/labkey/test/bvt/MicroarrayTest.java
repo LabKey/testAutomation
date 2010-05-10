@@ -19,6 +19,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 
 /**
  * User: Erik
@@ -82,11 +83,11 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         waitForElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
         setFormElement(Locator.raw("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
-        addField("Batch Fields", 0, BATCH_STRING_FIELD, BATCH_STRING_FIELD, "Text (String)");
-        addField("Run Fields", 0, RUN_STRING_FIELD, RUN_STRING_FIELD, "Text (String)");
+        addField("Batch Fields", 0, BATCH_STRING_FIELD, BATCH_STRING_FIELD, ListHelper.ListColumnType.String);
+        addField("Run Fields", 0, RUN_STRING_FIELD, RUN_STRING_FIELD, ListHelper.ListColumnType.String);
         setFormElement("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']", XPATH_TEST);
-        addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, "Integer");
-        addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, "Text (String)");
+        addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
+        addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
         clickNavButton("Save & Close");

@@ -549,8 +549,10 @@ public class StudyBvtTest extends StudyManualTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
         clickNavButton("Edit Definition");
-        waitForElement(Locator.id("ff_name0"), WAIT_FOR_PAGE);
-        click(Locator.id("ff_name0"));
+        waitForElement(Locator.name("ff_name0"), WAIT_FOR_PAGE);
+        click(Locator.name("ff_name0"));
+        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
+        waitForElement(Locator.name("mvEnabled"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox("mvEnabled");
         setFormElement(Locator.id("propertyDescription"), COLUMN_DESC);
         // TODO: add lookups for current & other folders

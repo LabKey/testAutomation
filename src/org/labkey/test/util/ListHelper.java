@@ -173,7 +173,7 @@ public class ListHelper
 
     public enum ListColumnType
     {
-        Integer("Integer"), String("Text (String)"), DateTime("DateTime"), Boolean("Boolean"), Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer");
+        MutliLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), DateTime("DateTime"), Boolean("Boolean"), Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer");
 
         private final String _description;
 
@@ -296,8 +296,8 @@ public class ListHelper
         test.selectOptionByText("ff_keyType", listKeyType.toString());
         test.setFormElement("ff_keyName", listKeyName);
         test.clickNavButton("Create List", 0);
-        test.waitForElement(Locator.id("ff_description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        test.waitForElement(Locator.id("ff_name0"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.name("ff_description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.name("ff_name0"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         test.log("Check that list was created correctly");
         test.assertFormElementEquals("ff_name", listName);
@@ -312,9 +312,12 @@ public class ListHelper
             ListColumn col = cols[i-1];
             test.waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             test.clickNavButton("Add Field", 0);
-            test.setFormElement(Locator.id("ff_name" + i),  col.getName());
-            test.setFormElement(Locator.id("ff_label" + i), col.getLabel());
-            test.selectOptionByText("ff_type" + i, col.getType().toString());
+            test.setFormElement(Locator.name("ff_name" + i),  col.getName());
+            TAB(test, Locator.name("ff_name" +i));
+            test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
+            TAB(test, Locator.name("ff_label" +i));
+            test.setFormElement(Locator.name("ff_type" + i), col.getType().toString());
+            TAB(test, Locator.name("ff_type" +i));
             test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
             if (col.getFormat() != null)
             {
@@ -322,21 +325,34 @@ public class ListHelper
             }
 
             if (col.isMvEnabled())
-            {
-                test.checkCheckbox("mvEnabled");
-            }
+                clickMvEnabled(test, "");
 
             LookupInfo lookup = col.getLookup();
             if (lookup != null)
             {
-                test.mouseClick(Locator.id("partdown_lookup" + i).toString());
+                // click the combobox trigger image
+                test.click(Locator.xpath("//input[@name='ff_type" + i + "']/../img"));
+               // click lookup checkbox
+                test.waitForElement(Locator.xpath("//label[text()='Lookup']/../input"),BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+                test.click(Locator.xpath("//label[text()='Lookup']/../input"));
+
                 if (lookup.getFolder() != null)
                 {
-                    test.setFormElement("folder", lookup.getFolder());
+                    test.setFormElement(Locator.tagWithName("input","lookupContainer"), lookup.getFolder());
+                    TAB(test,Locator.tagWithName("input","container"));
                 }
-                test.setFormElement("schema", lookup.getSchema());
-                test.setFormElement("table", lookup.getTable());
-                test.clickNavButton("Close", 0);
+
+                test.setFormElement(Locator.tagWithName("input","schema"), lookup.getSchema());
+                TAB(test, Locator.tagWithName("input","schema"));
+
+                test.setFormElement(Locator.tagWithName("input","table"), lookup.getTable());
+                TAB(test, Locator.tagWithName("input","table"));
+                
+                //test.clickNavButton("Apply", 0);
+                test.click(Locator.tagWithText("button","Apply"));
+                
+                // wait a while to make sure rangeURI is set (async check)
+                test.sleep(1000);
             }
 
             FieldValidator validator = col.getValidator();
@@ -463,4 +479,75 @@ public class ListHelper
     {
         test.waitAndClick(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Delete List"), BaseSeleniumWebTest.WAIT_FOR_PAGE);
     }
+
+    public static void clickRow(BaseSeleniumWebTest test, int index)
+    {
+        clickRow(test, null, index);
+    }
+
+    public static void clickRow(BaseSeleniumWebTest test, String prefix, int index)
+    {
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
+        test.click(l);        
+    }
+    
+
+    public static void setColumnName(BaseSeleniumWebTest test, int index, String name)
+    {
+        setColumnName(test, null, index, name);
+    }
+    public static void setColumnName(BaseSeleniumWebTest test, String prefix, int index, String name)
+    {
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
+        test.setFormElement(l, name);
+        TAB(test, l);
+    }
+    public static void setColumnLabel(BaseSeleniumWebTest test, int index, String label)
+    {
+        setColumnLabel(test,null,index,label);
+    }
+    public static void setColumnLabel(BaseSeleniumWebTest test, String prefix, int index, String label)
+    {
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
+        test.setFormElement(l, label);
+        TAB(test, l);
+    }
+    public static void setColumnType(BaseSeleniumWebTest test, int index, ListHelper.ListColumnType type)
+    {
+        setColumnType(test, null, index, type);
+    }
+    public static void setColumnType(BaseSeleniumWebTest test, String prefix, int index, ListHelper.ListColumnType type)
+    {
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']");
+        test.setFormElement(l, type.toString());
+        TAB(test, l);
+    }
+
+    public static void selectPropertyTab(BaseSeleniumWebTest test, String name)
+    {
+        selectPropertyTab(test, null, name);
+    }
+    public static void selectPropertyTab(BaseSeleniumWebTest test, String prefix, String name)
+    {
+        test.click(Locator.xpath((null==prefix?"":prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
+    }
+
+
+    public static void clickMvEnabled(BaseSeleniumWebTest test, String prefix)
+    {
+        selectPropertyTab(test, prefix, "Advanced");
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='mvEnabled']");
+        test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.checkCheckbox(l);
+    }
+
+    public static void TAB(BaseSeleniumWebTest test, Locator l)
+    {
+        String sel = l.toString();
+        test.getWrapper().keyPress(sel, "\t");
+        test.getWrapper().keyDown(sel, "\t");
+        test.getWrapper().keyUp(sel, "\t");
+        test.sleep(50);
+    }
+    
 }

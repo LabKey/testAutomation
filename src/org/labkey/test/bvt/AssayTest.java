@@ -17,6 +17,8 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ListHelper;
+import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import java.io.File;
 
@@ -35,17 +37,17 @@ public class AssayTest extends AbstractAssayTest
     protected static final String TEST_ASSAY_SET_PROP_EDIT = "NewTargetStudy";
     protected static final String TEST_ASSAY_SET_PROP_NAME = "testAssaySetProp";
     protected static final int TEST_ASSAY_SET_PREDEFINED_PROP_COUNT = 2;
-    protected static final String[] TEST_ASSAY_SET_PROP_TYPES = { "Boolean", "Number (Double)", "Integer", "DateTime" };
+    protected static final ListColumnType[] TEST_ASSAY_SET_PROP_TYPES = { ListColumnType.Boolean, ListColumnType.Double, ListColumnType.Integer, ListColumnType.DateTime };
     protected static final String[] TEST_ASSAY_SET_PROPERTIES = { "false", "100.0", "200", "2001-10-10" };
     protected static final String TEST_ASSAY_RUN_PROP_NAME = "testAssayRunProp";
     protected static final int TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT = 0;
-    protected static final String[] TEST_ASSAY_RUN_PROP_TYPES = { "Text (String)", "Boolean", "Number (Double)", "Integer", "DateTime" };
+    protected static final ListColumnType[] TEST_ASSAY_RUN_PROP_TYPES = { ListColumnType.String, ListColumnType.Boolean, ListColumnType.Double, ListColumnType.Integer, ListColumnType.DateTime };
     protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     protected static final String TEST_ASSAY_DATA_ALIASED_PROP_NAME = "testAssayAliasedData";
     protected static final String ALIASED_DATA = "aliasedData";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
-    protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = { "Boolean", "Integer", "DateTime", "Text (String)" };
+    protected static final ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListColumnType.Boolean, ListColumnType.Integer, ListColumnType.DateTime, ListColumnType.String };
     protected static final String TEST_RUN1 = "FirstRun";
     protected static final String TEST_RUN1_COMMENTS = "First comments";
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
@@ -160,22 +162,16 @@ public class AssayTest extends AbstractAssayTest
         }
 
         // Set some to required
-        selenium.click(getPropertyXPath("Batch Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT) + "']");
-        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@name='required']");
+        setRequired("Batch Fields", TEST_ASSAY_SET_PREDEFINED_PROP_COUNT);
+        setRequired("Batch Fields", TEST_ASSAY_SET_PREDEFINED_PROP_COUNT+1);
+        setRequired("Run Fields", 0);
+        setRequired("Data Fields", 0);
+        setRequired("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2);
 
-        selenium.click(getPropertyXPath("Batch Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + "']");
-        selenium.click(getPropertyXPath("Batch Fields") + "//span/input[@name='required']");
-
-        selenium.click(getPropertyXPath("Run Fields") + "//td/input[@id='ff_name0']");
-        selenium.click(getPropertyXPath("Run Fields") + "//span/input[@name='required']");
-
-        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name0']");
-        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='required']");
-
-        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2) + "']");
-        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='required']");
-
-        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name" + (TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 3) + "']");
+        // import aliases
+        ListHelper.clickRow(this, getPropertyXPath("Data Fields"), TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 3);
+        click(Locator.xpath(getPropertyXPath("Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
+        waitForElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td/input[@id='importAliases']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td/input[@id='importAliases']"), TEST_ASSAY_DATA_ALIASED_PROP_NAME);
 
         sleep(1000);
@@ -183,6 +179,15 @@ public class AssayTest extends AbstractAssayTest
         waitForText("Save successful.", 20000);
 
     } //defineAssay()
+
+    private void setRequired(String where, int index)
+    {
+        String prefix = getPropertyXPath(where);
+        ListHelper.clickRow(this, prefix, index);
+        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
+    }
+
 
     /**
      * Generates the text that appears in the target study drop-down for a given study name
@@ -448,9 +453,9 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY);
         click(Locator.linkWithText("manage assay design >>"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']"), WAIT_FOR_JAVASCRIPT);
-        selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
-        selenium.type(getPropertyXPath("Data Fields") + "//td/input[@id='ff_label5']", TEST_ASSAY_DATA_PROP_NAME + "edit");
+        waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
+        ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
+        ListHelper.setColumnLabel(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         selenium.mouseClick(getPropertyXPath("Data Fields") + "//div[@id='partdelete_4']");
         clickNavButton("OK", 0); // Confirm the deletion
         waitForElement(Locator.raw("//td/img[@id='partdeleted_4']"), WAIT_FOR_JAVASCRIPT);

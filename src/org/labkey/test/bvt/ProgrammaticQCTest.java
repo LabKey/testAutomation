@@ -44,7 +44,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
-    protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = { "Boolean", "Integer", "DateTime" };
+    protected static final ListHelper.ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
 
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
             "s1\ta\t1\ttrue\t20\t2000-01-01\n" +
@@ -155,7 +155,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         }
 
         // add an 'animal' field which will be populated by the transform script
-        addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Animal", "Animal", "Text (String)");
+        addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Animal", "Animal", ListHelper.ListColumnType.String);
 
         sleep(1000);
         clickNavButton("Save", 0);

@@ -18,6 +18,7 @@ package org.labkey.test.ms2;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 
 import java.io.IOException;
 
@@ -55,9 +56,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAME);
 
-        addField("Run Fields", 0, "IntegerField", "IntegerField", "Integer");
-        addField("Run Fields", 1, "TextField", "TextField", "Text (String)");
-        addField("Run Fields", 2, "BooleanField", "BooleanField", "Boolean");
+        addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelper.ListColumnType.Integer);
+        addField("Run Fields", 1, "TextField", "TextField", ListHelper.ListColumnType.String);
+        addField("Run Fields", 2, "BooleanField", "BooleanField", ListHelper.ListColumnType.Boolean);
 
         sleep(1000);
         clickNavButton("Save", 0);

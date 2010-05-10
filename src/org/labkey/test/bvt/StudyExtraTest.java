@@ -159,7 +159,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		clickNavButton("Create List", 0);
         waitForElement(Locator.navButton("Add Field"),30000);
         clickNavButton("Add Field", 0);
-		selenium.type("ff_name1", "Value");
+        ListHelper.setColumnName(this, 1, "Value");
         clickNavButton("Save", 0);
         waitForElement(Locator.navButton("Done"), 30000);
         clickNavButton("Done");
@@ -238,7 +238,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         setFormElement("typeName", "Simple");
         clickNavButton("Next");
         waitForElement(Locator.raw("ff_name0"), WAIT_FOR_JAVASCRIPT);
-        selenium.type("ff_name0", "Value");
+        ListHelper.setColumnName(this, 0, "Value");
         clickNavButton("Save");
         waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("View Data");
@@ -276,7 +276,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
     protected static final int TEST_ASSAY_SET_PREDEFINED_PROP_COUNT = 2;
     protected static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
     protected static final String[] TEST_ASSAY_DATA_PROP_NAMES = {"Value" };
-    protected static final String[] TEST_ASSAY_DATA_PROP_TYPES = {"Integer" };
+    protected static final ListHelper.ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelper.ListColumnType.Integer };
     // protected final static int WAIT_FOR_JAVASCRIPT = 5000;  uncomment to override base class
 
     /**
@@ -323,9 +323,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
             selenium.click(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
-            selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_name" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-            selenium.type(getPropertyXPath("Data Fields") + "//input[@id='ff_label" + i + "']", TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-            selenium.select(getPropertyXPath("Data Fields") + "//select[@id='ff_type" + i + "']", TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            ListHelper.setColumnLabel( this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            ListHelper.setColumnType(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
         }
 
         sleep(1000);

@@ -483,16 +483,16 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
 
         int index = AssayTest.TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT;
-        addField("Data Fields", index++, "age", "Age", "Integer");
-        addField("Data Fields", index++, "sex", "Sex", "Text (String)");
+        addField("Data Fields", index++, "age", "Age", ListHelper.ListColumnType.Integer);
+        addField("Data Fields", index++, "sex", "Sex", ListHelper.ListColumnType.String);
         sleep(1000);
 
         log("setting fields to enable missing values");
-        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name4']");
-        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='mvEnabled']");
+        ListHelper.clickRow(this, getPropertyXPath("Data Fields"), 4);
+        ListHelper.clickMvEnabled(this, getPropertyXPath("Data Fields")); 
 
-        selenium.click(getPropertyXPath("Data Fields") + "//td/input[@id='ff_name5']");
-        selenium.click(getPropertyXPath("Data Fields") + "//span/input[@name='mvEnabled']");
+        ListHelper.clickRow(this, getPropertyXPath("Data Fields"), 5);
+        ListHelper.clickMvEnabled(this, getPropertyXPath("Data Fields"));
 
         clickNavButton("Save & Close");
         assertNoLabkeyErrors();

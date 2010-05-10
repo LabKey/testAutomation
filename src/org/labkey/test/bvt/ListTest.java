@@ -131,13 +131,13 @@ if (!INCREMENTALTEST){
         log("Setup project and list module");
         createProject(PROJECT_NAME);
 
+        log("Add list -- " + LIST_NAME);
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
         clickEditDesign();
         setFormElement("ff_description", LIST_DESCRIPTION);
-        //setFormElement("ff_keyName", LIST_KEY_NAME2);
-        setFormElement("ff_name0", LIST_KEY_NAME2);
+        setColumnName(0, LIST_KEY_NAME2);
         clickSave();
 
         log("Check that edit list definition worked");
@@ -186,28 +186,30 @@ if (!INCREMENTALTEST){
         clickLinkWithText("Lists");
         clickLinkWithText("view design");
         clickEditDesign();
-        setFormElement(Locator.id("ff_name1"), _listCol1.getName());
-        setFormElement(Locator.id("ff_label1"), _listCol1.getLabel());
+        setColumnName(1,_listCol1.getName());
+        setColumnLabel(1, _listCol1.getLabel());
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name4"), _listCol4.getName());
-        setFormElement(Locator.id("ff_label4"), _listCol4.getLabel());
-        selectOptionByText("ff_type4", _listCol4.getType().toString());
+        setColumnName(4,_listCol4.getName());
+        setColumnLabel(4, _listCol4.getLabel());
+        setColumnType(4, _listCol4.getType());
         setFormElement(Locator.id("propertyDescription"), _listCol4.getDescription());
 
         // Create "Hidden Field" and remove from all views.
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name5"), _listCol5.getName());
-        setFormElement(Locator.id("ff_label5"), _listCol5.getLabel());
-        selectOptionByText("ff_type5", _listCol5.getType().toString());
+        setColumnName(5, _listCol5.getName());
+        setColumnLabel(5,_listCol5.getLabel());
+        setColumnType(5,_listCol5.getType());
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
 
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name6"), _listCol6.getName());
-        setFormElement(Locator.id("ff_label6"), _listCol6.getLabel());
-        selectOptionByText("ff_type6", _listCol6.getType().toString());
+        setColumnName(6, _listCol6.getName());
+        setColumnLabel(6,_listCol6.getLabel());
+        setColumnType(6,_listCol6.getType());
+        selectPropertyTab("Advanced");
+        waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), ALIASED_KEY_NAME);
 
         mouseClick(Locator.id("partdown_2").toString());
@@ -286,13 +288,13 @@ if (!INCREMENTALTEST){
         log("Check hidden field is hidden only where specified.");
         dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
+        setColumnName(5,_listCol5.getName()); // Select Hidden field.
         checkCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
         mouseClick(Locator.id("partdown_2").toString());
         clickDone();
 
         log("Check that hidden column is hidden.");
-        clickLinkWithText("view data");
+//        clickLinkWithText("view data");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
@@ -309,12 +311,12 @@ if (!INCREMENTALTEST){
 
         dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
+        setColumnName(5,_listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
         checkCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
         clickDone();
 
-        clickLinkWithText("view data");
+//        clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
@@ -328,12 +330,12 @@ if (!INCREMENTALTEST){
 
         dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
+        setColumnName(5,_listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
         checkCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
         clickDone();
 
-        clickLinkWithText("view data");
+//        clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
@@ -347,12 +349,12 @@ if (!INCREMENTALTEST){
 
         dataregionToEditDesign();
 
-        setFormElement(Locator.id("ff_name5"), _listCol5.getName()); // Select Hidden field.
+        setColumnName(5,_listCol5.getName()); // Select Hidden field.
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
         checkCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
         clickDone();
 
-        clickLinkWithText("view data");
+//        clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from details view.
@@ -471,7 +473,7 @@ if (!INCREMENTALTEST){
         log("Create second project");
         createProject(PROJECT_NAME2);
 
-        log("Add List");
+        log("Add List -- " + LIST3_NAME);
         ListHelper.createList(this, PROJECT_NAME2, LIST3_NAME, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
         assertTextPresent("<AUTO> (Owner)");
 
@@ -479,7 +481,7 @@ if (!INCREMENTALTEST){
         ListHelper.uploadData(this, PROJECT_NAME2, LIST3_NAME, LIST3_DATA);
 
         log("Navigate back to first project");
-        log("Add second list");
+        log("Add list -- " + LIST2_NAME);
         ListHelper.createList(this, PROJECT_NAME, LIST2_NAME, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, _list3Col1);
 
         log("Upload data to second list");
@@ -611,14 +613,14 @@ if (!INCREMENTALTEST){
         ListHelper.createList(this, PROJECT_NAME, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
         clickEditDesign();
-        setFormElement(Locator.id("ff_name1"), "FooFoo");
-        setFormElement(Locator.id("ff_label1"), "");
+        setColumnName(1,"FooFoo");
+        setColumnLabel(1,"");
         clickSave();
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
         clickEditDesign();
         clickNavButton("Add Field", 0);
-        setFormElement(Locator.id("ff_name2"), "BarBar");
+        setColumnName(2,"BarBar");
         clickSave();
         assertTextPresent("FooFoo");
         assertTextPresent("BarBar");
@@ -706,7 +708,7 @@ if (!INCREMENTALTEST){
 
     void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
     {
-        log("Add List");
+        log("Add List -- " + name);
         ListHelper.createList(this, PROJECT_NAME, name, cols.get(0).getType(), cols.get(0).getName(),
                 cols.subList(1,cols.size()).toArray(new ListHelper.ListColumn[cols.size()-1]));
         clickEditDesign();
@@ -805,5 +807,30 @@ if (!INCREMENTALTEST){
     void clickDeleteList()
     {
         ListHelper.clickDeleteList(this);
+    }
+
+    void selectPropertyTab(String name)
+    {
+        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
+    }
+
+    void setColumnName(int index, String name)
+    {
+        setFormElement(Locator.name("ff_name"+index), name);
+        TAB(Locator.name("ff_name"+index));
+    }
+    void setColumnLabel(int index, String label)
+    {
+        setFormElement(Locator.name("ff_label"+index), label);
+        TAB(Locator.name("ff_label"+index));
+    }
+    void setColumnType(int index, ListHelper.ListColumnType type)
+    {
+        setFormElement(Locator.name("ff_type"+index), type.toString());
+        TAB(Locator.name("ff_type"+index));
+    }
+    void TAB(Locator l)
+    {
+        ListHelper.TAB(this,l);
     }
 }

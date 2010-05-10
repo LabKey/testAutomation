@@ -17,6 +17,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -188,9 +189,9 @@ public class StudyTest extends StudyBaseTest
         checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
 
         // add a comment field
-        setFormElement(Locator.id("ff_name" + 0),  COMMENT_FIELD_NAME);
-        setFormElement(Locator.id("ff_label" + 0), PARTICIPANT_COMMENT_LABEL);
-        selectOptionByText("ff_type" + 0, "Multi-Line Text");
+        ListHelper.setColumnName(this, 0, COMMENT_FIELD_NAME);
+        ListHelper.setColumnLabel(this, 0, PARTICIPANT_COMMENT_LABEL);
+        ListHelper.setColumnType(this, 0, ListHelper.ListColumnType.MutliLine);
         clickNavButton("Save");
 
         log("creating the participant/visit comment dataset");
@@ -202,9 +203,9 @@ public class StudyTest extends StudyBaseTest
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         // add a comment field
-        setFormElement(Locator.id("ff_name" + 0),  COMMENT_FIELD_NAME);
-        setFormElement(Locator.id("ff_label" + 0), PARTICIPANT_VISIT_COMMENT_LABEL);
-        selectOptionByText("ff_type" + 0, "Multi-Line Text");
+        ListHelper.setColumnName(this, 0, COMMENT_FIELD_NAME);
+        ListHelper.setColumnLabel(this, 0, PARTICIPANT_VISIT_COMMENT_LABEL);
+        ListHelper.setColumnType(this, 0, ListHelper.ListColumnType.MutliLine);
         clickNavButton("Save");
 
         log("configure comments");
