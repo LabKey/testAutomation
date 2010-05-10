@@ -32,6 +32,13 @@ public class ModuleAssayTest extends AbstractAssayTest
     private static final String MODULE_NAME = "miniassay";
     private static final String ASSAY_NAME = "My Simple Assay";
 
+    private static final String SAMPLE_SET = "Test Sample Set";
+    private static final String SAMPLE_SET_ROWS = "Name\tBarcode\n" +
+            "First\t251379110131_A01\n" +
+            "Second\t251379110131_A01\n" +
+            "Third\t\n" +
+            "Fourth\t\n";
+
     public String getAssociatedModuleDirectory()
     {
         return "study";
@@ -132,6 +139,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         createProject(PROJECT_NAME);
         setupPipeline(PROJECT_NAME);
         createAssayDesign();
+        createSampleSet();
     }
 
     protected void createAssayDesign()
@@ -154,6 +162,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         sleep(1000);
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
+    }
+
+    protected void createSampleSet()
+    {
+        log("Creating sample set");
+        clickLinkWithText(PROJECT_NAME);
+
+        addWebPart("Sample Sets");
+        clickNavButton("Import Sample Set");
+        setFormElement("name", SAMPLE_SET);
+        setFormElement("data", SAMPLE_SET_ROWS);
+        submit();
     }
 
     protected void uploadBatch(String batchName, String... uploadedFiles)
