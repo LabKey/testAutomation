@@ -2173,7 +2173,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickExtTab(String tabname)
     {
         log("Selecting Ext tab " + tabname);
-        mouseDownAt(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']"), 0, 0);
+        click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']"));
     }
 
     public void clickExtToolbarButton(String caption)
@@ -2895,11 +2895,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
-     * Clicks the ext menu item and optional submenu labels's (for cascading menus)
+     * Clicks the labkey menu item and optional submenu labels's (for cascading menus)
      */
     public void clickMenuButton(String MenusLabel, String ... subMenusLabels)
     {
         ExtHelper.clickMenuButton(this, true, MenusLabel, subMenusLabels);
+    }
+
+    /**
+     * Clicks the ext menu item and optional submenu labels's (for cascading menus)
+     */
+    public void clickExtMenuButton(String MenusLabel, String ... subMenusLabels)
+    {
+        ExtHelper.clickExtMenuButton(this, true, MenusLabel, subMenusLabels);
     }
 
     /**
