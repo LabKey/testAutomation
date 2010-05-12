@@ -26,11 +26,31 @@ import org.labkey.test.Locator;
 public class ExtHelper
 {
     /**
-     * Clicks the ext menu item from the submenu specified by the ext object's text
+     * Clicks the labkey menu item from the submenu specified by the menu object's text
      */
     public static void clickMenuButton(BaseSeleniumWebTest test, boolean wait, String MenusLabel, String ... subMenuLabels)
     {
         test.clickAndWait(Locator.navButton(MenusLabel), 0);
+        for (int i = 0; i < subMenuLabels.length - 1; i++)
+        {
+            Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
+            test.waitForElement(parentLocator, 1000);
+            test.mouseOver(parentLocator);
+        }
+        Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
+        test.waitForElement(itemLocator, 1000);
+        if(wait)
+            test.clickAndWait(itemLocator);
+        else
+            test.click(itemLocator);
+    }
+
+    /**
+     * Clicks the ext menu item from the submenu specified by the ext object's text
+     */
+    public static void clickExtMenuButton(BaseSeleniumWebTest test, boolean wait, String MenusLabel, String ... subMenuLabels)
+    {
+        test.clickAndWait(Locator.extButton(MenusLabel), 0);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(subMenuLabels[i]);

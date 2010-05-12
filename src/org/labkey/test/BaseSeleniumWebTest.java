@@ -2904,6 +2904,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     /**
      * Clicks the ext menu item and optional submenu labels (for cascading menus)
+     */
+    public void clickExtMenuButton(String MenusLabel, String ... subMenusLabels)
+    {
+        ExtHelper.clickExtMenuButton(this, true, MenusLabel, subMenusLabels);
+    }
+   
+    /**
+     * Clicks the ext menu item and optional submenu labels's (for cascading menus)
      * Does not wait for page load.
      */
     public void clickMenuButtonAndContinue(String MenusLabel, String ... subMenusLabels)

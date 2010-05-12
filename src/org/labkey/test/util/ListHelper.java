@@ -358,6 +358,7 @@ public class ListHelper
             FieldValidator validator = col.getValidator();
             if (validator != null)
             {
+                test.clickExtTab("Validators");
                 if (validator instanceof RegExValidator)
                     test.clickNavButton("Add Regular Expression Validator", 0);
                 else
@@ -521,6 +522,20 @@ public class ListHelper
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']");
         test.setFormElement(l, type.toString());
         TAB(test, l);
+    }
+    public static void setColumnType(BaseSeleniumWebTest test, int index, LookupInfo lookup)
+    {
+        setColumnType(test, null, index, lookup);
+    }
+    public static void setColumnType(BaseSeleniumWebTest test, String prefix, int index, LookupInfo lookup)
+    {
+        test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']"));
+        if ( test.isAlertPresent() ) test.getAlert(); // Don't worry about schema alert until saving.
+        test.click(Locator.xpath("//div[./label[text() = 'Lookup']]/input[@type = 'radio']"));
+        if ( lookup.getFolder() != null ) test.setFormElement("lookupContainer", lookup.getFolder());
+        if ( lookup.getSchema() != null ) test.setFormElement("schema", lookup.getSchema());
+        if ( lookup.getTable() != null ) test.setFormElement("table", lookup.getTable());
+        test.clickNavButton("Apply", 0);
     }
 
     public static void selectPropertyTab(BaseSeleniumWebTest test, String name)
