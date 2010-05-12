@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.drt.StudyBaseTest;
+import org.labkey.test.util.ListHelper;
 
 /**
  * User: klum
@@ -256,8 +257,8 @@ public class QuerySnapshotTest extends StudyBaseTest
 
             String xpath = getPropertyXPath("Dataset Fields") + "//span" + Locator.navButton("Add Field").getPath();
             selenium.click(xpath);
-            setFormElement(getPropertyXPath("Dataset Fields") + "//td/input[@id='ff_name" + index + "']", keyField);
-            selectOptionByText(getPropertyXPath("Dataset Fields") + "//td/select[@id='ff_type" + index + "']", "Integer");
+            ListHelper.setColumnName(this, index, keyField);
+            ListHelper.setColumnType(this, index, ListHelper.ListColumnType.Integer);
 
             sleep(1000);
             clickRadioButtonById("button_managedField");
