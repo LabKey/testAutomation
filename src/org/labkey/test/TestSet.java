@@ -33,9 +33,9 @@ public enum TestSet
         BasicTest.class,
         JUnitTest.class,
         SecurityTest.class,
-        FlowTest.class,
-        XTandemTest.class,
-        StudyTest.class
+//        FlowTest.class,
+//        XTandemTest.class,
+//        StudyTest.class
     }),
 
     BVT(DRT, new Class[] {
@@ -43,7 +43,7 @@ public enum TestSet
         ExpTest.class,
         AssayTest.class,
         StudyBvtTest.class,
-        PipelineBvtTest.class,
+        //PipelineBvtTest.class,
         //FileContentTest.class,
         ClientAPITest.class,
         MissingValueIndicatorsTest.class,
