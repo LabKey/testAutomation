@@ -19,6 +19,7 @@ package org.labkey.test.drt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -108,11 +109,10 @@ public class ExpTest extends BaseSeleniumWebTest
         // Edit the metadata to use a special date format
         clickMenuButton("Query", "Edit Source");
         clickNavButton("Edit Metadata");
-        waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
-        waitForElement(Locator.raw("//td/input[@id='ff_label5']"), defaultWaitForPage);
-        selenium.type("//td/input[@id='ff_label5']", "editedCreated");
+        waitForElement(Locator.name("ff_label5"), WAIT_FOR_JAVASCRIPT);
+        ListHelper.setColumnLabel(this, 5, "editedCreated");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
-        selenium.click("//span" + Locator.navButton("Save").getPath());
+        clickNavButton("Save", 0);
         waitForText("Save successful.", 10000);
 
         // Verify that it ended up in the XML version of the metadata
@@ -137,14 +137,12 @@ public class ExpTest extends BaseSeleniumWebTest
         selenium.click("//span" + Locator.navButton("OK").getPath());
 
         // Make it a lookup into our custom query
-        int fieldCount = selenium.getXpathCount("//div[contains(@id, 'partdown_lookup')]").intValue();
-        mouseClick(Locator.id("partdown_lookup" + (fieldCount - 1)).toString());
-        setFormElement("schema", "exp");
-        setFormElement("table", "dataCustomQuery");
-        clickNavButton("Close", 0);
+        int fieldCount = selenium.getXpathCount("//input[contains(@name, 'ff_type')]").intValue();
+        ListHelper.setColumnType(this, fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
+        mouseClick(Locator.name("ff_type" + (fieldCount - 1)).toString());
 
         // Save it
-        selenium.click("//span" + Locator.navButton("Save").getPath());
+        clickNavButton("Save", 0);
         waitForText("Save successful.", 10000);
         clickNavButton("Edit Source");
         clickNavButton("View Data");
