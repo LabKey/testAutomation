@@ -2895,7 +2895,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
-     * Clicks the labkey menu item and optional submenu labels's (for cascading menus)
+     * Clicks the labkey menu item and optional submenu labels (for cascading menus)
      */
     public void clickMenuButton(String MenusLabel, String ... subMenusLabels)
     {
@@ -2903,7 +2903,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
-     * Clicks the ext menu item and optional submenu labels's (for cascading menus)
+     * Clicks the ext menu item and optional submenu labels (for cascading menus)
      * Does not wait for page load.
      */
     public void clickMenuButtonAndContinue(String MenusLabel, String ... subMenusLabels)
