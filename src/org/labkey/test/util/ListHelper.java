@@ -47,9 +47,9 @@ public class ListHelper
 
         public LookupInfo(String folder, String schema, String table)
         {
-            _folder = folder;
-            _schema = schema;
-            _table = table;
+            _folder = (folder == "" ? null : folder);
+            _schema = (schema == "" ? null : schema);
+            _table = (table == "" ? null : table);
         }
 
         public String getFolder()
