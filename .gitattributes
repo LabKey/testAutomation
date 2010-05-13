@@ -63,6 +63,8 @@ src/org/labkey/test/bvt/RlabkeyTest.java -text
 src/org/labkey/test/bvt/SampleSetTest.java -text
 src/org/labkey/test/bvt/SchemaBrowserTest.java -text
 src/org/labkey/test/bvt/ScriptValidationTest.java -text
+src/org/labkey/test/bvt/SearchHelper.java -text
+src/org/labkey/test/bvt/SearchTest.java -text
 src/org/labkey/test/bvt/SimpleApiTest.java -text
 src/org/labkey/test/bvt/SimpleModuleTest.java -text
 src/org/labkey/test/bvt/SpecimenTest.java -text

@@ -33,9 +33,9 @@ public enum TestSet
         BasicTest.class,
         JUnitTest.class,
         SecurityTest.class,
-//        FlowTest.class,
-//        XTandemTest.class,
-//        StudyTest.class
+        FlowTest.class,
+        XTandemTest.class,
+        StudyTest.class
     }),
 
     BVT(DRT, new Class[] {
@@ -43,12 +43,11 @@ public enum TestSet
         ExpTest.class,
         AssayTest.class,
         StudyBvtTest.class,
-        //PipelineBvtTest.class,
+        PipelineBvtTest.class,
         //FileContentTest.class,
         ClientAPITest.class,
         MissingValueIndicatorsTest.class,
         ReportTest.class,
-        SchemaBrowserTest.class,
         MicroarrayTest.class,
         ViabilityTest.class,
         ButtonCustomizationTest.class,
@@ -102,7 +101,8 @@ public enum TestSet
         SCHARPStudyTest.class,
         IDRIParticleSizeTest.class,
         CohortTest.class,
-        RlabkeyTest.class
+        RlabkeyTest.class,
+        SearchTest.class
     }),
 
     Cluster(new Class[]

@@ -119,6 +119,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setUp() throws Exception {
         selenium = new DefaultSeleniumWrapper();
         selenium.start();
+        selenium.setTimeout(Integer.toString(defaultWaitForPage));
         //Now inject our standard javascript functions...
         InputStream inputStream = BaseSeleniumWebTest.class.getResourceAsStream("seleniumHelpers.js");
         String script = getStreamContentsAsString(inputStream);
