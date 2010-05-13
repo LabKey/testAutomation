@@ -260,7 +260,7 @@ public class QuerySnapshotTest extends StudyBaseTest
             ListHelper.setColumnName(this, index, keyField);
             ListHelper.setColumnType(this, index, ListHelper.ListColumnType.Integer);
 
-            sleep(1000);
+            click(Locator.name("ff_name0"));
             clickRadioButtonById("button_managedField");
             selectOptionByText("list_managedField", keyField);
             clickNavButton("Save", WAIT_FOR_JAVASCRIPT);
