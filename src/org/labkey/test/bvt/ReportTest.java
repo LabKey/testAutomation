@@ -521,6 +521,7 @@ public class ReportTest extends StudyBaseTest
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
         clickMenuButton("Views", "default");
+        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
         clickMenuButton("Views", "Create", "Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
