@@ -162,7 +162,7 @@ public class JUnitTest extends TestSuite
             }
             else
             {
-                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + "): " + url);
+                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + HttpStatus.getStatusText(status) + "): " + url);
             }
         }
         finally
