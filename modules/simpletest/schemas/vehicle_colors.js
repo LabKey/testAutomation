@@ -5,7 +5,7 @@
  */
 // ================================================
 
-print("** evaluating: " + this['javax.script.filename']);;
+print("** evaluating: " + this['javax.script.filename']);
 
 var Debug = {
     addBefore : function (obj, fname, before) {
@@ -22,18 +22,12 @@ var Debug = {
     }
 };
 
-var totalcalls = 0;
 function trace(args, oldFn, thiz)
 {
     var msg = oldFn.name + "(";
     for (var i = 0; i < args.length; i++)
         msg += (i > 0 ? ", " : "") + args[i];
     msg += ")";
-
-    if (!oldFn.callcount)
-        oldFn.callcount = 0;
-    var count = ++oldFn.callcount;
-    print(msg + " (callcount=" + count + "/" + (++totalcalls) + ")");
 
     // return arguments needed by oldFn
     return args;
@@ -43,37 +37,60 @@ function trace(args, oldFn, thiz)
 
 var hexRe = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
-function init_insert(rows, errors) {
-    for (var i in rows) {
-        var row = rows[i];
-        if (row.Name == "Glucose") {
-            errors[i] = { Name : "Glucose isn't the name of a color!" };
-        }
-    }
+var rows = [];
+
+// called once before insert/update/delete
+function init(event, errors) {
 }
 
-function before_insert(row, errors) {
+function beforeInsert(row, errors) {
     // Throwing a script exception will cancel the insert.
     if (row.Hex && row.Hex[0] != "#")
-        throw new Error("Hex color value must start with '#'");
+        throw new Error("color value must start with '#'");
 
     // Any errors added to the error map will cancel the insert
     // and show up next to the field with the error.
     if (row.Hex && !hexRe.test(row.Hex))
-        errors.Hex = "Hex color value must be of the form #abc or #aabbcc";
+        errors.Hex = "color value must be of the form #abc or #aabbcc";
 
     // Returning false will cancel the insert with a
     // generic error message for the row.
     if (row.Name == "Muave")
         return false;
 
+    // Values can be transformed during insert and update
     row.Name = row.Name + "!";
+    rows.push(row);
 }
 
-function complete_insert(rows, errors) {
+function beforeUpdate(row, oldRow, errors) {
+    // Woah, scary! Even the pk 'Name' can be changed during update.
+    if (row.Name[row.Name.length - 1] == "!")
+        row.Name = row.Name.substring(0, row.Name.length-1) + "?";
+
+    if (oldRow.Hex != row.Hex)
+        errors.Hex = "once set, cannot be changed";
 }
 
-Debug.addBefore(this, 'init_insert', trace);
-Debug.addBefore(this, 'before_insert', trace);
-Debug.addBefore(this, 'complete_insert', trace);
+function afterUpdate(row, oldRow, errors) {
+    if (row.Name[row.Name.length - 1] != "?")
+        throw new Error("Expected color name to end in '?'");
+}
+
+// called once after insert/update/delete
+function complete(event, errors) {
+    if (event == "insert") {
+        for (var i in rows) {
+            var row = rows[i];
+            if (row.Name == "Glucose!") {
+                errors.push({ Name : "Glucose isn't the name of a color!", _rowNumber: i });
+            }
+        }
+    }
+}
+
+Debug.addBefore(this, 'init', trace);
+Debug.addBefore(this, 'beforeInsert', trace);
+Debug.addBefore(this, 'beforeUpdate', trace);
+Debug.addBefore(this, 'complete', trace);
 
