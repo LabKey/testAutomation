@@ -81,10 +81,10 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent("Example 5 Run");
         clickLinkWithText(RUN_NAME);
         clickLinkWithText("graph summary view");
-//        clickImageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP);
-//        clickImageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE);
-//        assertTextPresent("CAexample_mini.mzXML");
-//        assertTextPresent("Not available on disk");
+        clickImageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP);
+        clickImageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE);
+        assertTextPresent("CAexample_mini.mzXML");
+        assertTextPresent("Not available on disk");
 
         // Write a simple custom query that wraps the data table
         clickTab("Query");
