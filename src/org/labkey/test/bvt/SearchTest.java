@@ -18,7 +18,7 @@ public class SearchTest extends StudyTest
     private static final String PROJECT_NAME = "SearchTest Project";
     private static final String FOLDER_A = "Folder Apple";
     private static final String FOLDER_B = "Folder Banana"; // Folder move destination
-    private static final String FOLDER_C = "Folder Chery"; // Folder rename name.
+    private static final String FOLDER_C = "Folder Cherry"; // Folder rename name.
     private static final String GROUP_NAME = "Test Group";
     private static final String USER1 = "user1@search.test";
 
@@ -79,9 +79,11 @@ public class SearchTest extends StudyTest
 
     protected void doVerifySteps()
     {
+        sleep(10000); // wait for indexer
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
         renameFolder(getProjectName(), getFolderName(), FOLDER_C, false);
         FOLDER_NAME = FOLDER_C;
+        sleep(10000); // wait for indexer
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
         moveFolder(getProjectName(), getFolderName(), FOLDER_B, false);
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
