@@ -16,6 +16,9 @@
 package org.labkey.test.bvt;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseSeleniumWebTest;
@@ -81,24 +84,9 @@ public class ScriptValidationTest extends SimpleModuleTest
     {
         try
         {
-            log("** Try inserting Glucose");
-            insertColors(Arrays.asList(
-                    new ColorRecord("Red", "#f00"),
-                    new ColorRecord("Blue", "#0f0"),
-                    new ColorRecord("Glucose", "")
-            ));
-            fail("Should throw an exception for Glucose");
-        }
-        catch (Exception e)
-        {
-            assertEquals("Row 2 has error: Name: Glucose isn't the name of a color!", e.getMessage());
-        }
-
-        try
-        {
-            log("** Try inserting bad hex value");
+            log("** Test errors: throw Error()'");
             insertColors(Arrays.asList(new ColorRecord("ShouldError", "not a hex value")));
-            fail("Should throw an exception for invalid hex values");
+            fail("Should throw an exception");
         }
         catch (Exception e)
         {
@@ -108,37 +96,171 @@ public class ScriptValidationTest extends SimpleModuleTest
 
         try
         {
-            log("** Try inserting bad hex value again");
-            insertColors(Arrays.asList(new ColorRecord("ShouldError", "#still not a hex value")));
-            fail("Should throw an exception for invalid hex values");
+            log("** Test errors: Field='message'");
+            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorMessage", null)));
+            fail("Should throw an exception");
         }
-        catch (Exception e)
+        catch (CommandException e)
         {
-            assertEquals("Hex: color value must be of the form #abc or #aabbcc", e.getMessage());
+            assertEquals("single message", e.getMessage());
+
+            JSONObject properties = (JSONObject)e.getProperties();
+            JSONArray errors = (JSONArray)properties.get("errors");
+            assertEquals(1, errors.size());
+
+            JSONObject error = (JSONObject)errors.get(0);
+            assertEquals("Hex", error.get("field"));
+            assertEquals("single message", error.get("message"));
         }
 
         try
         {
-            log("** Try inserting Muave");
-            insertColors(Arrays.asList(new ColorRecord("Muave", "")));
-            fail("Should throw an exception for invalid hex values");
+            log("** Test errors: Field=[array of messages]");
+            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorArray", null)));
+            fail("Should throw an exception");
         }
-        catch (Exception e)
+        catch (CommandException e)
+        {
+            assertEquals("one error message; two error message!; ha ha ha!; also an error here", e.getMessage());
+
+            JSONObject properties = (JSONObject)e.getProperties();
+            assertEquals(0, ((Number)properties.get("rowNumber")).intValue());
+            
+            JSONArray errors = (JSONArray)properties.get("errors");
+            assertEquals(4, errors.size());
+
+            JSONObject error0 = (JSONObject)errors.get(0);
+            assertEquals("Name", error0.get("field"));
+            assertEquals("one error message", error0.get("message"));
+
+            JSONObject error1 = (JSONObject)errors.get(1);
+            assertEquals("Name", error1.get("field"));
+            assertEquals("two error message!", error1.get("message"));
+
+            JSONObject error2 = (JSONObject)errors.get(2);
+            assertEquals("Name", error2.get("field"));
+            assertEquals("ha ha ha!", error2.get("message"));
+
+            JSONObject error3 = (JSONObject)errors.get(3);
+            assertEquals("Hex", error3.get("field"));
+            assertEquals("also an error here", error3.get("message"));
+        }
+
+        try
+        {
+            log("** Test errors: row level error");
+            insertColors(Arrays.asList(new ColorRecord("TestRowError", null)));
+            fail("Should throw an exception");
+        }
+        catch (CommandException e)
+        {
+            assertEquals("boring error message", e.getMessage());
+
+            JSONObject properties = (JSONObject)e.getProperties();
+            assertEquals(0, ((Number)properties.get("rowNumber")).intValue());
+
+            JSONArray errors = (JSONArray)properties.get("errors");
+            assertEquals(1, errors.size());
+
+            JSONObject error0 = (JSONObject)errors.get(0);
+//            assertNull(error0.get("field"));
+            assertEquals("boring error message", error0.get("message"));
+        }
+
+        try
+        {
+            log("** Test errors: returning false");
+            insertColors(Arrays.asList(new ColorRecord("TestReturnFalse", "")));
+            fail("Should throw an exception");
+        }
+        catch (CommandException e)
         {
             assertEquals("beforeInsert validation failed", e.getMessage());
+
+            JSONObject properties = (JSONObject)e.getProperties();
+            assertEquals(0, ((Number)properties.get("rowNumber")).intValue());
+
+            JSONArray errors = (JSONArray)properties.get("errors");
+            assertEquals(1, errors.size());
+
+            JSONObject error0 = (JSONObject)errors.get(0);
+            assertFalse(error0.containsKey("field"));
+            assertEquals("beforeInsert validation failed", error0.get("message"));
         }
 
         try
         {
-            log("** try updating hex value");
+            log("** Test errors: error in complete");
+            insertColors(Arrays.asList(
+                    new ColorRecord("Red", "#f00"),
+                    new ColorRecord("Blue", "#0f0"),
+                    new ColorRecord("TestErrorInComplete", "")
+            ));
+            fail("Should throw an exception");
+        }
+        catch (CommandException e)
+        {
+            assertEquals("Row 2: TestErrorInComplete error one; TestErrorInComplete error two\n" +
+                    "Row 2: TestErrorInComplete error three!", e.getMessage());
+
+            JSONObject properties = (JSONObject)e.getProperties();
+
+            JSONArray errors = (JSONArray)properties.get("errors");
+            assertEquals(2, errors.size());
+
+            JSONObject error0 = (JSONObject)errors.get(0);
+            assertFalse(error0.containsKey("field"));
+            assertFalse(error0.containsKey("message"));
+            assertEquals(2, ((Number)error0.get("rowNumber")).intValue());
+
+            JSONArray error0errors = (JSONArray)error0.get("errors");
+            assertEquals(2, error0errors.size());
+            assertEquals("Hex", ((JSONObject)error0errors.get(0)).get("field"));
+            assertEquals("TestErrorInComplete error one", ((JSONObject)error0errors.get(0)).get("message"));
+            assertEquals("Hex", ((JSONObject)error0errors.get(1)).get("field"));
+            assertEquals("TestErrorInComplete error two", ((JSONObject)error0errors.get(1)).get("message"));
+
+
+            JSONObject error1 = (JSONObject)errors.get(1);
+            JSONArray error1errors = (JSONArray)error1.get("errors");
+            assertEquals(2, ((Number)error1.get("rowNumber")).intValue());
+            assertEquals("Name", ((JSONObject)error1errors.get(0)).get("field"));
+            assertEquals("TestErrorInComplete error three!", ((JSONObject)error1errors.get(0)).get("message"));
+        }
+
+        try
+        {
+            log("** Test errors: adding array of errors in complete");
+            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorArrayInComplete", "")));
+            fail("Should throw an exception");
+        }
+        catch (CommandException e)
+        {
+            assertEquals("one error message; two error message", e.getMessage());
+        }
+
+        try
+        {
+            log("** Test errors: script level variables, color regular expression");
+            insertColors(Arrays.asList(new ColorRecord("ShouldError", "#still not a hex value")));
+            fail("Should throw an exception");
+        }
+        catch (CommandException e)
+        {
+            assertEquals("color value must be of the form #abc or #aabbcc", e.getMessage());
+        }
+
+        try
+        {
+            log("** Test errors: updating hex value");
             ColorRecord red = selectColor("Red?").get(0);
             red.hex = "shouldn't happen";
             updateColors(Arrays.asList(red));
-            fail("Should throw an exception for trying to update hex");
+            fail("Should throw an exception");
         }
-        catch (Exception e)
+        catch (CommandException e)
         {
-            assertEquals("Hex: once set, cannot be changed", e.getMessage());
+            assertEquals("once set, cannot be changed", e.getMessage());
         }
     }
 
