@@ -43,12 +43,10 @@
         <ns:isReadOnly>true</ns:isReadOnly>
         <ns:isKeyField>true</ns:isKeyField>
         <ns:isHidden>true</ns:isHidden>
-        <ns:url>/simpletest/manufactuer.view?rowid=${RowId}</ns:url>
       </ns:column>
       <ns:column columnName="Name">
         <ns:datatype>varchar</ns:datatype>
         <ns:scale>255</ns:scale>
-        <ns:url>/simpletest/manufactuer.view?rowid=${RowId}</ns:url>
       </ns:column>
     </ns:columns>
   </ns:table>
@@ -85,6 +83,7 @@
 
   <ns:table tableName="Vehicles" tableDbType="TABLE">
     <ns:pkColumnName>RowId</ns:pkColumnName>
+    <ns:tableUrl>/simpletest/vehicle.view?rowid=${RowId}</ns:tableUrl>
     <ns:columns>
       <ns:column columnName="RowId">
         <ns:datatype>serial</ns:datatype>
@@ -94,7 +93,6 @@
         <ns:isReadOnly>true</ns:isReadOnly>
         <ns:isKeyField>true</ns:isKeyField>
         <ns:isHidden>true</ns:isHidden>
-        <ns:url>/simpletest/vehicle.view?rowid=${RowId}</ns:url>
       </ns:column>
       <ns:column columnName="Container">
         <ns:isUserEditable>false</ns:isUserEditable>

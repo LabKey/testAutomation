@@ -134,7 +134,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertNotNull(priusId);
         assertNotNull(f150Id);
 
-        log("** Testing vehicle.Model url link...");
+        log("** Testing vehicle.Model RowId url link...");
         beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickLinkWithText("Prius");
@@ -208,6 +208,17 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName());
         assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
         assertEquals(4, ((Number)(updateRows.getRows().get(0).get("Milage"))).intValue());
+
+
+        log("** Testing vehicle.Vehicles details url link...");
+        beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
+        viewQueryData(VEHICLE_SCHEMA, "Vehicles");
+        clickLinkWithText("details");
+        assertTextPresent("Hooray!");
+        rowidStr = getText(Locator.id("vehicle.rowid"));
+        rowid = Integer.parseInt(rowidStr);
+        assertTrue("Expected rowid on vehicle.html page", rowid > 0);
+
 
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);

@@ -17,6 +17,7 @@ modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
 modules/simpletest/views/model.html -text
 modules/simpletest/views/other.html -text
+modules/simpletest/views/vehicle.html -text
 modules/simpletest/views/webpart.html -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
