@@ -270,14 +270,14 @@ public class SearchTest extends StudyTest
         if (isFileUploadAvailable())
         {
             clickLinkWithText("Attach a file", false);
-            File file = new File(getLabKeyRoot() + "/server/config.properties");
+            File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
             setFormElement("formFiles[0]", file);
         }
         clickNavButton("Submit");
 
         SearchHelper.enqueueSearchItem(MESSAGE_TITLE, Locator.linkContainingText(MESSAGE_TITLE));
         SearchHelper.enqueueSearchItem(MESSAGE_BODY, Locator.linkContainingText(MESSAGE_TITLE));
-        SearchHelper.enqueueSearchItem("system instances", Locator.linkContainingText("\"config.properties\" attached to message \"" + MESSAGE_TITLE + "\"")); // some text from attached file
+        SearchHelper.enqueueSearchItem("persimmon", Locator.linkContainingText("\"fruits.tsv\" attached to message \"" + MESSAGE_TITLE + "\"")); // some text from attached file
     }
 
     private void addSearchableFiles()
