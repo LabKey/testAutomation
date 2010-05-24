@@ -105,10 +105,9 @@ public class StudyManualTest extends StudyTest
 
         // upload datasets:
         clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Files");
-        clickNavButton("Setup");
         setPipelineRoot(getPipelinePath());
-        clickLinkWithText("Pipeline");
+        clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Manage Files");
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("datasets"));
         ExtHelper.waitForImportDataEnabled(this);
