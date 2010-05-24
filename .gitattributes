@@ -11,8 +11,9 @@ modules/simpletest/queries/vehicle/Toyotas.sql -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-0.10.sql -text
+modules/simpletest/schemas/lists/People.js -text
 modules/simpletest/schemas/vehicle.xml -text
-modules/simpletest/schemas/vehicle_colors.js -text
+modules/simpletest/schemas/vehicle/colors.js -text
 modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
 modules/simpletest/views/model.html -text
