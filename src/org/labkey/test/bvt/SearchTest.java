@@ -81,7 +81,7 @@ public class SearchTest extends StudyTest
         addSearchableStudy(); // Must come first;  Creates project.
         addSearchableContainers();
         addSearchableList();
-        addSearchableReports();
+        //addSearchableReports(); // Reports not currently indexed.
         addSearchableWiki();
         addSearchableIssues();
         addSearchableMessages();
