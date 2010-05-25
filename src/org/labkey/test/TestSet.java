@@ -58,7 +58,9 @@ public enum TestSet
     {
         XTandemTest.class,
         MascotTest.class,
-        SequestTest.class
+        SequestTest.class,
+        MS2BvtTest.class,
+        MS2BvtTestGZ.class,
     }),
 
     Daily(600000, new Class[]
