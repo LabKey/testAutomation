@@ -124,10 +124,10 @@ public class Crawler
 
     public class CrawlStats
     {
-        private int _newPages;
-        private int _uniqueActions;
-        private int _crawlTestLength;
-        private int _maxDepth;
+        private final int _newPages;
+        private final int _uniqueActions;
+        private final int _crawlTestLength;
+        private final int _maxDepth;
 
         public CrawlStats(int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
         {
@@ -406,6 +406,7 @@ public class Crawler
                 linkCount++;
             }
         }
+
         _crawlTime = (int) (System.currentTimeMillis() - startTime);
         return linkCount;
     }
