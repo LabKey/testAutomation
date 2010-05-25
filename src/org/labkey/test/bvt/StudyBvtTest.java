@@ -469,7 +469,7 @@ public class StudyBvtTest extends StudyManualTest
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage QC States");
+        clickLinkWithText("Manage Dataset QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickNavButton("Save");
 

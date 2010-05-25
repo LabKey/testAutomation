@@ -99,7 +99,7 @@ public class StudyManualTest extends StudyTest
         // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage QC States");
+        clickLinkWithText("Manage Dataset QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickNavButton("Save");
 

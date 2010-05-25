@@ -89,7 +89,7 @@ public class StudyTest extends StudyBaseTest
         // configure QC state management before importing duplicate data
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage QC States");
+        clickLinkWithText("Manage Dataset QC States");
         setFormElement("newLabel", "unknown QC");
         setFormElement("newDescription", "Unknown data is neither clean nor dirty.");
         clickCheckboxById("dirty_public");
