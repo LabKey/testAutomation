@@ -320,7 +320,6 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         clickTab("Wiki");
         clickLinkWithText("Terms of Use");
-        searchFor(PROJECT_NAME, "fight club", 1, "Terms of Use");
         clickLinkWithText("edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
