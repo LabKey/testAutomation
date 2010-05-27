@@ -19,7 +19,7 @@ package org.labkey.test;
 import org.labkey.test.bvt.*;
 import org.labkey.test.daily.*;
 import org.labkey.test.drt.*;
-import org.labkey.test.module.ModuleTest;
+import org.labkey.test.module.*;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.SequestTest;
@@ -169,6 +169,10 @@ public enum TestSet
 
     Weekly(BVTnDaily, new Class[] {
             // Add special test classes, not in daily or BVT.
+    }),
+
+    Adaptive(new Class[]{
+            AdaptiveTest.class
     }),
 
     CONTINUE(new Class[] {})
