@@ -951,7 +951,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 log("Found " + leakCount + " in-use objects; rerunning GC.  ("
                         + (GC_ATTEMPT_LIMIT - attempt) + " attempt(s) remaining.)");
             }
-            beginAt("/admin/memTracker.view?gc=true&clearCaches=true");
+            beginAt("/admin/memTracker.view?gc=1&clearCaches=1");
             if (!isTextPresent("In-Use Objects"))
                 fail("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
             leakCount = getImageWithAltTextCount("expand/collapse");
