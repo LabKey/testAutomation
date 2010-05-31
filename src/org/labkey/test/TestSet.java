@@ -103,7 +103,7 @@ public enum TestSet
         SCHARPStudyTest.class,
         IDRIParticleSizeTest.class,
         CohortTest.class,
-        RlabkeyTest.class,
+        //RlabkeyTest.class,
         SearchTest.class
     }),
 
