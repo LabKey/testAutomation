@@ -221,7 +221,7 @@ public class SearchTest extends StudyTest
         createPermissionsGroup(GROUP_NAME, USER1);
         clickNavButton("Save and Finish");
         clickLinkWithText(getFolderName());
-        addWebPart("Issues");
+        addWebPart("Issues Summary");
 
         // Setup issues options.
         clickLinkWithText("Issues Summary");
