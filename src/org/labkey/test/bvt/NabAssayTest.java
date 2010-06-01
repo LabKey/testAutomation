@@ -240,7 +240,46 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextPresent("ptid 1 C, Vst 1.0");
             assertTextPresent("&lt; 20", 10);
             // check for the first dilution for the second participant:
+            // Five Parameter IC50
             assertTextPresent("561");
+            // Five PL AUC
+            assertTextPresent("0.077");
+            // Five PL posAUC
+            assertTextPresent("0.081");
+            // Polynomial IC50:
+            assertTextNotPresent("503");
+            // Four parameter IC50
+            assertTextNotPresent("461");
+
+            clickLinkContainingText("View With Curve Type", false);
+            clickAndWait(Locator.menuItem("Four Parameter"));
+            // Five Parameter IC50
+            assertTextNotPresent("561");
+            // Polynomial IC50:
+            assertTextNotPresent("503");
+            // Four parameter IC50
+            assertTextPresent("461");
+            // 4PL AUC/PosAUC
+            assertTextPresent("0.043");
+            // Five PL AUC
+            assertTextNotPresent("0.077");
+
+            clickLinkContainingText("View With Curve Type", false);
+            clickAndWait(Locator.menuItem("Polynomial"));
+            // Five Parameter IC50
+            assertTextNotPresent("561");
+            // Polynomial IC50:
+            assertTextPresent("503");
+            // Four parameter IC50
+            assertTextNotPresent("461");
+            // Polynomial AUC:
+            assertTextPresent("0.054");
+            // Polynomial posAUC:
+            assertTextPresent("0.055");
+            // Five PL AUC
+            assertTextNotPresent("0.077");
+            // 4PL AUC/PosAUC
+            assertTextNotPresent("0.043");
 
             // test creating a custom details view via a "magic" named run-level view:
             clickLinkWithText("View Runs");
