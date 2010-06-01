@@ -154,7 +154,7 @@ if (!INCREMENTALTEST){
         assertTextPresent("could not be matched to a field");
         setFormElement("ff_data", TEST_FAIL2);
         submit();
-        assertTextPresent("could not be matched to a field");
+        assertTextPresent("must be of type");
         setFormElement("ff_data", LIST_DATA);
         submit();
 
