@@ -62,7 +62,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         enableModule(PROJECT_NAME, "Dumbster");
 
         clickLinkWithText(PROJECT_NAME);
-        addWebPart("Issues");
+        addWebPart("Issues Summary");
         addWebPart("Search");
         assertTextPresent("Open");
 
