@@ -43,7 +43,10 @@ public class SearchHelper
             }
             if ( container != null )
             {
-                test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
+                if ( test.isLinkPresentContainingText("@files") )
+                    test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
+                else
+                    test.assertLinkPresentWithText(container);
             }
             if ( crawlResults )
             {

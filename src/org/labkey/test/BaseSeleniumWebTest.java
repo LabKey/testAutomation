@@ -931,6 +931,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void checkLeaksAndErrors()
     {
 		checkErrors();
+        waitForPageToLoad();
 		checkLeaks();
         _checkedLeaksAndErrors = true;
     }

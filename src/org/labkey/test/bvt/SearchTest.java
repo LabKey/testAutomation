@@ -88,7 +88,7 @@ public class SearchTest extends StudyTest
         if (isFileUploadAvailable())
         {
             // TODO: enable once files move with their container
-            //addSearchableFiles();
+            addSearchableFiles();
         }
     }
 
