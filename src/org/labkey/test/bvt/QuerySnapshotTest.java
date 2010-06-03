@@ -128,6 +128,11 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickMenuButton("QC State", "All data");
         waitForSnapshotUpdate("Armenian");
 
+        log("delete the snapshot");
+        clickMenuButton("Views", "Edit Snapshot");
+        clickNavButton("Delete Snapshot", 0);
+        getConfirmationAndWait();
+
         // snapshot over a custom view
         // test automatic updates by altering the source dataset
         log("create a snapshot over a custom view");
@@ -159,6 +164,11 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickMenuButton("QC State", "All data");
 
         waitForSnapshotUpdate("Slovakian");
+
+        log("delete the snapshot");
+        clickMenuButton("Views", "Edit Snapshot");
+        clickNavButton("Delete Snapshot", 0);
+        getConfirmationAndWait();
 
         // snapshot over a custom query
         log("create a snapshot over a custom query");
@@ -235,6 +245,10 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickLinkWithText(FOLDER_2);
         clickLinkWithText(CROSS_STUDY_SNAPSHOT);
         waitForSnapshotUpdate("Undecided");
+
+        clickMenuButton("Views", "Edit Snapshot");
+        clickNavButton("Delete Snapshot", 0);
+        getConfirmationAndWait();
     }
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic)
