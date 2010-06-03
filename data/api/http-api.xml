@@ -82,7 +82,6 @@
 },
 "columnModel":[
     {
-        "scale": 30,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -93,7 +92,6 @@
         "header": "Color"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -105,7 +103,6 @@
         "tooltip": "What the color is like"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "right",
@@ -117,7 +114,6 @@
         "tooltip": "When to wear the color"
     },
     {
-        "scale": 10,
         "hidden": false,
         "sortable": true,
         "align": "right",
@@ -261,7 +257,6 @@
 },
 "columnModel":[
     {
-        "scale": 30,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -272,7 +267,6 @@
         "header": "Color"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -284,7 +278,6 @@
         "tooltip": "What the color is like"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "right",
@@ -296,7 +289,6 @@
         "tooltip": "When to wear the color"
     },
     {
-        "scale": 10,
         "hidden": false,
         "sortable": true,
         "align": "right",
@@ -445,7 +437,6 @@
 },
 "columnModel":[
     {
-        "scale": 30,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -456,7 +447,6 @@
         "header": "Color"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -468,7 +458,6 @@
         "tooltip": "What the color is like"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "right",
@@ -480,7 +469,6 @@
         "tooltip": "When to wear the color"
     },
     {
-        "scale": 10,
         "hidden": false,
         "sortable": true,
         "align": "right",
@@ -616,7 +604,6 @@
 },
 "columnModel":[
     {
-        "scale": 30,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -627,7 +614,6 @@
         "header": "Color"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "left",
@@ -639,7 +625,6 @@
         "tooltip": "What the color is like"
     },
     {
-        "scale": 100,
         "hidden": false,
         "sortable": true,
         "align": "right",
@@ -651,7 +636,6 @@
         "tooltip": "When to wear the color"
     },
     {
-        "scale": 10,
         "hidden": false,
         "sortable": true,
         "align": "right",
