@@ -78,13 +78,14 @@ public class SearchTest extends StudyTest
 
     protected void doCreateSteps()
     {
+        deleteIndex();
         addSearchableStudy(); // Must come first;  Creates project.
         addSearchableContainers();
         addSearchableList();
         //addSearchableReports(); // Reports not currently indexed.
         addSearchableWiki();
         addSearchableIssues();
-        addSearchableMessages();
+        //addSearchableMessages();
         if (isFileUploadAvailable())
         {
             // TODO: enable once files move with their container
@@ -104,6 +105,14 @@ public class SearchTest extends StudyTest
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
 
         _testDone = true;
+    }
+
+    private void deleteIndex()
+    {
+        ensureAdminMode();
+        goToAdmin();
+        clickLinkWithText("full-text search");
+        clickNavButton("Delete Index");
     }
 
     @Override
