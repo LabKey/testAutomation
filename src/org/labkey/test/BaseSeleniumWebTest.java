@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 
 import static org.labkey.test.WebTestHelper.*;
 
@@ -931,7 +932,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void checkLeaksAndErrors()
     {
 		checkErrors();
-        waitForPageToLoad();
 		checkLeaks();
         _checkedLeaksAndErrors = true;
     }
@@ -952,14 +952,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 log("Found " + leakCount + " in-use objects; rerunning GC.  ("
                         + (GC_ATTEMPT_LIMIT - attempt) + " attempt(s) remaining.)");
             }
-            beginAt("/admin/memTracker.view?gc=1&clearCaches=1");
+            beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
                 fail("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
             leakCount = getImageWithAltTextCount("expand/collapse");
         }
 
         if (leakCount > MAX_LEAK_LIMIT)
-            fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
+        {
+            String leaks = selenium.getText(Locator.xpath("//table[@name = 'leaks']").toString());
+            CRC32 crc = new CRC32();
+            crc.update(leaks.getBytes());
+            if(leakCRC != crc.getValue())
+            {
+                leakCRC = crc.getValue();
+                dumpHeap();
+                fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
+            }
+            log("Found " + leakCount + " in-use objects.  They appear to be from the previous test.");
+        }
         else
             log("Found " + leakCount + " in-use objects.  This is within the expected number of " + MAX_LEAK_LIMIT + ".");
     }
@@ -1050,6 +1061,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         catch (Exception e)
         {
             log("Error executing dump()");
+        }
+    }
+
+    public void dumpHeap()
+    {
+        try
+        {
+            beginAt("/admin/dumpHeap.view");
+            File dumpDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
+            String dumpMsg = selenium.getText("xpath=//td[@id='bodypanel']/div");
+            String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
+            File heapDump = new File(getLabKeyRoot() + "/build/deploy", filename);
+
+            heapDump.renameTo(new File(dumpDir, filename));
+            publishArtifact(heapDump);
+        }
+        catch (Exception e)
+        {
+            log("Error dumping heap.");
         }
     }
 
