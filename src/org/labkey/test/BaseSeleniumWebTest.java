@@ -1070,22 +1070,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         try
         {
             beginAt("/admin/dumpHeap.view");
-            File dumpDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
+            File destDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
             String dumpMsg = selenium.getText("xpath=//td[@id='bodypanel']/div");
             String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
             File heapDump = new File(getLabKeyRoot() + "/build/deploy", filename);
-            File dest = new File(dumpDir, filename);
-            if (!dest.exists())
-                dest.mkdirs();
+            if (!destDir.exists())
+                destDir.mkdirs();
             
-            if (heapDump.renameTo(dest))
+            if (heapDump.renameTo(new File(destDir, filename)))
                 publishArtifact(heapDump);
             else
-                log("Unable to move heapDump to test logs directory.");
+                log("Unable to move HeapDump file to test logs directory.");
         }
         catch (Exception e)
         {
-            log("Error dumping heap.");
+            log("Error dumping heap: " + e.getMessage());
         }
         popLocation(); // go back to get screenshot if needed.
     }
