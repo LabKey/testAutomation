@@ -1060,15 +1060,35 @@
             <fileset dir="${project.root}/remoteapi/r/test">
                 <include name="listArchive.zip"/>
                 <include name="vignette.R"/>
+                <include name="instwin.r"/>
           </fileset>
         </copy>
+        
         <condition property="r.path" value="${env.R_HOME}/R" else="R">
             <isset property="env.R_HOME"/>
         </condition>
-        <copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true" file="${project.root}/remoteapi/r/build/Rlabkey_latest.tar.gz"/>
-        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
+        
+        <copy todir="${project.root}/sampledata/rlabkey" >
+            <fileset dir="${project.root}/remoteapi/r/latest">
+            	<include name="Rlabkey*.zip"/>
+          </fileset>
+        </copy>
+        <exec dir="${project.root}/sampledata/rlabkey" executable="Rterm" osfamily="windows" failifexecutionfails="false" input="${project.root}/remoteapi/r/test/instwin.r">
+            <arg line="--vanilla" />
+        </exec>
+        
+        
+	 <copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true" >
+	             <fileset dir="${project.root}/remoteapi/r/latest">
+	             	<include name="Rlabkey*.tar.gz"/>
+	           </fileset>
+	</copy>
+        
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey"  osfamily="unix"  failifexecutionfails="false" searchpath="true">
             <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
         </exec>
+
+
     </target>
 </project>
 
