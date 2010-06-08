@@ -1066,6 +1066,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void dumpHeap()
     {
+        pushLocation();
         try
         {
             beginAt("/admin/dumpHeap.view");
@@ -1073,14 +1074,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             String dumpMsg = selenium.getText("xpath=//td[@id='bodypanel']/div");
             String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
             File heapDump = new File(getLabKeyRoot() + "/build/deploy", filename);
-
-            heapDump.renameTo(new File(dumpDir, filename));
-            publishArtifact(heapDump);
+            File dest = new File(dumpDir, filename);
+            if (!dest.exists())
+                dest.mkdirs();
+            
+            if (heapDump.renameTo(dest))
+                publishArtifact(heapDump);
+            else
+                log("Unable to move heapDump to test logs directory.");
         }
         catch (Exception e)
         {
             log("Error dumping heap.");
         }
+        popLocation(); // go back to get screenshot if needed.
     }
 
     // Publish artifacts while the build is still in progrss:
