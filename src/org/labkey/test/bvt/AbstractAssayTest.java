@@ -210,7 +210,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickNavButton("Study Security");
 
         selectOptionByValue("securityString", "ADVANCED_READ");
-        selenium.waitForPageToLoad("30000");
+        waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 

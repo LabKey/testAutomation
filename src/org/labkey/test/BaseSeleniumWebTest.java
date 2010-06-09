@@ -67,6 +67,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private List<String> _createdProjects = new ArrayList<String>();
     private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
     protected boolean _testFailed = true;
+    protected boolean _testTimeout = false;
     protected int defaultWaitForPage = 60000;
     public final static int WAIT_FOR_PAGE = 60000;
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
@@ -855,6 +856,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 {
                     dump();
                     dumpPipelineLogFiles(getLabKeyRoot() + "/sampledata");
+                    if(_testTimeout)
+                        dumpThreads();
                 }
                 log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
             }
@@ -1087,6 +1090,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Error dumping heap: " + e.getMessage());
         }
         popLocation(); // go back to get screenshot if needed.
+    }
+
+    public void dumpThreads()
+    {
+        pushLocation();
+        try
+        {
+            File threadDumpRequest = new File(getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
+            threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
+        }
+        catch (Exception e)
+        {
+            log("Error dumping threads: " + e.getMessage());
+        }
+        log("Timeout - Threads dumped to standard labkey log file");
+        popLocation();
     }
 
     // Publish artifacts while the build is still in progrss:
@@ -1723,8 +1742,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("ERROR: Unexpected alert.\n" + selenium.getAlert());
         else
         {
-            selenium.setTimeout(Integer.toString(millis));
+            _testTimeout = true;
             selenium.waitForPageToLoad(Integer.toString(millis));
+            _testTimeout = false;
         }
     }
 

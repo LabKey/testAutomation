@@ -337,7 +337,7 @@ public class StudyBvtTest extends StudyManualTest
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED_READ");
-        selenium.waitForPageToLoad("30000");
+        waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='Users']/..//input[@value='READ']"));
         clickAndWait(Locator.id("groupUpdateButton"));
@@ -439,7 +439,7 @@ public class StudyBvtTest extends StudyManualTest
         clickNavButton("Study Security");
 
         selectOptionByValue("securityString", "BASIC_WRITE");
-        selenium.waitForPageToLoad("30000");
+        waitForPageToLoad(30000);
 
         clickLinkWithText(getFolderName());
         clickLinkWithText("DEM-1: Demographics");

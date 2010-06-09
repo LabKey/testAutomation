@@ -72,7 +72,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         enterPermissionsUI();
         clickNavButton("Study Security");
         selectOptionByValue("securityString", "BASIC_WRITE");
-        selenium.waitForPageToLoad("30000");
+        waitForPageToLoad(30000);
 
         // shut off demographics bit to allow for insert
         clickLinkWithText(folderName);

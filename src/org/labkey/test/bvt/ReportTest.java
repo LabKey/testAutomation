@@ -491,7 +491,7 @@ public class ReportTest extends StudyBaseTest
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED_READ");
-        selenium.waitForPageToLoad("30000");
+        waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
