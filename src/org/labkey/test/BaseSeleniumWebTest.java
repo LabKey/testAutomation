@@ -4335,7 +4335,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         public void open(String url, int millis)
         {
             setTimeout("" + millis);
+            _testTimeout = true;
             super.open(url);
+            _testTimeout = false;
         }
 
         @Override
