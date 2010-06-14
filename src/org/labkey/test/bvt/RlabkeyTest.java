@@ -34,6 +34,7 @@ public class RlabkeyTest extends SimpleApiTest
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
     private static final String LIST_NAME = "AllTypes";
     private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")";
+    private static final String FOLDER_NAME = "RlabkeyTest";
 
     @Override
     public void runUITests() throws Exception
@@ -50,7 +51,7 @@ public class RlabkeyTest extends SimpleApiTest
             fail("Unable to locate the list archive: " + listArchive.getName());
 
         ListHelper.importListArchive(this, PROJECT_NAME, listArchive);
-        createSubfolder(PROJECT_NAME, "test", new String[0]);
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
 
         RReportHelper.ensureRConfig(this);
     }

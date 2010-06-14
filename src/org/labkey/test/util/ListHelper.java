@@ -196,6 +196,7 @@ public class ListHelper
         private String _description;
         private String _format;
         private boolean _mvEnabled;
+        private boolean _required;
         private LookupInfo _lookup;
         private FieldValidator _validator;
         private String _url;
@@ -277,6 +278,16 @@ public class ListHelper
             _mvEnabled = mvEnabled;
         }
 
+        public boolean isRequired()
+        {
+            return _required;
+        }
+
+        public void setRequired(boolean required)
+        {
+            _required = required;
+        }
+
         public void setURL(String url)
         {
             _url = url;
@@ -326,6 +337,9 @@ public class ListHelper
 
             if (col.isMvEnabled())
                 clickMvEnabled(test, "");
+
+            if (col.isRequired())
+                clickRequired(test, "");
 
             LookupInfo lookup = col.getLookup();
             if (lookup != null)
@@ -547,6 +561,14 @@ public class ListHelper
         test.click(Locator.xpath((null==prefix?"":prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
     }
 
+
+    public static void clickRequired(BaseSeleniumWebTest test, String prefix)
+    {
+        selectPropertyTab(test, prefix, "Validators");
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='required']");
+        test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.checkCheckbox(l);
+    }
 
     public static void clickMvEnabled(BaseSeleniumWebTest test, String prefix)
     {

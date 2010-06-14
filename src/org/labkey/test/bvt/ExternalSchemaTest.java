@@ -424,8 +424,8 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
     private void _updateViaForm(String containerPath, int pk, String text, int intNotNull)
     {
-        log("** Updating via form: pk=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/externalschema/" + containerPath + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&pk=" + pk);
+        log("** Updating via form: RowId=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
+        beginAt("/externalschema/" + containerPath + "/update.view?queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&RowId=" + pk);
         setFormElement("quf_Text", text);
         setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
         setFormElement("quf_DatetimeNotNull", "2008-09-25");

@@ -5,15 +5,15 @@ data/api/http-api.xml -text
 data/api/rlabkey-api.xml -text
 data/api/security-api.xml -text
 modules/simpletest/config/module.xml -text
+modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text
 modules/simpletest/queries/vehicle/Toyotas.sql -text
+modules/simpletest/queries/vehicle/colors.js -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-0.10.sql -text
-modules/simpletest/schemas/lists/People.js -text
 modules/simpletest/schemas/vehicle.xml -text
-modules/simpletest/schemas/vehicle/colors.js -text
 modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
 modules/simpletest/views/model.html -text

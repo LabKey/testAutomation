@@ -5,7 +5,7 @@
  */
 // ================================================
 
-print("** evaluating: " + this['javax.script.filename']);
+console.log("** evaluating: " + this['javax.script.filename']);
 
 var Debug = {
     addBefore : function (obj, fname, before) {

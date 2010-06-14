@@ -40,6 +40,11 @@ public class ClientAPITest extends BaseSeleniumWebTest
         new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
         new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age")
     };
+    static
+    {
+        LIST_COLUMNS[0].setRequired(true);
+        LIST_COLUMNS[1].setRequired(true);
+    }
 
     private final static String[][] TEST_DATA =
     {
@@ -153,6 +158,18 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        var rowCopy = {};\n" +
             "        for (var prop in prevRowset[0])\n" +
             "            rowCopy[prop] = prevRowset[0][prop];\n" +
+            "        rowCopy.LastName = null;\n" +
+            "        rowCopy.Age = 99;\n" +
+            "        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        \n" +
+            "    },\n" +
+            "\n" +
+            "    function()\n" +
+            "    {\n" +
+            "        // get the result from the single-row select call:\n" +
+            "        var prevRowset = testResults[1].rows;\n" +
+            "        var rowCopy = {};\n" +
+            "        for (var prop in prevRowset[0])\n" +
+            "            rowCopy[prop] = prevRowset[0][prop];\n" +
             "        rowCopy.Age = 99;\n" +
             "        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        \n" +
             "    },\n" +
@@ -169,6 +186,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        // get the result from the single-row select call:\n" +
             "        var prevRowset = testResults[1].rows;\n" +
             "        LABKEY.Query.insertRows(schemaName, queryName, prevRowset, successHandler, failureHandler);        \n" +
+            "    },\n" +
+            "\n" +
+            "    function()\n" +
+            "    {\n" +
+            "        // get the result from the single-row select call:\n" +
+            "        var missingLastName = [ { FirstName: 'Herbert', Age: 100 } ];\n" +
+            "        LABKEY.Query.insertRows(schemaName, queryName, missingLastName, successHandler, failureHandler);\n" +
             "    },\n" +
             "\n" +
             "    function()\n" +
@@ -197,30 +221,40 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        else\n" +
             "            html += 'FAILURE: Select 2 returned ' + testResults[1].rowCount + ' rows, expected 1.  Error value = ' + testResults[1].exception + '<br>';\n" +
             "\n" +
-            "        if (testResults[2].rowsAffected == 1)\n" +
-            "            html += 'SUCCESS: Update affected 1 rows<br>';\n" +
+            "        if (testResults[2].exception)\n" +
+            "            html += 'SUCCESS: Bad update generated exception: ' + testResults[2].exception + '<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[2].exception + '<br>';\n" +
+            "            html += 'FAILURE: Bad update did not generate expected exception.<br>';\n" +
             "\n" +
             "        if (testResults[3].rowsAffected == 1)\n" +
-            "            html += 'SUCCESS: Delete affected 1 rows<br>';\n" +
+            "            html += 'SUCCESS: Update affected 1 rows<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: Delete affected ' + testResults[3].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '<br>';\n" +
+            "            html += 'FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '<br>';\n" +
             "\n" +
             "        if (testResults[4].rowsAffected == 1)\n" +
+            "            html += 'SUCCESS: Delete affected 1 rows<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: Delete affected ' + testResults[4].rowCount + ' rows, expected 1.  Error value = ' + testResults[4].exception + '<br>';\n" +
+            "\n" +
+            "        if (testResults[5].rowsAffected == 1)\n" +
             "            html += 'SUCCESS: Insert created 1 rows<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: Insert created ' + testResults[4].rowCount + ' rows, expected 1.  Error value = ' + testResults[4].exception + '<br>';\n" +
+            "            html += 'FAILURE: Insert created ' + testResults[5].rowCount + ' rows, expected 1.  Error value = ' + testResults[5].exception + '<br>';\n" +
             "\n" +
-            "        if (testResults[5].exception)\n" +
-            "            html += 'SUCCESS: bad query generated exception: ' + testResults[5].exception + '<br>';\n" +
+            "        if (testResults[6].exception)\n" +
+            "            html += 'SUCCESS: Bad insert generated exception: ' + testResults[6].exception + '<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: bad query did not generate expected exception.<br>';\n" +
+            "            html += 'FAILURE: Bad insert did not generate expected exception.<br>';\n" +
             "\n" +
-            "        if (testResults[6].rowCount == 7)\n" +
+            "        if (testResults[7].exception)\n" +
+            "            html += 'SUCCESS: Bad query generated exception: ' + testResults[7].exception + '<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: Bad query did not generate expected exception.<br>';\n" +
+            "\n" +
+            "        if (testResults[8].rowCount == 7)\n" +
             "            html += 'SUCCESS: executeSql returned 7 rows<br>';\n" +
             "        else\n" +
-            "            html += 'FAILURE: executeSql returned ' + testResults[6].rowCount + ' rows, expected 7. Error value = ' + testResults[6].exception + '<br>';\n" +
+            "            html += 'FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';\n" +
             "\n" +
             "        document.getElementById('testDiv').innerHTML = html;        \n" +
             "    }\n" +
@@ -695,10 +729,12 @@ public class ClientAPITest extends BaseSeleniumWebTest
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "SUCCESS: Select 1 returned 7 rows");
         assertElementContains(loc, "SUCCESS: Select 2 returned 1 rows");
+        assertElementContains(loc, "SUCCESS: Bad update generated exception: The field 'LastName' is required.");
         assertElementContains(loc, "SUCCESS: Update affected 1 rows");
         assertElementContains(loc, "SUCCESS: Delete affected 1 rows");
         assertElementContains(loc, "SUCCESS: Insert created 1 rows");
-        assertElementContains(loc, "SUCCESS: bad query generated exception: Failed to convert property value of type");
+        assertElementContains(loc, "SUCCESS: Bad insert generated exception: The field 'LastName' is required.");
+        assertElementContains(loc, "SUCCESS: Bad query generated exception: Failed to convert property value of type");
         assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
         clearTestPage("Query portion of test page complete");
     }

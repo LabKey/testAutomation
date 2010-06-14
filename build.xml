@@ -110,8 +110,8 @@
         <echo message="The leak checker is run by default for DRT and BVT tests.  To disable mem checking:"/>
         <echo message="    -DmemCheck=false"/>
         <echo message=""/>
-        <echo message="Add javascript error checking (firefox only):"/>
-        <echo message="    -DscriptCheck=true"/>
+        <echo message="Disable javascript error checking (firefox only):"/>
+        <echo message="    -DscriptCheck=false"/>
         <echo message=""/>
         <echo message="Randomize test order."/>
         <echo message="    -DshuffleTests=true"/>
@@ -724,7 +724,7 @@
         </condition>
 
         <!-- Set property sysprop.scriptCheck: true or false -->
-        <condition property="sysprop.scriptCheck" value="false">
+        <condition property="sysprop.scriptCheck" value="true">
             <not>
                 <isset property="scriptCheck"/>
             </not>
@@ -1060,35 +1060,35 @@
             <fileset dir="${project.root}/remoteapi/r/test">
                 <include name="listArchive.zip"/>
                 <include name="vignette.R"/>
-                <include name="instwin.r"/>
+                <include name="instwin.r" />
           </fileset>
         </copy>
-        
         <condition property="r.path" value="${env.R_HOME}/R" else="R">
             <isset property="env.R_HOME"/>
         </condition>
-        
-        <copy todir="${project.root}/sampledata/rlabkey" >
-            <fileset dir="${project.root}/remoteapi/r/latest">
-            	<include name="Rlabkey*.zip"/>
-          </fileset>
-        </copy>
-        <exec dir="${project.root}/sampledata/rlabkey" executable="Rterm" osfamily="windows" failifexecutionfails="false" input="${project.root}/remoteapi/r/test/instwin.r">
-            <arg line="--vanilla" />
-        </exec>
-        
-        
-	 <copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true" >
-	             <fileset dir="${project.root}/remoteapi/r/latest">
-	             	<include name="Rlabkey*.tar.gz"/>
-	           </fileset>
-	</copy>
-        
-        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey"  osfamily="unix"  failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
-        </exec>
-
-
+        <condition property="rlabkey.windows">
+        	<os family="windows"/> 
+        </condition>
+        <antcall target="install-rlabkey-binary"/>
+        <antcall target="install-rlabkey-source"/>        
+	
     </target>
+	<target name="install-rlabkey-binary" if="rlabkey.windows" >
+		<copy todir="${project.root}/sampledata/rlabkey" overwrite="true">
+			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.zip"/>        	
+		</copy>	
+		<exec dir="${project.root}/sampledata/rlabkey" executable="${r.path}term" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r">
+		    <arg line="--vanilla" />
+		</exec>
+	</target>	
+	<target name="install-rlabkey-source" unless="rlabkey.windows" >
+		<copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true">
+			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.tar.gz"/>        	
+		</copy>	
+		<exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
+			    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
+		</exec>   
+	 </target>	
+
 </project>
 
