@@ -19,6 +19,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.drt.StudyManualTest;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -93,8 +94,7 @@ public class StudyBvtTest extends StudyManualTest
         hideDataset(HIDDEN_DATASET);
         modifyDatasetColumn(MODIFIED_DATASET);
 
-        // TODO: Enable list roundtripping once Issue 10080 is resolved.
-        //ListHelper.importListArchive(this, getFolderName(), new File(getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
+        ListHelper.importListArchive(this, getFolderName(), new File(getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
 
         // export new study to zip file using "xml" formats
         exportStudy(true, true);
