@@ -404,6 +404,9 @@ public class AssayTest extends AbstractAssayTest
         clickNavButton("Copy to Study");
 
         log("Verifying that the data was published");
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        addCustomizeViewColumn("QCState", "QC State");
+        clickNavButton("Save");
         assertTextPresent("Pending Review");
         assertTextPresent("a");
         assertTextPresent(TEST_RUN1_COMMENTS);

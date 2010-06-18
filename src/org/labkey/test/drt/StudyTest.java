@@ -123,6 +123,9 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("5000.0");
         assertTextPresent("new text");
         assertTextPresent("QC State");
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        addCustomizeViewColumn("QCState", "QC State");
+        clickNavButton("Save");
         assertTextPresent("unknown QC");
     }
 
