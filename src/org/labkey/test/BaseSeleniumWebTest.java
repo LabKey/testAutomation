@@ -690,6 +690,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         goToHome();
     }
 
+    public void disableMaintenance()
+    {
+        beginAt("/admin/customizeSite.view");
+        click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
+        clickNavButton("Save");
+    }
 
     public void populateLastPageInfo()
     {
@@ -765,6 +771,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             signIn();
 			resetErrors();
+
+            if( isMaintenanceDisabled() )
+            {
+                // Disable scheduled system maintenance to prevent timeouts during nightly tests.
+                disableMaintenance();
+            }
 
             DatabaseInfo info = getDatabaseInfo();
             if (!isDatabaseSupported(info))
@@ -930,6 +942,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public boolean skipLeakCheck()
     {
         return "false".equals(System.getProperty("memCheck"));
+    }
+
+    public boolean isMaintenanceDisabled()
+    {
+        return "never".equals(System.getProperty("systemMaintenance"));
     }
 
     public void checkLeaksAndErrors()
