@@ -47,7 +47,7 @@ public class BasicTest extends BaseSeleniumWebTest
         checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
         clickNavButton("Save");
 
-        // Manually start system maintenance... need to ensure it's done before mem check, check this at the end of the test
+        // Manually start system maintenance... we'll check to make sure it's complete at the end of the test (before mem check)
         selenium.openWindow("", "systemMaintenance");
         clickLinkWithText("Run system maintenance now", false);
 
@@ -149,14 +149,12 @@ public class BasicTest extends BaseSeleniumWebTest
         // verify that web part is gone, even after a refresh:
         assertElementNotPresent(searchLocator);
 
-        // Now that the whole test is done, ensure that system maintenance is done...
+        // Now that the whole test is done, ensure that system maintenance is complete...
         selenium.selectWindow("systemMaintenance");
 
+        // Page should update automatically via AJAX
         while (!isTextPresent("System maintenance complete"))
-        {
-            refresh();
             sleep(1000);
-        }
     }
 
     public String getAssociatedModuleDirectory()
