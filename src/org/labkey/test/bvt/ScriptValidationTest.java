@@ -21,11 +21,13 @@ import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Test JavaScript validation in file-based modules.
