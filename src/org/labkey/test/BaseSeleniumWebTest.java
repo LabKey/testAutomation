@@ -697,6 +697,44 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Save");
     }
 
+    private long smStart = 0;
+
+    public void startSystemMaintenance()
+    {
+        ensureAdminMode();
+        clickLinkWithText("Admin Console");
+        clickLinkWithText("site settings");
+        selenium.openWindow("", "systemMaintenance");
+        clickLinkWithText("Run system maintenance now", false);
+        smStart = System.currentTimeMillis();
+    }
+
+    public void waitForSystemMaintenanceCompletion()
+    {
+        assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
+        long elapsed = System.currentTimeMillis() - smStart;
+
+        // Ensure that at least 5 seconds has passed since system maintenance was started
+        if (elapsed < 5000)
+        {
+            log("Sleeping for " + (5000 - elapsed) + " ms");
+            sleep(5000 - elapsed);
+        }
+
+        selenium.selectWindow("systemMaintenance");
+
+        // Page updates automatically via AJAX... keep checking (up to 10 minutes) for system maintenance complete text
+        waitFor(new Checker() {
+            public boolean check()
+            {
+                return isTextPresent("System maintenance complete");
+            }
+        }, "System maintenance failed to complete in 10 minutes.", 10 * 60 * 1000);
+
+        selenium.close();
+        selenium.selectWindow(null);
+    }
+
     public void populateLastPageInfo()
     {
         _lastPageTitle = getLastPageTitle();

@@ -41,15 +41,12 @@ public class BasicTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("site settings");
+        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
+        startSystemMaintenance();
+
         checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
         checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
         clickNavButton("Save");
-
-        // Manually start system maintenance... we'll check to make sure it's complete at the end of the test (before mem check)
-        selenium.openWindow("", "systemMaintenance");
-        clickLinkWithText("Run system maintenance now", false);
 
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
@@ -149,12 +146,8 @@ public class BasicTest extends BaseSeleniumWebTest
         // verify that web part is gone, even after a refresh:
         assertElementNotPresent(searchLocator);
 
-        // Now that the whole test is done, ensure that system maintenance is complete...
-        selenium.selectWindow("systemMaintenance");
-
-        // Page should update automatically via AJAX
-        while (!isTextPresent("System maintenance complete"))
-            sleep(1000);
+        // Now that the test is done, ensure that system maintenance is complete...
+        waitForSystemMaintenanceCompletion();
     }
 
     public String getAssociatedModuleDirectory()

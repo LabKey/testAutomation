@@ -129,15 +129,8 @@ public class MS1Bvt extends BaseSeleniumWebTest
         //After data is imported, run the system maintenance task so that
         //we do a vacuum on Postgres. Otherwise, we'll get a timeout
         log("Running system maintenance task (vacuum on Postgres)...");
-        ensureAdminMode();
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("site settings");
-        selenium.openWindow("", "systemMaintenance");
-        clickLinkWithText("Run system maintenance now", false);
-        sleep(5000);
-        selenium.selectWindow("systemMaintenance");
-        selenium.close();
-        selenium.selectWindow(null);
+        startSystemMaintenance();
+        waitForSystemMaintenanceCompletion();
         log("System maintenance task complete.");
     }
 
