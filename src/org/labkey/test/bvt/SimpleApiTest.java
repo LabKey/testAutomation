@@ -119,7 +119,8 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
     protected List<ApiTestCase> parseTests(File testFile)
     {
-        try {
+        try
+        {
             List<ApiTestCase> tests = new ArrayList<ApiTestCase>();
             ApiTestsDocument doc = ApiTestsDocument.Factory.parse(testFile);
 
@@ -181,7 +182,8 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         HttpMethod method = null;
         String requestUrl = WebTestHelper.getBaseURL() + '/' + url;
 
-        switch (type) {
+        switch (type)
+        {
             case get:
                 method = new GetMethod(requestUrl);
                 break;

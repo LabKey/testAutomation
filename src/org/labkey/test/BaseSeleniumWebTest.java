@@ -916,6 +916,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    // Writes message to the labkey server log. Message parameter is output as sent, except that \n is translated to newline.
     private void logToServer(String message)
     {
         beginAt("/admin/log.view?message=" + message);
