@@ -193,7 +193,8 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
         if (method != null)
         {
-            try {
+            try
+            {
                 HttpClient client = WebTestHelper.getHttpClient(requestUrl);
 
                 int status = client.executeMethod(method);

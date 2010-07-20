@@ -808,6 +808,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             _startTime = System.currentTimeMillis();
 
             signIn();
+            logToServer("=== Starting " + getClass().getSimpleName() + Runner.getProgress() + " ===");
 			resetErrors();
 
             if( isMaintenanceDisabled() )
@@ -880,6 +881,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
 
             checkLeaksAndErrors();
+            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
 
             try
             {
@@ -912,6 +914,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
             }
         }
+    }
+
+    private void logToServer(String message)
+    {
+        beginAt("/admin/log.view?message=" + message);
     }
 
     protected abstract void doTestSteps() throws Exception;
