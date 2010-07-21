@@ -859,7 +859,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 					resetErrors();
             }
 
-
             _testFailed = false;
 
             try
@@ -881,16 +880,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
 
             checkLeaksAndErrors();
-            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
-
-            try
-            {
-                signOut();
-            }
-            catch (Throwable t)
-            {
-                // fall through
-            }
         }
         finally
         {
@@ -902,21 +891,40 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 System.out.println("Unable to determine information about the last page: server not started or -Dlabkey.port incorrect?");
             }
-            finally
+
+            if (_testFailed)
             {
-                if (_testFailed)
+                try
                 {
                     dump();
                     dumpPipelineLogFiles(getLabKeyRoot() + "/sampledata");
-                    if(_testTimeout)
+                    if (_testTimeout)
                         dumpThreads();
                 }
-                log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
+                catch (Exception t)
+                {
+
+                    System.out.println("Unable to dump failure information");
+                    t.printStackTrace();
+                }
             }
+
+            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===\\n");
+
+            try
+            {
+                signOut();
+            }
+            catch (Throwable t)
+            {
+                // fall through
+            }
+
+            log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
     }
 
-    // Writes message to the labkey server log. Message parameter is output as sent, except that \n is translated to newline.
+    // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
     private void logToServer(String message)
     {
         beginAt("/admin/log.view?message=" + message);
