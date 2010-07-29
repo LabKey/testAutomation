@@ -139,7 +139,7 @@ function toggleRecorder(checkbox)
             }
 %>
             <td><%=h(m.getHeaderValue("To"))%></td><td><%=h(m.getHeaderValue("From"))%></td>
-            <td><a href="javascript:toggleBody(email_body_<%=rowIndex%>)"><%=h(m.getHeaderValue("Subject"))%></a>
+            <td><a href="javascript:toggleBody('email_body_<%=rowIndex%>')"><%=h(m.getHeaderValue("Subject"))%></a>
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=body%></div></td></tr>
 <%
         }
