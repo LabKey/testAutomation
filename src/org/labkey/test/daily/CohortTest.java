@@ -40,7 +40,7 @@ public class CohortTest extends BaseSeleniumWebTest
     private static final String INFECTED_3 = "Infected3";
     private static final String INFECTED_4 = "Infected4";
     private static final String UNASSIGNED_1 = "Unassigned1";
-    private static final String XPATH_COHORT_ASSIGNMENT_TABLE = "//td[@id='bodypanel']//p/table";
+    private static final String XPATH_COHORT_ASSIGNMENT_TABLE = "//table[@id='participant-cohort-assignments']";
     private static final String COHORT_TABLE = "Cohort Table";
 
     @Override
