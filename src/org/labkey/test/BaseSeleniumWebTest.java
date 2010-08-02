@@ -4408,7 +4408,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             setTimeout("" + millis);
             _testTimeout = true;
-            super.open(url);
+            // Workaround for selenium issue 408 http://code.google.com/p/selenium/issues/detail?id=408
+            // TODO: remove workaround when we upgrade to selenium 2.x (currently in alpha)
+            // super.open(url);
+            commandProcessor.doCommand("open", new String[] {url,"true"});
             _testTimeout = false;
         }
 
