@@ -1077,7 +1077,7 @@
 		<copy todir="${project.root}/sampledata/rlabkey" overwrite="true">
 			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.zip"/>        	
 		</copy>	
-		<exec dir="${project.root}/sampledata/rlabkey" executable="${r.path}term" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r">
+		<exec dir="${project.root}/sampledata/rlabkey" executable="${r.path}term" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r" failifexecutionfails="false">
 		    <arg line="--vanilla" />
 		</exec>
 	</target>	
