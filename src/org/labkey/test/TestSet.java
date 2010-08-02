@@ -167,7 +167,7 @@ public enum TestSet
 
     BVTnDaily(BVT, Daily.tests),
 
-    Weekly(BVTnDaily, new Class[] {
+    Weekly(600000, BVTnDaily, new Class[] {
             // Add special test classes, not in daily or BVT.
     }),
 
