@@ -1,7 +1,7 @@
 /*
  * Dumbster - a dummy SMTP server
  * Copyright 2004 Jason Paul Kitchen
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,12 +16,7 @@
  */
 package com.dumbster.smtp;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Container for a complete SMTP message - headers and message body.
@@ -29,8 +24,12 @@ import java.util.Set;
 public class SmtpMessage {
   /** Headers: Map of List of String hashed on header name. */
   private Map headers;
+  private String headerLast;
   /** Message body. */
   private StringBuffer body;
+  private boolean inBody;
+  private Date createdTimestamp = new Date();
+
 
   /**
    * Constructor. Initializes headers Map and body buffer.
@@ -53,8 +52,14 @@ public class SmtpMessage {
           String name = params.substring(0, headerNameEnd).trim();
           String value = params.substring(headerNameEnd+1).trim();
           addHeader(name, value);
+          headerLast = name;
+        } else if (headerLast != null) {
+          appendHeader(headerLast, params);
         }
       } else if (SmtpState.DATA_BODY == response.getNextState()) {
+        if (inBody)
+          body.append("\n");
+        inBody = true;
         body.append(params);
       }
     }
@@ -121,6 +126,20 @@ public class SmtpMessage {
   }
 
   /**
+   * Appends a to the existing value for a header to the Map.
+   * @param name header name
+   * @param value header value
+   */
+  private void appendHeader(String name, String value) {
+    List valueList = (List)headers.get(name);
+    if (valueList == null) {
+      valueList = new ArrayList(1);
+      headers.put(name, valueList);
+    }
+    valueList.set(0, valueList.get(0) + value);
+  }
+
+  /**
    * String representation of the SmtpMessage.
    * @return a String
    */
@@ -142,4 +161,9 @@ public class SmtpMessage {
     msg.append('\n');
     return msg.toString();
   }
+
+    public Date getCreatedTimestamp()
+    {
+        return createdTimestamp;
+    }
 }

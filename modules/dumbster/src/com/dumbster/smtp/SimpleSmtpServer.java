@@ -75,10 +75,10 @@ public class SimpleSmtpServer implements Runnable {
    * Main loop of the SMTP server.
    */
   public void run() {
-    stopped = false;
     try {
       try {
         serverSocket = new ServerSocket(port);
+        stopped = false; // Successful connection to the socket means started
         serverSocket.setSoTimeout(TIMEOUT); // Block for maximum of 1.5 seconds
       } finally {
         synchronized (this) {
@@ -143,6 +143,9 @@ public class SimpleSmtpServer implements Runnable {
    * Stops the server. Server is shutdown after processing of the current request is complete.
    */
   public synchronized void stop() {
+    if (stopped)
+      return;
+
     // Mark us closed
     stopped = true;
     try {
@@ -252,11 +255,11 @@ public class SimpleSmtpServer implements Runnable {
   public static SimpleSmtpServer start(int port) {
     SimpleSmtpServer server = new SimpleSmtpServer(port);
     Thread t = new Thread(server);
-    t.start();
     
     // Block until the server socket is created
     synchronized (server) {
       try {
+        t.start();
         server.wait();
       } catch (InterruptedException e) {
         // Ignore don't care.
