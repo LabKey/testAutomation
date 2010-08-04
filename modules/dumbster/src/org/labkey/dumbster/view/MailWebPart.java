@@ -16,7 +16,9 @@
 
 package org.labkey.dumbster.view;
 
+import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.JspView;
+import org.labkey.dumbster.DumbsterController;
 import org.labkey.dumbster.model.DumbsterManager;
 
 import javax.servlet.ServletException;
@@ -27,6 +29,7 @@ public class MailWebPart extends JspView<MailPage>
     {
         super("/org/labkey/dumbster/view/mailWebPart.jsp", new MailPage());
         setTitle("Mail Record");
+        setTitleHref(new ActionURL(DumbsterController.BeginAction.class, getViewContext().getContainer()));
     }
 
 

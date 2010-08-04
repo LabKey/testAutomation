@@ -1,9 +1,12 @@
 * text=auto !eol
 /Dumbster.iml -text
-lib/dumbster-1.6.jar -text
-lib/dumbster-src.zip -text
 /module.properties -text
-src/META-INF/dumbster/jars.txt -text
+src/com/dumbster/smtp/SimpleSmtpServer.java -text
+src/com/dumbster/smtp/SmtpActionType.java -text
+src/com/dumbster/smtp/SmtpMessage.java -text
+src/com/dumbster/smtp/SmtpRequest.java -text
+src/com/dumbster/smtp/SmtpResponse.java -text
+src/com/dumbster/smtp/SmtpState.java -text
 src/org/labkey/dumbster/DumbsterController.java -text
 src/org/labkey/dumbster/DumbsterModule.java -text
 src/org/labkey/dumbster/model/DumbsterManager.java -text

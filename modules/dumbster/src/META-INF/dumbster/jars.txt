@@ -1,4 +1,0 @@
-{table}
-Filename|Component|Version|Source|License|LabKey Dev|Purpose
-dumbster-1.6.jar|Dumbster|1.6|{link:QuintanaSoft|http://quintanasoft.com/dumbster}|{link:Apache 2.0|http://www.apache.org/licenses/LICENSE-2.0}|adam|Testing of email notifications
-{table}

@@ -20,6 +20,8 @@
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.ViewContext" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="org.labkey.api.util.PageFlowUtil" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%
@@ -107,6 +109,7 @@ function toggleRecorder(checkbox)
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>To</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>From</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Message</div></td>
+        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Headers</div></td>
     </tr>
     <%
     if (messages.length > 0)
@@ -137,10 +140,23 @@ function toggleRecorder(checkbox)
                 else if (line.indexOf("------=") == 0)
                     sawHtml = inHtml = false;
             }
+
+            StringBuilder headers = new StringBuilder();
+            Iterator i = m.getHeaderNames();
+            while (i.hasNext())
+            {
+                String header = (String)i.next();
+                headers.append(PageFlowUtil.filter(header));
+                headers.append(": ");
+                headers.append(PageFlowUtil.filter(m.getHeaderValue(header)));
+                headers.append("<br/>\n");
+            }
 %>
             <td><%=h(m.getHeaderValue("To"))%></td><td><%=h(m.getHeaderValue("From"))%></td>
             <td><a href="javascript:toggleBody('email_body_<%=rowIndex%>')"><%=h(m.getHeaderValue("Subject"))%></a>
-                <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=body%></div></td></tr>
+                <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=body%></div></td>
+            <td><a href="javascript:toggleBody('email_headers_<%=rowIndex%>')">View headers</a>
+                <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=headers%></div></td></tr>
 <%
         }
     }
