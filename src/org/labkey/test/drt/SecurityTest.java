@@ -79,7 +79,8 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         log("Check welcome emails [6 new users]");
         assertEquals("Expected 12 notification emails (+4 rows).", getTableRowCount("dataregion_EmailRecord"), 16);
-        assertTextPresent(": Welcome", 6);
+        // Once in the message itself, plus copies in the headers
+        assertTextPresent(": Welcome", 18);
     }
 
     private void guestTest()
