@@ -193,10 +193,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
 
         // test validate
-        assertTextPresent("Field AssignedTo cannot be null");
+        assertTextPresent("Field AssignedTo cannot be blank");
         selectOptionByText("assignedTo", getDisplayName());
         clickNavButton("Submit");
-        assertTextPresent("Field Milestone cannot be null");
+        assertTextPresent("Field Milestone cannot be blank");
         selectOptionByText("milestone", "2012");
         clickNavButton("Submit");
 
@@ -285,7 +285,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
         createUser(USER2, "", false);
-        
+
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent("No email recorded.");
 
@@ -396,7 +396,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("New Issue");
         clickNavButton("Submit");
 
-        assertTextPresent("Field Title cannot be null.");
+        assertTextPresent("Field Title cannot be blank.");
         clickNavButton("View Grid");
     }
 
