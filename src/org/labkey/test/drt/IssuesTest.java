@@ -321,7 +321,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + PasswordUtil.getUsername() + "' and position() = '1']"));
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + USER1 + "' and position() = '1']"));
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + USER2 + "' and position() = '1']"));
-        assertTableCellContains(EMAILRECORD_TABLE, 3, 2, ISSUE_TITLE_2);
+        assertTableCellContains(EMAILRECORD_TABLE, 3, 3, ISSUE_TITLE_2);
 
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
@@ -336,7 +336,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//tr[position() <= '5']/td[text() = '" + PasswordUtil.getUsername() + "' and position() = '1']"));
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//tr[position() <= '5']/td[text() = '" + USER3 + "' and position() = '1']"));
-        assertTableCellContains(EMAILRECORD_TABLE, 3, 2, ISSUE_TITLE_2);
+        assertTableCellContains(EMAILRECORD_TABLE, 3, 3, ISSUE_TITLE_2);
 
         stopImpersonating();
     }

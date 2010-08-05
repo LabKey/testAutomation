@@ -333,7 +333,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         log("Check emailed messages");
         addWebPart("Mail Record");
-        assertTextPresent("RE: " + MSG1_TITLE, 2); // TODO: switch to 3 when empty messages are emailed
+        assertTextPresent("RE: " + MSG1_TITLE, 4); // TODO: switch to 3 when empty messages are emailed
         clickLinkWithText(MSG1_TITLE, 0, false);
         assertTextPresent("1 x");
         assertTextPresent(HTML_BODY_WEBPART_TEST);
