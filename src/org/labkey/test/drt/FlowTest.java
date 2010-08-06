@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ExtHelper;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -86,7 +87,7 @@ public class FlowTest extends BaseFlowTest
         waitAndClick(Locator.fileTreeByName("8colordata"));
         waitForElement(ExtHelper.locateBrowserFileCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Current directory of 11 FCS Files");
-        assertTextPresent("The following directories within '8color/8colordata'");
+        assertTextPresent("The following directories within '8color" + File.separator + "8colordata'");
         assertTextPresent("Current Directory (11 fcs files)");
         assertTextNotPresent("run2");
         clickNavButton("Import Selected Runs");
