@@ -20,6 +20,8 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
@@ -807,8 +809,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             _startTime = System.currentTimeMillis();
 
-            signIn();
             logToServer("=== Starting " + getClass().getSimpleName() + Runner.getProgress() + " ===");
+            signIn();
 			resetErrors();
 
             if( isMaintenanceDisabled() )
@@ -909,16 +911,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
             }
 
-            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===\\n");
-
-            try
-            {
-                signOut();
-            }
-            catch (Throwable t)
-            {
-                // fall through
-            }
+            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
 
             log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
@@ -927,7 +920,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
     private void logToServer(String message)
     {
-        beginAt("/admin/log.view?message=" + message);
+        try
+        {
+            String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
+            HttpClient client = WebTestHelper.getHttpClient(getBaseURL() + "/admin/log.view?message=" + message);
+            int status = client.executeMethod(new GetMethod(encodedUrl));
+        }
+        catch (IOException e)
+        {
+            // fall through
+        }
+    }
+
+    protected String encodeURI(String parameter)
+    {
+        ArrayList<Integer> chars = new ArrayList<Integer>();
+        // Percent-escape any characters that cause GetMethod to throw an exception.
+        return parameter.replaceAll(" ", "%20");
     }
 
     protected abstract void doTestSteps() throws Exception;
