@@ -140,7 +140,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             clickLinkWithText("configure templates");
 
-            clickLinkWithText("new NAb Default template");
+            clickLinkWithText("new 96 well (8x12) NAb Default template");
 
             waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
 
