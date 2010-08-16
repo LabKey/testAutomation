@@ -43,7 +43,9 @@
     "root": "rows",
     "fields": [
         {
+            "dimension": false,
             "mvEnabled": false,
+            "measure": false,
             "hidden": false,
             "name": "Color",
             "type": "string",
@@ -52,7 +54,9 @@
             "shownInInsertView": true
         },
         {
+            "dimension": false,
             "mvEnabled": false,
+            "measure": false,
             "hidden": false,
             "name": "Like",
             "type": "string",
@@ -61,7 +65,9 @@
             "shownInInsertView": true
         },
         {
+            "dimension": false,
             "mvEnabled": false,
+            "measure": false,
             "hidden": false,
             "name": "Month",
             "type": "date",
@@ -70,7 +76,9 @@
             "shownInInsertView": true
         },
         {
+            "dimension": false,
             "mvEnabled": false,
+            "measure": true,
             "hidden": false,
             "name": "Good",
             "type": "int",
