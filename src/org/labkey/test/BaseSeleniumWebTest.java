@@ -1152,6 +1152,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         pushLocation();
         try
         {
+            // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
             beginAt("/admin/dumpHeap.view");
             File destDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
             String dumpMsg = selenium.getText("xpath=//td[@id='bodypanel']/div");
@@ -1175,7 +1176,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void dumpThreads()
     {
-        pushLocation();
         try
         {
             File threadDumpRequest = new File(getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
@@ -1186,7 +1186,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Error dumping threads: " + e.getMessage());
         }
         log("Timeout - Threads dumped to standard labkey log file");
-        popLocation();
     }
 
     // Publish artifacts while the build is still in progrss:
