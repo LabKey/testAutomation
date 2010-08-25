@@ -111,6 +111,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickNavButton("Edit Metadata");
         waitForElement(Locator.name("ff_label5"), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnLabel(this, 5, "editedCreated");
+        clickExtTab("Format");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
         clickNavButton("Save", 0);
         waitForText("Save successful.", 10000);
