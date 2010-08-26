@@ -330,10 +330,6 @@ public class ListHelper
             test.setFormElement(Locator.name("ff_type" + i), col.getType().toString());
             TAB(test, Locator.name("ff_type" +i));
             test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
-            if (col.getFormat() != null)
-            {
-                test.setFormElement("propertyFormat", col.getFormat());
-            }
 
             if (col.isMvEnabled())
                 clickMvEnabled(test, "");
@@ -367,6 +363,12 @@ public class ListHelper
                 
                 // wait a while to make sure rangeURI is set (async check)
                 test.sleep(1000);
+            }
+
+            if (col.getFormat() != null)
+            {
+                test.clickExtTab("Format");
+                test.setFormElement("propertyFormat", col.getFormat());
             }
 
             FieldValidator validator = col.getValidator();

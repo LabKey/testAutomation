@@ -411,7 +411,7 @@ public class TestHelper
         body.add(testHeader, BorderLayout.NORTH);
 
         JScrollPane bodyPane = new JScrollPane(_testTree);
-        bodyPane.setPreferredSize(new Dimension(400, 500));
+        bodyPane.setPreferredSize(new Dimension(400, 400));
         body.add(bodyPane, BorderLayout.CENTER);
 
         body.add(createButtonBar(), BorderLayout.SOUTH);
