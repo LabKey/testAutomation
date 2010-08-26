@@ -75,23 +75,18 @@ public class RlabkeyTest extends SimpleApiTest
                 File libPath = new File(getLabKeyRoot() + "/sampledata/rlabkey");
                 String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
-                try {
-                    for (ApiTestCase test : tests)
-                    {
-                        StringBuilder sb = new StringBuilder(pathCmd);
-
-                        sb.append('\n');
-                        sb.append(test.getUrl().trim().replaceAll("%baseUrl%", WebTestHelper.getBaseURL()));
-                        String verify = test.getReponse().trim();
-
-                        if (!RReportHelper.executeScript(this, sb.toString(), verify))
-                            fail("Failed executing R script for test case: " + test.getName());
-                    }
-                }
-                finally
+                for (ApiTestCase test : tests)
                 {
-                    RReportHelper.saveReport(this, "dummy");
+                    StringBuilder sb = new StringBuilder(pathCmd);
+
+                    sb.append('\n');
+                    sb.append(test.getUrl().trim().replaceAll("%baseUrl%", WebTestHelper.getBaseURL()));
+                    String verify = test.getReponse().trim();
+
+                    if (!RReportHelper.executeScript(this, sb.toString(), verify))
+                        fail("Failed executing R script for test case: " + test.getName());
                 }
+                RReportHelper.saveReport(this, "dummy");
             }
         }
     }
