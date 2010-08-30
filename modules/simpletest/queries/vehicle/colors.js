@@ -28,6 +28,7 @@ function trace(args, oldFn, thiz)
     for (var i = 0; i < args.length; i++)
         msg += (i > 0 ? ", " : "") + args[i];
     msg += ")";
+    console.log("** trace: " + msg);
 
     // return arguments needed by oldFn
     return args;
@@ -44,6 +45,10 @@ function init(event, errors) {
 }
 
 function beforeInsert(row, errors) {
+    // Test row map is case-insensitive
+    if (row.Name != row.nAmE && row.Hex != row.hex)
+        throw new Error("row properties must be case-insensitive.");
+
     // Throwing a script exception will bubble all the way up and cancel the insert immediately.
     if (row.Hex && row.Hex[0] != "#")
         throw new Error("color value must start with '#'");
@@ -83,7 +88,21 @@ function beforeInsert(row, errors) {
     rows.push(row);
 }
 
+function afterInsert(row, errors) {
+    // Test row map is case-insensitive
+    if (row.Name != row.nAmE && row.Hex != row.hex)
+        throw new Error("afterInsert row properties must be case-insensitive.");
+}
+
 function beforeUpdate(row, oldRow, errors) {
+    // Test row map is case-insensitive
+    if (row.Name != row.nAmE && row.Hex != row.hex)
+        throw new Error("beforeUpdate row properties must be case-insensitive.");
+
+    // Test oldRow map is case-insensitive
+    if (oldRow.Name != oldRow.nAmE && oldRow.Hex != oldRow.hex)
+        throw new Error("beforeUpdate oldRow properties must be case-insensitive.");
+
     // Woah, scary! Even the pk 'Name' property can be changed during update.
     if (row.Name[row.Name.length - 1] == "!")
         row.Name = row.Name.substring(0, row.Name.length-1) + "?";
@@ -93,8 +112,28 @@ function beforeUpdate(row, oldRow, errors) {
 }
 
 function afterUpdate(row, oldRow, errors) {
+    // Test row map is case-insensitive
+    if (row.Name != row.nAmE && row.Hex != row.hex)
+        throw new Error("afterUpdate row properties must be case-insensitive.");
+
+    // Test oldRow map is case-insensitive
+    if (oldRow.Name != oldRow.nAmE && oldRow.Hex != oldRow.hex)
+        throw new Error("afterUpdate oldRow properties must be case-insensitive.");
+
     if (row.Name[row.Name.length - 1] != "?")
         throw new Error("Expected color name to end in '?'");
+}
+
+function beforeDelete(row, errors) {
+    // Test row map is case-insensitive
+    if (row.Name != row.nAmE)
+        throw new Error("beforeDelete row properties must be case-insensitive.");
+}
+
+function afterDelete(row, errors) {
+    // Test row map is case-insensitive
+    if (row.Name != row.nAmE)
+        throw new Error("afterDelete row properties must be case-insensitive.");
 }
 
 // called once after insert/update/delete
@@ -128,6 +167,10 @@ function complete(event, errors) {
 
 Debug.addBefore(this, 'init', trace);
 Debug.addBefore(this, 'beforeInsert', trace);
+Debug.addBefore(this, 'afterInsert', trace);
 Debug.addBefore(this, 'beforeUpdate', trace);
+Debug.addBefore(this, 'afterUpdate', trace);
+Debug.addBefore(this, 'beforeDelete', trace);
+Debug.addBefore(this, 'afterDelete', trace);
 Debug.addBefore(this, 'complete', trace);
 
