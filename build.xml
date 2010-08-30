@@ -439,6 +439,7 @@
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
+            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -632,6 +633,18 @@
 
     <target name="test-debug">
         <property name="suite" value="TEST"/>
+        <property name="debug.suspend.selenium" value="y"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="adaptive">
+        <property name="suite" value="Adaptive"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
+    <target name="adaptive-debug">
+        <property name="suite" value="Adaptive"/>
         <property name="debug.suspend.selenium" value="y"/>
         <antcall target="sub-selenium"/>
     </target>
@@ -834,6 +847,11 @@
         </condition>
 
 
+        <!-- Set property sysprop.adaptiveRoot: relative path -->
+        <condition property="sysprop.adaptiveRoot" value="${adaptiveRoot}" else="">
+            <isset property="adaptiveRoot"/>
+        </condition>
+
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
         <condition property="sysprop.suite" value="DRT">
             <not><isset property="suite"/></not>
@@ -909,6 +927,7 @@
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
+            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -949,6 +968,7 @@
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
+            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
 
             <formatter type="plain"/>
 
@@ -990,6 +1010,7 @@
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
+            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -1067,11 +1088,11 @@
             <isset property="env.R_HOME"/>
         </condition>
         <condition property="rlabkey.windows">
-        	<os family="windows"/> 
+        	<os family="windows"/>
         </condition>
         <antcall target="install-rlabkey-binary"/>
-        <antcall target="install-rlabkey-source"/>        
-	
+        <antcall target="install-rlabkey-source"/>
+
     </target>
 	<target name="install-rlabkey-binary" if="rlabkey.windows" >
 		<copy todir="${project.root}/sampledata/rlabkey" overwrite="true">
@@ -1080,15 +1101,15 @@
 		<exec dir="${project.root}/sampledata/rlabkey" executable="${r.path}term" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r" failifexecutionfails="false">
 		    <arg line="--vanilla" />
 		</exec>
-	</target>	
+	</target>
 	<target name="install-rlabkey-source" unless="rlabkey.windows" >
 		<copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true">
-			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.tar.gz"/>        	
-		</copy>	
+			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.tar.gz"/>
+		</copy>
 		<exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
 			    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
-		</exec>   
-	 </target>	
+		</exec>
+	 </target>
 
 </project>
 

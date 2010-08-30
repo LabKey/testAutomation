@@ -361,12 +361,14 @@ public class Locator
 
     public static XPathLocator permissionButton(String groupName, String role)
     {
-        return xpath("//td[@id=" + xq("$buttons$"+role) + "]//button[contains(text()," + xq(groupName) + ")]");
+        // Supports permission types from a variety of modules.
+        return xpath("//td[contains (@id, '$buttons$') and contains (@id, " + xq(role) + ")]//button[contains(text()," + xq(groupName) + ")]");
     }
 
     public static XPathLocator closePermissionButton(String groupName, String role)
     {
-        return xpath("//td[@id=" + xq("$buttons$"+role) + "]//button[contains(text()," + xq(groupName) + ")]/../../..//i[@class='pclose']");
+        // Supports permission types from a variety of modules.
+        return xpath("//td[contains (@id, '$buttons$') and contains (@id, " + xq(role) + ")]//button[contains(text()," + xq(groupName) + ")]/../../..//i[@class='pclose']");
     }
 
     public static XPathLocator permissionsInput(String role)

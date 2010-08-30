@@ -442,7 +442,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isElementPresent(Locator.tagContainingText("span", "Hide Navigation Bar")))
             clickAndWait(Locator.tagContainingText("span", "Hide Navigation Bar"));
     }
-    
+
     public void clickAdminMenuItem(String... items)
     {
         clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
@@ -1161,7 +1161,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             File destFile = new File(destDir, filename);
 
             if (!destDir.exists())
-                destDir.mkdirs();                 
+                destDir.mkdirs();
             if ( heapDump.renameTo(destFile) )
                 publishArtifact(destFile);
             else
@@ -1360,7 +1360,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForPageToLoad();
         return confirmation;
     }
-    
+
     public void assertConfirmation(String msg)
     {
         assertEquals(msg, selenium.getConfirmation());
@@ -3047,7 +3047,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         ExtHelper.clickExtMenuButton(this, true, MenusLabel, subMenusLabels);
     }
-   
+
     /**
      * Clicks the ext menu item and optional submenu labels's (for cascading menus)
      * Does not wait for page load.
@@ -3412,7 +3412,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     String toRole(String perm)
     {
-        String R = "org.labkey.api.security.roles.";
+        String R = "security.roles.";
         if ("No Permissions".equals(perm))
             return R + "NoPermissionsRole";
         if ("Project Administrator".equals(perm))
@@ -3439,7 +3439,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else
         {
             String role = toRole(permissionSetting);
-            if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
+            if ("security.roles.NoPermissionsRole".equals(role))
             {
                 assertNoPermission(groupName,"Reader");
                 assertNoPermission(groupName,"Editor");
@@ -3526,9 +3526,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             String input = "$add$" + role;
-            String combo = "$combo$" + role;
+            String combo = "$combo$";
             //selenium.type(name, groupName + "\n");
-            click(Locator.xpath("//td[@id='" + combo + "']//img[contains(@class,'x-form-trigger')]"));
+            click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
             click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and contains(text(),'" + groupName + "')]"));
             //selenium.type(name, "\n");
             //selenium.focus("//body");
