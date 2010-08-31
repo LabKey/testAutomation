@@ -120,7 +120,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return WebTestHelper.getContextPath();
     }
 
-    public void setUp() throws Exception {
+    @Override
+    public void setUp() throws Exception
+    {
         selenium = new DefaultSeleniumWrapper();
         selenium.start();
         selenium.setTimeout(Integer.toString(defaultWaitForPage));
@@ -246,7 +248,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-    public void tearDown() throws Exception {
+    @Override
+    public void tearDown() throws Exception
+    {
         if (this.enableScriptCheck())
             endJsErrorChecker();
 
