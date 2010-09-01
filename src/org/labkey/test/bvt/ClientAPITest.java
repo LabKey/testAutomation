@@ -366,6 +366,12 @@ public class ClientAPITest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         createProject(PROJECT_NAME);
+
+        enableModule(PROJECT_NAME, "Dumbster");
+        goToModule("Dumbster");
+        uncheckCheckbox("emailRecordOn");
+        checkCheckbox("emailRecordOn");
+
         createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
 
         clickLinkWithText(FOLDER_NAME);
