@@ -231,9 +231,9 @@ public class JUnitTest extends TestSuite
 
             StringBuilder sb = new StringBuilder();
             sb.append("ran: ").append(json.get("runCount"));
-            sb.append(", errors: ").append(json.get("errorCount"));
+//            sb.append(", errors: ").append(json.get("errorCount"));
             sb.append(", failed: ").append(json.get("failureCount")).append("\n");
-            dumpFailures(sb, (List<Map<String, Object>>) json.get("errors"));
+//            dumpFailures(sb, (List<Map<String, Object>>) json.get("errors"));
             dumpFailures(sb, (List<Map<String, Object>>) json.get("failures"));
             return sb.toString();
         }
