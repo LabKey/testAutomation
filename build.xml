@@ -432,6 +432,8 @@
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
             <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
             <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
+            <sysproperty key="selenium.browser" value="${sysprop.selenium.browser}"/>
+            <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
             <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
             <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
