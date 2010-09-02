@@ -322,8 +322,8 @@ public class AssayTest extends AbstractAssayTest
         addCustomizeViewColumn("Properties/SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
         addCustomizeViewColumn("Properties/SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
         addCustomizeViewColumn("Properties/SpecimenID/AssayMatch", "Specimen Assay Match");
-        removeCustomizeViewColumn("testAssayRunProp1");
-        removeCustomizeViewColumn("testAssaySetProp2");
+        removeCustomizeViewColumn("Run testAssayRunProp1");
+        removeCustomizeViewColumn("Run Batch testAssaySetProp2");
         removeCustomizeViewColumn("testAssayDataProp4");
         clickNavButton("Save");
 
