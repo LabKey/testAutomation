@@ -209,8 +209,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         addWebPart("Wiki TOC");
         clickLinkWithText("new page");
 
-        Locator.XPathLocator loc = Locator.xpath("//td[@id='wiki-tab-source']");
-        click(loc);
+        switchWikiToSourceView();
         sleep(2000);
         
         setFormElement("name", "formulations");

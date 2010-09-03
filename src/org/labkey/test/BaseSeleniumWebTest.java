@@ -3938,7 +3938,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void switchWikiToSourceView()
     {
-        Locator sourceTab = Locator.tagContainingText("td", "Source");
+        Locator sourceTab = Locator.xpath("//li[@id='wiki-tab-source']/a");
         if(null != sourceTab)
             click(sourceTab);
     }
