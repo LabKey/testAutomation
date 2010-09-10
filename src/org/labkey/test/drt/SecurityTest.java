@@ -81,6 +81,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertEquals("Expected 12 notification emails (+4 rows).", getTableRowCount("dataregion_EmailRecord"), 16);
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
+        passwordStrengthTest();
     }
 
     private void guestTest()
@@ -388,5 +389,61 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
+    }
+
+    private void passwordStrengthTest()
+    {
+        String[] passwords = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
+        String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
+        String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
+
+        setDbLoginConfig(PasswordRule.Strong, null);
+
+        setInitialPassword(NORMAL_USER, simplePassword);
+        assertTextPresent("Your password must contain three of the following"); // fail, too simple
+
+        setFormElement("password", shortPassword);
+        setFormElement("password2", shortPassword);
+        clickNavButton("Set Password");
+        assertTextPresent("Your password must be eight characters or more."); // fail, too short
+
+        setFormElement("password", passwords[0]);
+        setFormElement("password2", passwords[0]);
+        clickNavButton("Set Password");
+        assertLinkPresentWithText("Sign Out"); // success
+        //success
+        impersonate(NORMAL_USER);
+
+        changePassword(passwords[0], passwords[1]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[1], simplePassword); // fail, too simple
+        assertTextPresent("Your password must contain three of the following");
+        changePassword(passwords[1], shortPassword); // fail, too short
+        assertTextPresent("Your password must be eight characters or more.");
+        changePassword(passwords[1], passwords[2]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[2], passwords[3]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[3], passwords[4]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[4], passwords[5]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[5], passwords[6]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[6], passwords[7]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[7], passwords[8]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[8], passwords[9]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[9], passwords[10]);
+        assertTextNotPresent("Choose a new password.");
+        changePassword(passwords[10], passwords[1]); // fail, used 9 passwords ago.
+        assertTextPresent("Your password must not match a recently used password.");
+        changePassword(passwords[10], passwords[0]);
+        assertTextNotPresent("Choose a new password.");
+
+        stopImpersonating();
+        resetDbLoginConfig();
     }
 }

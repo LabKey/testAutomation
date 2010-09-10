@@ -217,6 +217,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
             catch (IOException e)
             {
+                // Do nothing.
             }
         }
         return contents.toString();
@@ -430,6 +431,93 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         assertTextPresent("Sign Out");
         assertTextPresent("My Account");
+    }
+           
+    protected void setInitialPassword(String user, String password)
+    {
+        // Get setPassword URL from notification email.
+        goToModule("Dumbster");
+        clickLink(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + user + "']/..//a[contains(@href, 'setPassword.view')]"));
+
+        setFormElement("password", password);
+        setFormElement("password2", password);
+
+        clickNavButton("Set Password");
+    }
+
+    protected void changePassword(String oldPassword, String password)
+    {
+        clickLinkWithText("My Account");
+        clickNavButton("Change Password");
+
+        setFormElement("oldPassword", oldPassword);
+        setFormElement("password", password);
+        setFormElement("password2", password);
+
+        clickNavButton("Set Password");
+    }
+
+    protected enum PasswordRule {Weak, Strong}
+    protected enum PasswordExpiration {Never, FiveSeconds, ThreeMonths, SixMonths, OneYear}
+
+    protected PasswordRule oldStrength = null;
+    protected PasswordExpiration oldExpiration = null;
+    protected void setDbLoginConfig(PasswordRule strength, PasswordExpiration expiration)
+    {
+        PasswordRule curStrength = null;
+        PasswordExpiration curExpiration = null;
+
+        pushLocation();
+
+        beginAt("/login/configureDbLogin.view");
+
+
+        if ( oldStrength == null || oldExpiration == null )
+        {
+            // Remember old login settings.
+            curStrength = PasswordRule.valueOf(getAttribute(Locator.xpath("//input[@type = 'radio' and @checked = '' and @name='strength']"), "value"));
+            curExpiration = PasswordExpiration.valueOf(getFormElement("expiration"));
+        }
+
+        if ( strength != null && curStrength != strength)
+        {
+            if ( oldStrength == null ) oldStrength = curStrength;
+            click(Locator.radioButtonByNameAndValue("strength", strength.toString()));
+        }
+
+        if ( expiration != null && curExpiration != expiration)
+        {
+            if ( oldExpiration == null ) oldExpiration = curExpiration;
+            setFormElement("expiration", expiration.toString());
+        }
+
+        clickNavButton("Save");
+
+        popLocation();
+    }
+
+    protected void resetDbLoginConfig()
+    {
+        if ( oldStrength != null || oldExpiration != null )
+        {
+            pushLocation();
+
+            beginAt("/login/configureDbLogin.view");
+
+            if ( oldStrength != null ) click(Locator.radioButtonByNameAndValue("strength", oldStrength.toString()));
+            if ( oldExpiration != null ) setFormElement("expiration", oldExpiration.toString());
+
+            clickNavButton("Save");
+
+            if ( oldStrength != null ) assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getAttribute(Locator.xpath("//input[@type = 'radio' and @checked = '' and @name='strength']"), "value")));
+            if ( oldExpiration != null ) assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement("expiration")));
+
+            // Back to default.
+            oldStrength = null;
+            oldExpiration = null;
+
+            popLocation();
+        }
     }
 
     public void ensureAdminMode()
@@ -912,6 +1000,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
                     System.out.println("Unable to dump failure information");
                     t.printStackTrace();
+                }
+                finally
+                {
+                    if ( isElementPresent(Locator.linkWithText("Stop Impersonating") )) stopImpersonating();
+                    resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                 }
             }
 
