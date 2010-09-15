@@ -82,7 +82,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
 
     public String getAssociatedModuleDirectory()
     {
-        return "pipeline";  // + ms2 and ms1
+        return "server/modules/pipeline";  // + ms2 and ms1
     }
 
     protected void doCleanup() throws Exception

@@ -51,7 +51,6 @@ public enum TestSet
         MicroarrayTest.class,
         ViabilityTest.class,
         ButtonCustomizationTest.class,
-        ScriptValidationTest.class
     }),
 
     MS2(new Class[]
@@ -103,8 +102,10 @@ public enum TestSet
         SCHARPStudyTest.class,
         IDRIParticleSizeTest.class,
         CohortTest.class,
+        ReagentTest.class,
         RlabkeyTest.class,
-        SearchTest.class
+        ScriptValidationTest.class,
+        SearchTest.class,
     }),
 
     Cluster(new Class[]
@@ -159,6 +160,7 @@ public enum TestSet
             ExternalSchemaTest.class,
             ListTest.class,
             IssuesTest.class,
+            ScriptValidationTest.class
     }),
 
     IDRI(new Class[] {

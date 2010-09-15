@@ -55,7 +55,7 @@ public class SearchTest extends StudyTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return "search";
+        return "server/modules/search";
     }
 
     @Override

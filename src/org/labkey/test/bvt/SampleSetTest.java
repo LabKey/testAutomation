@@ -49,7 +49,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "experiment";
+        return "server/modules/experiment";
     }
 
     protected void doCleanup()

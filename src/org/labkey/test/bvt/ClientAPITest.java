@@ -352,7 +352,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "none";
+        return null;
     }
 
     protected void doCleanup() throws Exception

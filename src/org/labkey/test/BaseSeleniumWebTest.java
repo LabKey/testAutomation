@@ -4312,6 +4312,24 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    public void pressTab(String xpath)
+    {
+        selenium.keyDown(xpath, "\\9"); // For Windows
+        selenium.keyPress(xpath, "\\9"); // For Linux
+    }
+
+    public void pressEnter(String xpath)
+    {
+        selenium.keyDown(xpath, "\\13"); // For Windows
+        selenium.keyPress(xpath, "\\13"); // For Linux
+    }
+
+    public void pressDownArrow(String xpath)
+    {
+        selenium.keyDown(xpath, "\\40"); // For Windows
+        selenium.keyPress(xpath, "\\40"); // For Linux
+    }
+
     public class DefaultSeleniumWrapper extends DefaultSelenium
     {
         DefaultSeleniumWrapper()

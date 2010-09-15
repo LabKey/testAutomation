@@ -736,19 +736,15 @@ public class Runner extends TestSuite
                     Constructor<WebTest> c = testClass.getConstructor();
                     WebTest test = c.newInstance();
                     String directory = test.getAssociatedModuleDirectory();
+                    if (directory == null || directory.length() == 0)
+                        continue;
 
-                    if (null == directory || 0 == directory.length())
-                        System.out.println("ERROR: Invalid module directory \"" + directory + "\" specified by " + testClass);
+                    File testDir = new File(WebTestHelper.getLabKeyRoot(), directory);
 
-                    if (!"none".equals(directory))
+                    if (!testDir.exists())
                     {
-                        File testDir = new File(WebTestHelper.getLabKeyRoot(), "/server/modules/" + directory);
-
-                        if (!testDir.exists())
-                        {
-                            System.out.println("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
-                            System.exit(1);
-                        }
+                        System.out.println("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
+                        System.exit(1);
                     }
 
                     tm.put(directory, testClass);

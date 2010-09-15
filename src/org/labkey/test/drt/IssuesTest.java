@@ -41,7 +41,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "issues";
+        return "server/modules/issues";
     }
 
     protected void doCleanup()

@@ -33,7 +33,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "core";
+        return "server/modules/core";
     }
 
     protected void doTestSteps()

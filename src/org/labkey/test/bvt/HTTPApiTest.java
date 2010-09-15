@@ -59,7 +59,7 @@ public class HTTPApiTest extends SimpleApiTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "query";
+        return "server/modules/query";
     }
 
     protected void doCleanup() throws Exception

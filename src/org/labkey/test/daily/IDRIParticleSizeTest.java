@@ -189,7 +189,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "none";
+        return "server/modules/idriParticleSize";
     }
 
     @Override

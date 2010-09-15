@@ -32,7 +32,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "filecontent";
+        return "server/modules/filecontent";
     }
 
     public boolean isFileUploadTest()

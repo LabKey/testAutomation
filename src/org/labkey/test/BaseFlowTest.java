@@ -29,7 +29,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "flow";
+        return "server/modules/flow";
     }
 
     protected void setFlowPipelineRoot(String rootPath)

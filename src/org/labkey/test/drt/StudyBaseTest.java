@@ -39,7 +39,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "study";
+        return "server/modules/study";
     }
 
     protected static String getSampleDataPath()

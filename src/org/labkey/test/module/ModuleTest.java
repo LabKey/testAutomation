@@ -47,7 +47,7 @@ public class ModuleTest extends BaseSeleniumWebTest
     
     public String getAssociatedModuleDirectory()
     {
-        return "none";
+        return null;
     }
 
 }

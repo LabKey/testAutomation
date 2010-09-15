@@ -545,6 +545,6 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "ms1";
+        return "server/modules/ms1";
     }
 }

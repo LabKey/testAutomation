@@ -29,7 +29,7 @@ public class CaBigTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "cabig";
+        return "server/modules/cabig";
     }
 
     protected void doCleanup()

@@ -65,7 +65,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
     // Return the directory of the module whose functionality this class tests, or "none" if multiple/all modules are tested
     public String getAssociatedModuleDirectory()
     {
-        return "ms2";
+        return "server/modules/ms2";
     }
 
     @Override

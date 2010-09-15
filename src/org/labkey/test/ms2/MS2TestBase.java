@@ -50,7 +50,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "ms2";
+        return "server/modules/ms2";
     }
 
     protected void doCleanup() throws IOException

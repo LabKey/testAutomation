@@ -174,7 +174,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "query";
+        return "server/modules/query";
     }
 
     private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch) throws UnsupportedEncodingException

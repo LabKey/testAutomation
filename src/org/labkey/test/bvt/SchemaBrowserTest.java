@@ -112,6 +112,6 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "query";
+        return "server/modules/query";
     }
 }

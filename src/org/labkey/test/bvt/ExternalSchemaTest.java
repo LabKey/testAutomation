@@ -177,7 +177,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "query";
+        return "server/modules/query";
     }
 
     protected void doTestSteps() throws Exception

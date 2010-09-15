@@ -41,7 +41,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "study";
+        return "server/modules/study";
     }
 
     @Override

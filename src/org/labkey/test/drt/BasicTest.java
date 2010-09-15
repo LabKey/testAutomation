@@ -152,6 +152,6 @@ public class BasicTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "none";
+        return null;
     }
 }

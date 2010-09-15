@@ -305,6 +305,6 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "experiment";
+        return "server/modules/experiment";
     }
 }

@@ -261,6 +261,6 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return "list";
+        return "server/modules/list";
     }
 }

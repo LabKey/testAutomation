@@ -30,7 +30,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "ms2";
+        return "server/modules/ms2";
     }
 
     protected void doTestSteps() throws Exception

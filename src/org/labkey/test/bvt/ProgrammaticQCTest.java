@@ -260,6 +260,6 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "query";
+        return "server/modules/query";
     }
 }

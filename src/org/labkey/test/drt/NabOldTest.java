@@ -35,7 +35,7 @@ public class NabOldTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "nab";
+        return "server/modules/nab";
     }
 
 

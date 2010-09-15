@@ -51,7 +51,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "luminex";
+        return "server/modules/luminex";
     }
 
     /**

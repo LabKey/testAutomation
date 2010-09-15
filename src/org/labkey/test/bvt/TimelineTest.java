@@ -87,7 +87,7 @@ public class TimelineTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "timeline";
+        return "server/modules/timeline";
     }
 
     protected void doCleanup() throws Exception

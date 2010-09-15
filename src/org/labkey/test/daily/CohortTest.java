@@ -311,7 +311,7 @@ public class CohortTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "study";
+        return "server/modules/study";
     }
 }
 

@@ -35,7 +35,7 @@ public class ViabilityTest extends AbstractQCAssayTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "viability";
+        return "server/modules/viability";
     }
 
     @Override
@@ -228,12 +228,6 @@ public class ViabilityTest extends AbstractQCAssayTest
         String xpath = "//input[@name='" + id + "'][" + index + "]";
         setFormElement(xpath, value);
         pressTab(xpath);
-    }
-
-    public void pressTab(String xpath)
-    {
-        selenium.keyDown(xpath, "\\9"); // For Windows
-        selenium.keyPress(xpath, "\\9"); // For Linux
     }
 
     protected void runTransformTest()

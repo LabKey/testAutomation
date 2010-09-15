@@ -48,7 +48,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "core";
+        return "server/modules/core";
     }
 
     protected void doCleanup()

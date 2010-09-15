@@ -378,9 +378,9 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        //return "none" to skip verification of module directory
+        //return "null" to skip verification of module directory
         //as it won't exist until after the test starts running the first time
-        return "none";
+        return null;
     }
 
 }

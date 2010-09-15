@@ -38,7 +38,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "audit";
+        return "server/modules/audit";
     }
 
     protected void doCleanup() throws Exception

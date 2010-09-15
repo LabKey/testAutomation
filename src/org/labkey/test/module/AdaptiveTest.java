@@ -655,7 +655,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return "none";
+        return null;
     }
 
     @Override

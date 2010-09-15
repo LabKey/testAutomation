@@ -522,6 +522,6 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "experiment";
+        return "server/modules/experiment";
     }
 }

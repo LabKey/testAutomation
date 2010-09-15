@@ -49,7 +49,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "microarray";
+        return "server/modules/microarray";
     }
 
     protected void doCleanup() throws Exception

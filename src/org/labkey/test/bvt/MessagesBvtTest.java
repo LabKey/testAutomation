@@ -46,7 +46,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "announcements";
+        return "server/modules/announcements";
     }
 
     protected void permissionCheck(String permission, boolean readAbility)

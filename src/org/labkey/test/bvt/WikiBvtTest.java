@@ -81,7 +81,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "wiki";
+        return "server/modules/wiki";
     }
 
 

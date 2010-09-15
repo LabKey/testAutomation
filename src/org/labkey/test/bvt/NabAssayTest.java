@@ -84,7 +84,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "nab";
+        return "server/modules/nab";
     }
 
     /**

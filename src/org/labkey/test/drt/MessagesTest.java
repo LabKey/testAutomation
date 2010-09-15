@@ -35,7 +35,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
     public String getAssociatedModuleDirectory()
     {
-        return "announcements";
+        return "server/modules/announcements";
     }
 
     @Override
