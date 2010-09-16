@@ -43,9 +43,6 @@ public class MS2BvtTest extends MS2TestBase
     protected static final String PEPTIDE3 = "K.HVSGKIIGFFY.-";
     protected static final String PEPTIDE4 = "R.ISSTKMDGIGPK.K";
     protected static final String SEARCH_TYPE = "xtandem";
-    protected static final String SEARCH_NAME = "XTandem";
-    protected static final String SEARCH_NAME2 = "X!Tandem";
-    protected static final String SEARCH_BUTTON = "X%21Tandem";
     protected static final String SEARCH_NAME3 = "X! Tandem";
     protected static final String ENZYME = "trypsin";
     protected static final String MASS_SPEC = "ThermoFinnigan";
@@ -1012,7 +1009,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
         assertTextPresent("Default Experiment");
-        selectOptionByValue("//div[contains(text(), 'Chart:')]/../../td/select", "group1");
+        selectOptionByValue("//div[text() = 'A']/../../../td/select", "group1");
 
         log("Test Customize View");
         clickMenuButton("Views", CUSTOMIZE_VIEW);
