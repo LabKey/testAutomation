@@ -19,7 +19,8 @@ package org.labkey.test;
 import org.labkey.test.bvt.*;
 import org.labkey.test.daily.*;
 import org.labkey.test.drt.*;
-import org.labkey.test.module.*;
+import org.labkey.test.module.AdaptiveTest;
+import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.SequestTest;
@@ -51,6 +52,7 @@ public enum TestSet
         MicroarrayTest.class,
         ViabilityTest.class,
         ButtonCustomizationTest.class,
+        ReagentTest.class,
     }),
 
     MS2(new Class[]
@@ -102,7 +104,6 @@ public enum TestSet
         SCHARPStudyTest.class,
         IDRIParticleSizeTest.class,
         CohortTest.class,
-        ReagentTest.class,
         RlabkeyTest.class,
         ScriptValidationTest.class,
         SearchTest.class,

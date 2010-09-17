@@ -30,6 +30,12 @@ public class ReagentTest extends BaseSeleniumWebTest
     protected static final String FOLDER_NAME = "ReagentFolder";
 
     @Override
+    protected boolean isDatabaseSupported(DatabaseInfo info)
+    {
+        return info.productName.equals("PostgreSQL");
+    }
+
+    @Override
     public String getAssociatedModuleDirectory()
     {
         return "server/customModules/reagent";
