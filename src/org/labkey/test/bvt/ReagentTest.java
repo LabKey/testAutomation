@@ -67,6 +67,7 @@ public class ReagentTest extends BaseSeleniumWebTest
         submit();
 
         beginAt("reagent/" + PROJECT_NAME + "/" + FOLDER_NAME + "/initialize.view");
+        waitForText("Done.", 2*WAIT_FOR_JAVASCRIPT);
     }
 
     public void _testInsert()
