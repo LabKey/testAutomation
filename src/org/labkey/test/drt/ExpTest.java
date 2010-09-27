@@ -38,7 +38,6 @@ public class ExpTest extends BaseSeleniumWebTest
     private static final String RUN_NAME = "Example 5 Run (XTandem peptide search)";
     private static final String RUN_NAME_IMAGEMAP = "Example 5 Run (XTandem peptide search)";
     private static final String DATA_OBJECT_TITLE = "Data: CAexample_mini.mzXML";
-    private static final int MAX_WAIT_SECONDS = 60*5;
 
     public String getAssociatedModuleDirectory()
     {
@@ -92,6 +91,7 @@ public class ExpTest extends BaseSeleniumWebTest
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Datas");
         clickNavButton("Create and Edit Source");
+        toggleEditors();
         setFormElement("ff_queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
                 "Datas.Run AS Run,\n" +
@@ -114,10 +114,11 @@ public class ExpTest extends BaseSeleniumWebTest
         clickExtTab("Format");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
         clickNavButton("Save", 0);
-        waitForText("Save successful.", 10000);
+        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
 
         // Verify that it ended up in the XML version of the metadata
         clickNavButton("Edit Source");
+        toggleEditors();
         assertTextPresent("<ns:columnTitle>editedCreated</ns:columnTitle>");
         assertTextPresent("<ns:formatString>ddd MMM dd yyyy</ns:formatString>");
 
@@ -145,7 +146,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Save it
         clickNavButton("Save", 0);
-        waitForText("Save successful.", 10000);
+        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
         clickNavButton("Edit Source");
         clickNavButton("View Data");
 
@@ -163,6 +164,16 @@ public class ExpTest extends BaseSeleniumWebTest
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Reset to Default").getPath());
         selenium.click("//span" + Locator.navButton("OK").getPath());
-        waitForText("Reset successful", 10000);
+        waitForText("Reset successful", WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void toggleEditors()
+    {
+        Locator queryId = Locator.id("edit_area_toggle_checkbox_queryText");
+        Locator metadataId = Locator.id("edit_area_toggle_checkbox_metadataText");
+        waitForElement(queryId, WAIT_FOR_PAGE);
+        waitForElement(metadataId, WAIT_FOR_JAVASCRIPT);
+        uncheckCheckbox(queryId);
+        uncheckCheckbox(metadataId);
     }
 }
