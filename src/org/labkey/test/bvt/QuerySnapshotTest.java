@@ -211,6 +211,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         setFormElement("ff_newQueryName", "cross study query");
         clickNavButton("Create and Edit Source");
+        toggleQueryEditors();
         setFormElement("queryText", CROSS_STUDY_QUERY_SQL);
         clickNavButton("View Data");
         
