@@ -4730,6 +4730,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertEquals(getCompleteCount(statusValues), completeJobsExpected);
     }
 
+    /** Turns off the fancy SQL and XML editors for custom queries and sets them to be simple text areas which are easier
+     * to manipulate through the tests */
+    protected void toggleQueryEditors()
+    {
+        Locator queryId = Locator.id("edit_area_toggle_checkbox_queryText");
+        Locator metadataId = Locator.id("edit_area_toggle_checkbox_metadataText");
+        waitForElement(queryId, WAIT_FOR_PAGE);
+        waitForElement(metadataId, WAIT_FOR_JAVASCRIPT);
+        uncheckCheckbox(queryId);
+        uncheckCheckbox(metadataId);
+    }
+
     /**
      * For invoking pipeline actions from the file web part. Displays the import data
      * dialog and selects and submits the specified action.

@@ -210,7 +210,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextPresent("Milestone");
 
         // ListAction
-        clickLinkWithText("view grid");
+        clickLinkWithText("return to grid");
 
         //Click the issue id based on the text issue title
         //String xpath = "//td/a[text() = '" + ISSUE_TITLE_0 + "']/../../td[2]/a";
@@ -249,7 +249,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextNotPresent("Invalid");
 
         // SearchAction
-        clickLinkWithText("view grid");
+        clickLinkWithText("return to grid");
         pushLocation();
         String index = getContextPath() + "/search/" + PROJECT_NAME + "/index.view?wait=1";
         log(index);
@@ -397,7 +397,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
 
         assertTextPresent("Field Title cannot be blank.");
-        clickNavButton("View Grid");
+        clickNavButton("Return to Grid");
     }
 
     private void checkRequiredField(String name, boolean select)
@@ -428,7 +428,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("View Details");
         assertTextPresent("a bright flash of light");
         assertTextPresent("don't believe the hype");
-        clickLinkWithText("view grid");
+        clickLinkWithText("return to grid");
     }
 
     public void testLastFilter(int issueId)
@@ -447,7 +447,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
 
         // assert both issues are present
-        clickLinkWithText("view grid");
+        clickLinkWithText("return to grid");
         clearAllFilters("Issues", "IssueId");
         assertTextPresent(ISSUE_TITLE_0);
         assertTextPresent(ISSUE_TITLE_1);
@@ -461,7 +461,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText(String.valueOf(issueId));
 
         // assert .lastFilter is applied
-        clickLinkWithText("view grid");
+        clickLinkWithText("return to grid");
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent(ISSUE_TITLE_1);
 

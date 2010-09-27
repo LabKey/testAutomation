@@ -60,6 +60,7 @@ public class FlowTest extends BaseFlowTest
         submit();
 
         beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + getFolderName() + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
+        toggleQueryEditors();
         setFormElement("ff_queryText", "SELECT FCSAnalyses.RowId,\n" +
                 "FCSAnalyses.Statistic.\"Count\",\n" +
                 "FCSAnalyses.Run.FilePathRoot,\n" +

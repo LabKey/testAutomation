@@ -91,7 +91,7 @@ public class ExpTest extends BaseSeleniumWebTest
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Datas");
         clickNavButton("Create and Edit Source");
-        toggleEditors();
+        toggleQueryEditors();
         setFormElement("ff_queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
                 "Datas.Run AS Run,\n" +
@@ -118,7 +118,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Verify that it ended up in the XML version of the metadata
         clickNavButton("Edit Source");
-        toggleEditors();
+        toggleQueryEditors();
         assertTextPresent("<ns:columnTitle>editedCreated</ns:columnTitle>");
         assertTextPresent("<ns:formatString>ddd MMM dd yyyy</ns:formatString>");
 
@@ -165,15 +165,5 @@ public class ExpTest extends BaseSeleniumWebTest
         selenium.click("//span" + Locator.navButton("Reset to Default").getPath());
         selenium.click("//span" + Locator.navButton("OK").getPath());
         waitForText("Reset successful", WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void toggleEditors()
-    {
-        Locator queryId = Locator.id("edit_area_toggle_checkbox_queryText");
-        Locator metadataId = Locator.id("edit_area_toggle_checkbox_metadataText");
-        waitForElement(queryId, WAIT_FOR_PAGE);
-        waitForElement(metadataId, WAIT_FOR_JAVASCRIPT);
-        uncheckCheckbox(queryId);
-        uncheckCheckbox(metadataId);
     }
 }
