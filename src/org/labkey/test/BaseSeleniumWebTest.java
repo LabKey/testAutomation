@@ -4734,11 +4734,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      * to manipulate through the tests */
     protected void toggleQueryEditors()
     {
+        toggleSQLQueryEditor();
+        toggleMetadataQueryEditor();
+    }
+
+    protected void toggleSQLQueryEditor()
+    {
         Locator queryId = Locator.id("edit_area_toggle_checkbox_queryText");
-        Locator metadataId = Locator.id("edit_area_toggle_checkbox_metadataText");
         waitForElement(queryId, WAIT_FOR_PAGE);
-        waitForElement(metadataId, WAIT_FOR_JAVASCRIPT);
         uncheckCheckbox(queryId);
+    }
+
+    protected void toggleMetadataQueryEditor()
+    {
+        Locator metadataId = Locator.id("edit_area_toggle_checkbox_metadataText");
+        waitForElement(metadataId, WAIT_FOR_JAVASCRIPT);
         uncheckCheckbox(metadataId);
     }
 
