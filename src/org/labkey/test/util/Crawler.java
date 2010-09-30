@@ -240,6 +240,10 @@ public class Crawler
 
             rootRelativeURL = BaseSeleniumWebTest.stripContextPath(rootRelativeURL);
             int postControllerSlashIdx = rootRelativeURL.indexOf('/');
+
+            if (-1 == postControllerSlashIdx)
+                fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
+
             _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
             _folder = rootRelativeURL.substring(postControllerSlashIdx, rootRelativeURL.lastIndexOf('/'));
         }
