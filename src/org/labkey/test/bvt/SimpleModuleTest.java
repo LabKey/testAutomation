@@ -24,6 +24,7 @@ import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.CommandException;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Date;
@@ -239,27 +240,36 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         }
     }
 
-    private void cleanupSchema(Connection cn) throws Exception
+    private void cleanupSchema(Connection cn) throws IOException
     {
-        cleanupTable(cn, "Vehicles");
-        cleanupTable(cn, "Models");
-        cleanupTable(cn, "Manufacturers");
-        cleanupTable(cn, "Colors");
+        cleanupTable(cn, "Vehicles", getProjectName());
+        cleanupTable(cn, "Models", null);
+        cleanupTable(cn, "Manufacturers", null);
+        cleanupTable(cn, "Colors", null);
     }
 
-    private void cleanupTable(Connection cn, String tableName) throws Exception
+    private void cleanupTable(Connection cn, String tableName, String project) throws IOException
     {
-        log("** Deleting all " + tableName);
-        SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, tableName);
-        selectCmd.setMaxRows(-1);
-        SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
-
-        if (selectResp.getRowCount().intValue() > 0)
+        log("** Deleting all " + tableName + " from '" + (project == null ? "root" : project) + "'");
+        try
         {
-            DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, tableName);
-            deleteCmd.setRows(selectResp.getRows());
-            deleteCmd.execute(cn, getProjectName());
-            assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, getProjectName()).getRowCount().intValue());
+            SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, tableName);
+            selectCmd.setMaxRows(-1);
+            SelectRowsResponse selectResp = selectCmd.execute(cn, project);
+
+            if (selectResp.getRowCount().intValue() > 0)
+            {
+                DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, tableName);
+                deleteCmd.setRows(selectResp.getRows());
+                deleteCmd.execute(cn, project);
+                assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, project).getRowCount().intValue());
+            }
+        }
+        catch (CommandException e)
+        {
+            // Don't log project not found error
+            if (e.getStatusCode() != 404)
+                e.printStackTrace();
         }
     }
 
