@@ -297,7 +297,9 @@ public class SearchTest extends StudyTest
         String filename = "InlineFile.html";
         String sampleRoot = getLabKeyRoot() + "/sampledata/security";
         File f = new File(sampleRoot, filename);
-        setFormElement("fileUpload-file", f);
+
+        Locator fileUpload = Locator.xpath("//label[text() = 'Choose a file:']//..//input[@class = 'x-form-file']");
+        setFormElement(fileUpload.toString(), f);
         clickNavButton("Submit", 0);
         waitForText(filename, 10000);
 
