@@ -164,8 +164,8 @@ public class StudyBvtTest extends StudyManualTest
 
         // verify dataset columns
         clickLinkWithText(MODIFIED_DATASET);
-        assertChecked(Locator.xpath("//tr[7]/td[6]/input"));
-        assertElementContains(Locator.xpath("//tr[7]/td[7]"), COLUMN_DESC);
+        assertChecked(Locator.xpath("//tr[9]/td[6]/input"));
+        assertElementContains(Locator.xpath("//tr[9]/td[7]"), COLUMN_DESC);
         assertTextPresent(CATEGORY);
 
         // TODO: verify lookup
