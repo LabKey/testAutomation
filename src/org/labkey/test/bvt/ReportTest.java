@@ -279,7 +279,7 @@ public class ReportTest extends StudyBaseTest
 
         log("Create view");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        removeCustomizeViewColumn(R_REMCOL);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, R_REMCOL);
         CustomizeViewsHelper.addCustomizeViewFilter(this, "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
         CustomizeViewsHelper.addCustomizeViewSort(this, R_SORT, "2.What is your sex?", "Descending");
         CustomizeViewsHelper.saveCustomView(this, R_VIEW);
