@@ -19,6 +19,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.CustomizeViewsHelper;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -283,10 +284,9 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // test creating a custom details view via a "magic" named run-level view:
             clickLinkWithText("View Runs");
-            clickMenuButton("Views", CUSTOMIZE_VIEW);
-            removeCustomizeViewColumn("Virus Name");
-            setFormElement("ff_columnListName", "CustomDetailsView");
-            clickNavButton("Save");
+            CustomizeViewsHelper.openCustomizeViewPanel(this);
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "VirusName");
+            CustomizeViewsHelper.saveCustomView(this, "CustomDetailsView");
 
             clickLinkContainingText("details", 1);
             assertNabData(true);
@@ -452,21 +452,20 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Adding AUC columns to custom view");
         // add AUC columns. ORDER MATTERS!
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.id("expand_Properties"));
-        addCustomizeViewColumn("Properties/AUC_4pl", "AUC 4pl");
-        addCustomizeViewColumn("Properties/AUC_5pl", "AUC 5pl");
-        addCustomizeViewColumn("Properties/AUC_poly", "AUC Poly");
-        addCustomizeViewColumn("Properties/Curve IC50_4pl", "Curve IC50 4pl");
-        addCustomizeViewColumn("Properties/Curve IC50_5pl", "Curve IC50 5pl");
-        addCustomizeViewColumn("Properties/Curve IC50_poly", "Curve IC50 Poly");
-        addCustomizeViewColumn("Properties/Curve IC70_4pl", "Curve IC70 4pl");
-        addCustomizeViewColumn("Properties/Curve IC70_5pl", "Curve IC70 5pl");
-        addCustomizeViewColumn("Properties/Curve IC70_poly", "Curve IC70 Poly");
-        addCustomizeViewColumn("Properties/Curve IC80_4pl", "Curve IC80 4pl");
-        addCustomizeViewColumn("Properties/Curve IC80_5pl", "Curve IC80 5pl");
-        addCustomizeViewColumn("Properties/Curve IC80_poly", "Curve IC80 Poly");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_4pl", "AUC 4pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_5pl", "AUC 5pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_poly", "AUC Poly");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_4pl", "Curve IC50 4pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_5pl", "Curve IC50 5pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_poly", "Curve IC50 Poly");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_4pl", "Curve IC70 4pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_5pl", "Curve IC70 5pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_poly", "Curve IC70 Poly");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl", "Curve IC80 4pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_5pl", "Curve IC80 5pl");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_poly", "Curve IC80 Poly");
+        clickNavButton("Apply");
     }
 
     private void assertAliasedAUCCellData()
