@@ -17,6 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * User: tamram
@@ -50,13 +51,13 @@ public class CaBigTest extends BaseSeleniumWebTest
         enterPermissionsUI();
 
         // Test publish/unpublish on the project
-        clickExtTab("Publish to caBIG");
+        ExtHelper.clickExtTab(this, "Publish to caBIG");
         assertTextPresent("This folder is not published to the caBIG");
         clickNavButton("Publish");
-        clickExtTab("Publish to caBIG");
+        ExtHelper.clickExtTab(this, "Publish to caBIG");
         assertTextPresent("This folder is published to the caBIG");
         clickNavButton("Unpublish");
-        clickExtTab("Publish to caBIG");
+        ExtHelper.clickExtTab(this, "Publish to caBIG");
         assertTextPresent("This folder is not published to the caBIG");
         clickNavButton("Save and Finish");
 
@@ -81,7 +82,7 @@ public class CaBigTest extends BaseSeleniumWebTest
 
         // Should be on the project permissions page
         assertTextPresent("Publish to caBIG");
-        clickExtTab("Publish to caBIG");
+        ExtHelper.clickExtTab(this, "Publish to caBIG");
         assertTextPresent("This folder is not published to the caBIG");
         clickNavButton("Save and Finish");
 

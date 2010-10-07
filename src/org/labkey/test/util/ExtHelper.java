@@ -142,4 +142,47 @@ public class ExtHelper
         file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-inner x-grid3-hd-checker x-grid3-hd-checker-on']");
         test.waitForElement(file, 60000);
     }
+
+    public static void selectComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
+    {
+        test.click(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"));
+        test.click(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"));
+        test.mouseDown(Locator.xpath("/html/body"));
+    }
+
+
+    public static void closeExtTab(BaseSeleniumWebTest test, String tabName)
+    {
+        test.log("Closing Ext tab " + tabName);
+        test.mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 0, 0);
+    }
+
+    public static void clickExtTab(BaseSeleniumWebTest test, String tabname)
+    {
+        test.log("Selecting Ext tab " + tabname);
+        test.click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']"));
+    }
+
+    public static void clickExtTabContainingText(BaseSeleniumWebTest test, String tabText)
+    {
+        test.log("Selecting Ext tab " + tabText);
+        test.click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and contains( text(), '" + tabText + "')]"));
+    }
+
+    public static void clickExtToolbarButton(BaseSeleniumWebTest test, String caption)
+    {
+        clickExtToolbarButton(test, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
+    }
+
+    public static void clickExtToolbarButton(BaseSeleniumWebTest test, String caption, int wait)
+    {
+        test.log("Clicking Ext button with caption: " + caption);
+        Locator loc = Locator.xpath("//button[contains(./@class, 'x-btn-text') and text()='" + caption + "']");
+        test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        if (wait > 0)
+            test.clickAndWait(loc, wait);
+        else
+            test.click(loc);
+    }
+
 }

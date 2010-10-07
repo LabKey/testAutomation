@@ -460,8 +460,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected enum PasswordRule {Weak, Strong}
     protected enum PasswordExpiration {Never, FiveSeconds, ThreeMonths, SixMonths, OneYear}
 
-    protected PasswordRule oldStrength = null;
-    protected PasswordExpiration oldExpiration = null;
+    private PasswordRule oldStrength = null;
+    private PasswordExpiration oldExpiration = null;
     protected void setDbLoginConfig(PasswordRule strength, PasswordExpiration expiration)
     {
         PasswordRule curStrength = null;
@@ -501,6 +501,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if ( oldStrength != null || oldExpiration != null )
         {
             pushLocation();
+
+            if ( isElementPresent(Locator.linkWithText("Stop Impersonating") )) stopImpersonating();
 
             beginAt("/login/configureDbLogin.view");
 
@@ -1003,7 +1005,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
                 finally
                 {
-                    if ( isElementPresent(Locator.linkWithText("Stop Impersonating") )) stopImpersonating();
                     resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                 }
             }
@@ -1492,6 +1493,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 	{
 		return selenium.getAlert();
 	}
+
+    public enum SeleniumEvent
+    {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload}
+
+    public void fireEvent(Locator loc, SeleniumEvent event)
+    {
+        selenium.fireEvent(loc.toString(), event.toString());
+    }
 
     public void createProject(String projectName)
     {
@@ -2399,34 +2408,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLink(getTabLinkId(tabname));
     }
 
-    public void closeExtTab(String tabName)
-    {
-        log("Closing Ext tab " + tabName);
-        mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 0, 0);
-    }
-
-    public void clickExtTab(String tabname)
-    {
-        log("Selecting Ext tab " + tabname);
-        click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']"));
-    }
-
-    public void clickExtToolbarButton(String caption)
-    {
-        clickExtToolbarButton(caption, defaultWaitForPage);
-    }
-
-    public void clickExtToolbarButton(String caption, int wait)
-    {
-        log("Clicking Ext button with caption: " + caption);
-        Locator loc = Locator.xpath("//button[contains(./@class, 'x-btn-text') and text()='" + caption + "']");
-        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
-        if (wait > 0)
-            clickAndWait(loc, wait);
-        else
-            click(loc);
-    }
-
     public void clickImageWithAltText(String altText)
     {
         log("Clicking first image with alt text " + altText );
@@ -3049,6 +3030,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public String getPropertyXPath(String propertyHeading)
     {
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
+    }
+
+    public int getXpathCount(Locator.XPathLocator xpath)
+    {
+        return selenium.getXpathCount(xpath.getPath()).intValue();
     }
 
     // UNDONE: move usages to use ListHelper
@@ -3726,7 +3712,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTextNotPresent("Stop Impersonating");
         ensureAdminMode();
         enterPermissionsUI();
-        clickExtTab("Impersonate");
+        ExtHelper.clickExtTab(this, "Impersonate");
         selectOptionByText(Locator.id("email").toString(), fakeUser);
         clickNavButton("Impersonate");
         _impersonationStack.push(fakeUser);
@@ -3840,7 +3826,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        clickExtTab("Groups for project " + projectName);
+        ExtHelper.clickExtTab(this, "Groups for project " + projectName);
         boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         exitPermissionsUI();
         return ret;
@@ -3865,7 +3851,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        clickExtTab("Groups for project " + projectName);
+        ExtHelper.clickExtTab(this, "Groups for project " + projectName);
         click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
         click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
@@ -4299,7 +4285,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void validateQueries()
     {
-        clickExtToolbarButton("Validate Queries", 0);
+        ExtHelper.clickExtToolbarButton(this, "Validate Queries", 0);
         Locator locButton = Locator.xpath("//button[text()='Start Validation']");
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
         waitForElement(locButton, WAIT_FOR_JAVASCRIPT);
@@ -4655,6 +4641,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             copyFile(_specimenArchive, _copiedArchive);
 
             clickLinkWithText(_studyFolderName);
+
+            int total = 0;
+            while( !isLinkPresentWithText("Manage Files") && total < WAIT_FOR_PAGE)
+            {
+                // Loop in case test is outrunning the study creator
+                sleep(250);
+                total += 250;
+                refresh();
+            }
+
             clickLinkWithText("Manage Files");
             clickNavButton("Process and Import Data");
             sleep(1000);

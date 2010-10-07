@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.drt.StudyBaseTest;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -138,16 +139,10 @@ public class QuerySnapshotTest extends StudyBaseTest
         log("create a snapshot over a custom view");
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
 
-        click(Locator.xpath("//img[@id='expand_MouseId']"));
-        click(Locator.xpath("//img[@id='expand_MouseId/DataSet']"));
-        click(Locator.xpath("//img[@id='expand_MouseId/DataSet/DEM-1: Demographics']"));
-        click(Locator.xpath("//img[@id='expand_MouseId/DataSet/DEM-1: Demographics/seq101']"));
-
-        addCustomizeViewColumn("MouseId/DataSet/DEM-1: Demographics/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
-        setFormElement("ff_columnListName", "APX Joined View");
-        clickNavButton("Save");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "MouseId/DataSet/DEM-1: Demographics/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
+        CustomizeViewsHelper.saveCustomView(this, "APX Joined View");
 
         createQuerySnapshot(APX_SNAPSHOT, true, false);
         assertTextNotPresent("Slovakian");

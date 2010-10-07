@@ -24,6 +24,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -144,7 +145,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     {
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/begin.view");
-        clickExtToolbarButton("Schema Administration");
+        ExtHelper.clickExtToolbarButton(this, "Schema Administration");
 
         if (!isTextPresent("reload"))
         {

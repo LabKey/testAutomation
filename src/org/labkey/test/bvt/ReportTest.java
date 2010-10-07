@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.drt.StudyBaseTest;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 
@@ -58,12 +59,11 @@ public class ReportTest extends StudyBaseTest
     private final static String R_SCRIPT1_TEXT2 = "1980-08-01";
     private final static String R_SCRIPT1_IMG = "resultImage";
     private final static String R_SCRIPT1_PDF = "PDF output file (click to download)";
-    private final static String R_FILTER = "DEMhisp";
     private final static String R_FILTERED = "999320565";
     private final static String R_SORT = "DEMsex";
     private final static String R_SORT1 = "Male";
     private final static String R_SORT2 = "Female";
-    private final static String R_REMCOL = "5. Sexual orientation";
+    private final static String R_REMCOL = "DEMsexor";
     private final static String R_SCRIPT2_METHOD = "func2";
     private final static String[] R_SCRIPTS = { "rScript1", "rScript2", "rScript3", "rScript4" };
     private final static String R_SCRIPT1_METHOD = "func1";
@@ -278,12 +278,11 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Save");
 
         log("Create view");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
         removeCustomizeViewColumn(R_REMCOL);
-        addCustomizeViewFilter(R_FILTER, "3.Latino/a or Hispanic?", "Does Not Equal", "Yes");
-        addCustomizeViewSort(R_SORT, "2.What is your sex?", "DESC");
-        setFormElement("ff_columnListName", R_VIEW);
-        clickNavButton("Save");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
+        CustomizeViewsHelper.addCustomizeViewSort(this, R_SORT, "2.What is your sex?", "Descending");
+        CustomizeViewsHelper.saveCustomView(this, R_VIEW);
 
         log("Check that customize view worked");
         assertTextNotPresent(R_REMCOL);

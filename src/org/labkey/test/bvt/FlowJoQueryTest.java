@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -41,18 +42,15 @@ public class FlowJoQueryTest extends BaseFlowTest
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
         importAnalysis(containerPath, "/flowjoquery/Workspaces/PV1-public.xml", null, "FlowJoAnalysis", true);
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        clearCustomizeViewColumns();
-        addCustomizeViewColumn("Name");
-        addCustomizeViewColumn("AnalysisScript", "Analysis Script");
-        click(Locator.raw("expand_FCSFile"));
-        click(Locator.raw("expand_FCSFile/Keyword"));
-        addCustomizeViewColumn("FCSFile/Keyword/Stim", "Stim");
-        addCustomizeViewColumn("FCSFile/Keyword/Sample Order", "Sample Order");
-        click(Locator.raw("expand_Statistic"));
-        addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
-        addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
-        clickNavButton("Save", longWaitForPage);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.clearCustomizeViewColumns(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Name");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "AnalysisScript", "Analysis Script");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Keyword/Stim", "Stim");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Keyword/Sample Order", "Sample Order");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
+        clickNavButton("Apply", longWaitForPage);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Folder Settings");
         toggleCheckboxByTitle("Query");

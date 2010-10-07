@@ -17,6 +17,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -123,9 +124,9 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("5000.0");
         assertTextPresent("new text");
         assertTextPresent("QC State");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        addCustomizeViewColumn("QCState", "QC State");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCState", "QC State");
+        clickNavButton("Apply");
         assertTextPresent("unknown QC");
     }
 

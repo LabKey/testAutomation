@@ -367,14 +367,14 @@ public class ListHelper
 
             if (col.getFormat() != null)
             {
-                test.clickExtTab("Format");
+                ExtHelper.clickExtTab(test, "Format");
                 test.setFormElement("propertyFormat", col.getFormat());
             }
 
             FieldValidator validator = col.getValidator();
             if (validator != null)
             {
-                test.clickExtTab("Validators");
+                ExtHelper.clickExtTab(test, "Validators");
                 if (validator instanceof RegExValidator)
                     test.clickNavButton("Add Regular Expression Validator", 0);
                 else

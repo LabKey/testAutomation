@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
@@ -111,7 +112,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickNavButton("Edit Metadata");
         waitForElement(Locator.name("ff_label5"), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnLabel(this, 5, "editedCreated");
-        clickExtTab("Format");
+        ExtHelper.clickExtTab(this, "Format");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
         clickNavButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
@@ -151,10 +152,9 @@ public class ExpTest extends BaseSeleniumWebTest
         clickNavButton("View Data");
 
         // Customize the view to add the newly joined column
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.raw("expand_WrappedRowId"));
-        addCustomizeViewColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "WrappedRowId/Created", "Wrapped Row Id editedCreated");
+        clickNavButton("Apply");
         // Verify that it was joined and formatted correctly
         assertTextPresent(dateFormat.format(new Date()), 5);
 

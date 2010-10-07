@@ -17,6 +17,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.drt.StudyBaseTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 /*
 * User: dave
@@ -146,7 +147,7 @@ public class StudySecurityTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         enterPermissionsUI();
-        clickExtTab("Study Security");
+        ExtHelper.clickExtTab(this, "Study Security");
         waitAndClickNavButton("Study Security");
 
         click(getRadioButtonLocator(groupName, setting));
@@ -224,7 +225,7 @@ public class StudySecurityTest extends StudyBaseTest
     {
         //setup advanced dataset security
         enterPermissionsUI();
-        clickExtTab("Study Security");
+        ExtHelper.clickExtTab(this, "Study Security");
         waitAndClickNavButton("Study Security");
 
         setFormElement("securityString", "ADVANCED_WRITE");

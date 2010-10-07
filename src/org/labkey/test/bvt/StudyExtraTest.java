@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -177,7 +178,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
         goToModule("Query");
-        clickExtToolbarButton("Schema Administration");
+        ExtHelper.clickExtToolbarButton(this, "Schema Administration");
 		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
 		setFormElement("dbSchemaName", "verifysnapshot");
@@ -214,7 +215,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
         goToModule("Query");
-        clickExtToolbarButton("Schema Administration");
+        ExtHelper.clickExtToolbarButton(this, "Schema Administration");
         clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
         clickLinkWithText("Query Schema Browser");

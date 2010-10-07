@@ -17,6 +17,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 /*
@@ -49,14 +50,14 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
         clickLookupLink("lists", "Authors", "AuthorId");
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_AUTHORS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        closeExtTab("lists.Authors");
+        ExtHelper.closeExtTab(this, "lists.Authors");
         sleep(500);
         assertTextNotPresent(TEST_DESC_AUTHORS);
 
         clickLookupLink("lists", "Publishers", "PublisherId");
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_PUBLISHERS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        closeExtTab("lists.Publishers");
+        ExtHelper.closeExtTab(this, "lists.Publishers");
         sleep(500);
         assertTextNotPresent(TEST_DESC_PUBLISHERS);
 
