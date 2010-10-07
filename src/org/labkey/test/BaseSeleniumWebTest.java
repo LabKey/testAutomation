@@ -1009,32 +1009,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
             }
 
-            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
+            WebTestHelper.logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
 
             log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
-    }
-
-    // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
-    private void logToServer(String message)
-    {
-        try
-        {
-            String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
-            HttpClient client = WebTestHelper.getHttpClient(getBaseURL() + "/admin/log.view?message=" + message);
-            int status = client.executeMethod(new GetMethod(encodedUrl));
-        }
-        catch (IOException e)
-        {
-            // fall through
-        }
-    }
-
-    protected String encodeURI(String parameter)
-    {
-        ArrayList<Integer> chars = new ArrayList<Integer>();
-        // Percent-escape any characters that cause GetMethod to throw an exception.
-        return parameter.replaceAll(" ", "%20");
     }
 
     protected abstract void doTestSteps() throws Exception;

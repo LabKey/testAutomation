@@ -18,10 +18,12 @@ package org.labkey.test;
 
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -162,6 +164,27 @@ public class WebTestHelper
     public static void log(String message)
     {
         System.out.println(message);
+    }
+
+    // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
+    public static int logToServer(String message)
+    {
+        try
+        {
+            String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
+            HttpClient client = WebTestHelper.getHttpClient(getBaseURL() + "/admin/log.view?message=" + message);
+            return client.executeMethod(new GetMethod(encodedUrl));
+        }
+        catch (IOException e)
+        {
+            return -1;
+        }
+    }
+
+    private static String encodeURI(String parameter)
+    {
+        // Percent-escape any characters that cause GetMethod to throw an exception.
+        return parameter.replaceAll(" ", "%20");
     }
 
     public static String getTabLinkId(String tabName)
