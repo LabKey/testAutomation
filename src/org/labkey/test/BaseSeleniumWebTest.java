@@ -432,7 +432,31 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTextPresent("Sign Out");
         assertTextPresent("My Account");
     }
-           
+
+    // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
+    public void signIn(String email, String password, boolean failOnError)
+    {
+        if ( !isLinkPresentWithText("Sign In") )
+            fail("You need to be logged out to log in.  Please log out to log in.");
+
+        clickLinkWithText("Sign In");
+
+        assertTitleEquals("Sign In");
+        assertFormPresent("login");
+        setText("email", email);
+        setText("password", password);
+        clickLinkWithText("Sign In");
+
+        if ( failOnError )
+        {
+            if ( isTextPresent("Type in your email address and password") )
+                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+
+            assertTextPresent("Sign Out");
+            assertTextPresent("My Account");
+        }
+    }
+                 
     protected void setInitialPassword(String user, String password)
     {
         // Get setPassword URL from notification email.

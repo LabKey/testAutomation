@@ -62,6 +62,9 @@ public class AuditLogTest extends BaseSeleniumWebTest
         createUser(AUDIT_TEST_USER, null);
         impersonate(AUDIT_TEST_USER);
         stopImpersonating();
+        signOut();
+        signIn(AUDIT_TEST_USER, "asdf", false); // Bad login.  Existing User
+        simpleSignIn();
         deleteUser(AUDIT_TEST_USER);
 
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was added to the system", 10);
@@ -69,6 +72,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, "impersonated " + AUDIT_TEST_USER, 10);
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was no longer impersonated by", 10);
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, "stopped impersonating " + AUDIT_TEST_USER, 10);
+        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " failed to login: incorrect password.", 10);
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was deleted from the system", 10);
     }
 
