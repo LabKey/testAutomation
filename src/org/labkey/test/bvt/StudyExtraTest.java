@@ -246,6 +246,11 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Import Data");
         selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
         submit();
+
+
+        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        addCustomizeViewColumn("Day");
+        clickNavButton("Save");
         assertTextPresent("-120");
         assertTextPresent("320");
         clickLinkWithText("VaccineStudy Study");
