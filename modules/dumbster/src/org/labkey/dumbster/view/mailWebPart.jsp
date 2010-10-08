@@ -157,9 +157,9 @@ function toggleRecorder(checkbox)
             <td><%=h(m.getHeaderValue("To"))%></td>
             <td><%=h(m.getHeaderValue("From"))%></td>
             <td><%=h(DateUtil.formatDateTime(m.getCreatedTimestamp()))%></td>
-            <td><a href="javascript:toggleBody('email_body_<%=rowIndex%>')"><%=h(m.getHeaderValue("Subject"))%></a>
+            <td><a onclick="toggleBody('email_body_<%=rowIndex%>'); return false;"><%=h(m.getHeaderValue("Subject"))%></a>
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=body%></div></td>
-            <td><a href="javascript:toggleBody('email_headers_<%=rowIndex%>')">View headers</a>
+            <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=headers%></div></td></tr>
 <%
         }
