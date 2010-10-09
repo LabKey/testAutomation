@@ -76,7 +76,7 @@ public class IssuesTest extends BaseSeleniumWebTest
     {
         initProject();
 
-        clickLinkWithText("view open issues");
+        clickLinkWithText("view open Issues");
         assertNavButtonPresent("New Issue");
 
 //        pushLocation();
@@ -179,7 +179,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText("IssuesVerifyProject");
         addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, TEST_GROUP);
         clickLinkWithText("IssuesVerifyProject");
-        clickLinkWithText("view open issues");
+        clickLinkWithText("view open Issues");
 
         // InsertAction
         clickNavButton("New Issue");
