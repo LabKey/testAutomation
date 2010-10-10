@@ -20,8 +20,6 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
@@ -36,7 +34,19 @@ import org.tmatesoft.svn.core.wc.SVNStatusType;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -49,7 +59,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
-import static org.labkey.test.WebTestHelper.*;
+import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
+import static org.labkey.test.WebTestHelper.FolderIdentifier;
+import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
+import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
+import static org.labkey.test.WebTestHelper.getTabLinkId;
+import static org.labkey.test.WebTestHelper.getTargetServer;
+import static org.labkey.test.WebTestHelper.leakCRC;
+import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
  * User: Mark Igra
