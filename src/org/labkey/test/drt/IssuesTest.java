@@ -200,13 +200,13 @@ public class IssuesTest extends BaseSeleniumWebTest
         selectOptionByText("milestone", "2012");
         clickNavButton("Submit");
 
-        // find issueId
+        // find issueId - parse the text from first space to :
         String title = getLastPageTitle();
-        title = title.substring(0,title.indexOf(':')).trim();
+        title = title.substring(title.indexOf(' '), title.indexOf(':')).trim();
         int issueId = Integer.parseInt(title);
 
         // DetailsAction
-        assertTextPresent("" + issueId + " : " + ISSUE_TITLE_0);
+        assertTextPresent("Issue " + issueId + ": " + ISSUE_TITLE_0);
         assertTextPresent("Milestone");
 
         // ListAction
@@ -243,7 +243,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         testLastFilter(issueId);
 
         // JumpToIssueAction
-        setText("issueId",""+ issueId);
+        setText("issueId", "" + issueId);
         submit(Locator.formWithName("jumpToIssue"));
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent("Invalid");
