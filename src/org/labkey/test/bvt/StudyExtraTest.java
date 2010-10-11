@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
@@ -248,9 +249,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         submit();
 
 
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
         addCustomizeViewColumn("Day");
-        clickNavButton("Save");
+        clickNavButton("Apply");
         assertTextPresent("-120");
         assertTextPresent("320");
         clickLinkWithText("VaccineStudy Study");
