@@ -250,7 +250,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
 
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        addCustomizeViewColumn("Day");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Day");
         clickNavButton("Apply");
         assertTextPresent("-120");
         assertTextPresent("320");
