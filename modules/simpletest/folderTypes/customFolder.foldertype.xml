@@ -1,0 +1,41 @@
+<ft:folderType xmlns:ft="http://labkey.org/data/xml/folderType">
+   <ft:name>My XML-defined Folder Type</ft:name>
+   <ft:description>A demonstration of defining a folder type in an XML file</ft:description>
+   <ft:requiredWebParts>
+       <ft:webPart>
+           <ft:name>Query</ft:name>
+           <ft:location>body</ft:location>
+           <ft:property name="title" value="A customized web part" />
+           <ft:property name="schemaName" value="study" />
+           <ft:property name="queryName" value="StudyProperties" />
+       </ft:webPart>
+       <ft:webPart>
+           <ft:name>Data Pipeline</ft:name>
+           <ft:location>body</ft:location>
+       </ft:webPart>
+       <ft:webPart>
+           <ft:name>Experiment Runs</ft:name>
+           <ft:location>body</ft:location>
+       </ft:webPart>
+   </ft:requiredWebParts>
+   <ft:preferredWebParts>
+       <ft:webPart>
+           <ft:name>Sample Sets</ft:name>
+           <ft:location>body</ft:location>
+       </ft:webPart>
+       <ft:webPart>
+           <ft:name>Run Groups</ft:name>
+           <ft:location>right</ft:location>
+       </ft:webPart>
+       <ft:webPart>
+           <ft:name>Assay List</ft:name>
+           <ft:location>body</ft:location>
+       </ft:webPart>
+   </ft:preferredWebParts>
+   <ft:modules>
+       <ft:moduleName>Portal</ft:moduleName>
+       <ft:moduleName>simpletest</ft:moduleName>
+       <ft:moduleName>Query</ft:moduleName>
+   </ft:modules>
+   <ft:defaultModule>Portal</ft:defaultModule>
+</ft:folderType>

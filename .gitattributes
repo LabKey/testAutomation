@@ -5,6 +5,7 @@ data/api/http-api.xml -text
 data/api/rlabkey-api.xml -text
 data/api/security-api.xml -text
 modules/simpletest/config/module.xml -text
+modules/simpletest/folderTypes/customFolder.foldertype.xml -text
 modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text

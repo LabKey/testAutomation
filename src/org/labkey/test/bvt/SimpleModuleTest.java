@@ -38,6 +38,7 @@ import java.util.Date;
 */
 public class SimpleModuleTest extends BaseSeleniumWebTest
 {
+    public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String LIST_NAME = "People";
@@ -55,11 +56,18 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         assertModuleDeployed(MODULE_NAME);
-        createProject(getProjectName());
-        enableModule(getProjectName(), MODULE_NAME);
-        enableModule(getProjectName(), "Query");
+        createProject(getProjectName(), FOLDER_TYPE);
+        assertModuleEnabledByDefault("Portal");
+        assertModuleEnabledByDefault("simpletest");
+        assertModuleEnabledByDefault("Query");
+
+
+        // Modules enabled in file based folder definition
+        //enableModule(getProjectName(), MODULE_NAME);
+        //enableModule(getProjectName(), "Query");
 
         clickLinkWithText(getProjectName());
+        doTestCustomFolder();
         doTestSchemas();
         doTestViews();
         doTestWebParts();
@@ -67,6 +75,16 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         doTestQueries();
         doTestQueryViews();
         doTestReports();
+    }
+    
+    private void doTestCustomFolder()
+    {
+        assertTextPresent("A customized web part");
+        assertTextPresent("Data Pipeline");
+        assertTextPresent("Experiment Runs");
+        assertTextPresent("Sample Sets");
+        assertTextPresent("Run Groups");
+        assertLinkNotPresentWithText("Create Run Group"); // Not in small Run Groups web-part.
     }
 
     private void doTestSchemas() throws Exception
@@ -277,7 +295,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     {
         log("Testing views in modules...");
         //begin.view should display when clicking on the module's tab
-        clickTab(MODULE_NAME);
+        goToModule(MODULE_NAME);
         assertTextPresent("This is the begin view from the test module");
 
         //navigate to other view
@@ -321,7 +339,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         //go to query module portal
         clickLinkWithText(getProjectName());
-        clickTab("Query");
+        goToModule("Query");
         viewQueryData("lists", "TestQuery");
 
         assertTextPresent("Adam");
@@ -371,6 +389,13 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("Ensuring that that '" + moduleName + "' module is deployed");
         clickLinkWithText("Admin Console");
         assertTextPresent(moduleName);
+    }
+
+    protected void assertModuleEnabledByDefault(String moduleName)
+    {
+        log("Ensuring that that '" + moduleName + "' module is enabled");
+        clickLinkWithText("Folder Settings");
+        assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 
     protected void doCleanup() throws Exception
