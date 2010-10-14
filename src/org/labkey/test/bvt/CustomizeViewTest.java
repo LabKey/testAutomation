@@ -1,0 +1,166 @@
+package org.labkey.test.bvt;
+
+import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.ListHelper;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: kevink
+ * Date: Oct 14, 2010
+ * Time: 11:37:20 AM
+ */
+public class CustomizeViewTest extends BaseSeleniumWebTest
+{
+    public static final String PROJECT_NAME = "CustomizeViewTest";
+    public static final String LIST_NAME = "People";
+    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
+    private final static String LIST_KEY_NAME = "Key";
+    protected static final String TEST_ASSAY = "TestAssay1";
+    protected static final String TEST_ASSAY_DESC = "Description for assay 1";
+
+    private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
+            {
+                    new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
+                    new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
+                    new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age")
+            };
+    static
+    {
+        LIST_COLUMNS[0].setRequired(true);
+        LIST_COLUMNS[1].setRequired(true);
+    }
+
+    private final static String[][] TEST_DATA =
+            {
+                    { "1", "Bill", "Billson", "34" },
+                    { "2", "Jane", "Janeson", "42" },
+                    { "3", "John", "Johnson", "17" },
+                    { "4", "Mandy", "Mandyson", "32" },
+                    { "5", "Norbert", "Norbertson", "28" },
+                    { "6", "Penny", "Pennyson", "38" },
+                    { "7", "Yak", "Yakson", "88" },
+            };
+
+
+    @Override
+    protected void doCleanup() throws Exception
+    {
+        try { deleteProject(PROJECT_NAME) ; } catch (Throwable t) { }
+    }
+
+    @Override
+    protected void doTestSteps() throws Exception
+    {
+        createProject(PROJECT_NAME);
+        createList();
+
+        log("** Show only LastName and Age");
+        setColumns("LastName", "Age");
+        assertTextPresent("Norbertson");
+        assertTextNotPresent("First Name");
+
+        log("** Add filter: FirstName starts with 'J'");
+        addFilter("LastName", "Starts With", "J");
+        assertTextNotPresent("Norbertson");
+        assertTextPresent("Janeson");
+        assertTextPresent("Johnson");
+
+        log("** Add another filter: FirstName != 'Johnson'");
+        addFilter("LastName", "Does Not Equal", "Johnson");
+        assertTextPresent("Janeson");
+        assertTextNotPresent("Johnson");
+
+        log("** Remove filter");
+        removeFilter("LastName");
+        assertTextPresent("Johnson");
+        assertTextPresent("Norbertson");
+
+        log("** Add sort by Age");
+        assertTextBefore("Billson", "Johnson");
+        addSort("Age", "Ascending");
+        assertTextBefore("Johnson", "Billson");
+
+        log("** Remove sort");
+        removeSort("Age");
+        assertTextBefore("Billson", "Johnson");
+
+        // TODO: pin, unpin, setting column title, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links, 
+    }
+
+    private void createList()
+    {
+        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+
+        StringBuilder data = new StringBuilder();
+        data.append(LIST_KEY_NAME).append("\t");
+        for (int i = 0; i < LIST_COLUMNS.length; i++)
+        {
+            data.append(LIST_COLUMNS[i].getName());
+            data.append(i < LIST_COLUMNS.length - 1 ? "\t" : "\n");
+        }
+        for (String[] rowData : TEST_DATA)
+        {
+            for (int col = 0; col < rowData.length; col++)
+            {
+                data.append(rowData[col]);
+                data.append(col < rowData.length - 1 ? "\t" : "\n");
+            }
+        }
+
+        ListHelper.clickImportData(this);
+        setFormElement("ff_data", data.toString());
+        submit();
+        for (String[] rowData : TEST_DATA)
+        {
+            // check that all the data is in the grid (skipping the key column at index 0)
+            for (int col = 1; col < rowData.length; col++)
+            {
+                assertTextPresent(rowData[col]);
+            }
+        }
+    }
+
+    void setColumns(String... column_ids)
+    {
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.clearCustomizeViewColumns(this);
+        for (String column_id : column_ids)
+            CustomizeViewsHelper.addCustomizeViewColumn(this, column_id);
+        clickNavButton("Apply", longWaitForPage);
+    }
+
+    void addFilter(String column_id, String op, String value)
+    {
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewFilter(this, column_id, op, value);
+        clickNavButton("Apply", longWaitForPage);
+    }
+
+    void addSort(String column_id, String order)
+    {
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewSort(this, column_id, order);
+        clickNavButton("Apply", longWaitForPage);
+    }
+
+    void removeFilter(String column_id)
+    {
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewFilter(this, column_id);
+        clickNavButton("Apply", longWaitForPage);
+    }
+
+    void removeSort(String column_id)
+    {
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewSort(this, column_id);
+        clickNavButton("Apply", longWaitForPage);
+    }
+
+    @Override
+    public String getAssociatedModuleDirectory()
+    {
+        return null;
+    }
+}

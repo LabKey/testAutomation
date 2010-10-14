@@ -52,6 +52,7 @@ public enum TestSet
         MicroarrayTest.class,
         ViabilityTest.class,
         ButtonCustomizationTest.class,
+        CustomizeViewTest.class,
         ReagentTest.class,
     }),
 

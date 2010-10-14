@@ -40,6 +40,7 @@ src/org/labkey/test/bvt/AuditLogTest.java -text
 src/org/labkey/test/bvt/ButtonCustomizationTest.java -text
 src/org/labkey/test/bvt/CaBigTest.java -text
 src/org/labkey/test/bvt/ClientAPITest.java -text
+src/org/labkey/test/bvt/CustomizeViewTest.java -text
 src/org/labkey/test/bvt/DataRegionTest.java -text
 src/org/labkey/test/bvt/ExternalSchemaTest.java -text
 src/org/labkey/test/bvt/FieldValidatorTest.java -text
