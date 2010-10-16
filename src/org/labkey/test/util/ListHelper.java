@@ -376,7 +376,7 @@ public class ListHelper
             {
                 ExtHelper.clickExtTab(test, "Validators");
                 if (validator instanceof RegExValidator)
-                    test.clickNavButton("Add Regular Expression Validator", 0);
+                    test.clickNavButton("Add RegEx Validator", 0);
                 else
                     test.clickNavButton("Add Range Validator", 0);
                 test.setFormElement("name", validator.getName());
