@@ -252,7 +252,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             // Four parameter IC50
             assertTextNotPresent("461");
 
-            clickLinkContainingText("View With Curve Type", false);
+            clickLinkContainingText("Change Curve Type", false);
             clickAndWait(Locator.menuItem("Four Parameter"));
             // Five Parameter IC50
             assertTextNotPresent("561");
@@ -265,7 +265,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             // Five PL AUC
             assertTextNotPresent("0.077");
 
-            clickLinkContainingText("View With Curve Type", false);
+            clickLinkContainingText("Change Curve Type", false);
             clickAndWait(Locator.menuItem("Polynomial"));
             // Five Parameter IC50
             assertTextNotPresent("561");
