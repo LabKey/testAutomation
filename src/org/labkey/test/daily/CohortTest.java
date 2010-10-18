@@ -182,7 +182,7 @@ public class CohortTest extends BaseSeleniumWebTest
         clickNavButtonByIndex("Move Up", 1, 0);
         clickNavButtonByIndex("Move Up", 1, 0);
         clickNavButton("Save");
-        updateCohorts(); // TODO: Remove once Issue #9670 is resolved.
+        //updateCohorts(); // TODO: Remove once Issue #10698 is resolved.
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("View Available Reports");
         clickNavButtonByIndex("View", 2);
@@ -286,7 +286,7 @@ public class CohortTest extends BaseSeleniumWebTest
                 
     }
 
-    // TODO: Remove once Issue #9670 is resolved.
+    // TODO: Remove once Issue #10698 is resolved.
     private void updateCohorts()
     {
         pushLocation();
