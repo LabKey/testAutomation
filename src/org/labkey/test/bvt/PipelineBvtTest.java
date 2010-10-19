@@ -110,10 +110,11 @@ public class PipelineBvtTest extends PipelineWebTestBase
         checkEmail(emailTable, 2);
 
         // Make sure there haven't been any errors yet.
-        checkErrors();
+        //checkErrors();
 
         // Break the pipeline tools directory setting to cause errors.
         String oldToolsDirectory = setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
+        boolean testFailed = true;
         try
         {
             runProcessing(_testSetMS1);
@@ -125,17 +126,36 @@ public class PipelineBvtTest extends PipelineWebTestBase
             // Test pipeline error escalation email.
             _testSetMS1.getParams()[0].validateEmailEscalation(0);
             checkEmail(emailTable, 1);
+            testFailed = false;
         }
         finally
         {
-            // Fix the pipeline tools directory.
-            if (new File(oldToolsDirectory).exists())
+            try
             {
-                setPipelineToolsDirectory(oldToolsDirectory);
+                // Fix the pipeline tools directory.
+                if (new File(oldToolsDirectory).exists())
+                {
+                    setPipelineToolsDirectory(oldToolsDirectory);
+                }
+                else
+                {
+                    setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "build" + File.separatorChar + "deploy" + File.separatorChar + "bin");
+                }
+            checkErrors();
             }
-            else
+            catch (AssertionError ae)
             {
-                setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "build" + File.separatorChar + "deploy" + File.separatorChar + "bin");
+                // Assure that this failure is noticed
+                // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
+                log("**************************ERROR*******************************");
+                log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
+                log("** Server remains in a bad state.                           **");
+                log("** Set tools directory manually or bootstrap to fix.        **");
+                log("**************************ERROR*******************************");
+                if ( !testFailed )
+                    fail("Failed to reset pipeline tools directory. + \n" + ae.getMessage());
+                else // Don't clobber an existing error.
+                    log("Error: " + ae.getMessage());
             }
         }
 
@@ -250,6 +270,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
     {
         log("Set tools bin directory to " + path);
         pushLocation();
+        goToHome();
         clickLinkWithText("Admin Console");
         clickLinkWithText("site settings");
         String existingValue = getFormElement("pipelineToolsDirectory");
