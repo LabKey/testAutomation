@@ -110,7 +110,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
         checkEmail(emailTable, 2);
 
         // Make sure there haven't been any errors yet.
-        //checkErrors();
+        checkErrors();
 
         // Break the pipeline tools directory setting to cause errors.
         String oldToolsDirectory = setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
@@ -141,7 +141,6 @@ public class PipelineBvtTest extends PipelineWebTestBase
                 {
                     setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "build" + File.separatorChar + "deploy" + File.separatorChar + "bin");
                 }
-            checkErrors();
             }
             catch (AssertionError ae)
             {
@@ -153,7 +152,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
                 log("** Set tools directory manually or bootstrap to fix.        **");
                 log("**************************ERROR*******************************");
                 if ( !testFailed )
-                    fail("Failed to reset pipeline tools directory. + \n" + ae.getMessage());
+                    fail("Failed to reset pipeline tools directory.\n" + ae.getMessage());
                 else // Don't clobber an existing error.
                     log("Error: " + ae.getMessage());
             }
