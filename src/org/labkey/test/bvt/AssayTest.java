@@ -17,6 +17,7 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
@@ -315,17 +316,14 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("f");
         assertTextPresent(ALIASED_DATA);
 
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.raw("expand_Properties"));
-        click(Locator.raw("expand_Properties/SpecimenID"));
-        click(Locator.raw("expand_Properties/SpecimenID/Specimen"));
-        addCustomizeViewColumn("Properties/SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
-        addCustomizeViewColumn("Properties/SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
-        addCustomizeViewColumn("Properties/SpecimenID/AssayMatch", "Specimen Assay Match");
-        removeCustomizeViewColumn("Run testAssayRunProp1");
-        removeCustomizeViewColumn("Run Batch testAssaySetProp2");
-        removeCustomizeViewColumn("testAssayDataProp4");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/SpecimenID/AssayMatch", "Specimen Assay Match");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/testAssayRunProp1");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/Batch/testAssaySetProp2");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/testAssayDataProp4");
+        clickNavButton("Apply");
 
         assertTextPresent("Blood (Whole)", 4);
         int totalTrues = countText("true");
@@ -404,9 +402,9 @@ public class AssayTest extends AbstractAssayTest
         clickNavButton("Copy to Study");
 
         log("Verifying that the data was published");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        addCustomizeViewColumn("QCState", "QC State");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCState", "QC State");
+        clickNavButton("Apply");
         assertTextPresent("Pending Review");
         assertTextPresent("a");
         assertTextPresent(TEST_RUN1_COMMENTS);
@@ -493,6 +491,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("SecondRun");
 
         log("Setting the customized view to include subfolders");
+        //TODO: Use new customize views UI for this.  Issue #11052                 
         clickMenuButton("Views", CUSTOMIZE_VIEW);
 
         clickCheckbox("ff_saveFilter");
