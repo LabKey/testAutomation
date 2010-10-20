@@ -179,9 +179,14 @@ public class CustomizeViewsHelper
 
         String itemXPath = itemXPath(type, column_id);
 
+        Locator item = Locator.xpath(itemXPath);
+        Locator close = Locator.xpath(itemXPath + "//*[contains(@class, 'labkey-tool-close')]");
+
+        //test.assertElementPresent(item);
+
         // XXX: removes all filter clauses
-        while (test.isElementPresent(Locator.xpath(itemXPath)))
-            test.click(Locator.xpath(itemXPath + "//*[contains(@class, 'labkey-tool-close')]"));
+        while (test.isElementPresent(item))
+            test.click(close);
     }
 
     private static void removeCustomizeViewItem(BaseSeleniumWebTest test, int item_index, ViewItemType type)
@@ -190,9 +195,14 @@ public class CustomizeViewsHelper
 
         String itemXPath = itemXPath(type, item_index);
 
+        Locator item = Locator.xpath(itemXPath);
+        Locator close = Locator.xpath(itemXPath + "//*[contains(@class, 'labkey-tool-close')]");
+
+        //test.assertElementPresent(item);
+
         // XXX: removes all filter clauses
-        while (test.isElementPresent(Locator.xpath(itemXPath)))
-            test.click(Locator.xpath(itemXPath + "//*[contains(@class, 'labkey-tool-close')]"));
+        while (test.isElementPresent(item))
+            test.click(close);
     }
 
     public static void addCustomizeViewSort(BaseSeleniumWebTest test, String column_name, String order)
