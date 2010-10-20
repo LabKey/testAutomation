@@ -1550,8 +1550,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.clickExtTabContainingText(this, "Groups for project");
         setFormElement("newGroupForm$input",groupName);
-        clickButton("Create new group", 0);
+        clickButton("Create New Group", 0);
         sleep(500);
         waitAndClick(Locator.xpath("//div[@id='userInfoPopup']//div[contains(@class,'x-tool-close')]"));
         waitForElement(Locator.xpath("//div[@id='groupsFrame']//div[contains(@class,'pGroup') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
@@ -1563,8 +1564,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.clickExtTabContainingText(this, "Groups for project");
         setFormElement("newGroupForm$input",groupName);
-        clickButton("Create new group", 0);
+        clickButton("Create New Group", 0);
         sleep(500);
 
         StringBuilder namesList = new StringBuilder();
