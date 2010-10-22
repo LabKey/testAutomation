@@ -78,7 +78,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         guestTest();
 
         log("Check welcome emails [6 new users]");
-        assertEquals("Expected 12 notification emails (+4 rows).", getTableRowCount("dataregion_EmailRecord"), 16);
+        assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
         passwordStrengthTest();
@@ -382,10 +382,10 @@ public class SecurityTest extends BaseSeleniumWebTest
         selectOptionByText("view", "User events");
         waitForPageToLoad();
 
-        String createdBy = getTableCellText("dataregion_audit", 5, 1);
-        String impersonatedBy = getTableCellText("dataregion_audit", 5, 2);
-        String user = getTableCellText("dataregion_audit", 5, 3);
-        String comment = getTableCellText("dataregion_audit", 5, 4);
+        String createdBy = getTableCellText("dataregion_audit", 4, 1);
+        String impersonatedBy = getTableCellText("dataregion_audit", 4, 2);
+        String user = getTableCellText("dataregion_audit", 4, 3);
+        String comment = getTableCellText("dataregion_audit", 4, 4);
 
         assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");

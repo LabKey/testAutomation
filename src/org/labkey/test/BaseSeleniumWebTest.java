@@ -2559,7 +2559,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTextPresent(columnTitle);
         for(int col = 0; col < 100; col++) // TODO: Find out how wide the table is.
         {
-            if(getTableCellText(tableName, 2, col).equals(columnTitle))
+            if(getTableCellText(tableName, 1, col).equals(columnTitle))
             {
                 return col;
             }

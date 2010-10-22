@@ -596,8 +596,8 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         // Scan table for a row that matches what we are looking for.
         for ( int i = startRow; i <= maxRow; i++)
         {
-            if ( messageTo.equals(getTableCellText("dataregion_EmailRecord", i + 2, 0)) &&
-                 messageSubject.equals(getText(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (i + 3) + "]//a"))) )
+            if ( messageTo.equals(getTableCellText("dataregion_EmailRecord", i + 1, 0)) &&
+                 messageSubject.equals(getText(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (i + 2) + "]//a"))) )
             {
                 messageRow = i;
                 i = maxRow; // exit loop.
@@ -610,16 +610,16 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         }
 
         // expand message text.
-        click(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (messageRow + 3) + "]//a"));
+        click(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (messageRow + 2) + "]//a"));
 
         // check for required message text
         for ( String snippet : messageContents)
         {
-            assertElementContains(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (messageRow + 3) + "]//div"), snippet);
+            assertElementContains(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (messageRow + 2) + "]//div"), snippet);
         }
 
         // expand message text. (for better screenshots)
-        click(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (messageRow + 3) + "]//a"));
+        click(Locator.xpath("//table[@id = 'dataregion_EmailRecord']//tr[" + (messageRow + 2) + "]//a"));
 
     }
 

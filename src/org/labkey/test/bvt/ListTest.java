@@ -163,9 +163,9 @@ if (!INCREMENTALTEST){
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
         assertTextPresent(TEST_DATA[3][2]);
-        assertTableCellTextEquals("dataregion_query", 3, 6, "true");
-        assertTableCellTextEquals("dataregion_query", 4, 6, "false");
-        assertTableCellTextEquals("dataregion_query", 5, 6, "true");
+        assertTableCellTextEquals("dataregion_query", 2, 6, "true");
+        assertTableCellTextEquals("dataregion_query", 3, 6, "false");
+        assertTableCellTextEquals("dataregion_query", 4, 6, "true");
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
@@ -178,9 +178,9 @@ if (!INCREMENTALTEST){
         setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox("quf_JewelTone");
         submit();
+        assertTableCellTextEquals("dataregion_query", 2, 6, "true");
         assertTableCellTextEquals("dataregion_query", 3, 6, "true");
-        assertTableCellTextEquals("dataregion_query", 4, 6, "true");
-        assertTableCellTextEquals("dataregion_query", 5, 6, "false");
+        assertTableCellTextEquals("dataregion_query", 4, 6, "false");
 
         log("Test edit and adding new field with imported data present");
         clickLinkWithText("Lists");
@@ -230,8 +230,8 @@ if (!INCREMENTALTEST){
         assertTextPresent(TEST_DATA[3][2]);
         
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
-        assertTableCellTextEquals("dataregion_query", 2, 5, _listCol3.getLabel()); // Colummns...
-        assertTableCellTextEquals("dataregion_query", 2, 6, _listCol2.getLabel()); // ...swapped.
+        assertTableCellTextEquals("dataregion_query", 1, 5, _listCol3.getLabel()); // Colummns...
+        assertTableCellTextEquals("dataregion_query", 1, 6, _listCol2.getLabel()); // ...swapped.
 
         log("Add data to existing rows");
         clickImportData();
@@ -283,7 +283,7 @@ if (!INCREMENTALTEST){
         assertTextPresent(TEST_DATA[1][3]);
         assertTextPresent(TEST_DATA[2][3]);
         assertTextPresent(TEST_DATA[3][3]);
-        assertTableCellTextEquals("dataregion_query", 6, 5, "false");
+        assertTableCellTextEquals("dataregion_query", 5, 5, "false");
 
         log("Check hidden field is hidden only where specified.");
         dataregionToEditDesign();
@@ -534,7 +534,7 @@ if (!INCREMENTALTEST){
         popLocation();
 
         log("Test edit row");
-        if (getTableCellText("dataregion_query", 3, 3).compareTo(LIST2_KEY3) != 0)
+        if (getTableCellText("dataregion_query", 2, 3).compareTo(LIST2_KEY3) != 0)
             clickLinkWithText(LIST2_KEY_NAME);
         clickLinkWithText("edit");
         selectOptionByText("quf_Color", TEST_DATA[1][1]);
