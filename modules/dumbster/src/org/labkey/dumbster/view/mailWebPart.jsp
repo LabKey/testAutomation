@@ -105,7 +105,6 @@ function toggleRecorder(checkbox)
     <colgroup><col width="120"/><col width="120"/><col width="125"/><col width="400"></colgroup>
     <!-- hidden TRs where the header region and message box would normally be in a real data region -->
     <tr style="display:none"><td colspan="5">&nbsp;</td></tr>
-    <tr style="display:none"><td colspan="5">&nbsp;</td></tr>
     <tr>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>To</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>From</div></td>
