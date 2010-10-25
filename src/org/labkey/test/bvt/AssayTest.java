@@ -491,11 +491,10 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("SecondRun");
 
         log("Setting the customized view to include subfolders");
-        //TODO: Use new customize views UI for this.  Issue #11052                 
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
 
-        clickCheckbox("ff_saveFilter");
-        clickNavButton("Save");
+        CustomizeViewsHelper.pinFolderFilter(this);
+        CustomizeViewsHelper.saveCustomView(this, "");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");

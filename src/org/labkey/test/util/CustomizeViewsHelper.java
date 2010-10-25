@@ -37,7 +37,8 @@ public class CustomizeViewsHelper
     public static void saveCustomView(BaseSeleniumWebTest test, String name)
     {
         test.clickNavButton("Save", 0);
-        test.setFormElement(Locator.xpath("//div[contains(@style, 'display: block')]//input[@type='text']"), name);
+        if (name != null)
+            test.setFormElement(Locator.xpath("//div[contains(@style, 'display: block')]//input[@type='text']"), name);
         test.clickButtonByIndex("Save", 1);
     }
 
@@ -271,6 +272,69 @@ public class CustomizeViewsHelper
         String deleteButtonXPath = tabXPath + "//*[contains(@class, 'labkey-tool-close')]";
         while (test.isElementPresent(Locator.xpath(deleteButtonXPath)))
             test.click(Locator.xpath(deleteButtonXPath));
+    }
+
+    private static String folderFilterComboXPath()
+    {
+        return tabContentXPath(ViewItemType.Filter) + "//div[contains(@class, 'labkey-folder-filter-combo')]";
+    }
+
+    private static String folderFilterPinXPath()
+    {
+        return tabContentXPath(ViewItemType.Filter) + "//div[contains(@class, 'labkey-folder-filter-pin')]";
+    }
+
+    public static void setFolderFilter(BaseSeleniumWebTest test, String folderFilter)
+    {
+        test.log("Setting folder filter to: " + folderFilter);
+        changeTab(test, ViewItemType.Filter);
+
+        String folderFilterComboXPath = folderFilterComboXPath();
+        ExtHelper.selectComboBoxItem(test, Locator.xpath(folderFilterComboXPath), folderFilter);
+    }
+
+    public static void togglePinFolderFilter(BaseSeleniumWebTest test)
+    {
+        Locator folderFilterPinXPath = Locator.xpath(folderFilterPinXPath());
+        String attr = test.getAttribute(folderFilterPinXPath, "class");
+        if (attr.contains("labkey-tool-pin"))
+            unpinFolderFilter(test);
+        else if (attr.contains("labkey-tool-unpin"))
+            pinFolderFilter(test);
+        else
+            test.fail("Expected to find folder filter pin state in attribute value: " + attr);
+    }
+
+    public static void pinFolderFilter(BaseSeleniumWebTest test)
+    {
+        test.log("Pinning folder filter");
+        changeTab(test, ViewItemType.Filter);
+
+        Locator folderFilterPinXPath = Locator.xpath(folderFilterPinXPath());
+        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-unpin");
+        test.click(folderFilterPinXPath);
+        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-pin");
+    }
+
+    public static void unpinFolderFilter(BaseSeleniumWebTest test)
+    {
+        test.log("Unpinning folder filter");
+        changeTab(test, ViewItemType.Filter);
+
+        Locator folderFilterPinXPath = Locator.xpath(folderFilterPinXPath());
+        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-unpin");
+        test.click(folderFilterPinXPath);
+        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-pin");
+    }
+
+    public static void pinFilter(BaseSeleniumWebTest test, String column_id)
+    {
+        throw new RuntimeException("not yet implemented");
+    }
+
+    public static void pinSort(BaseSeleniumWebTest test, String column_id)
+    {
+        throw new RuntimeException("not yet implemented");
     }
 
     /*
