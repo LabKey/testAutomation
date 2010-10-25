@@ -142,12 +142,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement(Locator.formElement("addPriority", "keyword"), "ABC");
         clickNavButton("Add Priority");
         assertTextPresent("Priority must be an integer");
-        clickNavButton("Back");
         assertTextNotPresent("ABC");
         setFormElement(Locator.formElement("addPriority", "keyword"), "1.2");
         clickNavButton("Add Priority");
         assertTextPresent("Priority must be an integer");
-        clickNavButton("Back");
         assertTextNotPresent("1.2");
 
         // AddKeywordAction
