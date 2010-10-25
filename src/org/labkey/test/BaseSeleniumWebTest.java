@@ -2114,6 +2114,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
     }
 
+    public void assertElementPresent(Locator.XPathLocator loc, int amount)
+    {
+        assertEquals("Xpath '" + loc.getPath() + "' not present expected number of times.", amount, getXpathCount(loc));
+    }
+
     public void assertElementContains(Locator loc, String text)
     {
         String elemText = selenium.getText(loc.toString());
@@ -2420,6 +2425,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void mouseDownAt(Locator l, int x, int y)
     {
         selenium.mouseDownAt(l.toString(), x + "," + y);
+    }
+
+    public int getElementIndex(Locator l)
+    {
+        return selenium.getElementIndex(l.toString()).intValue();
+    }
+
+    public void dragAndDrop(Locator from, Locator to)
+    {                
+        selenium.mouseDownAt(from.toString(), "1,1");
+        selenium.mouseMoveAt(to.toString(), "1,1");
+        selenium.mouseOver(to.toString());
+        selenium.mouseUpAt(to.toString(), "1,1");
     }
 
     public void clickTab(String tabname)
@@ -2774,8 +2792,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public Locator.XPathLocator getButtonLocator(String text)
     {
+        // check for narmal button:
+        Locator.XPathLocator locator = Locator.button(text);
+        if (isElementPresent(locator))
+            return locator;
+
         // check for normal labkey nav button:
-        Locator.XPathLocator locator = Locator.navButton(text);
+        locator = Locator.navButton(text);
         if (isElementPresent(locator))
             return locator;
 
@@ -2789,12 +2812,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private Locator.XPathLocator getButtonLocatorContainingText(String text)
     {
-        // check for normal labkey nav button:
-        Locator.XPathLocator locator = Locator.navButtonContainingText(text);
+        // check for normal button:
+        Locator.XPathLocator locator = Locator.buttonContainingText(text);
         if (isElementPresent(locator))
             return locator;
 
-        // check for normal labkey submit button:
+        // check for normal labkey submit/nav button:
         locator = Locator.navButtonContainingText(text);
         if (isElementPresent(locator))
             return locator;

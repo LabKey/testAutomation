@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
@@ -127,7 +128,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-if (!INCREMENTALTEST){
+    if (!INCREMENTALTEST){
         log("Setup project and list module");
         createProject(PROJECT_NAME);
 
@@ -373,16 +374,14 @@ if (!INCREMENTALTEST){
         assertTextNotPresent(TEST_DATA[0][3]);
 
         log("Test Customize View");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
+        clickLinkWithText("Clear all filters");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
 
-        removeCustomizeViewColumn(_listCol4.getLabel());
-        removeCustomizeViewFilter(_listCol4.getLabel());
-        addCustomizeViewFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        removeCustomizeViewSort(_listCol1.getLabel());
-        addCustomizeViewSort(_listCol2.getName(), _listCol2.getLabel(), "ASC");
-        setFormElement("ff_columnListName", TEST_VIEW);
-        clickNavButton("Save");
-        
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol4.getName());
+        CustomizeViewsHelper.addCustomizeViewFilter(this, _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
+        CustomizeViewsHelper.addCustomizeViewSort(this, _listCol2.getName(), _listCol2.getLabel(), "Ascending");
+        CustomizeViewsHelper.saveCustomView(this, TEST_VIEW);
+
         log("Check Customize View worked");
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
@@ -391,13 +390,13 @@ if (!INCREMENTALTEST){
 
         log("4725: Check Customize View can't remove all fields");
         pushLocation();
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        removeCustomizeViewColumn(LIST_KEY_NAME2);
-        removeCustomizeViewColumn(_listCol1.getLabel());
-        removeCustomizeViewColumn(_listCol2.getLabel());
-        removeCustomizeViewColumn(_listCol3.getLabel());
-        removeCustomizeViewColumn(_listCol6.getLabel());
-        clickNavButton("Save", 0);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, LIST_KEY_NAME2);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol1.getName());
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol2.getName());
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol3.getName());
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol6.getName());
+        clickNavButton("Apply", 0);
         assertAlert("You must select at least one field to display in the grid.");
         popLocation();
 
@@ -494,18 +493,15 @@ if (!INCREMENTALTEST){
         assertTextPresent(LIST2_KEY4);
 
         log("Check that reference worked");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.id("expand_Color"));
-        addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol1.getName(), _list2Col1.getLabel() + " " +  _listCol1.getLabel());
-        addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol2.getName(), _list2Col1.getLabel() + " " +  _listCol2.getLabel());
-        addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
-        addCustomizeViewFilter(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel(), "Is Less Than", "10");
-        addCustomizeViewSort(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel(), "ASC");
-        click(Locator.id("expand_Owner"));
-        addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col1.getName(), _list3Col1.getLabel() + " " +  _list3Col1.getLabel());
-        addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col2.getName(), _list3Col1.getLabel() + " " +  _list3Col2.getLabel());
-        setFormElement("ff_columnListName", TEST_VIEW);
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, _list2Col1.getName() + "/" +  _listCol1.getName(), _list2Col1.getLabel() + " " +  _listCol1.getLabel());
+        CustomizeViewsHelper.addCustomizeViewColumn(this, _list2Col1.getName() + "/" +  _listCol2.getName(), _list2Col1.getLabel() + " " +  _listCol2.getLabel());
+        CustomizeViewsHelper.addCustomizeViewColumn(this, _list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
+        CustomizeViewsHelper.addCustomizeViewFilter(this, _list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Is Less Than", "10");
+        CustomizeViewsHelper.addCustomizeViewSort(this, _list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Ascending");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, _list3Col1.getName() + "/" +  _list3Col1.getName(), _list3Col1.getLabel() + " " +  _list3Col1.getLabel());
+        CustomizeViewsHelper.addCustomizeViewColumn(this, _list3Col1.getName() + "/" +  _list3Col2.getName(), _list3Col1.getLabel() + " " +  _list3Col2.getLabel());
+        CustomizeViewsHelper.saveCustomView(this, TEST_VIEW);
 
         log("Check adding referenced fields worked");
         waitForText(_listCol1.getLabel(), WAIT_FOR_JAVASCRIPT);
@@ -565,9 +561,9 @@ if (!INCREMENTALTEST){
         assertTextNotPresent(LIST_NAME);
         clickLinkWithText("view data");
         pushLocation();
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        assertElementNotPresent(Locator.id("expand_" + LIST_KEY_NAME2));
-        assertElementPresent(Locator.id("expand_" + LIST3_KEY_NAME));
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        assertElementNotPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST_KEY_NAME + "']"));
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
         popLocation();
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent("Query '" + LIST_NAME + "' has errors");
@@ -754,16 +750,13 @@ if (!INCREMENTALTEST){
             popLocation();
 
             // show all columns
-            clickMenuButton("Views", CUSTOMIZE_VIEW);
-            click(Locator.id("expand_Bfk"));
-            click(Locator.id("expand_Bfk/Cfk"));
-            addCustomizeViewColumn("Bfk/B", "Bfk B");
-            addCustomizeViewColumn("Bfk/title", "Bfk Title");
-            addCustomizeViewColumn("Bfk/Cfk", "Bfk Cfk");
-            addCustomizeViewColumn("Bfk/Cfk/C", "Bfk Cfk C");
-            addCustomizeViewColumn("Bfk/Cfk/title", "Bfk Cfk Title");
-            setFormElement("ff_columnListName", "allColumns");
-            clickNavButton("Save");
+            CustomizeViewsHelper.openCustomizeViewPanel(this);
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/B", "Bfk B");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/title", "Bfk Title");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/Cfk", "Bfk Cfk");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/Cfk/C", "Bfk Cfk C");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/Cfk/title", "Bfk Cfk Title");
+            CustomizeViewsHelper.saveCustomView(this, "allColumns");
 
             clickLinkWithText("one C", 1);
             assertElementPresent(inputWithValue("key","1"));

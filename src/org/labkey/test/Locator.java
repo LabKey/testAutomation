@@ -133,6 +133,15 @@ public class Locator
         return xpath("//a/img[contains(@src, " + xq(image) + ")]");
     }
 
+    public static XPathLocator button(String text)
+    {
+        return xpath("//button[text() = '" + text + "']");
+    }
+
+    public static XPathLocator buttonContainingText(String text)
+    {
+        return xpath("//button[contains(text(), '" + text + "')]");
+    }
 
     public static XPathLocator navButton(String text)
     {

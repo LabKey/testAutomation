@@ -19,6 +19,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.CustomizeViewsHelper;
 
 /**
  * MS1 BVT
@@ -244,9 +245,9 @@ public class MS1Bvt extends BaseSeleniumWebTest
         popLocation();
 
         //test measure filtering
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        addCustomizeViewFilter("CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
+        clickNavButton("Apply");
         assertLinkNotPresentWithText("1");
 
         pushLocation();
@@ -256,10 +257,9 @@ public class MS1Bvt extends BaseSeleniumWebTest
         popLocation();
 
         //test fk table column filtering
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.raw("expand_CTAGG_MIN_FeatureId"));
-        addCustomizeViewFilter("CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
+        clickNavButton("Apply");
         assertTextNotPresent("461.7480"); //mz value
 
         log("Compare runs view OK.");
@@ -364,30 +364,28 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         //test customize view
         log("Testing customize view...");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        removeCustomizeViewColumn("Related Peptide");
-        removeCustomizeViewColumn("Related Peptide Fraction Run Description");
-        addCustomizeViewColumn("KL");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "RelatedPeptide");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "RelatedPeptide/Fraction/Run/Description");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "KL");
+        clickNavButton("Apply");
 
         assertTextPresent("KL");
         assertTextNotPresent("Related Peptide");
         assertTextNotPresent("K.AVVQDPALKPLALVYGEATSR.R");
 
         //reset view
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        clickNavButton("Reset my default view");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.resetCustomView(this);
 
         //add other columns from peptide data
         //and test saving under a name
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.raw("expand_RelatedPeptide"));
-        addCustomizeViewColumn("RelatedPeptide/PeptideProphet", "Related Peptide PepProphet");
-        addCustomizeViewColumn("RelatedPeptide/Protein", "Related Peptide Protein");
-        addCustomizeViewSort("RelatedPeptide/PeptideProphet", "Related Peptide PepProphet", "ASC");
-        moveCustomizeViewSort("Related Peptide PepProphet", true);
-        setFormElement("ff_columnListName", "My View");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RelatedPeptide/PeptideProphet", "PepProphet");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RelatedPeptide/Protein", "Protein");
+        CustomizeViewsHelper.addCustomizeViewSort(this, "RelatedPeptide/PeptideProphet", "PepProphet", "Ascending");
+        CustomizeViewsHelper.moveCustomizeViewSort(this, "RelatedPeptide/PeptideProphet", true);
+        CustomizeViewsHelper.saveCustomView(this, "My View");
 
         assertTextPresent("Related Peptide PepProphet");
         assertTextPresent("Related Peptide Protein");

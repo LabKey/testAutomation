@@ -121,40 +121,40 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         }
     }
 
-    void setColumns(String... column_ids)
+    void setColumns(String... fieldKeys)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.clearCustomizeViewColumns(this);
-        for (String column_id : column_ids)
-            CustomizeViewsHelper.addCustomizeViewColumn(this, column_id);
+        for (String fieldKey : fieldKeys)
+            CustomizeViewsHelper.addCustomizeViewColumn(this, fieldKey);
         clickNavButton("Apply", longWaitForPage);
     }
 
-    void addFilter(String column_id, String op, String value)
+    void addFilter(String fieldKey, String op, String value)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewFilter(this, column_id, op, value);
+        CustomizeViewsHelper.addCustomizeViewFilter(this, fieldKey, op, value);
         clickNavButton("Apply", longWaitForPage);
     }
 
-    void addSort(String column_id, String order)
+    void addSort(String fieldKey, String order)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewSort(this, column_id, order);
+        CustomizeViewsHelper.addCustomizeViewSort(this, fieldKey, order);
         clickNavButton("Apply", longWaitForPage);
     }
 
-    void removeFilter(String column_id)
+    void removeFilter(String fieldKey)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewFilter(this, column_id);
+        CustomizeViewsHelper.removeCustomizeViewFilter(this, fieldKey);
         clickNavButton("Apply", longWaitForPage);
     }
 
-    void removeSort(String column_id)
+    void removeSort(String fieldKey)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewSort(this, column_id);
+        CustomizeViewsHelper.removeCustomizeViewSort(this, fieldKey);
         clickNavButton("Apply", longWaitForPage);
     }
 

@@ -20,6 +20,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.ms2.MS2TestBase;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
@@ -509,21 +510,17 @@ public class MS2BvtTest extends MS2TestBase
         assertTextBefore("K.ERQPPPR.L", "K.KLHQK.L");
 
         log("Test customize view");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        addCustomizeViewSort("Charge", "Z", "DESC");
-        addCustomizeViewSort("Mass", "CalcMH+", "DESC");
-        removeCustomizeViewSort("Next");
-        removeCustomizeViewSort("Scan");
-        addCustomizeViewFilter("DeltaMass", "dMass", "Is Less Than", "0");
-        addCustomizeViewFilter("RowId", "Row Id", "Is Greater Than", "3");
-        removeCustomizeViewFilter(2);
-        removeCustomizeViewFilter("Hyper");
-        addCustomizeViewColumn("NextAA", "Next AA");
-        addCustomizeViewColumn("OrigScore", "Orig Score");
-        removeCustomizeViewColumn("Expect");
-        removeCustomizeViewColumn("SeqHits");
-        setFormElement("ff_columnListName", VIEW4);
-        clickNavButton("Save");
+        clickLinkWithText("Clear all filters");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewSort(this, "Charge", "Z", "Descending");
+        CustomizeViewsHelper.addCustomizeViewSort(this, "Mass", "CalcMH+", "Descending");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "DeltaMass", "dMass", "Is Less Than", "0");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "RowId", "Row Id", "Is Greater Than", "3");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "NextAA", "Next AA");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "OrigScore", "Orig Score");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Expect");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "ProteinHits");
+        CustomizeViewsHelper.saveCustomView(this, VIEW4);
 
         log("Test that the sorting and filtering worked and that the columns were changed");
         assertTextNotPresent("K.LLASMLAK.A");
@@ -539,16 +536,28 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("gi|27805893|guanine_nucleotid");
 
         log("Test changing order of sorts and columns");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        moveCustomizeViewSort("Z", false);
-        moveCustomizeViewColumn("Peptide", false);
-        clickNavButton("Save");
+        clickMenuButton("Views", CUSTOMIZE_VIEW);  // TODO: remove (Issue 11066)
+        moveCustomizeViewSort("Z", false);         // TODO: remove (Issue 11066)
+        moveCustomizeViewColumn("Peptide", false); // TODO: remove (Issue 11066)
+        clickNavButton("Save");                    // TODO: remove (Issue 11066)
+        //TODO: Use New CV UI once Issue #11066 is resolved
+//        CustomizeViewsHelper.openCustomizeViewPanel(this);
+//        CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", false);
+//        CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", false);
+//        clickNavButton("Apply");
+
         assertTextBefore("K.TESGYGSESSLR.R", "K.HVSGKIIGFFY.-");
         assertTextBefore("gi|30519530|A38R_protein", "K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        moveCustomizeViewSort("Z", true);
-        moveCustomizeViewColumn("Peptide", true);
-        clickNavButton("Save");
+
+        clickMenuButton("Views", CUSTOMIZE_VIEW); // TODO: remove (Issue 11066)
+        moveCustomizeViewSort("Z", true);         // TODO: remove (Issue 11066)
+        moveCustomizeViewColumn("Peptide", true); // TODO: remove (Issue 11066)
+        clickNavButton("Save");                   // TODO: remove (Issue 11066)
+        //TODO: Use New CV UI once Issue #11066 is resolved
+//        CustomizeViewsHelper.openCustomizeViewPanel(this);
+//        CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", true);
+//        CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", true);
+//        clickNavButton("Apply");
 
         log("Test Ignore View Filter");
         clickMenuButton("Views", "Apply View Filter");
@@ -645,15 +654,14 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("SeqHits");
 
         log("Test changing default view");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        clearCustomizeViewFilters();
-        clearCustomizeViewSorts();
-        addCustomizeViewSort("DeltaMass", "dMass", "ASC");
-        addCustomizeViewFilter("Mass", "CalcMH+", "Is Greater Than", "1000");
-        addCustomizeViewColumn("Fraction");
-        removeCustomizeViewColumn("Ion%");
-        setFormElement("ff_columnListName", "");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.clearCustomizeViewFilters(this);
+        CustomizeViewsHelper.clearCustomizeViewSorts(this);
+        CustomizeViewsHelper.addCustomizeViewSort(this, "DeltaMass", "dMass", "Ascending");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "Mass", "CalcMH+", "Is Greater Than", "1000");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Fraction");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "IonPercent");
+        CustomizeViewsHelper.saveCustomView(this, "");
         clickMenuButton("Views", "default");
         assertTextNotPresent("K.LLASMLAK.A");
         assertTextPresent("Fraction");
@@ -661,8 +669,8 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("Ion%");
 
         log("Test restoring default view");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        clickNavButton("Reset my default view");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.resetCustomView(this);
         assertTextPresent("K.LLASMLAK.A");
         assertTextNotPresent("Fraction");
         assertTextBefore("R.LGARRVSPVR.A", "K.TKDYEGMQVPVK.V");
@@ -670,8 +678,9 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test delete view");
         clickMenuButton("Views", VIEW4);
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        clickNavButtonContainingText("Delete my view");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        clickButton("Delete", 0);
+        clickButton("Yes");
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextNotPresent("Next AA");
@@ -681,19 +690,16 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("SeqHits");
 
         log("Test Protein Prophet view in Query - Peptides grouping");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.raw("expand_ProteinProphetData"));
-        click(Locator.raw("expand_ProteinProphetData/ProteinGroupId"));
-        addCustomizeViewColumn("ProteinProphetData/ProteinGroupId/Group", "Group");
-        addCustomizeViewColumn("ProteinProphetData/ProteinGroupId/TotalNumberPeptides", "Peptides");
-        addCustomizeViewColumn("ProteinProphetData/ProteinGroupId/GroupProbability", "Prob");
-        addCustomizeViewColumn("ProteinProphetData/ProteinGroupId/BestName", "Best Name");
-        removeCustomizeViewColumn("CalcMH+");
-        addCustomizeViewFilter("DeltaMass", "dMass", "Is Greater Than", "0");
-        addCustomizeViewFilter("ProteinProphetData/ProteinGroupId/GroupProbability", "Prob", "Is Greater Than", "0.7");
-        addCustomizeViewSort("ProteinProphetData/ProteinGroupId/GroupProbability", "Prob", "ASC");
-        setFormElement("ff_columnListName", VIEW4);
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "ProteinProphetData/ProteinGroupId/Group", "Group");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "ProteinProphetData/ProteinGroupId/TotalNumberPeptides", "Peptides");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "ProteinProphetData/ProteinGroupId/GroupProbability", "Prob");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "ProteinProphetData/ProteinGroupId/BestName", "Best Name");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Mass");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "DeltaMass", "dMass", "Is Greater Than", "0");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "ProteinProphetData/ProteinGroupId/GroupProbability", "Prob", "Is Greater Than", "0.7");
+        CustomizeViewsHelper.addCustomizeViewSort(this, "ProteinProphetData/ProteinGroupId/GroupProbability", "Prob", "Ascending");
+        CustomizeViewsHelper.saveCustomView(this, VIEW4);
 
         log("Test that Protein Prophet view is displayed and that it sorts and filters correctly");
         assertTextPresent("Group");
@@ -751,15 +757,23 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("gi|4883902|APETALA3_homolog_R");
 
         log("Test customize view");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        removeCustomizeViewColumn("Unique");
-        selenium.click("expand_Proteins");
-        selenium.click("expand_Proteins/Protein");
-        addCustomizeViewColumn("Proteins/Protein/ProtSequence", "Protein Sequence");
-        addCustomizeViewFilter("GroupProbability", "Prob", "Is Greater Than", "0.7");
-        addCustomizeViewSort("ErrorRate", "Error", "DESC");
-        setFormElement("ff_columnListName", VIEW4);
-        clickNavButton("Save");
+        clickMenuButton("Views", CUSTOMIZE_VIEW);                                     // TODO: remove (Issue 11075)
+        removeCustomizeViewColumn("Unique");                                          // TODO: remove (Issue 11075)
+        selenium.click("expand_Proteins");                                            // TODO: remove (Issue 11075)
+        selenium.click("expand_Proteins/Protein");                                    // TODO: remove (Issue 11075)
+        addCustomizeViewColumn("Proteins/Protein/ProtSequence", "Protein Sequence");  // TODO: remove (Issue 11075)
+        addCustomizeViewFilter("GroupProbability", "Prob", "Is Greater Than", "0.7"); // TODO: remove (Issue 11075)
+        addCustomizeViewSort("ErrorRate", "Error", "DESC");                           // TODO: remove (Issue 11075)
+        setFormElement("ff_columnListName", VIEW4);                                   // TODO: remove (Issue 11075)
+        clickNavButton("Save");                                                       // TODO: remove (Issue 11075)
+
+        //TODO: Use New CV UI once Issue #11075 is resolved
+//        CustomizeViewsHelper.openCustomizeViewPanel(this);
+//        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Unique");
+//        CustomizeViewsHelper.addCustomizeViewColumn(this, "Proteins/Protein/ProtSequence", "Protein Sequence");
+//        CustomizeViewsHelper.addCustomizeViewFilter(this, "GroupProbability", "Prob", "Is Greater Than", "0.7");
+//        CustomizeViewsHelper.addCustomizeViewSort(this, "ErrorRate", "Error", "Descending");
+//        CustomizeViewsHelper.saveCustomView(this, VIEW4);
 
         log("Test that sorting, filtering, and columns are correct");
         assertTextNotPresent("Unique");
@@ -967,12 +981,11 @@ public class MS2BvtTest extends MS2TestBase
         log("Test customizing view to include the run groups");
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithText("MS2 Experiment Runs");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.raw("expand_RunGroups"));
-        addCustomizeViewColumn("RunGroups/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
-        addCustomizeViewColumn("RunGroups/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
-        addCustomizeViewColumn("RunGroups/Default Experiment", "Run Groups Default Experiment");
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/Default Experiment", "Run Groups Default Experiment");
+        clickNavButton("Apply");
 
         assertTextPresent("Run Groups " + RUN_GROUP1_NAME2);
         assertTextPresent("Run Groups " + RUN_GROUP2_NAME);
@@ -1012,12 +1025,10 @@ public class MS2BvtTest extends MS2TestBase
         selectOptionByValue("//div[text() = 'A']/../../../td/select", "group1");
 
         log("Test Customize View");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);
-        click(Locator.raw("expand_SeqId"));
-        addCustomizeViewColumn("SeqId/Mass", "Protein Mass");
-        addCustomizeViewFilter("SeqId/Mass", "Protein Mass", "Is Less Than", "30000");
-        setFormElement("ff_columnListName", VIEW5);
-        clickNavButton("Save");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "SeqId/Mass", "Protein Mass");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "SeqId/Mass", "Protein Mass", "Is Less Than", "30000");
+        CustomizeViewsHelper.saveCustomView(this, VIEW5);
 
         log("Make sure the filtering and new columns worked");
         assertElementPresent(Locator.id("query:SeqId/Mass:header"));
