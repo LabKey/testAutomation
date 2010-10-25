@@ -155,8 +155,8 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Contract Lab Services, Johannesburg, South Africa");
         assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
 
-        clickLinkWithText("Specimens");
-        clickNavButton("Search");
+        clickLinkWithText("Specimen Overview");
+        clickLinkWithText("By Vial");
         setFilter("SpecimenDetail", "QualityControlFlag", "Equals", "true");
         setSort("SpecimenDetail", "GlobalUniqueId", SortDirection.ASC);
         assertTextPresent("AAA07XK5-02");
