@@ -111,7 +111,7 @@
                 newrow <- data.frame(
                     DisplayFld="Inserted via Rlabkey"
                     , TextFld="how its done"
-                    , IntFld= 98
+                    , IntFld= ""
                     , DoubleFld = 12.345
                     , DateTimeFld = "03/01/2010"
                     , BooleanFld= FALSE
@@ -130,7 +130,7 @@
         <response>
             <![CDATA[
                 DisplayName Text Field Integer Field Double Field DateTime Field
-                Inserted via Rlabkey how its done 98 12.345 2010-03-01
+                Inserted via Rlabkey how its done NA 12.345 2010-03-01
                 Boolean Field Long Text Field Attachment Required Text
                 FALSE Four score and seven years ago
                 Required Integer Category Lookup
@@ -186,4 +186,123 @@
             ]]>
         </response>
     </test>
+    <test name="ContainerFilter1" type="post">
+            <url>
+                <![CDATA[
+                library(Rlabkey)
+
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
+                    schemaName="issues", queryName="Issues", containerFilter="Current")
+                selectedRow
+                ]]>
+            </url>
+            <response>
+                <![CDATA[
+                 Type Area Title Assigned To Pri Status
+                1 An issue entered at the Project level 0 3 open
+                 Milestone
+                1
+                ]]>
+            </response>
+        </test>
+    <test name="ContainerFilter2" type="post">
+             <url>
+                 <![CDATA[
+                     library(Rlabkey)
+                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
+                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndSubfolders")
+                 selectedRow
+                 ]]>
+             </url>
+             <response>
+                 <![CDATA[
+                  Type Area Title Assigned To Pri Status
+                 1 An issue entered at the Project level 0 3 open
+                 2 An issue inserted in the subfolder 0 3 open
+                  Milestone
+                 1
+                 2
+                 ]]>
+             </response>
+         </test>
+    <test name="ContainerFilter3" type="post">
+            <url>
+                <![CDATA[
+                library(Rlabkey)
+
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
+                    schemaName="issues", queryName="Issues", containerFilter="Current")
+                selectedRow
+                ]]>
+            </url>
+            <response>
+                <![CDATA[
+                 Type Area Title Assigned To Pri Status
+                1 An issue inserted in the subfolder 0 3 open
+                 Milestone
+                1
+                ]]>
+            </response>
+        </test>
+    <test name="ContainerFilter4" type="post">
+             <url>
+                 <![CDATA[
+                     library(Rlabkey)
+                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
+                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndParents")
+                 selectedRow
+                 ]]>
+             </url>
+             <response>
+                 <![CDATA[
+                  Type Area Title Assigned To Pri Status
+                 1 An issue entered at the Project level 0 3 open
+                 2 An issue inserted in the subfolder 0 3 open
+                  Milestone
+                 1
+                 2
+                 ]]>
+             </response>
+         </test>
+    <test name="ContainerFilter5" type="post">
+             <url>
+                 <![CDATA[
+                     library(Rlabkey)
+                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
+                     schemaName="issues", queryName="Issues", containerFilter="CurrentPlusProject")
+                 selectedRow
+                 ]]>
+             </url>
+             <response>
+                 <![CDATA[
+                  Type Area Title Assigned To Pri Status
+                 1 An issue entered at the Project level 0 3 open
+                 2 An issue inserted in the subfolder 0 3 open
+                  Milestone
+                 1
+                 2
+                 ]]>
+             </response>
+         </test>
+    <test name="ContainerFilter4" type="post">
+             <url>
+                 <![CDATA[
+                     library(Rlabkey)
+                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
+                     schemaName="issues", queryName="Issues", containerFilter="AllFolders")
+                 selectedRow
+                 ]]>
+             </url>
+             <response>
+                 <![CDATA[
+                  Type Area Title Assigned To Pri Status
+                 1 An issue entered at the Project level 0 3 open
+                 2 An issue inserted in the subfolder 0 3 open
+                  Milestone
+                 1
+                 2
+                 ]]>
+             </response>
+         </test>
+
 </ApiTests>
