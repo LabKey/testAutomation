@@ -757,23 +757,12 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("gi|4883902|APETALA3_homolog_R");
 
         log("Test customize view");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);                                     // TODO: remove (Issue 11075)
-        removeCustomizeViewColumn("Unique");                                          // TODO: remove (Issue 11075)
-        selenium.click("expand_Proteins");                                            // TODO: remove (Issue 11075)
-        selenium.click("expand_Proteins/Protein");                                    // TODO: remove (Issue 11075)
-        addCustomizeViewColumn("Proteins/Protein/ProtSequence", "Protein Sequence");  // TODO: remove (Issue 11075)
-        addCustomizeViewFilter("GroupProbability", "Prob", "Is Greater Than", "0.7"); // TODO: remove (Issue 11075)
-        addCustomizeViewSort("ErrorRate", "Error", "DESC");                           // TODO: remove (Issue 11075)
-        setFormElement("ff_columnListName", VIEW4);                                   // TODO: remove (Issue 11075)
-        clickNavButton("Save");                                                       // TODO: remove (Issue 11075)
-
-        //TODO: Use New CV UI once Issue #11075 is resolved
-//        CustomizeViewsHelper.openCustomizeViewPanel(this);
-//        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Unique");
-//        CustomizeViewsHelper.addCustomizeViewColumn(this, "Proteins/Protein/ProtSequence", "Protein Sequence");
-//        CustomizeViewsHelper.addCustomizeViewFilter(this, "GroupProbability", "Prob", "Is Greater Than", "0.7");
-//        CustomizeViewsHelper.addCustomizeViewSort(this, "ErrorRate", "Error", "Descending");
-//        CustomizeViewsHelper.saveCustomView(this, VIEW4);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "UniquePeptidesCount");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Proteins/Protein/ProtSequence", "Protein Sequence");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "GroupProbability", "Prob", "Is Greater Than", "0.7");
+        CustomizeViewsHelper.addCustomizeViewSort(this, "ErrorRate", "Error", "Descending");
+        CustomizeViewsHelper.saveCustomView(this, VIEW4);
 
         log("Test that sorting, filtering, and columns are correct");
         assertTextNotPresent("Unique");

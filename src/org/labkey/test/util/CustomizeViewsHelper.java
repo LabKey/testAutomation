@@ -377,7 +377,7 @@ public class CustomizeViewsHelper
     {
         String fromItemXPath = itemXPath(type, field_index);
         String toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 );
-                                 
+
         changeTab(test, type);
         test.dragAndDrop(Locator.xpath(fromItemXPath), Locator.xpath(toItemXPath));               
     }
