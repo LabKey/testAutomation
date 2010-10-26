@@ -40,9 +40,8 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
     private static final String USER2 = "user2@messages.test";
     private static final String USER3 = "user3@messages.test";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
-            "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
-            "queryName='Sequences', allowChooseQuery='true', allowChooseView='true')}</b>\n";
-    private static final String HTML_BODY_WEBPART_TEST = "Best Gene Name";
+            "<b>${labkey.webPart(partName='Lists')}</b>\n";
+    private static final String HTML_BODY_WEBPART_TEST = "manage lists";
 
     public String getAssociatedModuleDirectory()
     {
@@ -154,7 +153,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         submit();
         clickLinkWithText(MSG1_TITLE);
         assertTextPresent("1 x");
-        assertTextPresent(HTML_BODY_WEBPART_TEST);
+        assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
 
         log("Check that edit works");
         clickLinkWithText("edit");
@@ -336,7 +335,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         assertTextPresent("RE: " + MSG1_TITLE, 4); // TODO: switch to 3 when empty messages are emailed
         clickLinkWithText(MSG1_TITLE, 0, false);
         assertTextPresent("1 x");
-        assertTextPresent(HTML_BODY_WEBPART_TEST);
+        assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
         clickLinkWithText(MSG1_TITLE, 1, false);
         assertTextPresent("<b>x</b>");
         assertLinkNotPresentWithText(MSG3_TITLE);
