@@ -20,7 +20,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -67,6 +66,12 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     private static final String SEQUENCE_DATA_FILE_B = "VM-2.1.adap.txt";
     private static final String SAMPLE_B = "gemini789.1-009";
     private static final String SEQUENCE_SAMPLE_B = "VM-2.1";
+    private static final String VIEW_NAME_A = "Test View A";
+    private static final String VIEW_NAME_B = "Test View B";
+    private static final String VIEW_NAME_C = "Test View C";
+    private static final String VIEW_NAME_D = "Test View D";
+    private static final String VIEW_NAME_E = "Test View E";
+    private static final String DEMO_SITE = "Test Drive";
 
 
     protected void doCleanup()
@@ -78,6 +83,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     {
         setupAdaptiveProject();
         // TODO: Verify that customers have properly limited access.
+        verifyDemoSite(); // Could go later if uploaded samples to be tested in demo
         verifySetupMessages();
 
         createNewOrder();
@@ -104,6 +110,9 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         singleSampleAnalysis();
         compareSamples();
+        saveViews();
+        verifySavedViews();
+        //editSavedViews();
     }
 
     protected void setupAdaptiveProject()
@@ -111,12 +120,11 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME, "Adaptive Home Folder");
         enableModule(PROJECT_NAME, "Dumbster");
 
-        goToModule("Dumbster");
+        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
         uncheckCheckbox("emailRecordOn");
         checkCheckbox("emailRecordOn");
 
         //Set up adaptive UI
-        setCustomStylesheet(getAdaptiveRoot() + RESOURCE_DIR, "theme.css");
         createHeader();
 
         //Add a customer folder and add a customer group
@@ -126,6 +134,13 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         clickLinkWithText(CUSTOMER_A_FOLDER);
         enterPermissionsUI();
         setPermissions(CUSTOMER_A_GROUP, "Customer");
+        clickNavButton("Save and Finish");
+
+        // Setup demo site permissions
+        log("Setting up " + DEMO_SITE + " permissions.");
+        clickLinkWithText(DEMO_SITE);
+        enterPermissionsUI();
+        setSiteGroupPermissions("All Site Users", "Reader");
         clickNavButton("Save and Finish");
     }
 
@@ -205,7 +220,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         assertTextPresent("We will be shipping out a box shortly");
 
         // Verify notification emails.
-        goToModule("Dumbster");
+        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
         verifyMailRecord(ADAPTIVE_NOTIFY_EMAIL, "A new Adaptive order has been created");
 
         popLocation();
@@ -263,7 +278,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         // Verify notification emails.
         pushLocation();
-        goToModule("Dumbster");
+        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
         verifyMailRecord(2, USERA1, "Your Adaptive order has been shipped");
         verifyMailRecord(2, ADAPTIVE_NOTIFY_EMAIL, "An Adaptive order has been shipped");
         popLocation();
@@ -336,7 +351,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         // Verify notification emails.
         pushLocation();
-        goToModule("Dumbster");
+        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
         verifyMailRecord(2, USERA1, "Your Adaptive plates have been received");
         verifyMailRecord(2, ADAPTIVE_NOTIFY_EMAIL, "Your Adaptive plates have been received");
         popLocation();
@@ -363,7 +378,8 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         setFormElement(Locator.id("run-name"), RUN_NAME_ALPHA);
         setFormElement(Locator.id("pcr-date"), "07/08/2010");
-        setFormElement("Species", "Human");
+        // species : human is now the default on the form
+        //setFormElement("Species", "Human");
 
         File file = new File(getAdaptiveRoot() + SAMPLE_DATA_DIR, PCR_FILE_A);
         setFormElement(Locator.id("file-upload-field-file"), file.toString());
@@ -431,13 +447,13 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         // Verify notification emails.
         pushLocation();
-        goToModule("Dumbster");
+        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
 
         // TODO: fix when Issue 67 is resolved.
         //verifyMailRecord(2, USERA1, "Your Adaptive samples have been processed", SAMPLE_B, SEQUENCE_SAMPLE_B);
-        verifyMailRecord(ADAPTIVE_NOTIFY_EMAIL, "Your Adaptive samples have been processed", SAMPLE_B, SEQUENCE_SAMPLE_B);
+        verifyMailRecord(USERA1, "Your Adaptive samples have been processed", SAMPLE_B, SEQUENCE_SAMPLE_B);
         //verifyMailRecord(3, 4, USERA1, "Your Adaptive samples have been processed", SAMPLE_A, SEQUENCE_SAMPLE_A);
-        verifyMailRecord(2, 2, ADAPTIVE_NOTIFY_EMAIL, "Your Adaptive samples have been processed", SAMPLE_A, SEQUENCE_SAMPLE_A);
+        verifyMailRecord(2, 2, USERA1, "Your Adaptive samples have been processed", SAMPLE_A, SEQUENCE_SAMPLE_A);
         popLocation();
     }
 
@@ -447,18 +463,18 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
         clickAdaptiveMenuButton("Analysis", "Single Sample Analysis");
 
-        clickNavButton("View Data", 0);
+        clickLinkWithText("View Data", false);
         waitForText("Validation error", WAIT_FOR_JAVASCRIPT); // No sample selected
 
         setAnalysisSample(SAMPLE_A);
-        checkRadioButton("viewType", "histogram2D");
-        clickNavButton("View Data", 0);
+        setAnalysisPlotType("2dhistogram");
+        clickLinkWithText("View Data", false);
         waitForText("Validation error", WAIT_FOR_JAVASCRIPT); // No column selected
 
-        checkRadioButton("viewType", "tabular");
-        clickNavButton("View Data", 0);
+        setAnalysisPlotType("tabular");
+        clickLinkWithText("View Data", false);
         waitForText("Nucleotide", WAIT_FOR_JAVASCRIPT); // Wait for table to load
-        waitForText("Percent of total Unique Sequences", WAIT_FOR_JAVASCRIPT);
+        waitForText("% of Total", WAIT_FOR_JAVASCRIPT);
 
         assertProductsTableCellEquals(2, 2, "10,739,744"); // Productive Sequences
         assertProductsTableCellEquals(3, 5, "0.116%"); // Out of frame Uniques percent
@@ -471,44 +487,270 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
         clickAdaptiveMenuButton("Analysis", "Compare Samples");
 
-        clickNavButton("View Data", 0);
+        clickLinkWithText("View Data", false);
         waitForText("Validation error", WAIT_FOR_JAVASCRIPT); // No sample selected
 
         setAnalysisSample(SAMPLE_A);
         setAnalysisSample(SAMPLE_A, 1);
-        clickNavButton("View Data", 0);
+        clickLinkWithText("View Data", false);
         waitForText("Validation error", WAIT_FOR_JAVASCRIPT); // Same sample selected twice.
 
         setAnalysisSample(SAMPLE_B, 1);
-        clickNavButton("View Data", 0);
+        clickLinkWithText("View Data", false);
         waitForText("Unique Sequences", WAIT_FOR_JAVASCRIPT); // Wait for table to load
 
-        assertStatisticsTableCellEquals("Sequences in both samples", 2, 2, "5,398,980");     // Nick is worried about these values
-        assertStatisticsTableCellEquals("Sequences only in " + SAMPLE_A, 2, 2, "5,340,764");
-        assertStatisticsTableCellEquals("Sequences only in " + SAMPLE_B, 2, 3, "272,526");
+        assertStatisticsTableCellEquals(1, 2, 2, "5,398,980");
 
+        clickLinkWithText("Sequences only in " + SAMPLE_A, false);
+        assertStatisticsTableCellEquals(2, 2, 2, "5,340,764");
+        clickLinkWithText("Sequences only in " + SAMPLE_B, false);
+        assertStatisticsTableCellEquals(3, 2, 3, "272,526");
+    }
+
+    private void saveViews()
+    {
+        // View A, from compareSamples().  Complare samples [028x009]; Tabular; Default settings.
+        saveCurrentView(VIEW_NAME_A);
+
+        refresh();
+        // Setup view B.  Compare samples [009x028]; Scatter; Switched search/filter settings.
+        setAnalysisSample(SAMPLE_B);
+        setAnalysisSample(SAMPLE_A, 1);
+        click(Locator.id("compare-scatter"));
+        expandAnalysisPanel("Choose How To Search Your Data");
+        click(Locator.id("dna"));
+        setFormElement("searchDepth", "42");
+        expandAnalysisPanel("Choose How To Filter Your Data");
+        uncheckCheckbox(Locator.id("ssprod"));
+        checkCheckbox(Locator.id("ssnprod"));
+        checkCheckbox(Locator.id("ssscodon"));
+        saveCurrentView(VIEW_NAME_B);
+
+        refresh();
+        // Setup view C.  Single sample; Tabular; Switched search settings.
+        uncheckCheckbox(Locator.xpath("//input[@type='checkbox' and ../label[text()='Compare to Another Sample']]"));
+        setAnalysisSample(SAMPLE_B);
+        click(Locator.id("tabular"));
+        expandAnalysisPanel("Choose How To Search Your Data");
+        click(Locator.id("dna"));           
+        setFormElement("searchDepth", "37");
+        saveCurrentView(VIEW_NAME_C);
+
+        clickAdaptiveMenuButton("Analysis", "Single Sample Analysis");
+        // Setup view D.  Single sample; 2D Histogram; [JGene x Unique]; Switched filter settings.
+        /*setAnalysisSample(SAMPLE_A);
+        click(Locator.id("2dhistogram"));
+
+        setFormElement(Locator.xpath("//div[./label[text()='X-Axis']]//div//input[@type = 'text']"), "JGene");
+        assertFormElementEquals(Locator.xpath("//div[./label[text()='X-Axis']]//div//input[@type = 'text']"), "JGene");
+
+        setFormElement(Locator.xpath("//div[./label[text()='Count']]//div//input[@type = 'text']"), "Unique");
+        assertFormElementEquals(Locator.xpath("//div[./label[text()='Count']]//div//input[@type = 'text']"), "Unique");
+        
+        expandAnalysisPanel("Choose How To Filter Your Data");
+        uncheckCheckbox(Locator.id("ssprod"));
+        checkCheckbox(Locator.id("ssnprod"));
+        checkCheckbox(Locator.id("ssscodon"));
+        saveCurrentView(VIEW_NAME_D);
+
+        refresh();
+        // Setup view E.  Single sample; 3D Histogram; Switched filter settings.
+        uncheckCheckbox(Locator.xpath("//input[@type='checkbox' and ../label[text()='Compare to Another Sample']]"));
+        setAnalysisSample(SAMPLE_B);
+        click(Locator.id("3dhistogram"));
+        setFormElement(Locator.xpath("//div[./label[text()='Count']]//div//input[@type = 'text']"), "Average");
+        expandAnalysisPanel("Choose How To Filter Your Data");
+        uncheckCheckbox(Locator.id("ssprod"));
+        checkCheckbox(Locator.id("ssnprod"));
+        checkCheckbox(Locator.id("ssscodon"));
+        saveCurrentView(VIEW_NAME_E);*/
+    }
+
+    private void verifySavedViews()
+    {
+        clickLinkWithText(PROJECT_NAME);
+        goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
+        clickAdaptiveMenuButton("Analysis", "Compare Samples");
+
+        loadSavedView(VIEW_NAME_A); // View A, from compareSamples().  Complare samples [028x009]; Tabular; Default settings.
+        assertElementContains(Locator.xpath("//div[./div/span[text() = 'Choose Your Sample']]//dl[contains(@class,'x-list-selected')]//em"), SAMPLE_A);
+        assertElementContains(Locator.xpath("//div[./div/span[text() = 'Choose Your Second Sample']]//dl[contains(@class,'x-list-selected')]//em"), SAMPLE_B);
+        assertElementContains(Locator.xpath("//td[contains(@class, 'view-selected')]//div[contains(@class, 'x-btn-text')]"), "Tabular");
+        expandAnalysisPanel("Choose How To Search Your Data");
+        assertElementPresent(Locator.xpath("//*[@id='aminoAcid' and @checked=\"\"]"));
+        assertElementPresent(Locator.xpath("//*[@id='vfamily' and @checked=\"\"]"));
+
+        loadSavedView(VIEW_NAME_B); // Setup view B.  Compare samples [009x028]; Scatter; Switched search/filter settings.
+        assertElementContains(Locator.xpath("//div[./div/span[text() = 'Choose Your Sample']]//dl[contains(@class,'x-list-selected')]//em"), SAMPLE_B);
+        assertElementContains(Locator.xpath("//div[./div/span[text() = 'Choose Your Second Sample']]//dl[contains(@class,'x-list-selected')]//em"), SAMPLE_A);
+        assertElementContains(Locator.xpath("//td[contains(@class, 'view-selected')]//div[contains(@class, 'x-btn-text')]"), "Log Scatter");
+        expandAnalysisPanel("Choose How To Search Your Data");
+        assertElementPresent(Locator.xpath("//*[@id='dna' and @checked=\"\"]"));
+        assertFormElementEquals("searchDepth", "42");
+        expandAnalysisPanel("Choose How To Filter Your Data");
+        assertNotChecked(Locator.id("ssprod"));
+        assertChecked(Locator.id("ssnprod"));
+        assertChecked(Locator.id("ssscodon"));
+
+        loadSavedView(VIEW_NAME_C, false); // Setup view C.  Single sample; Tabular; Switched search settings.
+        assertElementContains(Locator.xpath("//div[./div/span[text() = 'Choose Your Sample']]//dl[contains(@class,'x-list-selected')]//em"), SAMPLE_B);
+        assertElementContains(Locator.xpath("//td[contains(@class, 'view-selected')]//div[contains(@class, 'x-btn-text')]"), "Tabular");
+        //expandAnalysisPanel("Choose How To Search Your Data");
+        //assertElementPresent(Locator.xpath("//*[@id='dna' and @checked=\"\"]"));
+        //assertFormElementEquals("searchDepth", "37");
+
+        /*loadSavedView(VIEW_NAME_D); // Setup view D.  Single sample; 2D Histogram; [JGene x Unique]; Switched filter settings.
+        assertElementContains(Locator.xpath("//div[./div/span[text() = 'Choose Your Sample']]//dl[contains(@class,'x-list-selected')]//em"), SAMPLE_A);
+        assertElementContains(Locator.xpath("//td[contains(@class, 'view-selected')]//div[contains(@class, 'x-btn-text')]"), "2D Histogram");
+        assertFormElementEquals(Locator.xpath("//div[./label[text()='X-Axis']]//div//input[@type = 'text']"), "JGene");
+        assertFormElementEquals(Locator.xpath("//div[./label[text()='Count']]//div//input[@type = 'text']"), "Unique");
+        expandAnalysisPanel("Choose How To Search Your Data");
+        expandAnalysisPanel("Choose How To Filter Your Data");
+        assertNotChecked(Locator.id("ssprod"));
+        assertChecked(Locator.id("ssnprod"));
+        assertChecked(Locator.id("ssscodon"));
+
+        /*loadSavedView(VIEW_NAME_E); // Setup view E.  Single sample; 3D Histogram; Switched filter settings.
+        assertElementContains(Locator.xpath("//div[./div/span[text() = 'Choose Your Sample']]//dl[contains(@class,'x-list-selected')]//em"), SAMPLE_B);
+        assertElementContains(Locator.xpath("//td[contains(@class, 'view-selected')]//div[contains(@class, 'x-btn-text')]"), "3D Histogram");
+        assertFormElementEquals(Locator.xpath("//div[./label[text()='Count']]//div//input[@type = 'text']"), "Average");
+        expandAnalysisPanel("Choose How To Search Your Data");
+        expandAnalysisPanel("Choose How To Filter Your Data");
+        assertNotChecked(Locator.id("ssprod"));
+        assertChecked(Locator.id("ssnprod"));
+        assertChecked(Locator.id("ssscodon"));*/
+    }
+
+    private void editSavedViews()
+    {
+        refresh(); // TODO: Something happens between call to this method and last method which results in mem leak? Refresh helps (possibly sampleComparisonCount.jsp)?
+        
+        /* Edit View A */
+        editSavedView(VIEW_NAME_A);  // Change view A to Compare Sample [009x028]. Switch to scatter / linear
+        setAnalysisSample(SAMPLE_B);
+        setAnalysisSample(SAMPLE_A, 1);
+        click(Locator.id("compare-linear"));
+        clickLinkWithText("View Data", false);
+    }
+
+    private void verifyDemoSite()
+    {
+        clickLinkWithText(DEMO_SITE);
+        pushLocation();
+        impersonate(USERA1);
+        popLocation();
+
+        /* Make sure navigation has been closed down to only necessary links */
+        assertTextNotPresent("New Order");
+        assertTextNotPresent("Upload Samples");
+        assertTextNotPresent("Administration");
+
+        /* TODO: Test Saved Views can be loaded / not saved or edited in demo site */
+        
+        pushLocation();
+        stopImpersonating();
+        popLocation();        
+    }
+   
+    private void expandAnalysisPanel(String panelTitle)
+    {
+        if ( isElementPresent(Locator.xpath("//div[../div/span[text() = '" + panelTitle + "'] and contains(@style, 'display: none')]")) )
+        {
+            click(Locator.xpath("//div[../span[text() = '" + panelTitle + "']]")); // Expand panel.
+        }
+    }
+
+    private void collapseAnalysisPanel(String panelTitle)
+    {
+        if ( isElementPresent(Locator.xpath("//div[../div/span[text() = '" + panelTitle + "'] and contains(@style, 'display: block')]")) )
+        {
+            click(Locator.xpath("//div[../span[text() = '" + panelTitle + "']]")); // Collapse panel.
+        }
     }
 
     private void assertProductsTableCellEquals(int row, int column, String text)
     {
-        assertElementPresent(Locator.xpath("//table [@class = 'adaptive-products-table']/tbody[" + row + "]/tr/td[position() = " + column + " and text() = '" + text + "']"));
+        assertElementPresent(Locator.xpath("//table [@class = 'adaptive-statistics-table']/tbody[" + row + "]/tr/td[position() = " + column + " and text() = '" + text + "']"));
     }
 
-    private void assertStatisticsTableCellEquals(String header, int row, int column, String expected)
+    private void assertStatisticsTableCellEquals(int tableNum, int row, int column, String expected)
     {
-        String actual = getText(Locator.xpath("//div[./div/span[text() = '" + header + "']]//table//tr[" + row + "]/td[" + column + "]"));
-        assertEquals("Did not find expected value '" + expected + "' in \"" + header + "\"." + row + "." + column + ".", expected, actual);
+        // since the multi-sample stats are in separate tabs, we have to find the active tab's table...
+        Locator table = Locator.xpath("(//table [@class = 'adaptive-statistics-table'])[" + tableNum + "]//tr[" + row + "]/td[" + column + "]");
+        waitForElement(table, WAIT_FOR_JAVASCRIPT);
+        String actual = getText(table);
+        assertEquals("Did not find expected value '" + expected + "' in \"" + tableNum + "\"." + row + "." + column + ".", expected, actual);
+    }
 
+    private void setAnalysisPlotType(String id)
+    {
+        click(Locator.xpath("//*[@id='" + id + "']"));
     }
 
     private void setAnalysisSample(String value)
     {
         setAnalysisSample(value, 0);
     }
-    
+
     private void setAnalysisSample(String value, int index)
     {
         click(Locator.xpath("//div[contains(@class, 'x-list-body-inner')]/dl/dt/em[contains(@unselectable, 'on') and text()='" + value + "']").index(index));
+    }
+
+    private void saveCurrentView(String viewName)
+    {
+        log("Saving view: " + viewName);
+        checkCheckbox("named-view-cb");
+        setFormElement("reportName", viewName);
+        clickNavButton("Save", 0);
+        waitForText("Saved.", WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void loadSavedView(String viewName)
+    {
+        loadSavedView(viewName, true);
+    }
+
+    private void loadSavedView(String viewName, boolean wait)
+    {
+        log("Loading view: " + viewName);
+        setViewSelection(viewName);
+        clickLinkWithText("Load View", false);
+        if (wait)
+        {
+            waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT * 3);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Loading Views...']"), WAIT_FOR_JAVASCRIPT);
+        }
+        
+        assertTextNotPresent("Load Error");
+    }
+
+    private void viewData(boolean wait)
+    {
+        clickLinkWithText("View Data", false);
+        if (wait)
+        {
+            waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT * 3);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Loading Views...']"), WAIT_FOR_JAVASCRIPT);
+        }
+
+        assertTextNotPresent("Load Error");
+    }
+
+    private void editSavedView(String viewName)
+    {
+        log("Editing view: " + viewName);
+        setViewSelection(viewName);
+        clickLinkWithText("Edit View", false);
+    }
+
+    private void setViewSelection(String viewName)
+    {
+        click(Locator.xpath("//span[text() = 'Saved Views']"));
+        waitForText("Your Saved Views", WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath("//em[text() = '" + viewName + "']"));
     }
     
     private void createHeader()

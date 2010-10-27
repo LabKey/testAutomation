@@ -117,9 +117,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return Integer.parseInt(portString);
     }
 
-    public static int getSeleniumServer() {
-        String portString = System.getProperty("selenium.server", DEFAULT_SELENIUM_SERVER);
-        return Integer.parseInt(portString);
+    public static String getSeleniumServer() {
+        return System.getProperty("selenium.server", DEFAULT_SELENIUM_SERVER);
     }
 
     public DefaultSeleniumWrapper getWrapper()
@@ -410,6 +409,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void signIn()
     {
+        if ( isGuestModeTest() )
+        {
+            waitForStartup();
+            log("Skipping sign in.  Test runs as guest.");
+            beginAt("/login/logout.view");
+            return;
+        }
+
         try
         {
             PasswordUtil.ensureCredentials();
@@ -430,6 +437,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
     public void simpleSignIn()
     {
+        if ( isGuestModeTest() )
+            return;
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view");
 
@@ -829,6 +838,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void disableMaintenance()
     {
+        if ( isGuestModeTest() )
+            return;
         beginAt("/admin/customizeSite.view");
         click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
         clickNavButton("Save");
@@ -922,6 +933,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void resetErrors()
     {
+        if ( isGuestModeTest() )
+            return;
 		if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
         	beginAt("/admin/resetErrorMark.view");
     }
@@ -954,11 +967,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 disableMaintenance();
             }
 
-            DatabaseInfo info = getDatabaseInfo();
-            if (!isDatabaseSupported(info))
+
+            if ( !isGuestModeTest() )
             {
-                log("** Skipping " + getClass().getSimpleName() + " test for unsupported database: " + info.productName + " " + info.productVersion);
-                return;
+                DatabaseInfo info = getDatabaseInfo();
+                if (!isDatabaseSupported(info))
+                {
+                    log("** Skipping " + getClass().getSimpleName() + " test for unsupported database: " + info.productName + " " + info.productVersion);
+                    return;
+                }
             }
 
             try
@@ -1129,8 +1146,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return "never".equals(System.getProperty("systemMaintenance"));
     }
 
+    public boolean isGuestModeTest()
+    {
+        return false;
+    }
+
     public void checkLeaksAndErrors()
     {
+        if ( isGuestModeTest() )
+            return;
 		checkErrors();
 		checkLeaks();
         _checkedLeaksAndErrors = true;
@@ -1141,6 +1165,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
 			return;
         if (skipLeakCheck())
+            return;
+        if (isGuestModeTest())
             return;
 
         log("Starting memory leak check...");
@@ -1180,6 +1206,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
 		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
 			return;
+        if ( isGuestModeTest() )
+            return;
         beginAt("/admin/showErrorsSinceMark.view");
 
         assertTrue("There were errors during the test run", isPageEmpty());
@@ -1190,6 +1218,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private void checkActionCoverage()
     {
+        if ( isGuestModeTest() )
+            return;
         int rowCount, coveredActions, totalActions;
         Double actionCoveragePercent;
         String actionCoveragePercentString;
@@ -1266,6 +1296,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void dumpHeap()
     {
+		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+			return;
+        if ( isGuestModeTest() )
+            return;
         pushLocation();
         try
         {
@@ -1293,6 +1327,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void dumpThreads()
     {
+		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+			return;
         try
         {
             File threadDumpRequest = new File(getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
@@ -1976,6 +2012,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         if (!checker.check())
             fail(failMessage);
+    }
+
+    public void waitForExtMaskToDisappear()
+    {
+        waitForExtMaskToDisappear( WAIT_FOR_JAVASCRIPT );
+    }
+
+    public void waitForExtMaskToDisappear(int wait)
+    {
+        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'display: block')]"), wait);
     }
 
     protected File getTestTempDir()

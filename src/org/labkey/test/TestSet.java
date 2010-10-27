@@ -20,6 +20,7 @@ import org.labkey.test.bvt.*;
 import org.labkey.test.daily.*;
 import org.labkey.test.drt.*;
 import org.labkey.test.module.AdaptiveTest;
+import org.labkey.test.module.AdaptiveVisualizationPerf;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
@@ -177,6 +178,10 @@ public enum TestSet
 
     Adaptive(new Class[]{
             AdaptiveTest.class
+    }),
+
+    AdaptivePerf(new Class[]{
+            AdaptiveVisualizationPerf.class
     }),
 
     CONTINUE(new Class[] {})
