@@ -153,6 +153,7 @@
             <include name="log4j-1.2.16.jar" />
             <include name="commons-logging-1.1.jar" />
             <include name="xbean.jar" />
+            <include name="opencsv-2.0.jar"/>
         </fileset>
         <fileset dir="${javaclientjar.dir}">
             <include name="labkey-client-api-${product.version}.jar"/>
@@ -1123,6 +1124,15 @@
 			    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
 		</exec>
 	 </target>
+
+    <target name="studysampler" depends="compile">
+        <copy file="${test.src.home}/org/labkey/test/studysampler/words.txt" todir="${test.build.home}/classes/"/>
+        <java classname="org.labkey.test.studysampler.Runner">
+            <classpath refid="test.run.classpath"/>
+            <!-- set the input dir on the ant command line with -D studysampler.dir=/path/to/study/-->
+            <arg value="${studysampler.dir}"/>
+        </java>
+    </target>
 
 </project>
 
