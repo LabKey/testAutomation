@@ -323,7 +323,7 @@ public class AssayTest extends AbstractAssayTest
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/testAssayRunProp1");
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/Batch/testAssaySetProp2");
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/testAssayDataProp4");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
 
         assertTextPresent("Blood (Whole)", 4);
         int totalTrues = countText("true");
@@ -404,7 +404,7 @@ public class AssayTest extends AbstractAssayTest
         log("Verifying that the data was published");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "QCState", "QC State");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
         assertTextPresent("Pending Review");
         assertTextPresent("a");
         assertTextPresent(TEST_RUN1_COMMENTS);

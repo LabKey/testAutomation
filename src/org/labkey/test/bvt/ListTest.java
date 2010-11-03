@@ -376,7 +376,6 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test Customize View");
         clickLinkWithText("Clear all filters");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol4.getName());
         CustomizeViewsHelper.addCustomizeViewFilter(this, _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
         CustomizeViewsHelper.addCustomizeViewSort(this, _listCol2.getName(), _listCol2.getLabel(), "Ascending");
@@ -389,16 +388,15 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(_listCol4.getLabel());
 
         log("4725: Check Customize View can't remove all fields");
-        pushLocation();
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.removeCustomizeViewColumn(this, LIST_KEY_NAME2);
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol1.getName());
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol2.getName());
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol3.getName());
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol6.getName());
-        clickNavButton("Apply", 0);
+        CustomizeViewsHelper.applyCustomView(this, 0);
         assertAlert("You must select at least one field to display in the grid.");
-        popLocation();
+        CustomizeViewsHelper.closeCustomizeViewPanel(this);
 
         log("Test Export");
         addUrlParameter("exportAsWebPage=true");

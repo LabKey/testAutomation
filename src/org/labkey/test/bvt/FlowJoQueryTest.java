@@ -50,7 +50,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Keyword/Sample Order", "Sample Order");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
-        clickNavButton("Apply", longWaitForPage);
+        CustomizeViewsHelper.applyCustomView(this);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Folder Settings");
         toggleCheckboxByTitle("Query");

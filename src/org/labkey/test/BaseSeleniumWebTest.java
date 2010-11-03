@@ -101,7 +101,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
     public final static String IE_BROWSER = "*iexplore";
     //protected final static String IE_UPLOAD_BROWSER = "*iehta";
-    public static final String CUSTOMIZE_VIEW = "Customize View";
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     private static boolean _checkedLeaksAndErrors = false;

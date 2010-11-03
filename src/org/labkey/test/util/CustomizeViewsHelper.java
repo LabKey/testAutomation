@@ -29,22 +29,46 @@ public class CustomizeViewsHelper
 {
     public static void openCustomizeViewPanel(BaseSeleniumWebTest test)
     {
-        test.clickMenuButtonAndContinue("Views", "Customize New View");
-        test.waitForElement(Locator.xpath("//button[text()='Apply']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.clickMenuButtonAndContinue("Views", "Customize View");
+        test.waitForElement(Locator.xpath("//button[text()='View Grid']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static void closeCustomizeViewPanel(BaseSeleniumWebTest test)
+    {
+        // UNDONE: click 'X' close button on columns/filter/sort tab panel instead.
+        test.clickMenuButtonAndContinue("Views", "Customize View");
+    }
+
+    public static void applyCustomView(BaseSeleniumWebTest test)
+    {
+        applyCustomView(test, test.getDefaultWaitForPage());
+    }
+
+    public static void applyCustomView(BaseSeleniumWebTest test, int waitMillis)
+    {
+        test.clickNavButton("View Grid", waitMillis);
     }
 
     public static void saveCustomView(BaseSeleniumWebTest test, String name)
     {
         test.clickNavButton("Save", 0);
         if (name != null)
-            test.setFormElement(Locator.xpath("//div[contains(@style, 'display: block')]//input[@type='text']"), name);
+        {
+            test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "named"));
+            test.setFormElement(Locator.xpath("//input[@name='saveCustomView_name']"), name);
+        }
         test.clickButtonByIndex("Save", 1);
     }
 
-    public static void resetCustomView(BaseSeleniumWebTest test)
+    public static void deleteView(BaseSeleniumWebTest test)
     {
-        test.clickNavButton("Reset", 0);
+        test.clickNavButton("Delete", 0);
         test.clickNavButton("Yes");
+    }
+
+    public static void revertUnsavedView(BaseSeleniumWebTest test)
+    {
+        test.clickNavButton("Revert");
     }
 
     public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String column_name)

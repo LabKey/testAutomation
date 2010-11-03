@@ -126,7 +126,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("QC State");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "QCState", "QC State");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
         assertTextPresent("unknown QC");
     }
 

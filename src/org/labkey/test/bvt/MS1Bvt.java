@@ -247,7 +247,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         //test measure filtering
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewFilter(this, "CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
         assertLinkNotPresentWithText("1");
 
         pushLocation();
@@ -259,7 +259,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         //test fk table column filtering
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewFilter(this, "CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
         assertTextNotPresent("461.7480"); //mz value
 
         log("Compare runs view OK.");
@@ -368,7 +368,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "RelatedPeptide");
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "RelatedPeptide/Fraction/Run/Description");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "KL");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
 
         assertTextPresent("KL");
         assertTextNotPresent("Related Peptide");
@@ -376,7 +376,7 @@ public class MS1Bvt extends BaseSeleniumWebTest
 
         //reset view
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.resetCustomView(this);
+        CustomizeViewsHelper.revertUnsavedView(this);
 
         //add other columns from peptide data
         //and test saving under a name

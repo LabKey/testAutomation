@@ -535,29 +535,21 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("SeqHits");
         assertTextPresent("gi|27805893|guanine_nucleotid");
 
+        /*
         log("Test changing order of sorts and columns");
-        clickMenuButton("Views", CUSTOMIZE_VIEW);  // TODO: remove (Issue 11066)
-        moveCustomizeViewSort("Z", false);         // TODO: remove (Issue 11066)
-        moveCustomizeViewColumn("Peptide", false); // TODO: remove (Issue 11066)
-        clickNavButton("Save");                    // TODO: remove (Issue 11066)
-        //TODO: Use New CV UI once Issue #11066 is resolved
-//        CustomizeViewsHelper.openCustomizeViewPanel(this);
-//        CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", false);
-//        CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", false);
-//        clickNavButton("Apply");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", false);
+        CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", false);
+        CustomizeViewsHelper.applyCustomView(this);
 
         assertTextBefore("K.TESGYGSESSLR.R", "K.HVSGKIIGFFY.-");
         assertTextBefore("gi|30519530|A38R_protein", "K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q");
 
-        clickMenuButton("Views", CUSTOMIZE_VIEW); // TODO: remove (Issue 11066)
-        moveCustomizeViewSort("Z", true);         // TODO: remove (Issue 11066)
-        moveCustomizeViewColumn("Peptide", true); // TODO: remove (Issue 11066)
-        clickNavButton("Save");                   // TODO: remove (Issue 11066)
-        //TODO: Use New CV UI once Issue #11066 is resolved
-//        CustomizeViewsHelper.openCustomizeViewPanel(this);
-//        CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", true);
-//        CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", true);
-//        clickNavButton("Apply");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", true);
+        CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", true);
+        CustomizeViewsHelper.applyCustomView(this);
+        */
 
         log("Test Ignore View Filter");
         clickMenuButton("Views", "Apply View Filter");
@@ -670,7 +662,7 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test restoring default view");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.resetCustomView(this);
+        CustomizeViewsHelper.revertUnsavedView(this);
         assertTextPresent("K.LLASMLAK.A");
         assertTextNotPresent("Fraction");
         assertTextBefore("R.LGARRVSPVR.A", "K.TKDYEGMQVPVK.V");
@@ -679,8 +671,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test delete view");
         clickMenuButton("Views", VIEW4);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        clickButton("Delete", 0);
-        clickButton("Yes");
+        CustomizeViewsHelper.deleteView(this);
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextNotPresent("Next AA");
@@ -974,7 +965,7 @@ public class MS2BvtTest extends MS2TestBase
         CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/Default Experiment", "Run Groups Default Experiment");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
 
         assertTextPresent("Run Groups " + RUN_GROUP1_NAME2);
         assertTextPresent("Run Groups " + RUN_GROUP2_NAME);

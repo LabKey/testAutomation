@@ -154,7 +154,7 @@ public class ExpTest extends BaseSeleniumWebTest
         // Customize the view to add the newly joined column
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "WrappedRowId/Created", "Wrapped Row Id editedCreated");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
         // Verify that it was joined and formatted correctly
         assertTextPresent(dateFormat.format(new Date()), 5);
 

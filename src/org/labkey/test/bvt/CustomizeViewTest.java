@@ -127,35 +127,35 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         CustomizeViewsHelper.clearCustomizeViewColumns(this);
         for (String fieldKey : fieldKeys)
             CustomizeViewsHelper.addCustomizeViewColumn(this, fieldKey);
-        clickNavButton("Apply", longWaitForPage);
+        CustomizeViewsHelper.applyCustomView(this);
     }
 
     void addFilter(String fieldKey, String op, String value)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewFilter(this, fieldKey, op, value);
-        clickNavButton("Apply", longWaitForPage);
+        CustomizeViewsHelper.applyCustomView(this);
     }
 
     void addSort(String fieldKey, String order)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewSort(this, fieldKey, order);
-        clickNavButton("Apply", longWaitForPage);
+        CustomizeViewsHelper.applyCustomView(this);
     }
 
     void removeFilter(String fieldKey)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.removeCustomizeViewFilter(this, fieldKey);
-        clickNavButton("Apply", longWaitForPage);
+        CustomizeViewsHelper.applyCustomView(this);
     }
 
     void removeSort(String fieldKey)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.removeCustomizeViewSort(this, fieldKey);
-        clickNavButton("Apply", longWaitForPage);
+        CustomizeViewsHelper.applyCustomView(this);
     }
 
     @Override

@@ -465,7 +465,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl", "Curve IC80 4pl");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_5pl", "Curve IC80 5pl");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_poly", "Curve IC80 Poly");
-        clickNavButton("Apply");
+        CustomizeViewsHelper.applyCustomView(this);
     }
 
     private void assertAliasedAUCCellData()
