@@ -2381,10 +2381,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public int countLinksWithText(String text)
     {
-        //TODO: Figure out how to count with a locator. For now still need to escape javascript string...
-        String js = "selenium.countLinksWithText('" + text + "');";
-        String count = selenium.getEval(js);
-        return Integer.parseInt(count);
+        return selenium.getXpathCount("//a[text() = '"+text+"']").intValue();
     }
 
     public void assertLinkPresentWithTextCount(String text, int count)
@@ -2483,6 +2480,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.mouseMoveAt(to.toString(), "1,1");
         selenium.mouseOver(to.toString());
         selenium.mouseUpAt(to.toString(), "1,1");
+    }
+
+    public enum Position
+    {top, bottom}
+
+    public void dragAndDrop(Locator from, Locator to, Position pos)
+    {
+        int y;
+        if ( pos == Position.top )
+            y = 1;
+        else // pos == Position.bottom
+            y = selenium.getElementHeight(to.toString()).intValue() - 1;
+
+        selenium.mouseDownAt(from.toString(), "1,1");
+        selenium.mouseMoveAt(to.toString(), "1," + y);
+        selenium.mouseOver(to.toString());
+        selenium.mouseUpAt(to.toString(), "1," + y);
     }
 
     public void clickTab(String tabname)

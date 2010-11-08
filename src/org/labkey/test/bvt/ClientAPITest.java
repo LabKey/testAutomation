@@ -27,8 +27,12 @@ import org.apache.commons.lang.StringUtils;
 public class ClientAPITest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "ClientAPITestProject";
+    private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
     private static final String FOLDER_NAME = "api folder";
+    private static final String SUBFOLDER_NAME = "subfolder";
     private final static String LIST_NAME = "People";
+    private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
+    private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
@@ -203,9 +207,30 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "    function()\n" +
             "    {\n" +
             "        LABKEY.Query.executeSql({schemaName: 'lists', " +
+                    "sort: 'Age', " +
                     "sql: 'select People.age from People', " +
                     "successCallback: successHandler, errorCallback: failureHandler});\n" +
             "    },\n" +
+            "\n" +
+            "    function()\n" +
+            "    {\n" +
+            "        LABKEY.Query.executeSql({\n" +
+            "            schemaName:'lists',\n" +
+            "            sql: 'select "+SUBFOLDER_LIST+".FirstName from Project.\""+FOLDER_NAME+"/" + SUBFOLDER_NAME +"/\".lists."+SUBFOLDER_LIST+"',\n" +
+            "            successCallback: successHandler,\n" +
+            "            errorCallback: failureHandler\n" +
+            "        });\n" +
+            "    },\n" +
+            "\n" +
+            "    function()\n" +
+            "    {\n" +
+            "        LABKEY.Query.executeSql({\n" +
+            "            schemaName:'lists',\n" +
+            "            sql: 'select "+ OTHER_PROJECT_LIST +".FirstName from \"/"+OTHER_PROJECT+"\".lists."+ OTHER_PROJECT_LIST +"',\n" +
+            "            successCallback: successHandler,\n" +
+            "            errorCallback: failureHandler\n" +
+            "        });\n" +
+            "    }," +
             "\n" +
             "    // last function sets the contents of the results div.\n" +
             "    function()\n" +
@@ -255,6 +280,21 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "            html += 'SUCCESS: executeSql returned 7 rows<br>';\n" +
             "        else\n" +
             "            html += 'FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';\n" +
+            "\n" +
+            "        if (testResults[8].rows[1].age < testResults[8].rows[2].age)\n" +
+            "            html += 'SUCCESS: executeSql returned properly sorted<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '<br>';\n" +
+            "\n" +
+            "        if (testResults[9].rowCount == 7)\n" +
+            "            html += 'SUCCESS: cross-folder executeSql succeeded<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: executeSql returned ' + testResults[9].rowCount + ' rows, expected 7.  Error value = ' + testResults[9].exception + '<br>';\n" +
+            "\n" +
+            "        if (testResults[10].rowCount == 7)\n" +
+            "            html += 'SUCCESS: cross-project executeSql succeeded<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: executeSql returned ' + testResults[10].rowCount + ' rows, expected 7.  Error value = ' + testResults[10].exception + '<br>';\n" +
             "\n" +
             "        document.getElementById('testDiv').innerHTML = html;        \n" +
             "    }\n" +
@@ -361,10 +401,12 @@ public class ClientAPITest extends BaseSeleniumWebTest
             deleteUser(user);
 
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        try {deleteProject(OTHER_PROJECT); } catch (Throwable t) {}
     }
 
     protected void doTestSteps() throws Exception
     {
+        createProject(OTHER_PROJECT);
         createProject(PROJECT_NAME);
 
         enableModule(PROJECT_NAME, "Dumbster");
@@ -374,11 +416,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
 
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
+
         clickLinkWithText(FOLDER_NAME);
         
         createWiki();
 
-        createList();
+        createLists();
 
         gridTest();
 
@@ -409,7 +453,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         saveWikiPage();
     }
 
-    private void createList()
+    private void createLists()
     {
         ListHelper.createList(this, FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
 
@@ -440,6 +484,20 @@ public class ClientAPITest extends BaseSeleniumWebTest
                 assertTextPresent(rowData[col]);
             }
         }
+
+        // Create lists for cross-folder query test.
+        ListHelper.createList(this, SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        ListHelper.clickImportData(this);
+        setFormElement("ff_data", data.toString());
+        submit();
+
+        // Create lists for cross-folder query test.
+        ListHelper.createList(this, OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        ListHelper.clickImportData(this);
+        setFormElement("ff_data", data.toString());
+        submit();
+
+        clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
     }
 
@@ -742,6 +800,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertElementContains(loc, "SUCCESS: Bad insert generated exception: The field 'LastName' is required.");
         assertElementContains(loc, "SUCCESS: Bad query generated exception: Failed to convert property value of type");
         assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
+        assertElementContains(loc, "SUCCESS: cross-folder executeSql succeeded");
+        assertElementContains(loc, "SUCCESS: cross-project executeSql succeeded");
         clearTestPage("Query portion of test page complete");
     }
 
