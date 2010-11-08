@@ -103,7 +103,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     //protected final static String IE_UPLOAD_BROWSER = "*iehta";
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
-    private static boolean _checkedLeaksAndErrors = false;
+    protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "springActions";
 
     public BaseSeleniumWebTest()
@@ -2478,7 +2478,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     public void dragAndDrop(Locator from, Locator to)
-    {                
+    {
         selenium.mouseDownAt(from.toString(), "1,1");
         selenium.mouseMoveAt(to.toString(), "1,1");
         selenium.mouseOver(to.toString());
