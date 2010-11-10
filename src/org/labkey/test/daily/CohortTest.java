@@ -232,7 +232,12 @@ public class CohortTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Test Results");
         clickMenuButton("Cohorts", "Cohort as of data collection", "Positive");
-        clickLinkWithText("Infected3");
+        clickLinkWithText("Infected1");
+        // Verify somewhat wacky paging order is correct
+        clickLinkWithText("Next Participant");
+        assertTextPresent("Infected3");
+        clickLinkWithText("Next Participant");
+        assertTextPresent("Infected2");
         assertLinkNotPresentWithText("Next Participant"); // Participant 4 should be filtered out
            
         // Check basic cohorts

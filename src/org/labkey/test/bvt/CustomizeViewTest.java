@@ -1,6 +1,8 @@
 package org.labkey.test.bvt;
 
+import com.google.common.base.Function;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 
@@ -85,7 +87,20 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         removeSort("Age");
         assertTextBefore("Billson", "Johnson");
 
-        // TODO: pin, unpin, setting column title, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links, 
+        // TODO: pin, unpin, setting column title, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links,
+
+
+        log("** Test HTML/JavaScript escaping");
+        Crawler.tryInject(this, new Function<Void, Void>() {
+            @Override
+            public Void apply(Void v)
+            {
+                CustomizeViewsHelper.openCustomizeViewPanel(CustomizeViewTest.this);
+                CustomizeViewsHelper.saveCustomView(CustomizeViewTest.this, "EVIL: " + Crawler.injectString);
+                assertTextBefore("Billson", "Johnson");
+                return null;
+            }
+        }, null);
     }
 
     private void createList()

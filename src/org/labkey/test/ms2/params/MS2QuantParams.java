@@ -60,10 +60,10 @@ class MS2QuantParams extends MS2TestParams
         // Navigate to the peptides view by clicking the experiment name link.
         _test.clickLinkWithText(link);
 
-        setGrouping("None");
+        setGrouping("Peptides (Legacy)");
         _test.clearAllFilters("MS2Peptides", "Scan");
 
-        setGrouping("Protein Prophet");
+        setGrouping("ProteinProphet (Legacy)");
         _test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
         _test.log("Pick protein columns");

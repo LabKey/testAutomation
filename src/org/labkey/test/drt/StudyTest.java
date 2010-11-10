@@ -393,13 +393,13 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Mouse >");
+        clickLinkWithText("Next Mouse");
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Mouse >");
+        clickLinkWithText("Next Mouse");
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Mouse >");
+        clickLinkWithText("Next Mouse");
     }
 
     @Override

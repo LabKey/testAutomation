@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.WebTestHelper;
@@ -470,9 +471,53 @@ public class Crawler
     }
 
 
-	final static String alertText = "8(";
-	final static String maliciousScript = "<script>alert(\"" + alertText + "\");</script>";
-	final static String injectString = "\"'>--></script>" + maliciousScript;
+	public static final String alertText = "8(";
+	public static final String maliciousScript = "<script>alert(\"" + alertText + "\");</script>";
+	public static final String injectString = "\"'>--></script>" + maliciousScript;
+
+    public static <F, T> T tryInject(BaseSeleniumWebTest test, Function<F, T> f, F arg)
+    {
+        try
+        {
+            String msg = null;
+            try
+            {
+                return f.apply(arg);
+            }
+            catch (SeleniumException se)
+            {
+                String html = test.getHtmlSource();
+                if (html.contains(maliciousScript))
+                    msg = "page contains injected script";
+
+                while (test.isAlertPresent())
+                {
+                    if (test.getAlert().startsWith(alertText))
+                        msg = " malicious script executed";
+                }
+
+                // see ConnectionWrapper.java
+                if (html.contains("SQL injection test failed"))
+                    msg = "SQL injection detected";
+
+                if (msg != null)
+                {
+                    String url = test.getCurrentRelativeURL();
+                    test.fail(msg + "\n" + url);
+                }
+
+                throw se;
+            }
+        }
+        catch (RuntimeException re)
+        {
+            // ignore javascript errors (HTTPUnit has a poor engine) and non-HTML download links:
+            if (re.getMessage().indexOf("ScriptException") < 0 && !re.getClass().getSimpleName().equals("NotHTMLException"))
+                throw re;
+        }
+
+        return null;
+    }
 	
 	private void testInjection(UrlToCheck urlToCheck, URL start)
 	{
@@ -492,6 +537,15 @@ public class Crawler
 		if (query.length() == 0)
 			return;
 
+        Function<String, Void> urlTester = new Function<String, Void>() {
+            @Override
+            public Void apply(String urlMalicious)
+            {
+                _test.beginAt(urlMalicious);
+                return null;
+            }
+        };
+
 		String[] parts = StringUtils.split(query,'&');
 		for (int i=0 ; i<parts.length ; i++)
 		{
@@ -501,44 +555,7 @@ public class Crawler
 			parts[i] = save;
 
 			String urlMalicious = base + "?" + queryMalicious;
-
-			try
-			{
-                String msg = null;
-                try
-                {
-				    _test.beginAt(urlMalicious);
-                }
-                catch (SeleniumException se)
-                {
-                    String html = _test.getHtmlSource();
-                    if (html.contains(maliciousScript))
-                        msg = "page contains injected script";
-
-                    while (_test.isAlertPresent())
-                    {
-                        if (_test.getAlert().startsWith(alertText))
-                            msg = " malicious script executed";
-                    }
-
-                    // see ConnectionWrapper.java
-                    if (html.contains("SQL injection test failed"))
-                        msg = "SQL injection detected";
-
-                    if (msg != null)
-                    {
-                        fail(msg + "\n" + urlMalicious);
-                    }
-                    
-                    throw se;
-                }
-			}
-			catch (RuntimeException re)
-			{
-				// ignore javascript errors (HTTPUnit has a poor engine) and non-HTML download links:
-				if (re.getMessage().indexOf("ScriptException") < 0 && !re.getClass().getSimpleName().equals("NotHTMLException"))
-					throw re;
-			}
+            tryInject(_test, urlTester, urlMalicious);
 		}
 	}
 

@@ -493,7 +493,7 @@ public class AssayTest extends AbstractAssayTest
         log("Setting the customized view to include subfolders");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
 
-        CustomizeViewsHelper.pinFolderFilter(this);
+        CustomizeViewsHelper.clipFolderFilter(this);
         CustomizeViewsHelper.saveCustomView(this, "");
 
         assertTextPresent("FirstRun");

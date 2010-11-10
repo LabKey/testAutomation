@@ -155,6 +155,8 @@ public class MS2BvtTest extends MS2TestBase
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
         clickNavButton("Go");
+        selectOptionByText("grouping", "Peptides (Legacy)");
+        clickAndWait(Locator.id("viewTypeSubmitButton"));
 
         log("Test export selected");
         addUrlParameter("exportAsWebPage=true");
@@ -309,7 +311,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Make saved view for Protein Group for Comparison");
         pushLocation();
         setFilter("MS2Peptides", "DeltaMass", "Is Greater Than", "0");
-        selectOptionByText("grouping", "Protein");
+        selectOptionByText("grouping", "Protein (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         setFilter("MS2Proteins", "SequenceMass", "Is Greater Than", "20000");
         log("Save view for later");
@@ -334,7 +336,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextNotPresent("-.MELFSNELLYK.T");
 
         log("Test Protein View and if viewParams hold");
-        selectOptionByText("grouping", "Protein");
+        selectOptionByText("grouping", "Protein (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Description");
         assertTextPresent("Coverage");
@@ -383,7 +385,7 @@ public class MS2BvtTest extends MS2TestBase
         popLocation();
 
         log("Test export expanded view");
-        selectOptionByText("grouping", "Protein");
+        selectOptionByText("grouping", "Protein (Legacy)");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         pushLocation();
@@ -409,7 +411,7 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test Protein Prophet");
         pushLocation();
-        selectOptionByText("grouping", "Protein Prophet");
+        selectOptionByText("grouping", "ProteinProphet (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Group");
         assertTextPresent("Prob");
@@ -421,7 +423,7 @@ public class MS2BvtTest extends MS2TestBase
         log("Test Protein Prophet with filters");
         selectOptionByText("viewParams", VIEW);
         clickNavButton("Go");
-        selectOptionByText("grouping", "Protein Prophet");
+        selectOptionByText("grouping", "ProteinProphet (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextNotPresent("gi|4689022|ribosomal_protein_");
         assertTextPresent("gi|16078254|similar_to_riboso");
@@ -462,7 +464,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Pick Peptide Columns");
         clickNavButton("Pick", 0);
         clickNavButton("Pick Columns");
-        selectOptionByText("grouping", "Protein Prophet");
+        selectOptionByText("grouping", "ProteinProphet (Legacy)");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         pushLocation();
@@ -489,13 +491,13 @@ public class MS2BvtTest extends MS2TestBase
         popLocation();
 
         log("Create saved view to test query groupings");
-        selectOptionByText("grouping", "None");
+        selectOptionByText("grouping", "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         selectOptionByText("views", VIEW);
         clickNavButton("Go");
 
         log("Test Query - Peptides Grouping");
-        selectOptionByText("grouping", "Query - Peptides");
+        selectOptionByText("grouping", "Standard");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
@@ -738,7 +740,7 @@ public class MS2BvtTest extends MS2TestBase
         popLocation();
 
         log("Test Query - Proteins Grouping");
-        selectOptionByText("grouping", "Query - Protein Groups");
+        selectOptionByText("grouping", "Protein Groups");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Protein");
@@ -850,7 +852,7 @@ public class MS2BvtTest extends MS2TestBase
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
-        clickLinkWithText("ProteinProphet");
+        clickLinkWithText("ProteinProphet (Legacy)");
         selectOptionByText("viewParams", VIEW3);
         clickNavButton("Go");
         assertTextPresent("(GroupProbability > 0.7)");
@@ -870,7 +872,7 @@ public class MS2BvtTest extends MS2TestBase
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
-        clickLinkWithText("ProteinProphet");
+        clickLinkWithText("ProteinProphet (Legacy)");
         checkCheckbox("light2HeavyRatioMean");
         uncheckCheckbox("groupProbability");
         clickNavButton("Go");
@@ -994,7 +996,7 @@ public class MS2BvtTest extends MS2TestBase
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
-        clickLinkWithText("ProteinProphet (Query)");
+        clickLinkWithText("ProteinProphet");
         clickNavButton("Go");
 
         clickLinkWithText("Comparison Overview", false);

@@ -68,14 +68,14 @@ class MS2ScoringParams extends MS2TestParams
         // Navigate to the peptides view by clicking the experiment name link.
         _test.clickLinkWithText(link);
 
-        setGrouping("None");
+        setGrouping("Peptides (Legacy)");
         _test.clearAllFilters("MS2Peptides", "Scan");
 
         int protsActual = 0;
 
         if (positiveProteins != null)
         {
-            setGrouping("Protein Prophet");
+            setGrouping("ProteinProphet (Legacy)");
             _test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
             int protsExpect = positiveProteins.size();
@@ -112,7 +112,7 @@ class MS2ScoringParams extends MS2TestParams
             validateTrue("Actual positive protein IDs " + protsActual + " does not equal expected " + protsExpect,
                     protsExpect == protsActual);
 
-            setGrouping("None");
+            setGrouping("Peptides (Legacy)");
         }
 
         DataRegionTable tablePep = new DataRegionTable("MS2Peptides", _test);
@@ -130,7 +130,7 @@ class MS2ScoringParams extends MS2TestParams
                     " does not match " + maxFPPeptideAbove,
                 tablePep.getDataRowCount() == maxFPPeptideAbove);
 
-        setGrouping("Protein Prophet");
+        setGrouping("ProteinProphet (Legacy)");
         _test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
         protsActual = 0;

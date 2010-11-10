@@ -196,6 +196,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
         clickNavButton("Go");
+        selectOptionByText("grouping", "Peptides (Legacy)");
+        clickAndWait(Locator.id("viewTypeSubmitButton"));
 
         log("Test adding columns");
         clickNavButton("Pick Peptide Columns");

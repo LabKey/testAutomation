@@ -295,26 +295,9 @@ public class CustomizeViewsHelper
         return tabContentXPath(ViewItemType.Filter) + "//div[contains(@class, 'labkey-folder-filter-combo')]";
     }
 
-    private static String folderFilterPinXPath()
+    private static String folderFilterPaperclipXPath()
     {
-        return tabContentXPath(ViewItemType.Filter) + "//div[contains(@class, 'labkey-folder-filter-pin')]";
-    }
-
-    public static void pinAllFiltersAndSorts(BaseSeleniumWebTest test)
-    {
-        test.log("Pin all filters and sorts.");
-
-        String pinXpath = "//div[contains(@class, 'labkey-tool-unpin')]";
-
-        changeTab(test, ViewItemType.Filter);
-        while (test.isElementPresent(Locator.xpath(pinXpath)))
-        {
-            int count = test.getXpathCount(Locator.xpath(pinXpath));
-            test.click(Locator.xpath(pinXpath));
-            test.assertElementPresent(Locator.xpath(pinXpath), count - 1);
-        }
-
-        throw new RuntimeException("Method not tested, please verify results");
+        return tabContentXPath(ViewItemType.Filter) + "//table[contains(@class, 'labkey-folder-filter-paperclip')]";
     }
 
     public static void setFolderFilter(BaseSeleniumWebTest test, String folderFilter)
@@ -326,46 +309,44 @@ public class CustomizeViewsHelper
         ExtHelper.selectComboBoxItem(test, Locator.xpath(folderFilterComboXPath), folderFilter);
     }
 
-    public static void togglePinFolderFilter(BaseSeleniumWebTest test)
+    public static void togglePaperclipFolderFilter(BaseSeleniumWebTest test)
     {
-        Locator folderFilterPinXPath = Locator.xpath(folderFilterPinXPath());
-        String attr = test.getAttribute(folderFilterPinXPath, "class");
-        if (attr.contains("labkey-tool-pin"))
-            unpinFolderFilter(test);
-        else if (attr.contains("labkey-tool-unpin"))
-            pinFolderFilter(test);
+        Locator loc = Locator.xpath(folderFilterPaperclipXPath());
+        String attr = test.getAttribute(loc, "class");
+        if (attr.contains("x-btn-pressed"))
+            unclipFolderFilter(test);
         else
-            test.fail("Expected to find folder filter pin state in attribute value: " + attr);
+            clipFolderFilter(test);
     }
 
-    public static void pinFolderFilter(BaseSeleniumWebTest test)
+    public static void clipFolderFilter(BaseSeleniumWebTest test)
     {
-        test.log("Pinning folder filter");
+        test.log("Clip folder filter");
         changeTab(test, ViewItemType.Filter);
 
-        Locator folderFilterPinXPath = Locator.xpath(folderFilterPinXPath());
-        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-unpin");
-        test.click(folderFilterPinXPath);
-        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-pin");
+        Locator loc = Locator.xpath(folderFilterPaperclipXPath());
+        test.assertAttributeNotContains(loc, "class", "x-btn-pressed");
+        test.click(loc);
+        test.assertAttributeContains(loc, "class", "x-btn-pressed");
     }
 
-    public static void unpinFolderFilter(BaseSeleniumWebTest test)
+    public static void unclipFolderFilter(BaseSeleniumWebTest test)
     {
-        test.log("Unpinning folder filter");
+        test.log("Unclip folder filter");
         changeTab(test, ViewItemType.Filter);
 
-        Locator folderFilterPinXPath = Locator.xpath(folderFilterPinXPath());
-        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-unpin");
-        test.click(folderFilterPinXPath);
-        test.assertAttributeContains(folderFilterPinXPath, "class", "labkey-tool-pin");
+        Locator loc = Locator.xpath(folderFilterPaperclipXPath());
+        test.assertAttributeContains(loc, "class", "x-btn-pressed");
+        test.click(loc);
+        test.assertAttributeNotContains(loc, "class", "x-btn-pressed");
     }
 
-    public static void pinFilter(BaseSeleniumWebTest test, String column_id)
+    public static void clipFilter(BaseSeleniumWebTest test, String column_id)
     {
         throw new RuntimeException("not yet implemented");
     }
 
-    public static void pinSort(BaseSeleniumWebTest test, String column_id)
+    public static void clipSort(BaseSeleniumWebTest test, String column_id)
     {
         throw new RuntimeException("not yet implemented");
     }

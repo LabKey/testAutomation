@@ -4267,6 +4267,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to contain '" + value + "', but was '" + actual + "' instead.", actual != null && actual.contains(value));
     }
 
+    public void assertAttributeNotContains(Locator locator, String attributeName, String value)
+    {
+        String actual = getAttribute(locator, attributeName);
+        assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
+    }
+
     public String getAttribute(Locator locator, String attributeName)
     {
         return selenium.getAttribute(locator.toString() + "@" + attributeName);
