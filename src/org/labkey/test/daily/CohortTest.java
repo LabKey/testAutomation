@@ -182,7 +182,6 @@ public class CohortTest extends BaseSeleniumWebTest
         clickNavButtonByIndex("Move Up", 1, 0);
         clickNavButtonByIndex("Move Up", 1, 0);
         clickNavButton("Save");
-        updateCohorts(); // TODO: Remove once Issue #10698 is resolved.
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("View Available Reports");
         clickNavButtonByIndex("View", 2);
@@ -289,16 +288,6 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 4, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 5, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
                 
-    }
-
-    // TODO: Remove once Issue #10698 is resolved.
-    private void updateCohorts()
-    {
-        pushLocation();
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Manage Cohorts");
-        clickNavButton("Update Assignments");
-        popLocation();
     }
 
     private void importStudy(String studyFile)
