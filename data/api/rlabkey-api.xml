@@ -70,21 +70,26 @@
                 scobj <- getSchema(s, "lists")
                 lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
                 cols <- c(names(scobj$AllTypes)[2:6], names(lucols)[2:4])
-                simpledf <- getRows(s, scobj$AllTypes, colSelect=paste(cols, sep=","))
+                simpledf <- getRows(s, scobj$AllTypes, colSelect=paste(cols, sep=","), colNameOpt="caption")
                 simpledf
             ]]>
         </url>
         <response>
             <![CDATA[
-                TextFld IntFld DoubleFld DateTimeFld BooleanFld
+                Text Field Integer Field Double Field DateTime Field Boolean Field                
                 some text here 99 987.654 2010-02-14 FALSE
                 More plane values -34 98123.450 1999-01-01 FALSE
                 null NULL NA and na 123 44.330 2002-02-20 FALSE
                 how its done 98 12.345 2010-03-01 FALSE
-                Category/Category Category/CategorySort Category/Group
-                Basic functional test 1 Punctuation
-                Empty Values Test 4 TypeRange
-                2nd level lookup 3 BasicTest
+                Category Lookup Category Category Lookup Sort Ordinal
+                Basic functional test 1
+                Empty Values Test 4
+                2nd level lookup 3
+                Category Lookup Category Group  
+                1 Punctuation
+                4 TypeRange
+                7 BasicTest
+
             ]]>
         </response>
     </test>
