@@ -144,18 +144,18 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "\n" +
             "var testResults = [];\n" +
             "var testFunctions = [\n" +
-            "    function()\n" +
+            "    function() //testResults[0]\n" +
             "    {\n" +
             "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler);\n" +
             "    },\n" +
             "    \n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[1]\n" +
             "    {\n" +
             "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('FirstName', 'Norbert') ]);\n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[2]\n" +
             "    {\n" +
             "        // get the result from the single-row select call:\n" +
             "        var prevRowset = testResults[1].rows;\n" +
@@ -167,7 +167,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        \n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[3]\n" +
             "    {\n" +
             "        // get the result from the single-row select call:\n" +
             "        var prevRowset = testResults[1].rows;\n" +
@@ -178,33 +178,33 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        \n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[4]\n" +
             "    {\n" +
             "        // get the result from the single-row select call:\n" +
             "        var prevRowset = testResults[1].rows;\n" +
             "        LABKEY.Query.deleteRows(schemaName, queryName, prevRowset, successHandler, failureHandler);        \n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[5]\n" +
             "    {\n" +
             "        // get the result from the single-row select call:\n" +
             "        var prevRowset = testResults[1].rows;\n" +
             "        LABKEY.Query.insertRows(schemaName, queryName, prevRowset, successHandler, failureHandler);        \n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[6]\n" +
             "    {\n" +
             "        // get the result from the single-row select call:\n" +
             "        var missingLastName = [ { FirstName: 'Herbert', Age: 100 } ];\n" +
             "        LABKEY.Query.insertRows(schemaName, queryName, missingLastName, successHandler, failureHandler);\n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[7]\n" +
             "    {\n" +
             "        LABKEY.Query.selectRows(schemaName + '-badname', queryName, successHandler, failureHandler);\n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[8]\n" +
             "    {\n" +
             "        LABKEY.Query.executeSql({schemaName: 'lists', " +
                     "sort: 'Age', " +
@@ -212,7 +212,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
                     "successCallback: successHandler, errorCallback: failureHandler});\n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[9]\n" +
             "    {\n" +
             "        LABKEY.Query.executeSql({\n" +
             "            schemaName:'lists',\n" +
@@ -222,7 +222,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        });\n" +
             "    },\n" +
             "\n" +
-            "    function()\n" +
+            "    function() //testResults[10]\n" +
             "    {\n" +
             "        LABKEY.Query.executeSql({\n" +
             "            schemaName:'lists',\n" +
@@ -230,7 +230,58 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "            successCallback: successHandler,\n" +
             "            errorCallback: failureHandler\n" +
             "        });\n" +
-            "    }," +
+            "    },\n" +
+            "\n" +
+            "// Test QUERY.saveRows (transacted)\n" +
+            "    function() //testResults[11]\n" +
+            "    {\n" +
+            "        var peopleRowset = testResults[0].rows;\n" +
+            "        peopleRowset[0].Age = -1;\n" +
+            "        peopleRowset[1].Age = -1;\n" +
+            "        LABKEY.Query.saveRows({\n" +
+            "            commands:[\n" +
+            "                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[0]]},\n" +
+            "                {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[1]]},\n" +
+            "                {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[2]]},\n" +
+            "                {schemaName:schemaName, queryName:'noSuchQuery', command:'insert', rows:[peopleRowset[0]]}\n" +
+            "            ],\n" +
+            "            successCallback: successHandler,\n" +
+            "            errorCallback: failureHandler,\n" +
+            "        });\n" +
+            "    },\n" +
+            "\n" +
+            "// Test QUERY.saveRows (not transacted)\n" +
+            "    function() //testResults[12]\n" +
+            "    {\n" +
+            "        var peopleRowset = testResults[0].rows;\n" +
+            "        peopleRowset[3].Age = 101;\n" +
+            "        peopleRowset[5].Age = 101;\n" +
+            "        peopleRowset[6].Age = -1;\n" +
+            "        LABKEY.Query.saveRows({\n" +
+            "            commands:[\n" +
+            "                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[3]]},\n" +
+            "                {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[5]]},\n" +
+            "                {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[6]]},\n" +
+            "                {schemaName:'noSuchSchema', queryName:queryName, command:'insert', rows:[peopleRowset[6]]},\n" +
+            "                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[6]]}\n" +
+            "            ],\n" +
+            "            successCallback: successHandler,\n" +
+            "            errorCallback: failureHandler,\n" +
+            "            transacted: false\n" +
+            "        });\n" +
+            "    },\n" +
+            "\n" +
+            "// Verify QUERY.saveRows operations\n" +
+            "    function() //testResults[13]\n" +
+            "    { // Check that successful inserts/updates occurred (Age: 101) and unsuccessful deletes did not (Age: 17)\n" +
+            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '101;17', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);\n" +
+            "    },\n" +
+            "\n" +
+            "// Verify QUERY.saveRows operations\n" +
+            "    function() //testResults[14]\n" +
+            "    { // Check that failed inserts/updates did not occur (Age: -1) and successful deletes did (Age: 88)\n" +
+            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '-1;88', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);\n" +
+            "    },\n" +
             "\n" +
             "    // last function sets the contents of the results div.\n" +
             "    function()\n" +
@@ -296,6 +347,26 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "        else\n" +
             "            html += 'FAILURE: executeSql returned ' + testResults[10].rowCount + ' rows, expected 7.  Error value = ' + testResults[10].exception + '<br>';\n" +
             "\n" +
+            "        if (testResults[11].exception)\n" +
+            "            html += 'SUCCESS: Bad saveRows exception: ' + testResults[11].exception + '<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: Bad saveRows did not generate an exception.<br>';\n" +
+            "\n" +
+            "        if (testResults[12].exception)\n" +
+            "            html += 'SUCCESS: Bad saveRows exception: ' + testResults[12].exception + '<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: Bad saveRows did not generate an exception.<br>';\n" +
+            "\n" +
+            "        if (testResults[13].rowCount == 3)\n" +
+            "            html += 'SUCCESS: Non-transacted bad saveRows modified rows.<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[13].rowCount + ' rows, expected 3.  Error value = ' + testResults[13].exception + '<br>';" +
+            "\n" +
+            "        if (testResults[14].rowCount == 0)\n" +
+            "            html += 'SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';\n" +
+            "        else\n" +
+            "            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';" +
+            "\n" +
             "        document.getElementById('testDiv').innerHTML = html;        \n" +
             "    }\n" +
             "];\n" +
@@ -306,15 +377,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "    currentFn();\n" +
             "}\n" +
             "\n" +
-            "function failureHandler(responseObj)\n" +
+            "function failureHandler(errorInfo, responseObj, options)\n" +
             "{\t\t\n" +
-            "    testResults[testResults.length] = responseObj;\n" +
+            "    testResults[testResults.length] = errorInfo;\n" +
             "    executeNext();\n" +
             "}\n" +
             "\n" +
-            "function successHandler(responseObj)\n" +
+            "function successHandler(data, responseObj, options)\n" +
             "{\n" +
-            "    testResults[testResults.length] = responseObj;\n" +
+            "    testResults[testResults.length] = data;\n" +
             "    executeNext();\n" +
             "}\n" +
             "\n" +
@@ -424,15 +495,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         createLists();
 
-        gridTest();
-
-        chartTest();
-
-        webpartTest();
-
-        clearTestPage("WebPart Test Complete.");
-
-        assayTest();
+//        gridTest();
+//
+//        chartTest();
+//
+//        webpartTest();
+//
+//        clearTestPage("WebPart Test Complete.");
+//
+//        assayTest();
 
         queryTest();
 
