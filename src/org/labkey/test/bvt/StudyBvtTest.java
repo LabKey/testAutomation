@@ -296,7 +296,7 @@ public class StudyBvtTest extends StudyManualTest
         assertTextNotPresent("WARNING: Missing Specimens");
         assertTextPresent("New Request");
         assertTextNotPresent("Pending Approval");
-        clickLinkWithText("Update Status");
+        clickLinkWithText("Update Request");
         selectOptionByText("status", "Pending Approval");
         setFormElement("comments", "Request is now pending.");
         clickNavButton("Save Changes and Send Notifications");
