@@ -143,15 +143,15 @@ public enum TestSet
     }),
 
     Study(new Class[] {
-            StudyTest.class,
-            StudyBvtTest.class,
-            StudyManualTest.class,
-            StudyExtraTest.class,
-            CohortTest.class,
-            AssayTest.class,
-            ReportTest.class,
-            QuerySnapshotTest.class,
-            SCHARPStudyTest.class
+        StudyTest.class,
+        StudyBvtTest.class,
+        StudyManualTest.class,
+        StudyExtraTest.class,
+        CohortTest.class,
+        AssayTest.class,
+        ReportTest.class,
+        QuerySnapshotTest.class,
+        SCHARPStudyTest.class
     }),
 
     UnitTests(new Class[] {
@@ -159,15 +159,15 @@ public enum TestSet
     }),
 
     Data(new Class[] {
-            DataRegionTest.class,
-            ExternalSchemaTest.class,
-            ListTest.class,
-            IssuesTest.class,
-            ScriptValidationTest.class
+        DataRegionTest.class,
+        ExternalSchemaTest.class,
+        ListTest.class,
+        IssuesTest.class,
+        ScriptValidationTest.class
     }),
 
     IDRI(new Class[] {
-            IDRIParticleSizeTest.class
+        IDRIParticleSizeTest.class
     }),
 
     BVTnDaily(BVT, Daily.tests),
@@ -177,7 +177,7 @@ public enum TestSet
     }),
 
     Adaptive(new Class[]{
-            AdaptiveTest.class
+        AdaptiveTest.class
     }),
 
     AdaptivePerf(new Class[]{
