@@ -495,15 +495,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         createLists();
 
-//        gridTest();
-//
-//        chartTest();
-//
-//        webpartTest();
-//
-//        clearTestPage("WebPart Test Complete.");
-//
-//        assayTest();
+        gridTest();
+
+        chartTest();
+
+        webpartTest();
+
+        clearTestPage("WebPart Test Complete.");
+
+        assayTest();
 
         queryTest();
 
