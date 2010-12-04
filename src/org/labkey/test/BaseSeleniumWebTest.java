@@ -603,7 +603,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Click on a module listed on the admin menu
     public void goToModule(String moduleName)
     {
-        clickAdminMenuItem("Go To Module", moduleName);
+        clickAdminMenuItem("Go To Module", "More Modules", moduleName);
     }
 
     public void goToSchemaBrowser()
@@ -1810,6 +1810,36 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkNotPresentWithText(project);
     }
 
+    public void enableEmailRecorder()
+    {
+        pushLocation();
+        goToModule("Dumbster");
+        if ( initialRecorderSetting == null )
+            initialRecorderSetting = getFormElement("emailRecordOn");
+        uncheckCheckbox("emailRecordOn");
+        checkCheckbox("emailRecordOn");
+        popLocation();
+    }
+
+    public void disableEmailRecorder()
+    {
+        pushLocation();
+        goToModule("Dumbster");
+        if ( initialRecorderSetting == null )
+            initialRecorderSetting = getFormElement("emailRecordOn");
+        uncheckCheckbox("emailRecordOn");
+        popLocation();
+    }
+
+    public static String initialRecorderSetting = null;
+    public void resetEmailRecorder()
+    {
+        if ( initialRecorderSetting.equals("true") )
+            enableEmailRecorder();
+        else if ( initialRecorderSetting.equals("false") )
+            disableEmailRecorder();
+    }
+
     public void addWebPart(String webPartName)
     {
         Locator.XPathLocator selects = Locator.xpath("//form[contains(@action,'addWebPart.view')]//tr/td/select[@name='name']");
@@ -2004,8 +2034,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitFor(Checker checker, String failMessage, int wait)
     {
         int time = 0;
-        while (!checker.check() && time < wait)
+        while ( time < wait )
         {
+            if( checker.check() )
+                return;
             sleep(100);
             time += 100;
         }
@@ -3417,174 +3449,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void selectOptionByText(Locator locator, String text)
     {
         selenium.select(locator.toString(), text);
-    }
-
-    public void addCustomizeViewOption(String tab, String column_name)
-    {
-        addCustomizeViewOption(tab, column_name, column_name);
-    }
-
-    public void addCustomizeViewOption(String tab, String column_id, String column_name)
-    {
-        // column_id refers to the form of the name used after "column_" and is necessary to specify if it is different
-        // than the column_name that appears to the user
-
-        selenium.click(tab + ".tab");
-        selenium.click("column_" + column_id);
-        clickNavButton("Add >>", 0);
-        int millis = 0;
-        while(!selenium.isElementPresent("//div[@id='" + tab + ".list.div']//tr/td[text()='" + column_name + "']") && millis < defaultWaitForPage)
-        {
-            log("If this message is appearing multiple times, you probably need to specify the column_id");
-            millis = millis + 100;
-            sleep(100);
-        }
-        if (millis >= defaultWaitForPage)
-            fail("Did not recognize addition of " + column_name);
-
-    }
-
-    public void addCustomizeViewColumn(String column_name)
-    {
-        addCustomizeViewColumn(column_name, column_name);
-    }
-
-    public void addCustomizeViewColumn(String column_id, String column_name)
-    {
-        // column_id refers to the form of the name used after "column_" and is necessary to specify if it is different
-        // than the column_name that appears to the user
-
-        log("Adding " + column_name + " column");
-        addCustomizeViewOption("columns", column_id, column_name);
-    }
-
-    public void addCustomizeViewFilter(String column_name, String filter_type)
-    {
-        addCustomizeViewFilter(column_name, column_name, filter_type, "");
-    }
-
-    public void addCustomizeViewFilter(String column_name, String filter_type, String filter)
-    {
-        addCustomizeViewFilter(column_name, column_name, filter_type, filter);
-    }
-
-    public void addCustomizeViewFilter(String column_id, String column_name, String filter_type, String filter)
-    {
-        // column_id refers to the form of the name used after "column_" and is necessary to specify if it is different
-        // than the column_name that appears to the user
-
-        if (filter.compareTo("") == 0)
-            log("Adding " + column_name + " filter of " + filter_type);
-        else
-            log("Adding " + column_name + " filter of " + filter_type + " " + filter);
-
-        if (selenium.isElementPresent("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "'][1]"))
-            log("This test method does not support adding multiple filters of the same type");
-
-        addCustomizeViewOption("filter", column_id, column_name);
-        selenium.click("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select");
-        selenium.select("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select", filter_type);
-
-        if (filter.compareTo("") != 0)
-        {
-            selenium.type("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[3]/input", filter);
-            selenium.fireEvent("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']/../td[3]/input", "blur");
-        }
-    }
-
-    public void addCustomizeViewSort(String column_name, String order)
-    {
-        addCustomizeViewSort(column_name, column_name, order);
-    }
-
-    public void addCustomizeViewSort(String column_id, String column_name, String order)
-    {
-        // column_id refers to the form of the name used after "column_" and is necessary to specify if it is different
-        // than the column_name that appears to the user
-
-        log("Adding " + column_name + " sort");
-        addCustomizeViewOption("sort", column_id, column_name);
-        selenium.click("//div[@id='sort.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select");
-        selenium.select("//div[@id='sort.list.div']//tr/td[text()='" + column_name + "']/../td[2]/select", "label=" + order);
-    }
-
-    public void removeCustomizeViewOption(String tab, String column_name)
-    {
-        selenium.click(tab + ".tab");
-        selenium.click("//div[@id='" + tab + ".list.div']//tr/td[text()='" + column_name + "']");
-        selenium.click("//img[@alt='Delete']");
-    }
-
-    public void removeCustomizeViewColumn(String column_name)
-    {
-        log("Removing " + column_name + " column");
-        removeCustomizeViewOption("columns", column_name);
-    }
-
-    public void removeCustomizeViewFilter(String column_name)
-    {
-        log("Removing " + column_name + " filter");
-        selenium.click("filter.tab");
-
-        selenium.click("//div[@id='filter.list.div']//tr/td[text()='" + column_name + "']");
-        selenium.click("//img[@alt='Delete']");
-    }
-
-    public void removeCustomizeViewFilter(int filter_place)
-    {
-        log("Removing filter at position " + filter_place);
-        selenium.click("filter.tab");
-        selenium.click("//div[@id='filter.list.div']/table/tbody/tr[" + (filter_place * 2) + "]/td[1]");
-        selenium.click("//img[@alt='Delete']");
-    }
-
-    public void removeCustomizeViewSort(String column_name)
-    {
-        log("Removing " + column_name + " sort");
-        removeCustomizeViewOption("sort", column_name);
-    }
-
-    public void clearCustomizeViewFilters()
-    {
-        selenium.click("filter.tab");
-        while (selenium.isElementPresent("//div[@id='filter.list.div']/table/tbody/tr[2]/td[1]"))
-            selenium.click("//img[@alt='Delete']");
-    }
-
-    public void clearCustomizeViewSorts()
-    {
-        selenium.click("sort.tab");
-        while (selenium.isElementPresent("//div[@id='sort.list.div']/table/tbody/tr[1]/td[1]"))
-            selenium.click("//img[@alt='Delete']");
-    }
-
-    public void clearCustomizeViewColumns()
-    {
-        selenium.click("columns.tab");
-        while (selenium.isElementPresent("//div[@id='columns.list.div']/table/tbody/tr[1]/td[1]"))
-            selenium.click("//img[@alt='Delete']");
-    }
-
-    public void moveCustomizeViewColumn(String column_name, boolean moveUp)
-    {
-        moveCustomizeViewOption("columns", column_name, moveUp);
-    }
-
-    public void moveCustomizeViewFilter(String column_name, boolean moveUp)
-    {
-        moveCustomizeViewOption("filter", column_name, moveUp);
-    }
-
-    public void moveCustomizeViewSort(String column_name, boolean moveUp)
-    {
-        moveCustomizeViewOption("sort", column_name, moveUp);
-    }
-
-    public void moveCustomizeViewOption(String tab, String column_name, boolean moveUp)
-    {
-        selenium.click(tab + ".tab");
-        selenium.click("//div[@id='" + tab + ".list.div']//tr/td[text()='" + column_name + "']");
-        selenium.click("//td[@id='" + tab + ".controls']//a/img[@alt='Move " + (moveUp ? "Up" : "Down") + "']");
     }
 
     public void addUrlParameter(String parameter)

@@ -18,6 +18,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +30,11 @@ public class FileContentTest extends BaseSeleniumWebTest
     // i18n. See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=5369
     private static final String PROJECT_NAME = "File Content T\u017Dst Project";
     private static final String PROJECT_ENCODED = "File%20Content%20T%C3%A9st%20Project";
+    private static final String FILE_DESCRIPTION = "FileContentTestFile";
+    private static final String CUSTOM_PROPERTY_VALUE = "ExtendedProperty";
+    private static final String CUSTOM_PROPERTY = "customProperty";
+    private static final String TEST_USER = "user@filecontent.test";
+    private static final String TEST_GROUP = "FileContentTestGroup";
 
     public String getAssociatedModuleDirectory()
     {
@@ -54,6 +60,9 @@ public class FileContentTest extends BaseSeleniumWebTest
             "in its Connector element: URIEncoding=\"UTF-8\"");
 
         createProject(PROJECT_NAME);
+        createPermissionsGroup(TEST_GROUP, TEST_USER);
+        setPermissions(TEST_GROUP, "Editor");
+        exitPermissionsUI();
 
         assertFalse("ERROR: Add project with special characters failed; check that tomcat's server.xml contains the following attribute " +
             "in its Connector element: URIEncoding=\"UTF-8\"", isTextPresent("404: page not found"));
@@ -68,21 +77,78 @@ public class FileContentTest extends BaseSeleniumWebTest
 
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Files");
-                
+
         if (isFileUploadAvailable())
         {
-            clickLinkWithText("Manage Files");
+            enableEmailRecorder();
+            // Setup custom file properties
+            clickButton("Admin", 0);
+            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
+            clickConfigTab(FileTab.file);
+            checkRadioButton("fileOption", "useCustom");
+            clickButton("Edit Properties...");
+            waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
+            setFormElement("ff_name0", CUSTOM_PROPERTY);
+            clickNavButton("Save & Close");
 
-//            clickLinkWithText("Upload File...", false);
-//            selenium.waitForPopUp("uploadFiles", "30000");
-//            selenium.selectWindow("uploadFiles");
+            waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
+            sleep(1000); // Config button bar is broken without this wait.
+            clickButton("Admin", 0);
+            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
+
+            // Setup custom file actions
+            uncheckCheckbox("importAction");
+
+            // enable custom file properties.
+            clickConfigTab(FileTab.file);
+            checkRadioButton("fileOption", "useCustom");
+
+            clickConfigTab(FileTab.toolbar);
+
+            // TODO: Add new button once 11342 is resolved.
+            // dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Show History']"),
+            //             Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
+            click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconDownload')]"));
+            click(Locator.xpath("//a[./span[text()='remove']]"));
+            
+            // Test email admin
+            clickConfigTab(FileTab.email);
+            checkRadioButton("emailPref", "1");
+
+            // Save settings.
+            click(Locator.xpath("//button[text()='Submit']").index(1));
+            waitForExtMaskToDisappear();
+
+            // Verify custom action buttons
+            waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconDownload')]"), WAIT_FOR_JAVASCRIPT);
+            // TODO: Check added button once 11342 is resolved. 
+            // assertElementPresent(Locator.xpath("//button[text()='Show History']"));
+
+            clickButton("Upload Files",0);
 
             String filename = "InlineFile.html";
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
-            setFormElement("fileUpload-file", f);
-            selenium.fireEvent(Locator.id("fileUpload-file").toString(), "change");
-            waitForText(filename, 10000);
+            setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), f.toString());
+            setFormElement(Locator.xpath("//div[./label[text() = 'Description:']]/div/input[contains(@class, 'x-form-text')]"), FILE_DESCRIPTION);
+            fireEvent(Locator.xpath("//div[./label[text() = 'Description:']]/div/input[contains(@class, 'x-form-text')]"), SeleniumEvent.blur);
+            click(Locator.xpath("//button[text()='Submit']"));
+            waitForExtMaskToDisappear();
+            ExtHelper.waitForExtDialog(this, "Extended File Properties", WAIT_FOR_JAVASCRIPT);
+            setFormElement(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE);
+            clickButton("Done", 0);
+            waitForExtMaskToDisappear();
+            
+            waitForText(filename, WAIT_FOR_JAVASCRIPT);
+            waitForText(FILE_DESCRIPTION, WAIT_FOR_JAVASCRIPT);
+            waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT);
+
+            // Check custom actions as non-administrator.
+            impersonate(TEST_USER);
+            clickLinkWithText(PROJECT_NAME);
+            waitForElementToDisappear(Locator.xpath("//button[text()='Import Data']"), WAIT_FOR_JAVASCRIPT);
+
+            stopImpersonating();
 
             signOut();
 
@@ -95,6 +161,23 @@ public class FileContentTest extends BaseSeleniumWebTest
             simpleSignIn();
 
             assertTextPresent("antidisestablishmentarianism");
+
+            clickLinkWithText(PROJECT_NAME);
+
+            // Delete file.
+            waitForText(filename, WAIT_FOR_JAVASCRIPT);
+            ExtHelper.clickFileBrowserFileCheckbox(this, filename);
+            click(Locator.xpath("//button[contains(@class, 'iconDelete')]"));
+            clickButton("Yes", 0);
+            waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);
+                  
+            clickButton("Audit History");
+            assertTextPresent("file uploaded to folder: /" + PROJECT_NAME);
+            assertTextPresent("annotations updated: "+CUSTOM_PROPERTY+"="+CUSTOM_PROPERTY_VALUE);
+            assertTextPresent("file deleted from folder: /" + PROJECT_NAME);
+
+            goToModule("Dumbster");
+            //TODO: Verify file notification emails.
         }
     }
 
@@ -102,6 +185,11 @@ public class FileContentTest extends BaseSeleniumWebTest
     {
         return URLEncoder.encode(data, "UTF-8").replace("+","%20");
     }
-    
 
+    private enum FileTab
+    {action, file, toolbar, email}
+    private void clickConfigTab(FileTab tab)
+    {
+        click(Locator.xpath("//li[contains(@id, '__"+tab+"Tab')]/a[contains(@class, 'x-tab-right')]"));
+    }
 }
