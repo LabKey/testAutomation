@@ -50,40 +50,12 @@ public class JUnitTest extends TestSuite
     public void run(TestResult testResult)
     {
         log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
-        JUnitSeleniumHelper helper = new JUnitSeleniumHelper();
         try
         {
-            try
-            {
-                helper.setUp();
-                // sign in performs upgrade if necessary
-                helper.signIn();
-                if (!helper.checkedLeaksAndErrors())
-                {
-                    helper.checkLeaksAndErrors();
-                }
-            }
-            catch(Exception e)
-            {
-                helper.log("Unable to setup selenium.");
-            }
-
-            // Run all JUnit tests.
             super.run(testResult);
-
-            helper.checkLeaksAndErrors();
         }
         finally
         {
-            try
-            {
-                helper.tearDown();
-            }
-            catch(Exception e)
-            {
-                helper.log("Failed to tear down selenium.");
-            }
-
             log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
     }
@@ -99,10 +71,6 @@ public class JUnitTest extends TestSuite
         public void unfail()
         {
             _testFailed = false;
-        }
-        private boolean checkedLeaksAndErrors()
-        {
-            return _checkedLeaksAndErrors;
         }
         protected void doTestSteps() throws Exception { }
         protected void doCleanup() throws Exception { }
