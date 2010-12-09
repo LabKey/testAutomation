@@ -313,11 +313,11 @@ public class Crawler
 
         // skip export actions. 
         if (actionId.getAction().toLowerCase().indexOf("export") >= 0)
-                return false;
+            return false;
 
         // skip expanding and collapsing paths -- no HTML returned
-        if (actionId.getAction().equals("collapseExpand"))
-                return false;
+        if (actionId.getAction().equals("collapseExpand"))      // TODO: action is called expandCollapse
+            return false;
 
         // in addition to test projects, we'll crawl all admin functionality as well
         // (otherwise this never gets covered).
