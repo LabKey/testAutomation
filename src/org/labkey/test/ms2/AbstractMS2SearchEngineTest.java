@@ -108,31 +108,12 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("configureXml", INPUT_XML);
         submit();
         log("View the analysis log.");
-        sleep(WAIT_FOR_JAVASCRIPT);
-//        waitFor(new Checker(){
-//            public boolean check()
-//            {
-//                return isTextPresent(SAMPLE_BASE_NAME + " (test2)");
-//            }
-//        },"Text '" + SAMPLE_BASE_NAME + " (test2)' was not present",GWT_WAIT);
+        waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
 
-        assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
         clickLinkWithText("Data Pipeline");
 
-        String test2LocatorText = "//td[contains(text(),'" + SAMPLE_BASE_NAME + " (test2)" + "')]/../td[2]/a";
-        seconds = 0;
+        waitForPipelineJobsToComplete(1, SAMPLE_BASE_NAME + " (test2)");
 
-        while (getText(Locator.raw(test2LocatorText)).compareTo("COMPLETE") != 0 && seconds++ < MAX_WAIT_SECONDS)
-        {
-            sleep(1000);
-            assertTextNotPresent("ERROR");
-            refresh(longWaitForPage);
-        }
-
-        if (getText(Locator.raw(test2LocatorText)).compareTo("COMPLETE") != 0)
-            fail("All tasks did not complete.");
-
-//        waitForText("COMPLETE", defaultWaitForPage);
         clickAndWait(Locator.raw("//td[contains(text(), 'test2')]/../td/a"));
 
         log("View log file.");
@@ -165,6 +146,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("View full status.");
         clickLinkWithText(FOLDER_NAME);
+
+        assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
+
         clickLinkWithText("Data Pipeline");
 
         // Since the list of jobs is sorted by creation time in descending
@@ -174,8 +158,16 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickLinkWithText("COMPLETE");
         clickNavButton("Data");
 
-        log("Verify experiment view");
+        log("Verify msPicture");
         assertImageMapAreaPresent("graphmap", ANNOTATION_RUN_NAME);
+        pushLocation();
+        clickImageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".mzXML.image..itms.png (Run Output)");
+        assertLinkPresentWithTextCount("msPicture", 2);
+        beginAt(getAttribute(Locator.xpath("//img[contains(@src, 'showFile.view')]"), "src"));
+        assertTitleContains("showFile.view (PNG Image, 910x540 pixels)");
+        popLocation();
+
+        log("Verify experiment view");
         clickImageMapLinkByTitle("graphmap", "bov_sample/" + SAMPLE_BASE_NAME + " (test2)");
 
         log("Verify experiment run view.");
