@@ -1812,8 +1812,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void enableEmailRecorder()
     {
+        log("Enable email recorder");
         pushLocation();
         goToModule("Dumbster");
+        waitForElement(Locator.checkboxByName("emailRecordOn"), WAIT_FOR_JAVASCRIPT);
         if ( initialRecorderSetting == null )
             initialRecorderSetting = getFormElement("emailRecordOn");
         uncheckCheckbox("emailRecordOn");
@@ -1823,15 +1825,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void disableEmailRecorder()
     {
+        log("Disable email recorder");
         pushLocation();
         goToModule("Dumbster");
+        waitForElement(Locator.checkboxByName("emailRecordOn"), WAIT_FOR_JAVASCRIPT);
         if ( initialRecorderSetting == null )
             initialRecorderSetting = getFormElement("emailRecordOn");
         uncheckCheckbox("emailRecordOn");
         popLocation();
     }
 
-    public static String initialRecorderSetting = null;
+    private static String initialRecorderSetting = null;
     public void resetEmailRecorder()
     {
         if ( initialRecorderSetting.equals("true") )
@@ -1871,6 +1875,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertTitleEquals(String match)
     {
         assertEquals("Wrong page title", match, selenium.getTitle());
+    }
+
+    public void assertTitleContains(String match)
+    {
+        String title = selenium.getTitle();
+        assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
     }
 
     public boolean isFormPresent(String form)
@@ -4709,6 +4719,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
         assertEquals(getCompleteCount(statusValues), completeJobsExpected);
+    }
+
+    // Note: unverified
+    protected void waitForRunningPipelineJobs(int wait)
+    {
+        log("Waiting for running pipeline jobs list to be empty.");
+        startTimer();
+        while (elapsedSeconds() < wait)
+            if ( getPipelineStatusValues().size() == 0 )
+                return;
+
+        //else
+        fail("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
     /** Turns off the fancy SQL and XML editors for custom queries and sets them to be simple text areas which are easier

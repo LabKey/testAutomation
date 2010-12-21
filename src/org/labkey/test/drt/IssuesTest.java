@@ -38,6 +38,17 @@ public class IssuesTest extends BaseSeleniumWebTest
     private static final String[] REQUIRED_FIELDS = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",
                 "NotifyList", "String1", "Int1"};
     private static final String TEST_GROUP = "testers";
+    private static final String TEST_EMAIL_TEMPLATE =
+                "You can review this issue here: ^detailsURL^\n" +
+                "Modified by: ^user^\n" +
+                "^modifiedFields^\n" +
+                "^string2|This line shouldn't appear: %s^\n" +
+                "^string3|This line shouldn't appear: %s^\n" +
+                "^string5|Customized template line: %s^\n" +
+                "^comment^";
+
+    private static final String TEST_EMAIL_TEMPLATE_BAD = TEST_EMAIL_TEMPLATE +
+                "\n^asdf|The current date is: %1$tb %1$te, %1$tY^";
 
     public String getAssociatedModuleDirectory()
     {
@@ -66,10 +77,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         addWebPart("Search");
         assertTextPresent("Open");
 
-        log("Record emails");
-        addWebPart("Mail Record");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
+        enableEmailRecorder();
     }
 
     protected void doTestSteps()
@@ -148,6 +156,24 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextPresent("Priority must be an integer");
         assertTextNotPresent("1.2");
 
+        // SetCustomColumnConfigurationAction
+        setText("int1", "MyInteger");
+        setText("int2", "MySecondInteger");
+        setText("string1", "MyFirstString");
+        // Omit string2 to test using it in email template.
+        setText("string3", "MyThirdString");
+        setText("string4", "MyFourthString");
+        setText("string5", "MyFifthString");
+        checkCheckbox("pickListColumns", "string1");
+        checkCheckbox("pickListColumns", "string5");
+        clickNavButton("Update Custom Fields");
+
+        // UpdateRequiredFieldsAction
+        checkCheckbox("requiredFields", "Milestone");
+        checkCheckbox("requiredFields", "String4");
+        checkCheckbox("requiredFields", "String5");
+        clickNavButton("Update Required Fields");
+
         // AddKeywordAction
         setFormElement(Locator.formElement("addMilestone", "keyword"), "2012");
         clickNavButton("Add Milestone");
@@ -155,15 +181,18 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement(Locator.formElement("addMilestone", "keyword"), "2013");
         clickNavButton("Add Milestone");
         assertTextPresent("2013");
-
-        // UpdateRequiredFieldsAction
-        //         <tr><td><input type="checkbox" name="requiredFields"  value="Milestone">Milestone</td></tr>
-        checkCheckbox("requiredFields", "Milestone");
-        clickNavButton("Update Required Fields");
-
-        // SetCustomColumnConfigurationAction
-        setText("int1", "MyInteger");
-        clickNavButton("Update Custom Fields");
+        setFormElement(Locator.formElement("addMyFirstString", "keyword"), "North");
+        clickNavButton("Add MyFirstString");
+        assertTextPresent("North");
+        setFormElement(Locator.formElement("addMyFirstString", "keyword"), "South");
+        clickNavButton("Add MyFirstString");
+        assertTextPresent("South");
+        setFormElement(Locator.formElement("addMyFifthString", "keyword"), "Cadmium");
+        clickNavButton("Add MyFifthString");
+        assertTextPresent("Cadmium");
+        setFormElement(Locator.formElement("addMyFifthString", "keyword"), "Polonium");
+        clickNavButton("Add MyFifthString");
+        assertTextPresent("Polonium");
 
         // ListAction (empty)
         clickNavButton("Back to Issues");
@@ -183,6 +212,8 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("New Issue");
         assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
         assertEquals(assignedToText, getDisplayName());
+        String customStringText = getText(Locator.xpath("//select[@name='string5']"));
+        assertEquals(customStringText, "Cadmium Polonium");
         setFormElement("title", ISSUE_TITLE_0);
         selectOptionByText("type", "UFO");
         selectOptionByText("area", "Area51");
@@ -197,6 +228,12 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextPresent("Field Milestone cannot be blank");
         selectOptionByText("milestone", "2012");
         clickNavButton("Submit");
+        assertTextPresent("Field MyFourthString cannot be blank");
+        setFormElement("string4", "http://www.issues.test");
+        clickNavButton("Submit");
+        assertTextPresent("Field MyFifthString cannot be blank");
+        selectOptionByText("string5", "Polonium");
+        clickNavButton("Submit");
 
         // find issueId - parse the text from first space to :
         String title = getLastPageTitle();
@@ -206,6 +243,14 @@ public class IssuesTest extends BaseSeleniumWebTest
         // DetailsAction
         assertTextPresent("Issue " + issueId + ": " + ISSUE_TITLE_0);
         assertTextPresent("Milestone");
+        assertTextPresent("MyInteger");
+        assertTextPresent("MySecondInteger");
+        assertTextPresent("MyFirstString");
+        assertTextNotPresent("MySecondString");
+        assertTextPresent("MyThirdString");
+        assertTextPresent("MyFourthString");
+        assertTextPresent("MyFifthString");
+        assertLinkPresentWithText("http://www.issues.test");
 
         // ListAction
         clickLinkWithText("return to grid");
@@ -285,9 +330,26 @@ public class IssuesTest extends BaseSeleniumWebTest
         createUser(USER2, "", false);
 
         clickLinkWithText(PROJECT_NAME);
+        goToModule("Dumbster");
         assertTextPresent("No email recorded.");
 
-        // EmailPrefsAction
+        // CustomizeEmailAction 
+        goToModule("Issues");
+        clickNavButton("Admin");
+        clickNavButton("Customize Email Template");
+        String subject = getFormElement("emailSubject");
+        /* TODO: Enable this check. Blocked by issue #11389
+        setFormElement("emailMessage", TEST_EMAIL_TEMPLATE_BAD);
+        clickNavButton("Save");
+        assertTextPresent("Invalid template");
+        */
+        setFormElement("emailMessage", TEST_EMAIL_TEMPLATE);
+        clickNavButton("Save");
+        assertTextNotPresent("Invalid template");
+        assertFormElementEquals("emailSubject", subject); // regression check for issue #11389
+        goToModule("Portal");
+
+       // EmailPrefsAction
         clickLinkWithText("Issues Summary");
         clickNavButton("Email Preferences");
         checkCheckbox("emailPreference", "8"); // self enter/edit an issue
@@ -301,9 +363,8 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Update");
         stopImpersonating();
 
+        enableEmailRecorder();
         clickLinkWithText(PROJECT_NAME);
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
 
         clickLinkWithText("Issues Summary");
         clickNavButton("New Issue");
@@ -313,12 +374,17 @@ public class IssuesTest extends BaseSeleniumWebTest
         selectOptionByText("milestone", "2012");
         setFormElement("notifyList", USER2);
         setFormElement("comment", "No big whup");
+        setFormElement("string4", "http://www.issues2.test");
+        selectOptionByText("string5", "Cadmium");
         clickNavButton("Submit");
 
-        clickLinkWithText(PROJECT_NAME);
+        goToModule("Dumbster");
+        pushLocation();
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + PasswordUtil.getUsername() + "' and position() = '1']"));
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + USER1 + "' and position() = '1']"));
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + USER2 + "' and position() = '1']"));
+        assertTextPresent("Customized template line: Cadmium", 3);
+        assertTextNotPresent("This line shouldn't appear");
         assertTableCellContains(EMAILRECORD_TABLE, 3, 3, ISSUE_TITLE_2);
 
         impersonate(USER1);
@@ -331,7 +397,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("comment", "Oh Noez!");
         clickNavButton("Submit");
 
-        clickLinkWithText(PROJECT_NAME);
+        popLocation();
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//tr[position() <= '5']/td[text() = '" + PasswordUtil.getUsername() + "' and position() = '1']"));
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//tr[position() <= '5']/td[text() = '" + USER3 + "' and position() = '1']"));
         assertTableCellContains(EMAILRECORD_TABLE, 3, 3, ISSUE_TITLE_2);
@@ -341,6 +407,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     private void entryTypeNameTest()
     {
+        goToModule("Issues");
         clickNavButton("Admin");
         setFormElement(Locator.formElement("entryTypeNames", "entrySingularName"), "Ticket");
         setFormElement(Locator.formElement("entryTypeNames", "entryPluralName"), "Tickets");
@@ -367,6 +434,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     private void requiredFieldsTest()
     {
+        goToModule("Issues");
         clickNavButton("Admin");
         setFormElement("int1", "Contract Number");
         setFormElement("string1", "Customer Name");
@@ -426,7 +494,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("View Details");
         assertTextPresent("a bright flash of light");
         assertTextPresent("don't believe the hype");
-        clickLinkWithText("return to grid");
+        clickLinkWithText("view grid");
     }
 
     public void testLastFilter(int issueId)
@@ -442,6 +510,8 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("comment", "alien autopsy");
         selectOptionByText("milestone", "2013");
         selectOptionByText("assignedTo", getDisplayName());
+        setFormElement("string4", "http://www.issues2.test");
+        selectOptionByText("string5", "Cadmium");
         clickNavButton("Submit");
 
         // assert both issues are present
