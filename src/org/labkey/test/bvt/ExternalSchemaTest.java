@@ -468,7 +468,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
         waitForPageToLoad();
     }
 

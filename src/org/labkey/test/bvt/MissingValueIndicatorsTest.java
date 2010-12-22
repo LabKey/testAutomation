@@ -208,7 +208,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         submit();
         validateSingleColumnData();
 
-        deleteListData();        
+        deleteListData(3);
 
         log("Test inserting a single new row");
         clickNavButton("Insert New");
@@ -221,7 +221,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         assertTextPresent("male");
         assertTextPresent("N");
 
-        deleteListData();
+        deleteListData(1);
 
         log("Test separate MVIndicator column");
         clickNavButton("Import Data");
@@ -234,12 +234,12 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         validateTwoColumnData("query", "name");
     }
 
-    private void deleteListData()
+    private void deleteListData(int rowCount)
     {
         checkCheckbox(".toggle");
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
         waitForPageToLoad();
     }
 
@@ -278,7 +278,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         submit();
         validateSingleColumnData();
 
-        deleteDatasetData();
+        deleteDatasetData(3);
 
         log("Test inserting a single row");
         clickNavButton("Insert New");
@@ -292,7 +292,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         assertTextPresent("male");
         assertTextPresent("N");
 
-        deleteDatasetData();
+        deleteDatasetData(1);
 
         log("Import dataset data with two mv columns");
         clickNavButton("Import Data");
@@ -502,12 +502,12 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
     }
 
-    private void deleteDatasetData()
+    private void deleteDatasetData(int rowCount)
     {
         checkCheckbox(".toggle");
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        assertEquals(selenium.getConfirmation(), "Delete selected rows of this dataset?");
+        assertEquals("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?", selenium.getConfirmation());
         waitForPageToLoad();
     }
 
