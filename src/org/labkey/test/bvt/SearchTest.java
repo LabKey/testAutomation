@@ -78,7 +78,7 @@ public class SearchTest extends StudyTest
 
     protected void doCreateSteps()
     {
-        deleteIndex();
+        SearchHelper.deleteIndex(this);
         addSearchableStudy(); // Must come first;  Creates project.
         addSearchableContainers();
         addSearchableList();
@@ -105,14 +105,6 @@ public class SearchTest extends StudyTest
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
 
         _testDone = true;
-    }
-
-    private void deleteIndex()
-    {
-        ensureAdminMode();
-        goToAdmin();
-        clickLinkWithText("full-text search");
-        clickNavButton("Delete Index");
     }
 
     @Override
@@ -292,17 +284,21 @@ public class SearchTest extends StudyTest
     private void addSearchableFiles()
     {
         clickLinkWithText(getFolderName());
-        addWebPart("Files");
-        clickLinkWithText("Files");
-        String filename = "InlineFile.html";
-        String sampleRoot = getLabKeyRoot() + "/sampledata/security";
-        File f = new File(sampleRoot, filename);
+        goToModule("FileContent");
+        File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
+        File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
 
-        Locator fileUpload = Locator.xpath("//label[text() = 'Choose a file:']//..//input[@class = 'x-form-file']");
-        setFormElement(fileUpload.toString(), f);
+        uploadFile(file);
+        uploadFile(MLfile);
+
+        SearchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(file.getName()));
+        SearchHelper.enqueueSearchItem("ThermoFinnigan", true, Locator.linkWithText(MLfile.getName()));
+    }
+
+    private void uploadFile(File f)
+    {
+        setFormElement(Locator.xpath("//label[text() = 'Choose a file:']//..//input[@class = 'x-form-file']"), f.toString());
         clickNavButton("Submit", 0);
-        waitForText(filename, 10000);
-
-        SearchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(filename));
+        waitForText(f.getName(), 10000);
     }
 }
