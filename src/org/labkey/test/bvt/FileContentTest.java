@@ -152,6 +152,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             //getFormElement("lookup");
             setFormElement(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE);
             click(Locator.xpath("//img[../../../label[contains(text(),'"+COLUMN_NAME+":')] ]"));
+            waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"), WAIT_FOR_JAVASCRIPT);                        
             click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"));
             clickButton("Done", 0);
             waitForExtMaskToDisappear();
