@@ -3194,6 +3194,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ListHelper.setColumnType(this, prefix, index, type);
     }
 
+    // UNDONE: move usages to use ListHelper
+    public void addLookupField(String areaTitle, int index, String name, String label, ListHelper.LookupInfo type)
+    {
+        String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
+        String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
+        selenium.click(addField);
+        waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
+        ListHelper.setColumnName(this, prefix, index, name);
+        ListHelper.setColumnLabel(this, prefix, index, label);
+        ListHelper.setColumnType(this, prefix, index, type);
+    }
+
     public void setLongTextField(String elementName, String text)
     {
         setFormElement(elementName, "");

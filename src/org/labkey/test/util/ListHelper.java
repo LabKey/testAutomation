@@ -545,7 +545,8 @@ public class ListHelper
     }
     public static void setColumnType(BaseSeleniumWebTest test, String prefix, int index, LookupInfo lookup)
     {
-        test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']"));
+        //test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']"));
+        test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']/../img"));
         if ( test.isAlertPresent() ) test.getAlert(); // Don't worry about schema alert until saving.
         test.click(Locator.xpath("//div[./label[text() = 'Lookup']]/input[@type = 'radio']"));
         if ( lookup.getFolder() != null ) test.setFormElement("lookupContainer", lookup.getFolder());

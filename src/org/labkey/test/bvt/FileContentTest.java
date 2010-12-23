@@ -19,6 +19,7 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -35,6 +36,12 @@ public class FileContentTest extends BaseSeleniumWebTest
     private static final String CUSTOM_PROPERTY = "customProperty";
     private static final String TEST_USER = "user@filecontent.test";
     private static final String TEST_GROUP = "FileContentTestGroup";
+
+    // Lookup list info
+    private static final String LIST_NAME = "LookupList";
+    private static final String COLUMN_NAME = "LookupColumn";
+    private static final String LOOKUP_VALUE_1 = "Hydrogen";
+    private static final String LOOKUP_VALUE_2 = "Helium";
 
     public String getAssociatedModuleDirectory()
     {
@@ -59,6 +66,8 @@ public class FileContentTest extends BaseSeleniumWebTest
             "so if this fails, check that tomcat's server.xml contains the following attribute " +
             "in its Connector element: URIEncoding=\"UTF-8\"");
 
+        SearchHelper.initialize(this);
+
         createProject(PROJECT_NAME);
         createPermissionsGroup(TEST_GROUP, TEST_USER);
         setPermissions(TEST_GROUP, "Editor");
@@ -81,6 +90,10 @@ public class FileContentTest extends BaseSeleniumWebTest
         if (isFileUploadAvailable())
         {
             enableEmailRecorder();
+            // Create list for lookup custom file property
+            ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
+            ListHelper.uploadData(this, PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
+            clickLinkWithText(PROJECT_NAME);
             // Setup custom file properties
             clickButton("Admin", 0);
             ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
@@ -89,6 +102,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickButton("Edit Properties...");
             waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
             setFormElement("ff_name0", CUSTOM_PROPERTY);
+            addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
             clickNavButton("Save & Close");
 
             waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
@@ -135,13 +149,17 @@ public class FileContentTest extends BaseSeleniumWebTest
             click(Locator.xpath("//button[text()='Submit']"));
             waitForExtMaskToDisappear();
             ExtHelper.waitForExtDialog(this, "Extended File Properties", WAIT_FOR_JAVASCRIPT);
+            //getFormElement("lookup");
             setFormElement(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE);
+            click(Locator.xpath("//img[../../../label[contains(text(),'"+COLUMN_NAME+":')] ]"));
+            click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"));
             clickButton("Done", 0);
             waitForExtMaskToDisappear();
             
             waitForText(filename, WAIT_FOR_JAVASCRIPT);
             waitForText(FILE_DESCRIPTION, WAIT_FOR_JAVASCRIPT);
-            waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT);
+            // waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT); // TODO: 11373: Custom file properties don't work on sqlserver
+            waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
 
             // Check custom actions as non-administrator.
             impersonate(TEST_USER);
@@ -164,7 +182,14 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             clickLinkWithText(PROJECT_NAME);
 
+            SearchHelper.enqueueSearchItem(filename, true, Locator.linkContainingText(filename));
+            //SearchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename)); // TODO: Blocked by Issue #11393
+            SearchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(filename));
+
+            SearchHelper.verifySearchResults(this, "/" + PROJECT_NAME, false);
+
             // Delete file.
+            clickLinkWithText(PROJECT_NAME);
             waitForText(filename, WAIT_FOR_JAVASCRIPT);
             ExtHelper.clickFileBrowserFileCheckbox(this, filename);
             click(Locator.xpath("//button[contains(@class, 'iconDelete')]"));
@@ -176,8 +201,8 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertTextPresent("annotations updated: "+CUSTOM_PROPERTY+"="+CUSTOM_PROPERTY_VALUE);
             assertTextPresent("file deleted from folder: /" + PROJECT_NAME);
 
-            goToModule("Dumbster");
-            //TODO: Verify file notification emails.
+            // TODO: Verify file notification emails.
+            // goToModule("Dumbster");
         }
     }
 
