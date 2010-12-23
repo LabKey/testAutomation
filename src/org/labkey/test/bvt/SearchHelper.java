@@ -31,6 +31,12 @@ public class SearchHelper
 {
     private static LinkedList<SearchItem> _searchQueue = new LinkedList<SearchItem>();
 
+    public static void initialize(BaseSeleniumWebTest test)
+    {
+        _searchQueue.clear();
+        deleteIndex(test);
+    }
+        
     public static void verifySearchResults(BaseSeleniumWebTest test, String container, boolean crawlResults)
     {
         test.log("Verify search results.");
@@ -50,7 +56,7 @@ public class SearchHelper
             }
             if ( crawlResults )
             {
-
+                test.fail("Search result crawling not yet implemented");
             }
         }
     }
@@ -91,6 +97,14 @@ public class SearchHelper
             test.setFormElement(Locator.id("headerSearchInput"), searchTerm);
             test.clickAndWait(Locator.xpath("//input[@src = '/labkey/_images/search.png']"));
         }
+    }
+
+    public static void deleteIndex ( BaseSeleniumWebTest test )
+    {
+        test.ensureAdminMode();
+        test.goToAdmin();
+        test.clickLinkWithText("full-text search");
+        test.clickNavButton("Delete Index");
     }
 
     public static class SearchItem
