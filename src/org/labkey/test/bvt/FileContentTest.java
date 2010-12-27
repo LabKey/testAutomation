@@ -149,10 +149,9 @@ public class FileContentTest extends BaseSeleniumWebTest
             click(Locator.xpath("//button[text()='Submit']"));
             waitForExtMaskToDisappear();
             ExtHelper.waitForExtDialog(this, "Extended File Properties", WAIT_FOR_JAVASCRIPT);
-            //getFormElement("lookup");
             setFormElement(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE);
             click(Locator.xpath("//img[../../../label[contains(text(),'"+COLUMN_NAME+":')] ]"));
-            waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"), WAIT_FOR_JAVASCRIPT);                        
+            waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"), WAIT_FOR_JAVASCRIPT);
             click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"));
             clickButton("Done", 0);
             waitForExtMaskToDisappear();
@@ -160,7 +159,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForText(filename, WAIT_FOR_JAVASCRIPT);
             waitForText(FILE_DESCRIPTION, WAIT_FOR_JAVASCRIPT);
             // waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT); // TODO: 11373: Custom file properties don't work on sqlserver
-            waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
+            // waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
 
             // Check custom actions as non-administrator.
             impersonate(TEST_USER);
