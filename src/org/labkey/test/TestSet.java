@@ -109,6 +109,7 @@ public enum TestSet
         RlabkeyTest.class,
         ScriptValidationTest.class,
         SearchTest.class,
+        WorkbookTest.class,
     }),
 
     Cluster(new Class[]

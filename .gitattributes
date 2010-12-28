@@ -81,6 +81,7 @@ src/org/labkey/test/bvt/UserBvtTest.java -text
 src/org/labkey/test/bvt/UserPermissionsTest.java -text
 src/org/labkey/test/bvt/ViabilityTest.java -text
 src/org/labkey/test/bvt/WikiBvtTest.java -text
+src/org/labkey/test/bvt/WorkbookTest.java -text
 src/org/labkey/test/daily/CohortTest.java -text
 src/org/labkey/test/daily/FlowImportTest.java -text
 src/org/labkey/test/daily/IDRIParticleSizeTest.java -text
