@@ -317,30 +317,30 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(ALIASED_DATA);
 
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/SpecimenID/AssayMatch", "Specimen Assay Match");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "SpecimenID/AssayMatch", "Specimen Assay Match");
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/testAssayRunProp1");
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/Batch/testAssaySetProp2");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/testAssayDataProp4");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "testAssayDataProp4");
         CustomizeViewsHelper.applyCustomView(this);
 
         assertTextPresent("Blood (Whole)", 4);
         int totalTrues = countText("true");
-        setFilter("TestAssay1 Data", "Properties/SpecimenID", "Starts With", "AssayTestControl");
+        setFilter("TestAssay1 Data", "SpecimenID", "Starts With", "AssayTestControl");
         // Subtract four trues for the assay match column that were filtered out
         assertEquals(countText("true"), totalTrues - 4);
 
         log("Check out the data for all of the runs");
         clickLinkWithText("view results");
-        clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
+        clearAllFilters("TestAssay1 Data", "SpecimenID");
         isTextPresent("2.0");
         assertTextPresent("7.0");
         assertTextPresent("18");
 
         assertTextPresent("Blood (Whole)", 7);
         int totalFalses = countText("false");
-        setFilter("TestAssay1 Data", "Properties/SpecimenID", "Does Not Start With", "BAQ");
+        setFilter("TestAssay1 Data", "SpecimenID", "Does Not Start With", "BAQ");
         // Subtract three falses for the assay match column that were filtered out, add one false
         // for the 'return false' that appears in the filter notification header javascript link.
         assertEquals(countText("false"), totalFalses - 2);
@@ -510,7 +510,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(4, 2, 0);
 
         clickLinkWithText("view results");
-        clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
+        clearAllFilters("TestAssay1 Data", "SpecimenID");
         verifySpecimensPresent(4, 2, 3);
 
         log("Testing assay-study linkage");
@@ -525,7 +525,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(4, 2, 0);
 
         clickLinkWithText("view results");
-        clearAllFilters("TestAssay1 Data", "Properties/SpecimenID");
+        clearAllFilters("TestAssay1 Data", "SpecimenID");
         verifySpecimensPresent(4, 2, 3);
 
         // Verify that the correct copied to study column is present
