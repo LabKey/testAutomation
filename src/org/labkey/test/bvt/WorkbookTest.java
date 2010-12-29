@@ -96,7 +96,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
         // Delete a workbook
         checkDataRegionCheckbox("query", 2); // Select renamed workbook
         clickNavButton("Delete");
-        assertConfirmation("Are you sure you want to delete the selected rows?");
+        assertConfirmation("Are you sure you want to delete the selected row?");
         assertTextNotPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // TODO: Test Workbook API
