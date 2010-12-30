@@ -16,13 +16,12 @@
  */
 %>
 <%@ page import="com.dumbster.smtp.SmtpMessage" %>
+<%@ page import="org.labkey.api.util.DateUtil" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.ViewContext" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="java.util.Iterator" %>
-<%@ page import="org.labkey.api.util.PageFlowUtil" %>
-<%@ page import="org.labkey.api.util.DateUtil" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%
@@ -144,12 +143,13 @@ function toggleRecorder(checkbox)
 
             StringBuilder headers = new StringBuilder();
             Iterator i = m.getHeaderNames();
+
             while (i.hasNext())
             {
                 String header = (String)i.next();
-                headers.append(PageFlowUtil.filter(header));
+                headers.append(h(header));
                 headers.append(": ");
-                headers.append(PageFlowUtil.filter(m.getHeaderValue(header)));
+                headers.append(h(m.getHeaderValue(header)));
                 headers.append("<br/>\n");
             }
 %>
