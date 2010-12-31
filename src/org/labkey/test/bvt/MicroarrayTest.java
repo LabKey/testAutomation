@@ -59,16 +59,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        log("Point at extraction server");
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("site settings");
-        String oldName = getFormElement("microarrayFeatureExtractionServer");
-        setFormElement("microarrayFeatureExtractionServer", EXTRACTION_SERVER);
-        clickNavButton("Save");
-        assertTrue(EXTRACTION_SERVER.equals(getFormElement("microarrayFeatureExtractionServer")));
-        setFormElement("microarrayFeatureExtractionServer", oldName);
-        clickNavButton("Save");
-
+        log("Create Project");
         log("Create Project");
         createProject(PROJECT_NAME);
         clickLinkWithText("Folder Settings");
