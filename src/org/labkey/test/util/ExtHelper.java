@@ -86,7 +86,7 @@ public class ExtHelper
 
     public static void waitForExtDialog(final BaseSeleniumWebTest test, String title, int timeout)
     {
-        final Locator locator = Locator.xpath("//span[normalize-space(@class) = 'x-window-header-text' and string() = '" + title + "']");
+        final Locator locator = Locator.xpath("//span[contains(@class, 'x-window-header-text') and contains(string(), '" + title + "')]");
         
         test.waitFor(new BaseSeleniumWebTest.Checker()
         {

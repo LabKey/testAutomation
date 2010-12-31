@@ -102,7 +102,19 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         removeSort("Age");
         assertTextBefore("Billson", "Johnson");
 
-        // TODO: pin, unpin, setting column title, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links,
+        log("** Set column title and SUM aggregate");
+        assertTextNotPresent("Oldness Factor");
+        setColumnProperties("Age", "Oldness Factor", "SUM");
+        assertTextPresent("Oldness");
+        assertTextPresent("Total:");
+        assertTextPresent("279");
+
+        log("** Clear column title and SUM aggregate");
+        setColumnProperties("Age", null, null);
+        assertTextNotPresent("Oldness Factor");
+        assertTextNotPresent("Total:");
+
+        // TODO: pin, unpin, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links,
 
 
         log("** Test HTML/JavaScript escaping");
@@ -185,6 +197,13 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.removeCustomizeViewSort(this, fieldKey);
+        CustomizeViewsHelper.applyCustomView(this);
+    }
+
+    void setColumnProperties(String fieldKey, String columnTitle, String aggregate)
+    {
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.setColumnProperties(this, fieldKey, columnTitle, aggregate);
         CustomizeViewsHelper.applyCustomView(this);
     }
 

@@ -386,4 +386,41 @@ public class CustomizeViewsHelper
         changeTab(test, type);
         test.dragAndDrop(Locator.xpath(fromItemXPath), Locator.xpath(toItemXPath));               
     }
+
+    public static void removeColumnProperties(BaseSeleniumWebTest test, String fieldKey)
+    {
+        setColumnProperties(test, fieldKey, null, null);
+    }
+
+    /**
+     * Sets the column title and aggregate.
+     * @param test The test.
+     * @param fieldKey The field key of the column to change.  Note that the column should already be in the selected column list.
+     * @param caption The caption value or null to unset the column caption.
+     * @param aggregate The aggregate to apply to the column or null to unset.
+     */
+    public static void setColumnProperties(BaseSeleniumWebTest test, String fieldKey, String caption, String aggregate)
+    {
+        String msg = "Setting column " + fieldKey;
+        if (caption != null)
+            msg = msg + " caption to '" + caption + "'";
+        if (aggregate != null)
+            msg = msg + " aggregate to '" + aggregate + "'";
+        test.log(msg);
+
+        changeTab(test, ViewItemType.Columns);
+
+        String itemXPath = itemXPath(ViewItemType.Columns, fieldKey);
+        test.click(Locator.xpath(itemXPath + "//div[contains(@class, 'labkey-tool-gear')]"));
+        ExtHelper.waitForExtDialog(test, "Edit column properties for", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
+        if (caption == null)
+            caption = "";
+        test.setFormElement(Locator.xpath("//div[contains(@class, 'x-window')]//input[@name='title']"), caption);
+
+        if (aggregate == null || "".equals(aggregate))
+            aggregate = "[None]";
+        ExtHelper.selectComboBoxItem(test, Locator.xpath("//div[contains(@class, 'x-window')]//input[@name='aggregate']/.."), aggregate);
+        test.clickButton("OK", 0);
+    }
 }
