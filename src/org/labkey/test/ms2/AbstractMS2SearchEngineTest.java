@@ -54,13 +54,19 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Create a new MS2 sample prep assay definition.");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+
+        // set the assay name and checkbox to show the advanced designer
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAME);
+        checkCheckbox(Locator.xpath("//span[@id='ShowAssayDesigner']/input[@type='checkbox']"));
+        clickNavButton("Next", 0);
+        waitForElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), WAIT_FOR_JAVASCRIPT);
 
         addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelper.ListColumnType.Integer);
         addField("Run Fields", 1, "TextField", "TextField", ListHelper.ListColumnType.String);
         addField("Run Fields", 2, "BooleanField", "BooleanField", ListHelper.ListColumnType.Boolean);
 
         sleep(1000);
+/*
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
 
@@ -70,6 +76,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, "CAexample_mini.mzXML");
         selectImportDataAction("Use " + TEST_ASSAY_NAME);
+*/
+        // technically, you should be able to continue through in this wizard to the import file step (although the button label will certainly change)
+        clickNavButton("Save & Close", 0);
+        waitForElement(Locator.xpath("//input[@id='__fractions']"), WAIT_FOR_JAVASCRIPT);
 
         log("Describe MS2 run.");
         clickNavButton("Next");
