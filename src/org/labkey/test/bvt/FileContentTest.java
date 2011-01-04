@@ -191,9 +191,10 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Delete file.
             clickLinkWithText(PROJECT_NAME);
             waitForText(filename, WAIT_FOR_JAVASCRIPT);
+            // Wait a bit before trying to select the file
+            sleep(2000);
             ExtHelper.clickFileBrowserFileCheckbox(this, filename);
             click(Locator.xpath("//button[contains(@class, 'iconDelete')]"));
-            waitForElement(getButtonLocator("Yes"), WAIT_FOR_JAVASCRIPT);
             clickButton("Yes", 0);
             waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);
                   
