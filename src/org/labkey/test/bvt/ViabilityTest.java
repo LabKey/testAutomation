@@ -372,8 +372,8 @@ public class ViabilityTest extends AbstractQCAssayTest
         //TODO: uncomment once Issue 10054 is resolved.
         //assertEquals(expectConfirmation, actualConfirmation);
 
-        clickLinkWithText("small.VIA.csv"); // run name
-        
+        clickLinkWithText("small-1.VIA.csv"); // run name
+
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "TargetStudy", "Target Study");
         CustomizeViewsHelper.saveDefaultView(this);
