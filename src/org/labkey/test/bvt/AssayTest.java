@@ -457,9 +457,7 @@ public class AssayTest extends AbstractAssayTest
         waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         ListHelper.setColumnLabel(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
-        selenium.mouseClick(getPropertyXPath("Data Fields") + "//div[@id='partdelete_4']");
-        clickNavButton("OK", 0); // Confirm the deletion
-        waitForElement(Locator.raw("//td/img[@id='partdeleted_4']"), WAIT_FOR_JAVASCRIPT);
+        deleteField("Data Fields", 4);
         clickNavButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
 

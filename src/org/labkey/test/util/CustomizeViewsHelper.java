@@ -49,13 +49,33 @@ public class CustomizeViewsHelper
         test.clickNavButton("View Grid", waitMillis);
     }
 
+    public static void saveDefaultView(BaseSeleniumWebTest test)
+    {
+        saveCustomView(test, "");
+    }
+
+    public static void saveCustomView(BaseSeleniumWebTest test)
+    {
+        saveCustomView(test, null);
+    }
+
+    /**
+     * Save a custom view
+     * @param test test
+     * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
+     */
     public static void saveCustomView(BaseSeleniumWebTest test, String name)
     {
         test.clickNavButton("Save", 0);
         if (name != null)
         {
+            test.log("Saving custom view '" + name + "'");
             test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "named"));
             test.setFormElement(Locator.xpath("//input[@name='saveCustomView_name']"), name);
+        }
+        else
+        {
+            test.log("Saving current custom view");
         }
         test.clickButtonByIndex("Save", 1);
     }

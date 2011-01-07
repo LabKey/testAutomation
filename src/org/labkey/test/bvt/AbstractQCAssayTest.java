@@ -81,12 +81,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             click(Locator.id(id));
 
             // wait until the dialog has been dismissed
-            int cnt = 3;
-            while (isElementPresent(Locator.id(id)) && cnt > 0)
-            {
-                sleep(1000);
-                cnt--;
-            }
+            waitForElementToDisappear(Locator.id(id), WAIT_FOR_JAVASCRIPT);
 
             if (!isEngineConfigured())
                 fail("unable to setup the java engine");

@@ -155,6 +155,17 @@ public enum TestSet
         SCHARPStudyTest.class
     }),
 
+    Assays(new Class[] {
+        AssayTest.class,
+        MissingValueIndicatorsTest.class,
+        NabOldTest.class,
+        NabAssayTest.class,
+        LuminexTest.class,
+        ViabilityTest.class,
+        ModuleAssayTest.class,
+        IDRIParticleSizeTest.class,
+    }),
+
     UnitTests(new Class[] {
         JUnitTest.class
     }),

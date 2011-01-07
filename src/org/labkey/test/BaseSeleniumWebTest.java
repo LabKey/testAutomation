@@ -3206,6 +3206,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ListHelper.setColumnType(this, prefix, index, type);
     }
 
+    // UNDONE: move usages to ListHelper
+    public void deleteField(String areaTitle, int index)
+    {
+        String prefix = getPropertyXPath(areaTitle);
+        selenium.mouseClick(prefix + "//div[@id='partdelete_" + index + "']");
+        clickNavButton("OK", 0); // Confirm the deletion
+        waitForElement(Locator.raw("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
+    }
+
     public void setLongTextField(String elementName, String text)
     {
         setFormElement(elementName, "");
