@@ -70,6 +70,11 @@ selenium.getExtElementId = function (id) {
     return null;
 };
 
+selenium.getContainerId = function () {
+    var win = selenium.browserbot.getCurrentWindow();
+    return win.LABKEY.container.id;
+};
+
 // firefox error console listener
 // http://sejq.blogspot.com/2008/12/can-selenium-detect-if-page-has.html
 // https://developer.mozilla.org/en/Console_service
@@ -82,6 +87,7 @@ if (browserVersion.isChrome) {
                 dump("Log : " + msg.message);
                 if (msg.message != null &&
                     msg.message.indexOf("[JavaScript Error:") == 0 &&
+                    msg.message.indexOf("setting a property that has only a getter") == -1 &&
                     msg.message.indexOf("{file: \"chrome://") == -1 &&
                     msg.message.indexOf("XULElement.selectedIndex") == -1) // Ignore known Firefox Issue
                 {
