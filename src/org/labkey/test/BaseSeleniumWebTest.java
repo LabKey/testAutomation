@@ -1506,6 +1506,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.open(getBaseURL() + relativeURL, millis);
     }
 
+    public String getContainerId(String url)
+    {
+        pushLocation();
+        beginAt(url);
+        String containerId = selenium.getEval("selenium.getContainerId()");
+        popLocation();
+        return containerId;
+    }
+
     public String getConfirmationAndWait()
     {
         String confirmation = selenium.getConfirmation();
@@ -3211,8 +3220,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         String prefix = getPropertyXPath(areaTitle);
         selenium.mouseClick(prefix + "//div[@id='partdelete_" + index + "']");
-        clickNavButton("OK", 0); // Confirm the deletion
-        waitForElement(Locator.raw("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
+
+        // If domain hasn't been saved yet, the 'OK' prompt will not appear.
+        Locator.XPathLocator buttonLocator = getButtonLocator("OK");
+        if (buttonLocator != null)
+        {
+            // Confirm the deletion
+            clickNavButton("OK", 0);
+            waitForElement(Locator.raw("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public void setLongTextField(String elementName, String text)

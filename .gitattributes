@@ -76,6 +76,7 @@ src/org/labkey/test/bvt/SpecimenTest.java -text
 src/org/labkey/test/bvt/StudyBvtTest.java -text
 src/org/labkey/test/bvt/StudyExtraTest.java -text
 src/org/labkey/test/bvt/StudySecurityTest.java -text
+src/org/labkey/test/bvt/TargetStudyTest.java -text
 src/org/labkey/test/bvt/TimelineTest.java -text
 src/org/labkey/test/bvt/UserBvtTest.java -text
 src/org/labkey/test/bvt/UserPermissionsTest.java -text

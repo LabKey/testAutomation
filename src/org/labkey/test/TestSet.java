@@ -52,8 +52,8 @@ public enum TestSet
         ReportTest.class,
         MicroarrayTest.class,
         ViabilityTest.class,
+        TargetStudyTest.class,
         ButtonCustomizationTest.class,
-        CustomizeViewTest.class,
         ReagentTest.class,
     }),
 
@@ -110,6 +110,7 @@ public enum TestSet
         ScriptValidationTest.class,
         SearchTest.class,
         WorkbookTest.class,
+        CustomizeViewTest.class,
     }),
 
     Cluster(new Class[]
@@ -150,14 +151,16 @@ public enum TestSet
         StudyExtraTest.class,
         CohortTest.class,
         AssayTest.class,
+        TargetStudyTest.class,
         ReportTest.class,
         QuerySnapshotTest.class,
-        SCHARPStudyTest.class
+        SCHARPStudyTest.class,
     }),
 
     Assays(new Class[] {
         AssayTest.class,
         MissingValueIndicatorsTest.class,
+        TargetStudyTest.class,
         NabOldTest.class,
         NabAssayTest.class,
         LuminexTest.class,
