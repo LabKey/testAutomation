@@ -16,9 +16,8 @@
 
 package org.labkey.test;
 
-import java.io.File;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 /**

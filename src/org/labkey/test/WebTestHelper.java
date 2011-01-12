@@ -16,18 +16,20 @@
 
 package org.labkey.test;
 
-import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.URI;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 
 /**
- * Created by IntelliJ IDEA.
  * User: Mark Igra
  * Date: Feb 7, 2007
  * Time: 11:16:41 PM
