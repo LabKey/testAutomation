@@ -72,7 +72,7 @@ function toggleRecorder(checkbox)
     {
         var json;
         var contentType = response.getResponseHeader('Content-Type');
-        if(contentType && contentType.indexOf('application/json') >= 0)
+        if (contentType && contentType.indexOf('application/json') >= 0)
             json = Ext.util.JSON.decode(response.responseText);
         if (json && json.error)
             onUpdateFailure(response, json.error);
