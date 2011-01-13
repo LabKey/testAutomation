@@ -17,11 +17,11 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.util.Random;
 
 /**
  * User: kevink
@@ -42,7 +42,7 @@ public class TargetStudyTest extends AbstractAssayTest
             // study 1: container id
             "AAA07XMC-02\t\t\t${Study1ContainerID}\n" +
             // study 1: study label
-            "AAA07XMC-04\t\t\t" + STUDY1_LABEL + "\n" +
+            "AAA07XMC-04\t\t\t${Study1Label}" + "\n" +
             // fake study / no study
             "AAA07XSF-02\t\t\tStudyNotExist\n" +
             // study 2
@@ -52,6 +52,9 @@ public class TargetStudyTest extends AbstractAssayTest
             ;
 
     private String _study1ContainerId = null;
+    private String _study1Label = null;
+    private String _study2Label = null;
+    private String _study3Label = null;
 
     @Override
     protected void doCleanup() throws Exception
@@ -77,8 +80,7 @@ public class TargetStudyTest extends AbstractAssayTest
         assertNotNull(_study1ContainerId);
 
         uploadRuns();
-
-        // UNDONE: copy-to-study with multiple targets
+        copyToStudy();
     }
 
 
@@ -99,17 +101,23 @@ public class TargetStudyTest extends AbstractAssayTest
 
     protected void setupLabels()
     {
+        // Using a random label helps uniqueify the study when there is another "AwesomeStudy3" from a previous test run.
+        Random r = new Random();
+        _study1Label = STUDY1_LABEL + " " + r.nextInt();
+        _study2Label = STUDY2_LABEL + " " + r.nextInt();
+        _study3Label = STUDY3_LABEL + " " + r.nextInt();
+
         log("** Set some awesome study labels");
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/manageStudyProperties.view");
-        setFormElement("label", STUDY1_LABEL);
+        setFormElement("label", _study1Label);
         clickNavButton("Update");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/manageStudyProperties.view");
-        setFormElement("label", STUDY2_LABEL);
+        setFormElement("label", _study2Label);
         clickNavButton("Update");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + "/manageStudyProperties.view");
-        setFormElement("label", STUDY3_LABEL);
+        setFormElement("label", _study3Label);
         clickNavButton("Update");
     }
     protected void setupAssay()
@@ -151,7 +159,9 @@ public class TargetStudyTest extends AbstractAssayTest
 
         selenium.type("name", TEST_RUN1);
         selenium.click("//input[@value='textAreaDataProvider']");
-        String data1 = TEST_RUN1_DATA1.replace("${Study1ContainerID}", _study1ContainerId);
+        String data1 = TEST_RUN1_DATA1
+                .replace("${Study1ContainerID}", _study1ContainerId)
+                .replace("${Study1Label}", _study1Label);
         selenium.type("TextAreaDataCollector.textArea", data1);
         clickNavButton("Save and Finish");
         assertTextPresent("Couldn't resolve TargetStudy 'StudyNotExist' to a study folder.");
@@ -170,14 +180,14 @@ public class TargetStudyTest extends AbstractAssayTest
         assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3);
 
         DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
-        assertEquals(STUDY1_LABEL, table.getDataAsText(0, "Target Study"));
-        assertEquals(STUDY1_LABEL, table.getDataAsText(1, "Target Study"));
-        assertEquals(STUDY1_LABEL, table.getDataAsText(2, "Target Study"));
+        assertEquals(_study1Label, table.getDataAsText(0, "Target Study"));
+        assertEquals(_study1Label, table.getDataAsText(1, "Target Study"));
+        assertEquals(_study1Label, table.getDataAsText(2, "Target Study"));
         //BUGBUG: target study renders as "" instead of "[None]"
         //assertEquals("[None]", table.getDataAsText(3, "Target Study"));
         assertEquals("", table.getDataAsText(3, "Target Study"));
-        assertEquals(STUDY2_LABEL, table.getDataAsText(4, "Target Study"));
-        assertEquals(STUDY3_LABEL, table.getDataAsText(5, "Target Study"));
+        assertEquals(_study2Label, table.getDataAsText(4, "Target Study"));
+        assertEquals(_study3Label, table.getDataAsText(5, "Target Study"));
 
         log("** Check SpecimenID resolved the PTID in the study");
         assertEquals("999320812", table.getDataAsText(0, "Participant ID"));
@@ -186,6 +196,55 @@ public class TargetStudyTest extends AbstractAssayTest
         assertEquals("", table.getDataAsText(3, "Participant ID"));
         assertEquals("999320706", table.getDataAsText(4, "Participant ID"));
         assertEquals("", table.getDataAsText(5, "Participant ID"));
+    }
+
+    protected void copyToStudy()
+    {
+        DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
+        table.checkAllOnPage();
+        clickNavButton("Copy to Study");
+
+        log("** Check TargetStudy dropdowns");
+        assertOptionEquals(table.xpath(0, 0).child("select[@name='targetStudy']"), "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + _study1Label + ")");
+        assertOptionEquals(table.xpath(1, 0).child("select[@name='targetStudy']"), "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + _study1Label + ")");
+        assertOptionEquals(table.xpath(2, 0).child("select[@name='targetStudy']"), "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + _study1Label + ")");
+        assertOptionEquals(table.xpath(3, 0).child("select[@name='targetStudy']"), "[None]");
+        assertOptionEquals(table.xpath(4, 0).child("select[@name='targetStudy']"), "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + " (" + _study2Label + ")");
+        assertOptionEquals(table.xpath(5, 0).child("select[@name='targetStudy']"), "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + " (" + _study3Label + ")");
+
+        log("** Check ptid/visit matches for rows 0-2 and 4, no match for rows 3 and 5");
+        assertAttributeContains(table.xpath(0, 1).child("img"), "src", "check.png");
+        assertAttributeContains(table.xpath(1, 1).child("img"), "src", "check.png");
+        assertAttributeContains(table.xpath(2, 1).child("img"), "src", "check.png");
+        assertAttributeContains(table.xpath(3, 1).child("img"), "src", "cancel.png");
+        assertAttributeContains(table.xpath(4, 1).child("img"), "src", "check.png");
+        assertAttributeContains(table.xpath(5, 1).child("img"), "src", "cancel.png");
+
+        clickNavButton("Re-Validate");
+        assertTextPresent("You must specify a Target Study for all selected rows.");
+
+        log("** Uncheck row 3 and 5");
+        table.uncheckCheckbox(3);
+        table.uncheckCheckbox(5);
+        clickNavButton("Re-Validate");
+        assertTextNotPresent("You must specify a Target Study for all selected rows.");
+
+        log("** Copy to studies");
+        clickNavButton("Copy to Study");
+
+        beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/dataset.view?datasetId=5001");
+        DataRegionTable dataset = new DataRegionTable("Dataset", this);
+        assertEquals(3, dataset.getDataRowCount());
+        assertEquals("999320396", dataset.getDataAsText(0, "Participant ID"));
+        assertEquals("999320396", dataset.getDataAsText(1, "Participant ID"));
+        assertEquals("999320812", dataset.getDataAsText(2, "Participant ID"));
+
+        beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/dataset.view?datasetId=5001");
+        assertEquals(1, dataset.getDataRowCount());
+        assertEquals("999320706", dataset.getDataAsText(0, "Participant ID"));
+
+        beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + "/dataset.view?datasetId=5001");
+        assertEquals(404, getResponseCode());
     }
 
 }

@@ -114,9 +114,15 @@ public class DataRegionTable
         return rows;
     }
 
+    public Locator.XPathLocator xpath(int row, int col)
+    {
+        return Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+3) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
+    }
+
     public void clickLink(int row, int col)
     {
-        _test.clickAndWait(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+3) + "]/td[" + (col+1) + "]/a[1]"));
+        Locator cell = xpath(row, col);
+        _test.clickAndWait(Locator.xpath(cell + "/a[1]"));
     }
 
     public int getColumn(String name)
@@ -257,6 +263,11 @@ public class DataRegionTable
     public void checkCheckbox(int index)
     {
         _test.checkDataRegionCheckbox(_tableName, index);
+    }
+
+    public void uncheckCheckbox(int index)
+    {
+        _test.uncheckDataRegionCheckbox(_tableName, index);
     }
 
     public void pageFirst()

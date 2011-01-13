@@ -3377,6 +3377,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         checkCheckbox(Locator.raw("document.forms['" + dataRegionName + "'].elements['.select'][" + index + "]"));
     }
 
+    /** Sets selection state for single rows of the data region. */
+    public void uncheckDataRegionCheckbox(String dataRegionName, int index)
+    {
+        uncheckCheckbox(Locator.raw("document.forms['" + dataRegionName + "'].elements['.select'][" + index + "]"));
+    }
+
     public void toggleCheckboxByTitle(String title)
     {
         log("Clicking checkbox with title " + title);
@@ -3452,6 +3458,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void uncheckCheckbox(String name, String value)
     {
         uncheckCheckbox(Locator.checkboxByNameAndValue(name, value));
+    }
+
+    public void uncheckCheckbox(String name, int index)
+    {
+        uncheckCheckbox(Locator.checkboxByName(name).index(index));
     }
 
     public void uncheckCheckbox(Locator checkBoxLocator)

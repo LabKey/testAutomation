@@ -40,7 +40,6 @@ public class Locator
         loc = locator;
     }
 
-
     public static Locator raw(String str)
     {
         return new Locator(str);
@@ -474,6 +473,11 @@ public class Locator
         public XPathLocator parent()
         {
             return new XPathLocator("(" + path + ")/..");
+        }
+
+        public XPathLocator child(String str)
+        {
+            return new XPathLocator("(" + path + ")/" + str);
         }
 
         public String getPath()
