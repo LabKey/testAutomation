@@ -108,7 +108,7 @@ public class PipelineStatusTable extends DataRegionTable
 
     public void clickStatusLink(int row)
     {
-        clickLink(row, getStatusColumn() + (_selectors ? 1 : 0));
+        clickLink(row, getStatusColumn());
     }
 
     private int getExpectedJobRow(String name)

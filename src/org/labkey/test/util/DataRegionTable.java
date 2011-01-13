@@ -121,8 +121,8 @@ public class DataRegionTable
 
     public void clickLink(int row, int col)
     {
-        Locator cell = xpath(row, col);
-        _test.clickAndWait(Locator.xpath(cell + "/a[1]"));
+        Locator.XPathLocator cell = xpath(row, col);
+        _test.clickAndWait(cell.child("a[1]"));
     }
 
     public int getColumn(String name)
