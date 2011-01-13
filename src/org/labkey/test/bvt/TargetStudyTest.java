@@ -74,7 +74,8 @@ public class TargetStudyTest extends AbstractAssayTest
         setupSpecimens();
         setupLabels();
         setupAssay();
-        
+
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         _study1ContainerId = getContainerId("/project/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/begin.view");
         log("** Study 1 container ID = " + _study1ContainerId);
         assertNotNull(_study1ContainerId);
