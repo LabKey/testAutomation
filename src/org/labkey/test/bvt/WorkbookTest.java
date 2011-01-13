@@ -99,7 +99,35 @@ public class WorkbookTest extends BaseSeleniumWebTest
         assertConfirmation("Are you sure you want to delete the selected row?");
         assertTextNotPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
 
-        // TODO: Test Workbook API
+        String containerId = "workbook-"+getTableCellText("dataregion_query", 2, 1);
+
+        // Test Workbook APIs
+        goToModule("Wiki");
+        createNewWikiPage("HTML");
+        setFormElement("name", "Workbook APIs");
+        setFormElement("title", "Workbook API Test Page");
+        setWikiBody("<script type=\"text/javascript\">\n" +
+                "LABKEY.Security.createContainer({\n" +
+                "   title : 'API Workbook',\n" +
+                "   description : 'Workbook created by JS API',\n" +
+                "   isWorkbook: true," +
+                "   failure: createFailure\n" +
+                "   });\n" +
+                "LABKEY.Security.deleteContainer({\n" +
+                "   containerPath: '/"+PROJECT_NAME+"/"+containerId+"'," +
+                "   failure: deleteFailure\n" +
+                "   });\n" +
+                "\n" +
+                "function createFailure(errorInfo, response)\n" +
+                "   {alert('Unable to create workbook: ' + errorInfo.exception);}\n" +
+                "function deleteFailure(errorInfo, response)\n" +
+                "   {alert('Unable to delete workbook: ' + errorInfo.exception);}\n" +
+                "</script>");
+        saveWikiPage();
+
+        clickLinkWithText(PROJECT_NAME);
+        assertLinkPresentWithText("API Workbook");
+        assertLinkNotPresentWithText(FILE_WORKBOOK_NAME);
     }
 
     private enum WorkbookFolderType
