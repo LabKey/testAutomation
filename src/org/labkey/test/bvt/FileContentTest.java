@@ -130,7 +130,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             checkRadioButton("emailPref", "1");
 
             // Save settings.
-            click(Locator.xpath("//button[text()='Submit']").index(1));
+            clickButton("Submit", 0);
             waitForExtMaskToDisappear();
 
             // Verify custom action buttons
@@ -146,7 +146,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), f.toString());
             setFormElement(Locator.xpath("//div[./label[text() = 'Description:']]/div/input[contains(@class, 'x-form-text')]"), FILE_DESCRIPTION);
             fireEvent(Locator.xpath("//div[./label[text() = 'Description:']]/div/input[contains(@class, 'x-form-text')]"), SeleniumEvent.blur);
-            click(Locator.xpath("//button[text()='Submit']"));
+            clickButton("Upload", 0);
             waitForExtMaskToDisappear();
             ExtHelper.waitForExtDialog(this, "Extended File Properties", WAIT_FOR_JAVASCRIPT);
             setFormElement(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE);

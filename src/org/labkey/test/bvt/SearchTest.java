@@ -298,7 +298,7 @@ public class SearchTest extends StudyTest
     private void uploadFile(File f)
     {
         setFormElement(Locator.xpath("//label[text() = 'Choose a file:']//..//input[@class = 'x-form-file']"), f.toString());
-        clickNavButton("Submit", 0);
+        clickNavButton("Upload", 0);
         waitForText(f.getName(), 10000);
     }
 }
