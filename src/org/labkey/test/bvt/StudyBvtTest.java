@@ -607,8 +607,11 @@ public class StudyBvtTest extends StudyManualTest
         setFormElement("uploadFormElement", datasetFile);
 
         waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_JAVASCRIPT);
+        selectOptionByValue(Locator.xpath("//select[@name='MouseId']"), "name");
+        selectOptionByValue(Locator.xpath("//select[@name='Sequence Num']"), "visit number");
 
-        clickNavButton("Import");
+        waitAndClickNavButton("Import");
+        waitForPageToLoad();
 
         assertTextPresent("kevin");
         assertTextPresent("chimpanzee");

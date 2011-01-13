@@ -57,8 +57,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         // set the assay name and checkbox to show the advanced designer
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAME);
-        checkCheckbox(Locator.xpath("//span[@id='ShowAssayDesigner']/input[@type='checkbox']"));
-        clickNavButton("Next", 0);
+        clickNavButton("Show Assay Designer", 0);
         waitForElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), WAIT_FOR_JAVASCRIPT);
 
         addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelper.ListColumnType.Integer);
