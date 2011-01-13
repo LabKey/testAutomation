@@ -99,8 +99,10 @@ public class BasicTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Admin Console");
 
-        if(enableDevMode()) assertTextNotPresent("Production"); // Verify that we're running in dev mode
-        else assertTextNotPresent("Development"); // Unless we're not supposed to be.
+        if (enableDevMode())
+            assertTextNotPresent("Production"); // Verify that we're running in dev mode
+        else
+            assertTextNotPresent("Development"); // Unless we're not supposed to be.
 
         // Navigate to the credits page and verify that all external components are documented
         clickLinkWithText("credits");

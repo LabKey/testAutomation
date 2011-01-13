@@ -39,7 +39,7 @@ public class ExtHelper
         }
         Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
         test.waitForElement(itemLocator, 1000);
-        if(wait)
+        if (wait)
             test.clickAndWait(itemLocator);
         else
             test.click(itemLocator);
@@ -59,7 +59,7 @@ public class ExtHelper
         }
         Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
         test.waitForElement(itemLocator, 1000);
-        if(wait)
+        if (wait)
             test.clickAndWait(itemLocator);
         else
             test.click(itemLocator);
