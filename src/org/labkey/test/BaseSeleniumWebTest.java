@@ -2235,6 +2235,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertFormElementEquals(new Locator(elementName), value);
     }
 
+    public String getFormElement(Locator loc)
+    {
+        return selenium.getValue(loc.toString());
+    }
+
     public String getFormElement(String elementName)
     {
         Locator loc = new Locator(elementName);
