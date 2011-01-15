@@ -106,24 +106,35 @@ public class WorkbookTest extends BaseSeleniumWebTest
         createNewWikiPage("HTML");
         setFormElement("name", "Workbook APIs");
         setFormElement("title", "Workbook API Test Page");
-        setWikiBody("<script type=\"text/javascript\">\n" +
+        setWikiBody("<div id='createWorkbookDiv'/><br><div id='deleteWorkbookDiv'/>\n" +
+                "<script type=\"text/javascript\">\n" +
                 "LABKEY.Security.createContainer({\n" +
                 "   title : 'API Workbook',\n" +
                 "   description : 'Workbook created by JS API',\n" +
-                "   isWorkbook: true," +
-                "   failure: createFailure\n" +
+                "   isWorkbook: true,\n" +
+                "   failure: createFailure,\n" +
+                "   success: createSuccess\n" +
                 "   });\n" +
                 "LABKEY.Security.deleteContainer({\n" +
-                "   containerPath: '/"+PROJECT_NAME+"/"+containerId+"'," +
-                "   failure: deleteFailure\n" +
+                "   containerPath: '/"+PROJECT_NAME+"/"+containerId+"',\n" +
+                "   failure: deleteFailure,\n" +
+                "   success: deleteSuccess\n" +
                 "   });\n" +
                 "\n" +
+                "function createSuccess()\n" +
+                "   {document.getElementById('createWorkbookDiv').innerHTML = 'Insert complete - Success.';}\n" +
                 "function createFailure(errorInfo, response)\n" +
-                "   {alert('Unable to create workbook: ' + errorInfo.exception);}\n" +
+                "   {document.getElementById('createWorkbookDiv').innerHTML = 'Insert complete - Failure: ' + errorInfo.exception;}\n" +
+                "function deleteSuccess()\n" +
+                "   {document.getElementById('deleteWorkbookDiv').innerHTML = 'Delete complete - Success.';}\n" +
                 "function deleteFailure(errorInfo, response)\n" +
-                "   {alert('Unable to delete workbook: ' + errorInfo.exception);}\n" +
+                "   {document.getElementById('deleteWorkbookDiv').innerHTML = 'Delete complete - Failure: ' + errorInfo.exception;}\n" +
                 "</script>");
         saveWikiPage();
+
+        waitForText("Insert complete", WAIT_FOR_JAVASCRIPT);
+        waitForText("Delete complete", WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("Insert complete - Success.", "Delete complete - Success.");
 
         clickLinkWithText(PROJECT_NAME);
         assertLinkPresentWithText("API Workbook");
