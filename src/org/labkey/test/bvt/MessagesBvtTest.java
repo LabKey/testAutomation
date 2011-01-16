@@ -126,7 +126,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 //        clickNavButton("Done");
 //        clickLinkWithText("email admin");
         clickNavButton("Cancel");
-        selectOptionByText("defaultEmailOption", "Broadcast only");
+        selectOptionByText("defaultEmailOption", "Broadcast messages only");
         clickNavButton("Set");
 
         log("Check message works in Wiki");
