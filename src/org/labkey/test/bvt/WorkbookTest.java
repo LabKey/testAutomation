@@ -71,7 +71,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
         // Edit Workbook Name
         click(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
         setFormElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), "Renamed"+DEFAULT_WORKBOOK_NAME);
-        fireEvent(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), SeleniumEvent.blur);
+        fireEvent(Locator.xpath("//input[contains(@value, '"+DEFAULT_WORKBOOK_NAME+"')]"), SeleniumEvent.blur);
         assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // Clear description
