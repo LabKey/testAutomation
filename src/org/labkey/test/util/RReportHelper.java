@@ -25,11 +25,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Mar 9, 2010
  * Time: 2:54:08 PM
- * To change this template use File | Settings | File Templates.
  */
 public class RReportHelper
 {
@@ -58,6 +56,8 @@ public class RReportHelper
         {
             test.clickLinkWithText("Source");
         }
+
+        test.toggleEditAreaOff("script");
         test.setFormElement(Locator.id("script"), script);
         test.clickNavButton("Execute Script");
 

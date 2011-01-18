@@ -4815,6 +4815,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         toggleMetadataQueryEditor();
     }
 
+    // TODO: Should call toggleEditAreaOff() for these two
+
     protected void toggleSQLQueryEditor()
     {
         Locator queryId = Locator.id("edit_area_toggle_checkbox_queryText");
@@ -4827,6 +4829,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         Locator metadataId = Locator.id("edit_area_toggle_checkbox_metadataText");
         waitForElement(metadataId, WAIT_FOR_JAVASCRIPT);
         uncheckCheckbox(metadataId);
+    }
+
+    public void toggleEditAreaOff(String underlyingTextAreaId)
+    {
+        Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + underlyingTextAreaId);
+        waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
+        uncheckCheckbox(toggleCheckBoxId);
     }
 
     /**
