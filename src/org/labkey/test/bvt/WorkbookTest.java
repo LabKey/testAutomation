@@ -69,7 +69,8 @@ public class WorkbookTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithText(DEFAULT_WORKBOOK_NAME); // Should not appear in folder tree.
 
         // Edit Workbook Name
-        click(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
+        waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
+        waitForElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), "Renamed"+DEFAULT_WORKBOOK_NAME);
         fireEvent(Locator.xpath("//input[contains(@value, '"+DEFAULT_WORKBOOK_NAME+"')]"), SeleniumEvent.blur);
         assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
