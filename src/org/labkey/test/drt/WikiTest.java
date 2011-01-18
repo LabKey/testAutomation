@@ -92,7 +92,7 @@ public class WikiTest extends BaseSeleniumWebTest
         searchFor(PROJECT_NAME, "Wiki", 1, WIKI_PAGE_TITLE);
 
         log("test edit wiki");
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_PAGE_TITLE, "Edit");
         setFormElement("title", WIKI_PAGE_ALTTITLE);
         String wikiPageContentEdited =
             "<b>Some HTML content</b><br>\n" +
@@ -104,7 +104,7 @@ public class WikiTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE_ALTTITLE);
 
         log("test delete wiki");
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_PAGE_ALTTITLE, "Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);

@@ -41,6 +41,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
     private static final String RESP1_BODY = "I disagree";
     private static final String USER1 = "user1@wikibvt.test";
     private static final String WIKI_PAGE3_WEBPART_TEST = "Best Gene Name";
+    private static final String WIKI_NAVTREE_TITLE = "NavTree";
+    private static final String WIKI_TERMS_TITLE = "Terms of Use";
     private static final int MAX_AJAX_WAIT_CYCLES = 10;
 
     private static final String WIKI_PAGE1_CONTENT =
@@ -154,7 +156,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         searchFor(PROJECT_NAME, "Wiki", 3, WIKI_PAGE3_NAME_TITLE);
 
         log("test edit");
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Edit");
         setFormElement("title", WIKI_PAGE3_ALTTITLE);
         String wikiPage3ContentEdited =
             "<b>Some HTML content</b><br>\n" +
@@ -164,24 +166,19 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         saveWikiPage();
 
         assertTextPresent("More HTML content");
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_PAGE3_ALTTITLE, "Edit");
         setWikiBody(WIKI_PAGE3_CONTENT_NO_QUERY);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         saveWikiPage();
 
-//        pushLocation();
-//        //because we replace the body with the content
-//        searchFor(PROJECT_NAME, "More HTML", 0);
-//        popLocation();
-
         log("test change renderer type");
         assertTextPresent("Some HTML content");
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Edit");
         changeFormat("TEXT_WITH_LINKS");
         saveWikiPage();
 
         assertTextPresent("<b>");
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Edit");
         changeFormat("HTML");
         saveWikiPage();
 
@@ -198,13 +195,13 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check sibling order edit works");
         clickLinkWithText(WIKI_PAGE1_TITLE);
-        clickLinkWithText("manage");
+        clickWebpartMenuItem(WIKI_PAGE1_TITLE, "Manage");
         clickNavButton("Move Down", 0);
         clickNavButton("Save");
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         clickLinkWithText("[next]");
         assertTextPresent("normal normal normal");
-        clickLinkWithText("manage");
+        clickWebpartMenuItem(WIKI_PAGE1_TITLE, "Manage");
         clickNavButton("Move Up", 0);
         clickNavButton("Save");
         clickLinkWithText("[next]");
@@ -212,7 +209,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check parent reset works");
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
-        clickLinkWithText("manage");
+        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Manage");
         selectOptionByText("parent", WIKI_PAGE1_TITLE + " (" + WIKI_PAGE1_NAME + ")");
         waitForPageToLoad();
         clickNavButton("Save");
@@ -250,14 +247,14 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("test navTree and header");
         createNewWikiPage("RADEOX");
         setFormElement("name", "_navTree");
-        setFormElement("title", "NavTree");
+        setFormElement("title", WIKI_NAVTREE_TITLE);
         setWikiBody(NAVBAR1_CONTENT);
         saveWikiPage();
 
         assertTextNotPresent("Home");
         assertLinkPresentWithText(PROJECT_NAME);
 
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_NAVTREE_TITLE, "Edit");
         setWikiBody(NAVBAR2_CONTENT);
         saveWikiPage();
         assertLinkPresentWithText("Projects");
@@ -265,7 +262,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("Manage Site");
 
         //test deleting via edit page
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_NAVTREE_TITLE, "Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         assertLinkPresentWithText("Home");
@@ -278,8 +275,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         assertTextPresent(HEADER_CONTENT);
-        clickLinkWithText("Header");
-        clickLinkWithText("edit", 0);
+        clickWebpartMenuItem("Header", "Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent(HEADER_CONTENT);
@@ -288,9 +284,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
 
         log("test versions");
-        clickLinkWithText("history");
-        //clickLinkWithText("1"); This has the query web part in it
-        //assertTextPresent("Some HTML content");
+        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "History");
         clickLinkWithText("2");
         clickNavButton("Make Current");
         assertTextPresent("6");
@@ -302,7 +296,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("test terms of use");
         createNewWikiPage("RADEOX");
         setFormElement("name", "_termsOfUse");
-        setFormElement("title", "Terms of Use");
+        setFormElement("title", WIKI_TERMS_TITLE);
         setFormElement("body", "The first rule of fight club is do not talk about fight club.");
         saveWikiPage();
 
@@ -319,11 +313,10 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickNavButton("Agree");
 
         clickTab("Wiki");
-        clickLinkWithText("Terms of Use");
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_TERMS_TITLE, "Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
-        assertTextNotPresent("Terms of Use");
+        assertTextNotPresent(WIKI_TERMS_TITLE);
 
         log("test copy wiki");
         clickLinkWithText("copy pages");
@@ -485,12 +478,11 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("test delete");
         clickLinkWithText(WIKI_PAGE2_TITLE);
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKI_PAGE2_TITLE, "Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         clickLinkWithText(WIKI_PAGE1_TITLE);
-        //add once bug with caching wiki title is fixed
-        //assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
+        assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
 
         log("delete project with copied wiki");
         clickLinkWithText("Folders");

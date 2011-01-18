@@ -126,7 +126,7 @@ public class BasicTest extends BaseSeleniumWebTest
         clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));
         assertTextPresent("Customize");
         clickNavButton("Cancel");
-        clickAndWait(Locator.raw("//a[contains(text(), 'Messages')]/../..//a/img[@title='Move Down']"), 0);
+        clickAndWait(Locator.xpath("//a[contains(@class, 'labkey-header')]/../..[contains(@class, 'labkey-wp-header')]//th[contains(@class, 'labkey-wp-title-right')]//img[contains(@title, 'Move Down')]"), 0);
         waitFor(new Checker() {
             public boolean check()
             {

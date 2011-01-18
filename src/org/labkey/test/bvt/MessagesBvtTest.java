@@ -100,31 +100,23 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithImageByIndex("/_images/partdelete.gif", 3, false);
 
         log("Check email preferences");
-        clickLinkWithText("email preferences");
+        clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "1");
         clickNavButton("Update");
         clickNavButton("Done");
 
         log("Customize message board");
-        clickLinkWithText("Messages");
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Messages", "Customize");
         checkCheckbox("expires");
         clickNavButton("Save");
 
         log("Check email admin works");
-        clickLinkWithText("email admin");
+        clickWebpartMenuItem("Messages", "Email", "Administration");
         selectOptionByText("defaultEmailOption", "All conversations");
         clickNavButton("Set");
         clickNavButton("Bulk Edit");
         assertTextPresent("All conversations");
         assertFormElementEquals("emailOptionId", "1");
-//        clickLinkWithText("Messages");
-//        clickLinkWithText("email preferences");
-//        checkRadioButton("notificationType", "256");
-//        checkRadioButton("emailPreference", "0");
-//        clickNavButton("Update");
-//        clickNavButton("Done");
-//        clickLinkWithText("email admin");
         clickNavButton("Cancel");
         selectOptionByText("defaultEmailOption", "Broadcast messages only");
         clickNavButton("Set");
@@ -194,7 +186,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         log("Check with security");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 1);
         clickNavButton("Save");
         permissionCheck("Reader", false);
@@ -202,7 +194,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         log("Check if the customized names work");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Messages", "Customize");
         setFormElement("boardName", "Notes");
         setFormElement("conversationName", "Thread");
         clickNavButton("Save");
@@ -214,10 +206,10 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickNavButton("Save");
 
         log("Check if sorting works");
-        clickLinkWithText("new message");
+        clickWebpartMenuItem("Messages", "New message");
         setFormElement("title", MSG2_TITLE);
         submit();
-        clickLinkWithText("Messages");
+        clickWebpartMenuItem("Messages", "Go to message");
         clickLinkWithText("view message or respond");
         assertTextPresent(MSG2_TITLE);
         clickLinkWithText("Messages");
@@ -283,7 +275,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickNavButton("Update Group Membership");
         
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("new message");
+        clickWebpartMenuItem("Messages", "New message");
         setFormElement("emailList", USER2);
         clickNavButton("Submit", 0);
         assertAlert("Title must not be blank");
@@ -300,12 +292,8 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent(MSG3_TITLE);
         stopImpersonating();
-//        impersonate(USER2);
-//        clickLinkWithText(PROJECT_NAME);
-//        assertTextNotPresent(MSG3_TITLE);
-//        stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 0);
         clickNavButton("Save");
         clickLinkWithText(MSG3_TITLE);
@@ -359,8 +347,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         log("Check admin broadcast message");
-        clickLinkWithText("Messages");
-        clickLinkWithText("new message");
+        clickWebpartMenuItem("Messages", "New message");
         setFormElement("title", MSGB_TITLE);
         setFormElement("body", MSGB_BODY);
         checkCheckbox("broadcast");

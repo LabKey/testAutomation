@@ -586,6 +586,26 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickAndWait(Locator.tagContainingText("span", "Hide Navigation Bar"));
     }
 
+    /**
+     * Allows for tester to navigate a Webpart Ext-based navigation menu. The first
+     * item should be the top link (a.k.a. the webpart title)
+     * @param items
+     */
+    public void clickWebpartMenuItem(String... items)
+    {
+        clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = '" + items[0] + "']"), 0);
+        Locator parentLocator;
+        for (int i = 1; i < items.length; i++)
+        {
+            parentLocator = Locator.menuItem(items[i]);
+            waitForElement(parentLocator, 1000);
+            mouseOver(parentLocator);
+        }
+        Locator itemLocator = Locator.menuItem(items[items.length - 1]);
+        waitForElement(itemLocator, 1000);
+        clickAndWait(itemLocator);
+    }
+    
     public void clickAdminMenuItem(String... items)
     {
         clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);

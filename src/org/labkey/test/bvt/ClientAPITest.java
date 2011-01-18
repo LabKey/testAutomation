@@ -519,7 +519,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
         setWikiBody("<p>" + message + "</p>");
         saveWikiPage();
     }
@@ -848,7 +848,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("edit");
+        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
