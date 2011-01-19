@@ -292,6 +292,7 @@ public class ReportTest extends StudyBaseTest
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
         clickMenuButton("Views", "Create", "R View");
+        toggleScriptReportEditor();
         setFormElement(Locator.id("script"), "labkey.data");
         clickNavButton("Execute Script");
         assertTextNotPresent(R_REMCOL);

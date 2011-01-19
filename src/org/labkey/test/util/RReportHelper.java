@@ -57,7 +57,7 @@ public class RReportHelper
             test.clickLinkWithText("Source");
         }
 
-        test.toggleEditAreaOff("script");
+        test.toggleScriptReportEditor();
         test.setFormElement(Locator.id("script"), script);
         test.clickNavButton("Execute Script");
 
