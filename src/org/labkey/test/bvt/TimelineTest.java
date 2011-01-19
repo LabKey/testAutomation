@@ -136,7 +136,7 @@ public class TimelineTest extends BaseSeleniumWebTest
     private void apiTest()
     {
         setSource(TIMELINE_TEST_SRC);
-        clickLinkWithText(WIKIPAGE_NAME);
+        //clickLinkWithText(WIKIPAGE_NAME); // Not needed with Webpart navigation added in 15432.
         waitForElement(Locator.tagContainingText("div", "Jane Janeson"), 10000);
         selenium.mouseDown(Locator.tagContainingText("div", "Jane Janeson").toString());
         assertTextPresent("Hi Jane I am the description");
