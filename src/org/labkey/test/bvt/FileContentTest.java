@@ -126,8 +126,10 @@ public class FileContentTest extends BaseSeleniumWebTest
             click(Locator.xpath("//a[./span[text()='remove']]"));
             
             // Test email admin
-            clickConfigTab(FileTab.email);
-            checkRadioButton("emailPref", "1");
+            // TODO: email admin has moved out of the config dialog, but also need a way to test email notifications
+            // as they are now digest based.
+            //clickConfigTab(FileTab.email);
+            //checkRadioButton("emailPref", "1");
 
             // Save settings.
             clickButton("Submit", 0);
