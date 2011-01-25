@@ -17,6 +17,8 @@
 package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * User: tamram
@@ -112,14 +114,21 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         log("Check email admin works");
         clickWebpartMenuItem("Messages", "Email", "Administration");
-        selectOptionByText("defaultEmailOption", "All conversations");
-        clickNavButton("Set");
-        clickNavButton("Bulk Edit");
+
+        clickNavButton("Settings", 0);
+
+        Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@id='defaultEmailOption']/../../div");
+
+        waitForElement(Locator.xpath("//input[@id='defaultEmailOption']"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Update Folder Default", 0);
+
+        waitForExtMaskToDisappear();
         assertTextPresent("All conversations");
-        assertFormElementEquals("emailOptionId", "1");
-        clickNavButton("Cancel");
-        selectOptionByText("defaultEmailOption", "Broadcast messages only");
-        clickNavButton("Set");
+        ExtHelper.selectComboBoxItem(this, folderDefaultCombo, "Broadcast messages only");
+        clickNavButton("Update Folder Default", 0);
+
+        waitForExtMaskToDisappear();
+        clickLinkWithText(PROJECT_NAME);
 
         log("Check message works in Wiki");
         clickLinkWithText("Messages");
