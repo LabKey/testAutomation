@@ -74,7 +74,8 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         selenium.waitForPopUp("prot", "10000");
         selenium.selectWindow("prot");
         assertTextPresent("PPIA_MOUSE");
-        assertTextPresent("Q9CWJ5");
+        click(Locator.id("expandCollapse-ProteinAnnotationsView"));
+        waitForText("Q9CWJ5", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Q9R137");
         assertTextPresent("Mus musculus");
         selenium.close();
@@ -93,7 +94,8 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         //opens in separate window
         selenium.waitForPopUp("prot", "10000");
         selenium.selectWindow("prot");
-        assertTextPresent("P11477");
+        click(Locator.id("expandCollapse-ProteinAnnotationsView"));
+        waitForText("P11477", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Q61448");
         assertTextPresent("DEF1_MOUSE");
         assertTextPresent("ENSMUSG00000074440");
