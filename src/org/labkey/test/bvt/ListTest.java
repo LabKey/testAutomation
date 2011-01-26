@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
@@ -36,8 +37,6 @@ import java.util.Arrays;
  */
 public class ListTest extends BaseSeleniumWebTest
 {
-    boolean INCREMENTALTEST=false;  // for test development only
-    
     protected final static String PROJECT_NAME = "ListVerifyProject";
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
     private final static String LIST_NAME = "Colors";
@@ -68,7 +67,7 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String LIST_ROW3 = TEST_DATA[0][2] + "\t" + TEST_DATA[1][2] + "\t" + TEST_DATA[2][2] + "\t" + CONVERTED_MONTHS[2];
     private final String LIST_DATA = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME +
             "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3;
-    private final String LIST_DATA2 = 
+    private final String LIST_DATA2 =
             LIST_KEY_NAME2 + "\t" + _listCol4.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listCol5.getName() + "\n" +
             TEST_DATA[0][0] + "\t" + TEST_DATA[4][0] + "\t" + TEST_DATA[5][0] + "\t" + HIDDEN_TEXT + "\n" +
             TEST_DATA[0][1] + "\t" + TEST_DATA[4][1] + "\t" + TEST_DATA[5][1] + "\t" + HIDDEN_TEXT + "\n" +
@@ -107,6 +106,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     private final String EXCEL_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.xls";
     private final String TSV_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.tsv";
+    private final String TSV_LIST_NAME = "Fruits from TSV";
 
     public String getAssociatedModuleDirectory()
     {
@@ -115,7 +115,6 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void doCleanup()
     {
-        if (INCREMENTALTEST) return;
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME2); } catch (Throwable t) {}
     }
@@ -128,7 +127,6 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-    if (!INCREMENTALTEST){
         log("Setup project and list module");
         createProject(PROJECT_NAME);
 
@@ -229,7 +227,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
         assertTextPresent(TEST_DATA[3][2]);
-        
+
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
         assertTableCellTextEquals("dataregion_query", 1, 5, _listCol3.getLabel()); // Colummns...
         assertTableCellTextEquals("dataregion_query", 1, 6, _listCol2.getLabel()); // ...swapped.
@@ -451,7 +449,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertEquals("List Links", 14 + 1, countLinksWithText(LIST_NAME)); // Table links + header link
         clickLinkWithText("details");
         assertTextPresent("List Item Details");
-        assertTextNotPresent("No details available for this event.");  
+        assertTextNotPresent("No details available for this event.");
         assertTextNotPresent("Unable to find the audit history detail for this event");
 
         clickNavButton("Done");
@@ -579,8 +577,21 @@ public class ListTest extends BaseSeleniumWebTest
 
         doRenameFieldsTest();
         doUploadTest();
-/* INCREMENTAL */ } else beginAt("http://localhost:8080/labkey/list/ListVerifyProject/begin.view?");
+        //customFormattingTest(); // TODO: Blocked by Issue 11435
         customizeURLTest();
+    }
+
+    private void customFormattingTest()
+    {
+        // assumes we are at the list designer after doUploadTest()
+        clickNavButton("Edit Design", 0);
+        click(Locator.name("ff_name3"));
+        click(Locator.xpath("//span[text()='Format']"));
+        clickNavButton("Add Conditional Format", 0);
+        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
+        setFormElement("value_1", "true");
+        clickNavButton("OK", 0);
+        // TODO: Blocked by Issue 11435
     }
 
     private void doUploadTest()
@@ -594,11 +605,34 @@ public class ListTest extends BaseSeleniumWebTest
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
 
-        log("Infer from a tsv file, then import data");
+        log("Infer from tsv file, but cancel before completion");
         File tsvFile = new File(TSV_DATA_FILE);
-        ListHelper.createListFromFile(this, PROJECT_NAME, "Fruits from a TSV", tsvFile);
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("manage lists");
+        clickNavButton("Create New List");
+        waitForElement(Locator.name("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        setFormElement("ff_name",  TSV_LIST_NAME);
+        checkCheckbox(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
+        clickNavButton("Create List", 0);
+        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        setFormElement("uploadFormElement", tsvFile);
+        waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Import", 0);
+        waitForElement(Locator.xpath("//div[text()='Creating columns...']"), WAIT_FOR_JAVASCRIPT);
+        sleep(50);
+        clickNavButton("Cancel");
+        assertTextNotPresent(TSV_LIST_NAME);
+
+        log("Infer from a tsv file, then import data");
+        ListHelper.createListFromFile(this, PROJECT_NAME, TSV_LIST_NAME, tsvFile);
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
+        log("Verify correct types are inferred from file");
+        clickNavButton("View Design");
+        waitForElement(Locator.xpath("//tr[./td/div[text()='BoolCol'] and ./td/div[text()='Boolean']]"), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//tr[./td/div[text()='IntCol'] and ./td/div[text()='Integer']]"));
+        assertElementPresent(Locator.xpath("//tr[./td/div[text()='NumCol'] and ./td/div[text()='Number (Double)']]"));
+        assertElementPresent(Locator.xpath("//tr[./td/div[text()='DateCol'] and ./td/div[text()='DateTime']]"));
     }
 
     private void doRenameFieldsTest()
