@@ -5,20 +5,16 @@
  */
 // ================================================
 
+var console = require("console");
 console.log("** evaluating: " + this['javax.script.filename']);
 
 var Debug = {
-    addBefore : function (obj, fname, before) {
-        var oldFn = obj[fname];
-        var wrappedFn = function () {
-            return oldFn.apply(scope, before(arguments, oldFn, this));
-        }
-        wrappedFn.oldFn = oldFn;
-        obj[fname] = wrappedFn;
-    },
-
-    restore : function (obj, fname) {
-        obj[fname] = obj[fname].oldFn;
+    addBefore : function (oldFn, before) {
+        return function () {
+            var me = this,
+                args = arguments;
+            return oldFn.apply(me, before(args, oldFn, me));
+        };
     }
 };
 
@@ -165,12 +161,12 @@ function complete(event, errors) {
     }
 }
 
-Debug.addBefore(this, 'init', trace);
-Debug.addBefore(this, 'beforeInsert', trace);
-Debug.addBefore(this, 'afterInsert', trace);
-Debug.addBefore(this, 'beforeUpdate', trace);
-Debug.addBefore(this, 'afterUpdate', trace);
-Debug.addBefore(this, 'beforeDelete', trace);
-Debug.addBefore(this, 'afterDelete', trace);
-Debug.addBefore(this, 'complete', trace);
+init         = Debug.addBefore(init, trace);
+beforeInsert = Debug.addBefore(beforeInsert, trace);
+afterInsert  = Debug.addBefore(afterInsert, trace);
+beforeUpdate = Debug.addBefore(beforeUpdate, trace);
+afterUpdate  = Debug.addBefore(afterUpdate, trace);
+beforeDelete = Debug.addBefore(beforeDelete, trace);
+afterDelete  = Debug.addBefore(afterDelete, trace);
+complete     = Debug.addBefore(complete, trace);
 
