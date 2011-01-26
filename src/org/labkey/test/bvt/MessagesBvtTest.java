@@ -131,8 +131,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
 
         log("Check message works in Wiki");
-        clickLinkWithText("Messages");
-        clickLinkWithText("new message");
+        clickWebpartMenuItem("Messages", "New message");
         setFormElement("title", MSG1_TITLE);
         setFormElement("expires", EXPIRES1);
         setFormElement("body", "1 <b>x</b>");
