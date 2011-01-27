@@ -83,6 +83,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         log("Visit batch details page");
         clickLinkWithText("details");
         assertTitleEquals(batchName + " Details: /" + PROJECT_NAME);
+        waitForElement(Locator.id("RunName_0"), WAIT_FOR_JAVASCRIPT);
         assertElementContains(Locator.id("RunName_0"), "run01");
         assertElementContains(Locator.id("SampleId_0_0"), "Monkey 1");
         assertElementContains(Locator.id("DoubleData_0_0"), String.valueOf(3.2));
@@ -216,7 +217,7 @@ public class ModuleAssayTest extends AbstractAssayTest
             } while (--count > 0);
             assertElementContains(Locator.id("batch_runCount_div"), String.valueOf(i+1));
             // file name should appear in runs grid on upload page
-            assertTextPresent(uploadedFile);
+            waitForText(uploadedFile, WAIT_FOR_JAVASCRIPT);
         }
     }
 }
