@@ -242,6 +242,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _test.log("Start analysis of " + getDataPath());
         _test.clickNavButton("Process and Import Data");
         String[] dirs = getDataPath().split("/");
+        _test.sleep(100);  // Workaround for lkwin03 // TODO: find a better solution
         for (String dir : dirs)
             _test.waitAndClick(Locator.fileTreeByName(dir));
 
