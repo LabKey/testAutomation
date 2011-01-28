@@ -605,8 +605,9 @@ public class ListTest extends BaseSeleniumWebTest
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
 
-        log("Infer from tsv file, but cancel before completion");
         File tsvFile = new File(TSV_DATA_FILE);
+        //Cancel test disabled.  //TODO: re-enable
+        /* log("Infer from tsv file, but cancel before completion");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("manage lists");
         clickNavButton("Create New List");
@@ -619,9 +620,8 @@ public class ListTest extends BaseSeleniumWebTest
         waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         clickNavButton("Import", 0);
         waitForElement(Locator.xpath("//div[text()='Creating columns...']"), WAIT_FOR_JAVASCRIPT);
-        sleep(50);
         clickNavButton("Cancel");
-        assertTextNotPresent(TSV_LIST_NAME);
+        assertTextNotPresent(TSV_LIST_NAME);*/
 
         log("Infer from a tsv file, then import data");
         ListHelper.createListFromFile(this, PROJECT_NAME, TSV_LIST_NAME, tsvFile);
