@@ -67,18 +67,18 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static final String AUC_4PL_STUDY_COL_TITLE = "AUC 4pl";
     private static final String AUC_5PL_STUDY_COL_TITLE = "AUC 5pl";
     private static final String AUC_POLY_STUDY_COL_TITLE = "AUC Poly";
-    private static final String CURVE_IC50_STUDY_COL_TITLE = "CurveIC50";
-    private static final String CURVE_IC50_4PL_STUDY_COL_TITLE = "CurveIC50_4pl";
-    private static final String CURVE_IC50_5PL_STUDY_COL_TITLE = "CurveIC50_5pl";
-    private static final String CURVE_IC50_POLY_STUDY_COL_TITLE = "CurveIC50_poly";
-    private static final String CURVE_IC70_STUDY_COL_TITLE = "CurveIC70";
-    private static final String CURVE_IC70_4PL_STUDY_COL_TITLE = "CurveIC70_4pl";
-    private static final String CURVE_IC70_5PL_STUDY_COL_TITLE = "CurveIC70_5pl";
-    private static final String CURVE_IC70_POLY_STUDY_COL_TITLE = "CurveIC70_poly";
-    private static final String CURVE_IC80_STUDY_COL_TITLE = "CurveIC80";
-    private static final String CURVE_IC80_4PL_STUDY_COL_TITLE = "CurveIC80_4pl";
-    private static final String CURVE_IC80_5PL_STUDY_COL_TITLE = "CurveIC80_5pl";
-    private static final String CURVE_IC80_POLY_STUDY_COL_TITLE = "CurveIC90_poly";
+    private static final String CURVE_IC50_STUDY_COL_TITLE = "Curve IC50";
+    private static final String CURVE_IC50_4PL_STUDY_COL_TITLE = "Curve IC50 4pl";
+    private static final String CURVE_IC50_5PL_STUDY_COL_TITLE = "Curve IC50 5pl";
+    private static final String CURVE_IC50_POLY_STUDY_COL_TITLE = "Curve IC50 Poly";
+    private static final String CURVE_IC70_STUDY_COL_TITLE = "Curve IC70";
+    private static final String CURVE_IC70_4PL_STUDY_COL_TITLE = "Curve IC70 4pl";
+    private static final String CURVE_IC70_5PL_STUDY_COL_TITLE = "Curve IC70 5pl";
+    private static final String CURVE_IC70_POLY_STUDY_COL_TITLE = "Curve IC70 Poly";
+    private static final String CURVE_IC80_STUDY_COL_TITLE = "Curve IC80";
+    private static final String CURVE_IC80_4PL_STUDY_COL_TITLE = "Curve IC80 4pl";
+    private static final String CURVE_IC80_5PL_STUDY_COL_TITLE = "Curve IC80 5pl";
+    private static final String CURVE_IC80_POLY_STUDY_COL_TITLE = "Curve IC80 Poly";
 
     private static final boolean CONTINUE = false;
     private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
@@ -375,7 +375,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             // reversed dilution direction:
             assertTextPresent("ptid 1 A");
             assertTextPresent("ptid 1 B");
-            assertTextPresent("CurveIC50");
+            assertTextPresent("Curve IC50");
             assertTextPresent("493");
             assertTextPresent("Specimen 1", 2);
         }
@@ -384,7 +384,6 @@ public class NabAssayTest extends AbstractQCAssayTest
             // standard dilution direction
             assertTextPresent("ptid 2 A");
             assertTextPresent("ptid 2 B");
-            assertTextPresent("CurveIC50");
             assertTextPresent("134");
             assertTextPresent("Specimen 2", 2);
         }
@@ -393,7 +392,6 @@ public class NabAssayTest extends AbstractQCAssayTest
             // invalid dilution direction
             assertTextPresent("ptid 3 A");
             assertTextPresent("ptid 3 B");
-            assertTextPresent("CurveIC50");
             assertTextPresent("436");
             assertTextPresent("Specimen 3", 2);
         }
@@ -402,7 +400,6 @@ public class NabAssayTest extends AbstractQCAssayTest
             // unspecified dilution direction
             assertTextPresent("ptid 4 A");
             assertTextPresent("ptid 4 B");
-            assertTextPresent("CurveIC50");
             assertTextPresent("277.9");
             assertTextPresent("Specimen 4", 2);
         }
@@ -499,6 +496,15 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Checking data in aliased AUC columns in Study");
         // check copied AUC data.
         setSort("Dataset", "ParticipantId", SortDirection.ASC);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_poly", AUC_POLY_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_4pl", AUC_4PL_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_5pl", AUC_5PL_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_4pl", CURVE_IC50_4PL_STUDY_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl", CURVE_IC80_4PL_STUDY_COL_TITLE);
+        CustomizeViewsHelper.saveCustomView(this);
         assertTableCellsEqual("dataregion_Dataset",  2, AUC_STUDY_COL_TITLE, 2, AUC_POLY_STUDY_COL_TITLE); //AUC = AUC_poly
         assertTableCellsEqual("dataregion_Dataset",  3, AUC_STUDY_COL_TITLE, 3, AUC_4PL_STUDY_COL_TITLE); //AUC = AUC_4pl
         assertTableCellsEqual("dataregion_Dataset",  2, CURVE_IC50_STUDY_COL_TITLE, 2, CURVE_IC50_POLY_STUDY_COL_TITLE); //CurveIC50 = CurveIC50_poly
