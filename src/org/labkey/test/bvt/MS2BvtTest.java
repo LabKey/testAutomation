@@ -905,7 +905,7 @@ public class MS2BvtTest extends MS2TestBase
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
-        clickLinkWithText("Peptide");
+        clickLinkWithText("Peptide (Legacy)");
         selectOptionByText("viewParams", VIEW2);
         clickNavButton("Go");
         assertTextPresent("(DeltaMass > 0)");
