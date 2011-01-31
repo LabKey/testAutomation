@@ -38,6 +38,11 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
     protected static final String SEARCH_TYPE = "xtandem";
     protected static final String SEARCH_BUTTON = "X!Tandem";
     protected static final String SEARCH_NAME = "X! Tandem";
+    protected static final String PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID = "peptideProphetRadioButton";
+    protected static final String PEPTIDE_CROSSTAB_RADIO_PROBABILITY_VALUE = "probability";
+    protected static final String PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME = "peptideProphetProbability";
+    protected static final String PEPTIDE_CROSSTAB_RADIO_NAME = "peptideFilterType";
+    protected static final String PEPTIDE_CROSSTAB_RADIO_VALUE_NONE = "none";
 
     protected void doCleanup() throws IOException
     {
@@ -108,7 +113,7 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
-        clickLinkWithText("Peptide");
+        clickLinkWithText("Peptide (Legacy)");
         selectOptionByText("viewParams", VIEW);
         clickNavButton("Go");
         assertTextPresent("(Mass > 1000)");
@@ -118,6 +123,27 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
 
         setSort("MS2Compare", "Peptide", SortDirection.DESC);
         assertTextBefore(PEPTIDE5, PEPTIDE4);
+
+        log("Test PeptideCrosstab");
+        clickLinkWithText("MS2 Dashboard");
+        click(Locator.name(".toggle"));
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Compare", 0);
+        clickLinkWithText("Peptide");
+
+        checkRadioButton(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE);
+        clickNavButton("Go");
+        assertTextPresent(PEPTIDE3);
+        assertTextPresent(PEPTIDE4);
+        assertTextPresent(PEPTIDE);
+
+        clickLinkWithText("Setup Compare Peptides");
+        clickRadioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID);
+        setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.75");
+        clickNavButton("Go");
+        assertTextPresent(PEPTIDE3);
+        assertTextPresent(PEPTIDE4);
+        assertTextNotPresent(PEPTIDE);
 
         log("Navigate to folder Portal");
         clickLinkWithText("MS2 Dashboard");
