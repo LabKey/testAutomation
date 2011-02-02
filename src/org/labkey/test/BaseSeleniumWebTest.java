@@ -4846,6 +4846,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void selectImportDataAction(String actionName)
     {
         ExtHelper.waitForImportDataEnabled(this);
+        sleep(100); // Fix for flow test.  TODO: remove once marker class is added to page by Karl. 
         clickNavButton("Import Data", 0);
 
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction']/../label[text()=" + Locator.xq(actionName) + "]"));
