@@ -265,7 +265,7 @@ public class SearchTest extends StudyTest
     {
         clickLinkWithText(getFolderName());
         addWebPart("Messages");
-        clickWebpartMenuItem("Messages", "New message");
+        clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MESSAGE_TITLE);
         setFormElement("body", MESSAGE_BODY);
         if (isFileUploadAvailable())

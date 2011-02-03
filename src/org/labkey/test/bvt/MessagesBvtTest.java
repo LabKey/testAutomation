@@ -99,7 +99,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         addWebPart("Mail Record");
         uncheckCheckbox("emailRecordOn");
         checkCheckbox("emailRecordOn");
-        clickLinkWithImageByIndex("/_images/partdelete.gif", 3, false);
+        clickLinkWithImageByIndex("/_images/partdelete.png", 3, false);
 
         log("Check email preferences");
         clickWebpartMenuItem("Messages", "Email", "Preferences");
@@ -131,7 +131,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
 
         log("Check message works in Wiki");
-        clickWebpartMenuItem("Messages", "New message");
+        clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MSG1_TITLE);
         setFormElement("expires", EXPIRES1);
         setFormElement("body", "1 <b>x</b>");
@@ -146,7 +146,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickNavButton("Delete");
 
         log("Check that HTML message works");
-        clickLinkWithText("new message");
+        clickNavButton("New");
         setFormElement("title", MSG1_TITLE);
         setFormElement("body", HTML_BODY);
         selectOptionByText("rendererType", "HTML");
@@ -162,7 +162,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         assertTextPresent(MSG1_BODY);
 
         log("Add response");
-        clickNavButton("Post Response");
+        clickNavButton("Respond");
         setFormElement("title", RESP1_TITLE);
         setFormElement("expires", EXPIRES2);
         setFormElement("body", RESP1_BODY);
@@ -174,7 +174,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         assertTextPresent(RESP1_BODY);
 
         log("Add second response, make sure it was entered and recognized");
-        clickNavButton("Post Response");
+        clickNavButton("Respond");
         setFormElement("body", RESP2_BODY);
         submit();
         assertTextPresent(RESP2_BODY);
@@ -208,24 +208,24 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickNavButton("Save");
         assertTextPresent("Notes");
         assertTextPresent("thread");
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Notes", "Customize");
         setFormElement("boardName", "Messages");
         setFormElement("conversationName", "Message");
         clickNavButton("Save");
 
         log("Check if sorting works");
-        clickWebpartMenuItem("Messages", "New message");
+        clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MSG2_TITLE);
         submit();
-        clickWebpartMenuItem("Messages", "Go to message");
+        clickLinkWithText("Messages");
         clickLinkWithText("view message or respond");
         assertTextPresent(MSG2_TITLE);
         clickLinkWithText("Messages");
         clickLinkWithText("view message or respond", 1);
-        clickNavButton("Post Response");
+        clickNavButton("Respond");
         submit();
         clickLinkWithText("Messages");
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("sortOrderIndex", 1);
         clickNavButton("Save");
         clickLinkWithText("view message or respond");
@@ -233,7 +233,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         log("Edit other customize options");
         clickLinkWithText("Messages");
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Messages", "Customize");
         uncheckCheckbox("titleEditable");
         checkCheckbox("memberList");
         checkCheckbox("status");
@@ -244,11 +244,11 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickNavButton("Save");
 
         log("Check if status and expires work");
-        clickLinkWithText("new message");
+        clickNavButton("New");
         assertTextPresent(USER1);
         clickNavButton("Cancel");
         clickLinkWithText(MSG2_TITLE);
-        clickNavButton("Post Response");
+        clickNavButton("Respond");
         selectOptionByText("status", "Closed");
         assertFormElementEquals("assignedTo", "");
         submit();
@@ -283,7 +283,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickNavButton("Update Group Membership");
         
         clickLinkWithText(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "New message");
+        clickWebpartMenuItem("Messages", "New");
         setFormElement("emailList", USER2);
         clickNavButton("Submit", 0);
         assertAlert("Title must not be blank");
@@ -343,7 +343,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         log("Set broadcast preferences.");
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("email preferences");
+        clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "0");
         pushLocation();
         clickNavButton("Update");
@@ -355,7 +355,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         log("Check admin broadcast message");
-        clickWebpartMenuItem("Messages", "New message");
+        clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MSGB_TITLE);
         setFormElement("body", MSGB_BODY);
         checkCheckbox("broadcast");

@@ -107,7 +107,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("test add response");
         clickLinkWithText("view message or respond");
-        clickNavButton("Post Response");
+        clickNavButton("Respond");
         setFormElement("expires", EXPIRES);
         setFormElement("title", RESP1_TITLE);
         setFormElement("body", RESP1_BODY);

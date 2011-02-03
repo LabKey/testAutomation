@@ -188,9 +188,9 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check Pages menu works");
         clickLinkWithText(WIKI_PAGE2_TITLE);
-        clickLinkWithText("[next]");
+        clickLinkWithText("next");
         assertTextPresent("Some HTML content");
-        clickLinkWithText("[previous]");
+        clickLinkWithText("previous");
         assertTextPresent("Welcome");
 
         log("Check sibling order edit works");
@@ -199,12 +199,12 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickNavButton("Move Down", 0);
         clickNavButton("Save");
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
-        clickLinkWithText("[next]");
+        clickLinkWithText("next");
         assertTextPresent("normal normal normal");
         clickWebpartMenuItem(WIKI_PAGE1_TITLE, "Manage");
         clickNavButton("Move Up", 0);
         clickNavButton("Save");
-        clickLinkWithText("[next]");
+        clickLinkWithText("next");
         assertTextPresent("Page AAA");
 
         log("Check parent reset works");
@@ -214,7 +214,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         waitForPageToLoad();
         clickNavButton("Save");
         clickLinkWithText(WIKI_PAGE1_TITLE);
-        clickLinkWithText("[next]");
+        clickLinkWithText("next");
         assertTextPresent("Some HTML content");
 
         log("Check that discussion board works");
@@ -233,7 +233,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextPresent(DISC1_BODY);
 
         log("Check response on discussion board works");
-        clickNavButton("Post Response");
+        clickNavButton("Respond");
         setFormElement("title", RESP1_TITLE);
         setFormElement("body", RESP1_BODY);
         submit();
@@ -289,7 +289,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickNavButton("Make Current");
         assertTextPresent("6");
         clickLinkWithText(WIKI_PAGE1_TITLE);
-        clickLinkWithText("[next]");
+        clickLinkWithText("next");
         assertTextPresent("More HTML content");
         assertTextPresent(WIKI_PAGE3_ALTTITLE);
 
@@ -319,14 +319,14 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextNotPresent(WIKI_TERMS_TITLE);
 
         log("test copy wiki");
-        clickLinkWithText("copy pages");
+        clickWebpartMenuItem("Pages", "Copy");
         clickLinkWithText(PROJECT2_NAME);
         clickNavButton("Copy Pages");
 
         log("test wiki customize link");
         clickTab("Portal");
         addWebPart("Wiki");
-        clickLinkWithImage(getContextPath() + "/_images/partedit.gif");
+        clickWebpartMenuItem("Wiki", "Customize");
         log("check that container is set to current project");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
         clickLinkWithText("Reset to Folder Default Page", false);
@@ -381,7 +381,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check if readers can read from other projects");
         clickLinkWithText(PROJECT2_NAME);
-        clickLinkWithImage(getContextPath() + "/_images/partedit.gif");
+        clickWebpartMenuItem(WIKI_PAGE2_TITLE, "Customize");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
 
         //page names are now fetched via AJAX, so wait for them to be populated
@@ -406,7 +406,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextNotPresent("Welcome");
         log("Also check copying permission");
         clickTab("Wiki");
-        clickLinkWithText("copy pages");
+        clickWebpartMenuItem("Pages", "Copy");
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
@@ -421,7 +421,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE2_TITLE);
         log("Also check copying permission");
         clickTab("Wiki");
-        clickLinkWithText("copy pages");
+        clickWebpartMenuItem("Pages", "Copy");
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
@@ -433,20 +433,20 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Wiki");
-        clickLinkWithText("copy pages");
+        clickWebpartMenuItem("Pages", "Copy");
         assertTextPresent(PROJECT_NAME);
         stopImpersonating();
 
         log("delete wiki web part");
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Portal");
-        clickLinkWithImage(getContextPath() + "/_images/partdelete.gif", 0);
-        waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.gif"), WAIT_FOR_JAVASCRIPT);
+        clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
+        waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
         assertLinkNotPresentWithText("Welcome");
 
         log("test wiki TOC customize link");
         addWebPart("Wiki TOC");
-        clickLinkWithImage(getContextPath() + "/_images/partedit.gif");
+        clickWebpartMenuItem("Pages", "Customize");
         setFormElement("title", "Test Customize TOC");
         log("check that container is set to current project");
         assertOptionEquals("webPartContainer", "/" + PROJECT2_NAME);
@@ -457,7 +457,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE2_TITLE);
 
         log("Check that 'Copy Pages' in TOC works");
-        clickLinkWithText("copy pages");
+        clickWebpartMenuItem("Test Customize TOC", "Copy");
         clickLinkWithText(PROJECT_NAME);
         clickNavButton("Copy Pages");
         clickLinkWithText(PROJECT_NAME);
@@ -467,7 +467,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("Check that 'New Page' works");
         clickLinkWithText(PROJECT2_NAME);
         clickTab("Portal");
-        createNewWikiPage("HTML");
+        clickWebpartMenuItem("Test Customize TOC", "New");
+        convertWikiFormat("HTML");
 
         setFormElement("name", WIKI_PAGE4_TITLE);
         setWikiBody(WIKI_PAGE4_CONTENT);

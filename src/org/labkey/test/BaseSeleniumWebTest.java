@@ -593,7 +593,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void clickWebpartMenuItem(String... items)
     {
-        clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = '" + items[0] + "']"), 0);
+        clickAndWait(Locator.xpath("//img[@id='more-" + items[0].toLowerCase() + "']"), 0);
+        //clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = '" + items[0] + "']"), 0);
         Locator parentLocator;
         for (int i = 1; i < items.length; i++)
         {
@@ -4016,6 +4017,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickLinkWithText("Create a new wiki page");
         else if(isLinkPresentWithText("add content"))
             clickLinkWithText("add content");
+        else if(isTextPresent("Pages"))
+            clickWebpartMenuItem("Pages", "New");
         else
             fail("Could not find a link on the current page to create a new wiki page." +
                     " Ensure that you navigate to the wiki controller home page or an existing wiki page" +

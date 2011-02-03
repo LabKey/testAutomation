@@ -61,7 +61,7 @@ public class BasicTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("Create a new wiki page");
         addWebPart("Wiki TOC");
         // move messages below wiki:
-        clickLinkWithImage("/_images/partdown.gif", 0);
+        clickLinkWithImage("/_images/partdown.png", 0);
         waitFor(new Checker()
         {
             public boolean check()
@@ -75,7 +75,7 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
         // remove wiki by clicking the first delete link:
-        clickLinkWithImage("/_images/partdelete.gif", 0);
+        clickLinkWithImage("/_images/partdelete.png", 0);
         waitFor(new Checker()
         {
             public boolean check()
@@ -123,10 +123,12 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTrue("The LabKey test suite requires Firefox 2.0, 3.0, 3.5, or 3.6", source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0"));
 
         log("Test webpart buttons");
-        clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));
+        clickWebpartMenuItem("Messages", "Customize");
+        //clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));
         assertTextPresent("Customize");
         clickNavButton("Cancel");
-        clickAndWait(Locator.xpath("//a[contains(@class, 'labkey-header')]/../..[contains(@class, 'labkey-wp-header')]//th[contains(@class, 'labkey-wp-title-right')]//img[contains(@title, 'Move Down')]"), 0);
+        clickLinkWithImage(getContextPath() + "/_images/partdown.png", 0);
+        //clickAndWait(Locator.xpath("//a[contains(@class, 'labkey-header')]/../..[contains(@class, 'labkey-wp-header')]//th[contains(@class, 'labkey-wp-title-right')]//img[contains(@title, 'Move Down')]"), 0);
         waitFor(new Checker() {
             public boolean check()
             {
