@@ -53,6 +53,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         hideNavigationBar();
 
+        goToModule("Wiki"); // Not required prior to 11.1 -- not sure how
         createNewWikiPage("HTML");
         setFormElement("name", WIKI_PAGE_TITLE);
         setFormElement("title", WIKI_PAGE_TITLE);
@@ -61,7 +62,8 @@ public class MenuBarTest extends BaseSeleniumWebTest
         clickAdminMenuItem("Manage Project", "Project Settings");
         clickLinkWithText("Menu Bar");
 
-        clickLinkWithImage(getContextPath() + "/_images/partedit.gif");
+        log("Test wiki customization");
+        clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
         waitForElement(Locator.tagWithText("option", WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")"), 2000);
         selectOptionByText("name", WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")");
@@ -70,17 +72,16 @@ public class MenuBarTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
 
         //Make sure that the menus are shown, but the content is not yet loaded.
-        //sleep(3000);
         assertElementPresent(Locator.id("menuBarFolder"));
         assertElementPresent(Locator.menuBarItem("Assays"));
         assertElementPresent(Locator.menuBarItem("Studies"));
         assertElementPresent(Locator.menuBarItem(WIKI_PAGE_TITLE));
 
+        log("Assert wiki, assay, and study portals not loaded");
         assertTextNotPresent(WIKI_PAGE_CONTENT);
         assertNavButtonNotPresent("Manage Assays");
         assertTextNotPresent("No Studies Found");
 
-        assertTextNotPresent(WIKI_PAGE_CONTENT);
         mouseOver(Locator.menuBarItem("Wiki Menu"));
         waitForText(WIKI_PAGE_CONTENT, 3000);
         mouseOver(Locator.menuBarItem("Assays"));

@@ -60,7 +60,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("Check that Plain Text message works and is added everywhere");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("new message");
+        clickNavButton("New");
 
         // Check defaults for uncustomized message board
         assertTextNotPresent("Status");
@@ -86,7 +86,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         if (isFileUploadAvailable())
             assertTextPresent("common.properties");
         assertTextPresent(MSG1_BODY_FIRST);
-        clickLinkWithText("view list");
+        clickWebpartMenuItem("Messages", "View List");
         assertTextPresent(MSG1_TITLE);
         clickLinkWithText("Messages");
         clickLinkWithText(MSG1_TITLE);
@@ -101,7 +101,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("test customize");
         clickLinkWithText("Messages");
-        clickLinkWithText("customize");
+        clickWebpartMenuItem("Messages", "Customize");
         checkCheckbox("expires");
         clickNavButton("Save");
 

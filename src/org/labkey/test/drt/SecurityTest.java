@@ -93,18 +93,18 @@ public class SecurityTest extends BaseSeleniumWebTest
         exitPermissionsUI();
 
         addWebPart("Messages");
-        assertLinkPresentWithText("new message");
+        assertNavButtonPresent("New");
         pushLocation();
         signOut();
         popLocation();
         clickLinkWithText(PROJECT_NAME);
-        assertLinkNotPresentWithText("new message");
+        assertNavButtonNotPresent("New");
         signIn();
         clickLinkWithText(PROJECT_NAME);
-        assertLinkPresentWithText("new message");
+        assertNavButtonPresent("New");
         impersonate(NORMAL_USER);
         clickLinkWithText(PROJECT_NAME);
-        assertLinkPresentWithText("new message");
+        assertNavButtonPresent("New");
         stopImpersonating();
     }
 
