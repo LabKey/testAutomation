@@ -131,7 +131,16 @@ public class ExtHelper
     {
         test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * test.WAIT_FOR_JAVASCRIPT);
     }
-    
+
+    /**
+     * Used for directory refreshes or folder changes for the file webpart grid to be ready and initialized.
+     * @param test
+     */
+    public static void waitForFileGridReady(BaseSeleniumWebTest test)
+    {
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * test.WAIT_FOR_JAVASCRIPT);
+    }
+
     public static void selectAllFileBrowserFiles(BaseSeleniumWebTest test)
     {
         Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
