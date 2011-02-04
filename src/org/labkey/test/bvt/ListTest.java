@@ -577,21 +577,8 @@ public class ListTest extends BaseSeleniumWebTest
 
         doRenameFieldsTest();
         doUploadTest();
-        //customFormattingTest(); // TODO: Blocked by Issue 11435
+        customFormattingTest(); // TODO: Blocked by Issue 11435
         customizeURLTest();
-    }
-
-    private void customFormattingTest()
-    {
-        // assumes we are at the list designer after doUploadTest()
-        clickNavButton("Edit Design", 0);
-        click(Locator.name("ff_name3"));
-        click(Locator.xpath("//span[text()='Format']"));
-        clickNavButton("Add Conditional Format", 0);
-        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
-        setFormElement("value_1", "true");
-        clickNavButton("OK", 0);
-        // TODO: Blocked by Issue 11435
     }
 
     private void doUploadTest()
@@ -635,6 +622,62 @@ public class ListTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//tr[./td/div[text()='DateCol'] and ./td/div[text()='DateTime']]"));
     }
 
+    private void customFormattingTest()
+    {
+        // Assumes we are at the list designer after doUploadTest()
+        clickNavButton("Edit Design", 0);
+
+        // Set conditional format on boolean column. Bold, italic, strikethrough, cyan text, red background
+        click(Locator.name("ff_name3")); // BoolCol
+        click(Locator.xpath("//span[text()='Format']"));
+        clickNavButton("Add Conditional Format", 0);
+        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
+        setFormElement("value_1", "true");
+        click(Locator.id("filterPanelOKButton"));
+        checkCheckbox("Bold");
+        checkCheckbox("Italic");
+        checkCheckbox("Strikethrough");
+        click(Locator.xpath("//div[@title='Color']"));
+        setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Background']]//input"), "FF0000"); // Red background
+        setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Foreground']]//input"), "00FFFF"); // Cyan text
+        click(Locator.id("button_OK"));
+
+        // Set multiple conditional formats on int column.
+        click(Locator.name("ff_name4")); // IntCol
+        click(Locator.xpath("//span[text()='Format']"));
+        // If greater than 5, Bold
+        clickNavButton("Add Conditional Format", 0);
+        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
+        selectOptionByText("compare_1", "Is Greater Than");
+        setFormElement("value_1", "5");
+        click(Locator.id("filterPanelOKButton"));
+        checkCheckbox("Bold");
+        // If greater than 7, strikethrough
+        clickNavButton("Add Conditional Format", 0);
+        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
+        selectOptionByText("compare_1", "Is Greater Than");
+        setFormElement("value_1", "7");
+        click(Locator.id("filterPanelOKButton"));
+        // Switch the order of filters so that >7 takes precedence over >5
+        dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
+        checkCheckbox("Strikethrough");
+
+        clickNavButton("Save", 0);
+        waitAndClickNavButton("Done");
+
+        // Verify conditional format of boolean column
+        // look for cells that do not match the
+        assertTextPresent(TSV_LIST_NAME);
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'line-through'))]"));
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'bold'))]"));
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'italic'))]"));
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'color: rgb(0, 255, 255)'))]")); // Cyan text
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'background-color: rgb(255, 0, 0)'))]")); // Red background
+        assertElementNotPresent(Locator.xpath("//td[text() = 'false' and @style]")); // No style on false items
+        assertElementPresent(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]"));
+        assertElementPresent(Locator.xpath("//td[text()='8' and contains(@style, 'line-through')]"));
+
+    }
     private void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
