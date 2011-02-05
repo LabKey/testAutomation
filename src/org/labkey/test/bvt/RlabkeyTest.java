@@ -60,7 +60,7 @@ public class RlabkeyTest extends SimpleApiTest
         addWebPart("Issues List");
         clickNavButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
-        clickNavButton("Update Required Fields");
+        clickNavButton("Update");
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_0);
@@ -71,7 +71,7 @@ public class RlabkeyTest extends SimpleApiTest
         addWebPart("Issues List");
         clickNavButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
-        clickNavButton("Update Required Fields");
+        clickNavButton("Update");
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_1);

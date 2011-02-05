@@ -166,13 +166,13 @@ public class IssuesTest extends BaseSeleniumWebTest
         setText("string5", "MyFifthString");
         checkCheckbox("pickListColumns", "string1");
         checkCheckbox("pickListColumns", "string5");
-        clickNavButton("Update Custom Fields");
+        clickNavButton("Update");
 
         // UpdateRequiredFieldsAction
         checkCheckbox("requiredFields", "Milestone");
         checkCheckbox("requiredFields", "String4");
         checkCheckbox("requiredFields", "String5");
-        clickNavButton("Update Required Fields");
+        clickNavButton("Update");
 
         // AddKeywordAction
         setFormElement(Locator.formElement("addMilestone", "keyword"), "2012");
@@ -438,13 +438,11 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Admin");
         setFormElement("int1", "Contract Number");
         setFormElement("string1", "Customer Name");
-        clickNavButton("Update Custom Fields");
 
-        //setWorkingForm("requiredFieldsForm");
         for (String field : REQUIRED_FIELDS)
             checkRequiredField(field, true);
 
-        clickNavButton("Update Required Fields");
+        clickNavButton("Update");
         clickNavButton("Back to Issues");
         clickNavButton("Admin");
 
@@ -454,10 +452,9 @@ public class IssuesTest extends BaseSeleniumWebTest
             verifyFieldChecked(field);
             checkRequiredField(field, false);
         }
-        clickNavButton("Update Required Fields");
 
         checkRequiredField("Title", true);
-        clickNavButton("Update Required Fields");
+        clickNavButton("Update");
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
         clickNavButton("Submit");
