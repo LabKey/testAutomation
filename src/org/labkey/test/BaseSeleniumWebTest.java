@@ -1191,6 +1191,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         log("Starting memory leak check...");
         int leakCount = MAX_LEAK_LIMIT + 1;
+
         for (int attempt = 0; attempt < GC_ATTEMPT_LIMIT && leakCount > MAX_LEAK_LIMIT; attempt++)
         {
             if (attempt > 0)
@@ -1209,13 +1210,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             String leaks = selenium.getText(Locator.xpath("//table[@name = 'leaks']").toString());
             CRC32 crc = new CRC32();
             crc.update(leaks.getBytes());
-            if(leakCRC != crc.getValue())
+
+            if (leakCRC != crc.getValue())
             {
                 leakCRC = crc.getValue();
                 dumpHeap();
                 fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
             }
-            log("Found " + leakCount + " in-use objects.  They appear to be from the previous test.");
+
+            log("Found " + leakCount + " in-use objects.  They appear to be from a previous test.");
         }
         else
             log("Found " + leakCount + " in-use objects.  This is within the expected number of " + MAX_LEAK_LIMIT + ".");
@@ -1349,6 +1352,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
 		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
 			return;
+
         try
         {
             File threadDumpRequest = new File(getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
@@ -1358,10 +1362,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             log("Error dumping threads: " + e.getMessage());
         }
-        log("Timeout - Threads dumped to standard labkey log file");
+
+        log("Threads dumped to standard labkey log file");
     }
 
-    // Publish artifacts while the build is still in progrss:
+    // Publish artifacts while the build is still in progress:
     // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
     public void publishArtifact(File file)
     {
