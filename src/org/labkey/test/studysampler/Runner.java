@@ -20,10 +20,11 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import org.apache.commons.io.IOUtils;
 
 
 /**
@@ -49,14 +51,8 @@ import java.util.Set;
 public class Runner
 {
 
-    // List of participant IDs to include data for
-    static final Set<String> sampleIds = newStringSet(
-        /*
-
-        Insert list of participant IDs here.
-
-         */
-    );
+    // List of subject IDs to include data for
+    static Set<String> subjectIds;
 
     // the name of the field where the above id is found
     static final String idField = "id";
@@ -74,7 +70,8 @@ public class Runner
             "clinremark",
             "description",
             "inves",
-            "surgeon"
+            "surgeon",
+            "source"
     );
 
     static Random random = new Random();
@@ -101,9 +98,9 @@ public class Runner
 
         FillerFactory() throws IOException
         {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(Runner.class.getClassLoader().getResourceAsStream("words.txt")));
+            BufferedReader reader = new BufferedReader(new FileReader("words.txt"));
             words = new ArrayList<String>();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null)
             {
                 words.add(line);
@@ -127,15 +124,22 @@ public class Runner
 
     public static void main(String[] args) throws IOException
     {
-        if (args.length != 1)
+        if (args.length != 2)
         {
-            System.out.println("takes one argument, the filesystem path to the root of the study export you want to" +
-                    " sample from. If you are running with ant do:\n\nant studysampler -Dstudysampler.dir=/path/to/study");
+            System.out.println("takes two arguments, the filesystem path to the root of the study export you want to" +
+                    " sample from and the path to a file listing subjects who's data should be kept and anonymized. \n" +
+                    "Ant usage:\nant studysampler -Dstudysampler.dir=/path/to/study -Dstudysampler.subjectfile=/path/to/file.txt");
             return;
         }
-        String studyRoot = args[0];
+        File studyRoot = new File(args[0]);
+        File destStudyRoot = new File(studyRoot.getParent(), studyRoot.getName() + " Anon");
+        File subjectFile = new File(args[1]);
         System.out.println("Study directory: " + studyRoot);
+        System.out.println("Sample file: " + subjectFile);
 
+        loadSubjectList(subjectFile);
+
+        // Get a list of files to be transformed
         Set<File> targets = new HashSet<File>();
         targets.add(new File(studyRoot + "/lists/project.tsv"));
         for (File f : new File(studyRoot + "/datasets").listFiles())
@@ -144,12 +148,21 @@ public class Runner
                 targets.add(f);
         }
 
+        // Get a list of all other study files
+        Set<File> allFiles = new HashSet<File>();
+        for (File f : listFilesRecursive(studyRoot) )
+        {
+            if(!targets.contains(f))
+                allFiles.add(f);
+        }
+
         AliasFactory aliaser = new AliasFactory();
         FillerFactory filler = new FillerFactory();
 
         for (File inFile : targets)
         {
-            File outFile = new File(inFile.getAbsolutePath() + ".tmp");
+            File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
+            outFile.getParentFile().mkdirs();
             CSVReader reader = new CSVReader(new FileReader(inFile.getAbsolutePath()), '\t');
             CSVWriter writer = new CSVWriter(new FileWriter(outFile), '\t');
 
@@ -178,7 +191,7 @@ public class Runner
             while ((row = reader.readNext()) != null)
             {
                 read++;
-                if (idPosition != null && !sampleIds.contains(row[idPosition]))
+                if (idPosition != null && !subjectIds.contains(row[idPosition]))
                     continue;
 
                 for (Integer aliasPos : aliasPositions)
@@ -196,14 +209,54 @@ public class Runner
 
             writer.close();
             reader.close();
-            outFile.renameTo(inFile);
 
-            System.out.println("wrote " + wrote + " of " + read + " records in " + inFile);
-
+            System.out.println("wrote " + wrote + " of " + read + " records from " + inFile + " to " + outFile);
         }
 
+        for (File inFile : allFiles)
+        {
+            File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
+            outFile.getParentFile().mkdirs();
+
+            FileInputStream input = new FileInputStream(inFile);
+            FileOutputStream output = new FileOutputStream(outFile);
+
+            int bytes = IOUtils.copy(input,output);
+
+            output.close();
+            input.close();
+
+            System.out.println("wrote " + bytes + " bytes from " + inFile + " to " + outFile);
+        }
     }
 
+    static void loadSubjectList(File subjectListFile) throws IOException
+    {
+        BufferedReader reader;
+        String line;
+        subjectIds = newStringSet();
+
+        reader = new BufferedReader(new FileReader(subjectListFile));
+        while((line = reader.readLine()) != null){
+            subjectIds.add(line);
+        }
+
+        reader.close();
+    }
+
+    static ArrayList<File> listFilesRecursive(File path)
+    {
+        File[] files = path.listFiles();
+        ArrayList<File> allFiles = new ArrayList<File>();
+        for (File file : files)
+        {
+            if ( file.isDirectory() )
+                allFiles.addAll(listFilesRecursive(file));
+            else // file.isFile()
+                allFiles.add(file);
+        }
+        return allFiles;
+    }
 
     static Set<String> newStringSet(String... strings)
     {
