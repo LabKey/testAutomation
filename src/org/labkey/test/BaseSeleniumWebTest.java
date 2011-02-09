@@ -2392,14 +2392,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    /** Find a link with the exact text specified, clicks it, and waits for the page to load */
+    /** Find a link with the exact text specified, click it, and wait for the page to load */
     public void clickLinkWithText(String text)
     {
         assertLinkPresentWithText(text);
         clickLinkWithText(text, true);
     }
 
-    /** Find a nth link with the exact text specified, clicks it, and waits for the page to load */
+    /** Find nth link with the exact text specified, click it, and wait for the page to load */
     public void clickLinkWithText(String text, int index)
     {
         Locator l = Locator.linkWithText(text, index);
@@ -2407,28 +2407,31 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, defaultWaitForPage);
     }
 
-    /** Find a link with the exact text specified, clicks it, optionally waiting for the page to load */
+    /** Find a link with the exact text specified and click it, optionally waiting for the page to load */
     public void clickLinkWithText(String text, boolean wait)
     {
         clickLinkWithText(text, 0, wait);
     }
 
-    /** Find a nth link with the exact text specified, clicks it, optionally waiting for the page to load */
+    /** Find nth link with the exact text specified and click it, optionally waiting for the page to load */
     public void clickLinkWithText(String text, int index, boolean wait)
+    {
+        clickLinkWithText(text, index, wait ? defaultWaitForPage: 0);
+    }
+
+    /** Find nth link with the exact text specified, click it, and wait up to millis for the page to load */
+    public void clickLinkWithText(String text, int index, int millis)
     {
         log("Clicking link with text '" + text + "'");
         Locator l;
 
-        if(index > 0)
+        if (index > 0)
             l = Locator.linkWithText(text, index);
         else
             l = Locator.linkWithText(text);
 
         assertElementPresent(l);
-        if (wait)
-            clickAndWait(l, defaultWaitForPage);
-        else
-            clickAndWait(l, 0);
+        clickAndWait(l, millis);
     }
 
     public void clickLinkContainingText(String text)
@@ -2444,7 +2447,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickLinkContainingText(String text, int index, boolean wait)
     {
         log("Clicking link " + index + " containing text: " + text);
-        Locator l  = Locator.linkContainingText(text, index);
+        Locator l = Locator.linkContainingText(text, index);
         if ( wait )
             clickAndWait(l, defaultWaitForPage);
         else
@@ -3038,7 +3041,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
 
     /**
-     *  wait for element, clickit, return immediately
+     *  wait for element, click it, return immediately
      */
     public void waitAndClick(Locator l)
     {
