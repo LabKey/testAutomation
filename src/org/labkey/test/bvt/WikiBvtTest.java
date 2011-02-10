@@ -156,7 +156,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         searchFor(PROJECT_NAME, "Wiki", 3, WIKI_PAGE3_NAME_TITLE);
 
         log("test edit");
-        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Edit");
+        clickLinkWithText("Edit");
         setFormElement("title", WIKI_PAGE3_ALTTITLE);
         String wikiPage3ContentEdited =
             "<b>Some HTML content</b><br>\n" +
@@ -166,19 +166,19 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         saveWikiPage();
 
         assertTextPresent("More HTML content");
-        clickWebpartMenuItem(WIKI_PAGE3_ALTTITLE, "Edit");
+        clickLinkWithText("Edit");
         setWikiBody(WIKI_PAGE3_CONTENT_NO_QUERY);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         saveWikiPage();
 
         log("test change renderer type");
         assertTextPresent("Some HTML content");
-        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Edit");
+        clickLinkWithText("Edit");
         changeFormat("TEXT_WITH_LINKS");
         saveWikiPage();
 
         assertTextPresent("<b>");
-        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Edit");
+        clickLinkWithText("Edit");
         changeFormat("HTML");
         saveWikiPage();
 
@@ -195,13 +195,13 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check sibling order edit works");
         clickLinkWithText(WIKI_PAGE1_TITLE);
-        clickWebpartMenuItem(WIKI_PAGE1_TITLE, "Manage");
+        clickLinkWithText("Manage");
         clickNavButton("Move Down", 0);
         clickNavButton("Save");
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         clickLinkWithText("next");
         assertTextPresent("normal normal normal");
-        clickWebpartMenuItem(WIKI_PAGE1_TITLE, "Manage");
+        clickLinkWithText("Manage");
         clickNavButton("Move Up", 0);
         clickNavButton("Save");
         clickLinkWithText("next");
@@ -209,7 +209,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("Check parent reset works");
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
-        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "Manage");
+        clickLinkWithText("Manage");
         selectOptionByText("parent", WIKI_PAGE1_TITLE + " (" + WIKI_PAGE1_NAME + ")");
         waitForPageToLoad();
         clickNavButton("Save");
@@ -254,7 +254,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextNotPresent("Home");
         assertLinkPresentWithText(PROJECT_NAME);
 
-        clickWebpartMenuItem(WIKI_NAVTREE_TITLE, "Edit");
+        clickLinkWithText("Edit");
         setWikiBody(NAVBAR2_CONTENT);
         saveWikiPage();
         assertLinkPresentWithText("Projects");
@@ -262,7 +262,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("Manage Site");
 
         //test deleting via edit page
-        clickWebpartMenuItem(WIKI_NAVTREE_TITLE, "Edit");
+        clickLinkWithText("Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         assertLinkPresentWithText("Home");
@@ -275,7 +275,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         assertTextPresent(HEADER_CONTENT);
-        clickWebpartMenuItem("Header", "Edit");
+        clickLinkWithText("Edit", 0);
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent(HEADER_CONTENT);
@@ -284,7 +284,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
 
         log("test versions");
-        clickWebpartMenuItem(WIKI_PAGE3_NAME_TITLE, "History");
+        clickLinkWithText("History");
         clickLinkWithText("2");
         clickNavButton("Make Current");
         assertTextPresent("6");
@@ -313,7 +313,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickNavButton("Agree");
 
         clickTab("Wiki");
-        clickWebpartMenuItem(WIKI_TERMS_TITLE, "Edit");
+        clickLinkWithText("Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent(WIKI_TERMS_TITLE);
@@ -479,7 +479,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         log("test delete");
         clickLinkWithText(WIKI_PAGE2_TITLE);
-        clickWebpartMenuItem(WIKI_PAGE2_TITLE, "Edit");
+        clickLinkWithText("Edit");
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         clickLinkWithText(WIKI_PAGE1_TITLE);

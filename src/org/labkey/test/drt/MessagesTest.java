@@ -101,7 +101,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("test customize");
         clickLinkWithText("Messages");
-        clickWebpartMenuItem("Messages", "Customize");
+        clickLinkWithText("Customize");
         checkCheckbox("expires");
         clickNavButton("Save");
 

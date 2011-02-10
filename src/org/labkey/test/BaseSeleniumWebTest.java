@@ -580,7 +580,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void hideNavigationBar()
     {
-        clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
+        clickAndWait(Locator.xpath("//a/span[text() = 'Admin']"), 0);
         waitForElement(Locator.tagContainingText("span", "Navigation Bar"), 1000);
         if (isElementPresent(Locator.tagContainingText("span", "Hide Navigation Bar")))
             clickAndWait(Locator.tagContainingText("span", "Hide Navigation Bar"));
@@ -594,7 +594,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickWebpartMenuItem(String... items)
     {
         clickAndWait(Locator.xpath("//img[@id='more-" + items[0].toLowerCase() + "']"), 0);
-        //clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = '" + items[0] + "']"), 0);
         Locator parentLocator;
         for (int i = 1; i < items.length; i++)
         {
@@ -609,7 +608,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     
     public void clickAdminMenuItem(String... items)
     {
-        clickAndWait(Locator.xpath("//a[@class='labkey-header']/span[text() = 'Admin']"), 0);
+        clickAndWait(Locator.xpath("//a/span[text() = 'Admin']"), 0);
         for (int i = 0; i < items.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(items[i]);

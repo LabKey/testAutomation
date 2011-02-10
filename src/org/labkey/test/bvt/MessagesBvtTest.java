@@ -225,7 +225,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickNavButton("Respond");
         submit();
         clickLinkWithText("Messages");
-        clickWebpartMenuItem("Messages", "Customize");
+        clickLinkWithText("Customize");
         checkRadioButton("sortOrderIndex", 1);
         clickNavButton("Save");
         clickLinkWithText("view message or respond");
@@ -233,7 +233,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
 
         log("Edit other customize options");
         clickLinkWithText("Messages");
-        clickWebpartMenuItem("Messages", "Customize");
+        clickLinkWithText("Customize");
         uncheckCheckbox("titleEditable");
         checkCheckbox("memberList");
         checkCheckbox("status");
