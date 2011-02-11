@@ -452,7 +452,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
 
         clickLinkWithText(TEST_ASSAY);
-        click(Locator.linkWithText("manage assay design >>"));
+        click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");

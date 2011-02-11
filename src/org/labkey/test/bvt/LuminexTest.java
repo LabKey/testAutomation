@@ -262,7 +262,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
-        click(Locator.linkWithText("manage assay design >>"));
+        click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 

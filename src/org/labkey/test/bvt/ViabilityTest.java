@@ -243,7 +243,7 @@ public class ViabilityTest extends AbstractQCAssayTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(ASSAY_NAME);
-        click(Locator.linkWithText("manage assay design >>"));
+        click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design", false);
         getConfirmationAndWait();
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
@@ -314,7 +314,7 @@ public class ViabilityTest extends AbstractQCAssayTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(ASSAY_NAME);
-        click(Locator.linkWithText("manage assay design >>"));
+        click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design", false);
         getConfirmationAndWait();
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
