@@ -4855,6 +4855,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void selectImportDataAction(String actionName)
     {
+        sleep(100);
         ExtHelper.waitForFileGridReady(this);
         ExtHelper.waitForImportDataEnabled(this);
         clickNavButton("Import Data", 0);

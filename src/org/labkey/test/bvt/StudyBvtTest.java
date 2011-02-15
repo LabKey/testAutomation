@@ -607,8 +607,11 @@ public class StudyBvtTest extends StudyManualTest
         setFormElement("uploadFormElement", datasetFile);
 
         waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_JAVASCRIPT);
-        selectOptionByValue(Locator.xpath("//select[@name='MouseId']"), "name");
-        selectOptionByValue(Locator.xpath("//select[@name='Sequence Num']"), "visit number");
+
+        Locator.XPathLocator mouseId = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='MouseId:']/../div/div");
+        ExtHelper.selectGWTComboBoxItem(this, mouseId, "name");
+        Locator.XPathLocator sequenceNum = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='Sequence Num:']/../div/div");
+        ExtHelper.selectGWTComboBoxItem(this, sequenceNum, "visit number");
 
         waitAndClickNavButton("Import");
         waitForPageToLoad();

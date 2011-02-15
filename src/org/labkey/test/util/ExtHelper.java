@@ -160,6 +160,16 @@ public class ExtHelper
         test.mouseDown(Locator.xpath("/html/body"));
     }
 
+    public static void selectGWTComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
+    {
+        test.click(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-trigger-arrow')]"));
+        test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
+        Locator option = Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']");
+
+        test.mouseDown(option);
+        test.mouseDown(Locator.xpath("/html/body"));
+    }
 
     public static void closeExtTab(BaseSeleniumWebTest test, String tabName)
     {
