@@ -19,6 +19,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
+
+import javax.print.attribute.standard.DateTimeAtCompleted;
 
 
 /**
@@ -57,11 +60,17 @@ public class Runner
     // the name of the field where the above id is found
     static final String idField = "id";
 
+    // the name of the field where snomed codes are found
+    static final String snomedField = "code";
+
     // list of field names where the values should be aliased to something new
     static final Set<String> aliasFields = newStringSet(
             idField,
             "project",
-            "account"
+            "account",
+            "dam",
+            "sire",
+            "userid"
     );
 
     // list of field names that should be overwritten with filler content
@@ -69,9 +78,27 @@ public class Runner
             "remark",
             "clinremark",
             "description",
-            "inves",
             "surgeon",
-            "source"
+            "source",
+            "room",
+            "cage",
+            "roomcage",
+            //protocol.tsv
+            "inves",
+            //blood draws (1008)
+            "done_by",
+            "done_for",
+            //necropsies (1022)
+            "pathologist",
+            "assistant",
+            "caseno",
+            //departure (1013)
+            "destination",
+            "authorize",
+            //demographics (1012)
+            "origin",
+            //rhesaux.tsv
+            "name"
     );
 
     static Random random = new Random();
@@ -124,6 +151,8 @@ public class Runner
 
     public static void main(String[] args) throws IOException
     {
+        long startTime = System.currentTimeMillis();
+
         if (args.length != 2)
         {
             System.out.println("takes two arguments, the filesystem path to the root of the study export you want to" +
@@ -139,27 +168,46 @@ public class Runner
 
         loadSubjectList(subjectFile);
 
-        // Get a list of files to be transformed
-        Set<File> targets = new HashSet<File>();
-        targets.add(new File(studyRoot + "/lists/project.tsv"));
-        for (File f : new File(studyRoot + "/datasets").listFiles())
+        // List of lists to be skipped
+        Set<File> clearTargets = new HashSet<File>();
+        clearTargets.add(new File(studyRoot + "/lists/deleted_records.tsv")); // contains scattered subject ids
+
+        // Get a set of lists to be minimized
+        Set<File> minimizeTargets = new HashSet<File>();
+        for (File f : new File(studyRoot + "/lists").listFiles())
         {
-            if (f.getName().endsWith("tsv"))
-                targets.add(f);
+            if (!clearTargets.contains(f) && f.getName().contains("snomed"))
+                minimizeTargets.add(f);
         }
 
-        // Get a list of all other study files
+        // Get a set of files to be transformed
+        Set<File> anonymizeTargets = new HashSet<File>();
+        for (File f : new File(studyRoot + "/datasets").listFiles())
+        {
+            if (f.getName().endsWith("tsv") && !minimizeTargets.contains(f) && !clearTargets.contains(f))
+                anonymizeTargets.add(f);
+        }
+        for (File f : new File(studyRoot + "/lists").listFiles())
+        {
+            if (f.getName().endsWith("tsv") && !minimizeTargets.contains(f) && !clearTargets.contains(f))
+                anonymizeTargets.add(f);
+        }
+
+        // Get a set of all other study files
         Set<File> allFiles = new HashSet<File>();
         for (File f : listFilesRecursive(studyRoot) )
         {
-            if(!targets.contains(f))
+            if(!anonymizeTargets.contains(f) && !minimizeTargets.contains(f) && !clearTargets.contains(f))
                 allFiles.add(f);
         }
 
         AliasFactory aliaser = new AliasFactory();
         FillerFactory filler = new FillerFactory();
+        ArrayList<String> usedSnomeds = new ArrayList<String>();
 
-        for (File inFile : targets)
+        System.out.println("\nAnonymize lists and datasets");
+
+        for (File inFile : anonymizeTargets)
         {
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
@@ -171,6 +219,7 @@ public class Runner
             writer.writeNext(row);
 
             Integer idPosition = null;
+            Integer snomedPosition = null;
             Set<Integer> wipePositions = new HashSet<Integer>();
             Set<Integer> aliasPositions = new HashSet<Integer>();
 
@@ -181,6 +230,8 @@ public class Runner
 
                 if (idField.equals(row[i].toLowerCase()))
                     idPosition = i;
+                if (snomedField.equals(row[i].toLowerCase()))
+                    snomedPosition = i;
                 else if (wipeFields.contains(row[i].toLowerCase()))
                     wipePositions.add(i);
             }
@@ -203,6 +254,9 @@ public class Runner
                     if (!row[wipePos].isEmpty())
                         row[wipePos] = filler.get(row[wipePos].length());
 
+                if (snomedPosition != null)
+                    usedSnomeds.add(row[snomedPosition]);
+
                 writer.writeNext(row);
                 wrote++;
             }
@@ -213,6 +267,66 @@ public class Runner
             System.out.println("wrote " + wrote + " of " + read + " records from " + inFile + " to " + outFile);
         }
 
+        System.out.println("\nPrune snomed lists");
+        for(File inFile : minimizeTargets)
+        {
+            File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
+            outFile.getParentFile().mkdirs();
+
+            CSVReader reader = new CSVReader(new FileReader(inFile.getAbsolutePath()), '\t');
+            CSVWriter writer = new CSVWriter(new FileWriter(outFile), '\t');
+
+            // read (and write) the field names.
+            String[] row = reader.readNext();
+            writer.writeNext(row);
+
+            Integer snomedPosition = null;
+
+            for (int i = 0; i < row.length; i++)
+            {
+                if (snomedField.equals(row[i].toLowerCase()))
+                    snomedPosition = i;
+            }
+
+            int read = 0;
+            int wrote = 0;
+
+            while ((row = reader.readNext()) != null)
+            {
+                read++;
+                if (usedSnomeds.contains(row[snomedPosition]))
+                {
+                    writer.writeNext(row);
+                    wrote++;
+                }
+            }
+
+            writer.close();
+            reader.close();
+
+            System.out.println("wrote " + wrote + " of " + read + " records from " + inFile + " to " + outFile);
+        }
+
+        System.out.println("\nCreate empty files.");
+        for (File inFile : clearTargets)
+        {
+            File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
+            outFile.getParentFile().mkdirs();
+
+            BufferedReader input = new BufferedReader(new FileReader(inFile));
+            BufferedWriter output = new BufferedWriter(new FileWriter(outFile));
+
+            //Copy column headers only.
+            String line = input.readLine();
+            output.write(line);
+
+            output.close();
+            input.close();
+
+            System.out.println("wrote " + outFile.length() + " bytes from " + inFile + " to " + outFile);
+        }
+
+        System.out.println("\nCopy remaining study files");
         for (File inFile : allFiles)
         {
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
@@ -228,6 +342,8 @@ public class Runner
 
             System.out.println("wrote " + bytes + " bytes from " + inFile + " to " + outFile);
         }
+
+        System.out.println("Elapsed: " + (int)((System.currentTimeMillis() - startTime)/1000) + " seconds.");
     }
 
     static void loadSubjectList(File subjectListFile) throws IOException
