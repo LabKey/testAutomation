@@ -50,6 +50,8 @@ public class AssayTransform extends AbstractAssayValidator
                 runLuminexTest();
             else if ("Viability".equalsIgnoreCase(type))
                 runViabilityTest();
+            else if ("ELISpot".equalsIgnoreCase(type))
+                runElispotTest();
             else
                 throw new IllegalArgumentException("Test does not exist for assay type: " + type);
         }
@@ -296,6 +298,70 @@ public class AssayTransform extends AbstractAssayValidator
                             {
                                 if ("SpecimenIDs".equalsIgnoreCase(entry.getKey()))
                                     sb.append("Transformed");
+                                else
+                                {
+                                    String value = entry.getValue();
+                                    if (value != null)
+                                        sb.append(value);
+                                }
+                            }
+                            delim = "\t";
+                        }
+                        header = false;
+                        sb.append('\n');
+                        pw.write(sb.toString());
+                    }
+                }
+                finally
+                {
+                    pw.close();
+                }
+            }
+            else
+                writeError("Unable to locate the runDataFile", "runDataFile");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void runElispotTest()
+    {
+        try {
+            if (getRunProperties().containsKey(Props.runDataFile.name()))
+            {
+                String runDataFile = getRunProperties().get(Props.runDataFile.name());
+                List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
+                File transformFile = new File(getTransformFile().get(runDataFile));
+
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
+
+                try {
+                    // transform the spot count column
+                    StringBuilder sb = new StringBuilder();
+                    boolean header = true;
+
+                    // transform the data, adding a new column
+                    for (Map<String, String> row : dataMap)
+                    {
+                        if (header)
+                            row.put("CustomElispotColumn", "CustomElispotColumn");
+                        else
+                            row.put("CustomElispotColumn", "transformed!");
+
+                        sb.setLength(0);
+                        String delim = "";
+
+                        for (Map.Entry<String, String> entry : row.entrySet())
+                        {
+                            sb.append(delim);
+                            if (header)
+                                sb.append(entry.getValue());
+                            else
+                            {
+                                if ("SpotCount".equalsIgnoreCase(entry.getKey()))
+                                    sb.append("747.7");
                                 else
                                 {
                                     String value = entry.getValue();
