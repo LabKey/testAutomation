@@ -153,7 +153,6 @@
             <include name="log4j-1.2.16.jar" />
             <include name="commons-logging-1.1.jar" />
             <include name="xbean.jar" />
-            <include name="opencsv-2.0.jar"/>
         </fileset>
         <fileset dir="${javaclientjar.dir}">
             <include name="labkey-client-api-${product.version}.jar"/>
