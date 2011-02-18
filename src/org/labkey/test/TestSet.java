@@ -111,6 +111,7 @@ public enum TestSet
         SearchTest.class,
         WorkbookTest.class,
         CustomizeViewTest.class,
+        ElispotAssayTest.class
     }),
 
     Cluster(new Class[]
