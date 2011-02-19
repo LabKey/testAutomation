@@ -1,9 +1,16 @@
 * text=auto !eol
 /bootstrap_stress_test.cmd -text
 /build.xml -text
+data/api/assayTest.js -text
+data/api/chartTest.js -text
+data/api/domainTest.js -text
+data/api/gridTest.js -text
 data/api/http-api.xml -text
+data/api/lineChartTest.js -text
+data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
 data/api/security-api.xml -text
+data/api/webPartTest.js -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
 modules/simpletest/queries/lists/People.js -text

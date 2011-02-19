@@ -1,10 +1,16 @@
 package org.labkey.test.bvt;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.apache.commons.lang.StringUtils;
+
+import java.net.URLEncoder;
 
 /**
  * Copyright (c) 2008-2011 LabKey Corporation
@@ -71,355 +77,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private static final String GRIDTEST_GRIDTITLE = "ClientAPITest Grid Title";
 
     private static final int PAGE_SIZE = 4;
-    private static final String GRIDTEST_SRC =
-                "// create new grid over a list named 'People'\n" +
-                "window.gridView = new LABKEY.ext.EditorGridPanel({\n" +
-                        "    store: new LABKEY.ext.Store({\n" +
-                        "       schemaName : 'lists',\n" +
-                        "       queryName : 'People',\n" +
-                        "       sort: 'LastName'}),\n" +
-                        "    renderTo : '" + TEST_DIV_NAME + "',\n" +
-                        "    editable : true,\n" +
-                        "    enableFilters : true,\n" +
-                        "    title :'" + GRIDTEST_GRIDTITLE + "',\n" +
-                        "    autoHeight : true,\n" +
-                        "    width: 800,\n" +
-                        "    pageSize: " + PAGE_SIZE + "\n" +
-                        "});\n";
-
-    private static final String CHARTTEST_SRC = "var chartConfig = {\n" +
-            "    queryName: 'People',\n" +
-            "    schemaName: 'lists',\n" +
-            "    chartType: LABKEY.Chart.XY,\n" +
-            "    columnXName: 'Key',\n" +
-            "    columnYName: ['Age'],\n" +
-            "    renderTo: '" + TEST_DIV_NAME + "'\n" +
-            "};\n" +
-            "var chart = new LABKEY.Chart(chartConfig);\n" +
-            "chart.render();";
-
-    private static final String WEBPARTTEST_SRC =
-            "var renderer = new LABKEY.WebPart({partName: 'query',\n" +
-                    "renderTo: '" + TEST_DIV_NAME + "',\n"+
-                    "partConfig: {\n" +
-                    "        title: 'Webpart Title',\n" +
-                    "        schemaName: 'lists',\n" +
-                    "        queryName: 'People'\n" +
-                    "    }});\n" +
-                    "renderer.render();";
-
-    private static final String ASSAYTEST_SRC =
-            "function renderer(assayArray)\n" +
-            "{\n" +
-            "    var html = '';\n" +
-            "    for (var defIndex = 0; defIndex  < assayArray.length; defIndex ++)\n" +
-            "    {\n" +
-            "\tvar definition = assayArray[defIndex ];\n" +
-            "\thtml += '<b>' + definition.type + '</b>: ' + definition.name + '<br>';\n" +
-            "        for (var domain in definition.domains)\n" +
-            "        {\n" +
-            "            html += '&nbsp;&nbsp;&nbsp;' + domain + '<br>';\n" +
-            "            var properties = definition.domains[domain];\n" +
-            "            for (var propertyIndex = 0; propertyIndex < properties.length; propertyIndex++)\n" +
-            "            {\n" +
-            "                var property = properties[propertyIndex];\n" +
-            "                html += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +\n" +
-            "                         property.name + ' - ' + property.typeName + '<br>';\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n" +
-            "    document.getElementById('" + TEST_DIV_NAME + "').innerHTML = html;\n" +
-            "}\n" +
-            "\n" +
-            "function errorHandler(error)\n" +
-            "{\n" +
-            "    alert('An error occurred retrieving data.');\n" +
-            "}\n" +
-            "\n" +
-            "LABKEY.Assay.getAll(renderer, errorHandler);";
-
-    private static final String QUERYTEST_SRC =
-            "var schemaName = 'lists';\n" +
-            "var queryName = 'People';\n" +
-            "\n" +
-            "var testResults = [];\n" +
-            "var testFunctions = [\n" +
-            "    function() //testResults[0]\n" +
-            "    {\n" +
-            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler);\n" +
-            "    },\n" +
-            "    \n" +
-            "\n" +
-            "    function() //testResults[1]\n" +
-            "    {\n" +
-            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('FirstName', 'Norbert') ]);\n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[2]\n" +
-            "    {\n" +
-            "        // get the result from the single-row select call:\n" +
-            "        var prevRowset = testResults[1].rows;\n" +
-            "        var rowCopy = {};\n" +
-            "        for (var prop in prevRowset[0])\n" +
-            "            rowCopy[prop] = prevRowset[0][prop];\n" +
-            "        rowCopy.LastName = null;\n" +
-            "        rowCopy.Age = 99;\n" +
-            "        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        \n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[3]\n" +
-            "    {\n" +
-            "        // get the result from the single-row select call:\n" +
-            "        var prevRowset = testResults[1].rows;\n" +
-            "        var rowCopy = {};\n" +
-            "        for (var prop in prevRowset[0])\n" +
-            "            rowCopy[prop] = prevRowset[0][prop];\n" +
-            "        rowCopy.Age = 99;\n" +
-            "        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        \n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[4]\n" +
-            "    {\n" +
-            "        // get the result from the single-row select call:\n" +
-            "        var prevRowset = testResults[1].rows;\n" +
-            "        LABKEY.Query.deleteRows(schemaName, queryName, prevRowset, successHandler, failureHandler);        \n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[5]\n" +
-            "    {\n" +
-            "        // get the result from the single-row select call:\n" +
-            "        var prevRowset = testResults[1].rows;\n" +
-            "        LABKEY.Query.insertRows(schemaName, queryName, prevRowset, successHandler, failureHandler);        \n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[6]\n" +
-            "    {\n" +
-            "        // get the result from the single-row select call:\n" +
-            "        var missingLastName = [ { FirstName: 'Herbert', Age: 100 } ];\n" +
-            "        LABKEY.Query.insertRows(schemaName, queryName, missingLastName, successHandler, failureHandler);\n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[7]\n" +
-            "    {\n" +
-            "        LABKEY.Query.selectRows(schemaName + '-badname', queryName, successHandler, failureHandler);\n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[8]\n" +
-            "    {\n" +
-            "        LABKEY.Query.executeSql({schemaName: 'lists', " +
-                    "sort: 'Age', " +
-                    "sql: 'select People.age from People', " +
-                    "successCallback: successHandler, errorCallback: failureHandler});\n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[9]\n" +
-            "    {\n" +
-            "        LABKEY.Query.executeSql({\n" +
-            "            schemaName:'lists',\n" +
-            "            sql: 'select "+SUBFOLDER_LIST+".FirstName from Project.\""+FOLDER_NAME+"/" + SUBFOLDER_NAME +"/\".lists."+SUBFOLDER_LIST+"',\n" +
-            "            successCallback: successHandler,\n" +
-            "            errorCallback: failureHandler\n" +
-            "        });\n" +
-            "    },\n" +
-            "\n" +
-            "    function() //testResults[10]\n" +
-            "    {\n" +
-            "        LABKEY.Query.executeSql({\n" +
-            "            schemaName:'lists',\n" +
-            "            sql: 'select "+ OTHER_PROJECT_LIST +".FirstName from \"/"+OTHER_PROJECT+"\".lists."+ OTHER_PROJECT_LIST +"',\n" +
-            "            successCallback: successHandler,\n" +
-            "            errorCallback: failureHandler\n" +
-            "        });\n" +
-            "    },\n" +
-            "\n" +
-            "// Test QUERY.saveRows (transacted)\n" +
-            "    function() //testResults[11]\n" +
-            "    {\n" +
-            "        var peopleRowset = testResults[0].rows;\n" +
-            "        peopleRowset[0].Age = -1;\n" +
-            "        peopleRowset[1].Age = -1;\n" +
-            "        LABKEY.Query.saveRows({\n" +
-            "            commands:[\n" +
-            "                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[0]]},\n" +
-            "                {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[1]]},\n" +
-            "                {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[2]]},\n" +
-            "                {schemaName:schemaName, queryName:'noSuchQuery', command:'insert', rows:[peopleRowset[0]]}\n" +
-            "            ],\n" +
-            "            successCallback: successHandler,\n" +
-            "            errorCallback: failureHandler,\n" +
-            "        });\n" +
-            "    },\n" +
-            "\n" +
-            "// Test QUERY.saveRows (not transacted)\n" +
-            "    function() //testResults[12]\n" +
-            "    {\n" +
-            "        var peopleRowset = testResults[0].rows;\n" +
-            "        peopleRowset[3].Age = 101;\n" +
-            "        peopleRowset[5].Age = 101;\n" +
-            "        peopleRowset[6].Age = -1;\n" +
-            "        LABKEY.Query.saveRows({\n" +
-            "            commands:[\n" +
-            "                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[3]]},\n" +
-            "                {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[5]]},\n" +
-            "                {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[6]]},\n" +
-            "                {schemaName:'noSuchSchema', queryName:queryName, command:'insert', rows:[peopleRowset[6]]},\n" +
-            "                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[6]]}\n" +
-            "            ],\n" +
-            "            successCallback: successHandler,\n" +
-            "            errorCallback: failureHandler,\n" +
-            "            transacted: false\n" +
-            "        });\n" +
-            "    },\n" +
-            "\n" +
-            "// Verify QUERY.saveRows operations\n" +
-            "    function() //testResults[13]\n" +
-            "    { // Check that successful inserts/updates occurred (Age: 101) and unsuccessful deletes did not (Age: 17)\n" +
-            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '101;17', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);\n" +
-            "    },\n" +
-            "\n" +
-            "// Verify QUERY.saveRows operations\n" +
-            "    function() //testResults[14]\n" +
-            "    { // Check that failed inserts/updates did not occur (Age: -1) and successful deletes did (Age: 88)\n" +
-            "        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '-1;88', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);\n" +
-            "    },\n" +
-            "\n" +
-            "    // last function sets the contents of the results div.\n" +
-            "    function()\n" +
-            "    {\n" +
-            "        var html = '';\n" +
-            "        if (testResults[0].rowCount == 7)\n" +
-            "            html += 'SUCCESS: Select 1 returned 7 rows<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Select 1 returned ' + testResults[0].rowCount + ' rows, expected 7.  Error value = ' + testResults[0].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[1].rowCount == 1)\n" +
-            "            html += 'SUCCESS: Select 2 returned 1 rows<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Select 2 returned ' + testResults[1].rowCount + ' rows, expected 1.  Error value = ' + testResults[1].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[2].exception)\n" +
-            "            html += 'SUCCESS: Bad update generated exception: ' + testResults[2].exception + '<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Bad update did not generate expected exception.<br>';\n" +
-            "\n" +
-            "        if (testResults[3].rowsAffected == 1)\n" +
-            "            html += 'SUCCESS: Update affected 1 rows<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[4].rowsAffected == 1)\n" +
-            "            html += 'SUCCESS: Delete affected 1 rows<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Delete affected ' + testResults[4].rowCount + ' rows, expected 1.  Error value = ' + testResults[4].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[5].rowsAffected == 1)\n" +
-            "            html += 'SUCCESS: Insert created 1 rows<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Insert created ' + testResults[5].rowCount + ' rows, expected 1.  Error value = ' + testResults[5].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[6].exception)\n" +
-            "            html += 'SUCCESS: Bad insert generated exception: ' + testResults[6].exception + '<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Bad insert did not generate expected exception.<br>';\n" +
-            "\n" +
-            "        if (testResults[7].exception)\n" +
-            "            html += 'SUCCESS: Bad query generated exception: ' + testResults[7].exception + '<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Bad query did not generate expected exception.<br>';\n" +
-            "\n" +
-            "        if (testResults[8].rowCount == 7)\n" +
-            "            html += 'SUCCESS: executeSql returned 7 rows<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[8].rows[1].age < testResults[8].rows[2].age)\n" +
-            "            html += 'SUCCESS: executeSql returned properly sorted<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '<br>';\n" +
-            "\n" +
-            "        if (testResults[9].rowCount == 7)\n" +
-            "            html += 'SUCCESS: cross-folder executeSql succeeded<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: executeSql returned ' + testResults[9].rowCount + ' rows, expected 7.  Error value = ' + testResults[9].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[10].rowCount == 7)\n" +
-            "            html += 'SUCCESS: cross-project executeSql succeeded<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: executeSql returned ' + testResults[10].rowCount + ' rows, expected 7.  Error value = ' + testResults[10].exception + '<br>';\n" +
-            "\n" +
-            "        if (testResults[11].exception)\n" +
-            "            html += 'SUCCESS: Bad saveRows exception: ' + testResults[11].exception + '<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Bad saveRows did not generate an exception.<br>';\n" +
-            "\n" +
-            "        if (testResults[12].exception)\n" +
-            "            html += 'SUCCESS: Bad saveRows exception: ' + testResults[12].exception + '<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Bad saveRows did not generate an exception.<br>';\n" +
-            "\n" +
-            "        if (testResults[13].rowCount == 3)\n" +
-            "            html += 'SUCCESS: Non-transacted bad saveRows modified rows.<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[13].rowCount + ' rows, expected 3.  Error value = ' + testResults[13].exception + '<br>';" +
-            "\n" +
-            "        if (testResults[14].rowCount == 0)\n" +
-            "            html += 'SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';\n" +
-            "        else\n" +
-            "            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';" +
-            "\n" +
-            "        document.getElementById('testDiv').innerHTML = html;        \n" +
-            "    }\n" +
-            "];\n" +
-            "\n" +
-            "function executeNext()\n" +
-            "{\n" +
-            "    var currentFn = testFunctions[testResults.length];\n" +
-            "    currentFn();\n" +
-            "}\n" +
-            "\n" +
-            "function failureHandler(errorInfo, responseObj, options)\n" +
-            "{\t\t\n" +
-            "    testResults[testResults.length] = errorInfo;\n" +
-            "    executeNext();\n" +
-            "}\n" +
-            "\n" +
-            "function successHandler(data, responseObj, options)\n" +
-            "{\n" +
-            "    testResults[testResults.length] = data;\n" +
-            "    executeNext();\n" +
-            "}\n" +
-            "\n" +
-            "executeNext();";
-
-    private static final String DOMAIN_SRC = "function getSuccessHandler(domainDesign)\n" +
-            "{\n" +
-            "    var html = '';\n" +
-            "\n" +
-            "        html += '<b>' + domainDesign.name + '</b><br> ';\n" +
-            "    for (var i in domainDesign.fields)\n" +
-            "    {\n" +
-            "        html += '   ' + domainDesign.fields[i].name + '<br>';\n" +
-            "        }\n" +
-            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = html;\n" +
-            "\n" +
-            "        LABKEY.Domain.save(saveHandler, saveErrorHandler, domainDesign, 'study', 'StudyProperties');\n" +
-            "    }\n" +
-            "\n" +
-            "    function getErrorHandler()\n" +
-            "    {\n" +
-            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = \"Failed to get StudyProperties domain\";\n" +
-            "    }\n" +
-            "\n" +
-            "    function saveHandler()\n" +
-            "    {\n" +
-            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = \"Updated StudyProperties domain\";\n" +
-            "    }\n" +
-            "    function saveErrorHandler()\n" +
-            "    {\n" +
-            "        document.getElementById('" + TEST_DIV_NAME + "').innerHTML = \"Failed to save\";\n" +
-            "    }\n" +
-            "\n" +
-            "    LABKEY.Domain.get(getSuccessHandler, getErrorHandler, 'study', 'StudyProperties');\n";
 
     private static final String SRC_PREFIX = CLIENTAPI_HEADER + "\n<script type=\"text/javascript\">\n" +
             "    Ext.namespace('demoNamespace'); //define namespace with some 'name'\n" +
@@ -492,6 +149,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         clickLinkWithText(FOLDER_NAME);
         
         createWiki();
+
+        lineChartTest();
 
         createLists();
 
@@ -603,7 +262,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private void webpartTest()
     {
-        setSource(WEBPARTTEST_SRC);
+        setSourceFromFile("webPartTest.js");
 
         waitForDivPopulation();
         assertTextPresent("Webpart Title");
@@ -613,14 +272,38 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private void chartTest()
     {
-        String chartHtml = setSource(CHARTTEST_SRC);
+        String chartHtml = setSourceFromFile("chartTest.js");
         if (chartHtml.indexOf("<img") < 0 && chartHtml.indexOf("<IMG") < 0)
             fail("Test div does not contain an image:\n" + chartHtml);
     }
 
+    private void lineChartTest() throws Exception
+    {
+        setSourceFromFile("lineChartTest.js");
+
+        assertTextPresent("Test Chart");
+        assertTextPresent("Y Axis");
+        assertTextPresent("X Axis");
+        assertTextPresent("Series1");
+        assertTextPresent("Series2");
+
+        //Now see if the SVG converter is working by posting to it directly
+        clickButton("Get SVG", 0);
+        String svgText = getFormElement(Locator.id("svgtext"));
+
+        String url = WebTestHelper.getBaseURL() + "/visualization/" + PROJECT_NAME + "/" + URLEncoder.encode(FOLDER_NAME, "UTF-8").replace("+","%20")+ "/exportPDF.view";
+        HttpClient httpClient = WebTestHelper.getHttpClient(url);
+        PostMethod method = new PostMethod(url);
+        method.addParameter("svg", svgText);
+        int status = httpClient.executeMethod(method);
+        assertTrue("SVG Downloaded", status == HttpStatus.SC_OK);
+        assertTrue(method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
+        assertTrue(method.getResponseHeader("Content-Type").getValue().startsWith("application/pdf"));
+    }
+
     private void gridTest()
     {
-        setSource(GRIDTEST_SRC);
+        setSourceFromFile("gridTest.js");
 
         assertTextPresent(GRIDTEST_GRIDTITLE);
 
@@ -800,7 +483,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
         
-        setSource(ASSAYTEST_SRC);
+        setSourceFromFile("assayTest.js");
 
         assertTextPresent(TEST_ASSAY);
         assertTextPresent(TEST_ASSAY + " Run Fields");
@@ -834,7 +517,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         sleep(1000);
         clickNavButton("Save", 10000);
 
-        setSource(DOMAIN_SRC);
+        setSourceFromFile("domainTest.js");
 
         int limit = 30;
         Locator loc = Locator.id(TEST_DIV_NAME);
@@ -842,6 +525,18 @@ public class ClientAPITest extends BaseSeleniumWebTest
             sleep(1000);
 
         assertElementContains(Locator.id(TEST_DIV_NAME), "Updated StudyProperties domain");
+    }
+
+
+    /**
+     * Given a file name sets the page contents to a *wrapped* version of file in server/test/data/api
+     * Wrapped version puts everything inside a function and inserts a div id="testDiv" for output to be placed in
+     * @param fileName file will be found in server/test/data/api
+     * @return
+     */
+    private String setSourceFromFile(String fileName)
+    {
+        return setSource(getFileContents("server/test/data/api/" + fileName ));    
     }
 
     private String setSource(String srcFragment)
@@ -860,7 +555,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private void queryTest()
     {
-        setSource(QUERYTEST_SRC);
+        setSourceFromFile("queryTest.js");
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "SUCCESS: Select 1 returned 7 rows");
         assertElementContains(loc, "SUCCESS: Select 2 returned 1 rows");
