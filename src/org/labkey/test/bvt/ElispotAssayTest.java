@@ -97,7 +97,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText(TEST_ASSAY_ELISPOT);
 
-        click(Locator.linkWithText("manage assay design >>"));
+        click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
 
@@ -222,7 +222,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText(TEST_ASSAY_ELISPOT);
-        click(Locator.linkWithText("manage assay design >>"));
+        click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
