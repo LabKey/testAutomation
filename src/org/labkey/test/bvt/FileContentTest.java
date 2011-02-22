@@ -89,6 +89,30 @@ public class FileContentTest extends BaseSeleniumWebTest
 
         if (isFileUploadAvailable())
         {
+            // Setup notificaiton emails
+            // TODO: email admin has moved out of the config dialog, but also need a way to test email notifications
+            // as they are now digest based.
+            clickAdminMenuItem("Manage Project", "Folder Settings");
+            clickLinkWithText("Email Notifications");
+            clickNavButton("Settings", 0);
+            clickButtonByIndex("Update Settings", 1, 0);
+            ExtHelper.waitForExtDialog(this, "Error", WAIT_FOR_JAVASCRIPT);
+            clickNavButton("OK", 0);
+            // Set folder default
+            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='defaultFileEmailOption']]"), "15 minute digest");
+            clickButtonByIndex("Update Folder Default", 1, 0);
+            ExtHelper.waitForExtDialog(this, "Update complete", WAIT_FOR_JAVASCRIPT);            
+            waitForExtMaskToDisappear();
+            // Change user setting TEST_USER -> No Email
+            checkDataRegionCheckbox("Users", 1);
+            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='fileEmailOption']]"), "No Email");
+            clickButtonByIndex("Update Settings", 1, 0);
+            ExtHelper.waitForExtDialog(this, "Update selected users", WAIT_FOR_JAVASCRIPT);
+            clickNavButton("Yes", 0);
+            waitForExtMaskToDisappear(); // Can't tell when ext mask is active (not style=display:block...
+            sleep(200); // ...so we sleep
+
+            waitForElement(Locator.xpath("//a/span[text() = 'Admin']"), WAIT_FOR_JAVASCRIPT);
             enableEmailRecorder();
             // Create list for lookup custom file property
             ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
@@ -124,12 +148,6 @@ public class FileContentTest extends BaseSeleniumWebTest
             //             Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
             click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconDownload')]"));
             click(Locator.xpath("//a[./span[text()='remove']]"));
-            
-            // Test email admin
-            // TODO: email admin has moved out of the config dialog, but also need a way to test email notifications
-            // as they are now digest based.
-            //clickConfigTab(FileTab.email);
-            //checkRadioButton("emailPref", "1");
 
             // Save settings.
             clickButton("Submit", 0);
@@ -205,8 +223,12 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertTextPresent("annotations updated: "+CUSTOM_PROPERTY+"="+CUSTOM_PROPERTY_VALUE);
             assertTextPresent("file deleted from folder: /" + PROJECT_NAME);
 
-            // TODO: Verify file notification emails.
-            // goToModule("Dumbster");
+            beginAt(getBaseURL()+"/filecontent/" + PROJECT_NAME + "/sendShortDigest.view");
+            goToModule("Dumbster");
+            assertTextNotPresent(TEST_USER);  // User opted out of notifications
+            clickLinkWithText("File Management Notification", false);
+            assertTextBefore("file uploaded", "annotations updated");
+            assertTextBefore("annotations updated", "file deleted");
         }
     }
 
