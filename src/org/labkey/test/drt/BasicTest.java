@@ -16,6 +16,7 @@
 
 package org.labkey.test.drt;
 
+import org.bouncycastle.util.test.TestFailedException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -62,13 +63,8 @@ public class BasicTest extends BaseSeleniumWebTest
         addWebPart("Wiki TOC");
         // move messages below wiki:
         clickLinkWithImage("/_images/partdown.png", 0);
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return isTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
-            }
-        }, "Web parts failed to reorder", 30000);
+        waitForExtMaskToDisappear(30000);
+        assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
         refresh();
         // Verify that the asynchronous save worked by refreshing:
@@ -76,13 +72,9 @@ public class BasicTest extends BaseSeleniumWebTest
 
         // remove wiki by clicking the first delete link:
         clickLinkWithImage("/_images/partdelete.png", 0);
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return !isTextPresent(WIKI_WEBPART_TEXT);
-            }
-        }, "Web part was not removed correctly.", 30000);
+        waitForExtMaskToDisappear(30000);
+        assertTextNotPresent(WIKI_WEBPART_TEXT);
+
         refresh();
         // verify that the web part removal was correctly saved:
         assertTextNotPresent(WIKI_WEBPART_TEXT);
@@ -123,29 +115,20 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTrue("The LabKey test suite requires Firefox 2.0, 3.0, 3.5, or 3.6", source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0"));
 
         log("Test webpart buttons");
-        clickWebpartMenuItem("Messages", "Customize");
-        //clickAndWait(Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Customize Web Part']"));
+        clickWebpartMenuItem("Messages", "Customize");      
         assertTextPresent("Customize");
         clickNavButton("Cancel");
         clickLinkWithImage(getContextPath() + "/_images/partdown.png", 0);
-        //clickAndWait(Locator.xpath("//a[contains(@class, 'labkey-header')]/../..[contains(@class, 'labkey-wp-header')]//th[contains(@class, 'labkey-wp-title-right')]//img[contains(@title, 'Move Down')]"), 0);
-        waitFor(new Checker() {
-            public boolean check()
-            {
-                return isTextBefore("No data to show", "No messages");
-            }
-        }, "Failed to move web part.", 30000);
+        waitForExtMaskToDisappear();
+        assertTextBefore("No data to show", "No messages");
+        
         refresh();
         assertTextBefore("No data to show", "No messages");
 
         final Locator searchLocator = Locator.raw("//th[contains(text(), 'Search')]/..//a/img[@title='Remove From Page']");
         clickAndWait(searchLocator, 0);
-        waitFor(new Checker() {
-            public boolean check()
-            {
-                return !isElementPresent(searchLocator);
-            }
-        }, "Failed to remove web part.", 30000);
+        waitForExtMaskToDisappear();
+        assertElementNotPresent(searchLocator);
         refresh();
         // verify that web part is gone, even after a refresh:
         assertElementNotPresent(searchLocator);

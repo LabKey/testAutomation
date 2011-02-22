@@ -125,8 +125,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("search");
         popLocation();
 
-        clickLinkWithText("Pipeline");
-
         log("Analyze again.");
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
