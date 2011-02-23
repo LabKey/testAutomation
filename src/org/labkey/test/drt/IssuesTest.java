@@ -48,7 +48,7 @@ public class IssuesTest extends BaseSeleniumWebTest
                 "^comment^";
 
     private static final String TEST_EMAIL_TEMPLATE_BAD = TEST_EMAIL_TEMPLATE +
-                "\n^asdf|The current date is: %1$tb %1$te, %1$tY^";
+                "\n\'^asdf|The current date is: %1$tb %1$te, %1$tY^"; // Single quote for regression: 11389
 
     public String getAssociatedModuleDirectory()
     {
@@ -338,11 +338,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Admin");
         clickNavButton("Customize Email Template");
         String subject = getFormElement("emailSubject");
-        /* TODO: Enable this check. Blocked by issue #11389
         setFormElement("emailMessage", TEST_EMAIL_TEMPLATE_BAD);
         clickNavButton("Save");
         assertTextPresent("Invalid template");
-        */
         setFormElement("emailMessage", TEST_EMAIL_TEMPLATE);
         clickNavButton("Save");
         assertTextNotPresent("Invalid template");
