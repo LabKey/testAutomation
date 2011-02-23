@@ -577,7 +577,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         doRenameFieldsTest();
         doUploadTest();
-        customFormattingTest(); // TODO: Blocked by Issue 11435
+        customFormattingTest();
         customizeURLTest();
     }
 
@@ -638,9 +638,15 @@ public class ListTest extends BaseSeleniumWebTest
         checkCheckbox("Italic");
         checkCheckbox("Strikethrough");
         click(Locator.xpath("//div[@title='Color']"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Background']]//input"), "FF0000"); // Red background
         setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Foreground']]//input"), "00FFFF"); // Cyan text
         click(Locator.id("button_OK"));
+        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
+        // Regression test for Issue 11435
+        /*click(Locator.xpath("//div[@title='Color']"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
+        */ // Blocked: issue 11435
 
         // Set multiple conditional formats on int column.
         click(Locator.name("ff_name4")); // IntCol
