@@ -49,7 +49,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     private static final String CITY = "Seattle";
     private static final String STATE = "WA";
     private static final String ZIP = "98102";
-    private static final String PHONE = "(000) 456-7890";
+    private static final String PHONE = "(000) ant456-7890";
     private static final String PLATE_1_ID = "p789.1";
     private static String OUTGOING_TRACKING = "";
     private static String RETURN_TRACKING = "";
@@ -66,12 +66,14 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     private static final String SEQUENCE_DATA_FILE_B = "VM-2.1.adap.txt";
     private static final String SAMPLE_B = "gemini789.1-009";
     private static final String SEQUENCE_SAMPLE_B = "VM-2.1";
+    private static final String ADMIN_SAMPLE = "adminSample001";
     private static final String VIEW_NAME_A = "Test View A";
     private static final String VIEW_NAME_B = "Test View B";
     private static final String VIEW_NAME_C = "Test View C";
     private static final String VIEW_NAME_D = "Test View D";
     private static final String VIEW_NAME_E = "Test View E";
     private static final String DEMO_SITE = "Test Drive";
+    private static final String NORMALIZATION_SET = "NormalizationTestSet";
 
 
     protected void doCleanup()
@@ -112,7 +114,10 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         compareSamples();
         saveViews();
         verifySavedViews();
-        //editSavedViews();
+        //editSavedViews();*/
+
+        /* Admin actions */
+        //createAdminSamples();
     }
 
     protected void setupAdaptiveProject()
@@ -217,7 +222,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     {
         pushLocation();
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
-        assertTextPresent("We will be shipping out a box shortly");
+        assertTextPresent("We will review your order and will be in touch shortly when it is processed");
 
         // Verify notification emails.
         clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
@@ -252,7 +257,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     {
         pushLocation();
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
-        assertTextPresent("Adaptive has acknowledged your order");
+        assertTextPresent("will be sending you a box for shipping your samples to Adaptive");
         popLocation();
     }
 
@@ -274,7 +279,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     private void verifyShipBoxMessages()
     {
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
-        assertTextPresent("We've sent a box to you");
+        assertTextPresent("We've sent a sample shipping box to you");
 
         // Verify notification emails.
         pushLocation();
@@ -300,7 +305,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         //Wait for plate data to load.
         waitForText("Plate Contents", WAIT_FOR_JAVASCRIPT * 2);
-        //todo: verify plate data 
+        //todo: verify plate data
 
         clickNavButton("Next >", 0);
         clickNavButton("OK", 0);
@@ -321,7 +326,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     private void verifySampleMessages()
     {
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
-        assertTextPresent("Thank you for uploading your manifest. Please ship the box to Adaptive for processing.");
+        assertTextPresent("Thank you for uploading your manifest.");
     }
 
     private void receiveBox()
@@ -347,7 +352,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     private void verifyReceiveBoxMessages()
     {
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
-        assertTextPresent("A Box shipped by you has been received at Adaptive. We'll be processing your samples and will notify you when results are ready. Thank you.");
+        assertTextPresent("A Box shipped by you has been received at Adaptive. We'll be processing your samples and will notify you when results are ready.");
 
         // Verify notification emails.
         pushLocation();
@@ -416,11 +421,11 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         //upload sequence data (two files)
         File fileA = new File(getAdaptiveRoot() + SAMPLE_DATA_DIR + "/sequenceData", SEQUENCE_DATA_FILE_A);
-        setFormElement("fileUpload-file", fileA);
+        setFormElement("//input[contains(@class, 'x-form-file') and @type='file']", fileA);
         clickNavButton("Submit", 0);
         waitForText(fileA.getName(), 10000);
         File fileB = new File(getAdaptiveRoot() + SAMPLE_DATA_DIR + "/sequenceData", SEQUENCE_DATA_FILE_B);
-        setFormElement("fileUpload-file", fileB);
+        setFormElement("//input[contains(@class, 'x-form-file') and @type='file']", fileB);
         clickNavButton("Submit", 0);
         waitForText(fileB.getName(), 20000);
 
@@ -429,21 +434,67 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         ExtHelper.clickFileBrowserFileCheckbox(this, fileB.getName());
         selectImportDataAction("Process Adaptive Files");
 
+        // accept the defaults for the algorithm choice view and start the jobs
+        waitForPageToLoad();
+        clickNavButton("Start Processing", 0);
+
         waitForPipelineJobsToComplete(1, "Adaptive Sequence Post Process Job");
+
+        goToAdaptiveAdmin();
+        clickLinkWithText("Manage Normalization");
+
+        //Check for single old Normalization Test Set
+        if (isTextPresent(NORMALIZATION_SET))
+        {
+            clickLinkWithText(NORMALIZATION_SET, false);
+            clickButton("Delete Selected Sets", 0);
+            waitForText("Are you sure you wish to delete the selected sets", WAIT_FOR_JAVASCRIPT);
+            clickButton("Yes");
+        }
+
+        //Create normalization factors
+        clickButton("Create New Set", 0);
+
+        //Filling out normalization form
+        waitForText("Primer set selection", WAIT_FOR_JAVASCRIPT);
+        checkRadioButton("primerId", "0");
+        clickNavButton("Next", 0);
+
+        //Sample Selection
+        Locator check = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
+        waitForElement(check, 60000);
+        mouseClick(check.toString());
+        clickNavButton("Next", 0);
+
+        //Apply normalization factors
+        check = Locator.xpath("(//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker'])[2]");
+        waitForElement(check, 60000);
+        mouseClick(check.toString());
+        clickNavButton("Next", 0);
+
+        //Name normalization set
+        setFormElement("setName", NORMALIZATION_SET);
+        fireEvent(Locator.xpath("//input[@name='setName']"), SeleniumEvent.blur);
+        clickNavButton("Finish");
 
         //QC Sequence Results
         goToAdaptiveAdmin();
         clickLinkWithText("QC Sequence Results");
-        checkAllOnPage("samples");
-        clickNavButton("Publish to Customer");
-        getConfirmationAndWait();
+        checkAllOnPage("processed-sequences");
+
+        clickMenuButtonAndContinue("Set Normalization of selected Rows", NORMALIZATION_SET);
+        waitForText("Are you sure you want to assign the normalize set: " + NORMALIZATION_SET + " to the selected samples?", WAIT_FOR_JAVASCRIPT);
+        clickButton("Yes");
+        
+        clickMenuButtonAndContinue("Update state of selected Rows", "Publish to Customer");
+        waitForText("Are you sure you want to publish the selected samples?", WAIT_FOR_JAVASCRIPT);
+        clickButton("Yes");
     }
 
     private void verifyPostProcessingMessages()
     {
         goToAdaptiveCustomerFolder(CUSTOMER_A_FOLDER);
-        assertTextPresent("Post processing is complete for sample: gemini789.1-009. Your data can be viewed now.");
-        assertTextPresent("Post processing is complete for sample: gemini789.1-028. Your data can be viewed now.");
+        assertTextPresent("View completed sequences.");
 
         // Verify notification emails.
         pushLocation();
@@ -488,16 +539,16 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         clickAdaptiveMenuButton("Analysis", "Compare Samples");
 
         clickLinkWithText("View Data", false);
-        waitForText("Validation error", WAIT_FOR_JAVASCRIPT); // No sample selected
+        waitForText("Validation error", WAIT_FOR_PAGE); // No sample selected
 
         setAnalysisSample(SAMPLE_A);
         setAnalysisSample(SAMPLE_A, 1);
         clickLinkWithText("View Data", false);
-        waitForText("Validation error", WAIT_FOR_JAVASCRIPT); // Same sample selected twice.
+        waitForText("Validation error", WAIT_FOR_PAGE); // Same sample selected twice.
 
         setAnalysisSample(SAMPLE_B, 1);
         clickLinkWithText("View Data", false);
-        waitForText("Unique Sequences", WAIT_FOR_JAVASCRIPT); // Wait for table to load
+        waitForText("Unique Sequences", WAIT_FOR_PAGE); // Wait for table to load
 
         assertStatisticsTableCellEquals(1, 2, 2, "5,398,980");
 
@@ -532,7 +583,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         setAnalysisSample(SAMPLE_B);
         click(Locator.id("tabular"));
         expandAnalysisPanel("Choose How To Search Your Data");
-        click(Locator.id("dna"));           
+        click(Locator.id("dna"));
         setFormElement("searchDepth", "37");
         saveCurrentView(VIEW_NAME_C);
 
@@ -546,7 +597,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         setFormElement(Locator.xpath("//div[./label[text()='Count']]//div//input[@type = 'text']"), "Unique");
         assertFormElementEquals(Locator.xpath("//div[./label[text()='Count']]//div//input[@type = 'text']"), "Unique");
-        
+
         expandAnalysisPanel("Choose How To Filter Your Data");
         uncheckCheckbox(Locator.id("ssprod"));
         checkCheckbox(Locator.id("ssnprod"));
@@ -624,13 +675,32 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     private void editSavedViews()
     {
         refresh(); // TODO: Something happens between call to this method and last method which results in mem leak? Refresh helps (possibly sampleComparisonCount.jsp)?
-        
+
         /* Edit View A */
         editSavedView(VIEW_NAME_A);  // Change view A to Compare Sample [009x028]. Switch to scatter / linear
         setAnalysisSample(SAMPLE_B);
         setAnalysisSample(SAMPLE_A, 1);
         click(Locator.id("compare-linear"));
         clickLinkWithText("View Data", false);
+    }
+
+    private void createAdminSamples()
+    {
+        goToAdaptiveAdmin();
+        clickLinkWithText("PCR Samples");
+
+        clickButton("Create Samples");
+
+        /* On 'Create Samples' Page */
+        setFormElement(Locator.xpath("//input[@id='customer-site']"), CUSTOMER_A_FOLDER);
+        clickButton("Continue");
+
+        /* Fill out the form */
+        Locator sampleName = Locator.xpath("//input[@id='single-sample-name']");
+        waitForElement(sampleName, WAIT_FOR_JAVASCRIPT);
+        setFormElement(sampleName, ADMIN_SAMPLE);
+
+        setFormElement(Locator.xpath("//input[@name='purity']"), "5");
     }
 
     private void verifyDemoSite()
@@ -646,12 +716,12 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         assertTextNotPresent("Administration");
 
         /* TODO: Test Saved Views can be loaded / not saved or edited in demo site */
-        
+
         pushLocation();
         stopImpersonating();
-        popLocation();        
+        popLocation();
     }
-   
+
     private void expandAnalysisPanel(String panelTitle)
     {
         if ( isElementPresent(Locator.xpath("//div[../div/span[text() = '" + panelTitle + "'] and contains(@style, 'display: none')]")) )
@@ -718,11 +788,11 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         clickLinkWithText("Load View", false);
         if (wait)
         {
-            waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT);
-            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT * 3);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Generating graph data...']"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Loading, please wait...']"), WAIT_FOR_JAVASCRIPT * 5);
             waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Loading Views...']"), WAIT_FOR_JAVASCRIPT);
         }
-        
+
         assertTextNotPresent("Load Error");
     }
 
@@ -731,8 +801,8 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         clickLinkWithText("View Data", false);
         if (wait)
         {
-            waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT);
-            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Please Wait...']"), WAIT_FOR_JAVASCRIPT * 3);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Generating graph data...']"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Loading, please wait...']"), WAIT_FOR_JAVASCRIPT * 5);
             waitForElementToDisappear(Locator.xpath("//div[contains(@style, 'visibility: visible')]//span[text() = 'Loading Views...']"), WAIT_FOR_JAVASCRIPT);
         }
 
@@ -752,7 +822,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         waitForText("Your Saved Views", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//em[text() = '" + viewName + "']"));
     }
-    
+
     private void createHeader()
     {
         goToModule("Wiki");
@@ -810,7 +880,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     public void setCustomStylesheet(String cssPath, String cssFile)
     {
         ensureAdminMode();
-        
+
         clickAdminMenuItem("Manage Project", "Project Settings");
         clickLinkWithText("Resources");
 
@@ -897,7 +967,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;
+        return "none";
     }
 
     @Override
