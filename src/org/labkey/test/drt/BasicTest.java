@@ -42,6 +42,8 @@ public class BasicTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        // Disable scheduled system maintenance
+        setSystemMaintenance(false);
         // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
         startSystemMaintenance();
 
@@ -135,6 +137,11 @@ public class BasicTest extends BaseSeleniumWebTest
 
         // Now that the test is done, ensure that system maintenance is complete...
         waitForSystemMaintenanceCompletion();
+
+        // Verify scheduled system maintenance is disabled.
+        clickLinkWithText("Admin Console");
+        clickLinkWithText("running threads");
+        assertTextNotPresent("SystemMaintenance");
     }
 
     public String getAssociatedModuleDirectory()

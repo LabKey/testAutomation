@@ -571,6 +571,29 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    private Boolean initialSystemMaintenanceSchedule = null; // true = daily : false = never
+    protected void setSystemMaintenance(boolean enable)
+    {
+        ensureAdminMode();
+        clickLinkWithText("Admin Console");
+        clickLinkWithText("site settings");
+        if (initialSystemMaintenanceSchedule == null) initialSystemMaintenanceSchedule = getFormElement("systemMaintenanceInterval").equals("daily");
+        checkRadioButton("systemMaintenanceInterval", enable ? "daily" : "never");
+        clickNavButton("Save");
+    }
+
+    protected void resetSystemMaintenance()
+    {
+        if (initialSystemMaintenanceSchedule != null)
+        {
+            ensureAdminMode();
+            clickLinkWithText("Admin Console");
+            clickLinkWithText("site settings");
+            checkRadioButton("systemMaintenanceInterval", initialSystemMaintenanceSchedule ? "daily" : "never");
+            clickNavButton("Save");
+        }
+    }
+
     public void ensureAdminMode()
     {
         //Now switch to admin mode if available
@@ -1083,6 +1106,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 finally
                 {
                     resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
+                    resetSystemMaintenance(); // Return system maintenance config to its pre-test state.
                 }
             }
 
