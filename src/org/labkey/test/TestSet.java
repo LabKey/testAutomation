@@ -89,7 +89,7 @@ public enum TestSet
         MessagesTest.class,
         MS2BvtTest.class,
         MS2BvtTestGZ.class,           
-        WikiBvtTest.class,
+        WikiLongTest.class,
         ListTest.class,
         UserBvtTest.class,
         IssuesTest.class,

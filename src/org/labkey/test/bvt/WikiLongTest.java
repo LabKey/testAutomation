@@ -26,7 +26,7 @@ import java.io.File;
  * Date: Nov 15, 2005
  * Time: 1:55:56 PM
  */
-public class WikiBvtTest extends BaseSeleniumWebTest
+public class WikiLongTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "WikiVerifyProject";
     private static final String PROJECT2_NAME = "WikiCopied";
