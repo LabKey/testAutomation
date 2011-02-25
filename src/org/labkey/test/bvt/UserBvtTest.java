@@ -105,10 +105,7 @@ public class UserBvtTest extends SecurityTest
 
     private void passwordTest()
     {
-        enableModule(PROJECT_NAME, "Dumbster");
-        addWebPart("Mail Record");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
+        enableEmailRecorder();
 
         clickLinkWithText("Site Users");
         clickLinkWithText(NORMAL_USER);
@@ -118,6 +115,7 @@ public class UserBvtTest extends SecurityTest
         clickLinkWithText("Done");
         // View reset password email.
         clickLinkWithText(PROJECT_NAME);
+        goToModule("Dumbster");
         clickLinkContainingText("Reset Password Notification", false); // Expand message.
 
         clickLinkContainingText("setPassword"); // Set Password URL

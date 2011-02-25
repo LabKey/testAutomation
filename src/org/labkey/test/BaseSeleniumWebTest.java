@@ -1872,6 +1872,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Enable email recorder");
         pushLocation();
+        goToHome();
         goToModule("Dumbster");
         waitForElement(Locator.checkboxByName("emailRecordOn"), WAIT_FOR_JAVASCRIPT);
         if ( initialRecorderSetting == null )

@@ -137,10 +137,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         createProject(OTHER_PROJECT);
         createProject(PROJECT_NAME);
 
-        enableModule(PROJECT_NAME, "Dumbster");
-        goToModule("Dumbster");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
+        enableEmailRecorder();
 
         createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
 
@@ -585,10 +582,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
         for (String user : EMAIL_RECIPIENTS)
             createUser(user, null);
 
-        enableModule(PROJECT_NAME, "Dumbster");
-        addWebPart("Mail Record");
-        checkCheckbox("emailRecordOn");
-        assertTextPresent("Mail Record");
+        clickLinkWithText(PROJECT_NAME);
+        enableEmailRecorder();
+
 
         // test failure cases: no from email
         setSource(createEmailSource("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
@@ -617,7 +613,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         setSource(createEmailSource(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, true));
         assertTextPresent("success");
 
-        clickLinkWithText(PROJECT_NAME);
+        goToModule("Dumbster");
 
         assertTextPresent(EMAIL_SUBJECT_1);
         assertTextPresent(EMAIL_SUBJECT_2);

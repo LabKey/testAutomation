@@ -129,12 +129,6 @@ public class SearchTest extends StudyTest
     {
         super.doCreateSteps(); // import study and specimens
 
-        // Enable dumbster to prevent errors caused by undeliverable notification emails.
-        enableModule(getProjectName(), "Dumbster");
-        addWebPart("Mail Record");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
-
         SearchHelper.enqueueSearchItem("999320016", Locator.linkContainingText("999320016"));
         SearchHelper.enqueueSearchItem("Urinalysis", Locator.linkContainingText("URF-1"),
                                                      Locator.linkContainingText("URF-2"),

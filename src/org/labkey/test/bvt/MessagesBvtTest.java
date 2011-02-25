@@ -95,11 +95,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         log("Add search to project");
         addWebPart("Search");
 
-        log("Record emails");
-        addWebPart("Mail Record");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
-        clickLinkWithImageByIndex("/_images/partdelete.png", 3, false);
+        enableEmailRecorder();
 
         log("Check email preferences");
         clickWebpartMenuItem("Messages", "Email", "Preferences");
@@ -327,7 +323,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         assertTextNotPresent(MSG1_TITLE);
 
         log("Check emailed messages");
-        addWebPart("Mail Record");
+        goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 4); // TODO: switch to 3 when empty messages are emailed
         clickLinkWithText(MSG1_TITLE, 0, false);
         assertTextPresent("1 x");
@@ -340,6 +336,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         log("Clear mail record");
         uncheckCheckbox("emailRecordOn");
         checkCheckbox("emailRecordOn");
+
         log("Set broadcast preferences.");
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
@@ -360,7 +357,8 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         setFormElement("body", MSGB_BODY);
         checkCheckbox("broadcast");
         submit();
-        clickLinkWithText(PROJECT_NAME);
+
+        goToModule("Dumbster");
         assertTextPresent(USER2, USER3);
         assertTextNotPresent(USER1); // opted out of broadcasts
     }

@@ -65,11 +65,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        enableModule("Home", "Dumbster");
-        if ( !isElementPresent( Locator.id("dataregion_EmailRecord") ) )
-            addWebPart("Mail Record");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
+        enableEmailRecorder();
 
         displayNameTest();
         clonePermissionsTest();
@@ -78,6 +74,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         guestTest();
 
         log("Check welcome emails [6 new users]");
+        goToModule("Dumbster");
         assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
