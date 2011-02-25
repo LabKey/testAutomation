@@ -100,6 +100,8 @@ public class ViabilityTest extends AbstractQCAssayTest
         setLongTextField("tsv", getFileContents("/sampledata/viability/specimens.txt"));
         submit();
 
+        assertTextPresent("Specimens uploaded successfully");
+
         log("** Create viability assay");
         clickLinkWithText(getFolderName());
         addWebPart("Assay List");
