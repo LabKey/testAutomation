@@ -19,6 +19,8 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
+import java.io.File;
+
 /**
  * User: brittp
  * Date: Nov 15, 2005
@@ -28,6 +30,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "WikiVerifyProject";
     private static final String PROJECT2_NAME = "WikiCopied";
+    private static final String PROJECT3_NAME = "WikiBvt Public Project";
+    private static final String PROJECT4_NAME = "WikiBvt Fourth Project";
     private static final String WIKI_PAGE1_TITLE = "Page 1 Wiki Title";
     private static final String WIKI_PAGE1_NAME= "Page 1 Wiki Name";
     private static final String WIKI_PAGE2_NAME = "Page 2 Wiki Name";
@@ -40,6 +44,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
     private static final String RESP1_TITLE = "Let's Keep Talking";
     private static final String RESP1_BODY = "I disagree";
     private static final String USER1 = "user1@wikibvt.test";
+    private static final String USER2 = "user2@wikibvt.test";
     private static final String WIKI_PAGE3_WEBPART_TEST = "Best Gene Name";
     private static final String WIKI_NAVTREE_TITLE = "NavTree";
     private static final String WIKI_TERMS_TITLE = "Terms of Use";
@@ -148,8 +153,18 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         setFormElement("name", WIKI_PAGE3_NAME_TITLE);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         selectOptionByText("parent", WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
-        setWikiBody(WIKI_PAGE3_CONTENT);
+        setWikiBody(WIKI_PAGE3_CONTENT);        
+        if (isFileUploadAvailable())
+        {
+            log("test attachments in wiki");
+            File file = new File(getLabKeyRoot() + "/common.properties");
+            setFormElement("formFiles[0]", file);
+        }
+        else
+            log("File upload skipped.");
         saveWikiPage();
+        if (isFileUploadAvailable())
+            assertTextPresent("common.properties");
         assertTextPresent(WIKI_PAGE3_WEBPART_TEST);
         assertTextPresent("Some HTML content");
 
@@ -263,8 +278,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 
         //test deleting via edit page
         clickLinkWithText("Edit");
-        clickNavButton("Delete Page");
-        clickNavButton("Delete");
+        deleteWikiPage();
         assertLinkPresentWithText("Home");
 
         createNewWikiPage("HTML");
@@ -276,8 +290,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         assertTextPresent(HEADER_CONTENT);
         clickLinkWithText("Edit", 0);
-        clickNavButton("Delete Page");
-        clickNavButton("Delete");
+        deleteWikiPage();
         assertTextNotPresent(HEADER_CONTENT);
 
         log("Return to where we were...");
@@ -293,30 +306,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         assertTextPresent("More HTML content");
         assertTextPresent(WIKI_PAGE3_ALTTITLE);
 
-        log("test terms of use");
-        createNewWikiPage("RADEOX");
-        setFormElement("name", "_termsOfUse");
-        setFormElement("title", WIKI_TERMS_TITLE);
-        setFormElement("body", "The first rule of fight club is do not talk about fight club.");
-        saveWikiPage();
-
-        log("Terms don't come into play until you log out");
-        signOut();
-        signIn();
-        clickLinkWithText(PROJECT_NAME);
-        assertTextPresent("fight club");
-        log("Submit without agreeing");
-        clickNavButton("Agree");
-
-        assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
-
-        clickTab("Wiki");
-        clickLinkWithText("Edit");
-        clickNavButton("Delete Page");
-        clickNavButton("Delete");
-        assertTextNotPresent(WIKI_TERMS_TITLE);
+        termsOfUseTest();
 
         log("test copy wiki");
         clickWebpartMenuItem("Pages", "Copy");
@@ -480,8 +470,7 @@ public class WikiBvtTest extends BaseSeleniumWebTest
         log("test delete");
         clickLinkWithText(WIKI_PAGE2_TITLE);
         clickLinkWithText("Edit");
-        clickNavButton("Delete Page");
-        clickNavButton("Delete");
+        deleteWikiPage();
         clickLinkWithText(WIKI_PAGE1_TITLE);
         //add once bug with caching wiki title is fixed
         //assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
@@ -513,6 +502,124 @@ public class WikiBvtTest extends BaseSeleniumWebTest
 //        }
     }
 
+    private void deleteWikiPage()
+    {
+        waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'disabled')]/span[text()='Delete Page']"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Delete Page");
+        clickNavButton("Delete");
+    }
+
+    private void termsOfUseTest()
+    {
+        log("Create user for terms of use checks");
+        clickLinkWithText(PROJECT_NAME);
+        enterPermissionsUI();
+        clickManageGroup("Users");
+        setFormElement("names", USER2);
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership");
+
+        log("Test terms of use");
+        goToModule("Wiki");
+        createNewWikiPage("RADEOX");
+        setFormElement("name", "_termsOfUse");
+        setFormElement("title", WIKI_TERMS_TITLE);
+        setFormElement("body", "The first rule of fight club is do not talk about fight club.");
+        saveWikiPage();
+        pushLocation(); // For attempting to bypass Terms of Use (1 pop)
+
+        createProject(PROJECT3_NAME); // Public project
+        setSiteGroupPermissions("Guests", "Reader");
+        setSiteGroupPermissions("All Site Users", "Reader");
+        goToModule("Wiki");
+        createNewWikiPage("RADEOX");
+        setFormElement("name", "_termsOfUse");
+        setFormElement("title", WIKI_TERMS_TITLE);
+        setFormElement("body", "The second rule of fight club is do not talk about fight club.");
+        saveWikiPage();
+        pushLocation(); // For attempting to bypass Terms of Use (2 pops)
+
+        createProject(PROJECT4_NAME);
+        setSiteGroupPermissions("All Site Users", "Reader");
+        goToModule("Wiki");
+        createNewWikiPage("RADEOX");
+        setFormElement("name", "_termsOfUse");
+        setFormElement("title", WIKI_TERMS_TITLE);
+        setFormElement("body", "The third rule of fight club is do not talk about fight club.");
+        saveWikiPage();
+        pushLocation(); // For attempting to bypass Terms of Use (3 pops)
+        createSubfolder(PROJECT4_NAME, "subfolder", null);
+        pushLocation(); // For attempting to bypass Terms of Use (4 pops)
+
+        log("Terms don't come into play until you log out");
+        clickLinkWithText(PROJECT_NAME);
+        assertTextNotPresent("fight club");
+        signOut();
+
+        log("Access project with guest user");
+        clickLinkWithText(PROJECT3_NAME);
+        assertTextPresent("fight club");
+        checkCheckbox("approvedTermsOfUse");
+        clickNavButton("Agree");
+        goToHome();
+        clickLinkWithText(PROJECT3_NAME);
+        assertTextNotPresent("fight club");         
+
+        signIn();
+        log("Attempt to bypass terms with saved URLs");
+        popLocation();
+        assertTextPresent("fight club"); // PROJECT_NAME
+        popLocation();
+        assertTextPresent("fight club"); // PROJECT3_NAME
+        popLocation();
+        assertTextPresent("fight club"); // PROJECT4_NAME
+        popLocation();
+        assertTextPresent("fight club"); // PROJECT4_NAME/subfolder
+
+        goToHome();
+        clickLinkWithText(PROJECT_NAME);
+        assertTextPresent("fight club");
+        log("Submit without agreeing");
+        clickNavButton("Agree");
+
+        assertTextPresent("fight club");
+        checkCheckbox("approvedTermsOfUse");
+        clickNavButton("Agree");
+
+        clickLinkWithText(PROJECT4_NAME);
+        assertTextPresent("fight club");
+        checkCheckbox("approvedTermsOfUse");
+        clickNavButton("Agree");
+
+        log("Check terms with impersonated user");
+        impersonate(USER2);
+
+        clickLinkWithText(PROJECT_NAME);
+        assertTextPresent("fight club");
+        checkCheckbox("approvedTermsOfUse");
+        clickNavButton("Agree");
+        clickLinkWithText(PROJECT3_NAME);
+        assertTextPresent("fight club");
+        checkCheckbox("approvedTermsOfUse");
+        clickNavButton("Agree");
+        clickLinkWithText(PROJECT4_NAME);
+        assertTextPresent("fight club");
+        checkCheckbox("approvedTermsOfUse");
+        clickNavButton("Agree");
+
+        stopImpersonating();            
+        clickLinkWithText(PROJECT3_NAME);
+        assertTextPresent("fight club");
+        checkCheckbox("approvedTermsOfUse");
+        clickNavButton("Agree");
+
+        clickLinkWithText(PROJECT_NAME);
+        clickTab("Wiki");
+        clickLinkWithText("Edit");
+        deleteWikiPage();
+        assertTextNotPresent(WIKI_TERMS_TITLE);
+    }
+
     private void changeFormat(String format)
     {
         clickNavButton("Convert To...", 0);
@@ -537,6 +644,8 @@ public class WikiBvtTest extends BaseSeleniumWebTest
             deleteUser(USER1);
             try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
             try {deleteProject(PROJECT2_NAME); } catch (Throwable t) {}
+            try {deleteProject(PROJECT3_NAME); } catch (Throwable t) {}
+            try {deleteProject(PROJECT4_NAME); } catch (Throwable t) {}
         }
 
 }
