@@ -1,0 +1,38 @@
+<table>
+  <tr>
+    <td class='labkey-form-label'>Sample Id</td>
+    <td><div id='SampleId_div'>???</div></td>
+  </tr>
+  <tr>
+    <td class='labkey-form-label'>Time Point</td>
+    <td><div id='TimePoint_div'>???</div></td>
+  </tr>
+  <tr>
+    <td class='labkey-form-label'>Double Data</td>
+    <td><div id='DoubleData_div'>???</div></td>
+  </tr>
+  <tr>
+    <td class='labkey-form-label'>Hidden Data</td>
+    <td><div id='HiddenData_div'>???</div></td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  function setValue(row, property)
+  {
+    var div = Ext.get(property + "_div");
+    var value = row[property];
+    if (!value)
+      value = "<none>";
+    div.dom.innerHTML = value;
+  }
+
+  if (LABKEY.page.result)
+  {
+    var row = LABKEY.page.result;
+    setValue(row, "SampleId");
+    setValue(row, "TimePoint");
+    setValue(row, "DoubleData");
+    setValue(row, "HiddenData");
+  }
+</script>

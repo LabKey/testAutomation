@@ -1,0 +1,88 @@
+
+<div id="mydiv"></div>
+
+<script type="text/javascript">
+  var _url = LABKEY.ActionURL.buildURL;
+  var c = LABKEY.container.path;
+
+  function renderMaterials(title, materials)
+  {
+    if (!materials || materials.length == 0)
+      return "";
+
+    s = "<h3>" + title + "</h3>";
+    s += "<table>";
+
+    for (var i = 0; i < materials.length; i++)
+    {
+      var material = materials[i];
+      s += "<tr>";
+      s += "<td colspan=2><a href='" + _url('experiment', 'showMaterial', c, {rowId: material.id}) + "'>" + material.name + "</a></td>";
+      s += "</tr>";
+
+      s += "<tr>";
+      s += "<td class='labkey-form-label'>Created</td>";
+      s += "<td>" + material.created + "</td>";
+      s += "</tr>";
+
+      s += "<tr>";
+      s += "<td class='labkey-form-label'>Sample Set</td>";
+      s += "<td>" + (material.sampleSet ?  "<a href='" + _url('experiment', 'showMaterialSource', c, {rowId: material.sampleSet.id}) + "'>" + material.sampleSet.name + "</a>" : "(Not a member of a sample set)") + "</td>"; s += "</tr>";
+
+    }
+
+    s += "</table>";
+    return s;
+  }
+
+  function renderDatas(title, datas)
+  {
+    if (!datas || datas.length == 0)
+      return "";
+
+    s = "<h3>" + title + "</h3>";
+    s += "<table>";
+
+    for (var i = 0; i < datas.length; i++)
+    {
+      var data = datas[i];
+      s += "<tr>";
+      s += "<td colspan=2><a href='" + _url('experiment', 'showData', c, {rowId: data.rowId}) + "'>" + data.name + "</a></td>";
+      s += "</tr>";
+    }
+
+    s += "</table>";
+    return s;
+  }
+
+  function renderRows(title, rows)
+  {
+    if (!rows || rows.length == 0)
+      return "";
+
+    s = "<h3>" + title + "</h3>";
+    s += "<table>";
+
+    for (var i = 0; i < rows.length; i++)
+    {
+      var row = rows[i];
+      s += "<tr>";
+      s += "<td class='labkey-form-label'><span id='SampleId_" + i + "'>" + row.SampleId + "</span></td>";
+      s += "<td><span id='DoubleData_" + i + "'>" + row.DoubleData + "</span></td>";
+      s += "</tr>";
+    }
+    s += "</table>";
+    return s;
+  }
+
+  var s = "";
+  s += renderDatas('Data Inputs', LABKEY.page.run.dataInputs);
+  s += renderMaterials('Material Inputs', LABKEY.page.run.materialInputs);
+  s += renderDatas('Data Outputs', LABKEY.page.run.dataOutputs);
+  s += renderMaterials('Material Outputs', LABKEY.page.run.materialOutputs);
+  s += renderRows('Results', LABKEY.page.run.dataRows);
+
+  var mydiv = document.getElementById("mydiv");
+  mydiv.innerHTML = s;
+</script>
+

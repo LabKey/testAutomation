@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<provider xmlns="http://labkey.org/study/assay/xml">
+  <name>Simple</name>
+  <description>Simple file-based assay</description>
+  <fieldKeys>
+    <participantId>Properties/SampleId</participantId>
+    <date>Properties/TimePoint</date>
+  </fieldKeys>
+</provider>

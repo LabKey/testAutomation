@@ -257,7 +257,7 @@
     <target name="stage-miniassay-module">
       <antcall target="stage-test-module">
         <param name="module.name" value="miniassay"/>
-        <param name="module.src.dir" value="${project.root}/sampledata/miniassay"/>
+        <param name="module.src.dir" value="${project.root}/server/test/modules"/>
       </antcall>
     </target>
 

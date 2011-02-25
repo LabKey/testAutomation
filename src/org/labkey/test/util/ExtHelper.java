@@ -26,31 +26,24 @@ import org.labkey.test.Locator;
 public class ExtHelper
 {
     /**
-     * Clicks the labkey menu item from the submenu specified by the menu object's text
+     * Clicks the Ext or labkey menu item from the submenu specified by the menu object's text
      */
-    public static void clickMenuButton(BaseSeleniumWebTest test, boolean wait, String MenusLabel, String ... subMenuLabels)
+    public static void clickMenuButton(BaseSeleniumWebTest test, boolean wait, String menusLabel, String ... subMenuLabels)
     {
-        test.clickAndWait(Locator.navButton(MenusLabel), 0);
-        for (int i = 0; i < subMenuLabels.length - 1; i++)
-        {
-            Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
-            test.waitForElement(parentLocator, 1000);
-            test.mouseOver(parentLocator);
-        }
-        Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
-        test.waitForElement(itemLocator, 1000);
-        if (wait)
-            test.clickAndWait(itemLocator);
-        else
-            test.click(itemLocator);
+        Locator menu = Locator.extButton(menusLabel);
+        if (!test.isElementPresent(menu))
+            menu = Locator.navButton(menusLabel);
+        if (!test.isElementPresent(menu))
+            BaseSeleniumWebTest.fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
+        clickExtMenuButton(test, wait, menu, subMenuLabels);
     }
 
     /**
      * Clicks the ext menu item from the submenu specified by the ext object's text
      */
-    public static void clickExtMenuButton(BaseSeleniumWebTest test, boolean wait, String MenusLabel, String ... subMenuLabels)
+    public static void clickExtMenuButton(BaseSeleniumWebTest test, boolean wait, Locator menu, String ... subMenuLabels)
     {
-        test.clickAndWait(Locator.extButton(MenusLabel), 0);
+        test.clickAndWait(menu, 0);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
@@ -84,6 +77,11 @@ public class ExtHelper
         return null;
     }
 
+    public static void waitForExtDialog(final BaseSeleniumWebTest test, String title)
+    {
+        waitForExtDialog(test, title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
     public static void waitForExtDialog(final BaseSeleniumWebTest test, String title, int timeout)
     {
         final Locator locator = Locator.xpath("//span[contains(@class, 'x-window-header-text') and contains(string(), '" + title + "')]");
@@ -95,6 +93,19 @@ public class ExtHelper
                 return test.isElementPresent(locator);
             }
         }, "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
+    }
+
+    public static String getExtMsgBoxText(BaseSeleniumWebTest test, String title)
+    {
+        return getExtMsgBoxText(test, title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static String getExtMsgBoxText(BaseSeleniumWebTest test, String title, int timeout)
+    {
+        waitForExtDialog(test, title, timeout);
+        Locator locator = Locator.xpath("//div[contains(@class, 'x-window-dlg')]//span[contains(@class, 'ext-mb-text')]");
+        String msg = test.getText(locator);
+        return msg;
     }
 
     public static Locator locateBrowserFileCheckbox(String fileName)

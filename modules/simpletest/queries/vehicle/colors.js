@@ -8,28 +8,6 @@
 var console = require("console");
 console.log("** evaluating: " + this['javax.script.filename']);
 
-var Debug = {
-    addBefore : function (oldFn, before) {
-        return function () {
-            var me = this,
-                args = arguments;
-            return oldFn.apply(me, before(args, oldFn, me));
-        };
-    }
-};
-
-function trace(args, oldFn, thiz)
-{
-    var msg = oldFn.name + "(";
-    for (var i = 0; i < args.length; i++)
-        msg += (i > 0 ? ", " : "") + args[i];
-    msg += ")";
-    console.log("** trace: " + msg);
-
-    // return arguments needed by oldFn
-    return args;
-}
-
 // ================================================
 
 var hexRe = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
@@ -161,6 +139,7 @@ function complete(event, errors) {
     }
 }
 
+var {Debug, trace} = require("simpletest/Debug");
 init         = Debug.addBefore(init, trace);
 beforeInsert = Debug.addBefore(beforeInsert, trace);
 afterInsert  = Debug.addBefore(afterInsert, trace);

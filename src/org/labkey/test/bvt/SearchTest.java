@@ -165,7 +165,7 @@ public class SearchTest extends StudyTest
 
         // create new grid view report:
         clickMenuButton("Views", "Manage Views");
-        clickExtMenuButton("Create", "Grid View");
+        clickMenuButton("Create", "Grid View");
         setFormElement("label", GRID_VIEW_NAME);
         selectOptionByText("params", "ECI-1: Eligibility Criteria");
         clickNavButton("Create View");

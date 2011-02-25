@@ -119,14 +119,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertElementContains(Locator.id("DoubleData_div"), String.valueOf(3.2));
         assertElementContains(Locator.id("HiddenData_div"), "super secret!");
 
-    }
 
-//    protected void deploySimpleAssayModule() throws Exception
-//    {
-//        log("Deploying miniassay module");
-//        File moduleBaseDir = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/miniassay/module");
-//        ModuleUtil.createModule(moduleBaseDir, MODULE_NAME);
-//    }
+        log("Test assay query metadata when module is active");
+        selenium.goBack();
+        waitForPageToLoad();
+        clickLinkContainingText("view runs");
+        assertTextNotPresent("Simple Assay Button");
+        pushLocation();
+        enableModule(PROJECT_NAME, "miniassay");
+        popLocation();
+        clickButton("Simple Assay Button", 0);
+        assertAlert("button clicked");
+    }
 
     protected void checkModuleDeployed()
     {
@@ -180,6 +184,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void uploadBatch(String batchName, String... uploadedFiles)
     {
         File dataRoot = new File(getLabKeyRoot(), "/sampledata/miniassay/data");
+        assertTrue(dataRoot.isDirectory());
 
         log("Uploading batch: " + batchName);
         clickLinkWithText(PROJECT_NAME);
@@ -206,7 +211,9 @@ public class ModuleAssayTest extends AbstractAssayTest
         for (int i = 0; i < uploadedFiles.length; i++)
         {
             String uploadedFile = uploadedFiles[i];
-            setFormElement("upload-run-field-file", new File(dataRoot, uploadedFile));
+            File file = new File(dataRoot, uploadedFile);
+            assertTrue(file.exists());
+            setFormElement("upload-run-field-file", file);
             int count = 5;
             do
             {

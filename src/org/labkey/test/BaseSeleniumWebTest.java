@@ -614,33 +614,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      * item should be the top link (a.k.a. the webpart title)
      * @param items
      */
-    public void clickWebpartMenuItem(String... items)
+    public void clickWebpartMenuItem(String menu, String... items)
     {
-        clickAndWait(Locator.xpath("//img[@id='more-" + items[0].toLowerCase() + "']"), 0);
-        Locator parentLocator;
-        for (int i = 1; i < items.length; i++)
-        {
-            parentLocator = Locator.menuItem(items[i]);
-            waitForElement(parentLocator, 1000);
-            mouseOver(parentLocator);
-        }
-        Locator itemLocator = Locator.menuItem(items[items.length - 1]);
-        waitForElement(itemLocator, 1000);
-        clickAndWait(itemLocator);
+        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//img[@id='more-" + menu.toLowerCase() + "']"), items);
     }
     
     public void clickAdminMenuItem(String... items)
     {
-        clickAndWait(Locator.xpath("//a/span[text() = 'Admin']"), 0);
-        for (int i = 0; i < items.length - 1; i++)
-        {
-            Locator parentLocator = Locator.menuItem(items[i]);
-            waitForElement(parentLocator, 1000);
-            mouseOver(parentLocator);
-        }
-        Locator itemLocator = Locator.menuItem(items[items.length - 1]);
-        waitForElement(itemLocator, 1000);
-        clickAndWait(itemLocator);
+        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text() = 'Admin']"), items);
     }
 
     // Click on a module listed on the admin menu
@@ -1606,6 +1587,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 		return selenium.getAlert();
 	}
 
+    public void assertExtMsgBox(String title, String text)
+    {
+        String actual = ExtHelper.getExtMsgBoxText(this, title);
+        assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.indexOf(text) != -1);
+    }
+
     public enum SeleniumEvent
     {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload}
 
@@ -1758,13 +1745,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 savePermissions();
             }
             waitAndClickNavButton("Save and Finish");
-        }
 
-
-        if (tabsToAdd != null)
-        {
-            for (String tabname : tabsToAdd)
-                assertTabPresent(tabname);
+            if (tabsToAdd != null)
+            {
+                for (String tabname : tabsToAdd)
+                    assertTabPresent(tabname);
+            }
         }
 
         // verify that there's a link to our new folder:
@@ -3358,26 +3344,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     /**
      * Clicks the labkey menu item and optional submenu labels (for cascading menus)
      */
-    public void clickMenuButton(String MenusLabel, String ... subMenusLabels)
+    public void clickMenuButton(String menusLabel, String ... subMenusLabels)
     {
-        ExtHelper.clickMenuButton(this, true, MenusLabel, subMenusLabels);
-    }
-
-    /**
-     * Clicks the ext menu item and optional submenu labels (for cascading menus)
-     */
-    public void clickExtMenuButton(String MenusLabel, String ... subMenusLabels)
-    {
-        ExtHelper.clickExtMenuButton(this, true, MenusLabel, subMenusLabels);
+        ExtHelper.clickMenuButton(this, true, menusLabel, subMenusLabels);
     }
 
     /**
      * Clicks the ext menu item and optional submenu labels's (for cascading menus)
      * Does not wait for page load.
      */
-    public void clickMenuButtonAndContinue(String MenusLabel, String ... subMenusLabels)
+    public void clickMenuButtonAndContinue(String menusLabel, String ... subMenusLabels)
     {
-        ExtHelper.clickMenuButton(this, false, MenusLabel, subMenusLabels);
+        ExtHelper.clickMenuButton(this, false, menusLabel, subMenusLabels);
     }
 
     public void dataRegionPageFirst(String dataRegionName)

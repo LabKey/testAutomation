@@ -1,0 +1,313 @@
+<table>
+  <tr>
+    <td class='labkey-form-label'>Batch Name:</td>
+    <td>
+      <div id='batch_name_div'>
+        <span class='extContainer x-form-field-wrap'>
+          <input id='batch_name_input' type='text' value='' cols='40'>
+        </span>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td class='labkey-form-label'>Created:</td>
+    <td>
+      <span id='batch_createdBy_span'></span><br>
+      <span id='batch_created_span'></span>
+    </td>
+  </tr>
+  <tr>
+    <td class='labkey-form-label'>Modified:</td>
+    <td>
+      <span id='batch_modifiedBy_span'></span><br>
+      <span id='batch_modified_span'></span>
+    </td>
+  </tr>
+  <tr><td class='labkey-form-label'>Number of Runs:</td><td><div id='batch_runCount_div'>0</div></td></tr>
+  <tr>
+    <td class='labkey-form-label'>Comment:</td>
+    <td>
+      <div id='batch_comment_div'>
+        <span class='extContainer x-form-field-wrap'>
+          <input id='batch_comment_input' type='textarea' value='' rows='4' cols='60'>
+        </span>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td>
+      <a href='javascript:void(0)' onclick='saveBatch();return false;' class='labkey-disabled-button'>
+        <span>Save</span>
+      </a>
+    </td>
+    <td>
+      <form id='upload-run-form' enctype='multipart/form-data' method='POST'>
+        <div id='upload-run-button'></div>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<div id='runs_div'></div>
+
+<script type="text/javascript">
+  LABKEY.requiresScript("FileUploadField.js");
+</script>
+<script type="text/javascript">
+function setDirty(dirty) {
+  LABKEY.setDirty(dirty);
+  var save_btns = Ext.DomQuery.select("a:has(span:contains(Save))");
+  if (LABKEY.dirty) {
+    Ext.each(save_btns, function (item, index) {
+        Ext.get(item).replaceClass('labkey-disabled-button', 'labkey-button');
+    });
+  }
+  else {
+    Ext.each(save_btns, function (item, index) {
+        Ext.get(item).replaceClass('labkey-button', 'labkey-disabled-button');
+    });
+  }
+}
+
+function saveBatch()
+{
+  if (!LABKEY.dirty) return;
+
+  // XXX: do some basic validation before saving...
+  LABKEY.Experiment.saveBatch({
+    assayId : LABKEY.page.assay.id,
+    batch : LABKEY.page.batch,
+    successCallback : function (batch, response) {
+      LABKEY.page.batch = batch;
+      renderBatch();
+      setDirty(false);
+    },
+    failureCallback : function (errorInfo, response) {
+      Ext.Msg.alert("Error saving", errorInfo.exception || errorInfo.statusText);
+    }
+  });
+}
+
+function init()
+{
+  new Ext.form.TextField({
+    enableKeyEvents: true,
+    listeners: {
+      'keydown': function (field, evt) {
+        if (field.isDirty())
+        {
+          LABKEY.page.batch.name = field.getValue();
+          setDirty(true);
+        }
+      },
+      'specialkey': function (field, evt) {
+        if (evt.getKey() == Ext.EventObject.ENTER)
+        {
+          LABKEY.page.batch.name = field.getValue();
+          setDirty(true);
+        }
+      },
+      'change': function (field, newValue, oldValue) {
+        LABKEY.page.batch.name = newValue;
+        setDirty(true);
+      }
+    },
+    applyTo: 'batch_name_input',
+    id: 'batch_name_field',
+    width: 200
+  });
+
+  new Ext.form.TextArea({
+    enableKeyEvents: true,
+    listeners: {
+      'keydown': function (field, evt) {
+        if (field.isDirty())
+        {
+          LABKEY.page.batch.comment = field.getValue();
+          setDirty(true);
+        }
+      },
+      'specialkey': function (field, evt) {
+        if (evt.getKey() == Ext.EventObject.ENTER)
+        {
+          LABKEY.page.batch.name = field.getValue();
+          setDirty(true);
+        }
+      },
+      'change': function (field, newValue, oldValue) {
+        LABKEY.page.batch.comment = newValue;
+        setDirty(true);
+      }
+    },
+    applyTo: 'batch_comment_input',
+    id: 'batch_comment_field',
+    width: 350,
+    height: 80
+  });
+
+  var form = new Ext.form.BasicForm(
+    Ext.get("upload-run-form"), {
+      fileUpload: true,
+      frame: false,
+      url: LABKEY.ActionURL.buildURL("assay", "assayFileUpload"),
+      listeners: {
+        "actioncomplete" : function (f, action) {
+          console.log("actioncomplete");
+          console.log(action);
+          handleDataUpload(f, action);
+        },
+        "actionfailed" : function (f, action) {
+          console.log("actionfailed");
+          console.log(action);
+          handleDataUpload(f, action);
+        }
+      }
+    });
+
+  var uploadField = new Ext.form.FileUploadField({
+    id: "upload-run-field",
+    renderTo: "upload-run-button",
+    buttonText: "Upload Data...",
+    buttonOnly: true,
+    buttonCfg: {
+      cls: "labkey-button"
+    },
+    listeners: {
+      "fileselected": function (fb, v) {
+        form.submit();
+      }
+    }
+  });
+
+  renderBatch();
+}
+
+function renderBatch()
+{
+  var batch = LABKEY.page.batch;
+  Ext.getCmp('batch_name_field').setValue(batch.name);
+  Ext.fly('batch_created_span').update(batch.created);
+  Ext.fly('batch_createdBy_span').update(batch.createdBy);
+  Ext.fly('batch_modified_span').update(batch.modified);
+  Ext.fly('batch_modifiedBy_span').update(batch.modifiedBy);
+  Ext.getCmp('batch_comment_field').setValue(batch.comment);
+  var runCount = batch.runs ? batch.runs.length : 0;
+  Ext.fly('batch_runCount_div').update(runCount);
+
+  renderRunsWebPart();
+}
+
+var webpart = null;
+
+function renderRunsWebPart()
+{
+  if (LABKEY.page.batch.id)
+  {
+    var partConfig = {};
+    partConfig.viewProtocolId = LABKEY.page.assay.id;
+    partConfig[LABKEY.page.assay.name + " Runs.Batch/RowId~eq"] = LABKEY.page.batch.id;
+
+    webpart = new LABKEY.WebPart({
+      partName: 'Assay Runs',
+      renderTo: 'runs_div',
+      frame: 'none',
+      partConfig: partConfig
+      });
+  }
+
+  if (webpart) webpart.render();
+}
+
+function handleDataUpload(f, action)
+{
+  if (!action || !action.result) {
+    Ext.Msg.alert("Upload Failed", "Something went horribly wrong when uploading.");
+    return;
+  }
+  if (!action.result.id) {
+    Ext.Msg.alert("Upload Failed", "Failed to upload the data file: " + action.result);
+    return;
+  }
+
+  var data = new LABKEY.Exp.Data(action.result);
+
+  var run = new LABKEY.Exp.Run();
+  run.name = data.name || "[New]";
+
+  run.materialInputs = run.materialInputs || [];
+  run.materialInputs[0] = {
+    name: "MyNewMaterialInput_" + LABKEY.page.batch.name + "_" + run.name,
+    properties: { Barcode: "xyzzy" },
+    sampleSet: { name: "Test Sample Set" }
+  };
+
+  run.materialOutputs = run.materialOutputs || [];
+  run.materialOutputs[0] = {
+    name: "MyNewMaterialOutput_" + LABKEY.page.batch.name + "_" + run.name,
+    properties: { Barcode: "xyzzy" },
+    sampleSet: { name: "Test Sample Set" }
+  };
+
+  run.dataInputs = run.dataInputs || [];
+  run.dataInputs[0] = data;
+
+  if (!data.content) {
+    data.getContent({
+      format: 'jsonTSV',
+      successCallback: function (content, format) {
+        data.content = content;
+        handleRunContent(run, content);
+      },
+      failureCallback: function (error, format) {
+        Ext.Msg.alert("Upload Failed", "An error occurred while fetching the contents of the data file.");
+      }
+    });
+  }
+
+}
+
+function handleRunContent(run, content)
+{
+  if (!content) {
+    Ext.Msg.alert("Upload Failed", "The data file has no content");
+    return;
+  }
+  if (!content.sheets || content.sheets.length == 0) {
+    // expected the data file to be parsed as jsonTSV
+    Ext.Msg.alert("Upload Failed", "The data file has no sheets of data");
+    return;
+  }
+
+  var sheet = content.sheets[0];
+  var data = sheet.data;
+  if (!data.length) {
+    Ext.Msg.alert("Upload Failed", "The data file contains no rows");
+    return;
+  }
+
+  run.dataRows = [];
+  for (var i = 0; i < data.length; i++) {
+    // skip header row
+    if (i == 0)
+      continue;
+    var row = data[i];
+    run.dataRows.push({
+        "SampleId": row[0],
+        "TimePoint": row[1],
+        "DoubleData": row[2],
+        "HiddenData": row[3]
+    });
+  }
+
+  LABKEY.page.batch.runs = LABKEY.page.batch.runs || [];
+  LABKEY.page.batch.runs.push(run);
+
+  setDirty(true);
+  saveBatch();
+}
+
+init();
+</script>

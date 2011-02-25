@@ -68,3 +68,13 @@ function afterDelete(row, errors)
     if (row.Name != row.nAmE)
         throw new Error("afterDelete row properties must be case-insensitive.");
 }
+
+var {Debug, trace} = require("simpletest/Debug");
+init         = Debug.addBefore(init, trace);
+beforeInsert = Debug.addBefore(beforeInsert, trace);
+afterInsert  = Debug.addBefore(afterInsert, trace);
+beforeUpdate = Debug.addBefore(beforeUpdate, trace);
+afterUpdate  = Debug.addBefore(afterUpdate, trace);
+beforeDelete = Debug.addBefore(beforeDelete, trace);
+afterDelete  = Debug.addBefore(afterDelete, trace);
+

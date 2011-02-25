@@ -11,6 +11,15 @@ data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
 data/api/security-api.xml -text
 data/api/webPartTest.js -text
+modules/miniassay/assay/simple/config.xml -text
+modules/miniassay/assay/simple/domains/result.xml -text
+modules/miniassay/assay/simple/domains/run.xml -text
+modules/miniassay/assay/simple/queries/Runs.query.xml -text
+modules/miniassay/assay/simple/views/batch.html -text
+modules/miniassay/assay/simple/views/result.html -text
+modules/miniassay/assay/simple/views/run.html -text
+modules/miniassay/assay/simple/views/upload.html -text
+modules/miniassay/config/module.properties -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
 modules/simpletest/queries/lists/People.js -text
@@ -22,6 +31,7 @@ modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Repo
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/vehicle.xml -text
+modules/simpletest/scripts/simpletest/Debug.js -text
 modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
 modules/simpletest/views/model.html -text
@@ -42,11 +52,13 @@ src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
 src/org/labkey/test/bvt/AbstractAssayTest.java -text
 src/org/labkey/test/bvt/AbstractQCAssayTest.java -text
+src/org/labkey/test/bvt/AbstractViabilityTest.java -text
 src/org/labkey/test/bvt/AssayTest.java -text
 src/org/labkey/test/bvt/AuditLogTest.java -text
 src/org/labkey/test/bvt/ButtonCustomizationTest.java -text
 src/org/labkey/test/bvt/CaBigTest.java -text
 src/org/labkey/test/bvt/ClientAPITest.java -text
+src/org/labkey/test/bvt/CreateVialsTest.java -text
 src/org/labkey/test/bvt/CustomizeViewTest.java -text
 src/org/labkey/test/bvt/DataRegionTest.java -text
 src/org/labkey/test/bvt/ElispotAssayTest.java -text

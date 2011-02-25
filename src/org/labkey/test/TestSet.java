@@ -52,7 +52,6 @@ public enum TestSet
         ReportTest.class,
         MicroarrayTest.class,
         ViabilityTest.class,
-        TargetStudyTest.class,
         ButtonCustomizationTest.class,
         ReagentTest.class,
     }),
@@ -111,7 +110,9 @@ public enum TestSet
         SearchTest.class,
         WorkbookTest.class,
         CustomizeViewTest.class,
-        ElispotAssayTest.class
+        ElispotAssayTest.class,
+        CreateVialsTest.class,
+        TargetStudyTest.class,
     }),
 
     Cluster(new Class[]
