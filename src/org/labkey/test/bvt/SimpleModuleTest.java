@@ -40,6 +40,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 {
     public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml
     public static final String MODULE_NAME = "simpletest";
+    public static final String FOLDER_NAME = "subfolder";
     public static final String VEHICLE_SCHEMA = "vehicle";
     public static final String LIST_NAME = "People";
     public static final String LIST_DATA = "Name\tAge\tCrazy\n" +
@@ -61,6 +62,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertModuleEnabledByDefault("simpletest");
         assertModuleEnabledByDefault("Query");
 
+        createSubfolder(getProjectName(), FOLDER_NAME, null);
 
         // Modules enabled in file based folder definition
         //enableModule(getProjectName(), MODULE_NAME);
@@ -215,12 +217,23 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         ));
         try
         {
-            SaveRowsResponse updateRows = updateCmd.execute(cn, "Home");
+            SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
         {
             assertEquals("The row is from the wrong container.", ex.getMessage());
+        }
+
+        // Make sure that the schema isn't resolved if the module is not enabled in the container
+        try
+        {
+            SaveRowsResponse updateRows = updateCmd.execute(cn, "Home");
+            fail("Expected to throw CommandException");
+        }
+        catch (CommandException ex)
+        {
+            assertEquals("The schema 'vehicle' does not exist.", ex.getMessage());
         }
 
         log("** Updating vehicles...");
@@ -249,7 +262,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         try
         {
             log("** Trying to delete Vehicles from a different container");
-            SaveRowsResponse deleteResp = deleteCmd.execute(cn, "Home");
+            SaveRowsResponse deleteResp = deleteCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
