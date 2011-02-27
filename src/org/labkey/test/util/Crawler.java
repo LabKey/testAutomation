@@ -63,6 +63,7 @@ public class Crawler
             new ControllerActionId("Study", "deleteDatasetReport"),
             new ControllerActionId("Study", "deleteDataset"),
             new ControllerActionId("Study", "importStudyFromPipeline"),
+            new ControllerActionId("study", "snapshot"),         // TODO: remove once action is removed (11.2)
             new ControllerActionId("Study-Reports", "deleteReports"),
             new ControllerActionId("Study-Reports", "deleteReport"),
             new ControllerActionId("Study-Reports", "deleteCustomQuery"),
