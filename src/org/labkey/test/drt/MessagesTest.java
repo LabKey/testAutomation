@@ -88,6 +88,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         assertTextPresent(MSG1_BODY_FIRST);
         clickWebpartMenuItem("Messages", "View List");
         assertTextPresent(MSG1_TITLE);
+        goToModule("Messages");
         clickLinkWithText("Messages");
         clickLinkWithText(MSG1_TITLE);
 
