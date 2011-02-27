@@ -139,7 +139,7 @@ var configs = [
 
 //Lots of async script loading. Make sure everything is loaded before starting
 LABKEY.Utils.onTrue({
-    testCallback:function() {return Ext.isReady && LABKEY.vis;},
+    testCallback:function() {return Ext.isReady && LABKEY.vis && window.pv},
     //Calling createGraph directly causes errors to get swallowed by onTrue. We defer one more time
     successCallback:function () {createGraph.defer(100)},
     errorCallback:doError
