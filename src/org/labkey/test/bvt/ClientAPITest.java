@@ -278,13 +278,28 @@ public class ClientAPITest extends BaseSeleniumWebTest
     {
         setSourceFromFile("lineChartTest.js");
 
+        //Some things we know about test 0. After this we loop through some others and just test to see if they convert
         assertTextPresent("Test Chart");
         assertTextPresent("Y Axis");
         assertTextPresent("X Axis");
         assertTextPresent("Series1");
         assertTextPresent("Series2");
+        checkSVGConversion();
 
-        //Now see if the SVG converter is working by posting to it directly
+        String testCountStr = getFormElement(Locator.id("configCount"));
+        int testCount = Integer.parseInt(testCountStr);
+        for (int currentTest = 1; currentTest < testCount; currentTest++)
+        {
+            setFormElement("config", "" + currentTest);
+            clickAndWait(Locator.input("submit"));
+            waitForDivPopulation();
+            checkSVGConversion();
+        }
+    }
+
+    private void checkSVGConversion() throws Exception
+    {
+        //The server side svg converer is fairly strict and will fail with bad inputs
         clickButton("Get SVG", 0);
         String svgText = getFormElement(Locator.id("svgtext"));
 
