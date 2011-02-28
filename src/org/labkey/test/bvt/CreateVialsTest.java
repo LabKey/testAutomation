@@ -134,20 +134,21 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertEquals("2", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("totalCells", 0), "10000000");
-        fireEvent(Locator.name("totalCells", 0), BaseSeleniumWebTest.SeleniumEvent.blur);
+        fireEvent(Locator.name("totalCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
         assertEquals("1", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("totalCells", 0), "40000000");
-        fireEvent(Locator.name("totalCells", 0), BaseSeleniumWebTest.SeleniumEvent.blur);
+        fireEvent(Locator.name("totalCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
         assertEquals("2", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("totalCells", 0), "50000000");
-        fireEvent(Locator.name("totalCells", 0), BaseSeleniumWebTest.SeleniumEvent.blur);
+        fireEvent(Locator.name("totalCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
         assertEquals("3", table.getDataAsText(0, "Vial Count"));
 
         clickButton("Save");
 
         table = new DataRegionTable(getAssayName() + " Data", this);
+        assertEquals("B02_1.0_0,B02_1.0_1,B02_1.0_2", table.getDataAsText(1, "Specimen IDs"));
         assertEquals("5.000E7", table.getDataAsText(1, "Original Cells"));
         assertEquals("3", table.getDataAsText(1, "Specimen Count"));
 
