@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+ */
     LABKEY.requiresVisualization();
 //Since we are in a single script block (within a nested function created by test framework, no less)
 //we need to make sure that everything is loaded including visualization libraries
