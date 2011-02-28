@@ -2110,6 +2110,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'display: block')]"), wait);
     }
 
+    public void waitForExtMask()
+    {
+        waitForExtMask( WAIT_FOR_JAVASCRIPT );
+    }
+
+    public void waitForExtMask(int wait)
+    {
+        waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'display: block')]"), wait);
+    }
+
     protected File getTestTempDir()
     {
         File buildDir = new File(getLabKeyRoot(), "build");
@@ -4371,7 +4381,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void validateQueries()
     {
-        ExtHelper.clickExtToolbarButton(this, "Validate Queries", 0);
+        ExtHelper.clickExtButton(this, "Validate Queries", 0);
         Locator locButton = Locator.xpath("//button[text()='Start Validation']");
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
         waitForElement(locButton, WAIT_FOR_JAVASCRIPT);

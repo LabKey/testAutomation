@@ -54,14 +54,16 @@ public class RReportHelper
         // running a saved script
         if (!test.isLinkPresentWithText("Download input data") && test.isLinkPresentWithText("Source"))
         {
-            test.clickLinkWithText("Source");
+            ExtHelper.clickExtTab(test, "Source");
         }
 
         test.toggleScriptReportEditor();
         test.setFormElement(Locator.id("script"), script);
-        test.clickNavButton("Execute Script");
+        ExtHelper.clickExtTab(test, "View");
+        test.sleep(2000); // TODO -- need to wait for old output to disappear (in some cases)
+        test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), test.getDefaultWaitForPage());
 
-        Locator l = Locator.xpath("//div[@id='tabContent']//pre");
+        Locator l = Locator.xpath("//div[@id='viewDiv']//pre");
         String html = test.getText(l);
 
         if (failOnError)
@@ -87,6 +89,7 @@ public class RReportHelper
                 }
             }
         }
+
         return true;
     }
 

@@ -100,7 +100,7 @@ public class ReportTest extends StudyBaseTest
 
     protected void doCreateSteps()
     {
-        // fail fast if R is not configured 
+        // fail fast if R is not configured
         RReportHelper.ensureRConfig(this);
 
         // import study and wait; no specimens needed
@@ -246,9 +246,11 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("Views", "Create", "R View");
+        toggleScriptReportEditor();
+        setFormElement(Locator.id("script"), "");
 
         log("Execute bad scripts");
-        clickNavButton("Execute Script");
+        clickViewTab();
         assertTextPresent("Empty script, a script must be provided.");
         if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
@@ -272,10 +274,8 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent(R_SCRIPT1_TEXT2);
         assertElementPresent(Locator.id(R_SCRIPT1_IMG));
         assertTextPresent(R_SCRIPT1_PDF);
-        clickLinkWithText("Source");
-        clickNavButton("Save View", 0);
-        setFormElement("reportName", R_SCRIPTS[0]);
-        clickNavButton("Save");
+
+        saveReport(R_SCRIPTS[0]);
 
         log("Create view");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
@@ -294,15 +294,12 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Views", "Create", "R View");
         toggleScriptReportEditor();
         setFormElement(Locator.id("script"), "labkey.data");
-        clickNavButton("Execute Script");
+        clickViewTab();
         assertTextNotPresent(R_REMCOL);
         assertTextNotPresent(R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
 
-        clickLinkWithText("Source");
-        clickNavButton("Save View", 0);
-        setFormElement("reportName", R_SCRIPTS[3]);
-        clickNavButton("Save");
+        saveReport(R_SCRIPTS[3]);
 
         popLocation();
 
@@ -312,6 +309,7 @@ public class ReportTest extends StudyBaseTest
         //clickNavButton("Reports >>", 0);
         //clickLinkWithText(R_SCRIPTS[0]);
         clickMenuButton("Views", R_SCRIPTS[0]);
+        waitForText("Console output", WAIT_FOR_PAGE);
         assertTextPresent("null device");
         assertTextNotPresent("Error executing command");
         assertTextPresent(R_SCRIPT1_TEXT1);
@@ -326,21 +324,17 @@ public class ReportTest extends StudyBaseTest
         if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 fail("There was an error running the script");
-        clickLinkWithText("Source");
+        clickSourceTab();
         checkCheckbox("shareReport");
         checkCheckbox("runInBackground");
-        clickNavButton("Execute Script");
+        clickViewTab();
 
         log("Check that R script worked");
         // Add once issue 3738 is fixed
 //        assertElementNotPresent(Locator.id(R_SCRIPT1_IMG));
 //        assertTextNotPresent(R_SCRIPT1_PDF);
         assertTextPresent(R_SCRIPT2_TEXT1);
-        clickLinkWithText("Source");
-        //click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
-        clickNavButton("Save View", 0);
-        setFormElement("reportName", R_SCRIPTS[1]);
-        clickNavButton("Save");
+        saveReport(R_SCRIPTS[1]);
 
         log("Check that background run works");
         //clickNavButton("Reports >>", 0);
@@ -389,7 +383,7 @@ public class ReportTest extends StudyBaseTest
         setPermissions("Users", "Project Administrator");
         exitPermissionsUI();
 
-        log("Create a new R script which uses others R scripts");
+        log("Create a new R script that uses other R scripts");
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
@@ -400,8 +394,7 @@ public class ReportTest extends StudyBaseTest
             if (!RReportHelper.executeScript(this, R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 fail("There was an error running the script");
         assertTextPresent(R_SCRIPT2_TEXT1);
-        clickLinkWithText("Source");
-        clickNavButton("Save View", 0);
+        resaveReport();
 
         log("Test editing R scripts");
         signOut();
@@ -412,8 +405,7 @@ public class ReportTest extends StudyBaseTest
         if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 fail("There was an error running the script");
-        clickLinkWithText("Source");
-        clickNavButton("Save View");
+        resaveReport();
 
         log("Check that edit worked");
         clickLinkWithText(getProjectName());
@@ -421,14 +413,50 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink(R_SCRIPTS[1], "source");
 
         checkCheckbox(Locator.name("includedReports"));
-        clickNavButton("Execute Script");
-        clickNavButton("Start Job");
-        waitForElement(Locator.navButton("Start Job"), 30000);
+        clickViewTab();
+        waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Start Job", 0);
+        waitForText("COMPLETE", WAIT_FOR_PAGE);
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
+    }
+
+    private void saveReport(String name)
+    {
+        clickSourceTab();
+        clickNavButton("Save", 0);
+
+        if (null != name)
+        {
+            setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
+            ExtHelper.clickExtButton(this, "Save");
+        }
+
+        sleep(2000);
+    }
+
+    private void resaveReport()
+    {
+        saveReport(null);
+    }
+
+    private void clickViewTab()
+    {
+        clickDesignerTab("View");
+    }
+
+    private void clickSourceTab()
+    {
+        clickDesignerTab("Source");
+    }
+
+    private void clickDesignerTab(String name)
+    {
+        ExtHelper.clickExtTab(this, name);
+        sleep(2000); // TODO
     }
 
     protected void deleteRReports()

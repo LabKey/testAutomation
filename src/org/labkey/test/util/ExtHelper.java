@@ -200,12 +200,12 @@ public class ExtHelper
         test.click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and contains( text(), '" + tabText + "')]"));
     }
 
-    public static void clickExtToolbarButton(BaseSeleniumWebTest test, String caption)
+    public static void clickExtButton(BaseSeleniumWebTest test, String caption)
     {
-        clickExtToolbarButton(test, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
+        clickExtButton(test, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
     }
 
-    public static void clickExtToolbarButton(BaseSeleniumWebTest test, String caption, int wait)
+    public static void clickExtButton(BaseSeleniumWebTest test, String caption, int wait)
     {
         test.log("Clicking Ext button with caption: " + caption);
         Locator loc = Locator.xpath("//button[contains(./@class, 'x-btn-text') and text()='" + caption + "']");
@@ -215,5 +215,4 @@ public class ExtHelper
         else
             test.click(loc);
     }
-
 }

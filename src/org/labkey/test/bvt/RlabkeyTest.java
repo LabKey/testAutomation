@@ -77,7 +77,6 @@ public class RlabkeyTest extends SimpleApiTest
         setFormElement("title", ISSUE_TITLE_1);
         clickNavButton("Submit");
 
-
         RReportHelper.ensureRConfig(this);
     }
 
