@@ -464,7 +464,7 @@
     </target>
 
 
-    <target name="startSeleniumServer" if="selenium.server.needs.starting" depends="init-selenium">
+    <target name="startSeleniumServer" description="start selenium server" if="selenium.server.needs.starting" depends="init-selenium">
         <echo message="Starting selenium server on local server, port ${sysprop.selenium.server.port}."/>
         <echo message="Server will stop after successful tests."/>
         <echo message="Or use ant stopSeleniumServer to stop manually."/>
@@ -519,7 +519,7 @@
         <antcall target="sub-selenium"/>
     </target>
 
-    <target name="stopSeleniumServer" depends="init-selenium">
+    <target name="stopSeleniumServer" description="stop selenium server" depends="init-selenium">
         <echo message="Stopping selenium server." />
         <condition property="selenium.server.shut.down">
             <http url="http://localhost:${sysprop.selenium.server.port}/selenium-server/driver/?cmd=shutDownSeleniumServer"/>
