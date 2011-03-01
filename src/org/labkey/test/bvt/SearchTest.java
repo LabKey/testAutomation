@@ -22,7 +22,6 @@ import org.labkey.test.util.ListHelper;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Trey Chadick
  * Date: Apr 27, 2010
  * Time: 9:10:47 AM
@@ -104,14 +103,41 @@ public class SearchTest extends StudyTest
         moveFolder(getProjectName(), getFolderName(), FOLDER_B, false);
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
 
+        verifySyntaxErrorMessages();
+
         _testDone = true;
+    }
+
+    private void verifySyntaxErrorMessages()
+    {
+        SearchHelper.searchFor(this, "age()");
+        checkSyntaxErrorMessage("Error: Can't parse 'age()': Problem character is highlighted", "These characters have special meaning within search queries:", "You can escape special characters using \\ before the character or you can enclose the query string in double quotes.", "For more information, visit the search syntax documentation.");
+        SearchHelper.searchFor(this, "incomplete(");
+        checkSyntaxErrorMessage("Error: Can't parse 'incomplete(': Query string is incomplete", "These characters have special meaning within search queries:");
+        SearchHelper.searchFor(this, "this AND OR");
+        checkSyntaxErrorMessage("Error: Can't parse 'this AND OR': Problem character is highlighted", "Boolean operators AND, OR, and NOT have special meaning within search queries");
+    }
+
+    private void checkSyntaxErrorMessage(String... expectedPhrases)
+    {
+        // We want our nice, custom error messages to appear
+        assertTextPresent(expectedPhrases);
+
+        // Various phrases that appear in the standard Lucene system error message
+        assertTextNotPresent("Cannot parse");
+        assertTextNotPresent("encountered");
+        assertTextNotPresent("Was expecting");
+        assertTextNotPresent("<NOT>");
+        assertTextNotPresent("<OR>");
+        assertTextNotPresent("<AND>");
+        assertTextNotPresent("<EOF>");
     }
 
     @Override
     protected void doCleanup() throws Exception
     {
         try {deleteProject(getProjectName());} catch (Throwable t) {}
-        if(_testDone)
+        if (_testDone)
         {
             sleep(5000); // wait for index to update.
             SearchHelper.verifyNoSearchResults(this);
