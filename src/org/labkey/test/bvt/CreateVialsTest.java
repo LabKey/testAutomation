@@ -145,6 +145,8 @@ public class CreateVialsTest extends AbstractViabilityTest
         fireEvent(Locator.name("totalCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
         assertEquals("3", table.getDataAsText(0, "Vial Count"));
 
+        pressTab(Locator.name("totalCells", 0).toString());
+
         clickButton("Save");
 
         table = new DataRegionTable(getAssayName() + " Data", this);
