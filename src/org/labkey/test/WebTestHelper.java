@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
@@ -169,18 +170,15 @@ public class WebTestHelper
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
-    public static int logToServer(String message)
+    public static void logToServer(String message) throws Exception
     {
-        try
-        {
-            String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
-            HttpClient client = WebTestHelper.getHttpClient(getBaseURL() + "/admin/log.view?message=" + message);
-            return client.executeMethod(new GetMethod(encodedUrl));
-        }
-        catch (IOException e)
-        {
-            return -1;
-        }
+        String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
+        HttpClient client = getHttpClient(getBaseURL() + "/admin/log.view?message=" + message);
+        GetMethod get = new GetMethod(encodedUrl);
+        int responseCode = client.executeMethod(get);
+
+        if (responseCode != HttpStatus.SC_OK)
+            throw new Exception("Contacting server failed: " + HttpStatus.getStatusText(responseCode));
     }
 
     private static String encodeURI(String parameter)

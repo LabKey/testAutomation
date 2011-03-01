@@ -1091,7 +1091,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
             }
 
-            WebTestHelper.logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
+            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
 
             log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
