@@ -1705,9 +1705,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkNotPresentWithText(child);
         log("Creating subfolder " + child + " under project " + parent);
         clickLinkWithText(project);
+        if (!parent.equals(project))
+            clickLinkWithText(parent);
         clickLinkWithText("Folders");
         // click last index, since this text appears in the nav tree
-        clickLinkWithText(parent, countLinksWithText(parent) - 1);
         clickNavButton("Create Subfolder");
         setText("name", child);
         checkRadioButton("folderType", folderType);
@@ -1776,10 +1777,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Deleting folder " + folderName + " under project " + project);
         clickLinkWithText(project);
+        clickLinkWithText(folderName);
         ensureAdminMode();
         clickLinkWithText("Folders");
-        // click index 1, since this text appears in the nav tree as well as the folder management tree:
-        clickLinkWithText(folderName, 1);
         clickNavButton("Delete");
         // confirm delete:
         clickNavButton("Delete");
@@ -1792,10 +1792,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
         clickLinkWithText(project);
+        clickLinkWithText(folderName);
         ensureAdminMode();
-        clickLinkWithText("Folders");
-        // click index 1, since this text appears in the nav tree as well as the folder management tree:
-        clickLinkWithText(folderName, 1);
+        clickLinkWithText("Folders");     
         clickNavButton("Rename");
         setText("name", newFolderName);
         if (createAlias)
@@ -1813,17 +1812,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
         clickLinkWithText(projectName);
+        clickLinkWithText(folderName);
         ensureAdminMode();
         clickLinkWithText("Folders");
-        // click index 1, since this text appears in the nav tree as well as the folder management tree:
-        clickLinkWithText(folderName, 1);
         clickNavButton("Move");
         if (createAlias)
             checkCheckbox("addAlias");
         else
             uncheckCheckbox("addAlias");
+        // Select Target
+        selectFolderTreeItem(newParent);
         // move:
-        clickLinkWithText(newParent, 1);
+        clickNavButton("Confirm Move");
         // verify that we're not on an error page with a check for folder link:
         assertLinkPresentWithText(folderName);
         assertLinkPresentWithText(newParent);
@@ -2559,6 +2559,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, defaultWaitForPage);
     }
 
+    public void selectFolderTreeItem(String folderName)
+    {
+        click(Locator.permissionsTreeNode(folderName));
+    }
+    
     public void mouseOver(Locator l)
     {
         selenium.mouseOver(l.toString());
