@@ -209,7 +209,7 @@ public class RReportHelper
 
     public static void saveReport(BaseSeleniumWebTest test, String name)
     {
-        test.clickLinkWithText("Source");
+        test.clickLinkWithText("Source", 0);
         test.clickNavButton("Save View", 0);
         test.setFormElement("reportName", name);
         test.clickNavButton("Save");
