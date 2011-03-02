@@ -151,8 +151,15 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         table = new DataRegionTable(getAssayName() + " Data", this);
         assertEquals("B02_1.0_0,B02_1.0_1,B02_1.0_2", table.getDataAsText(1, "Specimen IDs"));
+        // Total Cells value doesn't get updated, only Original Cells
+        assertEquals("3.253E7", table.getDataAsText(1, "Total Cells"));
         assertEquals("5.000E7", table.getDataAsText(1, "Original Cells"));
         assertEquals("3", table.getDataAsText(1, "Specimen Count"));
+
+        assertEquals("B03_1.0_0,B03_1.0_1", table.getDataAsText(2, "Specimen IDs"));
+        assertEquals("3.476E7", table.getDataAsText(2, "Total Cells"));
+        assertEquals("3.476E7", table.getDataAsText(2, "Original Cells"));
+        assertEquals("2", table.getDataAsText(2, "Specimen Count"));
 
 
         // Uncomment when 11574 is fixed
