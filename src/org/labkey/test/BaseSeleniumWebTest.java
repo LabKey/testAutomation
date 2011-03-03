@@ -1704,11 +1704,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                     "This folder may already exist, or the name appears elsewhere in the UI.");
         assertLinkNotPresentWithText(child);
         log("Creating subfolder " + child + " under project " + parent);
-        clickLinkWithText(project);
-        if (!parent.equals(project))
-            clickLinkWithText(parent);
+        String _active = (!parent.equals(project)? parent : project);
+        clickLinkWithText(_active);
         clickLinkWithText("Folders");
         // click last index, since this text appears in the nav tree
+        waitForExtFolderTreeNode(_active, 10000);
         clickNavButton("Create Subfolder");
         setText("name", child);
         checkRadioButton("folderType", folderType);
@@ -1780,6 +1780,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(folderName);
         ensureAdminMode();
         clickLinkWithText("Folders");
+        waitForExtFolderTreeNode(folderName, 10000);
         clickNavButton("Delete");
         // confirm delete:
         clickNavButton("Delete");
@@ -1794,7 +1795,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(project);
         clickLinkWithText(folderName);
         ensureAdminMode();
-        clickLinkWithText("Folders");     
+        clickLinkWithText("Folders");
+        waitForExtFolderTreeNode(folderName, 10000);
         clickNavButton("Rename");
         setText("name", newFolderName);
         if (createAlias)
@@ -1815,6 +1817,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(folderName);
         ensureAdminMode();
         clickLinkWithText("Folders");
+        waitForExtFolderTreeNode(folderName, 10000);
         clickNavButton("Move");
         if (createAlias)
             checkCheckbox("addAlias");
@@ -2176,6 +2179,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         public boolean check();
     }
 
+    public void waitForExtFolderTreeNode(String nodeText, int wait)
+    {
+        final Locator locator = new Locator("//a[contains(@class, 'x-tree-node-anchor')]/span[text() = " + Locator.xq(nodeText) + "]");
+        String failMessage = "Ext NodeTree with locator " + locator + " did not appear in [" + wait + "ms]";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return isElementPresent(locator);
+            }
+        }, failMessage, wait);
+    }
+    
     public void waitForElement(final Locator locator, int wait)
     {
         String failMessage = "Element with locator " + locator + " did not appear [" + wait + "ms]";
