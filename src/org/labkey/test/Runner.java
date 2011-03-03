@@ -36,7 +36,7 @@ import java.util.*;
  */
 public class Runner extends TestSuite
 {
-    private static final int MAX_TEST_FAILURES = 10;
+    private static final int DEFAULT_MAX_TEST_FAILURES = 10;
     private static final TestSet DEFAULT_TEST_SET = TestSet.DRT;
     private static Map<Test, Long> _testStats = new LinkedHashMap<Test, Long>();
     private static int _testCount;
@@ -229,7 +229,17 @@ public class Runner extends TestSuite
         {
             boolean failed = false;
             boolean errored = false;
-            if (_failedTests.size() + _erroredTests.size() < MAX_TEST_FAILURES)
+            
+            int _maxTestFailures;
+            try{
+                _maxTestFailures = Integer.parseInt(System.getProperty("maxTestFailures", String.valueOf(DEFAULT_MAX_TEST_FAILURES))); // 0 is unlimited
+            }
+            catch (NumberFormatException e)
+            {
+                _maxTestFailures = DEFAULT_MAX_TEST_FAILURES;
+            }
+
+            if (_failedTests.size() + _erroredTests.size() < _maxTestFailures || _maxTestFailures <= 0)
             {
                 int failCount = testResult.failureCount();
                 int errorCount = testResult.errorCount();
@@ -239,7 +249,7 @@ public class Runner extends TestSuite
             }
             else
             {
-                testResult.addError(test, new Throwable(test.toString() + " not run: reached " + MAX_TEST_FAILURES + " failures."));
+                testResult.addError(test, new Throwable(test.toString() + " not run: reached " + _maxTestFailures + " failures."));
                 errored = true;
             }
 
