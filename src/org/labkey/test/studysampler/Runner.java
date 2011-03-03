@@ -36,8 +36,6 @@ import java.util.Random;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 
-import javax.print.attribute.standard.DateTimeAtCompleted;
-
 
 /**
  * Created by IntelliJ IDEA.
@@ -70,6 +68,7 @@ public class Runner
             "account",
             "dam",
             "sire",
+            "cage",
             "userid"
     );
 
@@ -81,7 +80,6 @@ public class Runner
             "surgeon",
             "source",
             "room",
-            "cage",
             "roomcage",
             //protocol.tsv
             "inves",
