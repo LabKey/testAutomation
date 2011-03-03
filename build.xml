@@ -853,11 +853,6 @@
             <isset property="devMode"/>
         </condition>
 
-        <!-- Set property sysprop.devMode: true or false -->
-        <condition property="sysprop.maxTestFailures" value="${maxTestFailures}" else="10">
-            <isset property="maxTestFailures"/>
-        </condition>
-
         <!-- Set property sysprop.adaptiveRoot: relative path -->
         <condition property="sysprop.adaptiveRoot" value="${adaptiveRoot}" else="">
             <isset property="adaptiveRoot"/>
@@ -945,7 +940,7 @@
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
-            <sysproperty key="maxTestFailures" value="${sysprop.maxTestFailures}"/>
+            <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -987,7 +982,7 @@
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
-            <sysproperty key="maxTestFailures" value="${sysprop.maxTestFailures}"/>
+            <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
 
             <formatter type="plain"/>
 
@@ -1030,7 +1025,7 @@
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
-            <sysproperty key="maxTestFailures" value="${sysprop.maxTestFailures}"/>
+            <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
