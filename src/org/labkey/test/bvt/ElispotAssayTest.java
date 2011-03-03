@@ -69,37 +69,26 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         addWebPart("Assay List");
 
+        //create a new elispot template
+        clickNavButton("Manage Assays");
+        clickNavButton("Configure Plate Templates");
+        clickLinkWithText("new 96 well (8x12) ELISpot default template");
+        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
+
+        setText("templateName", PLATE_TEMPLATE_NAME);
+        clickNavButton("Save & Close");
+        assertTextPresent(PLATE_TEMPLATE_NAME);
+
         //create a new elispot assay
+        clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
         checkRadioButton("providerName", "ELISpot");
         clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
         log("Setting up Elispot assay");
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_ELISPOT);
-
-        sleep(1000);
-        clickNavButton("Save", 0);
-        waitForText("Save successful.", 20000);
-
-        clickLinkWithText("configure templates");
-        clickLinkWithText("new 96 well (8x12) ELISpot default template");
-
-        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
-
-        setText("templateName", PLATE_TEMPLATE_NAME);
-        clickNavButton("Save & Close");
-
-        assertTextPresent(PLATE_TEMPLATE_NAME);
-
-        clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
-
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design");
-        waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
 
         selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_ELISPOT_DESC);
