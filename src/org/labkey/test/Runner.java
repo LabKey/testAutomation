@@ -23,6 +23,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.JUnitFooter;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -354,6 +355,7 @@ public class Runner extends TestSuite
         for (Class testClass : testClasses)
         {
             Test test = null;
+            Boolean isServerSideTest = false;
             try
             {
                 Method suiteMethod = testClass.getMethod("suite");
@@ -379,8 +381,15 @@ public class Runner extends TestSuite
             {
                 test = new JUnit4TestAdapter(testClass);
             }
+            else isServerSideTest = true;
 
             suite.addTest(test);
+
+            if (isServerSideTest)
+            {
+                // Check for leaks and errors after JUnitTest runs
+                suite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
+            }
         }
     }
 

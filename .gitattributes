@@ -171,6 +171,7 @@ src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/ExperimentRunTable.java -text
 src/org/labkey/test/util/ExtHelper.java -text
+src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/Maps.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
