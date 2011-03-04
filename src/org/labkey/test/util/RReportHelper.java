@@ -210,8 +210,8 @@ public class RReportHelper
     public static void saveReport(BaseSeleniumWebTest test, String name)
     {
         test.clickLinkWithText("Source", false);
-        test.clickNavButton("Save View", 0);
-        test.setFormElement("reportName", name);
-        test.clickNavButton("Save");
+        test.clickNavButton("Save", 0);
+        ExtHelper.setExtFormElement(test, name);
+        ExtHelper.clickExtButton(test, "Save");
     }
 }

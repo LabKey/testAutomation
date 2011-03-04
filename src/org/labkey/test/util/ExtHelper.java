@@ -108,6 +108,12 @@ public class ExtHelper
         return msg;
     }
 
+    public static void setExtFormElement(BaseSeleniumWebTest test, String text)
+    {
+        // Currently used only in RReportHelper.  Modify as needed to be more universal.
+        test.setFormElement(Locator.xpath("//input[@class='ext-mb-input' and @type='text']"), text);
+    }
+
     public static Locator locateBrowserFileCheckbox(String fileName)
     {
         return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
