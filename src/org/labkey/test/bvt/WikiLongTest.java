@@ -635,17 +635,17 @@ public class WikiLongTest extends BaseSeleniumWebTest
         {
             selectOptionByText("rendererType", renderType);
         }
+
         if ("HTML".equals(renderType) && isNavButtonPresent("Use HTML Source Editor"))
             clickNavButton("Use HTML Source Editor");
     }
 
     protected void doCleanup()
-        {
-            deleteUser(USER1);
-            try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-            try {deleteProject(PROJECT2_NAME); } catch (Throwable t) {}
-            try {deleteProject(PROJECT3_NAME); } catch (Throwable t) {}
-            try {deleteProject(PROJECT4_NAME); } catch (Throwable t) {}
-        }
-
+    {
+        deleteUser(USER1);
+        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        try {deleteProject(PROJECT2_NAME); } catch (Throwable t) {}
+        try {deleteProject(PROJECT3_NAME); } catch (Throwable t) {}
+        try {deleteProject(PROJECT4_NAME); } catch (Throwable t) {}
+    }
 }
