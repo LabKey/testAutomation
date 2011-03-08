@@ -25,6 +25,9 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.CommandException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Date;
@@ -228,7 +231,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         // Make sure that the schema isn't resolved if the module is not enabled in the container
         try
         {
-            SaveRowsResponse updateRows = updateCmd.execute(cn, "Home");
+            SaveRowsResponse updateRows = updateCmd.execute(cn, "Shared");
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -252,10 +255,47 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTrue("Expected rowid on vehicle.html page", rowid > 0);
 
 
+        log("** Insert vehicle into subfolder...");
+        insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        insertCmd.getRows().addAll(Arrays.asList(
+                Maps.<String, Object>of(
+                        "ModelId", priusId,
+                        "Color", "Red!",
+                        "ModelYear", Integer.valueOf(3000),
+                        "Milage", Integer.valueOf(3000),
+                        "LastService", new Date(2011, 1, 1)
+                )
+        ));
+        insertResp = insertCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
+        assertEquals("Expected to insert 1 row.", 1, insertResp.getRowsAffected().intValue());
+        
+        log("** Select with url containerFilter");
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
-        assertTrue("Expected to select >0 rows.", selectResp.getRowCount().intValue() > 0);
+        assertEquals("Expected to select 3 rows.", 3, selectResp.getRowCount().intValue());
+
+        log("** Select with customView with containerFilter");
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setViewName("VehiclesInCurrentAndSubfolders");
+        selectResp = selectCmd.execute(cn, getProjectName());
+        assertEquals("Expected to select 3 rows.", 3, selectResp.getRowCount().intValue());
+
+        log("** Select with customView with containerFilter, override with url containerFilter");
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(ContainerFilter.Current);
+        selectCmd.setViewName("VehiclesInCurrentAndSubfolders");
+        selectResp = selectCmd.execute(cn, getProjectName());
+        assertEquals("Expected to select 2 rows.", 2, selectResp.getRowCount().intValue());
+
+        log("** Select with no container filter");
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setMaxRows(-1);
+        selectResp = selectCmd.execute(cn, getProjectName());
+        assertEquals("Expected to select 2 rows.", 2, selectResp.getRowCount().intValue());
 
         DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         deleteCmd.setRows(selectResp.getRows());
@@ -273,27 +313,55 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
     private void cleanupSchema(Connection cn) throws IOException
     {
-        cleanupTable(cn, "Vehicles", getProjectName());
-        cleanupTable(cn, "Models", null);
-        cleanupTable(cn, "Manufacturers", null);
-        cleanupTable(cn, "Colors", null);
+        // enable simpletest module in Home so we can delete from all containers
+        enableModule("Home", "simpletest");
+
+        cleanupTable(cn, "Vehicles");
+        cleanupTable(cn, "Models");
+        cleanupTable(cn, "Manufacturers");
+        cleanupTable(cn, "Colors");
     }
 
-    private void cleanupTable(Connection cn, String tableName, String project) throws IOException
+    private void cleanupTable(Connection cn, String tableName) throws IOException
     {
-        log("** Deleting all " + tableName + " from '" + (project == null ? "root" : project) + "'");
+        log("** Deleting all " + tableName + " in all containers");
         try
         {
             SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, tableName);
             selectCmd.setMaxRows(-1);
-            SelectRowsResponse selectResp = selectCmd.execute(cn, project);
+            selectCmd.setContainerFilter(ContainerFilter.AllFolders);
+            selectCmd.setColumns(Arrays.asList("*"));
+            SelectRowsResponse selectResp = selectCmd.execute(cn, "Home");
 
             if (selectResp.getRowCount().intValue() > 0)
             {
-                DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, tableName);
-                deleteCmd.setRows(selectResp.getRows());
-                deleteCmd.execute(cn, project);
-                assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, project).getRowCount().intValue());
+                Map<String, List<Map<String, Object>>> rowsByContainer = new LinkedHashMap<String, List<Map<String, Object>>>();
+                if (selectResp.getColumnModel("Container") != null)
+                {
+                    for (Map<String, Object> row : selectResp.getRows())
+                    {
+                        String container = (String)row.get("Container");
+                        List<Map<String, Object>> rows = rowsByContainer.get(container);
+                        if (rows == null)
+                            rowsByContainer.put(container, rows = new ArrayList<Map<String, Object>>());
+                        rows.add(row);
+                    }
+                }
+                else
+                {
+                    rowsByContainer.put(null, selectResp.getRows());
+                }
+
+                for (String container : rowsByContainer.keySet())
+                {
+                    String c = container == null ? "Home" : container;
+                    DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, tableName);
+                    List<Map<String, Object>> rows = rowsByContainer.get(container);
+                    deleteCmd.setRows(rows);
+                    deleteCmd.execute(cn, c);
+                }
+                
+                assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, "Home").getRowCount().intValue());
             }
         }
         catch (CommandException e)
@@ -392,6 +460,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(LIST_NAME);
         clickMenuButton("Views", "Super Cool R Report");
+        waitForText("Console output", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("\"name\"");
         assertTextPresent("\"age\"");
         assertTextPresent("\"crazy\"");

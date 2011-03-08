@@ -203,16 +203,16 @@ public class CreateVialsTest extends AbstractViabilityTest
         popLocation();
 
 
-        // Uncomment when 11574 is fixed
-        //log("** Copy to study");
-        //clickLinkWithText("view runs");
-        //selenium.click(".toggle");
-        //clickButton("Copy to Study");
-        //clickButton("Next");
-        //assertTitleContains("Copy to " + getFolderName() + " Study");
-        //// UNDONE: assert first row has no specimen match
-        //clickButton("Copy to Study");
-        //assertTextPresent("B02");
+        log("** Copy to study");
+        clickLinkWithText("view runs");
+        selenium.click(".toggle");
+        clickButton("Copy to Study");
+        clickButton("Next");
+        assertTitleContains("Copy to " + getFolderName() + " Study");
+        // UNDONE: assert first row has no specimen match
+        clickButton("Copy to Study");
+        assertTextPresent("B02");
+        
     }
 
 }

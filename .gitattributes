@@ -26,6 +26,7 @@ modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text
 modules/simpletest/queries/vehicle/Toyotas.sql -text
+modules/simpletest/queries/vehicle/Vehicles/VehiclesInCurrentAndSubfolders.qview.xml -text
 modules/simpletest/queries/vehicle/colors.js -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-0.10.sql -text
