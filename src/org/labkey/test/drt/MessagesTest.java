@@ -58,6 +58,8 @@ public class MessagesTest extends BaseSeleniumWebTest
         submit();
         addWebPart("Search");
 
+        enableEmailRecorder();
+
         log("Check that Plain Text message works and is added everywhere");
         clickLinkWithText(PROJECT_NAME);
         clickNavButton("New");
