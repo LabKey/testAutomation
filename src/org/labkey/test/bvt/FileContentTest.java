@@ -90,14 +90,10 @@ public class FileContentTest extends BaseSeleniumWebTest
         if (isFileUploadAvailable())
         {
             // Setup notificaiton emails
-            // TODO: email admin has moved out of the config dialog, but also need a way to test email notifications
             // as they are now digest based.
             clickAdminMenuItem("Manage Project", "Folder Settings");
             clickLinkWithText("Email Notifications");
             clickNavButton("Settings", 0);
-            clickButtonByIndex("Update Settings", 1, 0);
-            ExtHelper.waitForExtDialog(this, "Error", WAIT_FOR_JAVASCRIPT);
-            clickNavButton("OK", 0);
             // Set folder default
             ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='defaultFileEmailOption']]"), "15 minute digest");
             clickButtonByIndex("Update Folder Default", 1, 0);
