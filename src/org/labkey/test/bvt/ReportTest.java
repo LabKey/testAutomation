@@ -401,7 +401,7 @@ public class ReportTest extends StudyBaseTest
         signIn();
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickReportGridLink(R_SCRIPTS[0], "source");
+        clickReportGridLink(R_SCRIPTS[0], "edit");
         if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 fail("There was an error running the script");
@@ -410,7 +410,7 @@ public class ReportTest extends StudyBaseTest
         log("Check that edit worked");
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickReportGridLink(R_SCRIPTS[1], "source");
+        clickReportGridLink(R_SCRIPTS[1], "edit");
 
         checkCheckbox(Locator.name("includedReports"));
         clickViewTab();
