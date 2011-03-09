@@ -42,6 +42,10 @@
     <property name="test.compile.optimize" value="true"/>
 
     <property file="${project.root}/server/version.properties" />
+    <!-- Grab product.version set by TeamCity if it is there -->
+    <condition property="product.version" value="${teamcity.product.version}" else="${svn.product.version}" >
+        <isset property="teamcity.product.version"/>
+    </condition>
     <property name="version" value="${product.version}"/>
 
 
