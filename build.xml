@@ -442,6 +442,7 @@
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
+            <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
