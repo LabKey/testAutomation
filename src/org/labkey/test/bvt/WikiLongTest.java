@@ -100,6 +100,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        enableEmailRecorder();
         createProject(PROJECT2_NAME);
         setPermissions("Users", "Editor");
         clickNavButton("Save and Finish");
