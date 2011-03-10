@@ -34,11 +34,15 @@ function beforeInsert(row, errors) {
 
     // Field error value as a single string.
     if (row.Name == "TestFieldErrorMessage")
+    {
+        errors.Hex = "**expect to overwrite this**";
         errors.Hex = "single message";
+    }
 
     // Field error value as an array of error messages.
     if (row.Name == "TestFieldErrorArray")
     {
+        errors.Name = "**expect to overwrite this**";
         errors.Name = [ "one error message"];
         errors.Name.push("two error message!");
         errors.Name.push("ha ha ha!");
@@ -47,7 +51,13 @@ function beforeInsert(row, errors) {
 
     // Adding a generic error not associated with a field
     if (row.Name == "TestRowError")
+    {
         errors[null] = "boring error message";
+        // Test setting a schema/query/row number
+        errors._rowNumber = 1000;
+        errors._schemaName = "blarg";
+        errors._queryName = "zorg";
+    }
 
     // Returning false will cancel the insert with a
     // generic error message for the row.
@@ -55,7 +65,7 @@ function beforeInsert(row, errors) {
         return false;
 
     if (row.Name == "TestErrorInComplete")
-        errors.Hex = "TestErrorInComplete error one";
+        errors.Hex = "TestErrorInComplete error field one";
 
     // Values can be transformed during insert and update
     row.Name = row.Name + "!";
@@ -76,6 +86,10 @@ function beforeUpdate(row, oldRow, errors) {
     // Test oldRow map is case-insensitive
     if (oldRow.Name != oldRow.nAmE && oldRow.Hex != oldRow.hex)
         throw new Error("beforeUpdate oldRow properties must be case-insensitive.");
+
+    // Adding a generic error not associated with a field
+    if (row.Name == "TestRowErrorBeforeUpdate!")
+        errors[null] = "boring error message beforeUpdate";
 
     // Woah, scary! Even the pk 'Name' property can be changed during update.
     if (row.Name[row.Name.length - 1] == "!")
@@ -102,6 +116,10 @@ function beforeDelete(row, errors) {
     // Test row map is case-insensitive
     if (row.Name != row.nAmE)
         throw new Error("beforeDelete row properties must be case-insensitive.");
+
+    // Adding a generic error not associated with a field
+    if (row.Name == "TestRowErrorBeforeDelete!")
+        errors[null] = "boring error message beforeDelete";
 }
 
 function afterDelete(row, errors) {
@@ -116,8 +134,12 @@ function complete(event, errors) {
 
         for (var i in errors) {
             var error = errors[i];
-            if (error.Hex == "TestErrorInComplete error one")
-                error.Hex = [ "TestErrorInComplete error one", "TestErrorInComplete error two" ];
+            // DEV NOTE: This is a little wierd: the value of error.Hex is the
+            // stringified form of the error.Hex field error list and so is
+            // bracketed by [ and ] which might be unexpected in the script.
+            // Assigning to 'Hex' adds new error messages.  Old ones can't be removed.
+            if (error.Hex == "[TestErrorInComplete error field one]")
+                error.Hex = [ "TestErrorInComplete error field two", "TestErrorInComplete error field three" ];
         }
 
         for (var i in rows) {
@@ -125,10 +147,13 @@ function complete(event, errors) {
 
             // The 'errors' object for init/complete is an array of maps
             if (row.Name == "TestErrorInComplete!")
-                errors.push({ Name : "TestErrorInComplete error three!", _rowNumber: i });
+                errors.push({ Name : "TestErrorInComplete error global four!", _rowNumber: i, _row: {a: "A", b: "B"} });
 
             if (row.Name == "TestFieldErrorArrayInComplete!")
-                errors.push({Name: ["one error message", "two error message"], _rowNumber: i});
+            {
+                errors.push({Name: ["one error message", "two error message"], Hex: ["three error message"], _rowNumber: i});
+                errors.push({Hex: "four error message", _rowNumber: i});
+            }
 
             // Returning false will cancel the insert with
             // a generic error message for the entire set of rows.

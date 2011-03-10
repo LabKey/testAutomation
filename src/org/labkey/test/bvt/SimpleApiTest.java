@@ -21,14 +21,12 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.Diff;
+import org.labkey.test.util.JSONHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,25 +43,7 @@ import java.util.regex.Pattern;
  */
 public abstract class SimpleApiTest extends BaseSeleniumWebTest
 {
-    private boolean _failedComparisonFatal = true;
-    private List<Pattern> _ignoredElements = null;
-
-    // json key elements to ignore during the comparison phase, these can be regular expressions
-    static final Pattern[] _globallyIgnored = {
-            Pattern.compile("entityid", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("containerid", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("rowid", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("lsid", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("_labkeyurl_.*"),
-            Pattern.compile("id", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("objectId", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("userId", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("groupId", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("message", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("created", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("FilePathRoot", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("displayName", Pattern.CASE_INSENSITIVE)
-    };
+    JSONHelper _helper = null;
 
     enum ActionType {
         get,
@@ -96,10 +76,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
         if (testFiles != null)
         {
-            // load up the elements to skip comparisons on
-            _ignoredElements = new ArrayList<Pattern>();
-            _ignoredElements.addAll(Arrays.asList(_globallyIgnored));
-            _ignoredElements.addAll(Arrays.asList(getIgnoredElements()));
+            _helper = new JSONHelper(this, getIgnoredElements());
             for (File testFile : testFiles)
             {
                 if (testFile.exists())
@@ -203,15 +180,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                 if (status == HttpStatus.SC_OK)
                 {
                     String response = method.getResponseBodyAsString();
-                    if (compareResponse(response, expectedResponse))
-                    {
-                        log("response matched");
-                    }
-                    else
-                    {
-                        String diff = Diff.diff(expectedResponse, response);
-                        fail("FAILED: test " + name + "\n" + diff);
-                    }
+                    _helper.assertEquals("FAILED: test " + name, expectedResponse, response);
                 }
             }
             catch (IOException e)
@@ -223,106 +192,6 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                 method.releaseConnection();
             }
         }
-    }
-
-    private boolean compareResponse(String responseStr, String expectedResponseStr)
-    {
-        JSONObject response = (JSONObject)JSONValue.parse(responseStr);
-        JSONObject expectedResponse = (JSONObject)JSONValue.parse(expectedResponseStr);
-
-        return compareElement(expectedResponse, response);
-    }
-
-    private boolean compareMap(Map map1, Map map2)
-    {
-/*
-        if (map1.size() != map2.size())
-        {
-            logInfo("Comparison of maps failed: sizes are different: " + map1.size() + " and: " + map2.size());
-            return false;
-        }
-*/
-
-        for (Object key : map1.keySet())
-        {
-            if (map2.containsKey(key))
-            {
-                if (!skipElement(String.valueOf(key)) && !compareElement(map1.get(key), map2.get(key)))
-                    return false;
-            }
-            else
-            {
-                logInfo("Comparison of maps failed: could not find key: " + key);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean compareList(List list1, List list2)
-    {
-        if (list1.size() != list2.size())
-        {
-            logInfo("Comparison of lists failed: sizes are different");
-            return false;
-        }
-
-        // lists are not ordered
-        _failedComparisonFatal = false;
-        for (int i=0; i < list1.size(); i++)
-        {
-            boolean matched = false;
-            for (int j=0; j < list2.size(); j++)
-            {
-                if (compareElement(list1.get(i), list2.get(j)))
-                {
-                    matched = true;
-                    break;
-                }
-            }
-            if (!matched)
-            {
-                _failedComparisonFatal = true;
-                logInfo("Failed to match two specified lists.  " + list1.get(i) + " was not found in list2.\nList 1: " +
-                        list1.toString() + "\nList2: " + list2.toString());
-                return false;
-            }
-        }
-        _failedComparisonFatal = true;
-        return true;
-    }
-
-    private boolean compareElement(Object o1, Object o2)
-    {
-        if (o1 instanceof Map)
-            return compareMap((Map)o1, (Map)o2);
-        else if (o1 instanceof List)
-            return compareList((List)o1, (List)o2);
-        else
-        {
-            if (StringUtils.equals(String.valueOf(o1), String.valueOf(o2)))
-                return true;
-            else
-            {
-                logInfo("Comparison of elements: " + o1 + " and: " + o2 + " failed");
-                return false;
-            }
-        }
-    }
-
-    private void logInfo(String msg)
-    {
-        if (_failedComparisonFatal)
-            log(msg);
-    }
-
-    private boolean skipElement(String element)
-    {
-        for (Pattern ignore : _ignoredElements)
-        {
-            if (ignore.matcher(element).matches()) return true;
-        }
-        return false;
     }
 
     private void sendRequest(String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch)

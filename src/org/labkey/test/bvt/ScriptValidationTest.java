@@ -16,11 +16,12 @@
 package org.labkey.test.bvt;
 
 import org.apache.commons.lang.StringUtils;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
+import org.labkey.test.util.JSONHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 
@@ -84,6 +85,8 @@ public class ScriptValidationTest extends SimpleModuleTest
 
     private void doTestValidation() throws Exception
     {
+        JSONHelper json = new JSONHelper(this);
+
         try
         {
             log("** Test errors: throw Error()'");
@@ -105,14 +108,28 @@ public class ScriptValidationTest extends SimpleModuleTest
         catch (CommandException e)
         {
             assertEquals("single message", e.getMessage());
-
             JSONObject properties = (JSONObject)e.getProperties();
-            JSONArray errors = (JSONArray)properties.get("errors");
-            assertEquals(1, errors.size());
-
-            JSONObject error = (JSONObject)errors.get(0);
-            assertEquals("Hex", error.get("field"));
-            assertEquals("single message", error.get("message"));
+            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+                "\"exception\":\"single message\"," +
+                "\"errors\":[{" +
+                    "\"errors\":[{" +
+                        "\"id\":\"Hex\"," +
+                        "\"field\":\"Hex\"," +
+                        "\"message\":\"single message\"," +
+                        "\"msg\":\"single message\"" +
+                    "}]," +
+                    "\"schemaName\":\"vehicle\"," +
+                    "\"queryName\":\"Colors\"," +
+                    "\"exception\":\"single message\"," +
+                    "\"rowNumber\":0," +
+                    "\"row\":{" +
+                        "\"Name\":\"TestFieldErrorMessage!\"," +
+                        "\"Hex\":null" +
+                    "}" +
+                "}]" +
+            "}");
+            
+            json.assertEquals("FAILED", expected, properties);
         }
 
         try
@@ -123,29 +140,29 @@ public class ScriptValidationTest extends SimpleModuleTest
         }
         catch (CommandException e)
         {
-            assertEquals("one error message; two error message!; ha ha ha!; also an error here", e.getMessage());
-
+            assertEquals("one error message", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
-            assertEquals(0, ((Number)properties.get("rowNumber")).intValue());
-            
-            JSONArray errors = (JSONArray)properties.get("errors");
-            assertEquals(4, errors.size());
+            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+                "\"exception\":\"one error message\"," +
+                "\"errors\":[{" +
+                    "\"errors\":[" +
+                        "{\"id\":\"Name\",\"field\":\"Name\",\"message\":\"one error message\",\"msg\":\"one error message\"}," +
+                        "{\"id\":\"Name\",\"field\":\"Name\",\"message\":\"two error message!\",\"msg\":\"two error message!\"}," +
+                        "{\"id\":\"Name\",\"field\":\"Name\",\"message\":\"ha ha ha!\",\"msg\":\"ha ha ha!\"}," +
+                        "{\"id\":\"Hex\",\"field\":\"Hex\",\"message\":\"also an error here\",\"msg\":\"also an error here\"}" +
+                    "]," +
+                    "\"schemaName\":\"vehicle\"," +
+                    "\"queryName\":\"Colors\"," +
+                    "\"exception\":\"one error message\"," +
+                    "\"rowNumber\":0," +
+                    "\"row\":{" +
+                        "\"Name\":\"TestFieldErrorArray!\"," +
+                        "\"Hex\":null" +
+                    "}" +
+                "}]" +
+            "}");
 
-            JSONObject error0 = (JSONObject)errors.get(0);
-            assertEquals("Name", error0.get("field"));
-            assertEquals("one error message", error0.get("message"));
-
-            JSONObject error1 = (JSONObject)errors.get(1);
-            assertEquals("Name", error1.get("field"));
-            assertEquals("two error message!", error1.get("message"));
-
-            JSONObject error2 = (JSONObject)errors.get(2);
-            assertEquals("Name", error2.get("field"));
-            assertEquals("ha ha ha!", error2.get("message"));
-
-            JSONObject error3 = (JSONObject)errors.get(3);
-            assertEquals("Hex", error3.get("field"));
-            assertEquals("also an error here", error3.get("message"));
+            json.assertEquals("FAILED", expected, properties);
         }
 
         try
@@ -159,14 +176,24 @@ public class ScriptValidationTest extends SimpleModuleTest
             assertEquals("boring error message", e.getMessage());
 
             JSONObject properties = (JSONObject)e.getProperties();
-            assertEquals(0, ((Number)properties.get("rowNumber")).intValue());
-
-            JSONArray errors = (JSONArray)properties.get("errors");
-            assertEquals(1, errors.size());
-
-            JSONObject error0 = (JSONObject)errors.get(0);
-//            assertNull(error0.get("field"));
-            assertEquals("boring error message", error0.get("message"));
+            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+                "\"exception\":\"boring error message\"," +
+                "\"errors\":[{" +
+                    "\"errors\":[{" +
+                        "\"message\":\"boring error message\"," +
+                        "\"msg\":\"boring error message\"" +
+                    "}]," +
+                    "\"schemaName\":\"blarg\"," +
+                    "\"queryName\":\"zorg\"," +
+                    "\"exception\":\"boring error message\"," +
+                    "\"rowNumber\":1000," +
+                    "\"row\":{" +
+                        "\"Name\":\"TestRowError!\"," +
+                        "\"Hex\":null" +
+                    "}" +
+                "}]" +
+            "}");
+            json.assertEquals("FAILED", expected, properties);
         }
 
         try
@@ -180,14 +207,24 @@ public class ScriptValidationTest extends SimpleModuleTest
             assertEquals("beforeInsert validation failed", e.getMessage());
 
             JSONObject properties = (JSONObject)e.getProperties();
-            assertEquals(0, ((Number)properties.get("rowNumber")).intValue());
-
-            JSONArray errors = (JSONArray)properties.get("errors");
-            assertEquals(1, errors.size());
-
-            JSONObject error0 = (JSONObject)errors.get(0);
-            assertFalse(error0.containsKey("field"));
-            assertEquals("beforeInsert validation failed", error0.get("message"));
+            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+                "\"exception\":\"beforeInsert validation failed\"," +
+                "\"errors\":[{" +
+                    "\"errors\":[{" +
+                        "\"message\":\"beforeInsert validation failed\"," +
+                        "\"msg\":\"beforeInsert validation failed\"" +
+                    "}]," +
+                    "\"schemaName\":\"vehicle\"," +
+                    "\"queryName\":\"Colors\"," +
+                    "\"exception\":\"beforeInsert validation failed\"," +
+                    "\"rowNumber\":0," +
+                    "\"row\":{" +
+                        "\"Name\":\"TestReturnFalse\"," +
+                        "\"Hex\":\"\"" +
+                    "}" +
+                "}]" +
+            "}");
+            json.assertEquals("FAILED", expected, properties);
         }
 
         try
@@ -202,32 +239,46 @@ public class ScriptValidationTest extends SimpleModuleTest
         }
         catch (CommandException e)
         {
-            assertEquals("Row 2: TestErrorInComplete error one; TestErrorInComplete error two\n" +
-                    "Row 2: TestErrorInComplete error three!", e.getMessage());
-
+            assertEquals("TestErrorInComplete error field two", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
-
-            JSONArray errors = (JSONArray)properties.get("errors");
-            assertEquals(2, errors.size());
-
-            JSONObject error0 = (JSONObject)errors.get(0);
-            assertFalse(error0.containsKey("field"));
-            assertFalse(error0.containsKey("message"));
-            assertEquals(2, ((Number)error0.get("rowNumber")).intValue());
-
-            JSONArray error0errors = (JSONArray)error0.get("errors");
-            assertEquals(2, error0errors.size());
-            assertEquals("Hex", ((JSONObject)error0errors.get(0)).get("field"));
-            assertEquals("TestErrorInComplete error one", ((JSONObject)error0errors.get(0)).get("message"));
-            assertEquals("Hex", ((JSONObject)error0errors.get(1)).get("field"));
-            assertEquals("TestErrorInComplete error two", ((JSONObject)error0errors.get(1)).get("message"));
-
-
-            JSONObject error1 = (JSONObject)errors.get(1);
-            JSONArray error1errors = (JSONArray)error1.get("errors");
-            assertEquals(2, ((Number)error1.get("rowNumber")).intValue());
-            assertEquals("Name", ((JSONObject)error1errors.get(0)).get("field"));
-            assertEquals("TestErrorInComplete error three!", ((JSONObject)error1errors.get(0)).get("message"));
+            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+                "\"exception\":\"TestErrorInComplete error field two\"," +
+                "\"errors\":[{" +
+                    "\"errors\":[{" +
+                        "\"id\":\"Hex\"," +
+                        "\"field\":\"Hex\"," +
+                        "\"message\":\"TestErrorInComplete error field two\"," +
+                        "\"msg\":\"TestErrorInComplete error field two\"" +
+                    "},{" +
+                        "\"id\":\"Hex\"," +
+                        "\"field\":\"Hex\"," +
+                        "\"message\":\"TestErrorInComplete error field three\"," +
+                        "\"msg\":\"TestErrorInComplete error field three\"" +
+                    "}]," +
+                    "\"schemaName\":\"vehicle\"," +
+                    "\"queryName\":\"Colors\"," +
+                    "\"exception\":\"TestErrorInComplete error field two\"," +
+                    "\"rowNumber\":2," +
+                    "\"row\":{" +
+                        "\"Name\":\"TestErrorInComplete!\"," +
+                        "\"Hex\":\"\"" +
+                    "}" +
+                "},{" +
+                    "\"errors\":[{" +
+                        "\"id\":\"Name\"," +
+                        "\"field\":\"Name\"," +
+                        "\"message\":\"TestErrorInComplete error global four!\"," +
+                        "\"msg\":\"TestErrorInComplete error global four!\"" +
+                    "}]," +
+                    "\"exception\":\"TestErrorInComplete error global four!\"," +
+                    "\"rowNumber\":2," +
+                    "\"row\":{" +
+                        "\"a\":\"A\"," +
+                        "\"b\":\"B\"" +
+                    "}" +
+                "}]" +
+            "}");
+            json.assertEquals("FAILED", expected, properties);
         }
 
         try
@@ -238,7 +289,41 @@ public class ScriptValidationTest extends SimpleModuleTest
         }
         catch (CommandException e)
         {
-            assertEquals("one error message; two error message", e.getMessage());
+            assertEquals("one error message", e.getMessage());
+            JSONObject properties = (JSONObject)e.getProperties();
+            JSONObject expected = (JSONObject)JSONValue.parse("{" +
+                "\"exception\":\"one error message\"," +
+                "\"errors\":[{" +
+                    "\"errors\":[{" +
+                        "\"id\":\"Name\"," +
+                        "\"field\":\"Name\"," +
+                        "\"message\":\"one error message\"," +
+                        "\"msg\":\"one error message\"" +
+                    "},{" +
+                        "\"id\":\"Name\"," +
+                        "\"field\":\"Name\"," +
+                        "\"message\":\"two error message\"," +
+                        "\"msg\":\"two error message\"" +
+                    "},{" +
+                        "\"id\":\"Hex\"," +
+                        "\"field\":\"Hex\"," +
+                        "\"message\":\"three error message\"," +
+                        "\"msg\":\"three error message\"" +
+                    "}]," +
+                    "\"exception\":\"one error message\"," +
+                    "\"rowNumber\":0" +
+                "},{" +
+                   "\"errors\":[{" +
+                       "\"id\":\"Hex\"," +
+                       "\"field\":\"Hex\"," +
+                       "\"message\":\"four error message\"," +
+                       "\"msg\":\"four error message\"" +
+                    "}]," +
+                    "\"exception\":\"four error message\"," +
+                    "\"rowNumber\":0" +
+                "}]" +
+            "}");
+            json.assertEquals("FAILED", expected, properties);
         }
 
         try
