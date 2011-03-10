@@ -111,7 +111,7 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         log("Check email admin works");
         clickWebpartMenuItem("Messages", "Email", "Administration");
 
-        clickNavButton("Settings", 0);
+        clickNavButton("Update Settings", 0);
 
         Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@id='defaultEmailOption']/../../div");
 
