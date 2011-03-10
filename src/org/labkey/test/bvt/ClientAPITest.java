@@ -651,11 +651,12 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         for (String email : recipients)
         {
-            if (NumberUtils.isDigits(email))
+            if (NumberUtils.isNumber(email))
             {
                 // principal id
-                recipientStr.append("{type:LABKEY.Message.recipientType.to, ").append("principalId:");
-                recipientStr.append(email).append("},");
+                recipientStr.append("LABKEY.Message.createPrincipalIdRecipient(LABKEY.Message.recipientType.to, '");
+                recipientStr.append(email);
+                recipientStr.append("'),");
             }
             else
             {
