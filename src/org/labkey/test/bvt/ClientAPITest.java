@@ -3,6 +3,7 @@ package org.labkey.test.bvt;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.lang.math.NumberUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -600,7 +601,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         enableEmailRecorder();
 
-
         // test failure cases: no from email
         setSource(createEmailSource("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
         assertTextPresent("failure");
@@ -628,6 +628,10 @@ public class ClientAPITest extends BaseSeleniumWebTest
         setSource(createEmailSource(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, true));
         assertTextPresent("success");
 
+        // verify principalId only allowed from a server side script
+        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
+        assertTextPresent("failure");
+
         goToModule("Dumbster");
 
         assertTextPresent(EMAIL_SUBJECT_1);
@@ -647,9 +651,18 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         for (String email : recipients)
         {
-            recipientStr.append("LABKEY.Message.createRecipient(LABKEY.Message.recipientType.to, '");
-            recipientStr.append(email);
-            recipientStr.append("'),");
+            if (NumberUtils.isDigits(email))
+            {
+                // principal id
+                recipientStr.append("{type:LABKEY.Message.recipientType.to, ").append("principalId:");
+                recipientStr.append(email).append("},");
+            }
+            else
+            {
+                recipientStr.append("LABKEY.Message.createRecipient(LABKEY.Message.recipientType.to, '");
+                recipientStr.append(email);
+                recipientStr.append("'),");
+            }
         }
 
         if (plainTxtBody != null)
