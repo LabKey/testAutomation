@@ -19,7 +19,6 @@ package org.labkey.test.bvt;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -152,6 +151,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         checkCheckbox(Locator.checkboxByTitle("Experiment"));
         checkCheckbox(Locator.checkboxByTitle("Query"));
         clickNavButton("Update Folder");
+
         addWebPart("Lists");
         clickLinkWithText("manage lists");
 
@@ -171,6 +171,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		selenium.type("firstInputField", "1");
 		selenium.type("quf_Value", "One");
         submit();
+
+/*
+        Snapshot Study Data feature has been removed
+
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Manage Study");
         clickNavButton("Snapshot Study Data");
@@ -195,6 +199,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         else
             fail("Missing subjects table");
         assertTextPresent("Vaccine2");
+
+       */
+
 		clickLinkWithText(STUDY_FOLDER + " Study");
         setupPipeline(PROJECT_NAME);
         defineAssay(PROJECT_NAME);
@@ -206,11 +213,17 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Next");
         clickNavButton("Copy to Study");
         clickLinkContainingText(STUDY_FOLDER + " Study");
+
+        clickLinkWithText("TestAssay1");
+        assertTextPresent("P1");
+        assertTextPresent("V3");
+        assertTextPresent("V4-8");
+
+/*
         clickLinkContainingText("Manage Study");
 
         //Resnapshot the data & pick up the new table
         clickNavButton("Snapshot Study Data");
-        assertTextPresent("TestAssay1");
         clickNavButton("Create Snapshot");
         clickLinkWithText(STUDY_FOLDER +" Study");
 
@@ -227,11 +240,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
             viewQueryData("VerifySnapshot", "testassay1");
         else
             fail("TestAssay1 table not present");
+*/
 
-        assertTextPresent("P1");
-        assertTextPresent("V3");
-
-        clickLinkWithText("VaccineStudy Study");
+        clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         assertTextPresent("Day 12");
         clickLinkWithText("Manage Study");
@@ -248,29 +259,28 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
         submit();
 
-
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Day");
         CustomizeViewsHelper.applyCustomView(this);
         assertTextPresent("-120");
         assertTextPresent("320");
-        clickLinkWithText("VaccineStudy Study");
+        clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         assertTextPresent("Day 320");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Timepoints");
         setFormElement("startDate", "2007-11-01");
         submit();
-        clickLinkWithText("VaccineStudy Study");
+        clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         //Make sure our guy picked up the new study start date
         assertTextPresent("Day 16");
-        clickLinkWithText("VaccineStudy Study");
+        clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Subjects");
         clickNavButton("Import Data");
         setFormElement("tsv", "participantid\tDate\tCohort\tStartDate\nPnew\t11/7/2007\tPlacebo\t11/7/2007");
         submit();
-        clickLinkWithText("VaccineStudy Study");
+        clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         //Make sure our guy picked up the his personal start date
         assertTextPresent("Day 10");
