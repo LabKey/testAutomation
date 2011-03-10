@@ -31,7 +31,7 @@ var testFunctions = [
         LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        
     },
 
-    /*function() //testResults[3]
+    function() //testResults[3]
     {
         // get the result from the single-row select call:
         var prevRowset = testResults[1].rows;
@@ -142,7 +142,7 @@ var testFunctions = [
     function() //testResults[14]
     { // Check that failed inserts/updates did not occur (Age: -1) and successful deletes did (Age: 88)
         LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '-1;88', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);
-    },*/
+    },
 
     // last function sets the contents of the results div.
     function()
@@ -163,7 +163,7 @@ var testFunctions = [
         else
             html += 'FAILURE: Bad update did not generate expected exception.<br>';
 
-        /*if (testResults[3].rowsAffected == 1)
+        if (testResults[3].rowsAffected == 1)
             html += 'SUCCESS: Update affected 1 rows<br>';
         else
             html += 'FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '<br>';
@@ -225,7 +225,7 @@ var testFunctions = [
         if (testResults[14].rowCount == 0)
             html += 'SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';
         else
-            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';*/
+            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';
         document.getElementById('testDiv').innerHTML = html;        
     }
 ];
