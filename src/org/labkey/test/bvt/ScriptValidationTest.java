@@ -101,8 +101,8 @@ public class ScriptValidationTest extends SimpleModuleTest
 
         try
         {
-            log("** Test errors: Field='message'");
-            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorMessage", null)));
+            log("** Test errors: Field='message' and test extraContext is echoed back");
+            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorMessage", null)), Maps.<String, Object>of("A", "a", "B", 3));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -111,6 +111,10 @@ public class ScriptValidationTest extends SimpleModuleTest
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"single message\"," +
+                "\"extraContext\":{" +
+                    "\"A\":\"a\"," +
+                    "\"B\":3" +
+                "}," +
                 "\"errors\":[{" +
                     "\"errors\":[{" +
                         "\"id\":\"Hex\"," +
@@ -369,6 +373,11 @@ public class ScriptValidationTest extends SimpleModuleTest
 
     private List<ColorRecord> insertColors(List<ColorRecord> colors) throws Exception
     {
+        return insertColors(colors, null);
+    }
+
+    private List<ColorRecord> insertColors(List<ColorRecord> colors, Map<String, Object> extraContext) throws Exception
+    {
         ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>(colors.size());
         for (ColorRecord color : colors)
             list.add(color.toMap());
@@ -377,6 +386,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         InsertRowsCommand cmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
+        cmd.setExtraContext(extraContext);
         SaveRowsResponse response = cmd.execute(cn, getProjectName());
         assertEquals("Expected to insert " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
@@ -388,6 +398,11 @@ public class ScriptValidationTest extends SimpleModuleTest
 
     private List<ColorRecord> updateColors(List<ColorRecord> colors) throws Exception
     {
+        return updateColors(colors, null);
+    }
+
+    private List<ColorRecord> updateColors(List<ColorRecord> colors, Map<String, Object> extraContext) throws Exception
+    {
         ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>(colors.size());
         for (ColorRecord color : colors)
             list.add(color.toMap());
@@ -396,6 +411,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         UpdateRowsCommand cmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
+        cmd.setExtraContext(extraContext);
         SaveRowsResponse response = cmd.execute(cn, getProjectName());
         assertEquals("Expected to update " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
