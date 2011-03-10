@@ -93,7 +93,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             // as they are now digest based.
             clickAdminMenuItem("Manage Project", "Folder Settings");
             clickLinkWithText("Email Notifications");
-            clickNavButton("Settings", 0);
+            click(Locator.navButton("Update Settings"));
             // Set folder default
             ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='defaultFileEmailOption']]"), "15 minute digest");
             clickButtonByIndex("Update Folder Default", 1, 0);
