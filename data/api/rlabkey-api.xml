@@ -204,7 +204,7 @@
             <response>
                 <![CDATA[
                  Type Area Title Assigned To Pri Status
-                1 An issue entered at the Project level 0 3 open
+                1 Rlabkey: Issue at the Project level 0 3 open
                  Milestone
                 1
                 ]]>
@@ -222,8 +222,8 @@
              <response>
                  <![CDATA[
                   Type Area Title Assigned To Pri Status
-                 1 An issue entered at the Project level 0 3 open
-                 2 An issue inserted in the subfolder 0 3 open
+                 1 Rlabkey: Issue at the Project level 0 3 open
+                 2 Rlabkey: Issue in the subfolder 0 3 open
                   Milestone
                  1
                  2
@@ -243,7 +243,7 @@
             <response>
                 <![CDATA[
                  Type Area Title Assigned To Pri Status
-                1 An issue inserted in the subfolder 0 3 open
+                1 Rlabkey: Issue in the subfolder 0 3 open
                  Milestone
                 1
                 ]]>
@@ -261,8 +261,8 @@
              <response>
                  <![CDATA[
                   Type Area Title Assigned To Pri Status
-                 1 An issue entered at the Project level 0 3 open
-                 2 An issue inserted in the subfolder 0 3 open
+                 1 Rlabkey: Issue at the Project level 0 3 open
+                 2 Rlabkey: Issue in the subfolder 0 3 open
                   Milestone
                  1
                  2
@@ -281,8 +281,8 @@
              <response>
                  <![CDATA[
                   Type Area Title Assigned To Pri Status
-                 1 An issue entered at the Project level 0 3 open
-                 2 An issue inserted in the subfolder 0 3 open
+                 1 Rlabkey: Issue at the Project level 0 3 open
+                 2 Rlabkey: Issue in the subfolder 0 3 open
                   Milestone
                  1
                  2
@@ -294,15 +294,17 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
-                     schemaName="issues", queryName="Issues", containerFilter="AllFolders")
+                     schemaName="issues", queryName="Issues",
+                     colFilter=makeFilter(c("Title", "STARTS_WITH", "Rlabkey:")),
+                     containerFilter="AllFolders")
                  selectedRow
                  ]]>
              </url>
              <response>
                  <![CDATA[
                   Type Area Title Assigned To Pri Status
-                 1 An issue entered at the Project level 0 3 open
-                 2 An issue inserted in the subfolder 0 3 open
+                 1 Rlabkey: Issue at the Project level 0 3 open
+                 2 Rlabkey: Issue in the subfolder 0 3 open
                   Milestone
                  1
                  2

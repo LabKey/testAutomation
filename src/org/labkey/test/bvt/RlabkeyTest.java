@@ -36,8 +36,8 @@ public class RlabkeyTest extends SimpleApiTest
     private static final String LIST_NAME = "AllTypes";
     private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")";
     private static final String FOLDER_NAME = "RlabkeyTest";
-    private static final String ISSUE_TITLE_0 = "An issue entered at the Project level";
-    private static final String ISSUE_TITLE_1 = "An issue inserted in the subfolder";
+    private static final String ISSUE_TITLE_0 = "Rlabkey: Issue at the Project level";
+    private static final String ISSUE_TITLE_1 = "Rlabkey: Issue in the subfolder";
 
     @Override
     public void runUITests() throws Exception
@@ -46,7 +46,7 @@ public class RlabkeyTest extends SimpleApiTest
         createProject(PROJECT_NAME);
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Lists");
-
+       
         log("Import Lists");
         File listArchive = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip");
 
@@ -76,7 +76,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_1);
         clickNavButton("Submit");
-
+        
         RReportHelper.ensureRConfig(this);
     }
 
