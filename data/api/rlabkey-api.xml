@@ -289,7 +289,7 @@
                  ]]>
              </response>
          </test>
-    <test name="ContainerFilter4" type="post">
+    <test name="ContainerFilter6" type="post">
              <url>
                  <![CDATA[
                      library(Rlabkey)
@@ -305,9 +305,11 @@
                   Type Area Title Assigned To Pri Status
                  1 Rlabkey: Issue at the Project level 0 3 open
                  2 Rlabkey: Issue in the subfolder 0 3 open
+                 3 Rlabkey: Issue in another project 0 3 open
                   Milestone
                  1
                  2
+                 3
                  ]]>
              </response>
          </test>

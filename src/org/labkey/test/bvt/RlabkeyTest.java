@@ -33,17 +33,20 @@ import java.util.List;
 public class RlabkeyTest extends SimpleApiTest
 {
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
+    private static final String PROJECT_NAME_2 = PROJECT_NAME + "2";
     private static final String LIST_NAME = "AllTypes";
     private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")";
     private static final String FOLDER_NAME = "RlabkeyTest";
     private static final String ISSUE_TITLE_0 = "Rlabkey: Issue at the Project level";
     private static final String ISSUE_TITLE_1 = "Rlabkey: Issue in the subfolder";
+    private static final String ISSUE_TITLE_2 = "Rlabkey: Issue in another project";
 
     @Override
     public void runUITests() throws Exception
     {
-        log("Create Project");
+        log("Create Projects");
         createProject(PROJECT_NAME);
+        createProject(PROJECT_NAME_2);
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Lists");
        
@@ -75,6 +78,16 @@ public class RlabkeyTest extends SimpleApiTest
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_1);
+        clickNavButton("Submit");
+
+        clickLinkWithText(PROJECT_NAME_2);
+        addWebPart("Issues List");
+        clickNavButton("Admin");
+        uncheckCheckbox("requiredFields", "AssignedTo");
+        clickNavButton("Update");
+        clickNavButton("Back to Issues");
+        clickNavButton("New Issue");
+        setFormElement("title", ISSUE_TITLE_2);
         clickNavButton("Submit");
         
         RReportHelper.ensureRConfig(this);
@@ -125,6 +138,7 @@ public class RlabkeyTest extends SimpleApiTest
     protected void doCleanup() throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        try {deleteProject(PROJECT_NAME_2); } catch (Throwable t) {}
     }
 
     public String getAssociatedModuleDirectory()
