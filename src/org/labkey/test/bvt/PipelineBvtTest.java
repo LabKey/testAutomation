@@ -121,7 +121,7 @@ public class PipelineBvtTest extends PipelineWebTestBase
             checkEmail(emailTable, 4);
 
             // Make sure the expected errors have been logged.
-            checkExpectedErrors();
+            checkExpectedErrors(4);
 
             // Test pipeline error escalation email.
             _testSetMS1.getParams()[0].validateEmailEscalation(0);
@@ -201,35 +201,6 @@ public class PipelineBvtTest extends PipelineWebTestBase
         assertTrue("Expected " + countExpect + " notification emails, found " + count,
                 count == countExpect);
         emailTable.clearAndRecord();
-    }
-
-    public void checkExpectedErrors()
-    {
-        // Need to remember our location or the next test could start with a blank page
-        pushLocation();
-        beginAt("/admin/showErrorsSinceMark.view");
-
-        //IE and Firefox have different notions of empty.
-        //IE returns html for all pages even empty text...
-        String text = selenium.getHtmlSource();
-        if (null == text)
-            text = "";
-        text = text.trim();
-        if ("".equals(text))
-        {
-            text = selenium.getText("//body");
-            if (null == text)
-                text = "";
-            text = text.trim();
-        }
-
-        assertTrue("Expected 4 errors during this run", StringUtils.countMatches(text, "ERROR") == 4);
-        log("Expected errors found.");
-
-        // Clear the errors to prevent the test from failing.
-        resetErrors();
-
-        popLocation();
     }
 
     private void runProcessing(PipelineTestsBase testSet)

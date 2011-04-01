@@ -78,7 +78,7 @@ public class StudyBvtTest extends StudyManualTest
         selectImportDataAction("Import Study");
 
         // wait for study & specimen load to complete
-        waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)");
+        waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)", false);
 
         // delete "export" directory
         deleteDir(new File(getPipelinePath() + "export"));
@@ -115,7 +115,7 @@ public class StudyBvtTest extends StudyManualTest
         selectImportDataAction("Import Study");
 
         // wait for study & specimen load
-        waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)");
+        waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)", false);
 
         // TODO: Move this earlier (after legacy format import) once issue 10074 is resolved. 
         setDemographicsBit();

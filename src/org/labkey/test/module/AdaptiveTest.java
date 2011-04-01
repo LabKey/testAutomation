@@ -438,7 +438,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         waitForPageToLoad();
         clickNavButton("Start Processing", 0);
 
-        waitForPipelineJobsToComplete(1, "Adaptive Sequence Post Process Job");
+        waitForPipelineJobsToComplete(1, "Adaptive Sequence Post Process Job", false);
 
         goToAdaptiveAdmin();
         clickLinkWithText("Manage Normalization");

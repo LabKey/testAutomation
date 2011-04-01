@@ -111,7 +111,23 @@ public class ExtHelper
     public static void setExtFormElement(BaseSeleniumWebTest test, String text)
     {
         // Currently used only in RReportHelper.  Modify as needed to be more universal.
-        test.setFormElement(Locator.xpath("//input[@class='ext-mb-input' and @type='text']"), text);
+        test.setFormElement(Locator.xpath("//input[(contains(@class, 'ext-mb-input') or contains(@class, 'x-form-field')) and @type='text']"), text);
+    }
+
+    public static void setExtFormElementByType(BaseSeleniumWebTest test, String windowTitle, String inputType, String text)
+    {
+        test.setFormElement(Locator.xpath(getExtDialogXPath(windowTitle) + "//input[contains(@class, 'x-form-field') and @type='"+inputType+"']"), text);
+    }
+
+    public static String getExtDialogXPath(String windowTitle)
+    {
+        return "//div[contains(@class, 'x-window') and not(contains(@class, 'x-window-')) and not(contains(@style, 'hidden')) and "+
+            ".//span[contains(@class, 'x-window-header-text') and contains(string(), '"+windowTitle+"')]]";
+    }
+
+    public static void waitForLoadingMaskToDisappear(BaseSeleniumWebTest test, int wait)
+    {
+        test.waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x-mask-loading')]"), wait);
     }
 
     public static Locator locateBrowserFileCheckbox(String fileName)

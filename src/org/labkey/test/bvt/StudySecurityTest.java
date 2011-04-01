@@ -86,7 +86,7 @@ public class StudySecurityTest extends StudyBaseTest
 
         clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Files");
-        waitForPipelineJobsToComplete(1, "study import");
+        waitForPipelineJobsToComplete(1, "study import", false);
     }
 
     protected void doVerifySteps()

@@ -105,7 +105,7 @@ public class ReportTest extends StudyBaseTest
 
         // import study and wait; no specimens needed
         importStudy();
-        waitForPipelineJobsToComplete(1, "study import");
+        waitForPipelineJobsToComplete(1, "study import", false);
 
         // need this to turn off the demographic bit in the DEM-1 dataset
         clickLinkWithText(getFolderName());
@@ -412,13 +412,13 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickReportGridLink(R_SCRIPTS[1], "edit");
 
-        checkCheckbox(Locator.name("includedReports"));
         clickViewTab();
         waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Start Job", 0);
         waitForText("COMPLETE", WAIT_FOR_PAGE);
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
+        resaveReport();
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);

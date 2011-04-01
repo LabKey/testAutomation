@@ -209,16 +209,12 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         addWebPart("Wiki TOC");
         clickWebpartMenuItem("Pages", "New");
 
-        switchWikiToSourceView();
-        sleep(2000);
-        
         setFormElement("name", "formulations");
         setFormElement("title", "Formulations");
 
         String wikiText = String.format(WIKI_FORMULATIONS_PAGE, getContextPath(), getContextPath());
-        setFormElement("body", wikiText);
-
-        clickNavButton("Save & Close");
+        setWikiBody(wikiText);
+        saveWikiPage();
 
         // add this new page to a wiki web part
         clickLinkWithText(PROJECT_NAME);

@@ -9,11 +9,21 @@ console.log("** evaluating: " + this['javax.script.filename'] + ", schema=" + sc
 if (extraContext)
     console.log("extraContext:", extraContext);
 
+var LABKEY = require("labkey");
+
 function beforeInsert(row, errors)
 {
     // Test row map is case-insensitive
     if (row.Name != row.nAmE)
         throw new Error("beforeInsert row properties must be case-insensitive.");
+
+
+//    var result = LABKEY.Query.deleteRows({
+//        schemaName: "lists",
+//        queryName: "People",
+//        rowDataArray: [{Key: 100}]
+//    });
+//    console.log("Result of deleteRows: ", result);
 }
 
 function afterInsert(row, errors)

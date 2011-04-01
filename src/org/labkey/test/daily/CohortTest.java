@@ -53,8 +53,7 @@ public class CohortTest extends BaseSeleniumWebTest
     {
         log("Check advanced cohort features.");
         createProject(PROJECT_NAME, "Study");
-        importStudy(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
-        waitForPipelineJobsToComplete(1, "Study import");
+        importStudyFromZip(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
         clickLinkWithText(PROJECT_NAME);
 
         // Check all cohorts after initial import.
@@ -288,13 +287,6 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 4, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 5, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
                 
-    }
-
-    private void importStudy(String studyFile)
-    {
-        clickNavButton("Import Study");
-        setFormElement("studyZip", studyFile);
-        clickNavButton("Import Study From Local Zip Archive");
     }
 
     @Override

@@ -67,7 +67,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         // Navigate
         clickLinkWithText(folderName);
         clickLinkWithText("Data Pipeline");
-        waitForPipelineJobsToComplete(1, "study import");
+        waitForPipelineJobsToComplete(1, "study import", false);
 
         // enable advanced study security
         enterPermissionsUI();

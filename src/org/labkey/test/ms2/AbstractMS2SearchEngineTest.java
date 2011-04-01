@@ -112,7 +112,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         clickLinkWithText("Data Pipeline");
 
-        waitForPipelineJobsToComplete(1, SAMPLE_BASE_NAME + " (test2)");
+        waitForPipelineJobsToComplete(1, SAMPLE_BASE_NAME + " (test2)", false);
 
         clickAndWait(Locator.raw("//td[contains(text(), 'test2')]/../td/a"));
 

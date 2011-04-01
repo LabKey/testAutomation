@@ -49,7 +49,7 @@ public class StudyManualTest extends StudyTest
         startSpecimenImport(2);
 
         // wait for datasets (but not specimens) to finish
-        waitForPipelineJobsToComplete(1, "study import");
+        waitForPipelineJobsToComplete(1, "study import", false);
         afterManualCreate();
     }
 

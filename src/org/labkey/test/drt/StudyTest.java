@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class StudyTest extends StudyBaseTest
         startSpecimenImport(2);
 
         // wait for study (but not specimens) to finish loading
-        waitForPipelineJobsToComplete(1, "study import");
+        waitForPipelineJobsToComplete(1, "study import", false);
     }
 
     protected void doVerifySteps()
@@ -157,10 +158,18 @@ public class StudyTest extends StudyBaseTest
 
         clickLinkWithText("Specimen Overview");
         clickLinkWithText("By Vial");
-        setFilter("SpecimenDetail", "QualityControlFlag", "Equals", "true");
-        setSort("SpecimenDetail", "GlobalUniqueId", SortDirection.ASC);
-        assertTextPresent("AAA07XK5-02");
-        assertTextPresent("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId");
+        DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
+        table.setFilter("QualityControlFlag", "Equals", "true");
+        table.setSort("GlobalUniqueId", SortDirection.ASC);
+        assertEquals("AAA07XK5-02", table.getDataAsText(0, "Global Unique Id"));
+        assertEquals("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId", table.getDataAsText(0, "Quality Control Comments"));
+        assertEquals("", table.getDataAsText(0, "Primary Type"));
+        assertEquals("", table.getDataAsText(0, "Additive Type"));
+
+        assertEquals("ABH00LT8-01", table.getDataAsText(2, "Global Unique Id"));
+        assertEquals("Conflicts found: VolumeUnits", table.getDataAsText(2, "Quality Control Comments"));
+        assertEquals("", table.getDataAsText(2, "Volume Units"));
+
         clickLinkContainingText("history");
         assertTextPresent("Blood (Whole)");
         assertTextPresent("Vaginal Swab");

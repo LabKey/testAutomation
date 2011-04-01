@@ -300,18 +300,29 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private void checkSVGConversion() throws Exception
     {
-        //The server side svg converer is fairly strict and will fail with bad inputs
+        //The server side svg converter is fairly strict and will fail with bad inputs
         clickButton("Get SVG", 0);
         String svgText = getFormElement(Locator.id("svgtext"));
 
         String url = WebTestHelper.getBaseURL() + "/visualization/" + PROJECT_NAME + "/" + URLEncoder.encode(FOLDER_NAME, "UTF-8").replace("+","%20")+ "/exportPDF.view";
         HttpClient httpClient = WebTestHelper.getHttpClient(url);
-        PostMethod method = new PostMethod(url);
-        method.addParameter("svg", svgText);
-        int status = httpClient.executeMethod(method);
-        assertTrue("SVG Downloaded", status == HttpStatus.SC_OK);
-        assertTrue(method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-        assertTrue(method.getResponseHeader("Content-Type").getValue().startsWith("application/pdf"));
+        PostMethod method = null;
+
+        try
+        {
+            method = new PostMethod(url);
+            method.addParameter("svg", svgText);
+            int status = httpClient.executeMethod(method);
+            assertTrue("SVG Downloaded", status == HttpStatus.SC_OK);
+            assertTrue(method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
+            assertTrue(method.getResponseHeader("Content-Type").getValue().startsWith("application/pdf"));
+            method.getResponseBodyAsString();
+        }
+        finally
+        {
+            if (null != method)
+                method.releaseConnection();
+        }
     }
 
     private void gridTest()

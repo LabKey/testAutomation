@@ -21,6 +21,7 @@ import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.ExtHelper;
@@ -1243,6 +1244,36 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
+    public void checkExpectedErrors(int count)
+    {
+        // Need to remember our location or the next test could start with a blank page
+        pushLocation();
+        beginAt("/admin/showErrorsSinceMark.view");
+
+        //IE and Firefox have different notions of empty.
+        //IE returns html for all pages even empty text...
+        String text = selenium.getHtmlSource();
+        if (null == text)
+            text = "";
+        text = text.trim();
+        if ("".equals(text))
+        {
+            text = selenium.getText("//body");
+            if (null == text)
+                text = "";
+            text = text.trim();
+        }
+
+        assertTrue("Expected " + count + " errors during this run", StringUtils.countMatches(text, "ERROR") == count);
+        log("Found " + count + " expected errors.");
+
+        // Clear the errors to prevent the test from failing.
+        resetErrors();
+
+        popLocation();
+    }
+
+
     private void checkActionCoverage()
     {
         if ( isGuestModeTest() )
@@ -2356,6 +2387,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertElementNotPresent(Locator loc)
     {
         assertFalse("Element was present in page: " + loc, isElementPresent(loc));
+    }
+
+    public void assertElementNotVisible(Locator loc)
+    {
+        assertFalse("Element was visible in page: " + loc, selenium.isVisible(loc.toString()));
     }
 
     public boolean isLinkPresent(String linkId)
@@ -4169,6 +4205,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    protected void importStudyFromZip(String studyFile)
+    {
+        clickNavButton("Import Study");
+        setFormElement("studyZip", studyFile);
+        clickNavButton("Import Study From Local Zip Archive");
+        waitForPipelineJobsToComplete(1, "Study import", false);
+    }
 
     public String getFileContents(String rootRelativePath)
     {
@@ -4419,18 +4462,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         selenium.keyDown(xpath, "\\9"); // For Windows
         selenium.keyPress(xpath, "\\9"); // For Linux
+        selenium.keyUp(xpath, "\\9");
     }
 
     public void pressEnter(String xpath)
     {
         selenium.keyDown(xpath, "\\13"); // For Windows
         selenium.keyPress(xpath, "\\13"); // For Linux
+        selenium.keyUp(xpath, "\\13");
     }
 
     public void pressDownArrow(String xpath)
     {
         selenium.keyDown(xpath, "\\40"); // For Windows
         selenium.keyPress(xpath, "\\40"); // For Linux
+        selenium.keyUp(xpath, "\\40");
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium
@@ -4728,20 +4774,39 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public class SpecimenImporter
     {
         private final File _pipelineRoot;
-        private final File _specimenArchive;
+        private final File[] _specimenArchives;
         private final File _tempDir;
         private final String _studyFolderName;
         private final int _completeJobsExpected;
-        private final File _copiedArchive;
+        private final File[] _copiedArchives;
+        private boolean _expectError = false;
 
         public SpecimenImporter(File pipelineRoot, File specimenArchive, File tempDir, String studyFolderName, int completeJobsExpected)
         {
+            this(pipelineRoot, new File[] { specimenArchive }, tempDir, studyFolderName, completeJobsExpected);
+        }
+
+        public SpecimenImporter(File pipelineRoot, File[] specimenArchives, File tempDir, String studyFolderName, int completeJobsExpected)
+        {
             _pipelineRoot = pipelineRoot;
-            _specimenArchive = specimenArchive;
+            _specimenArchives = specimenArchives;
             _tempDir = tempDir;
             _studyFolderName = studyFolderName;
             _completeJobsExpected = completeJobsExpected;
-            _copiedArchive = new File(_tempDir, FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
+
+            _copiedArchives = new File[_specimenArchives.length];
+            for (int i = 0; i < _specimenArchives.length; i++)
+            {
+                File specimenArchive = _specimenArchives[i];
+                String baseName = specimenArchive.getName();
+                baseName = baseName.substring(0, baseName.length() - ".specimens".length());
+                _copiedArchives[i] = new File(_tempDir, baseName + "_" + FastDateFormat.getInstance("MMddHHmmss").format(new Date()) + ".specimens");
+            }
+        }
+
+        public void setExpectError(boolean expectError)
+        {
+            _expectError = expectError;
         }
 
         public void importAndWaitForComplete()
@@ -4752,10 +4817,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         public void startImport()
         {
-            log("Starting import of specimen archive " + _specimenArchive);
+            log("Starting import of specimen archive(s):");
+            for (File specimenArchive : _specimenArchives)
+                log("  " + specimenArchive);
 
             // copy the file into its own directory
-            copyFile(_specimenArchive, _copiedArchive);
+            for (int i = 0; i < _specimenArchives.length; i++)
+            {
+                File specimenArchive = _specimenArchives[i];
+                copyFile(specimenArchive, _copiedArchives[i]);
+            }
 
             clickLinkWithText(_studyFolderName);
 
@@ -4800,28 +4871,30 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
 */
 
-            ExtHelper.clickFileBrowserFileCheckbox(BaseSeleniumWebTest.this, _copiedArchive.getName());
+            for (File copiedArchive : _copiedArchives)
+                ExtHelper.clickFileBrowserFileCheckbox(BaseSeleniumWebTest.this, copiedArchive.getName());
             selectImportDataAction("Import Specimen Data");
             clickNavButton("Start Import");
         }
 
         public void waitForComplete()
         {
-            log("Waiting for completion of specimen archive " + _specimenArchive + " import");
+            log("Waiting for completion of specimen archives");
 
             clickLinkWithText(_studyFolderName);
             clickLinkWithText("Manage Files");
 
-            waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import");
+            waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
 
-            if (!_copiedArchive.delete())
-                fail("Couldn't delete copied specimen archive");
+            for (File copiedArchive : _copiedArchives)
+                if (!copiedArchive.delete())
+                    fail("Couldn't delete copied specimen archive: " + copiedArchive.getAbsolutePath());
         }
     }
 
 
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
-    protected void waitForPipelineJobsToComplete(int completeJobsExpected, String description)
+    protected void waitForPipelineJobsToComplete(int completeJobsExpected, String description, boolean expectError)
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
         List<String> statusValues = getPipelineStatusValues();
@@ -4831,15 +4904,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         startTimer();
 
-        while (getCompleteCount(statusValues) < completeJobsExpected && !hasError(statusValues) && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (getCompleteCount(statusValues) < completeJobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
+            if (!expectError && hasError(statusValues))
+                break;
             log("Waiting for " + description);
             sleep(1000);
             refresh();
             statusValues = getPipelineStatusValues();
         }
 
-        assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
+        if (!expectError)
+            assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
         assertEquals(getCompleteCount(statusValues), completeJobsExpected);
     }
 

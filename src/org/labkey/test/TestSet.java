@@ -112,7 +112,9 @@ public enum TestSet
         CustomizeViewTest.class,
         ElispotAssayTest.class,
         CreateVialsTest.class,
+        SpecimenMergeTest.class,
         TargetStudyTest.class,
+        TimeChartTest.class,
     }),
 
     Cluster(new Class[]
@@ -153,6 +155,7 @@ public enum TestSet
         StudyExtraTest.class,
         CohortTest.class,
         AssayTest.class,
+        SpecimenMergeTest.class,
         TargetStudyTest.class,
         ReportTest.class,
         QuerySnapshotTest.class,
