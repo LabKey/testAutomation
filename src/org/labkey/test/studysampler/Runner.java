@@ -61,6 +61,8 @@ public class Runner
     // the name of the field where snomed codes are found
     static final String snomedField = "code";
 
+    static final int MAX_ROWS = 10000;
+
     // list of field names where the values should be aliased to something new
     static final Set<String> aliasFields = newStringSet(
             idField,
@@ -69,7 +71,8 @@ public class Runner
             "dam",
             "sire",
             "cage",
-            "userid"
+            "userid",
+            "roomcage"
     );
 
     // list of field names that should be overwritten with filler content
@@ -80,7 +83,6 @@ public class Runner
             "surgeon",
             "source",
             "room",
-            "roomcage",
             //protocol.tsv
             "inves",
             //blood draws (1008)
@@ -109,8 +111,18 @@ public class Runner
 
         String get(String key)
         {
+
             if (!_aliases.containsKey(key))
-                _aliases.put(key, random.nextInt(999999) + "");
+            {
+                String rand;
+                do
+                {
+                    rand = Integer.toString(random.nextInt(9999999));
+                }
+                while(_aliases.containsValue(rand)); // ensure unique ids
+                
+                _aliases.put(key, rand);
+            }
 
             return _aliases.get(key);
         }
@@ -237,7 +249,7 @@ public class Runner
             int read = 0;
             int wrote = 0;
 
-            while ((row = reader.readNext()) != null)
+            while ((row = reader.readNext()) != null && (wrote < MAX_ROWS || MAX_ROWS == -1))
             {
                 read++;
                 if (idPosition != null && !subjectIds.contains(row[idPosition]))
@@ -272,7 +284,7 @@ public class Runner
             outFile.getParentFile().mkdirs();
 
             CSVReader reader = new CSVReader(new FileReader(inFile.getAbsolutePath()), '\t');
-            CSVWriter writer = new CSVWriter(new FileWriter(outFile), '\t');
+            CSVWriter writer = new CSVWriter(new FileWriter(outFile), '\t'); // Excel format escapes quotes with quotes; manually remove such rows.
 
             // read (and write) the field names.
             String[] row = reader.readNext();
@@ -289,7 +301,7 @@ public class Runner
             int read = 0;
             int wrote = 0;
 
-            while ((row = reader.readNext()) != null)
+            while ((row = reader.readNext()) != null && wrote < MAX_ROWS)
             {
                 read++;
                 if (usedSnomeds.contains(row[snomedPosition]))

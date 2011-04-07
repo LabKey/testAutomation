@@ -617,9 +617,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void clickWebpartMenuItem(String menu, String... items)
     {
-        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//img[@id='more-" + menu.toLowerCase() + "']"), items);
+        clickWebpartMenuItem(menu, true, items);
     }
-    
+
+    public void clickWebpartMenuItem(String menu, boolean wait, String... items)
+    {
+        ExtHelper.clickExtMenuButton(this, wait, Locator.xpath("//img[@id='more-" + menu.toLowerCase() + "']"), items);
+    }
+
     public void clickAdminMenuItem(String... items)
     {
         ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text() = 'Admin']"), items);

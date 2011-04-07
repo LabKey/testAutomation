@@ -127,6 +127,7 @@ src/org/labkey/test/drt/WikiTest.java -text
 src/org/labkey/test/drt/XTandemTest.java -text
 src/org/labkey/test/module/AdaptiveTest.java -text
 src/org/labkey/test/module/AdaptiveVisualizationPerf.java -text
+src/org/labkey/test/module/EHRStudyTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
