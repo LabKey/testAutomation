@@ -4215,6 +4215,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Import Study");
         setFormElement("studyZip", studyFile);
         clickNavButton("Import Study From Local Zip Archive");
+        assertTextNotPresent("You must select a .study.zip file to import.");
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 

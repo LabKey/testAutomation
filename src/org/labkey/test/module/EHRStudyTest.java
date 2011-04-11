@@ -48,7 +48,19 @@ public class EHRStudyTest extends BaseSeleniumWebTest
     @Override
     public void doCleanup()
     {
+        long startTime = System.currentTimeMillis();
         try {deleteProject(PROJECT_NAME);} catch (Throwable t) { /*ignore*/ }
+        if(isTextPresent(PROJECT_NAME))
+        {
+            log("Wait extra long for folder to finish deleting.");
+            while (isTextPresent(PROJECT_NAME) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
+            {
+                sleep(5000);
+                refresh();
+            }
+            if (!isTextPresent(PROJECT_NAME)) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
+            else fail("Test Project not finished deleting after 5 minutes");
+        }
     }
 
     @Override
@@ -59,7 +71,7 @@ public class EHRStudyTest extends BaseSeleniumWebTest
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
 
         log("Remove all webparts");
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
         clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
         clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
         clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
