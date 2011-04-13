@@ -35,7 +35,6 @@ public class TimeChartTest extends BaseSeleniumWebTest
     private static final String CHART_TITLE = "New Chart Title";
 
     private static final String USER1 = "user1@timechart.test";
-    private static final String USER2 = "user2@timechart.test";
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -71,19 +70,26 @@ public class TimeChartTest extends BaseSeleniumWebTest
         clickNavButton("Select", 0);
         waitForText("No data found", WAIT_FOR_JAVASCRIPT);
 
-        // TODO: Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
-        log("Check visualization");
+        // Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
+        log("StdDev regression check");
         clickNavButton("Change", 0);
-
         extDialogTitle = "Change Measure...";
         ExtHelper.waitForExtDialog(this, extDialogTitle);
-        waitForText("NAbAssay", WAIT_FOR_JAVASCRIPT);     
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(extDialogTitle)+"//dl[./dt/em[text()='StdDev']]"));
+        clickNavButtonByIndex("Select", 1, 0); // Need to index button because previous dialog is present (but hidden)
+        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
+
+        log("Check visualization");
+        clickNavButton("Change", 0);
+        extDialogTitle = "Change Measure...";
+        ExtHelper.waitForExtDialog(this, extDialogTitle);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, extDialogTitle, "text", "viral");
         pressEnter(ExtHelper.getExtDialogXPath(extDialogTitle)+"//input[contains(@class, 'x-form-text') and @type='text']");
         assertEquals("", 1, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(extDialogTitle)+"//div[contains(@class, 'x-list-body-inner')]/dl")));
         click(Locator.xpath(ExtHelper.getExtDialogXPath(extDialogTitle)+"//dl[./dt/em[text()='HIV Test Results']]"));
-        clickNavButtonByIndex("Select", 1, 0); // Need to index button because previous dialog is present (but hidden)
+        clickNavButtonByIndex("Select", 2, 0); // Need to index button because previous dialog is present (but hidden)
         waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent("No data found");
 
@@ -91,7 +97,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
         waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker')]/div")); // Select all participants checkbox
         waitForText("1 - 38 of 38", WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "249320127"); // de-select one participant                                                        
+        ExtHelper.clickFileBrowserFileCheckbox(this, "249320127"); // de-select one participant
         waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
 
         log("Test X-Axis");
@@ -172,37 +178,33 @@ public class TimeChartTest extends BaseSeleniumWebTest
         assertTextPresent(CHART_TITLE, 6);
         pushLocation();
         pushLocation();
-        // TODO: remove work-around once issue 11839 is closed.
-        clickNavButton("Save", 0);
-        ExtHelper.waitForExtDialog(this, "Success");
-        clickNavButton("OK", 0);
-        // END TODO
-        
-        /* TODO: blocked by issues 11839
-        // Can't do work-around (saving), when user is only a reader
+
         log("Check Time Chart Permissions");
         createUser(USER1, null);
-        createUser(USER2, null);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         setUserPermissions(USER1, "Reader");
+        setSiteGroupPermissions("Guests", "Reader");
         clickNavButton("Save and Finish");
         impersonate(USER1);
-        popLocation();
-        waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(REPORT_DESCRIPTION);
-        assertElementNotVisible(Locator.button("Save"));
+        popLocation(); // Saved chart
+        waitForText("New Chart Title", WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//table[contains(@class, 'x-item-disabled')]//button[text()='Save']"));
+        clickLinkWithText(FOLDER_NAME);
+        assertTextNotPresent(REPORT_NAME_2);
         stopImpersonating();
-        impersonate(USER2);
-        popLocation();
-        */
+        signOut();
+        popLocation(); // Saved chart
+        waitForText("New Chart Title", WAIT_FOR_JAVASCRIPT);
+        assertElementNotVisible(Locator.button("Save As"));
+        assertElementPresent(Locator.xpath("//table[contains(@class, 'x-item-disabled')]//button[text()='Save']"));
+        simpleSignIn();
     }
 
     @Override
     public void doCleanup()
     {
         try {deleteUser(USER1);} catch (Throwable T) {}
-        try {deleteUser(USER2);} catch (Throwable T) {}
         try {deleteProject(PROJECT_NAME);} catch (Throwable T) {}
     }
 }
