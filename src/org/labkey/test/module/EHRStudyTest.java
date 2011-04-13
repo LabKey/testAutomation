@@ -46,6 +46,14 @@ public class EHRStudyTest extends BaseSeleniumWebTest
     }
 
     @Override
+    public boolean enableLinkCheck()
+    {
+        if ( super.enableLinkCheck() )
+            log("EHR test has too many hard coded links and special actions to crawl effectively. Skipping crawl.");
+        return false;
+    }
+
+    @Override
     public void doCleanup()
     {
         long startTime = System.currentTimeMillis();
