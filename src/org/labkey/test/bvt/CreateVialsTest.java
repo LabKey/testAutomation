@@ -81,6 +81,30 @@ public class CreateVialsTest extends AbstractViabilityTest
     }
 
     @Override
+    protected void initializeStudyFolder(String... tabs)
+    {
+        super.initializeStudyFolder(tabs);
+
+        log("** Adding new Sites to check null ExternalId (Issue 12074)");
+        clickLinkContainingText("Manage Labs/Sites");
+        setFormElement("newId", "100");
+        setFormElement("newLabel", "Alice Lab");
+        clickButton("Save");
+
+        setFormElement("newId", "200");
+        setFormElement("newLabel", "Bob's Lab");
+        clickButton("Save");
+
+        beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
+        DataRegionTable table = new DataRegionTable("query", this, false);
+        assertEquals(2, table.getDataRowCount());
+        assertEquals("Alice Lab", table.getDataAsText(0, "Label"));
+        assertEquals("", table.getDataAsText(0, "External Id"));
+        assertEquals("Bob's Lab", table.getDataAsText(1, "Label"));
+        assertEquals("", table.getDataAsText(1, "External Id"));
+    }
+
+    @Override
     protected void runUITests() throws Exception
     {
         // Create study with 'Letvin' module activated
@@ -127,6 +151,13 @@ public class CreateVialsTest extends AbstractViabilityTest
         table.uncheckCheckbox(0);
         clickButton("Create Vials", 0);
         ExtHelper.waitForExtDialog(this, "Create Vials");
+
+        // Check for 'Sally Lab' in ComboBox
+        click(Locator.xpath("//input[@name='defaultLocationField']/../img"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"), WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"));
+        assertFormElementEquals("defaultLocationField", "Alice Lab");
+
         setFormElement("maxCellPerVialField", "19e6");
         setFormElement("defaultLocationField", "Site A");
         //String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
@@ -142,7 +173,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Run Batch Target Study"));
         assertEquals("2", table.getDataAsText(0, "Vial Count"));
         assertEquals("Site A", getFormElement(Locator.name("siteLabel", 0)));
-        setFormElement(Locator.name("siteLabel", 0), "Site B");
+        setFormElement(Locator.name("siteLabel", 0), "Bob's Lab");
 
         setFormElement(Locator.name("viableCells", 0), "10000000");
         fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
@@ -164,7 +195,6 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         clickButton("Save");
 
-        
         log("** checking cell counts and specimen IDs");
         table = new DataRegionTable(getAssayName() + " Data", this);
         assertEquals("B02", table.getDataAsText(1, "Participant ID"));
@@ -181,21 +211,37 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertEquals("2", table.getDataAsText(2, "Specimen Count"));
 
         
+        log("** checking new site 'Site A' was added and no duplicate 'Bob's Lab' exist (Issue 12074)");
+        pushLocation();
+        beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
+        table = new DataRegionTable("query", this, false);
+        assertEquals(4, table.getDataRowCount());
+        assertEquals("Alice Lab", table.getDataAsText(0, "Label"));
+        assertEquals("-1", table.getDataAsText(0, "External Id"));
+        assertEquals("Bob's Lab", table.getDataAsText(1, "Label"));
+        assertEquals("-2", table.getDataAsText(1, "External Id"));
+        assertEquals("Not Specified", table.getDataAsText(2, "Label"));
+        assertEquals("1", table.getDataAsText(2, "External Id"));
+        assertEquals("Site A", table.getDataAsText(3, "Label"));
+        assertEquals("2", table.getDataAsText(3, "External Id"));
+        popLocation();
+
+
         log("** checking site and cells per vial");
         pushLocation();
         beginAt("/study-samples/" + getProjectName() + "/" + getFolderName() + "/samples.view?showVials=true");
         table = new DataRegionTable("SpecimenDetail", this);
         assertEquals("B02_1.0_0", table.getDataAsText(0, "Global Unique Id"));
         assertEquals("16,666,666.0", table.getDataAsText(0, "Volume"));
-        assertEquals("Site B", table.getDataAsText(0, "Site Name"));
+        assertEquals("Bob's Lab", table.getDataAsText(0, "Site Name"));
 
         assertEquals("B02_1.0_1", table.getDataAsText(1, "Global Unique Id"));
         assertEquals("16,666,666.0", table.getDataAsText(1, "Volume"));
-        assertEquals("Site B", table.getDataAsText(1, "Site Name"));
+        assertEquals("Bob's Lab", table.getDataAsText(1, "Site Name"));
 
         assertEquals("B02_1.0_2", table.getDataAsText(2, "Global Unique Id"));
         assertEquals("16,666,666.0", table.getDataAsText(2, "Volume"));
-        assertEquals("Site B", table.getDataAsText(2, "Site Name"));
+        assertEquals("Bob's Lab", table.getDataAsText(2, "Site Name"));
 
         assertEquals("B03_1.0_0", table.getDataAsText(3, "Global Unique Id"));
         assertEquals("11,349,723.0", table.getDataAsText(3, "Volume"));
@@ -218,7 +264,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertEquals("Site C", table.getDataAsText(1, "Site Name"));
 
         assertEquals("B02_1.0_2", table.getDataAsText(2, "Global Unique Id"));
-        assertEquals("Site B", table.getDataAsText(2, "Site Name"));
+        assertEquals("Bob's Lab", table.getDataAsText(2, "Site Name"));
         
         assertEquals("B03_1.0_0", table.getDataAsText(3, "Global Unique Id"));
         assertEquals("Site C", table.getDataAsText(3, "Site Name"));
