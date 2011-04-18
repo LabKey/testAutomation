@@ -67,6 +67,7 @@ src/org/labkey/test/bvt/ExternalSchemaTest.java -text
 src/org/labkey/test/bvt/FieldValidatorTest.java -text
 src/org/labkey/test/bvt/FileContentTest.java -text
 src/org/labkey/test/bvt/FlowJoQueryTest.java -text
+src/org/labkey/test/bvt/GpatAssayTest.java -text
 src/org/labkey/test/bvt/HTTPApiTest.java -text
 src/org/labkey/test/bvt/JavaClientApiTest.java -text
 src/org/labkey/test/bvt/ListTest.java -text

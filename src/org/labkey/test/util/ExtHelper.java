@@ -160,6 +160,27 @@ public class ExtHelper
         test.mouseDown(file);
     }
 
+    public static void selectTreeItem(BaseSeleniumWebTest test, String path)
+    {
+        test.log("selectTreeItem path: " + path);
+        if (path.startsWith("/"))
+            path = path.substring(1);
+        String[] parts = path.split("/");
+        for (int i = 0; i < parts.length; i++)
+        {
+            if (i == parts.length - 1)
+            {
+                // select last item: click on tree node name
+                ExtHelper.selectFileBrowserFile(test, parts[i]);
+            }
+            else
+            {
+                // expand tree node: click on expand/collapse icon
+                test.waitAndClick(Locator.fileTreeByName(parts[i]));
+            }
+        }
+    }
+
     public static void waitForImportDataEnabled(BaseSeleniumWebTest test)
     {
         test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * test.WAIT_FOR_JAVASCRIPT);

@@ -114,6 +114,7 @@ public enum TestSet
         TargetStudyTest.class,
         TimeChartTest.class,
         EHRStudyTest.class,
+        GpatAssayTest.class,    
     }),
 
     Cluster(new Class[]

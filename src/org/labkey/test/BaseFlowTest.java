@@ -210,7 +210,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         assertTitleEquals("Import Analysis: Upload Workspace: " + containerPath);
         sleep(500);
-        selectTreeItem(workspacePath);
+        ExtHelper.selectTreeItem(this, workspacePath);
 //        assertFormElementEquals("workspace.path", workspacePath);
         clickNavButton("Next");
     }
@@ -225,7 +225,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
         else if (fcsPath != null)
         {
-            selectTreeItem(fcsPath);
+            ExtHelper.selectTreeItem(this, fcsPath);
             clickNavButton("Next");
         }
         else
@@ -266,26 +266,4 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         waitForPipeline(containerPath);
         log("finished import analysis wizard");
     }
-
-    protected void selectTreeItem(String path)
-    {
-        log("selectTreeItem path: " + path);
-        if (path.startsWith("/"))
-            path = path.substring(1);
-        String[] parts = path.split("/");
-        for (int i = 0; i < parts.length; i++)
-        {
-            if (i == parts.length - 1)
-            {
-                // select last item: click on tree node name
-                ExtHelper.selectFileBrowserFile(this, parts[i]);
-            }
-            else
-            {
-                // expand tree node: click on expand/collapse icon
-                waitAndClick(Locator.fileTreeByName(parts[i]));
-            }
-        }
-    }
-
 }
