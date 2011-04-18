@@ -34,7 +34,7 @@ public enum TestSet
         JUnitTest.class,
         SecurityTest.class,
         FlowTest.class,
-        XTandemTest.class,
+//        XTandemTest.class,
         StudyTest.class
     }),
 
