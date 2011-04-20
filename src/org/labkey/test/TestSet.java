@@ -34,7 +34,7 @@ public enum TestSet
         JUnitTest.class,
         SecurityTest.class,
         FlowTest.class,
-//        XTandemTest.class,
+        XTandemTest.class,
         StudyTest.class
     }),
 
@@ -115,6 +115,11 @@ public enum TestSet
         TimeChartTest.class,
         EHRStudyTest.class,
         GpatAssayTest.class,    
+    }),
+
+    IE(DRT, new Class[]
+    {
+        ListTest.class
     }),
 
     Cluster(new Class[]
