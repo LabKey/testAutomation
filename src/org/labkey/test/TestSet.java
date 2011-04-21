@@ -122,6 +122,7 @@ public enum TestSet
         BasicTest.class,
         FlowTest.class,
         SecurityTest.class,
+        WikiTest.class,
     }),
 
     Cluster(new Class[]

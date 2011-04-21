@@ -62,7 +62,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         pushLocation();
         beginAt("/Flow" + containerPath + "/showJobs.view");
-        while(!isTextPresent("There are no running or pending flow jobs"))
+
+        long startTime = System.currentTimeMillis();
+        while(!isTextPresent("There are no running or pending flow jobs") && System.currentTimeMillis() - startTime < 300000)
         {
             sleep(2000);
             refresh();
