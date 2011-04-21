@@ -124,7 +124,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         toggleCheckboxByTitle("Pipeline");
         submit();
         addWebPart("Data Pipeline");
-        clickNavButton("Setup");
+        waitAndClickNavButton("Setup");
         setPipelineRoot(getPipelinePath());
     }
 

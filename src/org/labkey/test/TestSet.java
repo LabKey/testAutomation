@@ -117,9 +117,11 @@ public enum TestSet
         GpatAssayTest.class,    
     }),
 
-    IE(DRT, new Class[]
+    IE(new Class[]
     {
-        ListTest.class
+        BasicTest.class,
+        FlowTest.class,
+        SecurityTest.class,
     }),
 
     Cluster(new Class[]

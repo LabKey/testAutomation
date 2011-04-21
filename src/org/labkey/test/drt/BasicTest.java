@@ -114,7 +114,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         log("Test firefox version");
         String source = getHtmlSource();
-        assertTrue("The LabKey test suite requires Firefox 2.0, 3.0, 3.5, or 3.6", source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0"));
+        assertTrue("The LabKey test suite requires Firefox 2.0, 3.0, 3.5, or 3.6", source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0") || source.contains("MSIE 8") || source.contains("MSIE 7"));
 
         log("Test webpart buttons");
         clickWebpartMenuItem("Messages", "Customize");      

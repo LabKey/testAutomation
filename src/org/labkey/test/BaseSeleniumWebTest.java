@@ -100,7 +100,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
-    public final static String IE_BROWSER = "*iexplore";
+    public final static String IE_BROWSER = "*iexploreproxy";
     //protected final static String IE_UPLOAD_BROWSER = "*iehta";
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
@@ -525,7 +525,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if ( oldStrength == null || oldExpiration == null )
         {
             // Remember old login settings.
-            curStrength = PasswordRule.valueOf(getAttribute(Locator.xpath("//input[@type = 'radio' and @checked = '' and @name='strength']"), "value"));
+            curStrength = PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))); // getAttribute broken on IE
             curExpiration = PasswordExpiration.valueOf(getFormElement("expiration"));
         }
 
@@ -561,7 +561,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             clickNavButton("Save");
 
-            if ( oldStrength != null ) assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getAttribute(Locator.xpath("//input[@type = 'radio' and @checked = '' and @name='strength']"), "value")));
+            if ( oldStrength != null ) assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))));
             if ( oldExpiration != null ) assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement("expiration")));
 
             // Back to default.
@@ -944,7 +944,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (null == text || text.trim().length() == 0)
             return true;
 
-        text = selenium.getText("//body");
+        text = selenium.getBodyText();
         return null == text || text.trim().length() == 0;
     }
 
@@ -2300,7 +2300,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public boolean isElementPresent(Locator loc)
     {
-        return selenium.isElementPresent(loc.toString());
+        try
+        {
+            return selenium.isElementPresent(loc.toString());
+        }
+        catch(SeleniumException e)
+        {
+            /*ignore permission denied errors in IE when page refreshes during this check*/
+        }
+        return false;
     }
 
     public void assertElementPresent(Locator loc)
@@ -4036,7 +4044,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitFor(new WikiSaveChecker(), "Wiki page failed to save!", 10000);
         //sleep(100);
         log("Navigating to " + redirUrl);
-        selenium.open(redirUrl);
+        beginAt(redirUrl);
     }
 
     public String getUrlParam(String url, String paramName, boolean decode)
@@ -4429,7 +4437,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         log("Navigating to " + href);
-        selenium.open(href);
+        beginAt(href);
     }
 
     public void editQueryProperties(String schemaName, String queryName)
@@ -4446,7 +4454,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String url = selenium.getEval("selenium.browserbot.getCurrentWindow()._browser.getCreateQueryUrl('" + schemaName + "')");
         if (null == url || url.length() == 0)
             fail("Could not get the URL for creating a new query in schema " + schemaName);
-        selenium.open(url);
+        beginAt(url);
     }
 
     public void validateQueries()
@@ -4489,7 +4497,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         DefaultSeleniumWrapper()
         {
-            super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL());
+            super("localhost", getSeleniumServerPort(), getBrowser(), "http://localhost:"+getSeleniumServerPort()+"/selenium-server/RemoteRunner.html");
         }
 
         private void log(String s)
