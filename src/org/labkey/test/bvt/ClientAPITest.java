@@ -600,7 +600,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private static final String EMAIL_SUBJECT_2 = "Testing the email API (plain txt body)";
     private static final String EMAIL_SUBJECT_3 = "Testing the email API (html txt body)";
     private static final String EMAIL_BODY_PLAIN = "This is a test message.";
-    private static final String EMAIL_BODY_HTML = "<h2>This is a test message.</h2>";
+    private static final String EMAIL_BODY_HTML = "<h2>This is a test message.<\\\\/h2>";
     private static final String[] EMAIL_RECIPIENTS = {"user1@clientapi.test", "user2@clientapi.test", "user3@clientapi.test"};
 
     private void emailApiTest()

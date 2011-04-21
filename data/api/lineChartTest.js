@@ -170,7 +170,7 @@ function createGraph()
     var panel = new Ext.Panel({
         tbar: [{text:"Get SVG",
                 handler:function(btn) {Ext.getCmp("svgtext").setValue(chart.getSerializedXML())}}],
-        items:[{html:"<form>Config Count:<input id='configCount' value='" + configs.length + "'><br>Show Config<input type='text' name='config' value='" + index + "'><input type='submit' name='submit' value='Submit'></form>"},
+        items:[{html:"<form>Config Count:<input id='configCount' value='" + configs.length + "'><br>Show Config<input type='text' name='config' value='" + index + "'><input type='submit' name='submit' value='Submit'><\\/form>"},
             chart, {xtype:"textarea", height:300, width:400, id:"svgtext"}],
         renderTo:"testDiv"
     });

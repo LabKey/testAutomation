@@ -6,8 +6,8 @@
 function getSuccessHandler(domainDesign)
 {
     var html = '';
+    html += '<b>' + domainDesign.name + '<\\/b><br> ';
 
-        html += '<b>' + domainDesign.name + '</b><br> ';
     for (var i in domainDesign.fields)
     {
         html += '   ' + domainDesign.fields[i].name + '<br>';
