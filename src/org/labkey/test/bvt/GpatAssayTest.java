@@ -56,9 +56,9 @@ public class GpatAssayTest extends BaseSeleniumWebTest
     public void doTestSteps()
     {
         createProject(PROJECT_NAME, "Assay");
+        addWebPart("Pipeline Files");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/GPAT");
         clickLinkWithText(PROJECT_NAME);
-        addWebPart("Pipeline Files");
 
         log("Import XLS GPAT assay");
         ExtHelper.selectFileBrowserFile(this, GPAT_ASSAY_XLS);
