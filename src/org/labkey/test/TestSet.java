@@ -123,6 +123,7 @@ public enum TestSet
         FlowTest.class,
         SecurityTest.class,
         WikiTest.class,
+        GpatAssayTest.class, 
     }),
 
     Cluster(new Class[]

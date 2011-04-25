@@ -142,6 +142,12 @@ public class ExtHelper
 
     public static void clickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
     {
+        test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
+    }
+
+    @Deprecated
+    public static void prevClickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
+    {
         Locator file = locateBrowserFileCheckbox(fileName);
 
         test.waitForElement(file, 60000);
@@ -152,6 +158,7 @@ public class ExtHelper
      * Select a <b>single</b> row in the file browser by clicking on the file name.
      * Use {@link ExtHelper#clickFileBrowserFileCheckbox(BaseSeleniumWebTest, String)} to click the checkbox for multi-select.
      */
+    @Deprecated
     public static void selectFileBrowserFile(BaseSeleniumWebTest test, String fileName)
     {
         Locator file = locateBrowserFileName(fileName);
@@ -171,7 +178,7 @@ public class ExtHelper
             if (i == parts.length - 1)
             {
                 // select last item: click on tree node name
-                ExtHelper.selectFileBrowserFile(test, parts[i]);
+                ExtHelper.clickFileBrowserFileCheckbox(test, parts[i]);
             }
             else
             {

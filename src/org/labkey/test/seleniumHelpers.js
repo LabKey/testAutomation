@@ -70,6 +70,27 @@ selenium.getExtElementId = function (id) {
     return null;
 };
 
+selenium.selectFileBrowserCheckbox = function (filename) {
+
+    // find the grid view ext element
+    var domQuery = selenium.browserbot.getCurrentWindow().Ext.DomQuery;
+    var ext = selenium.browserbot.getCurrentWindow().Ext;
+
+    var el = domQuery.selectNode("div[class*='labkey-filecontent-grid']");
+    if (el)
+    {
+        var grid = ext.getCmp(el.id);
+        if (grid)
+        {
+            var idx = grid.getStore().find('name', filename);
+            if (idx != -1)
+            {
+                grid.getSelectionModel().selectRow(idx);
+            }
+        }
+    }
+};
+
 selenium.getContainerId = function () {
     var win = selenium.browserbot.getCurrentWindow();
     return win.LABKEY.container.id;
