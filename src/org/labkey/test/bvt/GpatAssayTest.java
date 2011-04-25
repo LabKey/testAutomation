@@ -61,7 +61,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
 
         log("Import XLS GPAT assay");
-        ExtHelper.selectFileBrowserFile(this, GPAT_ASSAY_XLS);
+        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_XLS);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement("AssayDesignerName", ASSAY_NAME_XLS);
@@ -92,7 +92,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Import TSV GPAT assay");
         clickLinkWithText(PROJECT_NAME);
-        ExtHelper.selectFileBrowserFile(this, GPAT_ASSAY_TSV);
+        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_TSV);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement("AssayDesignerName", ASSAY_NAME_TSV);
@@ -131,7 +131,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Verify standard column aliases");
         clickLinkWithText(PROJECT_NAME);
-        ExtHelper.selectFileBrowserFile(this, ALIASED_ASSAY_1);
+        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_1);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "specId");
@@ -139,7 +139,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("VisitID", "visitNo");
         assertFormElementEquals("Date", "draw_date");
         clickNavButton("Cancel");
-        ExtHelper.selectFileBrowserFile(this, ALIASED_ASSAY_2);
+        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_2);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId1");
@@ -147,7 +147,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("VisitID", "visit_no");
         assertFormElementEquals("Date", "drawDate");
         clickNavButton("Cancel");
-        ExtHelper.selectFileBrowserFile(this, ALIASED_ASSAY_3);
+        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_3);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId");
@@ -155,7 +155,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("VisitID", "visitId");
         assertFormElementEquals("Date", "date");
         clickNavButton("Cancel");
-        ExtHelper.selectFileBrowserFile(this, ALIASED_ASSAY_4);
+        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_4);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "guspec");
