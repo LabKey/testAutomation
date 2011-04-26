@@ -142,6 +142,7 @@ public class ExtHelper
 
     public static void clickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
     {
+        test.waitForElement(locateBrowserFileCheckbox(fileName), 60000);
         test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
     }
 
