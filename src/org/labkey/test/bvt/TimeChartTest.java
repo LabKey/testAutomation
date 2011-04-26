@@ -97,7 +97,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
         waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker')]/div")); // Select all participants checkbox
         waitForText("1 - 38 of 38", WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "249320127"); // de-select one participant
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // de-select one participant
         waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
 
         log("Test X-Axis");
@@ -146,7 +146,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
         setFormElement("chart-title-textfield", CHART_TITLE);
         fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur);
         assertTextPresent(CHART_TITLE, 5);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "249320127"); // re-select participant
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // re-select participant
         waitForText("New Chart Title: 249320127", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(CHART_TITLE, 6);
 
