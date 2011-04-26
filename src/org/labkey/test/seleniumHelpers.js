@@ -85,7 +85,11 @@ selenium.selectFileBrowserCheckbox = function (filename) {
             var idx = grid.getStore().find('name', filename);
             if (idx != -1)
             {
-                grid.getSelectionModel().selectRow(idx);
+                grid.getSelectionModel().selectRow(idx, true);
+            }
+            else
+            {
+                throw new Error("Unable to locate file: " + filename);                
             }
         }
     }
