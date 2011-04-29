@@ -109,6 +109,7 @@ src/org/labkey/test/bvt/WikiLongTest.java -text
 src/org/labkey/test/bvt/WorkbookTest.java -text
 src/org/labkey/test/daily/CohortTest.java -text
 src/org/labkey/test/daily/FlowImportTest.java -text
+src/org/labkey/test/daily/FormulationsTest.java -text
 src/org/labkey/test/daily/IDRIParticleSizeTest.java -text
 src/org/labkey/test/daily/SCHARPStudyTest.java -text
 src/org/labkey/test/daily/SecurityApiTest.java -text

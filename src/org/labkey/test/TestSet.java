@@ -102,6 +102,7 @@ public enum TestSet
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
         IDRIParticleSizeTest.class,
+        FormulationsTest.class,
         CohortTest.class,
         RlabkeyTest.class,
         ScriptValidationTest.class,
@@ -181,6 +182,7 @@ public enum TestSet
         ViabilityTest.class,
         ModuleAssayTest.class,
         IDRIParticleSizeTest.class,
+        FormulationsTest.class,
     }),
 
     UnitTests(new Class[] {
@@ -196,7 +198,8 @@ public enum TestSet
     }),
 
     IDRI(new Class[] {
-        IDRIParticleSizeTest.class
+        IDRIParticleSizeTest.class,
+        FormulationsTest.class,
     }),
 
     BVTnDaily(BVT, Daily.tests),
