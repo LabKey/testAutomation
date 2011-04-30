@@ -33,6 +33,15 @@ modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-0.10.sql -text
 modules/simpletest/schemas/vehicle.xml -text
 modules/simpletest/scripts/simpletest/Debug.js -text
+modules/simpletest/scripts/simpletest/ScriptValidationExports.js -text
+modules/simpletest/scripts/validationTest/actionUrlTest.js -text
+modules/simpletest/scripts/validationTest/exportTest.js -text
+modules/simpletest/scripts/validationTest/filterTest.js -text
+modules/simpletest/scripts/validationTest/messageTest.js -text
+modules/simpletest/scripts/validationTest/queryTest.js -text
+modules/simpletest/scripts/validationTest/securityTest.js -text
+modules/simpletest/scripts/validationTest/simpleQueryTest.js -text
+modules/simpletest/scripts/validationTest/utilsTest.js -text
 modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
 modules/simpletest/views/model.html -text

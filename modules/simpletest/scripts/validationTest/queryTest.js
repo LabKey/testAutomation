@@ -1,23 +1,31 @@
 /*
- * Copyright (c) 2011 LabKey Corporation
+ * Copyright (c) 2010-2011 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-// TODO: Query APIs added to this script should be matched by updates to test/modules/simpletest/scripts/simpletest/queryTest.js
 
-var schemaName = 'lists';
-var queryName = 'People';
+var console = require("console");
+console.log("** evaluating: " + this['javax.script.filename']);
+var LABKEY = require("labkey");
+
+//==================================================================
+// TODO: Query APIs added to this script should be matched by updates to test/data/api/queryTest.js
+
+var schemaName = 'vehicle';
+var queryName = 'Vehicles';
 
 var testResults = [];
 var testFunctions = [
     function() //testResults[0]
     {
-        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler);
+        testResults[testResults.length] = LABKEY.Query.selectRows(schemaName, queryName);
+        executeNext();
     },
 
     function() //testResults[1]
     {
-        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('FirstName', 'Norbert') ]);
+        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, filter: [ LABKEY.Filter.create('FirstName', 'Norbert') ]});
+        executeNext();
     },
 
     function() //testResults[2]
@@ -29,7 +37,8 @@ var testFunctions = [
             rowCopy[prop] = prevRowset[0][prop];
         rowCopy.LastName = null;
         rowCopy.Age = 99;
-        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        
+        testResults[testResults.length] = LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ]);
+        executeNext();
     },
 
     function() //testResults[3]
@@ -40,58 +49,62 @@ var testFunctions = [
         for (var prop in prevRowset[0])
             rowCopy[prop] = prevRowset[0][prop];
         rowCopy.Age = 99;
-        LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ], successHandler, failureHandler);        
+        testResults[testResults.length] = LABKEY.Query.updateRows(schemaName, queryName, [ rowCopy ]);
+        executeNext();
     },
 
     function() //testResults[4]
     {
         // get the result from the single-row select call:
         var prevRowset = testResults[1].rows;
-        LABKEY.Query.deleteRows(schemaName, queryName, prevRowset, successHandler, failureHandler);        
+        testResults[testResults.length] = LABKEY.Query.deleteRows(schemaName, queryName, prevRowset);
+        executeNext();
     },
 
     function() //testResults[5]
     {
         // get the result from the single-row select call:
         var prevRowset = testResults[1].rows;
-        LABKEY.Query.insertRows(schemaName, queryName, prevRowset, successHandler, failureHandler);        
+        testResults[testResults.length] = LABKEY.Query.insertRows(schemaName, queryName, prevRowset);
+        executeNext();
     },
 
     function() //testResults[6]
     {
         // get the result from the single-row select call:
         var missingLastName = [ { FirstName: 'Herbert', Age: 100 } ];
-        LABKEY.Query.insertRows(schemaName, queryName, missingLastName, successHandler, failureHandler);
+        testResults[testResults.length] = LABKEY.Query.insertRows(schemaName, queryName, missingLastName);
+        executeNext();
     },
 
     function() //testResults[7]
     {
-        LABKEY.Query.selectRows(schemaName + '-badname', queryName, successHandler, failureHandler);
+        testResults[testResults.length] = LABKEY.Query.selectRows(schemaName + '-badname', queryName);
+        executeNext();
     },
 
     function() //testResults[8]
     {
-        LABKEY.Query.executeSql({schemaName: 'lists', sort: 'Age', sql: 'select People.age from People', successCallback: successHandler, errorCallback: failureHandler});
+        testResults[testResults.length] = LABKEY.Query.executeSql({schemaName: 'lists', sort: 'Age', sql: 'select People.age from People'});
+        executeNext();
     },
 
     function() //testResults[9]
     {
-        LABKEY.Query.executeSql({
+        testResults[testResults.length] = LABKEY.Query.executeSql({
             schemaName:'lists',
-            sql: 'select subfolderList.FirstName from Project."api folder/subfolder/".lists.subfolderList',
-            successCallback: successHandler,
-            errorCallback: failureHandler
+            sql: 'select subfolderList.FirstName from Project."api folder/subfolder/".lists.subfolderList'
         });
+        executeNext();
     },
 
     function() //testResults[10]
     {
-        LABKEY.Query.executeSql({
+        testResults[testResults.length] = LABKEY.Query.executeSql({
             schemaName:'lists',
-            sql: 'select otherProjectList.FirstName from "/OtherClientAPITestProject".lists.otherProjectList',
-            successCallback: successHandler,
-            errorCallback: failureHandler
+            sql: 'select otherProjectList.FirstName from "/OtherClientAPITestProject".lists.otherProjectList'
         });
+        executeNext();
     },
 
 // Test QUERY.saveRows (transacted)
@@ -100,16 +113,15 @@ var testFunctions = [
         var peopleRowset = testResults[0].rows;
         peopleRowset[0].Age = -1;
         peopleRowset[1].Age = -1;
-        LABKEY.Query.saveRows({
+        testResults[testResults.length] = LABKEY.Query.saveRows({
             commands:[
                 {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[0]]},
                 {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[1]]},
                 {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[2]]},
                 {schemaName:schemaName, queryName:'noSuchQuery', command:'insert', rows:[peopleRowset[0]]}
-            ],
-            successCallback: successHandler,
-            errorCallback: failureHandler
+            ]
         });
+        executeNext();
     },
 
 // Test QUERY.saveRows (not transacted)
@@ -119,7 +131,7 @@ var testFunctions = [
         peopleRowset[3].Age = 101;
         peopleRowset[5].Age = 101;
         peopleRowset[6].Age = -1;
-        LABKEY.Query.saveRows({
+        testResults[testResults.length] = LABKEY.Query.saveRows({
             commands:[
                 {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[3]]},
                 {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[5]]},
@@ -127,22 +139,23 @@ var testFunctions = [
                 {schemaName:'noSuchSchema', queryName:queryName, command:'insert', rows:[peopleRowset[6]]},
                 {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[6]]}
             ],
-            successCallback: successHandler,
-            errorCallback: failureHandler,
             transacted: false
         });
+        executeNext();
     },
 
 // Verify QUERY.saveRows operations
     function() //testResults[13]
     { // Check that successful inserts/updates occurred (Age: 101) and unsuccessful deletes did not (Age: 17)
-        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '101;17', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);
+        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, filter:[ LABKEY.Filter.create('Age', '101;17', LABKEY.Filter.Types.EQUALS_ONE_OF) ]});
+        executeNext();
     },
 
 // Verify QUERY.saveRows operations
     function() //testResults[14]
     { // Check that failed inserts/updates did not occur (Age: -1) and successful deletes did (Age: 88)
-        LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '-1;88', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);
+        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, filter: [ LABKEY.Filter.create('Age', '-1;88', LABKEY.Filter.Types.EQUALS_ONE_OF) ]});
+        executeNext();
     },
 
     // last function sets the contents of the results div.
@@ -227,7 +240,9 @@ var testFunctions = [
             html += 'SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';
         else
             html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';
-        document.getElementById('testDiv').innerHTML = html;        
+
+        if (html.contains("FAILURE"))
+            throw new Error(html);
     }
 ];
 
@@ -237,16 +252,7 @@ function executeNext()
     currentFn();
 }
 
-function failureHandler(errorInfo, responseObj, options)
-{		
-    testResults[testResults.length] = errorInfo;
-    executeNext();
-}
-
-function successHandler(data, responseObj, options)
+function doTest()
 {
-    testResults[testResults.length] = data;
     executeNext();
 }
-
-executeNext();
