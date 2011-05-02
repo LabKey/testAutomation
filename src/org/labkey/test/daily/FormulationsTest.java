@@ -160,24 +160,28 @@ public class FormulationsTest extends BaseSeleniumWebTest
         waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
         setFormElement("concentration", "25.4");
 
-        // Test empty combo
-        clickButton("Add Another Material", 0);
-        clickButton("Create", 0);
-        waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
-
         // Test Duplicate Material
+        clickButton("Add Another Material", 0);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material1']]"), RAW_MATERIAL_1);
         waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
         setFormElements("input", "concentration", new String[]{"25.4", "66.2"});
         clickButton("Create", 0);
         waitForText("Duplicate source materials are not allowed.", WAIT_FOR_JAVASCRIPT);
 
+        // Test empty combo
+        clickButton("Add Another Material", 0);
+        clickButton("Create", 0);
+        waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
+        
         // Test empty concentration
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material1']]"), RAW_MATERIAL_2);
-        /*clickButton("Create", 0);
-        waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);*/
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material2']]"), RAW_MATERIAL_2);
+        clickButton("Create", 0);
+        waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
 
-        // Create
+        // Remove duplicate material
+        click(Locator.xpath("//a[text() = 'Remove'][1]")); // remove
+        
+        // Create        
         setFormElements("input", "concentration", new String[]{"25.4", "66.2"});
         clickButton("Create", 0);
         waitForText("has been created.", WAIT_FOR_JAVASCRIPT);
