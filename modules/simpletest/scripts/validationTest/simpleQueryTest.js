@@ -90,17 +90,17 @@ var testFunctions = [
 // Verify QUERY.saveRows operations
     function() //testResults[7]
     { // Check that improper inserts did not occur (Comment contains ERROR)
-        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, filterArray: [ LABKEY.Filter.create('Date', startTimeString, LABKEY.Filter.Types.GREATER_THAN_OR_EQUAL), LABKEY.Filter.create('Comment', 'ERROR', LABKEY.Filter.Types.CONTAINS) ]});
+        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, filterArray: [ LABKEY.Filter.create("Comment", startTimeString, LABKEY.Filter.Types.CONTAINS), LABKEY.Filter.create('Comment', 'ERROR', LABKEY.Filter.Types.CONTAINS) ]});
         executeNext();
     },
 
     // last function checks all results.
     function()
     {
-        if (testResults[0].rowsAffected != 1)
+        if (!testResults[0].rowsAffected || testResults[0].rowsAffected != 1)
             errors[errors.length] = new Error("Query.insertRows() = "+Ext.util.JSON.encode(testResults[0]));
 
-        if (testResults[1].rows.length  != 1)
+        if (!testResults[1].rows || testResults[1].rows.length  != 1)
             errors[errors.length] = new Error("Query.selectRows() = "+Ext.util.JSON.encode(testResults[1]));
 
         if (!testResults[2].errors)
@@ -115,10 +115,10 @@ var testFunctions = [
         if (!testResults[5].exception)
             errors[errors.length] = new Error("Query.saveRows(non-transacted) = "+Ext.util.JSON.encode(testResults[5]));
 
-        if (testResults[6].rows.length != 2)
+        if (!testResults[6].rows || testResults[6].rows.length != 2)
             errors[errors.length] = new Error("Verify inserted rows = "+Ext.util.JSON.encode(testResults[6]));
 
-        if (testResults[7].rows.length != 0)
+        if (!testResults[7].rows || testResults[7].rows.length != 0)
             errors[errors.length] = new Error("Verify failed inserts = "+Ext.util.JSON.encode(testResults[7]));
 
         if( errors.length > 0 )

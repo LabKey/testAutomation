@@ -7,6 +7,7 @@
 var console = require("console");
 console.log("** evaluating: " + this['javax.script.filename']);
 var LABKEY = require("labkey");
+var Ext = require("Ext").Ext;
 
 function doTest()
 {
