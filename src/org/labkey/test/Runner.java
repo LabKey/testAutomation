@@ -24,6 +24,7 @@ import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.JUnitFooter;
+import org.labkey.test.util.JUnitHeader;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -382,6 +383,12 @@ public class Runner extends TestSuite
                 test = new JUnit4TestAdapter(testClass);
             }
             else isServerSideTest = true;
+
+            if (isServerSideTest)
+            {
+                // Clear errors and enable dumbster before JUnitTest runs.
+                suite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
+            }
 
             suite.addTest(test);
 
