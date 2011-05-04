@@ -1080,7 +1080,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 try
                 {
                     dump();
-                    dumpPipelineLogFiles(getLabKeyRoot() + "/sampledata");
+                    dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
+                    dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
                     if (_testTimeout)
                         dumpThreads();
                 }
@@ -2841,12 +2842,29 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setPipelineRoot(rootPath, false);
     }
 
-    private void dumpPipelineLogFiles(String path)
+    private void dumpPipelineFiles(String path)
     {
+        // moves all files under @path, created by the test, to the TeamCity publish directory
         ArrayList<File> files = listFilesRecursive(new File(path), new NonSVNFilter());
         for (File file : files)
         {
             if ( file.isFile() )
+            {
+                File dest = new File( Runner.getDumpDir() + "/" + getClass().getSimpleName() + "/" + file.getParent().substring(path.length()));
+                if (!dest.exists())
+                    dest.mkdirs();
+                file.renameTo(new File(dest, file.getName()));
+            }
+        }
+    }
+
+    private void dumpPipelineLogFiles(String path)
+    {
+        // moves all .log files under @path, created by the test, to the TeamCity publish directory
+        ArrayList<File> files = listFilesRecursive(new File(path), new NonSVNFilter());
+        for (File file : files)
+        {
+            if ( file.isFile() && file.getName().endsWith(".log") )
             {
                 File dest = new File( Runner.getDumpDir() + "/" + getClass().getSimpleName() + "/" + file.getParent().substring(path.length()));
                 if (!dest.exists())
