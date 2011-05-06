@@ -50,9 +50,9 @@ public class PipelineBvtTest extends PipelineWebTestBase
         folder.setWebParts("Data Pipeline", "MS1 Runs", "MS2 Experiment Runs", "Mail Record");
 
         PipelineFolder.MailSettings mail = new PipelineFolder.MailSettings(this);
-        mail.setNotifyOnSuccess(true, true, "brother@labkey.org");
+        mail.setNotifyOnSuccess(true, true, "brother@pipelinebvt.test");
         mail.setNotifyOnError(true, true);
-        mail.setEscalateUsers("momma@labkey.org");
+        mail.setEscalateUsers("momma@pipelinebvt.test");
         folder.setMailSettings(mail);
 
         String[] sampleNames = new String[] { "CAexample_mini1", "CAexample_mini2" };

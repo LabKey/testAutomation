@@ -170,7 +170,7 @@
       },
       "user": {
           "userId": 1001,
-          "displayName": "daves@labkey.com"
+          "displayName": "security-api@clientapi.test"
       }
   }</response>
     </test>
@@ -209,11 +209,11 @@
     <response>{"currentUser": {
     "id": 1001,
     "canDeleteOwn": "true",
-    "email": "daves@labkey.com",
+    "email": "security-api@clientapi.test",
     "canDelete": "true",
     "canUpdate": "true",
     "isAdmin": "true",
-    "displayName": "daves@labkey.com",
+    "displayName": "security-api@clientapi.test",
     "canInsert": "true",
     "canUpdateOwn": "true"
 }}</response>
