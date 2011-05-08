@@ -31,12 +31,14 @@ public class GpatAssayTest extends BaseSeleniumWebTest
     private static final String PROJECT_NAME = "GpatAssayTest Project";
 
     private static final String GPAT_ASSAY_XLS = "trial01.xls";
+    private static final String GPAT_ASSAY_XLSX = "trial01a.xlsx";
     private static final String GPAT_ASSAY_TSV = "trial02.tsv";
     private static final String ALIASED_ASSAY_1 = "trial01columns1.tsv";
     private static final String ALIASED_ASSAY_2 = "trial01columns2.tsv";
     private static final String ALIASED_ASSAY_3 = "trial01columns3.tsv";
     private static final String ALIASED_ASSAY_4 = "trial01columns4.tsv";
     private static final String ASSAY_NAME_XLS = "XLS Assay";
+    private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
     
 
@@ -87,6 +89,34 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         clickNavButton("Next");
         clickNavButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_XLS);
+        assertTextNotPresent("Role"); // excluded column
+        assertTextPresent("1 - 100 of 201");
+
+        log("Import XLSX GPAT assay");
+        clickLinkWithText(PROJECT_NAME);
+        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_XLSX);
+        selectImportDataAction("Create New General Assay Design");
+        waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
+        setFormElement("AssayDesignerName", ASSAY_NAME_XLSX);
+        uncheckCheckbox(Locator.xpath("//span[@id='id_import_Role']/input"));
+        click(Locator.xpath("//tr[./td/span[@id='id_import_Score']]//div[contains(@class, 'x-tbar-page-next')]"));
+        ExtHelper.waitForExtDialog(this, "Score Column Properties");
+        ExtHelper.clickExtTab(this, "Validators");
+        checkCheckbox("required");
+        click(Locator.xpath("//tr[./td/span[@id='id_import_Primary']]//div[contains(@class, 'x-tbar-page-next')]"));
+        ExtHelper.waitForExtDialog(this, "Primary Column Properties");
+        ExtHelper.clickExtTab(this, "Advanced");
+        checkCheckbox("mvEnabled");
+        clickNavButton("Ok", 0);
+        assertFormElementEquals("SpecimenID", "SpecimenID");
+        assertFormElementEquals("ParticipantID", "ptid");
+        assertFormElementEquals("VisitID", "VisitID");
+        assertFormElementEquals("Date", "DrawDt");
+        ListHelper.setColumnType(this, 5, ListHelper.ListColumnType.String); // Row 201 is a string
+        clickNavButton("Begin import");
+        clickNavButton("Next");
+        clickNavButton("Save and Finish");
+        clickLinkWithText(GPAT_ASSAY_XLSX);
         assertTextNotPresent("Role"); // excluded column
         assertTextPresent("1 - 100 of 201");
 
