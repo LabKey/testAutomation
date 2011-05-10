@@ -9,6 +9,7 @@ data/api/http-api.xml -text
 data/api/lineChartTest.js -text
 data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
+data/api/scatterChartTest.js -text
 data/api/security-api.xml -text
 data/api/webPartTest.js -text
 modules/miniassay/assay/simple/config.xml -text

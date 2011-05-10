@@ -150,6 +150,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         lineChartTest();
 
+        scatterChartTest();
+
         createLists();
 
         gridTest();
@@ -290,6 +292,23 @@ public class ClientAPITest extends BaseSeleniumWebTest
         String testCountStr = getFormElement(Locator.id("configCount"));
         int testCount = Integer.parseInt(testCountStr);
         for (int currentTest = 1; currentTest < testCount; currentTest++)
+        {
+            setFormElement("config", "" + currentTest);
+            clickAndWait(Locator.input("submit"));
+            waitForDivPopulation();
+            checkSVGConversion();
+        }
+    }
+
+    private void scatterChartTest() throws Exception
+    {
+        setFormElement("config", "");
+        clickAndWait(Locator.input("submit"));
+        setSourceFromFile("scatterChartTest.js");
+
+        String testCountStr = getFormElement(Locator.id("configCount"));
+        int testCount = Integer.parseInt(testCountStr);
+        for (int currentTest = 0; currentTest < testCount; currentTest++)
         {
             setFormElement("config", "" + currentTest);
             clickAndWait(Locator.input("submit"));
