@@ -1,0 +1,96 @@
+<!--<script type="text/javascript">
+    LABKEY.requiresScript('seedrandom-min.js', true); // Javascript Math.random is not by default seedable!
+</script>-->
+<div id="start-test"></div>
+<script type="text/javascript">
+
+    function start(){
+
+        var n = 7;  // 7 = ~750 folders.
+
+        var fibArray = calculateFibonacci(n);
+
+        var btn = Ext.getCmp('test-button');
+
+        function createContainers(arr, path) {
+
+            btn.setText('Running...');
+
+            var count = 0;
+            
+            function getName() {
+
+                count = count + 1;
+                return count;
+                /*var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+                var name = '';
+                Math.seedrandom('FolderTest');
+                for (var i=0; i < 8; i++) {
+                    var rnum = Math.floor(Math.random() * chars.length); // This call is seeded due to Math.seedrandom
+                    name += chars.substring(rnum,rnum+1);
+                }
+                return name;*/
+            }
+
+            function createHelper(arr, path, delta) {
+                for (var j = 0; j < arr[(arr.length-1)]; j++){
+                    LABKEY.Security.createContainer({
+                        name          : delta * (j+1),
+                        containerPath : path,
+                        success       : function(ci) {
+                            createHelper(arr.slice(0, (arr.length-1)), ci.path, j);
+                        }
+                    });
+
+                }
+                if (arr[(arr.length-1)] == 0) {
+                    btn.setText('Done.');
+                }
+            }
+
+            // The first level is as long as the array
+            for (var i = 0; i < arr.length; i++) {
+                LABKEY.Security.createContainer({
+                    name          : i+1,
+                    containerPath : path,
+                    success       : function(ci){
+                        createHelper(arr.slice(0, (arr.length-1)), ci.path, i);
+                    }
+                });
+            }
+        }
+
+        createContainers(fibArray, LABKEY.containerPath);
+    }
+
+    /**
+     * Returns an array of length n of Fibonacci values. For example,
+     * if you gave n=3 it would return [0,1,1].
+     * @param n
+     */
+    function calculateFibonacci(n) {
+
+        n = n-1; // since we are returning a 0-based array
+
+        if (n == 0)
+            return [0];
+        if (n == 1)
+            return [0,1];
+
+        var ret = [0,1];
+        for (var x = 2; x <= n; x++) { ret.push(ret[x-1] + ret[x-2]); }
+        return ret;
+    }
+
+    function init(){
+        var btn = new Ext.Button({
+            id : 'test-button',
+            renderTo : 'start-test',
+            text     : 'Start Test',
+            handler  : start
+        });
+    }
+
+    Ext.onReady(init);
+
+</script>

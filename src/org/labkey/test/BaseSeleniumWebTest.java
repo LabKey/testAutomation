@@ -4174,6 +4174,30 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
+     * Given a file name sets the wikiName page contents to a file in server/test/data/api
+     * @param fileName file will be found in server/test/data/api
+     * @param wikiName Name of the wiki where the source should be placed
+     * @return The source found in the file.
+     */
+    public String setSourceFromFile(String fileName, String wikiName)
+    {
+        return setSource(getFileContents("server/test/data/api/" + fileName), wikiName);
+    }
+
+    private String setSource(String srcFragment, String wikiName)
+    {
+        if (!isTextPresent(wikiName))
+        {
+            fail("Could not find the Wiki '" + wikiName + "'. Please create the Wiki before attempting to set the source.");
+        }
+        clickWebpartMenuItem(wikiName, "Edit");
+
+        setWikiBody(srcFragment);
+        saveWikiPage();
+        return srcFragment;
+    }
+    
+    /**
      * Switches the wiki edit page to source view when the format type is HTML.
      */
     public void switchWikiToSourceView()

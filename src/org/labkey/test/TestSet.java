@@ -115,7 +115,8 @@ public enum TestSet
         TargetStudyTest.class,
         TimeChartTest.class,
         EHRStudyTest.class,
-        GpatAssayTest.class,    
+        GpatAssayTest.class,
+//      FolderTest.class,
     }),
 
     IE(new Class[]

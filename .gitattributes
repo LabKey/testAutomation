@@ -4,6 +4,7 @@
 data/api/assayTest.js -text
 data/api/chartTest.js -text
 data/api/domainTest.js -text
+data/api/folderTest.html -text
 data/api/gridTest.js -text
 data/api/http-api.xml -text
 data/api/lineChartTest.js -text
@@ -140,6 +141,7 @@ src/org/labkey/test/drt/XTandemTest.java -text
 src/org/labkey/test/module/AdaptiveTest.java -text
 src/org/labkey/test/module/AdaptiveVisualizationPerf.java -text
 src/org/labkey/test/module/EHRStudyTest.java -text
+src/org/labkey/test/module/FolderTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
