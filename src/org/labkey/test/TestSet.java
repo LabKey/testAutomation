@@ -114,7 +114,7 @@ public enum TestSet
         SpecimenMergeTest.class,
         TargetStudyTest.class,
         TimeChartTest.class,
-        EHRStudyTest.class,
+//        EHRStudyTest.class,
         GpatAssayTest.class,
 //      FolderTest.class,
     }),
