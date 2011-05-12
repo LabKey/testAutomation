@@ -222,8 +222,8 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         log("Test graph views");
         clickLinkWithText("Microarray Dashboard");
         clickLinkWithText(MAGEML_FILE1);
-        clickLinkWithText("graph summary view");
-        clickLinkWithText("graph detail view");
+        clickLinkWithText("Graph Summary View");
+        clickLinkWithText("Graph Detail View");
 
         log("Test assay view");
         clickLinkWithText(ASSAY_NAME);

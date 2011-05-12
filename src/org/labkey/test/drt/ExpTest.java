@@ -80,7 +80,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickLinkWithText(EXPERIMENT_NAME);
         assertTextPresent("Example 5 Run");
         clickLinkWithText(RUN_NAME);
-        clickLinkWithText("graph summary view");
+        clickLinkWithText("Graph Summary View");
         clickImageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP);
         clickImageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE);
         assertTextPresent("CAexample_mini.mzXML");

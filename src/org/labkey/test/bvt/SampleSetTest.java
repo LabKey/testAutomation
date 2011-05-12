@@ -136,7 +136,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
 
         clickLinkContainingText("Derive 2 samples");
-        clickLinkContainingText("text view");
+        clickLinkContainingText("Text View");
         assertTextPresent("FirstRole");
         assertTextPresent("SecondRole");
         assertTextPresent("ThirdRole");
