@@ -306,9 +306,16 @@ public class ClientAPITest extends BaseSeleniumWebTest
         clickAndWait(Locator.input("submit"));
         setSourceFromFile("scatterChartTest.js");
 
+        //Some things we know about test 0. After this we loop through some others and just test to see if they convert
+        assertTextPresent("Test Scatter Chart");
+        assertTextPresent("Left Y Axis");
+        assertTextPresent("Bottom Axis");
+        assertTextPresent("Series1");
+        assertTextPresent("Series2");
+
         String testCountStr = getFormElement(Locator.id("configCount"));
         int testCount = Integer.parseInt(testCountStr);
-        for (int currentTest = 0; currentTest < testCount; currentTest++)
+        for (int currentTest = 1; currentTest < testCount; currentTest++)
         {
             setFormElement("config", "" + currentTest);
             clickAndWait(Locator.input("submit"));
