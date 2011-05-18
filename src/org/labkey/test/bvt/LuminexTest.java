@@ -20,6 +20,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.RReportHelper;
+import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import java.io.File;
 
@@ -45,9 +47,16 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_LUM_FILE1 = getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls";
     protected final String TEST_ASSAY_LUM_FILE2 = getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xls";
     protected final String TEST_ASSAY_LUM_FILE3 = getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls";
+    protected final String TEST_ASSAY_LUM_FILE4 = getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls";
     protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
+    private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"1.00", "1.00", "25031.50", "25584.50", "391.50", "336.50", "263.75", "290.75",
+            "35.25", "35.25", "63.00", "71.00", "1.00", "1.00", "1.00", "1.00", "1.00", "1.00", "26430.75", "26556.25", "1.00", "1.00", "1.00",
+            "1.00", "1.00", "1.00", "194.25", "198.75", "1.00", "1.00", "1.00", "1.00"};
+    private static final String[] RTRANS_ESTLOGCONC_VALUES = {"-6.91", "-6.91", "4.29", "4.37", "0.48", "0.27", "-0.12", "0.05", "-6.91", "-6.91",
+            "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "4.30", "4.32", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91",
+            "-6.91", "-0.64", "-0.62", "-6.91", "-6.91", "-6.91", "-6.91"};
 
     public String getAssociatedModuleDirectory()
     {
@@ -63,6 +72,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // setup a scripting engine to run a java transform script
         prepareProgrammaticQC();
+
+        // fail fast if R is not configured
+        RReportHelper.ensureRConfig(this);
 
         //revert to the admin user
         revertToAdmin();
@@ -229,7 +241,8 @@ public class LuminexTest extends AbstractQCAssayTest
             assertTextPresent(TEST_ASSAY_LUM_RUN_NAME2);
             assertTextPresent("LX10005314302");
 
-            runTransformTest();
+            runJavaTransformTest();
+            runRTransformTest();
         }
     } //doTestSteps()
 
@@ -255,7 +268,7 @@ public class LuminexTest extends AbstractQCAssayTest
         return true;
     }
 
-    protected void runTransformTest()
+    protected void runJavaTransformTest()
     {
         // add the transform script to the assay
         log("Uploading Luminex Runs with a transform script");
@@ -285,5 +298,76 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i, "Description", "Transformed");
         }
+    }
+
+    protected void runRTransformTest()
+    {
+        log("Uploading Luminex run with a R transform script");
+
+        // add the R transform script to the assay
+        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickLinkWithText(TEST_ASSAY_LUM);
+        click(Locator.linkWithText("manage assay design"));
+        clickLinkWithText("edit assay design");
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/server/modules/luminex/resources/transformscripts/transform_v1.R"));
+
+        // add a run property for designation of which field to use for curve fit calc in transform
+        addField("Run Fields", 5, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
+
+        // add the data properties for the calculated columns
+        addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
+        addField("Data Fields", 1, "estLogConc", "Est Log Conc", ListColumnType.Double);
+        addField("Data Fields", 2, "estConc", "Est Conc", ListColumnType.Double);
+        addField("Data Fields", 3, "se", "SE", ListColumnType.Double);
+
+        // set format to two decimal place for easier testing later
+        setFormat("Data Fields", 0, "0.00");
+        setFormat("Data Fields", 1, "0.00");
+        setFormat("Data Fields", 2, "0.00");
+        setFormat("Data Fields", 3, "0.00");
+
+        // save changes to assay design
+        clickNavButton("Save & Close");
+
+        // upload the sample data file
+        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickLinkWithText(TEST_ASSAY_LUM);
+        clickNavButton("Import Data");
+        clickNavButton("Next");
+        setFormElement("name", "r script transformed assayId");
+        setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
+        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE4));
+        clickNavButton("Next", 60000);
+        clickNavButton("Save and Finish");
+
+        // verify that the PDF of curves was generated
+        // TODO: what to check for?
+
+        // verfiy that the calculated values were generated by the transform script
+        clickLinkWithText("r script transformed assayId");
+        setFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank", "Is Not Blank");
+        assertTextPresent("1 - 32 of 32");
+        // check values in the fi-bkgd-blank column
+        for(int i = 0; i < RTRANS_FIBKGDBLANK_VALUES.length; i++)
+        {
+            assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "FI-Bkgd-Blank", RTRANS_FIBKGDBLANK_VALUES[i]);
+        }
+        clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
+        setFilter(TEST_ASSAY_LUM + " Data", "estLogConc", "Is Not Blank");
+        assertTextPresent("1 - 32 of 32");
+        // check values in the est log conc column
+        for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES.length; i++)
+        {
+            assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "Est Log Conc", RTRANS_ESTLOGCONC_VALUES[i]);
+        }
+    }
+
+    private void setFormat(String where, int index, String formatStr)
+    {
+        String prefix = getPropertyXPath(where);
+        ListHelper.clickRow(this, prefix, index);
+        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Format']"));
+        setFormElement("propertyFormat", formatStr);
     }
 }
