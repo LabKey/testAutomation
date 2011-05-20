@@ -25,6 +25,8 @@ package org.labkey.test;
 public class Locator
 {
     private String loc;
+    // XPATH fragments
+    public static final String NOT_HIDDEN = "not(ancestor::*[contains(@style,'visibility: hidden')])";
     protected Locator(String rawString)
     {
         loc = rawString;
@@ -134,22 +136,22 @@ public class Locator
 
     public static XPathLocator button(String text)
     {
-        return xpath("//button[text() = '" + text + "']");
+        return xpath("//button["+ NOT_HIDDEN +" and text() = '" + text + "']");
     }
 
     public static XPathLocator buttonContainingText(String text)
     {
-        return xpath("//button[contains(text(), '" + text + "')]");
+        return xpath("//button["+ NOT_HIDDEN +" and contains(text(), '" + text + "')]");
     }
 
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a[contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
+        return xpath("//a["+ NOT_HIDDEN +" and contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator extButton(String text)
     {
-        return xpath("//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
+        return xpath("//button["+ NOT_HIDDEN +" and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
     }
 
     public static XPathLocator extButtonEnabled(String text)
@@ -229,7 +231,7 @@ public class Locator
 
     public static XPathLocator menuItem(String text)
     {
-        return xpath("//a/span[contains(text(), " + xq(text) + ") and contains(@class, 'x-menu-item-text')]");
+        return xpath("//a/span["+ NOT_HIDDEN +" and contains(text(), " + xq(text) + ") and contains(@class, 'x-menu-item-text')]");
     }
 
     public static XPathLocator menuBarItem(String text)

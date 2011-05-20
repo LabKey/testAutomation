@@ -72,6 +72,7 @@ public class Runner
             "sire",
             "cage",
             "userid",
+            "room",
             "roomcage"
     );
 
@@ -82,7 +83,6 @@ public class Runner
             "description",
             "surgeon",
             "source",
-            "room",
             //protocol.tsv
             "inves",
             //blood draws (1008)
@@ -101,7 +101,7 @@ public class Runner
             "name"
     );
 
-    static Random random = new Random();
+    static Random random; // Initialized with a constant seed defined in subjects file
 
     // to create and retrieve aliases for values during the run
 
@@ -165,9 +165,7 @@ public class Runner
 
         if (args.length != 2)
         {
-            System.out.println("takes two arguments, the filesystem path to the root of the study export you want to" +
-                    " sample from and the path to a file listing subjects who's data should be kept and anonymized. \n" +
-                    "Ant usage:\nant studysampler -Dstudysampler.dir=/path/to/study -Dstudysampler.subjectfile=/path/to/file.txt");
+            System.out.println("Takes two arguments: absolute/path/to/study absolute/path/to/subjectslist.txt");
             return;
         }
         File studyRoot = new File(args[0]);
@@ -176,7 +174,9 @@ public class Runner
         System.out.println("Study directory: " + studyRoot);
         System.out.println("Sample file: " + subjectFile);
 
-        loadSubjectList(subjectFile);
+        AliasFactory aliaser = new AliasFactory();
+        FillerFactory filler = new FillerFactory();
+        loadSubjectList(subjectFile, aliaser);
 
         // List of lists to be skipped
         Set<File> clearTargets = new HashSet<File>();
@@ -211,8 +211,6 @@ public class Runner
                 allFiles.add(f);
         }
 
-        AliasFactory aliaser = new AliasFactory();
-        FillerFactory filler = new FillerFactory();
         ArrayList<String> usedSnomeds = new ArrayList<String>();
 
         System.out.println("\nAnonymize lists and datasets");
@@ -246,12 +244,20 @@ public class Runner
                     wipePositions.add(i);
             }
 
+            int columnCount = row.length;
             int read = 0;
             int wrote = 0;
 
             while ((row = reader.readNext()) != null && (wrote < MAX_ROWS || MAX_ROWS == -1))
             {
                 read++;
+
+                if (row.length != columnCount)
+                {
+                    System.out.println(inFile.getName() + ". Malformed row ["+read+"]. Skipping.");
+                    continue;
+                }
+
                 if (idPosition != null && !subjectIds.contains(row[idPosition]))
                     continue;
 
@@ -298,12 +304,20 @@ public class Runner
                     snomedPosition = i;
             }
 
+            int columnCount = row.length;
             int read = 0;
             int wrote = 0;
 
             while ((row = reader.readNext()) != null && wrote < MAX_ROWS)
             {
                 read++;
+
+                if (row.length != columnCount)
+                {
+                    System.out.println(inFile.getName() + ". Malformed row ["+read+"]. Skipping.");
+                    continue;
+                }
+
                 if (usedSnomeds.contains(row[snomedPosition]))
                 {
                     writer.writeNext(row);
@@ -356,15 +370,18 @@ public class Runner
         System.out.println("Elapsed: " + (int)((System.currentTimeMillis() - startTime)/1000) + " seconds.");
     }
 
-    static void loadSubjectList(File subjectListFile) throws IOException
+    static void loadSubjectList(File subjectListFile, AliasFactory aliaser) throws IOException
     {
         BufferedReader reader;
         String line;
         subjectIds = newStringSet();
 
         reader = new BufferedReader(new FileReader(subjectListFile));
+        random = new Random(Long.parseLong(reader.readLine())); // First line is seed.
+
         while((line = reader.readLine()) != null){
             subjectIds.add(line);
+            aliaser.get(line); // Pre-generate aliases to ensure consistency.
         }
 
         reader.close();

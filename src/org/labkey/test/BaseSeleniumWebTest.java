@@ -3257,9 +3257,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setSort(String regionName, String columnName, SortDirection direction)
     {
+        setSort(regionName, columnName, direction, defaultWaitForPage);
+    }
+
+    public void setSort(String regionName, String columnName, SortDirection direction, int wait)
+    {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
         if (runMenuItemHandler(regionName + ":" + columnName + ":" + direction.toString().toLowerCase()))
-            waitForPageToLoad(defaultWaitForPage);
+            waitForPageToLoad(wait);
     }
 
     public void setFilter(String regionName, String columnName, String filterType)
@@ -3478,6 +3483,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private void clickDataRegionPageLink(String dataRegionName, String title)
     {
         clickAndWait(Locator.xpath("//table[@id='dataregion_header_" + dataRegionName + "']//div/a[@title='" + title + "']"));
+    }
+
+    public int getDataRegionRowCount(String dataRegionName)
+    {
+        return selenium.getXpathCount("//table[@id='dataregion_" + dataRegionName + "']/tbody/tr[contains(@class, 'labkey-row') or contains(@class, 'labkey-alternate-row')]").intValue();
     }
 
     /** Sets selection state for rows of the data region on the current page. */

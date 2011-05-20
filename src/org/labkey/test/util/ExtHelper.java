@@ -84,8 +84,8 @@ public class ExtHelper
 
     public static void waitForExtDialog(final BaseSeleniumWebTest test, String title, int timeout)
     {
-        final Locator locator = Locator.xpath("//span[contains(@class, 'x-window-header-text') and contains(string(), '" + title + "')]");
-        
+        final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'x-window-header-text') and contains(string(), '" + title + "')]");
+
         test.waitFor(new BaseSeleniumWebTest.Checker()
         {
             public boolean check()
@@ -220,6 +220,11 @@ public class ExtHelper
         test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.click(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"));
         test.mouseDown(Locator.xpath("/html/body"));
+    }
+
+    public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
+    {
+        selectComboBoxItem(test, Locator.xpath("//div[./label[text()='"+label+":']]/div/div"), selection);
     }
 
     public static void selectGWTComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)

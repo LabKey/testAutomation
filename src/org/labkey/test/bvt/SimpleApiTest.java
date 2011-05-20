@@ -71,8 +71,12 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
     public void runApiTests() throws Exception
     {
+        runApiTests(getTestFiles(), null, null, false);
+    }
+
+    public void runApiTests(File[] testFiles, String username, String password, boolean expectErrors) throws Exception
+    {
         int tests = 0;
-        File[] testFiles = getTestFiles();
 
         if (testFiles != null)
         {
@@ -85,7 +89,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                     {
                         tests++;
                         log("Starting new test case: " + StringUtils.trimToEmpty(test.getName()));
-                        sendRequestDirect(testFile.getName(), test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch());
+                        sendRequestDirect(testFile.getName(), test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch(), username, password, expectErrors);
                         log("test case completed");
                     }
                 }
@@ -154,7 +158,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         return "server/modules/query";
     }
 
-    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch) throws UnsupportedEncodingException
+    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, String username, String password, boolean acceptErrors) throws UnsupportedEncodingException
     {
         HttpMethod method = null;
         String requestUrl = WebTestHelper.getBaseURL() + '/' + url;
@@ -174,10 +178,10 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         {
             try
             {
-                HttpClient client = WebTestHelper.getHttpClient(requestUrl);
+                HttpClient client = username == null ? WebTestHelper.getHttpClient(requestUrl) : WebTestHelper.getHttpClient(requestUrl, username, password);
 
                 int status = client.executeMethod(method);
-                if (status == HttpStatus.SC_OK)
+                if (status == HttpStatus.SC_OK || acceptErrors)
                 {
                     String response = method.getResponseBodyAsString();
                     _helper.assertEquals("FAILED: test " + name, expectedResponse, response);

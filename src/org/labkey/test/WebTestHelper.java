@@ -194,11 +194,16 @@ public class WebTestHelper
 
     public static HttpClient getHttpClient(String url) throws URIException
     {
+        return getHttpClient(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public static HttpClient getHttpClient(String url, String username, String password) throws URIException
+    {
         HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
         client.getState().setCredentials(
                 new AuthScope(new URI(url, false).getHost(),
                         AuthScope.ANY_PORT, AuthScope.ANY_REALM),
-                new UsernamePasswordCredentials(PasswordUtil.getUsername(), PasswordUtil.getPassword())
+                new UsernamePasswordCredentials(username, password)
         );
         //send basic auth header on first request
         client.getParams().setAuthenticationPreemptive(true);
