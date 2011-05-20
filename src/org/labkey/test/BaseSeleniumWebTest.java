@@ -611,18 +611,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
-     * Allows for tester to navigate a Webpart Ext-based navigation menu. The first
-     * item should be the top link (a.k.a. the webpart title)
+     * Allows test code to navigate to a Webpart Ext-based navigation menu.
+     * @param webPartTitle title (not name) of webpart to be clicked.  Multiple web parts with the same title not supported.
      * @param items
      */
-    public void clickWebpartMenuItem(String menu, String... items)
+    public void clickWebpartMenuItem(String webPartTitle, String... items)
     {
-        clickWebpartMenuItem(menu, true, items);
+        clickWebpartMenuItem(webPartTitle, true, items);
     }
 
-    public void clickWebpartMenuItem(String menu, boolean wait, String... items)
+    public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
     {
-        ExtHelper.clickExtMenuButton(this, wait, Locator.xpath("//img[@id='more-" + menu.toLowerCase() + "']"), items);
+        ExtHelper.clickExtMenuButton(this, wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
     }
 
     public void clickAdminMenuItem(String... items)
@@ -3077,6 +3077,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return null;
     }
 
+    // waits for page to load after button is clicked
+    // use clickButton(text, 0) to click a button and continure immediately
     public void clickButton(String text)
     {
         clickButton(text, defaultWaitForPage);
@@ -3100,10 +3102,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("No button found with text \"" + text + "\"");
     }
 
-    public void clickNavButtonContainingText(String buttonText)
-    {
-        clickButtonContainingText(buttonText);
-    }
 
     public void clickNavButton(String buttonText)
     {

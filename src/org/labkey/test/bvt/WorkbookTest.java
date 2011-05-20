@@ -27,6 +27,9 @@ public class WorkbookTest extends BaseSeleniumWebTest
     private static final String FILE_WORKBOOK_DESCRIPTION = "Test File Workbook Type";
     private static final String ASSAY_WORKBOOK_DESCRIPTION = "Test Assay Workbook Type";
     private static final String ASSAY_WORKBOOK_NAME = "TestAssayWorkbook";
+    private static final String APITEST_NAME = "WorkbookAPIs";
+    private static final String APITEST_FILE = "workbookAPITest.html";
+
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -100,46 +103,28 @@ public class WorkbookTest extends BaseSeleniumWebTest
         assertConfirmation("Are you sure you want to delete the selected row?");
         assertTextNotPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
 
-        String containerId = "workbook-"+getTableCellText("dataregion_query", 2, 1);
 
         // Test Workbook APIs
-        goToModule("Wiki");
-        createNewWikiPage("HTML");
-        setFormElement("name", "Workbook APIs");
-        setFormElement("title", "Workbook API Test Page");
-        setWikiBody("<div id='createWorkbookDiv'/><br><div id='deleteWorkbookDiv'/>\n" +
-                "<script type=\"text/javascript\">\n" +
-                "LABKEY.Security.createContainer({\n" +
-                "   title : 'API Workbook',\n" +
-                "   description : 'Workbook created by JS API',\n" +
-                "   isWorkbook: true,\n" +
-                "   failure: createFailure,\n" +
-                "   success: createSuccess\n" +
-                "   });\n" +
-                "LABKEY.Security.deleteContainer({\n" +
-                "   containerPath: '/"+PROJECT_NAME+"/"+containerId+"',\n" +
-                "   failure: deleteFailure,\n" +
-                "   success: deleteSuccess\n" +
-                "   });\n" +
-                "\n" +
-                "function createSuccess()\n" +
-                "   {document.getElementById('createWorkbookDiv').innerHTML = 'Insert complete - Success.';}\n" +
-                "function createFailure(errorInfo, response)\n" +
-                "   {document.getElementById('createWorkbookDiv').innerHTML = 'Insert complete - Failure: ' + errorInfo.exception;}\n" +
-                "function deleteSuccess()\n" +
-                "   {document.getElementById('deleteWorkbookDiv').innerHTML = 'Delete complete - Success.';}\n" +
-                "function deleteFailure(errorInfo, response)\n" +
-                "   {document.getElementById('deleteWorkbookDiv').innerHTML = 'Delete complete - Failure: ' + errorInfo.exception;}\n" +
-                "</script>");
+
+        // Initialize the Creation Wiki
+        clickLinkWithText(PROJECT_NAME);
+        addWebPart("Wiki");
+
+        createNewWikiPage();
+        setFormElement("name", APITEST_NAME);
+        setFormElement("title", APITEST_NAME);
+        setWikiBody("Placeholder text.");
         saveWikiPage();
+
+        setSourceFromFile(APITEST_FILE, APITEST_NAME);
+
+
+        clickButton("RunAPITest", 0);
 
         waitForText("Insert complete", WAIT_FOR_JAVASCRIPT);
         waitForText("Delete complete", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Insert complete - Success.", "Delete complete - Success.");
 
-        clickLinkWithText(PROJECT_NAME);
-        assertLinkPresentWithText("API Workbook");
-        assertLinkNotPresentWithText(FILE_WORKBOOK_NAME);
     }
 
     private enum WorkbookFolderType

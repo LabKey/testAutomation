@@ -1,0 +1,69 @@
+
+<div id='testButtonDiv'/><br>
+<div id='createWorkbookDiv'/><br>
+<div id='deleteWorkbookDiv'/><br>
+
+<script type="text/javascript">
+
+
+    function createContainer (deleteAfterCreate) {
+
+        LABKEY.Security.createContainer({
+            title : 'API Test Workbook',
+            description : 'Workbook created by JS API',
+            isWorkbook: true,
+            failure: failure,
+            success: success
+        });
+
+        function success(containersinfo) {
+            document.getElementById('createWorkbookDiv').innerHTML = 'Insert complete - Success.';
+            if (deleteAfterCreate)
+                    deleteContainer(containersinfo.path);
+        }
+
+        function failure(errorInfo, response) {
+            document.getElementById('createWorkbookDiv').innerHTML = 'Insert complete - Failure: ' + errorInfo.exception;
+        }
+
+    }
+
+    function deleteContainer (path) {
+
+        LABKEY.Security.deleteContainer({
+            containerPath: path,
+            failure: failure,
+            success: success
+        });
+
+
+        function success() {
+            document.getElementById('deleteWorkbookDiv').innerHTML = 'Delete complete - Success.';
+        }
+
+        function failure(errorInfo, response) {
+            document.getElementById('deleteWorkbookDiv').innerHTML = 'Delete complete - Failure: ' + errorInfo.exception;
+        }
+
+    }
+
+    function run (){
+        createContainer(false);   // Create but don't delete
+        createContainer(true);    // Create then delete
+    }
+
+
+    function init(){
+        var btn = new Ext.Button({
+            id : 'testButton',
+            renderTo : 'testButtonDiv',
+            text     : 'RunAPITest',
+            handler  : run
+        });
+    }
+
+    Ext.onReady(init);
+
+
+</script>
+
