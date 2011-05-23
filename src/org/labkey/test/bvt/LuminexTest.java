@@ -313,24 +313,22 @@ public class LuminexTest extends AbstractQCAssayTest
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
-        // NOTE: change to using just the blank bead subtraction tranform script until the
-        //       library inclusion issue is figured out for the curve fit transform
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), RTRANSFORM_SCRIPT_FILE2));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), RTRANSFORM_SCRIPT_FILE1));
 
         // add a run property for designation of which field to use for curve fit calc in transform
-        //addField("Run Fields", 5, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
+        addField("Run Fields", 5, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
 
         // add the data properties for the calculated columns
         addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
-        //addField("Data Fields", 1, "estLogConc", "Est Log Conc", ListColumnType.Double);
-        //addField("Data Fields", 2, "estConc", "Est Conc", ListColumnType.Double);
-        //addField("Data Fields", 3, "se", "SE", ListColumnType.Double);
+        addField("Data Fields", 1, "estLogConc", "Est Log Conc", ListColumnType.Double);
+        addField("Data Fields", 2, "estConc", "Est Conc", ListColumnType.Double);
+        addField("Data Fields", 3, "se", "SE", ListColumnType.Double);
 
         // set format to two decimal place for easier testing later
         setFormat("Data Fields", 0, "0.00");
-        //setFormat("Data Fields", 1, "0.00");
-        //setFormat("Data Fields", 2, "0.00");
-        //setFormat("Data Fields", 3, "0.00");
+        setFormat("Data Fields", 1, "0.00");
+        setFormat("Data Fields", 2, "0.00");
+        setFormat("Data Fields", 3, "0.00");
 
         // save changes to assay design
         clickNavButton("Save & Close");
@@ -341,7 +339,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickNavButton("Import Data");
         clickNavButton("Next");
         setFormElement("name", "r script transformed assayId");
-        //setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
+        setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
         setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE4));
         clickNavButton("Next", 60000);
         clickNavButton("Save and Finish");
@@ -361,14 +359,14 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "FI-Bkgd-Blank", RTRANS_FIBKGDBLANK_VALUES[i]);
         }
-        //clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
-        //setFilter(TEST_ASSAY_LUM + " Data", "estLogConc", "Is Not Blank");
-        //assertTextPresent("1 - 32 of 32");
+        clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
+        setFilter(TEST_ASSAY_LUM + " Data", "estLogConc", "Is Not Blank");
+        assertTextPresent("1 - 32 of 32");
         // check values in the est log conc column
-        //for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES.length; i++)
-        //{
-        //    assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "Est Log Conc", RTRANS_ESTLOGCONC_VALUES[i]);
-        //}
+        for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES.length; i++)
+        {
+            assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "Est Log Conc", RTRANS_ESTLOGCONC_VALUES[i]);
+        }
     }
 
     private void setFormat(String where, int index, String formatStr)
