@@ -1,0 +1,315 @@
+<script type="text/javascript">
+    LABKEY.requiresClientAPI(true);
+    LABKEY.requiresVisualization();
+    Ext.QuickTips.init();
+</script>
+
+<script type="text/javascript">
+    var dateMeasure = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"x-axis",
+            "label":"Days Since Date",
+            "timeAxis":"true",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "dateOptions":{
+            "interval":"Days",
+            "zeroDateCol":{
+                "id":1,
+                "name":"date",
+                "label":"Date",
+                "longlabel":"Date (Demographics)",
+                "description":"",
+                "isUserDefined":false,
+                "queryName":"Demographics",
+                "schemaName":"study",
+                "type":"TIMESTAMP"
+            }
+        },
+        "measure":{
+            "id":1,
+            "name":"date",
+            "label":"Date",
+            "longlabel":"Date (Lab Results)",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"Lab Results",
+            "schemaName":"study",
+            "type":"TIMESTAMP"
+        }
+    };
+
+    var cd4Measure = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"CD4+ (cells/mm3)",
+            "scale":"linear",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":20,
+            "name":"CD4",
+            "label":"CD4+ (cells/mm3)",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"Lab Results",
+            "schemaName":"study",
+            "type":"INTEGER"
+        },
+        "dimension":null
+    };
+
+    var hemoglobinMeasure = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"Hemoglobin",
+            "scale":"linear",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":21,
+            "name":"Hemoglobin",
+            "label":"Hemoglobin",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"Lab Results",
+            "schemaName":"study",
+            "type":"DOUBLE"
+        },
+        "dimension":null
+    };
+
+    var weightMeasure = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"Weight (kg)",
+            "scale":"linear",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":22,
+            "name":"Weight_kg",
+            "label":"Weight (kg)",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"Physical Exam",
+            "schemaName":"study",
+            "type":"INTEGER"
+        },
+        "dimension":null
+    };
+
+    var vlMeasure = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"Viral Load Quantified (copies/ml)",
+            "scale":"log",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":22,
+            "name":"HIVLoadQuant",
+            "label":"Viral Load Quantified (copies/ml)",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"HIV Test Results",
+            "schemaName":"study",
+            "type":"INTEGER"
+        },
+        "dimension":null
+    };
+
+    var luminexMeasure = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"ObsConc",
+            "scale":"log",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":22,
+            "name":"ObsConc",
+            "label":"ObsConc",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "type":"DOUBLE"
+        },
+        "dimension":null
+    };
+
+    var luminexMeasureWithDimension = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"ObsConc",
+            "scale":"log",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":22,
+            "name":"ObsConc",
+            "label":"ObsConc",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "type":"DOUBLE"
+        },
+        "dimension":{
+            "name":"AnalyteName",
+            "label":"Analyte Name",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "type":"VARCHAR",
+            "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
+        }
+    };
+
+    var sortArray = [
+        {
+            "name":"ParticipantId",
+            "schemaName":"study",
+            "queryName":"Lab Results",
+            "values":["249318596","249320107","249320127","249320489","249320897"]
+        },
+        {
+            "id":1,
+            "name":"date",
+            "label":"Date",
+            "longlabel":"Date (Lab Results)",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"Lab Results",
+            "schemaName":"study",
+            "type":"TIMESTAMP"
+        }
+    ];
+
+    var configs = [
+        {title: 'Single Measure', measures: [dateMeasure, cd4Measure]},
+        {title: 'Two Measures from the same dataset', measures: [dateMeasure, cd4Measure, hemoglobinMeasure]},
+        {title: 'Two Measures from different datasets', measures: [dateMeasure, cd4Measure, weightMeasure]},
+        {title: 'Two Measures from different datasets (#2)', measures: [dateMeasure, cd4Measure, vlMeasure]},
+        {title: 'Two Measures - without dimension selected for second', measures: [dateMeasure, cd4Measure, luminexMeasure]},
+        {title: 'Two Measures - WITH dimension selected for second', measures: [dateMeasure, cd4Measure, luminexMeasureWithDimension]}
+    ];
+
+    var measureNames = [
+        "study_LabResults_CD4",
+        "study_LabResults_Hemoglobin",
+        "study_PhysicalExam_Weight_kg",
+        "study_HIVTestResults_HIVLoadQuant",
+        "study_LuminexAssay_ObsConc",
+        "IL-10 (23)::study_LuminexAssay_ObsConc_MAX"
+    ];
+
+    var configCounter = -1;
+    var configForm;
+
+    Ext.onReady(init);
+
+    function init(){
+        configForm = new Ext.FormPanel({
+            renderTo: 'config-form-div',
+            frame: false,
+            items: [{
+                xtype: 'numberfield',
+                fieldLabel: 'Current Config ',
+                name: 'currentConfig',
+                value: 0,
+                allowBlank: false,
+                width: 30
+            },
+            {
+                xtype: 'numberfield',
+                fieldLabel: 'Total Number ',
+                name: 'configCount',
+                value: 0,
+                allowBlank: false,
+                width: 30
+            },
+            {
+                xtype: 'displayfield',
+                fieldLabel: 'Config Title ',
+                name: 'configTitle',
+                width: 500
+            }],
+            buttons: [{
+                xtype: 'button',
+                name: 'nextBtn',
+                text: 'Next',
+                handler: changeGrid
+            }],
+            buttonAlign: 'left'
+        });
+
+        changeGrid();
+    }
+
+    function changeGrid(){
+        // increment the config counter
+        configCounter++;
+        configForm.getForm().findField('currentConfig').setValue(configCounter);
+
+        // check that config exists for current value of counter
+        if(configCounter >= configs.length){
+            alert("Config does not exist: " + configCounter);
+            return;
+        }
+
+        // set the values in the form
+        configForm.getForm().findField('configCount').setValue(configs.length);
+        configForm.getForm().findField('configTitle').setValue(configs[configCounter].title);
+
+        // call the getData API with the new config measures
+        LABKEY.Visualization.getData({
+            success: function(data){
+                // show the results in a query webpart using the temp queryName provided in the result
+                new LABKEY.QueryWebPart({
+                    renderTo: 'grid-div',
+                    schemaName: data.schemaName,
+                    queryName: data.queryName,
+                    dataRegionName: 'apiTestDataRegion',
+                    sort: 'study_LabResults_ParticipantId,Days,'+measureNames[configCounter],
+                    allowChooseQuery: false,
+                    allowChooseView: false,
+                    title: "",
+                    frame: "none"
+                });
+            },
+            failure : function(info, response, options) {LABKEY.Utils.displayAjaxErrorResponse(response, options);},
+            measures: configs[configCounter].measures,
+            sorts: sortArray,
+            scope: this
+        });
+    };
+
+</script>
+
+<div id='config-form-div'></div>
+<br/>
+<div id='grid-div'></div>
+
+

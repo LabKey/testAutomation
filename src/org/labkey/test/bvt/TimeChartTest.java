@@ -36,6 +36,60 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
     private static final String USER1 = "user1@timechart.test";
 
+    private static final String WIKIPAGE_NAME = "VisualizationGetDataAPITest";
+    private static final String[] GETDATA_API_TEST_TITLES = {
+        "Single Measure",
+        "Two Measures from the same dataset",
+        "Two Measures from different datasets",
+        "Two Measures from different datasets (#2)",
+        "Two Measures - without dimension selected for second",
+        "Two Measures - WITH dimension selected for second"
+    };
+    private static final String[] GETDATA_API_TEST_NUMROWS = {
+        "1 - 33 of 33", 
+        "1 - 33 of 33", 
+        "1 - 33 of 33",
+        "1 - 33 of 33",
+        "1 - 75 of 75",
+        "1 - 25 of 25"
+    };
+
+    private static final String[][] GETDATA_API_TEST_COLNAMES = {
+        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Days"},
+        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Days"},
+        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "Study Physical Exam Weight Kg", "Days"},
+        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "Study HIVTest Results HIVLoad Quant", "Days"},
+        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
+        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
+    };
+
+    private static final String[][] GETDATA_API_TEST_DAYS = {
+        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
+        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
+        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
+        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
+        {"44", "44", "44", "79", "79", "79", "108", "108", "108", "190", "190", "190", "246", "246", "246"},
+        {"44", "79", "108", "190", "246"}
+    };
+
+    private static final String[] GETDATA_API_TEST_MEASURES = {
+        "Study Lab Results CD4",
+        "Study Lab Results Hemoglobin",
+        "Study Physical Exam Weight Kg",
+        "Study HIVTest Results HIVLoad Quant",
+        "Study Luminex Assay Obs Conc",
+        "IL-10 (23)"
+    };
+
+    private static final String[][] GETDATA_API_TEST_MEASURE_VALUES = {
+        {"43", "520", "420", "185", "261", "308", "177", "144", "167", "154"},
+        {"14.5", "16.0", "12.2", "15.5", "13.9", "13.7", "12.9", "11.1", "13.2", "16.1"},
+        {"86", "84", "83", "80", "79", "79", "79", "78", "77", "75"},
+        {"4345", "3452", "98354", "32453", "324234", "345452", "235671", "456674", "567432", "653465"},
+        {"35.87", "40.07", "52.74", "13.68", "28.35", "42.38", "2.82", "5.19", "7.99", "5.12", "6.69", "32.33", "3.09", "5.76", "12.49"},
+        {"40.07", "42.38", "7.99", "32.33", "12.49"}
+    };
+
     @Override
     public String getAssociatedModuleDirectory()
     {
@@ -199,6 +253,46 @@ public class TimeChartTest extends BaseSeleniumWebTest
         assertElementNotVisible(Locator.button("Save As"));
         assertElementPresent(Locator.xpath("//table[contains(@class, 'x-item-disabled')]//button[text()='Save']"));
         simpleSignIn();
+
+        // check multi-measure calls to LABKEY.Visualization.getData API
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        // create new wiki to add to Demo study folder
+        addWebPart("Wiki");
+        createNewWikiPage("HTML");
+        setFormElement("name", WIKIPAGE_NAME);
+        setFormElement("title", WIKIPAGE_NAME);
+        // insert JS for getData calls and querywebpart
+        setWikiBody(getFileContents("server/test/data/api/getDataTest.html"));
+        saveWikiPage();
+        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+
+        // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
+        int testCount = Integer.parseInt(getFormElement(Locator.name("configCount")));
+        int testIndex = 0;
+        while(testIndex < testCount){
+            // check title is present
+            assertTextPresent(GETDATA_API_TEST_TITLES[testIndex]);
+            // check # of rows
+            waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
+            // check column headers
+            for(int i = 0; i < GETDATA_API_TEST_COLNAMES[testIndex].length; i++){
+                assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_TEST_COLNAMES[testIndex][i], GETDATA_API_TEST_COLNAMES[testIndex][i]);
+            }
+            // check values in interval column for the first participant
+            for(int i = 0; i < GETDATA_API_TEST_DAYS[testIndex].length; i++){
+                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, "Days", GETDATA_API_TEST_DAYS[testIndex][i]);
+            }
+            // check values in measure column
+            for(int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++){
+                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, GETDATA_API_TEST_MEASURES[testIndex], GETDATA_API_TEST_MEASURE_VALUES[testIndex][i]);
+            }
+
+            if(testIndex < testCount-1)
+                clickNavButton("Next", 0);
+
+            testIndex++;
+        }
     }
 
     @Override
