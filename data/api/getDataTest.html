@@ -1,3 +1,7 @@
+<div id="getData-config-form-div"></div>
+<br/>
+<div id="getData-grid-div"></div>
+
 <script type="text/javascript">
     LABKEY.requiresClientAPI(true);
     LABKEY.requiresVisualization();
@@ -228,11 +232,21 @@
     var configCounter = -1;
     var configForm;
 
-    Ext.onReady(init);
+    //Lots of async script loading. Make sure everything is loaded before starting
+    LABKEY.Utils.onTrue({
+        testCallback:function() {return Ext.isReady && LABKEY.vis},
+        //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
+        successCallback:function () {init.defer(100)},
+        errorCallback:doError
+    });
+
+    function doError(param) {
+        throw param;
+    }
 
     function init(){
         configForm = new Ext.FormPanel({
-            renderTo: 'config-form-div',
+            renderTo: 'getData-config-form-div',
             frame: false,
             items: [{
                 xtype: 'numberfield',
@@ -288,7 +302,7 @@
             success: function(data){
                 // show the results in a query webpart using the temp queryName provided in the result
                 new LABKEY.QueryWebPart({
-                    renderTo: 'grid-div',
+                    renderTo: 'getData-grid-div',
                     schemaName: data.schemaName,
                     queryName: data.queryName,
                     dataRegionName: 'apiTestDataRegion',
@@ -304,12 +318,6 @@
             sorts: sortArray,
             scope: this
         });
-    };
+    }
 
 </script>
-
-<div id='config-form-div'></div>
-<br/>
-<div id='grid-div'></div>
-
-
