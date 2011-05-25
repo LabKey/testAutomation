@@ -2742,7 +2742,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTableCellTextEquals(String tableName, int row, int column, String value)
     {
-        assertTrue(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", isTableCellEqual(tableName, row, column, value));
+        assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
     }
 
     public void assertTableCellTextEquals(String tableName, int row, String columnTitle, String value)
