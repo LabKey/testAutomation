@@ -52,14 +52,14 @@ public class LuminexTest extends AbstractQCAssayTest
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
-    private static final String RTRANSFORM_SCRIPT_FILE1 = "/server/modules/luminex/resources/transformscripts/transform_v1.R";
-    private static final String RTRANSFORM_SCRIPT_FILE2 = "/server/modules/luminex/resources/transformscripts/blank_bead_subtraction.R";
-    private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"1.00", "1.00", "25031.50", "25584.50", "391.50", "336.50", "263.75", "290.75",
-            "35.25", "35.25", "63.00", "71.00", "1.00", "1.00", "1.00", "1.00", "1.00", "1.00", "26430.75", "26556.25", "1.00", "1.00", "1.00",
-            "1.00", "1.00", "1.00", "194.25", "198.75", "1.00", "1.00", "1.00", "1.00"};
-    private static final String[] RTRANS_ESTLOGCONC_VALUES = {"-6.91", "-6.91", "4.29", "4.37", "0.48", "0.27", "-0.12", "0.05", "-6.91", "-6.91",
-            "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91", "4.30", "4.32", "-6.91", "-6.91", "-6.91", "-6.91", "-6.91",
-            "-6.91", "-0.64", "-0.62", "-6.91", "-6.91", "-6.91", "-6.91"};
+    private static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/transform_v1.R";
+    private static final String RTRANSFORM_SCRIPT_FILE2 = "/resources/transformscripts/blank_bead_subtraction.R";
+    private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"1.0", "1.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
+            "35.2", "35.2", "63.0", "71.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "26430.8", "26556.2", "1.0", "1.0", "1.0",
+            "1.0", "1.0", "1.0", "194.2", "198.8", "1.0", "1.0", "1.0", "1.0"};
+    private static final String[] RTRANS_ESTLOGCONC_VALUES = {"-6.9", "-6.9", "4.3", "4.4", "0.5", "0.3", "-0.1", "0.0", "-6.9", "-6.9",
+            "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "4.3", "4.3", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9",
+            "-6.9", "-0.6", "-0.6", "-6.9", "-6.9", "-6.9", "-6.9"};
 
     public String getAssociatedModuleDirectory()
     {
@@ -313,7 +313,7 @@ public class LuminexTest extends AbstractQCAssayTest
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), RTRANSFORM_SCRIPT_FILE1));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
 
         // add a run property for designation of which field to use for curve fit calc in transform
         addField("Run Fields", 5, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
@@ -325,10 +325,10 @@ public class LuminexTest extends AbstractQCAssayTest
         addField("Data Fields", 3, "se", "SE", ListColumnType.Double);
 
         // set format to two decimal place for easier testing later
-        setFormat("Data Fields", 0, "0.00");
-        setFormat("Data Fields", 1, "0.00");
-        setFormat("Data Fields", 2, "0.00");
-        setFormat("Data Fields", 3, "0.00");
+        setFormat("Data Fields", 0, "0.0");
+        setFormat("Data Fields", 1, "0.0");
+        setFormat("Data Fields", 2, "0.0");
+        setFormat("Data Fields", 3, "0.0");
 
         // save changes to assay design
         clickNavButton("Save & Close");
