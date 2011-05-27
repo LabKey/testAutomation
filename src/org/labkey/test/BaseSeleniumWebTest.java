@@ -3054,7 +3054,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isElementPresent(locator))
             return locator;
 
-        fail("Unable to locate button: \'" + text + "\'");
         return null;
     }
 
