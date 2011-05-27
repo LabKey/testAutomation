@@ -24,6 +24,8 @@ import org.labkey.test.util.RReportHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * User: jeckels
@@ -45,7 +47,7 @@ public class LuminexTest extends AbstractQCAssayTest
     protected static final String TEST_ASSAY_LUM_RUN_NAME2 = "testRunName2";
     protected static final String TEST_ASSAY_LUM_RUN_NAME3 = "WithIndices.xls";
     protected final String TEST_ASSAY_LUM_FILE1 = getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls";
-    protected final String TEST_ASSAY_LUM_FILE2 = getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xls";
+    protected final String TEST_ASSAY_LUM_FILE2 = getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx";
     protected final String TEST_ASSAY_LUM_FILE3 = getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls";
     protected final String TEST_ASSAY_LUM_FILE4 = getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls";
     protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
