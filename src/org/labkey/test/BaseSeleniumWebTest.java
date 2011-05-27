@@ -2624,7 +2624,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         click(Locator.permissionsTreeNode(folderName));
     }
-    
+
+    public void mouseOut(Locator l)
+    {
+        selenium.mouseOut(l.toString());
+    }
+
     public void mouseOver(Locator l)
     {
         selenium.mouseOver(l.toString());

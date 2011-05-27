@@ -684,7 +684,28 @@ public class ListTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]"));
         assertElementPresent(Locator.xpath("//td[text()='8' and contains(@style, 'line-through')]"));
 
+        // Check for appropriate tooltips
+        assertTextNotPresent("Formatting applied because column > 5.");
+        mouseOver(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]"));
+        // Tooltip doesn't show instantly, so wait for a bit
+        sleep(2000);
+        assertTextPresent("Formatting applied because column > 5.");
+        mouseOut(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]"));
+        // Tooltip doesn't hide instantly, so wait for a bit
+        sleep(2000);
+        assertTextNotPresent("Formatting applied because column > 5.");
+
+        assertTextNotPresent("Formatting applied because column STARTS WITH true.");
+        mouseOver(Locator.xpath("//td[text()='true']"));
+        // Tooltip doesn't show instantly, so wait for a bit
+        sleep(2000);
+        assertTextPresent("Formatting applied because column STARTS WITH true.");
+        mouseOut(Locator.xpath("//td[text()='true']"));
+        // Tooltip doesn't hide instantly, so wait for a bit
+        sleep(2000);
+        assertTextNotPresent("Formatting applied because column STARTS WITH true.");
     }
+
     private void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");

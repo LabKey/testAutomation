@@ -65,6 +65,11 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        createProjectAndFolder();
+    }
+
+    protected void createProjectAndFolder()
+    {
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "MS2", new String[] { });
 

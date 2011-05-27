@@ -19,40 +19,22 @@ package org.labkey.test.drt;
 import org.labkey.test.ms2.AbstractMS2SearchEngineTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.ms2.AbstractXTandemTest;
 
 import java.io.File;
 import java.io.IOException;
 
-public class XTandemTest extends AbstractMS2SearchEngineTest
+public class XTandemTest extends AbstractXTandemTest
 {
-    protected static final String PEPTIDE = "K.LLASMLAK.A";
-    protected static final String PEPTIDE2 = "K.EEEESDEDMGFG.-";
-    protected static final String PEPTIDE3 = "K.GSDSLSDGPACKR.S";
-    protected static final String PEPTIDE4 = "K.EEEESDEDMGFG.-";
-    protected static final String PEPTIDE5 = "K.LHRIEAGVMPR.N";
-    protected static final String PROTEIN = "gi|18311790|phosphoribosylfor";
     protected static final String SEARCH = "gi|4689022";
     protected static final String SEARCH_FIND = "SCHIZOSACCHAROMYCES";
     protected static final String SEARCH_FIND_ALT = "Schizosaccharomyces";
     protected static final String PROTOCOL = "X!Tandem analysis";
-    protected static final String SEARCH_TYPE = "xtandem";
-    protected static final String SEARCH_BUTTON = "X!Tandem";
-    protected static final String SEARCH_NAME = "X! Tandem";
     protected static final String PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID = "peptideProphetRadioButton";
     protected static final String PEPTIDE_CROSSTAB_RADIO_PROBABILITY_VALUE = "probability";
     protected static final String PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME = "peptideProphetProbability";
     protected static final String PEPTIDE_CROSSTAB_RADIO_NAME = "peptideFilterType";
     protected static final String PEPTIDE_CROSSTAB_RADIO_VALUE_NONE = "none";
-
-    protected void doCleanup() throws IOException
-    {
-        try {
-            deleteViews(VIEW); } catch (Throwable t) {}
-        try {deleteRuns(); } catch (Throwable t) {}
-        cleanPipe(SEARCH_TYPE);
-        try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-    }
 
     protected void doTestSteps()
     {
@@ -62,13 +44,6 @@ public class XTandemTest extends AbstractMS2SearchEngineTest
             fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         super.doTestSteps();
-    }
-
-    protected void setupEngine()
-    {
-        log("Analyze " + SEARCH_NAME + " sample data.");
-        sleep(1500);
-        selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
     }
 
     protected void basicChecks()

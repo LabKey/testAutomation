@@ -22,6 +22,7 @@ import org.labkey.test.drt.*;
 import org.labkey.test.module.*;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
+import org.labkey.test.ms2.QuantitationTest;
 import org.labkey.test.ms2.SequestTest;
 
 import java.util.Arrays;
@@ -84,6 +85,7 @@ public enum TestSet
         UniprotAnnotationTest.class, //requires bootstrap
         HTTPApiTest.class,
         MessagesBvtTest.class, //do we need both MessagesTest and MessagesBvtTest?
+        QuantitationTest.class,
         MessagesTest.class,
         MS2BvtTest.class,
         MS2BvtTestGZ.class,           

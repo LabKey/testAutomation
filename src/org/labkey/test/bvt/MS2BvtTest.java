@@ -269,7 +269,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("gi|29650192|ribosomal_protein");
         assertTextPresent("56");
         assertTextPresent("0.0000");
-        clickNavButton("Next >>");
+        clickLinkWithText("Next");
         assertTextPresent("R.GGNEESTK.T");
         assertTextPresent("gi|442754|A_Chain_A,_Superoxi");
 
