@@ -16,6 +16,7 @@
 package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 /**
  * User: Nick
@@ -63,8 +64,8 @@ public class FolderTest extends BaseSeleniumWebTest
         setSourceFromFile(FOLDER_CREATION_FILE, WIKITEST_NAME);
 
         // Run the Test Script
-        clickButton("Start Test");
-        waitForText("Done.", 60000);
+        clickButton("Start Test", 0);
+        waitForElement(Locator.button("Done."), 60000);
     }
 
     protected void moveFolders()
