@@ -3165,17 +3165,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, waitForPageToLoad);
     }
 
-
-    public String goToNavButton(String buttonText, String controller, String folderPath)
+    /** @return target of link */
+    public String getLinkHref(String linkText, String controller, String folderPath)
     {
-        // Returns address of NavButton
-        Locator navButton;
-        if (isElementPresent(Locator.navButton(buttonText)))
-            navButton = Locator.navButton(buttonText);
-        else
-            navButton = Locator.navSubmitButton(buttonText);
-        Locator navButtonLink = Locator.raw(navButton.toString().concat("/.."));
-        String localAddress = getButtonHref(navButtonLink);
+        Locator link = Locator.linkWithText(linkText);
+        String localAddress = getButtonHref(link);
         // IE puts the entire link in href, not just the local address
         if (localAddress.contains("/"))
         {

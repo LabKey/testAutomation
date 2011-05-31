@@ -123,16 +123,16 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test Navigation Bar for Run");
         log("Test Show Modifications");
-        pushLocation();
-        beginAt(goToNavButton("Show Modifications", "MS2", "/" + PROJECT_NAME + "/" + FOLDER_NAME));
+        clickLinkWithText("Show Modifications", false);
+        // Wait for tooltip to show up
+        sleep(2000);
         assertTextPresent("Variable");
         assertTextPresent("E^");
         assertTextPresent("Q^");
-        popLocation();
 
         log("Test Show Peptide Prophet Details");
         pushLocation();
-        beginAt(goToNavButton("Show Peptide Prophet Details", "MS2", "/" + PROJECT_NAME + "/" + FOLDER_NAME));
+        beginAt(getLinkHref("Show Peptide Prophet Details", "MS2", "/" + PROJECT_NAME + "/" + FOLDER_NAME));
         assertTextPresent("Minimum probability");
         assertTextPresent("Error rate");
         assertTextPresent("Sensitivity");
@@ -145,7 +145,7 @@ public class MS2BvtTest extends MS2TestBase
 
         log("Test Show Protein Prophet Details");
         pushLocation();
-        beginAt(goToNavButton("Show Protein Prophet Details", "MS2", "/" + PROJECT_NAME + "/" + FOLDER_NAME));
+        beginAt(getLinkHref("Show Protein Prophet Details", "MS2", "/" + PROJECT_NAME + "/" + FOLDER_NAME));
         assertTextPresent("Minimum probability");
         assertTextPresent("Error rate");
         assertTextPresent("Sensitivity");
@@ -268,7 +268,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("R.LSSMRDSR.S");
         assertTextPresent("gi|29650192|ribosomal_protein");
         assertTextPresent("56");
-        assertTextPresent("0.0000");
+        assertTextPresent("0.000");
         clickLinkWithText("Next");
         assertTextPresent("R.GGNEESTK.T");
         assertTextPresent("gi|442754|A_Chain_A,_Superoxi");
