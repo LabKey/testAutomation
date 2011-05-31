@@ -2820,11 +2820,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return -1;
     }
 
-    public void assertTableRowsEqual(String tableName, int startRow, String[][] cellValues)
+    public void assertTableRowsEqual(String tableId, int startRow, String[][] cellValues)
     {
         for (int row = 0; row < cellValues.length; row++)
             for (int col = 0; col < cellValues[row].length; col++)
-                assertTableCellTextEquals(tableName, row + startRow, col, cellValues[row][col]);
+                assertTableCellTextEquals(tableId, row + startRow, col, cellValues[row][col]);
     }
 
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid

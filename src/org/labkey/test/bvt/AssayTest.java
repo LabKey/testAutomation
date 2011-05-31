@@ -410,6 +410,21 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent("2000-01-01");
         clickLinkWithText("Study Overview");
+
+        log("Test participant counts and row counts in study overview");
+        // TODO: first "0" below will change with final implementation
+        String[] row2 = new String[]{"TestAssay1", "0", "1", "1", "1", "1", "1", "2", "1"};
+        assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
+        // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
+        click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
+        waitForPageToLoad();
+        row2 = new String[]{"TestAssay1", "9", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "2 / 3", "1 / 1"};
+        assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
+        uncheckCheckbox("visitStatistic", "ParticipantCount");
+        waitForPageToLoad();
+        row2 = new String[]{"TestAssay1", "9", "1", "1", "1", "1", "1", "3", "1"};
+        assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
+
         clickLinkWithText("9");
 
         assertTextPresent("301.0");
