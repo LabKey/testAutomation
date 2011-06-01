@@ -89,6 +89,7 @@ public class StudyBvtTest extends StudyManualTest
         setFormatStrings();
         setManualCohorts();
         modifyVisits();
+        importCustomVisitMapping();
         changeDatasetOrder("16");
         setDatasetCategory(MODIFIED_DATASET, CATEGORY);
         hideDataset(HIDDEN_DATASET);

@@ -77,6 +77,9 @@ public class StudyManualTest extends StudyTest
         setLongTextField("content", visitMapData);
         clickNavButton("Import");
 
+        // import custom visit mapping
+        importCustomVisitMapping();
+
         // define forms
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
@@ -119,7 +122,8 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Start Import");
     }
 
-    // Using old visit map format, which does not support default visibility (so we need to set it manually).
+
+    // Using old visit map format, which does not support default visibility, etc. (so we need to set these manually).
     protected void afterManualCreate()
     {
         hideSceeningVisit();
@@ -133,6 +137,18 @@ public class StudyManualTest extends StudyTest
     {
         clickLinkWithText(getFolderName());
         hideVisits("Screening Cycle", "Cycle 1");
+    }
+
+
+    protected void importCustomVisitMapping()
+    {
+        if (!isLinkPresentContainingText("Visit Import Mapping"))
+            clickLinkWithText("Manage Visits");
+
+        clickLinkWithText("Visit Import Mapping");
+        clickNavButton("Import Custom Mapping");
+        setLongTextField("tsv", VISIT_IMPORT_MAPPING);
+        clickNavButton("Submit");
     }
 
 

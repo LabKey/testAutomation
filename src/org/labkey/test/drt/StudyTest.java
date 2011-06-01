@@ -15,6 +15,7 @@
  */
 package org.labkey.test.drt;
 
+import org.apache.commons.lang.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -22,6 +23,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: adam
@@ -49,6 +52,12 @@ public class StudyTest extends StudyBaseTest
     private static final String COMMENT_FIELD_NAME = "comment";
     private static final String PARTICIPANT_COMMENT_LABEL = "mouse comment";
     private static final String PARTICIPANT_VISIT_COMMENT_LABEL = "mouse visit comment";
+
+    protected static final String VISIT_IMPORT_MAPPING = "Name\tSequenceNum\n" +
+        "Cycle 10\t10\n" +
+        "Soc Imp Log #%{S.3.2}\t5500\n" +
+        "ConMeds Log #%{S.3.2}\t9002\n" +
+        "All Done\t9999";
     
     protected void doCreateSteps()
     {
@@ -86,6 +95,7 @@ public class StudyTest extends StudyBaseTest
         verifyVisitMapPage();
         verifyManageDatasetsPage();
         verifyHiddenVisits();
+        verifyVisitImportMapping();
         verifyCohorts();
 
         // configure QC state management before importing duplicate data
@@ -376,6 +386,71 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Screening Cycle");
         assertTextPresent("Cycle 1");
         assertTextPresent("Pre-exist Cond");
+    }
+
+    private void verifyVisitImportMapping()
+    {
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Visits");
+        clickLinkWithText("Visit Import Mapping");
+        assertTableRowsEqual("customMapping", 2, VISIT_IMPORT_MAPPING.replace("SequenceNum", "Sequence Number"));
+
+        assertEquals("Incorrect number of gray cells", countTableCells(null, true), 40);
+        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false), 1);
+        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true), 18);
+        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", false), 1);
+        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", true), 1);
+        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", false), 1);
+        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", true), 1);
+
+        // Replace custom visit mapping and verify
+        String replaceMapping = "Name\tSequenceNum\nBarBar\t4839\nFoofoo\t9732";
+        clickLinkWithText("Replace Custom Mapping");
+        setLongTextField("tsv", replaceMapping);
+        clickNavButton("Submit");
+        assertTableRowsEqual("customMapping", 2, replaceMapping.replace("SequenceNum", "Sequence Number"));
+        assertTextNotPresent("Cycle 10");
+        assertTextNotPresent("All Done");
+
+        assertEquals("Incorrect number of gray cells", countTableCells(null, true), 36);
+        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false), 1);
+        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true), 18);
+        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", false), 1);
+        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", true), 0);
+        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", false), 1);
+        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", true), 0);
+
+        // Clear custom visit mapping and verify
+        clickLinkWithText("Clear Custom Mapping");
+        clickLinkWithText("OK");
+        assertTextPresent("The custom mapping is currently empty");
+        assertNavButtonPresent("Import Custom Mapping");
+        assertNavButtonNotPresent("Replace Custom Mapping");
+        assertNavButtonNotPresent("Clear Custom Mapping");
+        assertTextNotPresent("BarBar");
+        assertTextNotPresent("FooFoo");
+        assertTextNotPresent("Cycle 10");
+        assertTextNotPresent("All Done");
+    }
+
+    // Either param can be null
+    private int countTableCells(String text, Boolean grayed)
+    {
+        List<String> parts = new LinkedList<String>();
+
+        if (null != text)
+            parts.add("contains(text(), '" + text + "')");
+
+        if (null != grayed)
+        {
+            if (grayed)
+                parts.add("contains(@class, 'labkey-mv')");
+            else
+                parts.add("not(contains(@class, 'labkey-mv'))");
+        }
+
+        String path = "//td[" + StringUtils.join(parts, " and ") + "]";
+        return getXpathCount(Locator.xpath(path));
     }
 
     private void verifyCohorts()

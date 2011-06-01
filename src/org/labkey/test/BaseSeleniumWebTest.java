@@ -2820,6 +2820,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return -1;
     }
 
+    // Specifies cell values in a TSV string -- values are separated by tabs, rows are separated by \n
+    public void assertTableRowsEqual(String tableId, int startRow, String cellValuesTsv)
+    {
+        String[] lines = cellValuesTsv.split("\n");
+        String[][] cellValues = new String[lines.length][];
+
+        for (int row = 0; row < cellValues.length; row++)
+            cellValues[row] = lines[row].split("\t");
+
+        assertTableRowsEqual(tableId, startRow, cellValues);
+    }
+
     public void assertTableRowsEqual(String tableId, int startRow, String[][] cellValues)
     {
         for (int row = 0; row < cellValues.length; row++)

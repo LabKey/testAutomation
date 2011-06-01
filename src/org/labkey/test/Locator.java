@@ -17,7 +17,6 @@
 package org.labkey.test;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Mark Igra
  * Date: Feb 8, 2007
  * Time: 10:59:37 AM
@@ -27,6 +26,7 @@ public class Locator
     private String loc;
     // XPATH fragments
     public static final String NOT_HIDDEN = "not(ancestor::*[contains(@style,'visibility: hidden')])";
+
     protected Locator(String rawString)
     {
         loc = rawString;
@@ -487,5 +487,4 @@ public class Locator
             return path;
         }
     }
-
 }
