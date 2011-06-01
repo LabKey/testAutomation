@@ -90,7 +90,7 @@ public class XTandemTest extends AbstractXTandemTest
         clickNavButton("Compare", 0);
         clickLinkWithText("Peptide (Legacy)");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent("(Mass > 1000)");
 
         //Put in once bug with filters in postgres is fixed
@@ -107,7 +107,7 @@ public class XTandemTest extends AbstractXTandemTest
         clickLinkWithText("Peptide");
 
         checkRadioButton(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE);
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent(PEPTIDE3);
         assertTextPresent(PEPTIDE4);
         assertTextPresent(PEPTIDE);
@@ -115,7 +115,7 @@ public class XTandemTest extends AbstractXTandemTest
         clickLinkWithText("Setup Compare Peptides");
         clickRadioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID);
         setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.75");
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent(PEPTIDE3);
         assertTextPresent(PEPTIDE4);
         assertTextNotPresent(PEPTIDE);

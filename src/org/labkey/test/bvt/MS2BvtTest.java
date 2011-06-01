@@ -854,7 +854,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Compare", 0);
         clickLinkWithText("ProteinProphet (Legacy)");
         selectOptionByText("viewParams", VIEW3);
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent("(GroupProbability > 0.7)");
         assertTextNotPresent("gi|30089158|emb|CAD89505.1|");
         assertTextPresent("GroupNumber");
@@ -875,7 +875,7 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithText("ProteinProphet (Legacy)");
         checkCheckbox("light2HeavyRatioMean");
         uncheckCheckbox("groupProbability");
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent("ratiomean");
         assertTextNotPresent("GroupProbability");
 
@@ -888,7 +888,7 @@ public class MS2BvtTest extends MS2TestBase
         clickLinkWithText("Search Engine Protein");
         selectOptionByText("viewParams", VIEW2);
         checkCheckbox("total");
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent("(SequenceMass > 20000)");
         assertTextPresent("(DeltaMass > 0)");
         assertTextPresent("Total");
@@ -907,7 +907,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Compare", 0);
         clickLinkWithText("Peptide (Legacy)");
         selectOptionByText("viewParams", VIEW2);
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent("(DeltaMass > 0)");
         assertTextNotPresent("R.TIDPVIAR.K");
         assertTextNotPresent("K.KLYNEELK.A");
@@ -997,7 +997,7 @@ public class MS2BvtTest extends MS2TestBase
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
         clickLinkWithText("ProteinProphet");
-        clickNavButton("Go");
+        clickNavButton("Compare");
 
         clickLinkWithText("Comparison Overview", false);
         waitForText(RUN_GROUP1_NAME2, 1000);
@@ -1066,7 +1066,7 @@ public class MS2BvtTest extends MS2TestBase
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare");
         checkCheckbox("column", "QueryPeptides", true);
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
         assertTextPresent("R.VEKALLDNAGVR.N");
         assertTextPresent("PepProphet");

@@ -139,7 +139,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         clickNavButton("Compare", 0);
         clickLinkWithText("Peptide");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickNavButton("Compare");
         assertTextPresent("(Mass > 1000)");
 
         //Put in once bug with filters in postgres is fixed
