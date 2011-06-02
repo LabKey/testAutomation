@@ -820,7 +820,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("MS2 Export");
         checkRadioButton("exportFormat", "TSV");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickNavButton("Export");
         assertTextPresent("Scan");
         assertTextPresent("Protein");
         assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
@@ -836,7 +836,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("MS2 Export");
         checkRadioButton("exportFormat", "AMT");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickNavButton("Export");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
         assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
