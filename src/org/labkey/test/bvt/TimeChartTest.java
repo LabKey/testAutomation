@@ -126,8 +126,10 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
         // Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
         log("StdDev regression check");
-        clickNavButton("Change", 0);
-        extDialogTitle = "Change Measure...";
+        clickNavButton("Remove Measure", 0);
+        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Add Measure", 0);
+        extDialogTitle = "Add Measure...";
         ExtHelper.waitForExtDialog(this, extDialogTitle);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath(ExtHelper.getExtDialogXPath(extDialogTitle)+"//dl[./dt/em[text()='StdDev']]"));
@@ -135,8 +137,10 @@ public class TimeChartTest extends BaseSeleniumWebTest
         waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
 
         log("Check visualization");
-        clickNavButton("Change", 0);
-        extDialogTitle = "Change Measure...";
+        clickNavButton("Remove Measure", 0);
+        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Add Measure", 0);
+        extDialogTitle = "Add Measure...";
         ExtHelper.waitForExtDialog(this, extDialogTitle);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, extDialogTitle, "text", "viral");
