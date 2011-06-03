@@ -2388,6 +2388,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return selenium.getSelectedLabel(loc.toString());
     }
 
+    public String getSelectedOptionValue(Locator loc)
+    {
+        return selenium.getSelectedValue(loc.toString());
+    }
+
     public String getSelectedOptionText(String selectName)
     {
         return getSelectedOptionText(new Locator(selectName));

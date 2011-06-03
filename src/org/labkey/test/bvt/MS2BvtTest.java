@@ -860,7 +860,8 @@ public class MS2BvtTest extends MS2TestBase
         log("Verify protein page.");
         assertTextPresent("gi|15645924|ribosomal_protein");
         assertTextPresent("7,683");
-        boolean userPref = "false".equals(getSelectedOptionText("allPeps"));
+        String selectedValue = getSelectedOptionValue(Locator.name("allPeps"));
+        boolean userPref = selectedValue == null || "".equals(selectedValue) || "false".equals(selectedValue);
         if (!userPref)
         {
             selectOptionByValue(Locator.name("allPeps"), "false");
