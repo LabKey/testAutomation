@@ -787,9 +787,9 @@ public class MS2BvtTest extends MS2TestBase
         assertTextBefore("0.74", "0.78");
         assertTextPresent("\n", 3);
         popLocation();
+        clickLinkWithText("MS2 Dashboard");
 
         log("Upload second MS2 Run");
-        clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
@@ -846,9 +846,113 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("\n", 89, true);
         popLocation();
 
-        log("Test Compare MS2 Runs");
-        log("Test Protein Prophet Compare");
+        clickLinkWithText("drt/CAexample_mini (DRT2)");
 
+        selectOptionByText("viewParams", "<Standard View>");
+        clickNavButton("Go");
+
+        log("Test peptide filtering on protein page");
+        assertLinkPresentWithText("gi|15645924|ribosomal_protein");
+        address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
+        pushLocation();
+        beginAt(address);
+
+        log("Verify protein page.");
+        assertTextPresent("gi|15645924|ribosomal_protein");
+        assertTextPresent("7,683");
+        boolean userPref = "false".equals(getSelectedOptionText("allPeps"));
+        if (!userPref)
+        {
+            selectOptionByValue(Locator.name("allPeps"), "false");
+            waitForPageToLoad();
+        }
+        assertTextPresent("27% (18 / 66)");
+        assertTextPresent("27% (2,050 / 7,683)");
+        assertTextPresent("1 total, 1 distinct");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextNotPresent("K.YTELK.D");
+
+        selectOptionByValue(Locator.name("allPeps"), "true");
+        waitForPageToLoad();
+
+        assertTextPresent("35% (23 / 66)");
+        assertTextPresent("35% (2,685 / 7,683)");
+        assertTextPresent("Matches sequence of");
+        assertTextPresent("2 total, 2 distinct");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextPresent("K.YTELK.D");
+
+        log("Return to run and set a filter");
+        popLocation();
+        setFilter("MS2Peptides", "Scan", "Is Less Than", "25");
+        address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
+        pushLocation();
+        beginAt(address);
+
+        // Be sure that our selection is sticky
+        assertTextPresent("Matches sequence of");
+        // Be sure that our scan filter was propagated to the protein page
+        assertTextPresent("1 total, 1 distinct");
+        assertTextPresent("27% (18 / 66)");
+        assertTextPresent("27% (2,050 / 7,683)");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextNotPresent("K.YTELK.D");
+
+        if (userPref)
+        {
+            selectOptionByValue(Locator.name("allPeps"), "true");
+            waitForPageToLoad();
+        }
+
+        popLocation();
+        clickLinkWithText("MS2 Dashboard");
+
+        log("Test Compare MS2 Runs");
+
+        log("Test Compare Peptides using Query");
+        searchRunsTable.checkAllOnPage();
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Compare", 0);
+        clickLinkWithText("Peptide");
+        click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
+        setFormElement(Locator.input("targetProtein"), "");
+        clickNavButton("Compare");
+        assertTextPresent("K.EEEESDEDMGFG.-");
+        assertTextPresent("R.Q^YALHVDGVGTK.A");
+        assertTextPresent("K.GSDSLSDGPACKR.S");
+        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
+
+        clickLinkWithText("Setup Compare Peptides");
+        click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
+        setFormElement(Locator.input("peptideProphetProbability"), "0.9");
+        clickNavButton("Compare");
+        assertTextPresent("K.EEEESDEDMGFG.-");
+        assertTextPresent("R.Q^YALHVDGVGTK.A");
+        assertTextNotPresent("K.GSDSLSDGPACKR.S");
+        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
+
+        clickLinkWithText("Setup Compare Peptides");
+        setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
+        clickNavButton("Compare");
+        assertTextPresent("R.Q^YALHVDGVGTK.A");
+        assertTextNotPresent("K.EEEESDEDMGFG.-");
+        assertTextNotPresent("K.GSDSLSDGPACKR.S");
+        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+        clickLinkWithText("Setup Compare Peptides");
+        setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
+        click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
+        clickNavButton("Compare");
+        assertTextPresent("K.YTELK.D");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextNotPresent("R.Q^YALHVDGVGTK.A");
+        assertTextNotPresent("K.EEEESDEDMGFG.-");
+        assertTextNotPresent("K.GSDSLSDGPACKR.S");
+        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+        clickLinkWithText("MS2 Dashboard");
+
+        log("Test Protein Prophet Compare");
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Compare", 0);
@@ -899,7 +1003,7 @@ public class MS2BvtTest extends MS2TestBase
         setSort("MS2Compare", "Protein", SortDirection.ASC);
         assertTextBefore("gi|11499506|ref|NP_070747.1|", "gi|13507919|");
 
-        log("Test Compare Peptides");
+        log("Test Compare Peptides (Legacy)");
         clickLinkWithText("MS2 Dashboard");
 
         searchRunsTable.checkAllOnPage();
@@ -919,10 +1023,8 @@ public class MS2BvtTest extends MS2TestBase
             setSort("MS2Compare", "Peptide", SortDirection.ASC);
         assertTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G");
 
-        log("Test Compare Runs using Query");
-        clickLinkWithText("MS2 Dashboard");
-
         log("Test creating run groups");
+        clickLinkWithText("MS2 Dashboard");
         clickLinkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif");
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         clickNavButton("Create new group");
