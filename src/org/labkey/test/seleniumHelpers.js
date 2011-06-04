@@ -71,27 +71,41 @@ selenium.getExtElementId = function (id) {
 };
 
 selenium.selectFileBrowserCheckbox = function (filename) {
+    selenium.selectExtGridItem('name', filename, null, 'labkey-filecontent-grid', true);
+};
 
+selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {
     // find the grid view ext element
     var domQuery = selenium.browserbot.getCurrentWindow().Ext.DomQuery;
     var ext = selenium.browserbot.getCurrentWindow().Ext;
 
-    var el = domQuery.selectNode("div[class*='labkey-filecontent-grid']");
+    var el = domQuery.selectNode("div[class*='"+markerCls+"']");
     if (el)
     {
         var grid = ext.getCmp(el.id);
         if (grid)
         {
-            var idx = grid.getStore().find('name', filename);
-            if (idx != -1)
+            if (idx == null) idx = grid.getStore().find(columnName, columnVal);
+            if (idx < grid.getStore().getCount())
             {
-                grid.getSelectionModel().selectRow(idx, true);
+                if (idx >= 0)
+                {
+                    grid.getSelectionModel().selectRow(idx, keepExisting);
+                }
+                else
+                {
+                    throw new Error("Unable to locate " + columnName + ": " + columnVal);
+                }
             }
             else
             {
-                throw new Error("Unable to locate file: " + filename);                
+                throw new Error("No such row: " + idx);
             }
         }
+    }
+    else
+    {
+        throw new Error("Unable to locate grid panel: " + markerCls)
     }
 };
 
