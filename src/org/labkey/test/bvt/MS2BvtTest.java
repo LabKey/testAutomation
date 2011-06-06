@@ -864,6 +864,8 @@ public class MS2BvtTest extends MS2TestBase
         boolean userPref = selectedValue == null || "".equals(selectedValue) || "false".equals(selectedValue);
         if (!userPref)
         {
+            // User last viewed all peptides, regardless of search engine assignment, so flip to the other option
+            // before checking that the values match our expectations
             selectOptionByValue(Locator.name("allPeps"), "false");
             waitForPageToLoad();
         }
@@ -901,7 +903,8 @@ public class MS2BvtTest extends MS2TestBase
 
         if (userPref)
         {
-            selectOptionByValue(Locator.name("allPeps"), "true");
+            // User last only peptides assigned by the search engine, so flip back to restore their preference
+            selectOptionByValue(Locator.name("allPeps"), "false");
             waitForPageToLoad();
         }
 
