@@ -161,7 +161,7 @@ public class StudyBvtTest extends StudyManualTest
 
         // verify dataset category on dataset management page
         assertTextPresent(CATEGORY, 1);
-        assertElementContains(Locator.xpath("//tr[./td/a[text() = '" + MODIFIED_DATASET + "']]/td[3]"), CATEGORY);
+        assertElementContains(Locator.xpath("//tr[./td/a[text() = '" + MODIFIED_DATASET + "']]/td[4]"), CATEGORY);
 
         // verify dataset columns
         clickLinkWithText(MODIFIED_DATASET);

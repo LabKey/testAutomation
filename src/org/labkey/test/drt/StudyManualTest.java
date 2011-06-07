@@ -248,11 +248,11 @@ public class StudyManualTest extends StudyTest
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";
         setFormElement("tsv", _tsv + "\n" + errorRow);
         clickNavButton("Import Data");
-        assertTextPresent("Row 3 does not contain required field MouseId.");
-        assertTextPresent("Row 3 data type error for field SequenceNum.");
-        assertTextPresent("Row 3 does not contain required field SampleId.");
-        assertTextPresent("Row 3 data type error for field DateField.");
-        assertTextPresent("Row 3 does not contain required field NumberField.");
+//        assertTextPresent("Row 3 does not contain required field MouseId.");
+        assertTextPresent("Could not convert 'badvisitd'");
+//        assertTextPresent("Row 3 does not contain required field SampleId.");
+        assertTextPresent("Could not convert 'text'");
+//        assertTextPresent("Row 3 does not contain required field NumberField.");
 
         setFormElement("tsv", _tsv);
         clickNavButton("Import Data", longWaitForPage);
