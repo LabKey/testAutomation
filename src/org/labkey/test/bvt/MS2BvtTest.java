@@ -62,7 +62,7 @@ public class MS2BvtTest extends MS2TestBase
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
-    protected void goTestIt(String TEST, String TEST2)
+    protected void goTestIt(String testFile1, String testFile2)
     {
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
@@ -80,7 +80,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
-        waitAndClick(Locator.fileTreeByName(TEST));
+        waitAndClick(Locator.fileTreeByName(testFile1));
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, SAMPLE_BASE_NAME + ".search.xar.xml");
 
@@ -793,7 +793,7 @@ public class MS2BvtTest extends MS2TestBase
         clickNavButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("bov_sample"));
         waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
-        waitAndClick(Locator.fileTreeByName(TEST2));
+        waitAndClick(Locator.fileTreeByName(testFile2));
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, SAMPLE_BASE_NAME + ".search.xar.xml");
 
@@ -846,115 +846,118 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("\n", 89, true);
         popLocation();
 
-        clickLinkWithText("drt/CAexample_mini (DRT2)");
-
-        selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
-
-        log("Test peptide filtering on protein page");
-        assertLinkPresentWithText("gi|15645924|ribosomal_protein");
-        address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
-        pushLocation();
-        beginAt(address);
-
-        log("Verify protein page.");
-        assertTextPresent("gi|15645924|ribosomal_protein");
-        assertTextPresent("7,683");
-        String selectedValue = getSelectedOptionValue(Locator.name("allPeps"));
-        boolean userPref = selectedValue == null || "".equals(selectedValue) || "false".equals(selectedValue);
-        if (!userPref)
+        if ("DRT2".equals(testFile1) || "DRT2".equals(testFile2))
         {
-            // User last viewed all peptides, regardless of search engine assignment, so flip to the other option
-            // before checking that the values match our expectations
-            selectOptionByValue(Locator.name("allPeps"), "false");
+            clickLinkWithText("drt/CAexample_mini (DRT2)");
+
+            selectOptionByText("viewParams", "<Standard View>");
+            clickNavButton("Go");
+
+            log("Test peptide filtering on protein page");
+            assertLinkPresentWithText("gi|15645924|ribosomal_protein");
+            address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
+            pushLocation();
+            beginAt(address);
+
+            log("Verify protein page.");
+            assertTextPresent("gi|15645924|ribosomal_protein");
+            assertTextPresent("7,683");
+            String selectedValue = getSelectedOptionValue(Locator.name("allPeps"));
+            boolean userPref = selectedValue == null || "".equals(selectedValue) || "false".equals(selectedValue);
+            if (!userPref)
+            {
+                // User last viewed all peptides, regardless of search engine assignment, so flip to the other option
+                // before checking that the values match our expectations
+                selectOptionByValue(Locator.name("allPeps"), "false");
+                waitForPageToLoad();
+            }
+            assertTextPresent("27% (18 / 66)");
+            assertTextPresent("27% (2,050 / 7,683)");
+            assertTextPresent("1 total, 1 distinct");
+            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+            assertTextNotPresent("K.YTELK.D");
+
+            selectOptionByValue(Locator.name("allPeps"), "true");
             waitForPageToLoad();
+
+            assertTextPresent("35% (23 / 66)");
+            assertTextPresent("35% (2,685 / 7,683)");
+            assertTextPresent("Matches sequence of");
+            assertTextPresent("2 total, 2 distinct");
+            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+            assertTextPresent("K.YTELK.D");
+
+            log("Return to run and set a filter");
+            popLocation();
+            setFilter("MS2Peptides", "Scan", "Is Less Than", "25");
+            address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
+            pushLocation();
+            beginAt(address);
+
+            // Be sure that our selection is sticky
+            assertTextPresent("Matches sequence of");
+            // Be sure that our scan filter was propagated to the protein page
+            assertTextPresent("1 total, 1 distinct");
+            assertTextPresent("27% (18 / 66)");
+            assertTextPresent("27% (2,050 / 7,683)");
+            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+            assertTextNotPresent("K.YTELK.D");
+
+            if (userPref)
+            {
+                // User last only peptides assigned by the search engine, so flip back to restore their preference
+                selectOptionByValue(Locator.name("allPeps"), "false");
+                waitForPageToLoad();
+            }
+
+            popLocation();
+            clickLinkWithText("MS2 Dashboard");
+
+            log("Test Compare MS2 Runs");
+
+            log("Test Compare Peptides using Query");
+            searchRunsTable.checkAllOnPage();
+            waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+            clickNavButton("Compare", 0);
+            clickLinkWithText("Peptide");
+            click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
+            setFormElement(Locator.input("targetProtein"), "");
+            clickNavButton("Compare");
+            assertTextPresent("K.EEEESDEDMGFG.-");
+            assertTextPresent("R.Q^YALHVDGVGTK.A");
+            assertTextPresent("K.GSDSLSDGPACKR.S");
+            assertTextPresent("K.EYYLLHKPPKTISSTK.D");
+
+            clickLinkWithText("Setup Compare Peptides");
+            click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
+            setFormElement(Locator.input("peptideProphetProbability"), "0.9");
+            clickNavButton("Compare");
+            assertTextPresent("K.EEEESDEDMGFG.-");
+            assertTextPresent("R.Q^YALHVDGVGTK.A");
+            assertTextNotPresent("K.GSDSLSDGPACKR.S");
+            assertTextPresent("K.EYYLLHKPPKTISSTK.D");
+
+            clickLinkWithText("Setup Compare Peptides");
+            setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
+            clickNavButton("Compare");
+            assertTextPresent("R.Q^YALHVDGVGTK.A");
+            assertTextNotPresent("K.EEEESDEDMGFG.-");
+            assertTextNotPresent("K.GSDSLSDGPACKR.S");
+            assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+            clickLinkWithText("Setup Compare Peptides");
+            setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
+            click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
+            clickNavButton("Compare");
+            assertTextPresent("K.YTELK.D");
+            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+            assertTextNotPresent("R.Q^YALHVDGVGTK.A");
+            assertTextNotPresent("K.EEEESDEDMGFG.-");
+            assertTextNotPresent("K.GSDSLSDGPACKR.S");
+            assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+            clickLinkWithText("MS2 Dashboard");
         }
-        assertTextPresent("27% (18 / 66)");
-        assertTextPresent("27% (2,050 / 7,683)");
-        assertTextPresent("1 total, 1 distinct");
-        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-        assertTextNotPresent("K.YTELK.D");
-
-        selectOptionByValue(Locator.name("allPeps"), "true");
-        waitForPageToLoad();
-
-        assertTextPresent("35% (23 / 66)");
-        assertTextPresent("35% (2,685 / 7,683)");
-        assertTextPresent("Matches sequence of");
-        assertTextPresent("2 total, 2 distinct");
-        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-        assertTextPresent("K.YTELK.D");
-
-        log("Return to run and set a filter");
-        popLocation();
-        setFilter("MS2Peptides", "Scan", "Is Less Than", "25");
-        address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
-        pushLocation();
-        beginAt(address);
-
-        // Be sure that our selection is sticky
-        assertTextPresent("Matches sequence of");
-        // Be sure that our scan filter was propagated to the protein page
-        assertTextPresent("1 total, 1 distinct");
-        assertTextPresent("27% (18 / 66)");
-        assertTextPresent("27% (2,050 / 7,683)");
-        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-        assertTextNotPresent("K.YTELK.D");
-
-        if (userPref)
-        {
-            // User last only peptides assigned by the search engine, so flip back to restore their preference
-            selectOptionByValue(Locator.name("allPeps"), "false");
-            waitForPageToLoad();
-        }
-
-        popLocation();
-        clickLinkWithText("MS2 Dashboard");
-
-        log("Test Compare MS2 Runs");
-
-        log("Test Compare Peptides using Query");
-        searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
-        clickLinkWithText("Peptide");
-        click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
-        setFormElement(Locator.input("targetProtein"), "");
-        clickNavButton("Compare");
-        assertTextPresent("K.EEEESDEDMGFG.-");
-        assertTextPresent("R.Q^YALHVDGVGTK.A");
-        assertTextPresent("K.GSDSLSDGPACKR.S");
-        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
-
-        clickLinkWithText("Setup Compare Peptides");
-        click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
-        setFormElement(Locator.input("peptideProphetProbability"), "0.9");
-        clickNavButton("Compare");
-        assertTextPresent("K.EEEESDEDMGFG.-");
-        assertTextPresent("R.Q^YALHVDGVGTK.A");
-        assertTextNotPresent("K.GSDSLSDGPACKR.S");
-        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
-
-        clickLinkWithText("Setup Compare Peptides");
-        setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
-        clickNavButton("Compare");
-        assertTextPresent("R.Q^YALHVDGVGTK.A");
-        assertTextNotPresent("K.EEEESDEDMGFG.-");
-        assertTextNotPresent("K.GSDSLSDGPACKR.S");
-        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
-
-        clickLinkWithText("Setup Compare Peptides");
-        setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
-        click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
-        clickNavButton("Compare");
-        assertTextPresent("K.YTELK.D");
-        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-        assertTextNotPresent("R.Q^YALHVDGVGTK.A");
-        assertTextNotPresent("K.EEEESDEDMGFG.-");
-        assertTextNotPresent("K.GSDSLSDGPACKR.S");
-        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
-
-        clickLinkWithText("MS2 Dashboard");
 
         log("Test Protein Prophet Compare");
         searchRunsTable.checkAllOnPage();
@@ -1095,7 +1098,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextPresent("Default Experiment");
         checkDataRegionCheckbox("XTandemSearchRuns", 1);
         clickNavButton("Remove");
-        assert(!isTextPresent(TEST) || !isTextPresent(TEST2));
+        assert(!isTextPresent(testFile1) || !isTextPresent(testFile2));
         clickLinkWithText("MS2 Dashboard");
 
         log("Test that the compare run groups works");
