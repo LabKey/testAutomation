@@ -185,6 +185,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         // Test empty combo
         clickButton("Add Another Material", 0);
+        sleep(1000); // give form a chance to catch up
         clickButton("Create", 0);
         waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
         
