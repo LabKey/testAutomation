@@ -92,24 +92,26 @@ public class ExpTest extends BaseSeleniumWebTest
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Datas");
         clickNavButton("Create and Edit Source");
-        toggleQueryEditors();
-        setFormElement("ff_queryText", "SELECT Datas.Name AS Name,\n" +
+        toggleSQLQueryEditor();
+        setFormElement("queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
                 "Datas.Run AS Run,\n" +
                 "Datas.DataFileUrl AS DataFileUrl,\n" +
                 "substring(Datas.DataFileUrl, 0, 7) AS DataFileUrlPrefix,\n" +
                 "Datas.Created AS Created\n" +
                 "FROM Datas");
-        clickNavButton("View Data");
+        clickButton("Execute Query", 0);        
 
         // Check that it contains the date format we expect
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        assertTextPresent(dateFormat.format(new Date()), 5);
+        waitForText(dateFormat.format(new Date()), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("file:/", 10);
 
         // Edit the metadata to use a special date format
-        clickMenuButton("Query", "Edit Source");
-        clickNavButton("Edit Metadata");
+        ExtHelper.clickExtTab(this, "Source");
+        clickButton("Save", 0);
+        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        clickButton("Edit Metadata");
         waitForElement(Locator.name("ff_label5"), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnLabel(this, 5, "editedCreated");
         ExtHelper.clickExtTab(this, "Format");
@@ -119,15 +121,17 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Verify that it ended up in the XML version of the metadata
         clickNavButton("Edit Source");
-        toggleQueryEditors();
+        sleep(1000);
+        ExtHelper.clickExtTab(this, "XML");
+        toggleMetadataQueryEditor();
         assertTextPresent("<ns:columnTitle>editedCreated</ns:columnTitle>");
         assertTextPresent("<ns:formatString>ddd MMM dd yyyy</ns:formatString>");
 
         // Run it and see if we used the format correctly
-        clickNavButton("View Data");
+        ExtHelper.clickExtTab(this, "Data");
         assertTextPresent("editedCreated");
         dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
-        assertTextPresent(dateFormat.format(new Date()), 5);
+        waitForText(dateFormat.format(new Date()), WAIT_FOR_JAVASCRIPT);
 
         // Add a new wrapped column to the exp.Datas table
         clickTab("Query");
@@ -148,7 +152,6 @@ public class ExpTest extends BaseSeleniumWebTest
         // Save it
         clickNavButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Edit Source");
         clickNavButton("View Data");
 
         // Customize the view to add the newly joined column

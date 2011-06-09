@@ -5009,11 +5009,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     /** Turns off the fancy SQL and XML editors for custom queries and sets them to be simple text areas which are easier
      * to manipulate through the tests */
-    protected void toggleQueryEditors()
-    {
-        toggleSQLQueryEditor();
-        toggleMetadataQueryEditor();
-    }
+//    protected void toggleQueryEditors()
+//    {
+//        toggleSQLQueryEditor();
+//        toggleMetadataQueryEditor();
+//    }
 
     protected void toggleSQLQueryEditor()
     {

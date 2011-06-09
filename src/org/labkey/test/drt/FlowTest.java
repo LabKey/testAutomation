@@ -60,13 +60,15 @@ public class FlowTest extends BaseFlowTest
         submit();
 
         beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + getFolderName() + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
-        toggleQueryEditors();
-        setFormElement("ff_queryText", "SELECT FCSAnalyses.RowId,\n" +
+        toggleSQLQueryEditor();
+        setFormElement("queryText", "SELECT FCSAnalyses.RowId,\n" +
                 "FCSAnalyses.Statistic.\"Count\",\n" +
                 "FCSAnalyses.Run.FilePathRoot,\n" +
                 "FCSAnalyses.FCSFile.Run.WellCount\n" +
                 "FROM FCSAnalyses AS FCSAnalyses");
-        clickNavButton("View Data");
+        clickButton("Save", 0);
+        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        clickButton("Execute Query", 0); 
 
         clickLinkWithText("Flow Dashboard");
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);

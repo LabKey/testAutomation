@@ -119,10 +119,13 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         createNewQuery("flow");
         setFormElement("ff_newQueryName", name);
         clickNavButton("Create and Edit Source");
-        toggleQueryEditors();
-        setFormElement("ff_queryText", sql);
-        setFormElement("ff_metadataText", xml);
-        clickNavButton("Save");
+        toggleSQLQueryEditor();
+        setFormElement("queryText", sql);
+        ExtHelper.clickExtTab(this, "XML");
+        toggleMetadataQueryEditor();
+        setFormElement("metadataText", xml);
+        clickButton("Save", 0);
+        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         if (inheritable)
         {
             beginAt(queryURL);
