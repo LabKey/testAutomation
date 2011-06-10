@@ -33,6 +33,11 @@ import java.io.FilenameFilter;
 // verification steps.
 public abstract class StudyBaseTest extends BaseSeleniumWebTest
 {
+    protected static final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
+    protected static final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
+
+    private SpecimenImporter _specimenImporter;
+
     abstract protected void doCreateSteps();
 
     abstract protected void doVerifySteps();
@@ -74,6 +79,19 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 
+    // Start importing the specimen archive.  This can load in the background while executing the first set of
+    // verification steps to speed up the test.  Call waitForSpecimenImport() before verifying specimens.
+    protected void startSpecimenImport(int completeJobsExpected)
+    {
+        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
+        _specimenImporter.startImport();
+    }
+
+    protected void waitForSpecimenImport()
+    {
+        _specimenImporter.waitForComplete();
+    }
+
     protected final void doTestSteps()
     {
         doCreateSteps();
@@ -88,6 +106,7 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         deleteLogFiles("datasets");
         deleteDir(new File(getPipelinePath(), "assaydata"));
         deleteDir(new File(getPipelinePath(), "reports_temp"));
+        deleteDir(new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR));
     }
 
     private void deleteLogFiles(String directoryName)

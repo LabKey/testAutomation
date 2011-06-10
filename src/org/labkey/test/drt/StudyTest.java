@@ -30,7 +30,7 @@ import java.util.List;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-public class StudyTest extends StudyEmptyTest
+public class StudyTest extends StudyBaseTest
 {
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
 
@@ -51,6 +51,15 @@ public class StudyTest extends StudyEmptyTest
         "ConMeds Log #%{S.3.2}\t9002\n" +
         "All Done\t9999";
     
+    protected void doCreateSteps()
+    {
+        importStudy();
+        startSpecimenImport(2);
+
+        // wait for study (but not specimens) to finish loading
+        waitForPipelineJobsToComplete(1, "study import", false);
+    }
+
     protected void doVerifySteps()
     {
         verifyStudyAndDatasets();

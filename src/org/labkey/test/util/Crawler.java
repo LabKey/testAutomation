@@ -32,51 +32,11 @@ import java.util.*;
  */
 public class Crawler
 {
-    private ControllerActionId[] _excludedActions = new ControllerActionId[]{
-            new ControllerActionId("admin", "resetErrorMark"),
-            new ControllerActionId("admin", "dbChecker"),
-            new ControllerActionId("admin", "runSystemMaintenance"),
-            new ControllerActionId("admin", "deleteFolder"),
-            new ControllerActionId("admin", "defineWebThemes"),
-            new ControllerActionId("admin", "memTracker"),
-            new ControllerActionId("admin", "setAdminMode"),
-            new ControllerActionId("admin", "dumpHeap"),
-            new ControllerActionId("Experiment", "showFile"),
-            new ControllerActionId("flow-run", "download"),
-            new ControllerActionId("login", "logout"),
-            new ControllerActionId("login", "enable"),
-            new ControllerActionId("login", "disable"),
-            new ControllerActionId("login", "setPassword"),
-            new ControllerActionId("MS2", "showParamsFile"),
-            new ControllerActionId("project", "deleteWebPart"),
-            new ControllerActionId("project", "moveWebPart"),
-            new ControllerActionId("query", "printRows"),
-            new ControllerActionId("query", "exportRowsExcel"),
-            new ControllerActionId("query", "excelWebQueryDefinition"),
-            new ControllerActionId("reports", "downloadInputData"),
-            new ControllerActionId("reports", "streamFile"),
-            new ControllerActionId("reports", "download"),
-            new ControllerActionId("Security", "resetPassword"),
-            new ControllerActionId("Study", "confirmDeleteVisit"),
-            new ControllerActionId("Study", "template"),
-            new ControllerActionId("Study", "downloadTsv"),
-            new ControllerActionId("Study", "deleteDatasetReport"),
-            new ControllerActionId("Study", "deleteDataset"),
-            new ControllerActionId("Study", "importStudyFromPipeline"),
-            new ControllerActionId("Study-Reports", "deleteReports"),
-            new ControllerActionId("Study-Reports", "deleteReport"),
-            new ControllerActionId("Study-Reports", "deleteCustomQuery"),
-            new ControllerActionId("Study-Samples", "downloadSpecimenList"),
-            new ControllerActionId("Study-Samples", "emailLabSpecimenLists"),
-            new ControllerActionId("Study-Samples", "getSpecimenExcel"),
-            new ControllerActionId("Study-Samples", "download"),
-            new ControllerActionId("user", "impersonate")
-    };
-
-    protected final Collection<String> _forbiddenWords;
+    private final List<ControllerActionId> _excludedActions;
+    private final Collection<String> _forbiddenWords;
 
     // Replacements to make in HTML source before looking for "forbidden" words.
-    protected static Map<String, String> _sourceReplacements = new HashMap<String, String>();
+    private static Map<String, String> _sourceReplacements = new HashMap<String, String>();
 
     static
     {
@@ -94,7 +54,7 @@ public class Crawler
     private static final int DEFAULT_CRAWL_TIME = 90000;
 
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<String, CrawlStats>();
-    protected BaseSeleniumWebTest _test;
+    private BaseSeleniumWebTest _test;
 
     public Crawler(BaseSeleniumWebTest test)
     {
@@ -106,11 +66,57 @@ public class Crawler
         _test = test;
         _maxCrawlTime = crawlTime;
         _forbiddenWords = getForbiddenWords();
+        _excludedActions = getExcludedActions();
     }
 
     protected Set<String> getForbiddenWords()
     {
         return new HashSet<String>();
+    }
+
+    protected List<ControllerActionId> getExcludedActions()
+    {
+        List<ControllerActionId> list = new ArrayList<ControllerActionId>();
+        Collections.addAll(list, new ControllerActionId("admin", "resetErrorMark"),
+            new ControllerActionId("admin", "dbChecker"),
+            new ControllerActionId("admin", "runSystemMaintenance"),
+            new ControllerActionId("admin", "deleteFolder"),
+            new ControllerActionId("admin", "defineWebThemes"),
+            new ControllerActionId("admin", "memTracker"),
+            new ControllerActionId("admin", "setAdminMode"),
+            new ControllerActionId("admin", "dumpHeap"),
+            new ControllerActionId("experiment", "showFile"),
+            new ControllerActionId("flow-run", "download"),
+            new ControllerActionId("login", "logout"),
+            new ControllerActionId("login", "enable"),
+            new ControllerActionId("login", "disable"),
+            new ControllerActionId("login", "setPassword"),
+            new ControllerActionId("ms2", "showParamsFile"),
+            new ControllerActionId("project", "deleteWebPart"),
+            new ControllerActionId("project", "moveWebPart"),
+            new ControllerActionId("query", "printRows"),
+            new ControllerActionId("query", "exportRowsExcel"),
+            new ControllerActionId("query", "excelWebQueryDefinition"),
+            new ControllerActionId("reports", "downloadInputData"),
+            new ControllerActionId("reports", "streamFile"),
+            new ControllerActionId("reports", "download"),
+            new ControllerActionId("security", "resetPassword"),
+            new ControllerActionId("study", "confirmDeleteVisit"),
+            new ControllerActionId("study", "template"),
+            new ControllerActionId("study", "downloadTsv"),
+            new ControllerActionId("study", "deleteDatasetReport"),
+            new ControllerActionId("study", "deleteDataset"),
+            new ControllerActionId("study", "importStudyFromPipeline"),
+            new ControllerActionId("study-reports", "deleteReports"),
+            new ControllerActionId("study-reports", "deleteReport"),
+            new ControllerActionId("study-reports", "deleteCustomQuery"),
+            new ControllerActionId("study-samples", "downloadSpecimenList"),
+            new ControllerActionId("study-samples", "emailLabSpecimenLists"),
+            new ControllerActionId("study-samples", "getSpecimenExcel"),
+            new ControllerActionId("study-samples", "download"),
+            new ControllerActionId("user", "impersonate"));
+
+        return list;
     }
 
     protected List<String> getAdminControllers()
@@ -227,7 +233,7 @@ public class Crawler
     }
 
 
-    private class ControllerActionId
+    protected class ControllerActionId
     {
         private String _controller;
         private String _action;

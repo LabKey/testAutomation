@@ -29,12 +29,16 @@ import java.util.List;
 */
 
 // Consider: roll this test into StudyBvtTest to avoid creating/deleting the study yet again 
-public class StudyDemoModeTest extends StudyEmptyTest
+public class StudyDemoModeTest extends StudyBaseTest
 {
     @Override
     protected void doCreateSteps()
     {
-        super.doCreateSteps();
+        importStudy();
+        startSpecimenImport(2);
+
+        // wait for study and specimens to finish loading
+        waitForPipelineJobsToComplete(1, "study import", false);
         waitForSpecimenImport();
     }
 
@@ -109,6 +113,14 @@ public class StudyDemoModeTest extends StudyEmptyTest
         protected int getMaxDepth()
         {
             return 5;
+        }
+
+        @Override
+        protected List<ControllerActionId> getExcludedActions()
+        {
+            List<ControllerActionId> list = super.getExcludedActions();
+            list.add(new ControllerActionId("search", "search"));    // Search results page displays PTIDs
+            return list;
         }
 
         @Override
