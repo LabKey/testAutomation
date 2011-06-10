@@ -22,7 +22,6 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: kevink
  * Date: Oct 14, 2010
  * Time: 11:37:20 AM

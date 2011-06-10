@@ -22,7 +22,6 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,20 +30,13 @@ import java.util.List;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-public class StudyTest extends StudyBaseTest
+public class StudyTest extends StudyEmptyTest
 {
-    protected static final String PROJECT_NAME = "ImportStudyVerifyProject";
-    protected static final String FOLDER_NAME = "My Import Study";
-    protected static final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
 
     protected String _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\taliasedColumn\n" +
         "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\taliasedData\n" +
         "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t1.2\ttext\t\taliasedData\n";
-
-    protected static final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
-
-    private SpecimenImporter _specimenImporter;
 
     // specimen comment constants
     private static final String PARTICIPANT_CMT_DATASET = "Mouse Comments";
@@ -59,34 +51,12 @@ public class StudyTest extends StudyBaseTest
         "ConMeds Log #%{S.3.2}\t9002\n" +
         "All Done\t9999";
     
-    protected void doCreateSteps()
-    {
-        importStudy();
-        startSpecimenImport(2);
-
-        // wait for study (but not specimens) to finish loading
-        waitForPipelineJobsToComplete(1, "study import", false);
-    }
-
     protected void doVerifySteps()
     {
         verifyStudyAndDatasets();
         waitForSpecimenImport();
         verifySpecimens();
         verifyParticipantComments();
-    }
-
-    protected void startSpecimenImport(int completeJobsExpected)
-    {
-        // Start importing the specimens as well.  We'll let this load in the background while executing the first set of
-        // verification steps.  Doing this in parallel speeds up the test.
-        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
-        _specimenImporter.startImport();
-    }
-
-    protected void waitForSpecimenImport()
-    {
-        _specimenImporter.waitForComplete();
     }
 
     protected void verifyStudyAndDatasets()
@@ -484,13 +454,5 @@ public class StudyTest extends StudyBaseTest
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
         clickLinkWithText("Next Mouse");
-    }
-
-    @Override
-    protected void doCleanup() throws Exception
-    {
-        super.doCleanup();
-
-        deleteDir(new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR));
     }
 }

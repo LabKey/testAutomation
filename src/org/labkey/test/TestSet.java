@@ -119,6 +119,7 @@ public enum TestSet
 //        EHRStudyTest.class,
         GpatAssayTest.class,
 //        FolderTest.class,
+        StudyDemoModeTest.class
     }),
 
     IE(new Class[]

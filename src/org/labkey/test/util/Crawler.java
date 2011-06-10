@@ -63,7 +63,6 @@ public class Crawler
             new ControllerActionId("Study", "deleteDatasetReport"),
             new ControllerActionId("Study", "deleteDataset"),
             new ControllerActionId("Study", "importStudyFromPipeline"),
-            new ControllerActionId("study", "snapshot"),         // TODO: remove once action is removed (11.2)
             new ControllerActionId("Study-Reports", "deleteReports"),
             new ControllerActionId("Study-Reports", "deleteReport"),
             new ControllerActionId("Study-Reports", "deleteCustomQuery"),
@@ -73,14 +72,11 @@ public class Crawler
             new ControllerActionId("Study-Samples", "download"),
             new ControllerActionId("user", "impersonate")
     };
-    private static final String[] ADMIN_CONTROLLERS = new String[]
-            { "login", "admin", "Security", "User" };
 
-    private static final String[] FORBIDDEN_WORDS = new String[]
-            {};
+    protected final Collection<String> _forbiddenWords;
 
     // Replacements to make in HTML source before looking for "forbidden" words.
-    private static Map<String, String> _sourceReplacements = new HashMap<String, String>();
+    protected static Map<String, String> _sourceReplacements = new HashMap<String, String>();
 
     static
     {
@@ -94,12 +90,11 @@ public class Crawler
     private int _crawlTime = 0;
     private ArrayList<UrlToCheck> _urlsToCheck = new ArrayList<UrlToCheck>();
 
-    private static int _alwaysFollowDepth = 3;
     private int _maxCrawlTime;
     private static final int DEFAULT_CRAWL_TIME = 90000;
 
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<String, CrawlStats>();
-    private BaseSeleniumWebTest _test;
+    protected BaseSeleniumWebTest _test;
 
     public Crawler(BaseSeleniumWebTest test)
     {
@@ -110,6 +105,22 @@ public class Crawler
     {
         _test = test;
         _maxCrawlTime = crawlTime;
+        _forbiddenWords = getForbiddenWords();
+    }
+
+    protected Set<String> getForbiddenWords()
+    {
+        return new HashSet<String>();
+    }
+
+    protected List<String> getAdminControllers()
+    {
+        return Arrays.asList("login", "admin", "security", "user");
+    }
+
+    protected int getMaxDepth()
+    {
+        return 3;
     }
 
     private void saveCrawlStats(BaseSeleniumWebTest test, int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
@@ -298,7 +309,7 @@ public class Crawler
         _urlsChecked.add(strippedRelativeURL);
 
         // after navigating past the first N levels of links, we'll only try "new" actions:
-        if (currentDepth >= _alwaysFollowDepth && _actionsVisited.contains(actionId))
+        if (currentDepth >= getMaxDepth() && _actionsVisited.contains(actionId))
             return false;
 
         // never visit explicity excluded actions:
@@ -317,14 +328,14 @@ public class Crawler
             return false;
 
         // skip expanding and collapsing paths -- no HTML returned
-        if (actionId.getAction().equals("collapseExpand"))      // TODO: action is called expandCollapse
+        if (actionId.getAction().equals("expandCollapse"))
             return false;
 
         // in addition to test projects, we'll crawl all admin functionality as well
         // (otherwise this never gets covered).
-        for (String adminController : ADMIN_CONTROLLERS)
+        for (String adminController : getAdminControllers())
         {
-            if (actionId.getController().equals(adminController) && !"/home".equals(actionId.getFolder()))
+            if (actionId.getController().equalsIgnoreCase(adminController) && !"/home".equals(actionId.getFolder()))
                 return true;
         }
 		
@@ -438,36 +449,41 @@ public class Crawler
             // Keep track of where crawler has been
             _actionsVisited.add(new ControllerActionId(relativeURL));
 
-            if (FORBIDDEN_WORDS.length > 0)
-            {
-                String responseText = _test.getResponseText().toLowerCase();
-
-                for (Map.Entry<String, String> entry : _sourceReplacements.entrySet())
-                    responseText = responseText.replaceAll(entry.getKey(), entry.getValue());
-
-                //loop through forbidden words
-                for (String word : FORBIDDEN_WORDS)
-                {
-                    if (responseText.indexOf(word.toLowerCase()) > 0)
-                    {
-                        _test.log("Illegal use of forbidden word '" + word + "'> " + relativeURL);
-                        BaseSeleniumWebTest.fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
-                    }
-                }
-            }
+            checkForForbiddenWords(relativeURL);
 
             // Check that there was no error
             int code = _test.getResponseCode();
             if (code == 404 || code == 500)
-                BaseSeleniumWebTest.fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
+                fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
 
-			testInjection(urlToCheck ,currentPageUrl);
+			testInjection(urlToCheck, currentPageUrl);
         }
         catch (RuntimeException re)
         {
             // ignore javascript errors (HTTPUnit has a poor engine) and non-HTML download links:
             if (re.getMessage().indexOf("ScriptException") < 0 && !re.getClass().getSimpleName().equals("NotHTMLException"))
                 throw re;
+        }
+    }
+
+
+    protected void checkForForbiddenWords(String relativeURL)
+    {
+        if (!_forbiddenWords.isEmpty())
+        {
+            String responseText = _test.getResponseText().toLowerCase();
+
+            for (Map.Entry<String, String> entry : _sourceReplacements.entrySet())
+                responseText = responseText.replaceAll(entry.getKey(), entry.getValue());
+
+            //loop through forbidden words
+            for (String word : _forbiddenWords)
+            {
+                if (responseText.indexOf(word.toLowerCase()) > 0)
+                {
+                    fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
+                }
+            }
         }
     }
 
@@ -560,8 +576,9 @@ public class Crawler
 		}
 	}
 
-	void fail(String msg)
+	protected void fail(String msg)
 	{
+        _test.log(msg);
 		BaseSeleniumWebTest.fail(msg);
 	}
 }
