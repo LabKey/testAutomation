@@ -138,7 +138,7 @@
         "dimension":null
     };
 
-    var luminexMeasure = {
+    var luminexMeasureNonNull = {
         "axis":{
             "multiSelect":"false",
             "name":"y-axis",
@@ -156,12 +156,13 @@
             "isUserDefined":false,
             "queryName":"LuminexAssay",
             "schemaName":"study",
+            "allowNullResults": false,
             "type":"DOUBLE"
         },
         "dimension":null
     };
 
-    var luminexMeasureWithDimension = {
+    var luminexMeasureNullAllowed = {
         "axis":{
             "multiSelect":"false",
             "name":"y-axis",
@@ -179,6 +180,62 @@
             "isUserDefined":false,
             "queryName":"LuminexAssay",
             "schemaName":"study",
+            "allowNullResults": true,
+            "type":"DOUBLE"
+        },
+        "dimension":null
+    };
+
+    var luminexMeasureNonNullWithDimension = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"ObsConc",
+            "scale":"log",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":22,
+            "name":"ObsConc",
+            "label":"ObsConc",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": false,
+            "type":"DOUBLE"
+        },
+        "dimension":{
+            "name":"AnalyteName",
+            "label":"Analyte Name",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "type":"VARCHAR",
+            "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
+        }
+    };
+
+    var luminexMeasureNullAllowedWithDimension = {
+        "axis":{
+            "multiSelect":"false",
+            "name":"y-axis",
+            "label":"ObsConc",
+            "scale":"log",
+            "range":{
+                "type":"automatic"
+            }
+        },
+        "measure":{
+            "id":22,
+            "name":"ObsConc",
+            "label":"ObsConc",
+            "description":"",
+            "isUserDefined":false,
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": true,
             "type":"DOUBLE"
         },
         "dimension":{
@@ -216,8 +273,10 @@
         {title: 'Two Measures from the same dataset', measures: [dateMeasure, cd4Measure, hemoglobinMeasure]},
         {title: 'Two Measures from different datasets', measures: [dateMeasure, cd4Measure, weightMeasure]},
         {title: 'Two Measures from different datasets (#2)', measures: [dateMeasure, cd4Measure, vlMeasure]},
-        {title: 'Two Measures - without dimension selected for second', measures: [dateMeasure, cd4Measure, luminexMeasure]},
-        {title: 'Two Measures - WITH dimension selected for second', measures: [dateMeasure, cd4Measure, luminexMeasureWithDimension]}
+        {title: 'Two Measures - without dimension selected for second, inner join', measures: [dateMeasure, cd4Measure, luminexMeasureNonNull]},
+        {title: 'Two Measures - without dimension selected for second, outer join', measures: [dateMeasure, cd4Measure, luminexMeasureNullAllowed]},
+        {title: 'Two Measures - WITH dimension selected for second, inner join', measures: [dateMeasure, cd4Measure, luminexMeasureNonNullWithDimension]},
+        {title: 'Two Measures - WITH dimension selected for second, outer join', measures: [dateMeasure, cd4Measure, luminexMeasureNullAllowedWithDimension]}
     ];
 
     var measureNames = [
@@ -226,6 +285,8 @@
         "study_PhysicalExam_Weight_kg",
         "study_HIVTestResults_HIVLoadQuant",
         "study_LuminexAssay_ObsConc",
+        "study_LuminexAssay_ObsConc",
+        "IL-10 (23)::study_LuminexAssay_ObsConc_MAX",
         "IL-10 (23)::study_LuminexAssay_ObsConc_MAX"
     ];
 

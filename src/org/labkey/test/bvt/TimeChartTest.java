@@ -42,8 +42,10 @@ public class TimeChartTest extends BaseSeleniumWebTest
         "Two Measures from the same dataset",
         "Two Measures from different datasets",
         "Two Measures from different datasets (#2)",
-        "Two Measures - without dimension selected for second",
-        "Two Measures - WITH dimension selected for second"
+        "Two Measures - without dimension selected for second, inner join",
+        "Two Measures - without dimension selected for second, outer join",
+        "Two Measures - WITH dimension selected for second, inner join",
+        "Two Measures - WITH dimension selected for second, outer join"
     };
     private static final String[] GETDATA_API_TEST_NUMROWS = {
         "1 - 33 of 33", 
@@ -51,16 +53,20 @@ public class TimeChartTest extends BaseSeleniumWebTest
         "1 - 33 of 33",
         "1 - 33 of 33",
         "1 - 75 of 75",
-        "1 - 25 of 25"
+        "1 - 83 of 83",
+        "1 - 25 of 25",
+        "1 - 33 of 33"
     };
 
     private static final String[][] GETDATA_API_TEST_COLNAMES = {
-        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Days"},
-        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Days"},
-        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "Study Physical Exam Weight Kg", "Days"},
-        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "Study HIVTest Results HIVLoad Quant", "Days"},
-        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
-        {"Study Lab Results Participant Id", "Study Demographics Date", "Study Lab Results CD4", "Study Lab Results Participant Sequence Key", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
     };
 
     private static final String[][] GETDATA_API_TEST_DAYS = {
@@ -69,6 +75,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
         {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
         {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
         {"44", "44", "44", "79", "79", "79", "108", "108", "108", "190", "190", "190", "246", "246", "246"},
+        {"44", "44", "44", "79", "79", "79", "108", "108", "108", "190", "190", "190", "246", "246", "246", "276", "303", "335", "364", "394"},
+        {"44", "79", "108", "190", "246"},
         {"44", "79", "108", "190", "246"}
     };
 
@@ -78,6 +86,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
         "Study Physical Exam Weight Kg",
         "Study HIVTest Results HIVLoad Quant",
         "Study Luminex Assay Obs Conc",
+        "Study Luminex Assay Obs Conc",
+        "IL-10 (23)",
         "IL-10 (23)"
     };
 
@@ -87,6 +97,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
         {"86", "84", "83", "80", "79", "79", "79", "78", "77", "75"},
         {"4345", "3452", "98354", "32453", "324234", "345452", "235671", "456674", "567432", "653465"},
         {"35.87", "40.07", "52.74", "13.68", "28.35", "42.38", "2.82", "5.19", "7.99", "5.12", "6.69", "32.33", "3.09", "5.76", "12.49"},
+        {"35.87", "40.07", "52.74", "13.68", "28.35", "42.38", "2.82", "5.19", "7.99", "5.12", "6.69", "32.33", "3.09", "5.76", "12.49"},
+        {"40.07", "42.38", "7.99", "32.33", "12.49"},
         {"40.07", "42.38", "7.99", "32.33", "12.49"}
     };
 
