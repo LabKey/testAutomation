@@ -71,7 +71,7 @@ public enum TestSet
         SpecimenTest.class,
         StudyExtraTest.class,
         NabAssayTest.class,
-        FlowJoQueryTest.class,
+        //FlowJoQueryTest.class,
         FlowImportTest.class,
         DataRegionTest.class,
         UserPermissionsTest.class,
@@ -158,7 +158,7 @@ public enum TestSet
 
     Flow(new Class[] {
         FlowTest.class,
-        FlowJoQueryTest.class,
+        //FlowJoQueryTest.class,
         FlowImportTest.class,
     }),
 
