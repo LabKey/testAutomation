@@ -291,6 +291,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
             assertTextPresent(GETDATA_API_TEST_TITLES[testIndex]);
             // check # of rows
             waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
+            waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
             for(int i = 0; i < GETDATA_API_TEST_COLNAMES[testIndex].length; i++){
                 assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_TEST_COLNAMES[testIndex][i], GETDATA_API_TEST_COLNAMES[testIndex][i]);
