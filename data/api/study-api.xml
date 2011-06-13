@@ -1,0 +1,96 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="create classification 1" type="post">
+        <formData>{
+            type: 'list',
+            label: 'Controller',
+            participantIDs: [999320016, 999320010, 999320018, 999320021, 999320029]
+            }
+        </formData>
+        <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
+        <response>{
+            "classification": {
+            "shared": false,
+            "autoUpdate": false,
+            "label": "Controller",
+            "type": "list"
+            },
+            "success": true
+            }
+        </response>
+    </test>
+    <test name="create classification 2" type="post">
+        <formData>{
+            type: 'list',
+            label: 'Elite Controller',
+            participantIDs: [999320033, 999320036, 999320038]
+            }
+        </formData>
+        <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
+        <response>{
+            "classification": {
+            "shared": false,
+            "autoUpdate": false,
+            "label": "Elite Controller",
+            "type": "list"
+            },
+            "success": true
+            }
+        </response>
+    </test>
+
+    <test name="create classification 3" type="post">
+        <formData>{
+            type: 'list',
+            label: 'Non Controller',
+            participantIDs: [999320170, 999320173, 999320176]
+            }
+        </formData>
+        <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
+        <response>{
+            "classification": {
+            "shared": false,
+            "autoUpdate": false,
+            "label": "Non Controller",
+            "type": "list"
+            },
+            "success": true
+            }
+        </response>
+    </test>
+    <test name="list classifications" type="get">
+        <url>participant-list/StudyVerifyProject/My%2520Study/getParticipantClassifications.view?</url>
+        <response>{
+            "classifications": [
+            {
+            "shared": false,
+            "autoUpdate": false,
+            "label": "Controller",
+            "type": "list"
+            },
+            {
+            "shared": false,
+            "autoUpdate": false,
+            "label": "Elite Controller",
+            "type": "list"
+            },
+            {
+            "shared": false,
+            "autoUpdate": false,
+            "label": "Non Controller",
+            "type": "list"
+            }
+            ],
+            "success": true
+            }
+        </response>
+    </test>
+    <test name="delete classification" type="post">
+        <formData>{
+            label: 'Non Controller',
+            }
+        </formData>
+        <url>participant-list/StudyVerifyProject/My%2520Study/deleteParticipantClassification.view?</url>
+        <response>{"success": true}</response>
+    </test>
+</ApiTests>
+        

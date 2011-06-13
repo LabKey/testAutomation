@@ -14,6 +14,7 @@ data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
 data/api/scatterChartTest.js -text
 data/api/security-api.xml -text
+data/api/study-api.xml -text
 data/api/webPartTest.js -text
 data/api/workbookAPITest.html -text
 modules/miniassay/assay/simple/config.xml -text

@@ -22,6 +22,7 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,7 +51,12 @@ public class StudyTest extends StudyBaseTest
         "Soc Imp Log #%{S.3.2}\t5500\n" +
         "ConMeds Log #%{S.3.2}\t9002\n" +
         "All Done\t9999";
-    
+
+    protected File[] getTestFiles()
+    {
+        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/study-api.xml")};
+    }
+
     protected void doCreateSteps()
     {
         importStudy();

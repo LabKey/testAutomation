@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.bvt.SimpleApiTest;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
@@ -31,7 +32,7 @@ import java.io.FilenameFilter;
 
 // Provides some helpful utilities used in study-related tests.  Subclasses provide all study creation and
 // verification steps.
-public abstract class StudyBaseTest extends BaseSeleniumWebTest
+public abstract class StudyBaseTest extends SimpleApiTest
 {
     protected static final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
     protected static final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
@@ -92,10 +93,17 @@ public abstract class StudyBaseTest extends BaseSeleniumWebTest
         _specimenImporter.waitForComplete();
     }
 
-    protected final void doTestSteps()
+    @Override
+    protected void runUITests() throws Exception
     {
         doCreateSteps();
         doVerifySteps();
+    }
+
+    @Override
+    protected File[] getTestFiles()
+    {
+        return new File[0]; 
     }
 
     protected void doCleanup() throws Exception
