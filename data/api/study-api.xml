@@ -3,7 +3,7 @@
         <formData>{
             type: 'list',
             label: 'Controller',
-            participantIDs: [999320016, 999320010, 999320018, 999320021, 999320029]
+            participantIds: [999320016, 999320010, 999320018, 999320021, 999320029]
             }
         </formData>
         <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
@@ -12,7 +12,8 @@
             "shared": false,
             "autoUpdate": false,
             "label": "Controller",
-            "type": "list"
+            "type": "list",
+            "participantIds": ["999320016", "999320010", "999320018", "999320021", "999320029"]
             },
             "success": true
             }
@@ -22,7 +23,7 @@
         <formData>{
             type: 'list',
             label: 'Elite Controller',
-            participantIDs: [999320033, 999320036, 999320038]
+            participantIds: [999320033, 999320036, 999320038]
             }
         </formData>
         <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
@@ -31,7 +32,8 @@
             "shared": false,
             "autoUpdate": false,
             "label": "Elite Controller",
-            "type": "list"
+            "type": "list",
+            "participantIds": ["999320033", "999320036", "999320038"]
             },
             "success": true
             }
@@ -42,7 +44,7 @@
         <formData>{
             type: 'list',
             label: 'Non Controller',
-            participantIDs: [999320170, 999320173, 999320176]
+            participantIds: [999320170, 999320173, 999320176]
             }
         </formData>
         <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
@@ -51,7 +53,8 @@
             "shared": false,
             "autoUpdate": false,
             "label": "Non Controller",
-            "type": "list"
+            "type": "list",
+            "participantIds": ["999320170", "999320173", "999320176"]
             },
             "success": true
             }
@@ -65,19 +68,22 @@
             "shared": false,
             "autoUpdate": false,
             "label": "Controller",
-            "type": "list"
+            "type": "list",
+            "participantIds": ["999320016", "999320010", "999320018", "999320021", "999320029"]
             },
             {
             "shared": false,
             "autoUpdate": false,
             "label": "Elite Controller",
-            "type": "list"
+            "type": "list",
+            "participantIds": ["999320033", "999320036", "999320038"]
             },
             {
             "shared": false,
             "autoUpdate": false,
             "label": "Non Controller",
-            "type": "list"
+            "type": "list",
+            "participantIds": ["999320170", "999320173", "999320176"]
             }
             ],
             "success": true
