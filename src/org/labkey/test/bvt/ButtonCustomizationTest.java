@@ -2,6 +2,7 @@ package org.labkey.test.bvt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -163,9 +164,11 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         // wait for the domain editor to appear:
         waitForText("Label", 10000);
         clickNavButton("Edit Source");
+        ExtHelper.clickExtTab(this, "XML");
         toggleMetadataQueryEditor();
-        setText("ff_metadataText", getMetadataXML(true));
-        clickNavButton("View Data");
+        setText("metadataText", getMetadataXML(true));
+        ExtHelper.clickExtTab(this, "Source");
+        clickNavButton("Save & Finish");
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonPresent("Insert New");
 
@@ -176,11 +179,13 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickLinkWithText("edit metadata");
         waitForText("Edit Source", 10000);
         clickNavButton("Edit Source");
+        ExtHelper.clickExtTab(this, "XML");
         toggleMetadataQueryEditor();
-        setText("ff_metadataText", getMetadataXML(false));
-        clickNavButton("Save");
-        assertTextNotPresent("error");
-        clickNavButton("View Data");
+        setText("metadataText", getMetadataXML(false));
+        clickButton("Save", 0);
+        assertTextNotPresent("Failed");
+        ExtHelper.clickExtTab(this, "Source");
+        clickNavButton("Save & Finish");
         verifyMetadataButtons();
 
         // Create a wiki page to hold a query webpart with JavaScript-based button customization:

@@ -176,8 +176,8 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         setFormElement("ff_newQueryName", "APX: Custom Query");
         selectOptionByText("ff_baseTableName", "APX-1: Abbreviated Physical Exam");
-        clickNavButton("Create and Design Query");
-        clickNavButton("View Data");
+        clickNavButton("Create and Edit Source");
+        clickButton("Save & Finish");
 
         createQuerySnapshot("Custom Query Snapshot", true, true);
         assertTextPresent("Dataset: Custom Query Snapshot");
