@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 
 /**
@@ -541,9 +542,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         createNewQuery("issues");
         setFormElement("ff_newQueryName", "xxyzzy");
         clickNavButton("Create and Edit Source");
-        clickNavButton("View Data");
-        assertTextPresent(ISSUE_TITLE_0);
-        assertTextPresent(ISSUE_TITLE_1);
+        ExtHelper.clickExtTab(this, "Data");
+        waitForText(ISSUE_TITLE_0, WAIT_FOR_JAVASCRIPT);
+        waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
         clickLinkWithText(PROJECT_NAME);
     }
 }
