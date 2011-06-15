@@ -169,6 +169,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("VisitID", "visitNo");
         assertFormElementEquals("Date", "draw_date");
         clickNavButton("Cancel");
+        refresh(); // avoid file selection timeout
         ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_2);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
@@ -177,6 +178,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("VisitID", "visit_no");
         assertFormElementEquals("Date", "drawDate");
         clickNavButton("Cancel");
+        refresh(); // avoid file selection timeout
         ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_3);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
@@ -185,6 +187,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("VisitID", "visitId");
         assertFormElementEquals("Date", "date");
         clickNavButton("Cancel");
+        refresh(); // avoid file selection timeout
         ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_4);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
