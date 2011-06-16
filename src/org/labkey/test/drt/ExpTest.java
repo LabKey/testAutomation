@@ -129,7 +129,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Run it and see if we used the format correctly
         ExtHelper.clickExtTab(this, "Data");
-        assertTextPresent("editedCreated");
+        waitForText("editedCreated", WAIT_FOR_JAVASCRIPT);
         dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
         waitForText(dateFormat.format(new Date()), WAIT_FOR_JAVASCRIPT);
 
