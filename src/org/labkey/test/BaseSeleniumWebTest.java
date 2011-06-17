@@ -3274,6 +3274,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setSort(regionName, columnName, direction, defaultWaitForPage);
     }
 
+    //clear sort from a column
+    public void clearSort(String regionName, String columnName)
+    {
+        clearSort(regionName, columnName, defaultWaitForPage);
+    }
+
+    public void clearSort(String regionName, String columnName, int wait)
+    {
+        log("Clearing sort in " + regionName + " for " + columnName);
+        if (runMenuItemHandler(regionName + ":" + columnName + ":" + "clear"));
+            waitForPageToLoad(wait);
+    }
+
     public void setSort(String regionName, String columnName, SortDirection direction, int wait)
     {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());

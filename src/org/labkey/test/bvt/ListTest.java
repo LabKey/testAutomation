@@ -368,6 +368,9 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test Sort and Filter in Data View");
         setSort("query", _listCol1.getName(), SortDirection.ASC);
         assertTextBefore(TEST_DATA[0][1], TEST_DATA[0][0]);
+
+        clearSortTest();
+
         setFilter("query", _listCol4.getName(), "Is Greater Than", "7");
         assertTextNotPresent(TEST_DATA[0][3]);
 
@@ -579,6 +582,26 @@ public class ListTest extends BaseSeleniumWebTest
         doUploadTest();
         customFormattingTest();
         customizeURLTest();
+    }
+
+    /*                Issue 11825: Create test for "Clear Sort"
+        sort by a parameter, than clear sort.
+        Verify that reverts to original sort and the dropdown menu disappears
+
+        preconditions:  table already sorted by description
+     */
+    private void clearSortTest()
+    {
+        //make sure elements are ordered the way they should be
+        assertTextPresentInThisOrder(TEST_DATA[5][2], TEST_DATA[5][1],TEST_DATA[5][0]);
+
+        //sort  by element and verify it worked
+        setSort("query", _listCol6.getName(), SortDirection.DESC);
+        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][2], TEST_DATA[5][1]);
+
+        //remove sort and verify we return to initial state
+        clearSort("query", _listCol6.getName());
+        assertTextPresentInThisOrder(TEST_DATA[5][2], TEST_DATA[5][1],TEST_DATA[5][0]);
     }
 
     private void doUploadTest()
