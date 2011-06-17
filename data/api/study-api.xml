@@ -6,7 +6,7 @@
             participantIds: [999320016, 999320010, 999320018, 999320021, 999320029]
             }
         </formData>
-        <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
+        <url>participant-list/StudyVerifyProject/My%20Study/createParticipantClassification.view?</url>
         <response>{
             "classification": {
             "shared": false,
@@ -26,7 +26,7 @@
             participantIds: [999320033, 999320036, 999320038]
             }
         </formData>
-        <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
+        <url>participant-list/StudyVerifyProject/My%20Study/createParticipantClassification.view?</url>
         <response>{
             "classification": {
             "shared": false,
@@ -47,7 +47,7 @@
             participantIds: [999320170, 999320173, 999320176]
             }
         </formData>
-        <url>participant-list/StudyVerifyProject/My%2520Study/createParticipantClassification.view?</url>
+        <url>participant-list/StudyVerifyProject/My%20Study/createParticipantClassification.view?</url>
         <response>{
             "classification": {
             "shared": false,
@@ -61,7 +61,7 @@
         </response>
     </test>
     <test name="list classifications" type="get">
-        <url>participant-list/StudyVerifyProject/My%2520Study/getParticipantClassifications.view?</url>
+        <url>participant-list/StudyVerifyProject/My%20Study/getParticipantClassifications.view?</url>
         <response>{
             "classifications": [
             {
@@ -95,7 +95,7 @@
             label: 'Non Controller',
             }
         </formData>
-        <url>participant-list/StudyVerifyProject/My%2520Study/deleteParticipantClassification.view?</url>
+        <url>participant-list/StudyVerifyProject/My%20Study/deleteParticipantClassification.view?</url>
         <response>{"success": true}</response>
     </test>
 </ApiTests>

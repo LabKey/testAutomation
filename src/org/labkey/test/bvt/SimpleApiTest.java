@@ -186,6 +186,8 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                     String response = method.getResponseBodyAsString();
                     _helper.assertEquals("FAILED: test " + name, expectedResponse, response);
                 }
+                else
+                    fail(String.format("FAILED: test %s failed with status code: %s", name, status));
             }
             catch (IOException e)
             {
