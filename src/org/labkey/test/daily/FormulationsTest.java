@@ -176,6 +176,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         setFormElement("concentration", "25.4");
 
         // Test Duplicate Material
+        log("Test Duplicate Material");
         clickButton("Add Another Material", 0);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material1']]"), RAW_MATERIAL_1);
         waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
@@ -184,17 +185,20 @@ public class FormulationsTest extends BaseSeleniumWebTest
         waitForText("Duplicate source materials are not allowed.", WAIT_FOR_JAVASCRIPT);
 
         // Test empty combo
+        log("Test empty combo");
         clickButton("Add Another Material", 0);
-        sleep(1000); // give form a chance to catch up
+        sleep(3000); // give form a chance to catch up
         clickButton("Create", 0);
         waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
         
         // Test empty concentration
+        log("Test empty concentration");
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material2']]"), RAW_MATERIAL_2);
         clickButton("Create", 0);
         waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
 
         // Remove duplicate material
+        log("Remove duplicate material");
         click(Locator.xpath("//a[text() = 'Remove'][1]")); // remove
         
         // Create        
