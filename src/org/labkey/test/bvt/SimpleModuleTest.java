@@ -160,7 +160,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("** Testing vehicle.Model RowId url link...");
         beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
-        viewQueryData(VEHICLE_SCHEMA, "Models");
+        viewQueryData(VEHICLE_SCHEMA, "models");
         clickLinkWithText("Prius");
         assertTextPresent("Hooray!");
         String rowidStr = getText(Locator.id("model.rowid"));
@@ -247,7 +247,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("** Testing vehicle.Vehicles details url link...");
         beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
-        viewQueryData(VEHICLE_SCHEMA, "Vehicles");
+        viewQueryData(VEHICLE_SCHEMA, "vehicles");
         clickLinkWithText("details");
         assertTextPresent("Hooray!");
         rowidStr = getText(Locator.id("vehicle.rowid"));
