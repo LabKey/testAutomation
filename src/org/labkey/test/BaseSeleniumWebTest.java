@@ -2895,12 +2895,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         File[] files = path.listFiles(filter);
         ArrayList<File> allFiles = new ArrayList<File>();
-        for (File file : files)
+        if (files != null)
         {
-            if ( file.isDirectory() )
-                allFiles.addAll(listFilesRecursive(file, filter));
-            else // file.isFile()
-                allFiles.add(file);
+            for (File file : files)
+            {
+                if ( file.isDirectory() )
+                    allFiles.addAll(listFilesRecursive(file, filter));
+                else // file.isFile()
+                    allFiles.add(file);
+            }
         }
         return allFiles;
     }
