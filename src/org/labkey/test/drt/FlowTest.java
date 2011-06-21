@@ -57,9 +57,9 @@ public class FlowTest extends BaseFlowTest
         createNewQuery("flow");
         setFormElement(Locator.nameOrId("ff_newQueryName"), "DRTQuery1");
         selectOptionByText("identifier=ff_baseTableName", "FCSAnalyses");
-        submit();
+        clickButton("Create and Edit Source");
 
-        beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + getFolderName() + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
+        // Start Query Editing
         toggleSQLQueryEditor();
         setFormElement("queryText", "SELECT FCSAnalyses.RowId,\n" +
                 "FCSAnalyses.Statistic.\"Count\",\n" +

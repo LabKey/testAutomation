@@ -95,13 +95,13 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickLinkWithText("Email Notifications");
             click(Locator.navButton("Update Settings"));
             // Set folder default
-            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='defaultFileEmailOption']]"), "15 minute digest");
+            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
             clickButtonByIndex("Update Folder Default", 1, 0);
             ExtHelper.waitForExtDialog(this, "Update complete", WAIT_FOR_JAVASCRIPT);            
             waitForExtMaskToDisappear();
             // Change user setting TEST_USER -> No Email
             checkDataRegionCheckbox("Users", 1);
-            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='fileEmailOption']]"), "No Email");
+            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
             clickButtonByIndex("Update Settings", 1, 0);
             ExtHelper.waitForExtDialog(this, "Update selected users", WAIT_FOR_JAVASCRIPT);
             clickNavButton("Yes", 0);
