@@ -30,14 +30,31 @@ public class UserBvtTest extends SecurityTest
                 "IM", "Description"};
     private static final String TEST_PASSWORD = "testPassword";
 
+    /**copied from LoginController.EMAIL_PASSWORDMISMATCH_ERROR, but needs to be broken into multiple separate sentences,
+     *  the search function can't handle the line breaks
+     */
+    public static final String[] EMAIL_PASSWORD_MISMATCH_ERROR =
+            {"The e-mail address and password you entered did not match any accounts on file.",
+             "Note: Passwords are case sensitive; make sure your Caps Lock is off."};
+
+
+    //users for change e-mail tests.  Both included at top level so they can be included in the clean up.
+    // only one should exist at any one time, but by deleting both we ensure that nothing persists even if
+    // the test fails
+    protected static final String NORMAL_USER2 = "user2@security.test";
+    protected static final String NORMAL_USER2_ALTERNATE = "not-user2@security.test";
+
+
     protected void doTestSteps()
     {
         super.doTestSteps();
 
         siteUsersTest();
         requiredFieldsTest();
-        passwordTest();
+        simplePasswordResetTest();
+        changeUserEmailTest();
     }
+
 
     protected void doCleanup()
     {
@@ -45,6 +62,9 @@ public class UserBvtTest extends SecurityTest
         clickNavButton("Preferences");
         checkRequiredField("FirstName", false);
         clickNavButton("Update");
+
+        deleteUser(NORMAL_USER2);
+        deleteUser(NORMAL_USER2_ALTERNATE);
     }
 
     private void siteUsersTest()
@@ -67,6 +87,50 @@ public class UserBvtTest extends SecurityTest
 
         stopImpersonating();
     }
+
+    // Issue 3876: Add more security tests
+    private void changeUserEmailTest()//boolean fromAdmin)
+    {
+        boolean fromAdmin = false;
+        //get appropriate user
+        String userEmail = getEmailChangeableUser();
+        String newUserEmail = NORMAL_USER2_ALTERNATE;
+        deleteUser(newUserEmail, false);
+
+        //change their email address
+        changeUserEmail(userEmail, newUserEmail);
+
+        signOut();
+
+        //verify can log in with new address
+        signIn(newUserEmail, TEST_PASSWORD, true);
+
+        signOut();
+
+        //verify can't log in with old address
+        signInShouldFail(userEmail, TEST_PASSWORD, EMAIL_PASSWORD_MISMATCH_ERROR);
+
+        simpleSignIn();
+
+        deleteUser(newUserEmail, false);
+    }
+
+
+    /**if user NORMAL_USER2 does not exist, create them,
+     * give them password TEST_PASSWORD, and sign them in.
+     * @return email address of user
+     */
+    private String getEmailChangeableUser()
+    {
+
+        deleteUser(NORMAL_USER2_ALTERNATE, false);
+        createUserAndNotify(NORMAL_USER2, NORMAL_USER);
+        clickLinkContainingText("Home");
+        setInitialPassword(NORMAL_USER2, TEST_PASSWORD);
+
+        return NORMAL_USER2;
+    }
+
 
     /**
      * Selects required user information fields and tests to see they are
@@ -103,7 +167,7 @@ public class UserBvtTest extends SecurityTest
         clickNavButton("Show All Users");
     }
 
-    private void passwordTest()
+    private void simplePasswordResetTest()
     {
         enableEmailRecorder();
 
