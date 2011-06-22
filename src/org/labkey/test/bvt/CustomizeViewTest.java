@@ -150,8 +150,7 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         }
 
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", data.toString());
-        submit();
+        ListHelper.submitTsvData(this, data.toString());
         for (String[] rowData : TEST_DATA)
         {
             // check that all the data is in the grid (skipping the key column at index 0)
