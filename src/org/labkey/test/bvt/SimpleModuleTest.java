@@ -410,8 +410,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("Importing some data...");
         clickNavButton("Import Data");
-        setFormElement("ff_data", LIST_DATA);
-        submit();
+        ListHelper.submitTsvData(this, LIST_DATA);
     }
 
     private void doTestQueries()

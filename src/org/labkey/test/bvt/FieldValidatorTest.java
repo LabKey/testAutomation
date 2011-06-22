@@ -62,16 +62,13 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
 
         log("Test upload data");
         clickNavButton("Import Data");
-        submit();
-        assertTextPresent("Form contains no data");
-        setFormElement("ff_data", TEST_DATA_FAIL);
-        submit();
+        setFormElement("text", TEST_DATA_FAIL);
+        ListHelper.submitImportTsv_error(this, null);
         assertTextPresent(SEX_ERROR_MSG);
         assertTextPresent(ID_ERROR_MSG);
         assertTextPresent(AGE_ERROR_MSG);
 
-        setFormElement("ff_data", TEST_DATA_PASS);
-        submit();
+        ListHelper.submitTsvData(this, TEST_DATA_PASS);
         assertTextPresent("Ted");
         assertTextPresent("Alice");
         assertTextPresent("Bob");

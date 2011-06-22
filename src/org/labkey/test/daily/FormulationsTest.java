@@ -113,16 +113,14 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Upload temperature data");
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", TEMPERATURE_HEADER + TEMPERATURE_DATA);
-        clickNavButton("Submit");
+        ListHelper.submitTsvData(this, TEMPERATURE_HEADER + TEMPERATURE_DATA);
 
         clickLinkWithText("Lists");
 
         log("Add list -- " + TIME_LIST);
         ListHelper.createList(this, PROJECT_NAME, TIME_LIST, LIST_KEY_TYPE, "time", LIST_COL_SORT);
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", TIME_HEADER + TIME_DATA);
-        clickNavButton("Submit");
+        ListHelper.submitTsvData(this, TIME_HEADER + TIME_DATA);
     }
 
     protected void setupCompounds()

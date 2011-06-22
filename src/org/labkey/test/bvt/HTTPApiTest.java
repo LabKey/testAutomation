@@ -84,8 +84,7 @@ public class HTTPApiTest extends SimpleApiTest
 
         log("Upload data");
         clickNavButton("Import Data");
-        setFormElement("ff_data", LIST_DATA);
-        submit();
+        ListHelper.submitTsvData(this, LIST_DATA);
         
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Query");

@@ -39,6 +39,13 @@ public class ListHelper
         _submitImportTsv(test, null);
     }
 
+    public static void submitTsvData(BaseSeleniumWebTest test, String listData)
+    {
+        test.setFormElement("text", listData);
+        _submitImportTsv(test, null);
+    }
+
+
     public static void submitImportTsv_success(BaseSeleniumWebTest test)
     {
         _submitImportTsv(test, null);     
