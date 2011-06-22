@@ -35,8 +35,38 @@ public class ListHelper
         test.clickLinkWithText(listName);
 
         test.clickNavButton("Import Data");
-        test.setFormElement("ff_data", listData);
-        test.submit();
+        test.setFormElement("text", listData);
+        _submitImportTsv(test, null);
+    }
+
+    public static void submitImportTsv_success(BaseSeleniumWebTest test)
+    {
+        _submitImportTsv(test, null);     
+    }
+
+    // null means any error
+    public static void submitImportTsv_error(BaseSeleniumWebTest test, String error)
+    {
+        _submitImportTsv(test, null==error ? "" : error);     
+    }
+
+    private static void _submitImportTsv(BaseSeleniumWebTest test, String error)
+    {
+        test.clickNavButton("Submit", 0);
+        test.sleep(500);
+        if (null != error)
+        {
+            test.waitForExtMaskToDisappear();
+            if (0<error.length())
+                test.waitForText(error, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        }
+        else
+        {
+            ExtHelper.waitForExtDialog(test, "Success");
+            test.assertTextPresent(" inserted.");
+            test.clickNavButton("OK");
+            test.waitForPageToLoad();
+        }
     }
 
     public static class LookupInfo

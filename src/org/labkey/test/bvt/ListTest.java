@@ -145,17 +145,14 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test upload data");
         clickImportData();
-        submit();
-        assertTextPresent("Form contains no data");
-        setFormElement("ff_data", TEST_FAIL);
-        submit();
+        submitImportTsv("Form contains no data");
+        setFormElement("text", TEST_FAIL);
+        submitImportTsv("could not be matched to a field");
         assertTextPresent(TEST_FAIL);
-        assertTextPresent("could not be matched to a field");
-        setFormElement("ff_data", TEST_FAIL2);
-        submit();
-        assertTextPresent("must be of type");
-        setFormElement("ff_data", LIST_DATA);
-        submit();
+        setFormElement("text", TEST_FAIL2);
+        submitImportTsv("must be of type");
+        setFormElement("text", LIST_DATA);
+        submitImportTsv();
 
         log("Check upload worked correctly");
         assertTextPresent(_listCol2.getLabel());
@@ -234,8 +231,8 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Add data to existing rows");
         clickImportData();
-        setFormElement("ff_data", LIST_DATA2);
-        submit();
+        setFormElement("text", LIST_DATA2);
+        submitImportTsv();
 
         log("Check that data was added correctly");
         assertTextPresent(TEST_DATA[0][0]);
@@ -828,6 +825,17 @@ public class ListTest extends BaseSeleniumWebTest
     }
 
 
+    void submitImportTsv(String error)
+    {
+        ListHelper.submitImportTsv_error(this, error);
+    }
+
+    void submitImportTsv()
+    {
+        ListHelper.submitImportTsv_success(this);
+    }
+
+
     void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
     {
         log("Add List -- " + name);
@@ -837,8 +845,8 @@ public class ListTest extends BaseSeleniumWebTest
         selectOptionByText("ff_titleColumn", cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
         clickSave();
         clickImportData();
-        setFormElement("ff_data", toTSV(cols,data));
-        submit();
+        setFormElement("text", toTSV(cols,data));
+        submitImportTsv();
     }
 
 

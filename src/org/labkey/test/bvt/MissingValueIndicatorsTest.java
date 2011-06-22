@@ -200,12 +200,12 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
         log("Test upload list data with a combined data and MVI column");
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_LIST_BAD);
-        submit();
+        setFormElement("text", TEST_DATA_SINGLE_COLUMN_LIST_BAD);
+        ListHelper.submitImportTsv_error(this,null);
         assertLabkeyErrorPresent();
 
-        setFormElement("ff_data", TEST_DATA_SINGLE_COLUMN_LIST);
-        submit();
+        setFormElement("text", TEST_DATA_SINGLE_COLUMN_LIST);
+        ListHelper.submitImportTsv_success(this);
         validateSingleColumnData();
 
         deleteListData(3);
@@ -225,12 +225,12 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
         log("Test separate MVIndicator column");
         clickNavButton("Import Data");
-        setFormElement("ff_data", TEST_DATA_TWO_COLUMN_LIST_BAD);
-        submit();
+        setFormElement("text", TEST_DATA_TWO_COLUMN_LIST_BAD);
+        ListHelper.submitImportTsv_error(this,null);
         assertLabkeyErrorPresent();
 
-        setFormElement("ff_data", TEST_DATA_TWO_COLUMN_LIST);
-        submit();
+        setFormElement("text", TEST_DATA_TWO_COLUMN_LIST);
+        ListHelper.submitImportTsv_success(this);
         validateTwoColumnData("query", "name");
     }
 

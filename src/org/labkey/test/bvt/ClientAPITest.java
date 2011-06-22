@@ -204,8 +204,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         }
 
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", data.toString());
-        submit();
+        setFormElement("text", data.toString());
+        ListHelper.submitImportTsv_success(this);
         for (String[] rowData : TEST_DATA)
         {
             // check that all the data is in the grid (skipping the key column at index 0)
@@ -218,14 +218,14 @@ public class ClientAPITest extends BaseSeleniumWebTest
         // Create lists for cross-folder query test.
         ListHelper.createList(this, SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", data.toString());
-        submit();
+        setFormElement("text", data.toString());
+        ListHelper.submitImportTsv_success(this);
 
         // Create lists for cross-folder query test.
         ListHelper.createList(this, OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", data.toString());
-        submit();
+        setFormElement("text", data.toString());
+        ListHelper.submitImportTsv_success(this);
 
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
