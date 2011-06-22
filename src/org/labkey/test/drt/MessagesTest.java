@@ -88,7 +88,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         if (isFileUploadAvailable())
             assertTextPresent("common.properties");
         assertTextPresent(MSG1_BODY_FIRST);
-        clickWebpartMenuItem("Messages", "View List");
+        clickLinkWithText("view list");
         assertTextPresent(MSG1_TITLE);
         goToModule("Messages");
         clickLinkWithText("Messages");
