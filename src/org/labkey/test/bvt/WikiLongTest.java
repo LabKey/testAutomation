@@ -288,7 +288,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         setWikiBody(HEADER_CONTENT);
         saveWikiPage();
 
-        clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
+        clickLinkWithText("Header");
         assertTextPresent(HEADER_CONTENT);
         clickLinkWithText("Edit", 0);
         deleteWikiPage();

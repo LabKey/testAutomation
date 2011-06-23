@@ -4394,7 +4394,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement("query", searchFor);
         clickNavButton("Search");
         long wait = 0;
-        while (wait < defaultWaitForPage)
+        while (wait < 5*defaultWaitForPage)
         {
             if ((titleName == null && isTextPresent("Found " + expectedResults + " result")) ||
                 (titleName != null && isLinkPresentContainingText(titleName)))
