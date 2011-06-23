@@ -58,6 +58,11 @@ public class ExtHelper
             test.click(itemLocator);
     }
 
+    public static void selectFolderManagementTreeItem(BaseSeleniumWebTest test, String path, boolean keepExisting)
+    {
+        test.getWrapper().getEval("selenium.selectFolderManagementItem('" + path + "', " + keepExisting +");");
+    }
+
     /**
      * Returns a DOM Element id from an ext object id. Assumes that the ext component
      * has already been rendered.

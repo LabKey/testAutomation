@@ -109,6 +109,65 @@ selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, ke
     }
 };
 
+// Example: ExtHelper.selectFolderManagementTreeItem(this, "/home/545dcbbc9f7fa0f85a86190b9acd6381/14/15/3/2", true);
+selenium.selectFolderManagementItem = function(path, keepExisting) {
+    selenium.selectExtFolderTreeNode(path, 'folder-management-tree', keepExisting);
+};
+
+selenium.selectExtFolderTreeNode = function(containerPath, markerCls, keepExisting) {
+    var domQuery = selenium.browserbot.getCurrentWindow().Ext.DomQuery;
+    var ext = selenium.browserbot.getCurrentWindow().Ext;
+
+    // Get Path Array
+    var pathArray = containerPath.split("/");
+    if (pathArray.length == 0)
+        throw new Error("Unable to parse path: " + containerPath);
+
+    // Remove invalid paths due to parsing
+    if (pathArray[0] == "")
+        pathArray = pathArray.slice(1);
+    if (pathArray[pathArray.length-1] == "")
+        pathArray = pathArray.slice(0, pathArray.length-1);
+    
+    var el = domQuery.selectNode("div[class*='"+markerCls+"']");
+    if (el) {
+        var tree = ext.getCmp(el.id);
+        if (tree) {
+
+            var root = tree.getRootNode();
+            if (!root) {
+                throw new Error("Unable to find root node.");
+            }
+
+            var _path = "";
+            var node;
+
+            for (var i=0; i < pathArray.length; i++) {
+                _path += '/' + pathArray[i];
+                node = root.findChild('containerPath', _path, true);
+                if (node) {
+                    if (i==(pathArray.length-1)) {
+                        var e = {};
+                        if (keepExisting) {
+                            e.ctrlKey = true;
+                        }
+                        tree.getSelectionModel().select(node, e, keepExisting);
+                    }
+                }
+                else {
+                    throw new Error("Unable to find node: " + _path);
+                }
+            }
+        }
+        else {
+            throw new Error(el.id + " does not appear to be a valid Ext Component.");
+        }
+    }
+    else {
+        throw new Error("Unable to locate tree panel: " + markerCls);
+    }
+};
+
 selenium.getContainerId = function () {
     var win = selenium.browserbot.getCurrentWindow();
     return win.LABKEY.container.id;
