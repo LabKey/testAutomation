@@ -256,8 +256,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("View Data");
         clickNavButton("Import Data");
-        selenium.type("tsv", "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
-        submit();
+        ListHelper.submitTsvData(this, "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
 
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Day");
@@ -278,8 +277,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Subjects");
         clickNavButton("Import Data");
-        setFormElement("tsv", "participantid\tDate\tCohort\tStartDate\nPnew\t11/7/2007\tPlacebo\t11/7/2007");
-        submit();
+        ListHelper.submitTsvData(this, "participantid\tDate\tCohort\tStartDate\nPnew\t11/7/2007\tPlacebo\t11/7/2007");
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         //Make sure our guy picked up the his personal start date

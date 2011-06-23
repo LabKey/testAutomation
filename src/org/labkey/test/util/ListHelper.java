@@ -35,13 +35,13 @@ public class ListHelper
         test.clickLinkWithText(listName);
 
         test.clickNavButton("Import Data");
-        test.setFormElement("text", listData);
+        test.setLongTextField("text", listData);
         _submitImportTsv(test, null);
     }
 
     public static void submitTsvData(BaseSeleniumWebTest test, String listData)
     {
-        test.setFormElement("text", listData);
+        test.setLongTextField("text", listData);
         _submitImportTsv(test, null);
     }
 
@@ -65,7 +65,7 @@ public class ListHelper
         {
             test.waitForExtMaskToDisappear();
             if (0<error.length())
-                test.waitForText(error, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+                test.waitForText(error, BaseSeleniumWebTest.WAIT_FOR_PAGE);
         }
         else
         {

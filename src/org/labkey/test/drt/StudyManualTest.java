@@ -246,16 +246,11 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Import Data");
 
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";
-        setFormElement("tsv", _tsv + "\n" + errorRow);
-        clickNavButton("Import Data");
-//        assertTextPresent("Row 3 does not contain required field MouseId.");
-        assertTextPresent("Could not convert 'badvisitd'");
-//        assertTextPresent("Row 3 does not contain required field SampleId.");
+        setFormElement("text", _tsv + "\n" + errorRow);
+        ListHelper.submitImportTsv_error(this, "Could not convert 'badvisitd'");
         assertTextPresent("Could not convert 'text'");
-//        assertTextPresent("Row 3 does not contain required field NumberField.");
 
-        setFormElement("tsv", _tsv);
-        clickNavButton("Import Data", longWaitForPage);
+        ListHelper.submitTsvData(this, _tsv);
         assertTextPresent("1234");
         assertTextPresent("2006-02-01");
         assertTextPresent("1.2");

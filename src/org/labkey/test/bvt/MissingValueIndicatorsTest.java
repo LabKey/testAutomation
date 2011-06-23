@@ -269,13 +269,11 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         clickNavButton("View Data");
         clickNavButton("Import Data");
 
-        setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
-        submit();
-        assertLabkeyErrorPresent();
-        submit();
+        setFormElement("text", TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
+        ListHelper.submitImportTsv_error(this, null);
 
-        setFormElement("tsv", TEST_DATA_SINGLE_COLUMN_DATASET);
-        submit();
+        setFormElement("text", TEST_DATA_SINGLE_COLUMN_DATASET);
+        ListHelper.submitImportTsv_success(this);
         validateSingleColumnData();
 
         deleteDatasetData(3);
@@ -297,12 +295,10 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         log("Import dataset data with two mv columns");
         clickNavButton("Import Data");
 
-        setFormElement("tsv", TEST_DATA_TWO_COLUMN_DATASET_BAD);
-        submit();
-        assertLabkeyErrorPresent();
+        setFormElement("text", TEST_DATA_TWO_COLUMN_DATASET_BAD);
+        ListHelper.submitImportTsv_error(this, null);
 
-        setFormElement("tsv", TEST_DATA_TWO_COLUMN_DATASET);
-        submit();
+        ListHelper.submitTsvData(this, TEST_DATA_TWO_COLUMN_DATASET);
         validateTwoColumnData("Dataset", "ParticipantId");
     }
 

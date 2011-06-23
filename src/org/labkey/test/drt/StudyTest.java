@@ -108,15 +108,13 @@ public class StudyTest extends StudyBaseTest
 
         //Import duplicate data
         clickNavButton("Import Data");
-        setFormElement("tsv", _tsv);
-        clickNavButton("Import Data");
-        assertTextPresent("Duplicates were found");
+        setFormElement("text", _tsv);
+        ListHelper.submitImportTsv_error(this, "Duplicates were found");
         //Now explicitly replace, using 'mouseid' instead of 'participantid'
         _tsv = "mouseid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
-        setFormElement("tsv", _tsv);
-        clickNavButton("Import Data");
+        ListHelper.submitTsvData(this, _tsv);
         assertTextPresent("5000.0");
         assertTextPresent("new text");
         assertTextPresent("QC State");
