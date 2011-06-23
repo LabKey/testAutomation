@@ -68,7 +68,6 @@ public class FlowTest extends BaseFlowTest
                 "FROM FCSAnalyses AS FCSAnalyses");
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
-        clickButton("Execute Query", 0); 
 
         clickLinkWithText("Flow Dashboard");
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
