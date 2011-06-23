@@ -108,6 +108,11 @@ public class SearchTest extends StudyTest
         _testDone = true;
     }
 
+    public void runApiTests() throws Exception
+    {
+        /* No API tests */
+    }
+    
     private void verifySyntaxErrorMessages()
     {
         SearchHelper.searchFor(this, "age()");
