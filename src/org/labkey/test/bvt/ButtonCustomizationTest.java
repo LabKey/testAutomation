@@ -164,7 +164,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         // wait for the domain editor to appear:
         waitForText("Label", 10000);
         clickNavButton("Edit Source");
-        ExtHelper.clickExtTab(this, "XML");
+        ExtHelper.clickExtTab(this, "XML Metadata");
         toggleMetadataQueryEditor();
         setText("metadataText", getMetadataXML(true));
         ExtHelper.clickExtTab(this, "Source");
@@ -185,7 +185,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickLinkWithText("edit metadata");
         waitForText("Edit Source", 10000);
         clickNavButton("Edit Source");
-        ExtHelper.clickExtTab(this, "XML");
+        ExtHelper.clickExtTab(this, "XML Metadata");
         toggleMetadataQueryEditor();
         setText("metadataText", getMetadataXML(false));
         clickButton("Save", 0);

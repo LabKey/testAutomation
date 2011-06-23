@@ -121,7 +121,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("Create and Edit Source");
         toggleSQLQueryEditor();
         setFormElement("queryText", sql);
-        ExtHelper.clickExtTab(this, "XML");
+        ExtHelper.clickExtTab(this, "XML Metadata");
         toggleMetadataQueryEditor();
         setFormElement("metadataText", xml);
         clickButton("Save", 0);
