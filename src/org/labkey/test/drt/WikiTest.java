@@ -66,6 +66,7 @@ public class WikiTest extends BaseSeleniumWebTest
         clickLinkWithText("full-text search");
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
+        beginAt(selenium.getLocation().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
 
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Wiki");
