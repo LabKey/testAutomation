@@ -2167,7 +2167,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             time += 100;
         }
         if (!checker.check())
+        {
+            _testTimeout = true;
             fail(failMessage);
+        }
     }
 
     public void waitForExtMaskToDisappear()
