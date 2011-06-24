@@ -113,6 +113,11 @@ public class WikiLongTest extends BaseSeleniumWebTest
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
+        gotoAdminConsole();
+        clickLinkWithText("full-text search");
+        if (isTextPresent("pause crawler"))
+            clickButton("pause crawler");
+
         clickLinkWithText(PROJECT2_NAME);
         clickLinkWithText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
