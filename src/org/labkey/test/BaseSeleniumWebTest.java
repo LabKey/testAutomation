@@ -610,8 +610,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private Boolean initialSystemMaintenanceSchedule = null; // true = daily : false = never
     protected void setSystemMaintenance(boolean enable)
     {
-        ensureAdminMode();
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         clickLinkWithText("site settings");
         if (initialSystemMaintenanceSchedule == null) initialSystemMaintenanceSchedule = getFormElement("systemMaintenanceInterval").equals("daily");
         checkRadioButton("systemMaintenanceInterval", enable ? "daily" : "never");
@@ -622,8 +621,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if (initialSystemMaintenanceSchedule != null)
         {
-            ensureAdminMode();
-            clickLinkWithText("Admin Console");
+            gotoAdminConsole();
             clickLinkWithText("site settings");
             checkRadioButton("systemMaintenanceInterval", initialSystemMaintenanceSchedule ? "daily" : "never");
             clickNavButton("Save");
@@ -635,6 +633,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         //Now switch to admin mode if available
         if (!isLinkPresentWithText("Projects"))
             clickAdminMenuItem("Show Navigation Bar");
+    }
+
+    public void gotoAdminConsole()
+    {
+        ensureAdminMode();
+        clickLinkWithText("Admin Console");
     }
 
     public void hideNavigationBar()
@@ -913,8 +917,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void startSystemMaintenance()
     {
-        ensureAdminMode();
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         clickLinkWithText("site settings");
         selenium.openWindow("", "systemMaintenance");
         clickLinkWithText("Run system maintenance now", false);
@@ -3919,8 +3922,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("impersonating user : " + fakeUser);
         assertTextNotPresent("Stop Impersonating");
-        ensureAdminMode();
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         selectOptionByText(Locator.id("email").toString(), fakeUser);
         clickNavButton("Impersonate");
         _impersonationStack.push(fakeUser);
