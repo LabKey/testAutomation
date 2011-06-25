@@ -6,7 +6,7 @@
 
     function start(){
 
-        var n = 7;  // 7 = ~750 folders.
+        var n = 6;  // 7 = ~750 folders.
 
         var fibArray = calculateFibonacci(n);
 
@@ -32,13 +32,15 @@
                 return name;*/
             }
 
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+            
             function createHelper(arr, path, delta) {
                 for (var j = 0; j < arr[(arr.length-1)]; j++){
                     LABKEY.Security.createContainer({
-                        name          : delta * (j+1),
+                        name          : '[' + delta + chars[j] + ']',
                         containerPath : path,
                         success       : function(ci) {
-                            createHelper(arr.slice(0, (arr.length-1)), ci.path, j);
+                            createHelper(arr.slice(0, (arr.length-1)), ci.path, ci.title.substring(1, ci.title.length - 1));
                         }
                     });
 
@@ -51,10 +53,10 @@
             // The first level is as long as the array
             for (var i = 0; i < arr.length; i++) {
                 LABKEY.Security.createContainer({
-                    name          : i+1,
+                    name          : '[' + chars[i] + ']',
                     containerPath : path,
                     success       : function(ci){
-                        createHelper(arr.slice(0, (arr.length-1)), ci.path, i);
+                        createHelper(arr.slice(0, (arr.length-1)), ci.path, ci.title.substring(1, ci.title.length - 1));
                     }
                 });
             }

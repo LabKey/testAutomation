@@ -2705,15 +2705,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     public enum Position
-    {top, bottom}
+    {top, bottom, middle}
 
     public void dragAndDrop(Locator from, Locator to, Position pos)
     {
         int y;
         if ( pos == Position.top )
             y = 1;
-        else // pos == Position.bottom
+        else if ( pos == Position.bottom )
             y = selenium.getElementHeight(to.toString()).intValue() - 1;
+        else // pos == Position.middle
+            y = selenium.getElementHeight(to.toString()).intValue() / 2;        
 
         selenium.mouseDownAt(from.toString(), "1,1");
         selenium.mouseMoveAt(to.toString(), "1," + y);

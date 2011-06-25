@@ -88,7 +88,7 @@ public enum TestSet
         QuantitationTest.class,
         MessagesTest.class,
         MS2BvtTest.class,
-        MS2BvtTestGZ.class,           
+        MS2BvtTestGZ.class,
         WikiLongTest.class,
         ListTest.class,
         UserBvtTest.class,
@@ -118,7 +118,7 @@ public enum TestSet
         TimeChartTest.class,
 //        EHRStudyTest.class,
         GpatAssayTest.class,
-//        FolderTest.class,
+        FolderTest.class,
         StudyDemoModeTest.class
     }),
 
