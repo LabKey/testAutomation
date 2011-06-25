@@ -806,54 +806,54 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 simpleSignIn();
 
                 clickNavButton(upgradeButtonText);
-            }
 
-            int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
-            while (waitMs > 0 && (!(isNavButtonPresent("Next") || isLinkPresentWithText("Home"))))
-            {
-                try
+                int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
+
+                while (waitMs > 0 && (!(isNavButtonPresent("Next") || isLinkPresentWithText("Home"))))
                 {
-                    // Pound the server aggressively with requests for the home page to test synchronization
-                    // in the sql script runner.
-                    for (int i = 0; i < 5; i++)
+                    try
                     {
-                        goToHome();
-                        Thread.sleep(200);
-                        waitMs -= 200;
+                        // Pound the server aggressively with requests for the home page to test synchronization
+                        // in the sql script runner.
+                        for (int i = 0; i < 5; i++)
+                        {
+                            goToHome();
+                            Thread.sleep(200);
+                            waitMs -= 200;
+                        }
+                        Thread.sleep(2000);
+                        waitMs -= 2000;
+                        if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
+                            fail("A startup failure occurred.");
                     }
-                    Thread.sleep(2000);
-                    waitMs -= 2000;
-                    if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
-                        fail("A startup failure occurred.");
+                    catch (InterruptedException e)
+                    {
+                        log(e.getMessage());
+                    }
+                    catch (SeleniumException e)
+                    {
+                        // Do nothing -- this page will sometimes auto-navigate out from under selenium
+                    }
                 }
-                catch (InterruptedException e)
-                {
-                    log(e.getMessage());
-                }
-                catch (SeleniumException e)
-                {
-                    // Do nothing -- this page will sometimes auto-navigate out from under selenium
-                }
-            }
 
-            if (waitMs <= 0)
-                fail("Script runner took more than 10 minutes to complete.");
+                if (waitMs <= 0)
+                    fail("Script runner took more than 10 minutes to complete.");
 
-            if (isNavButtonPresent("Next"))
-            {
-                clickNavButton("Next");
-
-                // check for any additional upgrade pages inserted after module upgrade
                 if (isNavButtonPresent("Next"))
+                {
                     clickNavButton("Next");
 
-                // Save the default site config properties
-                clickNavButton("Save");
+                    // check for any additional upgrade pages inserted after module upgrade
+                    if (isNavButtonPresent("Next"))
+                        clickNavButton("Next");
+
+                    // Save the default site config properties
+                    clickNavButton("Save");
+                }
             }
-            else
-            {
-                clickLinkWithText("Home");
-            }
+
+            // Will fail if left navbar is not enabled in Home project. TODO: allow this, see #xxxx 
+            clickLinkWithText("Home");
         }
     }
 
