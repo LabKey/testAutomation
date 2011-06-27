@@ -1370,16 +1370,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    protected File ensureDumpDir()
+    {
+        File dumpDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
+        if ( !dumpDir.exists() )
+            dumpDir.mkdirs();
+
+        return dumpDir;
+    }
+
     public void dump()
     {
         try
         {
+            File dumpDir = ensureDumpDir();
             FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
             String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
-
-            File dumpDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
-            if ( !dumpDir.exists() )
-                dumpDir.mkdirs();
 
             publishArtifact(dumpFullScreen(dumpDir, baseName));
             publishArtifact(dumpScreen(dumpDir, baseName));
@@ -1402,14 +1408,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
             beginAt("/admin/dumpHeap.view");
-            File destDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
+            File destDir = ensureDumpDir();
             String dumpMsg = selenium.getText("xpath=//td[@id='bodypanel']/div");
             String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
             File heapDump = new File(getLabKeyRoot() + "/build/deploy", filename);
             File destFile = new File(destDir, filename);
 
-            if (!destDir.exists())
-                destDir.mkdirs();
             if ( heapDump.renameTo(destFile) )
                 publishArtifact(destFile);
             else
@@ -2904,13 +2908,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private void dumpPipelineFiles(String path)
     {
+        File dumpDir = ensureDumpDir();
+
         // moves all files under @path, created by the test, to the TeamCity publish directory
         ArrayList<File> files = listFilesRecursive(new File(path), new NonSVNFilter());
         for (File file : files)
         {
             if ( file.isFile() )
             {
-                File dest = new File( Runner.getDumpDir() + "/" + getClass().getSimpleName() + "/" + file.getParent().substring(path.length()));
+                File dest = new File(dumpDir, file.getParent().substring(path.length()));
                 if (!dest.exists())
                     dest.mkdirs();
                 file.renameTo(new File(dest, file.getName()));
@@ -2920,13 +2926,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private void dumpPipelineLogFiles(String path)
     {
+        File dumpDir = ensureDumpDir();
+
         // moves all .log files under @path, created by the test, to the TeamCity publish directory
         ArrayList<File> files = listFilesRecursive(new File(path), new NonSVNFilter());
         for (File file : files)
         {
             if ( file.isFile() && file.getName().endsWith(".log") )
             {
-                File dest = new File( Runner.getDumpDir() + "/" + getClass().getSimpleName() + "/" + file.getParent().substring(path.length()));
+                File dest = new File(dumpDir, file.getParent().substring(path.length()));
                 if (!dest.exists())
                     dest.mkdirs();
                 file.renameTo(new File(dest, file.getName()));

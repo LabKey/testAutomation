@@ -69,6 +69,19 @@ public class FlowTest extends BaseFlowTest
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
 
+        clickButton("Execute Query", 0);
+        waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
+        if (!selenium.isTextPresent("File Path Root"))
+        {
+            File dumpDir = ensureDumpDir();
+            dumpScreen(dumpDir, "FlowTest-DRTQuery1-execute");
+            dumpHtml(dumpDir, "FlowTest-DRTQuery1-execute");
+            beginAt("/query" + containerPath + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
+            dumpScreen(dumpDir, "FlowTest-DRTQuery1-source");
+            dumpHtml(dumpDir, "FlowTest-DRTQuery1-source");
+            fail("** Didn't find 'File Path Root' in grid");
+        }
+
         clickLinkWithText("Flow Dashboard");
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
