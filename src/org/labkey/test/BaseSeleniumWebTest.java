@@ -107,6 +107,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "springActions";
 
+
+    protected static final String PERMISSION_ERROR = "401: User does not have permission to perform this operation";
+
     public BaseSeleniumWebTest()
     {
 
@@ -510,6 +513,33 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement("password2", password);
 
         clickNavButton("Set Password");
+    }
+
+    protected String getPasswordResetUrl(String username)
+    {
+        goToHome();
+        goToModule("Dumbster");
+        clickLink(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]"));
+
+        return getCurrentRelativeURL();
+    }
+
+    protected void resetPassword(String resetUrl, String username, String newPassword)
+    {
+        if(resetUrl!=null)
+            beginAt(resetUrl);
+
+        assertTextPresent(new String[] {username, "Choose a password you'll use to access this server","Passwords must be six characters or more and must not match your email address"});
+
+        setFormElement("password", newPassword);
+        setFormElement("password2", newPassword);
+
+        clickNavButton("Set Password");
+        clickButtonContainingText("Submit", defaultWaitForPage*3);
+        clickNavButton("Done");
+
+        signOut();
+        signIn(username, newPassword, true);
     }
 
     protected void changePassword(String oldPassword, String password)
@@ -1065,6 +1095,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             doTestSteps();
 
+            //make sure you're signed in as admin, because this won't work otherwise
+            ensureSignedInAsAdmin();
+
             checkLeaksAndErrors();
 
             checkActionCoverage();
@@ -1135,6 +1168,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
+    }
+
+    private void ensureSignedInAsAdmin()
+    {
+        goToHome();
+        if(isTextPresent("Admin"))
+            return;
+
+        if(isTextPresent("Sign Out"))
+            signOut();
+
+        signIn();
+
     }
 
     protected abstract void doTestSteps() throws Exception;
@@ -2507,6 +2553,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertFalse("Found a link with text '" + text + "'", isLinkPresentWithText(text));
     }
 
+    public void assertAtUserUserLacksPermissionPage()
+    {
+        assertTextPresent(PERMISSION_ERROR);
+        assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
+    }
+
     public boolean isLinkPresentWithTitle(String title)
     {
         log("Checking for link with exact title '" + title + "'");
@@ -3171,9 +3223,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickButtonContainingText(String text)
     {
+        clickButtonContainingText(text, 0);
+    }
+
+    public void clickButtonContainingText(String text, int waitMills)
+    {
         Locator.XPathLocator buttonLocator = getButtonLocatorContainingText(text);
         if (buttonLocator != null)
-            clickAndWait(buttonLocator, defaultWaitForPage);
+            clickAndWait(buttonLocator, waitMills);
         else
             fail("No button found with text \"" + text + "\"");
     }
@@ -5143,5 +5200,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public static class DatabaseInfo
     {
         public String serverURL, productName, productVersion, driverName, driverVersion;
+    }
+
+    public void clickManageSubjectClassification(String subjectNoun)
+    {
+        clickLinkContainingText("Manage " + subjectNoun + " Classifications");
+    }
+
+    public void ensureSignedOut()
+    {
+        if(isTextPresent("Sign Out"))
+            signOut();
     }
 }
