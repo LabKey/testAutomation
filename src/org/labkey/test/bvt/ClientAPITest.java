@@ -169,6 +169,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
         domainTest();
 
         emailApiTest();
+
+        extIntegrationTest();
         
         //clear the test page so the crawler doesn't refetch a test and cause errors
         clearTestPage("Test Complete.");
@@ -586,16 +588,28 @@ public class ClientAPITest extends BaseSeleniumWebTest
      */
     private String setSourceFromFile(String fileName)
     {
-        return setSource(getFileContents("server/test/data/api/" + fileName ));    
+        return setSourceFromFile(fileName, false);
+    }
+
+    private String setSourceFromFile(String fileName, boolean excludeTags)
+    {
+        return setSource(getFileContents("server/test/data/api/" + fileName ), excludeTags);
     }
 
     private String setSource(String srcFragment)
+    {
+        return setSource(srcFragment, false);
+    }
+
+    private String setSource(String srcFragment, boolean excludeTags)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickLinkWithText(FOLDER_NAME);
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
-        String fullSource = getFullSource(srcFragment);
+        String fullSource = srcFragment;
+        if (!excludeTags)
+            fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
         log(fullSource);
         setWikiBody(fullSource);
@@ -718,5 +732,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
         }
         return String.format(EMAIL_SRC_TEMPLATE, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
                 contentStr.toString(), String.valueOf(allowUnregisteredUser));
+    }
+
+    private void extIntegrationTest()
+    {
+        setSourceFromFile("extIntegrationTest.html", true);
+        Locator loc = Locator.id(TEST_DIV_NAME);
+        assertElementContains(loc, "Month of the Year");
+        clearTestPage("Ext integration Test complete.");
     }
 }
