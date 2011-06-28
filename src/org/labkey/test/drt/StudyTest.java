@@ -21,6 +21,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.openqa.selenium.internal.seleniumemulation.Open;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -68,11 +69,193 @@ public class StudyTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
+        manageSubjectClassificationTest();
         verifyStudyAndDatasets();
         waitForSpecimenImport();
         verifySpecimens();
         verifyParticipantComments();
     }
+
+    protected static final String SUBJECT_NOUN = "Mouse";
+    protected static final String PROJECT_NAME = "StudyVerifyProject";
+    protected static final String STUDY_NAME = "My Study";
+    protected static final String LABEL_FIELD = "classificationLabel";
+    protected static final String ID_FIELD = "classificationIdentifiers";
+
+
+
+    protected void manageSubjectClassificationTest()
+    {
+
+        //verify/create the right data
+
+        goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
+
+        //issue 12487
+        assertTextPresent("Manage " + SUBJECT_NOUN + " Classifications");
+
+        //delete any existing lists
+
+        //these should do nothing, because no project is selected
+        clickNavButtonExpectNoResponse("Delete Selected");
+        clickNavButtonExpectNoResponse("Edit Selected");
+
+        String simpleList = "simple list";
+        String allList = "all list";
+
+        String pIDsAll = cancelCreateClassificationList(allList);
+
+//        String pIDsSimple = createClassificationList(simpleList);
+//
+////        editClassificationList(simpleList, pIDs);
+//
+//
+//        //create list with addAll, with and without filters
+//        createListWithAddAll();
+//
+//        //attempt create empty list, fail, cancel  out
+//        attemptCreateEmptyList();
+//
+//        //delete a list
+    }
+
+    private void assertThatListContains(String allList, String pIDsAll)
+    {
+    }
+
+    private String cancelCreateClassificationList(String listName)
+    {
+
+        createStudy();
+        clickButtonContainingText("Cancel");
+
+        return null;
+    }
+
+    /**preconditions: at participant picker main page
+     * post-conditions:  at screen for creating new PP list
+      * @return
+     */
+    private void createStudy()
+    {
+        clickButtonContainingText("Create", 0);
+        //Issue 12505:  uncomment "wait for cancel", comment out
+//        waitForText("Cancel", defaultWaitForPage);
+        waitForText("Add Selected", defaultWaitForPage);
+
+    }
+
+    private String createClassificationListAddAll(String listName)
+    {
+
+        clickNavButton("Create");
+
+//        setText(LABEL_FIELD, listName);
+//        clickButton("Add All");
+//
+//        String ids = getFormElement(ID_FIELD);
+//        //TODO: compare to column data
+//
+//        clickButton("Save");
+//        assertTextPresent(listName);
+
+        clickNavButton("Cancel");
+
+        return null;
+    }
+
+
+    private void clickNavButtonExpectNoResponse(String button)
+    {
+        clickNavButton(button, 0);
+    }
+
+    private void createListWithAddAll()
+    {
+
+    }
+    private void attemptCreateEmptyList()
+    {
+
+        startNewParticipantList();
+
+        clickNavButtonExpectNoResponse("Save");
+
+        clickButton("Cancel", 0);
+    }
+
+    private void startNewParticipantList()
+    {
+        //TODO:  switch to "ensure"
+        goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
+
+        clickNavButton("Create", 0);
+    }
+
+    private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
+    {
+        //if(already at page)
+        //donothing
+
+        //else
+        goToManageStudyPage(projectName, studyName);
+        clickManageSubjectClassification(subjectNoun);
+    }
+
+    private void editClassificationList(String listName, String[] pIDs)
+    {
+//        Open list listName
+
+        //verify pIDs are all present (ordering?)
+
+        //remove one
+
+        //save and close
+
+        //repoen and verify new list
+    }
+
+    // returns:  list of IDs in list
+    private String createClassificationList(String listName)
+    {
+
+        clickNavButton("Create", 0);
+        //TODO:  is this needed?
+//        waitForPageToLoad();
+
+        //issue 12487
+        assertTextPresent(SUBJECT_NOUN + " Id");
+
+        String ID_FIELD = "classificationIdentifiers";
+        setText(LABEL_FIELD, listName);
+
+        List<String> potentialIDs = getTableColumnValues("dataregion_demoDataRegion", 1);
+
+
+        //test what happens when you use a non-existant ID
+        setText(ID_FIELD, "nonexist" );
+        clickButtonContainingText("Save", 0);
+        waitForText("An error occurred trying to load: The Mouse ID specified : nonexist does not exist in this stud", 30*defaultWaitForPage);
+        //bug 12494
+//        assertTextPresent();
+         clickButtonContainingText("OK");
+
+
+        String usedIDs = potentialIDs.get(3) + "," + potentialIDs.get(20) +"," + potentialIDs.get(8);
+        setText(ID_FIELD, usedIDs + "," + potentialIDs.get(20) );
+        clickButton("Save");
+        //bug 12494
+        assertTextPresent("An error occurred trying to load: ERROR: duplicate key value violates unique constraint ");
+        clickButtonContainingText("OK");
+
+
+        setText(ID_FIELD, usedIDs );
+        clickButtonContainingText("Save");
+        assertTextPresent(listName);
+
+        return null;
+    }
+
 
     protected void verifyStudyAndDatasets()
     {

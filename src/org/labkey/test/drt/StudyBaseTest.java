@@ -206,4 +206,12 @@ public abstract class StudyBaseTest extends SimpleApiTest
     {
         assertEquals(selenium.getSelectedValue(Locator.tagWithName("select", name).index(i).toString()), expected);
     }
+
+    protected void goToManageStudyPage(String projectName, String studyName)
+    {
+        log("Going to Manage Study Page of: " + studyName);  clickLinkContainingText(studyName);
+        clickLinkContainingText(projectName);
+        clickLinkContainingText(studyName);
+        clickLinkContainingText("Manage Study");
+    }
 }
