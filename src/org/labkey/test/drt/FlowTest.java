@@ -49,6 +49,13 @@ public class FlowTest extends BaseFlowTest
         return ret;
     }
 
+    protected void dumpScreenAndHtml(String name)
+    {
+        File dumpDir = ensureDumpDir();
+        dumpScreen(dumpDir, name);
+        dumpHtml(dumpDir, name);
+    }
+
     protected void doTestSteps()
     {
         init();
@@ -60,26 +67,34 @@ public class FlowTest extends BaseFlowTest
         clickButton("Create and Edit Source");
 
         // Start Query Editing
+        dumpScreenAndHtml("FlowTest-00-DRTQuery1-before-toggleEditor");
         toggleSQLQueryEditor();
+        dumpScreenAndHtml("FlowTest-01-DRTQuery1-before-set-queryText");
         setFormElement("queryText", "SELECT FCSAnalyses.RowId,\n" +
                 "FCSAnalyses.Statistic.\"Count\",\n" +
                 "FCSAnalyses.Run.FilePathRoot,\n" +
                 "FCSAnalyses.FCSFile.Run.WellCount\n" +
                 "FROM FCSAnalyses AS FCSAnalyses");
+        dumpScreenAndHtml("FlowTest-02-DRTQuery1-after-set-queryText");
+        String queryText = getFormElement("queryText");
+        assertTrue(queryText.contains("FilePathRoot"));
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        dumpScreenAndHtml("FlowTest-03-DRTQuery1-after-save");
 
         clickButton("Execute Query", 0);
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
         if (!selenium.isTextPresent("File Path Root"))
         {
-            File dumpDir = ensureDumpDir();
-            dumpScreen(dumpDir, "FlowTest-DRTQuery1-execute");
-            dumpHtml(dumpDir, "FlowTest-DRTQuery1-execute");
+            dumpScreenAndHtml("FlowTest-04-DRTQuery1-execute");
             beginAt("/query" + containerPath + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
-            dumpScreen(dumpDir, "FlowTest-DRTQuery1-source");
-            dumpHtml(dumpDir, "FlowTest-DRTQuery1-source");
+            waitForExtReady();
+            dumpScreenAndHtml("FlowTest-04-DRTQuery1-source");
             fail("** Didn't find 'File Path Root' in grid");
+        }
+        else
+        {
+            log("** Found 'File Path Root'");
         }
 
         clickLinkWithText("Flow Dashboard");
