@@ -210,6 +210,7 @@ public enum TestSet
 
     Weekly(600000, BVTnDaily, new Class[] {
             // Add special test classes, not in daily or BVT.
+            SecurityTestExtended.class
     }),
 
     Adaptive(new Class[]{

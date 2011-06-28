@@ -43,6 +43,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin@security.test";
     protected static final String NORMAL_USER = "user@security.test";
+    protected static String NORMAL_USER_PASSWORD = "";
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin@security.test";
 
@@ -79,7 +80,258 @@ public class SecurityTest extends BaseSeleniumWebTest
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
         passwordStrengthTest();
+        cantReachAdminToolFromUserAccount(false);
+        passwordResetTest();
     }
+
+    protected static final String HISTORY_TAB_TITLE = "History:";
+    protected static final String[] unreachableUrlsShortList = {"/admin/showAdmin.view?",
+            "/user/showUsers.view?",
+            "/security/group.view?group=Administrators"};
+
+    protected static final String[] unreachableUrlsExtendedList = {"/security/group.view?group=Developers",
+        "user/showUsers.view?","security/project.view?returnUrl=%2Fuser%2FshowUsers.view%3F","admin/createFolder.view?",
+        "/analytics/begin.view?","/login/configure.view?", "/admin/customizeEmail.view?",
+        "/admin/filesSiteSettings.view?", "/admin/projectSettings.view?",
+        "/flow/flowAdmin.view?","/admin/folderSettings.view?",
+        "/admin/reorderFolders.view?", "/admin/customizeSite.view?",
+        "/reports/configureReportsAndScripts.view?", "/audit/showAuditLog.view?",
+        "/search/admin.view?", "/ms1/showAdmin.view?", "/ms2/showMS2Admin.view?",
+        "/experiment-types/begin.view?", "/pipeline-status/showList.view?", "/pipeline/setup.view?",
+        "/ms2/showProteinAdmin.view?", "/admin/actions.view?", "/admin/caches.view?",
+        "/admin/dbChecker.view?",
+            //"/admin/credits.view?",
+        "/query/dataSourceAdmin.view?",
+        "/admin/dumpHeap.view?", "/admin/environmentVariables.view?", "/admin/memTracker.view?",
+        "/admin/queries.view?", "/admin/resetErrorMark.view?", "/admin/showThreads.view?",
+        "/admin-sql/scripts.view?", "/admin/systemProperties.view?", "/admin/emailTest.view?",
+        "/admin/showAllErrors.view?","/admin/showErrorsSinceMark.view?",  "/admin/showPrimaryLog.view?"};
+
+    /**
+     * verify that a normal user does not get a link to a the admin console or see their own history, nor
+     * reach an admin-only url directly.
+     *
+     *
+     * @param longForm if and only if longFrom = true, test against the extended list of admin urls.
+     * if longForm = false, test against only a few high priority URLs.
+     */
+    protected void cantReachAdminToolFromUserAccount(boolean longForm)
+    {
+        //just in case, create user
+//        createUserAndNotify(NORMAL_USER, null);
+
+        //verify that you can see the text "history" in the appropriate area as admin.  If this fails, the
+        //check below is worthless
+        clickLinkWithText("My Account");
+        assertTextPresent(HISTORY_TAB_TITLE);
+
+        //log in as normal user
+        impersonate(NORMAL_USER);
+
+        //admin site link not available
+        assertTextNotPresent("Admin");
+
+        //can't reach admin urls directly either
+
+        for(String url : unreachableUrlsShortList)
+        {
+                assertUrlUnreachableDueToPermissions(url);
+        }
+
+        if(longForm)
+        {
+
+            for(String url : unreachableUrlsExtendedList)
+            {
+                assertUrlUnreachableDueToPermissions(url);
+            }
+        }
+
+        ///user/showUsers.view?
+
+        //shouldn't be able to view own history either
+        clickNavButton("Home");
+        clickLinkWithText("My Account");
+        assertTextNotPresent(HISTORY_TAB_TITLE);
+
+
+        stopImpersonating();
+    }
+
+    public void assertUrlUnreachableDueToPermissions(String url)
+    {
+        log("Attempting to reach URL user does not have permission for:  " + url);
+        beginAt(url);
+        assertAtUserUserLacksPermissionPage();
+    }
+
+    /**
+     *
+     * preconditions:  NORAM_USER exists with password NORMAL_USER_PASSWORD.  Currently logged in as admin
+     * post conditions
+     */
+    public void passwordResetTest()
+    {
+        //get user a password
+        String username = NORMAL_USER;
+        String password = NORMAL_USER_PASSWORD;
+
+        password = adminPasswordResetTest(username, password+"adminReset");
+        
+        String resetUrl = userForgotPasswordWorkflowTest(username, password);
+        
+        userPasswordResetTest(username, resetUrl);
+    }
+
+    protected static enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
+
+    //issue 3876
+
+    /**
+     * Precondtions:  able to reset user's password at resetUrl, db in weak-password mode
+     */
+    private void userPasswordResetTest(String username, String resetUrl)
+    {
+        ensureSignedOut();
+
+        beginAt(resetUrl);
+
+        String[][] passwords = {{"fooba", null}, {"foobar","foobar2"}};
+        String[][] messages = {{"Your password must be six characters or more."}, {"Your password entries didn't match."}};
+        attemptSetInvalidPasswords(PasswordAlterType.RESET_PASSWORD, passwords, messages);
+
+        //verify password- is there a helper for this?
+    }
+
+//    protected static final int RESET_PASSWORD = 1;
+//    protected static final int CHANGE_PASSWORD = 2;
+
+    /**RESET_PASSWORD means user or admin initiated password change that
+     * invovles visiting a webpage specified in an e-mail to change the password,
+     * without knowing the past password.
+     * CHANGE_PASSWORD means a user went into their account information and initiated the change by
+     * selecting "change password".  This requires the old password to work.
+      */
+
+    protected void attemptSetInvalidPasswords(PasswordAlterType changeType, String[][] passwords, String[][] errors)
+    {
+        //if reset, should already be at reset Url
+        for(int i = 0; i<errors.length; i++)
+        {
+            switch (changeType)
+            {
+                  case RESET_PASSWORD:
+                    attemptSetInvalidPassword(changeType, passwords[i], errors[i]);
+
+            }
+//            if(changeType==RESET_PASSWORD)
+//                attemptSetInvalidPassword(changeType, passwords[i], errors[i]);
+        }
+    }
+
+    protected void attemptSetInvalidPassword(PasswordAlterType changeType, String[] passwords, String... errors)
+    {
+        switch (changeType)
+        {
+            case CHANGE_PASSWORD:
+                fail("unsupported use of change password type");
+                break;
+            case RESET_PASSWORD:
+                waitForPageToLoad();
+                setFormElement("password", passwords[0]);
+                String password2 = passwords[1];
+                if(password2==null) password2 = passwords[0];
+                setFormElement("password2", password2);
+                clickButtonContainingText("Set Password");
+        }
+    }
+
+    /**
+     * preconditions: there exists user username with password password
+     * postcondtions:  user can reset password at return value, not signed in
+     *
+     * @param username  user's username
+     * @param password user's password
+     * @return URL to use to reset user password
+     */
+    //issue 3876
+    private String userForgotPasswordWorkflowTest(String username, String password)
+    {
+        ensureSignedOut();
+
+        String resetUrl = userInitiatePasswordReset(username);
+
+        signOut();
+
+        //attempt sign in with old password- should succeed
+        signIn(username,password, true);
+        signOut();
+
+        return resetUrl;
+    }
+
+    public String userInitiatePasswordReset(String username)
+    {
+        goToHome();
+        ensureSignedOut();
+
+        clickLinkContainingText("Sign In");
+        clickLinkContainingText("Forgot your password?");
+        setText("email", username);
+        clickButtonContainingText("Submit");
+
+//        clickButtonContainingText("Home");
+        signIn();
+        String resetUrl = getPasswordResetUrl(username);
+
+        //sign out
+
+        return resetUrl;
+    }
+
+    String[] wrongPasswordEntered =
+                new String[] {"The e-mail address and password you entered did not match any accounts on file.",
+                "Note: Passwords are case sensitive; make sure your Caps Lock is off."};
+
+    /**
+     *
+     * preconditions: logged in as admin
+     * postconditions:  not signed in, username's password is return value
+     *
+     * @param username username to initiate password rest for
+     * @param password user's current password (before test starts)
+     * @return user's new password
+     */
+    private String adminPasswordResetTest(String username, String password)
+    {
+        String newPassword = password +"1";
+        clickLinkContainingText("Site Users");
+        clickLinkContainingText(username);
+        clickButtonContainingText("Reset Password");
+        getConfirmationAndWait();
+        clickNavButton("Done");
+
+        String url = getPasswordResetUrl(username);
+
+
+        //make sure user can't log in with current password
+        signOut();
+        signInShouldFail(username, password, wrongPasswordEntered);
+
+        resetPassword(url, username, newPassword);
+        
+        signOut();
+        
+        //attempt to log in with old password (should fail)
+        signInShouldFail(username, password, wrongPasswordEntered);
+        
+//        resetPasswordDisallowedValues();
+//
+//        resetPasswordValid(password);
+
+        return newPassword;
+    }
+
 
     private void guestTest()
     {
@@ -439,6 +691,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertTextPresent("Your password must not match a recently used password.");
         changePassword(passwords[10], passwords[0]);
         assertTextNotPresent("Choose a new password.");
+        NORMAL_USER_PASSWORD = passwords[0];
 
         stopImpersonating();
         resetDbLoginConfig();
