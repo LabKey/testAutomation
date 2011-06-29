@@ -502,7 +502,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         assertTextPresent(expectedMessages);
     }
-                 
+
     protected void setInitialPassword(String user, String password)
     {
         // Get setPassword URL from notification email.
@@ -882,7 +882,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
             }
 
-            // Will fail if left navbar is not enabled in Home project. TODO: allow this, see #xxxx 
+            // Will fail if left navbar is not enabled in Home project. TODO: allow this, see #xxxx
             clickLinkWithText("Home");
         }
     }
@@ -2314,7 +2314,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
         }, failMessage, wait);
     }
-    
+
     public void waitForElement(final Locator locator, int wait)
     {
         String failMessage = "Element with locator " + locator + " did not appear [" + wait + "ms]";
@@ -2771,7 +2771,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else if ( pos == Position.bottom )
             y = selenium.getElementHeight(to.toString()).intValue() - 1;
         else // pos == Position.middle
-            y = selenium.getElementHeight(to.toString()).intValue() / 2;        
+            y = selenium.getElementHeight(to.toString()).intValue() / 2;
 
         selenium.mouseDownAt(from.toString(), "1,1");
         selenium.mouseMoveAt(to.toString(), "1," + y);
@@ -4339,7 +4339,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         saveWikiPage();
         return srcFragment;
     }
-    
+
     /**
      * Switches the wiki edit page to source view when the format type is HTML.
      */
@@ -5133,12 +5133,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     /** Turns off the fancy SQL and XML editors for custom queries and sets them to be simple text areas which are easier
      * to manipulate through the tests */
-//    protected void toggleQueryEditors()
-//    {
-//        toggleSQLQueryEditor();
-//        toggleMetadataQueryEditor();
-//    }
-
     protected void toggleSQLQueryEditor()
     {
         toggleEditAreaOff("queryText");
@@ -5154,11 +5148,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         toggleEditAreaOff("script");
     }
 
-    public void toggleEditAreaOff(String underlyingTextAreaId)
+    public void toggleEditAreaOff(final String underlyingTextAreaId)
     {
         Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + underlyingTextAreaId);
         waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
         uncheckCheckbox(toggleCheckBoxId);
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                String style = getAttribute(Locator.id(underlyingTextAreaId), "style");
+                return style.contains("display: inline");
+            }
+        }, "Expected to toggle edit_area off and display textarea " + underlyingTextAreaId, WAIT_FOR_JAVASCRIPT);
     }
 
     /**
