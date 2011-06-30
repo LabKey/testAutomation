@@ -21,7 +21,6 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
-import org.openqa.selenium.internal.seleniumemulation.Open;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -69,7 +68,7 @@ public class StudyTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
-        manageSubjectClassificationTest();
+        manageSubjectCategoryTest();
         verifyStudyAndDatasets();
         waitForSpecimenImport();
         verifySpecimens();
@@ -79,20 +78,20 @@ public class StudyTest extends StudyBaseTest
     protected static final String SUBJECT_NOUN = "Mouse";
     protected static final String PROJECT_NAME = "StudyVerifyProject";
     protected static final String STUDY_NAME = "My Study";
-    protected static final String LABEL_FIELD = "classificationLabel";
-    protected static final String ID_FIELD = "classificationIdentifiers";
+    protected static final String LABEL_FIELD = "categoryLabel";
+    protected static final String ID_FIELD = "categoryIdentifiers";
 
 
 
-    protected void manageSubjectClassificationTest()
+    protected void manageSubjectCategoryTest()
     {
 
         //verify/create the right data
 
-        goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
+        goToManageParticipantCategoryPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
 
         //issue 12487
-        assertTextPresent("Manage " + SUBJECT_NOUN + " Classifications");
+        assertTextPresent("Manage " + SUBJECT_NOUN + " Categories");
 
         //delete any existing lists
 
@@ -103,11 +102,11 @@ public class StudyTest extends StudyBaseTest
         String simpleList = "simple list";
         String allList = "all list";
 
-        String pIDsAll = cancelCreateClassificationList(allList);
+        String pIDsAll = cancelCreateCategoryGroup(allList);
 
-//        String pIDsSimple = createClassificationList(simpleList);
+//        String pIDsSimple = createCategoryGroup(simpleList);
 //
-////        editClassificationList(simpleList, pIDs);
+////        editCategoryGroup(simpleList, pIDs);
 //
 //
 //        //create list with addAll, with and without filters
@@ -123,7 +122,7 @@ public class StudyTest extends StudyBaseTest
     {
     }
 
-    private String cancelCreateClassificationList(String listName)
+    private String cancelCreateCategoryGroup(String listName)
     {
 
         createStudy();
@@ -145,7 +144,7 @@ public class StudyTest extends StudyBaseTest
 
     }
 
-    private String createClassificationListAddAll(String listName)
+    private String createCategoryGroupAddAll(String listName)
     {
 
         clickNavButton("Create");
@@ -177,32 +176,32 @@ public class StudyTest extends StudyBaseTest
     private void attemptCreateEmptyList()
     {
 
-        startNewParticipantList();
+        startNewParticipantGroup();
 
         clickNavButtonExpectNoResponse("Save");
 
         clickButton("Cancel", 0);
     }
 
-    private void startNewParticipantList()
+    private void startNewParticipantGroup()
     {
         //TODO:  switch to "ensure"
-        goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
+        goToManageParticipantCategoryPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
 
         clickNavButton("Create", 0);
     }
 
-    private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
+    private void goToManageParticipantCategoryPage(String projectName, String studyName, String subjectNoun)
     {
         //if(already at page)
         //donothing
 
         //else
         goToManageStudyPage(projectName, studyName);
-        clickManageSubjectClassification(subjectNoun);
+        clickManageSubjectCategory(subjectNoun);
     }
 
-    private void editClassificationList(String listName, String[] pIDs)
+    private void editCategoryGroup(String listName, String[] pIDs)
     {
 //        Open list listName
 
@@ -216,7 +215,7 @@ public class StudyTest extends StudyBaseTest
     }
 
     // returns:  list of IDs in list
-    private String createClassificationList(String listName)
+    private String createCategoryGroup(String listName)
     {
 
         clickNavButton("Create", 0);
@@ -225,8 +224,6 @@ public class StudyTest extends StudyBaseTest
 
         //issue 12487
         assertTextPresent(SUBJECT_NOUN + " Id");
-
-        String ID_FIELD = "classificationIdentifiers";
         setText(LABEL_FIELD, listName);
 
         List<String> potentialIDs = getTableColumnValues("dataregion_demoDataRegion", 1);
