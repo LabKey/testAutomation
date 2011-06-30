@@ -2339,6 +2339,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
+
+    public void waitForTextToDisappear(final String text, int wait)
+    {
+        String failMessage = text + " did not disappear";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return !isTextPresent(text);
+            }
+        }, failMessage, wait);
+
+    }
     public void waitForText(final String text, int wait)
     {
         String failMessage = text + " did not appear";
@@ -3235,6 +3248,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("No button found with text \"" + text + "\"");
     }
 
+    public void clickButtonContainingText(String buttonText, String textShouldAppearAfterLoading)
+    {
+        clickButtonContainingText(buttonText, 0);
+        waitForText(textShouldAppearAfterLoading, defaultWaitForPage);
+    }
 
     public void clickNavButton(String buttonText)
     {

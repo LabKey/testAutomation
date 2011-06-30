@@ -15,6 +15,7 @@
  */
 package org.labkey.test.drt;
 
+import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -52,6 +53,12 @@ public class StudyTest extends StudyBaseTest
         "ConMeds Log #%{S.3.2}\t9002\n" +
         "All Done\t9999";
 
+    public static final String APPEARS_AFTER_PICKER_LOAD = "Add Selected";
+
+
+    //lists created in participant picker tests must be cleaned up afterwards
+    LinkedList<String> persistingLists  = new LinkedList<String>();
+
     protected File[] getTestFiles()
     {
         return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/study-api.xml")};
@@ -66,9 +73,32 @@ public class StudyTest extends StudyBaseTest
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 
+    protected void doCleanup() throws Exception //child class cleanup method throws Exception
+    {
+        super.doCleanup();
+        emptyParticipantPickerList();
+    }
+
+    protected void emptyParticipantPickerList()
+    {
+
+        goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
+        while(persistingLists.size()!=0)
+        {
+            deleteListTest(persistingLists.pop());
+        }
+    }
+
     protected void doVerifySteps()
     {
-        manageSubjectCategoryTest();
+        try
+        {
+            manageSubjectClassificationTest();
+        }
+        finally
+        {
+            emptyParticipantPickerList();
+        }
         verifyStudyAndDatasets();
         waitForSpecimenImport();
         verifySpecimens();
@@ -82,176 +112,243 @@ public class StudyTest extends StudyBaseTest
     protected static final String ID_FIELD = "categoryIdentifiers";
 
 
-
-    protected void manageSubjectCategoryTest()
+    /**
+     * This is a test of the participant picker/classification creation UI.
+     */
+    protected void manageSubjectClassificationTest()
     {
 
         //verify/create the right data
 
-        goToManageParticipantCategoryPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
+        goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
 
         //issue 12487
         assertTextPresent("Manage " + SUBJECT_NOUN + " Categories");
 
-        //delete any existing lists
 
-        //these should do nothing, because no project is selected
-        clickNavButtonExpectNoResponse("Delete Selected");
-        clickNavButtonExpectNoResponse("Edit Selected");
 
-        String simpleList = "simple list";
-        String allList = "all list";
+        String allList = "all list12345";
+        String filteredList = "Filtered list";
 
-        String pIDsAll = cancelCreateCategoryGroup(allList);
+        cancelCreateClassificationList();
 
-//        String pIDsSimple = createCategoryGroup(simpleList);
-//
-////        editCategoryGroup(simpleList, pIDs);
-//
-//
-//        //create list with addAll, with and without filters
-//        createListWithAddAll();
-//
-//        //attempt create empty list, fail, cancel  out
-//        attemptCreateEmptyList();
-//
-//        //delete a list
+        String pIDs = createListWithAddAll(allList, false);
+        persistingLists.add(allList);
+
+        refresh();
+        editClassificationList(allList, pIDs);
+
+
+
+        //Issue 12485
+        createListWithAddAll(filteredList, true);
+        persistingLists.add(filteredList);
+
+        String changedList = changeListName(filteredList);
+        persistingLists.add(changedList);
+        persistingLists.remove(filteredList);
+        deleteListTest(allList);
+        persistingLists.remove(allList);
+
+
+        attemptCreateExpectError("1", "does not exist in this study.", "bad List ");
+        String id = pIDs.substring(0, pIDs.indexOf(","));
+        attemptCreateExpectError(id + "," + id, "ERROR: duplicate key value violates unique constraint", "Bad List 2");
+
     }
 
-    private void assertThatListContains(String allList, String pIDsAll)
+    /** verify that we can change a list's name
+     * pre-conditions: list with name listName exists
+     * post-conditions: list now named lCHANGEstName
+     * @param listName
+     * @return new name of list
+     */
+    private String changeListName(String listName)
     {
+        String newListName = listName.substring(0, 1) + "CHANGE" + listName.substring(2);
+        selectListName(listName);
+        clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
+
+        setFormElement(LABEL_FIELD, newListName);
+
+        clickButtonContainingText("Save");
+
+        waitForTextToDisappear(listName, 2*defaultWaitForPage);
+        assertTextPresent(newListName);
+        return newListName;
     }
 
-    private String cancelCreateCategoryGroup(String listName)
+    private void waitForListCreatorToClose()
+    {
+        waitForTextToDisappear("Create "  + SUBJECT_NOUN + " Classification", defaultWaitForPage);
+    }
+
+    /**
+     * verify that we can delete a list and its name no longer appears in classification list
+     * pre-conditions:  list listName exists
+     * post-conditions:  list listName does not exist
+     * @param listName list to delete
+     */
+    private void deleteListTest(String listName)
+    {
+        selectListName(listName);
+
+        clickButtonContainingText("Delete Selected");
+
+        //make sure we can change our minds
+        clickButtonContainingText("No");
+        assertTextPresent(listName);
+
+
+        clickButtonContainingText("Delete Selected");
+        clickButtonContainingText("Yes");
+        waitForTextToDisappear(listName, defaultWaitForPage);
+
+    }
+
+    /** verify that attempting to create a list with the expected name and list of IDs causes
+     * the error specified by expectedError
+     *
+     * @param ids IDs to enter in classification list
+     * @param expectedError error message to expect
+     * @param listName name to enter in classification label
+     */
+    private void attemptCreateExpectError(String ids, String expectedError, String listName)
+    {
+        createStudy();
+
+        setFormElement(LABEL_FIELD, listName);
+        setFormElement(ID_FIELD, ids);
+        clickButtonContainingText("Save");
+        waitForText(expectedError, 2*defaultWaitForPage);
+        clickButtonContainingText("OK");
+        clickButtonContainingText("Cancel");
+        assertTextNotPresent(listName);
+    }
+
+    /**
+     * verify that an already created list contains the pIDs we expect it to and can be changed.
+     * pre-conditions:  listName exists with the specified IDs
+     * post-conditions:  listName exists, with the same IDs, minus the first one
+     *
+     * @param listName
+     * @param pIDs
+     */
+    private void editClassificationList(String listName, String pIDs)
+    {
+        selectListName(listName);
+
+        clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
+        String newPids = getFormElement(ID_FIELD);
+        assertEquals(pIDs, newPids);
+
+        //remove first element
+        newPids = pIDs.substring(pIDs.indexOf(",")+1);
+        setFormElement(ID_FIELD, newPids);
+
+        //save, close, reopen, verify change
+        clickButtonContainingText("Save");
+        selectListName(listName);
+        clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
+
+        assertEquals(newPids, getFormElement(ID_FIELD) );
+
+        clickButtonContainingText("Cancel");
+    }
+
+    // select the list name from the main classification page
+    private void selectListName(String listName)
     {
 
+        Locator report = Locator.tagContainingText("div", listName);
+
+        // select the report and click the delete button
+        waitForElement(report, 10000);
+        selenium.mouseDown(report.toString());
+        selenium.click(report.toString());
+    }
+
+    /**
+     * very basic test of ability to enter and exit clist creation screen
+     *
+     * pre-condition:  at participant classification main screen
+     * post-condition:  no change
+     */
+    private void cancelCreateClassificationList()
+    {
         createStudy();
         clickButtonContainingText("Cancel");
-
-        return null;
     }
 
     /**preconditions: at participant picker main page
      * post-conditions:  at screen for creating new PP list
-      * @return
      */
     private void createStudy()
     {
-        clickButtonContainingText("Create", 0);
+//        clickButtonContainingText("Create", 0);
         //Issue 12505:  uncomment "wait for cancel", comment out
 //        waitForText("Cancel", defaultWaitForPage);
-        waitForText("Add Selected", defaultWaitForPage);
-
-    }
-
-    private String createCategoryGroupAddAll(String listName)
-    {
-
-        clickNavButton("Create");
-
-//        setText(LABEL_FIELD, listName);
-//        clickButton("Add All");
-//
-//        String ids = getFormElement(ID_FIELD);
-//        //TODO: compare to column data
-//
-//        clickButton("Save");
-//        assertTextPresent(listName);
-
-        clickNavButton("Cancel");
-
-        return null;
+//        waitForText("Add Selected", defaultWaitForPage);
+        clickButtonContainingText("Create", "Add Selected");
     }
 
 
-    private void clickNavButtonExpectNoResponse(String button)
+    /** create list using add all
+     *
+     * @param listName name of list to create
+     * @param filtered should list be filtered?  If so, only participants with DEMasian=0 will be included
+     * @return ids in new list
+     */
+    private String createListWithAddAll(String listName, boolean filtered)
     {
-        clickNavButton(button, 0);
+        createStudy();
+        setFormElement(LABEL_FIELD, listName);
+
+        if(filtered)
+        {
+            try
+            {
+                setFilter("demoDataRegion", "DEMasian", "Equals", "0");
+            }
+            catch (SeleniumException e)
+            {
+                //eat the exception, this isn't a real time out, it's caused
+                //by the helper function using NavButton rather than regular Button
+            }
+        }
+
+        clickButtonContainingText("Add All");
+
+        List<String> idsInColumn =getTableColumnValues("dataregion_demoDataRegion",  1);
+        String idsInForm = getFormElement(ID_FIELD);
+        assertIDListsMatch(idsInColumn, idsInForm);
+
+        clickButtonContainingText("Save");
+
+        return idsInForm;
     }
 
-    private void createListWithAddAll()
+    /**
+     * Compare list of IDs extracted from a column to those entered in
+     * the form.  They should be identical.
+     * @param idsInColumn
+     * @param idsInForm
+     */
+    private void assertIDListsMatch(List<String> idsInColumn, String idsInForm)
     {
-
-    }
-    private void attemptCreateEmptyList()
-    {
-
-        startNewParticipantGroup();
-
-        clickNavButtonExpectNoResponse("Save");
-
-        clickButton("Cancel", 0);
-    }
-
-    private void startNewParticipantGroup()
-    {
-        //TODO:  switch to "ensure"
-        goToManageParticipantCategoryPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
-
-        clickNavButton("Create", 0);
+        //assert same size
+        int columnCount = idsInColumn.size()-1; //the first entry in column count is the name
+        int formCount = idsInForm.length() - idsInForm.replace(",", "").length() + 1; //number of commas + 1 = number of entries
+        assertEquals(columnCount, formCount);
     }
 
-    private void goToManageParticipantCategoryPage(String projectName, String studyName, String subjectNoun)
+    private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
     {
-        //if(already at page)
-        //donothing
-
         //else
         goToManageStudyPage(projectName, studyName);
         clickManageSubjectCategory(subjectNoun);
     }
 
-    private void editCategoryGroup(String listName, String[] pIDs)
-    {
-//        Open list listName
-
-        //verify pIDs are all present (ordering?)
-
-        //remove one
-
-        //save and close
-
-        //repoen and verify new list
-    }
-
-    // returns:  list of IDs in list
-    private String createCategoryGroup(String listName)
-    {
-
-        clickNavButton("Create", 0);
-        //TODO:  is this needed?
-//        waitForPageToLoad();
-
-        //issue 12487
-        assertTextPresent(SUBJECT_NOUN + " Id");
-        setText(LABEL_FIELD, listName);
-
-        List<String> potentialIDs = getTableColumnValues("dataregion_demoDataRegion", 1);
-
-
-        //test what happens when you use a non-existant ID
-        setText(ID_FIELD, "nonexist" );
-        clickButtonContainingText("Save", 0);
-        waitForText("An error occurred trying to load: The Mouse ID specified : nonexist does not exist in this stud", 30*defaultWaitForPage);
-        //bug 12494
-//        assertTextPresent();
-         clickButtonContainingText("OK");
-
-
-        String usedIDs = potentialIDs.get(3) + "," + potentialIDs.get(20) +"," + potentialIDs.get(8);
-        setText(ID_FIELD, usedIDs + "," + potentialIDs.get(20) );
-        clickButton("Save");
-        //bug 12494
-        assertTextPresent("An error occurred trying to load: ERROR: duplicate key value violates unique constraint ");
-        clickButtonContainingText("OK");
-
-
-        setText(ID_FIELD, usedIDs );
-        clickButtonContainingText("Save");
-        assertTextPresent(listName);
-
-        return null;
-    }
 
 
     protected void verifyStudyAndDatasets()
