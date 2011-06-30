@@ -18,7 +18,6 @@ package org.labkey.test.drt;
 
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
@@ -67,17 +66,11 @@ public class FlowTest extends BaseFlowTest
         clickButton("Create and Edit Source");
 
         // Start Query Editing
-        dumpScreenAndHtml("FlowTest-00-DRTQuery1-before-toggleEditor");
-        toggleSQLQueryEditor();
-        dumpScreenAndHtml("FlowTest-01-DRTQuery1-before-set-queryText");
-        setFormElement("queryText", "SELECT FCSAnalyses.RowId,\n" +
-                "FCSAnalyses.Statistic.\"Count\",\n" +
-                "FCSAnalyses.Run.FilePathRoot,\n" +
-                "FCSAnalyses.FCSFile.Run.WellCount\n" +
+        setQueryEditorValue("queryText", "SELECT FCSAnalyses.RowId, " +
+                "FCSAnalyses.Statistic.\"Count\", " +
+                "FCSAnalyses.Run.FilePathRoot, " +
+                "FCSAnalyses.FCSFile.Run.WellCount " +
                 "FROM FCSAnalyses AS FCSAnalyses");
-        dumpScreenAndHtml("FlowTest-02-DRTQuery1-after-set-queryText");
-        String queryText = getFormElement("queryText");
-        assertTrue(queryText.contains("FilePathRoot"));
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         dumpScreenAndHtml("FlowTest-03-DRTQuery1-after-save");

@@ -256,5 +256,20 @@ selenium.doEndJsErrorChecker = function() {
     }
 };
 
+selenium.setEditAreaValue = function(id, value) {
+    try {
+        var win = selenium.browserbot.getCurrentWindow();
+        if (win.editAreaLoader) {
+            var eal = win.editAreaLoader;
+            eal.setValue(id, value);
+        }
+        else {
+            throw new SeleniumError("Unable to find editAreaLoader.");
+        }
+    } catch (e) {
+        throw new SeleniumError("setEditAreaValue() threw an exception: " + e.message);
+    }
+};
+
 "OK";
 

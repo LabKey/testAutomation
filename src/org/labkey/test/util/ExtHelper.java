@@ -62,6 +62,12 @@ public class ExtHelper
     {
         test.getWrapper().getEval("selenium.selectFolderManagementItem('" + path + "', " + keepExisting +");");
     }
+    
+    public static void setQueryEditorValue(BaseSeleniumWebTest test, String id, String value)
+    {
+        String script = "selenium.setEditAreaValue(" + jsString(id) + ", " + jsString(value) + ");";
+        test.getWrapper().getEval(script);
+    }
 
     /**
      * Returns a DOM Element id from an ext object id. Assumes that the ext component
@@ -276,5 +282,48 @@ public class ExtHelper
             test.clickAndWait(loc, wait);
         else
             test.click(loc);
+    }
+
+    private static String jsString(String s)
+    {
+        if (s == null)
+            return "''";
+
+        StringBuilder js = new StringBuilder(s.length() + 10);
+        js.append("'");
+        int len = s.length();
+        for (int i = 0 ; i<len ; i++)
+        {
+            char c = s.charAt(i);
+            switch (c)
+            {
+                case '\\':
+                    js.append("\\\\");
+                    break;
+                case '\n':
+                    js.append("\\n");
+                    break;
+                case '\r':
+                    js.append("\\r");
+                    break;
+                case '<':
+                    js.append("\\x3C");
+                    break;
+                case '>':
+                    js.append("\\x3E");
+                    break;
+                case '\'':
+                    js.append("\\'");
+                    break;
+                case '\"':
+                    js.append("\\\"");
+                    break;
+                default:
+                    js.append(c);
+                    break;
+            }
+        }
+        js.append("'");
+        return js.toString();
     }
 }

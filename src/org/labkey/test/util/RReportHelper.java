@@ -57,8 +57,7 @@ public class RReportHelper
             ExtHelper.clickExtTab(test, "Source");
         }
 
-        test.toggleScriptReportEditor();
-        test.setFormElement(Locator.id("script"), script);
+        test.setQueryEditorValue("script", script);
         ExtHelper.clickExtTab(test, "View");
         test.sleep(3000); // TODO -- need to wait for old output to disappear (in some cases)
         test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), test.getDefaultWaitForPage());

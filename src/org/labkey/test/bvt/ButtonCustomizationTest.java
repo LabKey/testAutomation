@@ -165,8 +165,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         waitForText("Label", 10000);
         clickNavButton("Edit Source");
         ExtHelper.clickExtTab(this, "XML Metadata");
-        toggleMetadataQueryEditor();
-        setText("metadataText", getMetadataXML(true));
+        setQueryEditorValue("metadataText", getMetadataXML(true));
         ExtHelper.clickExtTab(this, "Source");
         clickNavButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
@@ -186,8 +185,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         waitForText("Edit Source", 10000);
         clickNavButton("Edit Source");
         ExtHelper.clickExtTab(this, "XML Metadata");
-        toggleMetadataQueryEditor();
-        setText("metadataText", getMetadataXML(false));
+        setQueryEditorValue("metadataText", getMetadataXML(false));
         clickButton("Save", 0);
         assertTextNotPresent("Failed");
         ExtHelper.clickExtTab(this, "Source");

@@ -246,8 +246,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("Views", "Create", "R View");
-        toggleScriptReportEditor();
-        setFormElement(Locator.id("script"), "");
+        setQueryEditorValue("script", "");
 
         log("Execute bad scripts");
         clickViewTab();
@@ -292,8 +291,7 @@ public class ReportTest extends StudyBaseTest
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
         clickMenuButton("Views", "Create", "R View");
-        toggleScriptReportEditor();
-        setFormElement(Locator.id("script"), "labkey.data");
+        setQueryEditorValue("script", "labkey.data");
         clickViewTab();
         assertTextNotPresent(R_REMCOL);
         assertTextNotPresent(R_FILTERED);

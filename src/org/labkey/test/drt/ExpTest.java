@@ -92,8 +92,7 @@ public class ExpTest extends BaseSeleniumWebTest
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Datas");
         clickNavButton("Create and Edit Source");
-        toggleSQLQueryEditor();
-        setFormElement("queryText", "SELECT Datas.Name AS Name,\n" +
+        setQueryEditorValue("queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
                 "Datas.Run AS Run,\n" +
                 "Datas.DataFileUrl AS DataFileUrl,\n" +

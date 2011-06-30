@@ -5149,13 +5149,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         fail("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
-    /** Turns off the fancy SQL and XML editors for custom queries and sets them to be simple text areas which are easier
-     * to manipulate through the tests */
-    protected void toggleSQLQueryEditor()
-    {
-        toggleEditAreaOff("queryText");
-    }
-
     protected void toggleMetadataQueryEditor()
     {
         toggleEditAreaOff("metadataText");
@@ -5180,6 +5173,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 return style.contains("display: inline");
             }
         }, "Expected to toggle edit_area off and display textarea " + underlyingTextAreaId, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void setQueryEditorValue(String id, String value)
+    {
+        Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + id);
+        waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setQueryEditorValue(this, id, value);
     }
 
     /**
