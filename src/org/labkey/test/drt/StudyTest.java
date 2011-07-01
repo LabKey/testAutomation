@@ -219,6 +219,7 @@ public class StudyTest extends StudyBaseTest
 
         setFormElement(LABEL_FIELD, listName);
         setFormElement(ID_FIELD, ids);
+        sleep(500);
         clickButtonContainingText("Save");
         waitForText(expectedError, 2*defaultWaitForPage);
         clickButtonContainingText("OK");
