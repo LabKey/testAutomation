@@ -282,8 +282,48 @@ public class NabAssayTest extends AbstractQCAssayTest
             // 4PL AUC/PosAUC
             assertTextNotPresent("0.043");
 
-            // test creating a custom details view via a "magic" named run-level view:
+            // Test editing runs
+            // Set the design to allow editing
             clickLinkWithText("View Runs");
+            assertLinkNotPresentWithText("edit");
+            click(Locator.linkWithText("manage assay design"));
+            selenium.chooseOkOnNextConfirmation();
+            clickLinkWithText("edit assay design");
+            assertConfirmation("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
+            
+            waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
+            checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));
+            clickNavButton("Save & Close");
+
+            // Edit the first run
+            clickLinkWithText(TEST_ASSAY_FLDR_NAB);
+            clickLinkWithText(TEST_ASSAY_NAB);
+            clickLinkWithText("edit");
+            // Make sure that the properties that affect calculations aren't shown
+            assertTextNotPresent("Cutoff");
+            assertTextNotPresent("Curve Fit Method");
+            setText("quf_Name", "NameEdited.xlsx");
+            setText("quf_HostCell", "EditedHostCell");
+            setText("quf_PlateNumber", "EditedPlateNumber");
+            clickNavButton("Submit");
+            assertLinkPresentWithText("NameEdited.xlsx");
+            assertTextPresent("EditedHostCell", "EditedPlateNumber");
+
+            // Verify that the edit was audited
+            goToModule("Query");
+            selectQuery("auditLog", "ExperimentAuditEvent");
+            waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
+            clickLinkWithText("view data");
+            assertTextPresent("Run edited",
+                    "Plate Number changed from blank to 'EditedPlateNumber'",
+                    "Host Cell changed from blank to 'EditedHostCell'",
+                    "Name changed from 'm0902055;4001.xlsx' to 'NameEdited.xlsx'");
+
+            // Return to the run list
+            clickLinkWithText(TEST_ASSAY_FLDR_NAB);
+            clickLinkWithText(TEST_ASSAY_NAB);
+
+            // test creating a custom details view via a "magic" named run-level view:
             CustomizeViewsHelper.openCustomizeViewPanel(this);
             CustomizeViewsHelper.removeCustomizeViewColumn(this, "VirusName");
             CustomizeViewsHelper.saveCustomView(this, "CustomDetailsView");

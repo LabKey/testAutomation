@@ -120,9 +120,62 @@ public class AssayTest extends AbstractAssayTest
         importer.importAndWaitForComplete();
         defineAssay();
         uploadRuns(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_USR_TECH1);
+        editResults();
         publishData();
         editAssay();
         viewCrossFolderData();
+    }
+
+    private void editResults()
+    {
+        // Verify that the results aren't editable by default
+        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickLinkWithText(TEST_ASSAY);
+        clickLinkWithText("view results");
+        assertLinkNotPresentWithText("edit");
+        assertNavButtonNotPresent("Delete");
+
+        // Edit the design to make them editable
+        click(Locator.linkWithText("manage assay design"));
+        selenium.chooseOkOnNextConfirmation();
+        clickLinkWithText("edit assay design");
+        assertConfirmation("This assay is defined in the /Assay Security Test folder. Would you still like to edit it?");
+        waitForElement(Locator.xpath("//span[@id='id_editable_results_properties']"), WAIT_FOR_JAVASCRIPT);
+        checkCheckbox(Locator.xpath("//span[@id='id_editable_results_properties']/input"));
+        clickNavButton("Save & Close");
+
+        // Try an edit
+        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickLinkWithText(TEST_ASSAY);
+        clickLinkWithText("view results");
+        clickLinkWithText("edit");
+        setText("quf_SpecimenID", "EditedSpecimenID");
+        setText("quf_VisitID", "601.5");
+        setText("quf_testAssayDataProp5", "a");
+        clickNavButton("Submit");
+        assertTextPresent("Could not convert value: a");
+        setText("quf_testAssayDataProp5", "514801");
+        clickNavButton("Submit");
+        assertTextPresent("EditedSpecimenID", "601.5", "514801");
+
+        // Try a delete
+        checkCheckbox(".select");
+        selenium.chooseOkOnNextConfirmation();
+        clickNavButton("Delete");
+        assertConfirmation("Are you sure you want to delete the selected row?");
+
+        // Verify that the edit was audited
+        goToModule("Query");
+        selectQuery("auditLog", "ExperimentAuditEvent");
+        waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
+        clickLinkWithText("view data");
+        assertTextPresent("Data row, id ", ", edited.", 
+                "Specimen ID changed from 'AAA07XK5-05' to 'EditedSpecimenID'",
+                "Visit ID changed from '601.0' to '601.5",
+                "testAssayDataProp5 changed from blank to '514801'");
+        assertTextPresent("Deleted data row.");
+
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
     }
 
     /**
@@ -412,24 +465,25 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("Study Overview");
 
         log("Test participant counts and row counts in study overview");
-        String[] row2 = new String[]{"TestAssay1", "8", "1", "1", "1", "1", "1", "2", "1"};
+        String[] row2 = new String[]{"TestAssay1", "7", "1", "1", "1", "1", "1", "2"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
         click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
         waitForPageToLoad();
-        row2 = new String[]{"TestAssay1", "8 / 9", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "2 / 3", "1 / 1"};
+        row2 = new String[]{"TestAssay1", "7 / 8", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "2 / 3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         uncheckCheckbox("visitStatistic", "ParticipantCount");
         waitForPageToLoad();
-        row2 = new String[]{"TestAssay1", "9", "1", "1", "1", "1", "1", "3", "1"};
+        row2 = new String[]{"TestAssay1", "8", "1", "1", "1", "1", "1", "3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
-        clickLinkWithText("9");
+        clickLinkWithText("8");
 
         assertTextPresent("301.0");
-        assertTextPresent("601.0");
+        assertTextPresent("9.0");
+        assertTextPresent("8.0");
         assertLinkPresentWithTextCount("999320396", 2);
-        assertLinkPresentWithTextCount("999320812", 1);
+        assertLinkPresentWithTextCount("999320885", 1);
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent(TEST_RUN2_COMMENTS);
         assertTextPresent(TEST_RUN1);
@@ -514,16 +568,16 @@ public class AssayTest extends AbstractAssayTest
         log("Testing select all data and view");
         clickCheckbox(".toggle");
         clickButton("Show Results", defaultWaitForPage);
-        verifySpecimensPresent(4, 2, 3);
+        verifySpecimensPresent(3, 2, 3);
 
         log("Testing clicking on a run");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         clickLinkWithText("FirstRun");
-        verifySpecimensPresent(4, 2, 0);
+        verifySpecimensPresent(3, 2, 0);
 
         clickLinkWithText("view results");
         clearAllFilters("TestAssay1 Data", "SpecimenID");
-        verifySpecimensPresent(4, 2, 3);
+        verifySpecimensPresent(3, 2, 3);
 
         log("Testing assay-study linkage");
         clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
@@ -534,11 +588,11 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("SecondRun");
 
         clickLinkWithText("FirstRun");
-        verifySpecimensPresent(4, 2, 0);
+        verifySpecimensPresent(3, 2, 0);
 
         clickLinkWithText("view results");
         clearAllFilters("TestAssay1 Data", "SpecimenID");
-        verifySpecimensPresent(4, 2, 3);
+        verifySpecimensPresent(3, 2, 3);
 
         // Verify that the correct copied to study column is present
         assertTextPresent("Copied to Study 1 Study");
