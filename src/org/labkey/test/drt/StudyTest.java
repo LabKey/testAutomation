@@ -731,11 +731,11 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("999320016");
         assertTextPresent("999320518");
 
-        clickMenuButton("Cohorts", "Group 1");
+        clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
         assertTextPresent("999320016");
         assertTextNotPresent("999320518");
 
-        clickMenuButton("Cohorts", "Group 2");
+        clickMenuButton("Mouse Groups", "Cohorts", "Group 2");
         assertTextNotPresent("999320016");
         assertTextPresent("999320518");
 
