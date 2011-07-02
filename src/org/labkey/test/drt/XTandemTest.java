@@ -48,6 +48,16 @@ public class XTandemTest extends AbstractXTandemTest
 
     protected void basicChecks()
     {
+        goToModule("Query");
+        selectQuery("ms2", "Fractions");
+        waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
+        clickLinkWithText("view data");
+        assertTextPresent("CAexample_mini.mzXML");
+        // There should be 200 scans total
+        assertTextPresent("200");
+        // There should be 100 MS1 scans and 100 MS2 scans
+        assertTextPresent("100");
+
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
