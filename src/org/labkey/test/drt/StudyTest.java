@@ -150,7 +150,6 @@ public class StudyTest extends StudyBaseTest
         deleteListTest(allList);
         persistingLists.remove(allList);
 
-
         attemptCreateExpectError("1", "does not exist in this study.", "bad List ");
         String id = pIDs.substring(0, pIDs.indexOf(","));
         attemptCreateExpectError(id + "," + id, "ERROR: duplicate key value violates unique constraint", "Bad List 2");

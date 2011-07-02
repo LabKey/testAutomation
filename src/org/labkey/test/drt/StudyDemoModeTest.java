@@ -66,7 +66,7 @@ public class StudyDemoModeTest extends StudyBaseTest
     private void verifyNotInDemoMode()
     {
         assertTextPresent("This study is currently not in demo mode.");
-        assertTextPresent("Demo mode temporarily obscures participant IDs in many pages of the study");
+        assertTextPresent("Demo mode temporarily obscures mouse IDs in many pages of the study");
         assertTextPresent("you should hide your browser's address bar and status bar");
         assertNavButtonPresent("Enter Demo Mode");
         assertNavButtonPresent("Done");
