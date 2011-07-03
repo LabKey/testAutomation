@@ -177,11 +177,6 @@ public class StudyTest extends StudyBaseTest
         return newListName;
     }
 
-    private void waitForListCreatorToClose()
-    {
-        waitForTextToDisappear("Create "  + SUBJECT_NOUN + " Classification", defaultWaitForPage);
-    }
-
     /**
      * verify that we can delete a list and its name no longer appears in classification list
      * pre-conditions:  list listName exists
@@ -249,14 +244,15 @@ public class StudyTest extends StudyBaseTest
         log("edit list of IDs to: " + newPids);
 
         //save, close, reopen, verify change
+        sleep(500);
         clickButtonContainingText("Save");
         selectListName(listName);
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
 
+
         String pidsAfterEdit =   getFormElement(ID_FIELD);
         log("pids after edit: " + pidsAfterEdit);
 
-        sleep(500);
 
         assertEquals(newPids, pidsAfterEdit );
 
