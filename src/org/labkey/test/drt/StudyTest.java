@@ -123,7 +123,7 @@ public class StudyTest extends StudyBaseTest
         goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
 
         //issue 12487
-        assertTextPresent("Manage " + SUBJECT_NOUN + " Categories");
+        assertTextPresent("Manage " + SUBJECT_NOUN + " Groups");
 
 
 

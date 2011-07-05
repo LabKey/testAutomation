@@ -5225,7 +5225,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickManageSubjectCategory(String subjectNoun)
     {
-        clickLinkContainingText("Manage " + subjectNoun + " Categories");
+        clickLinkContainingText("Manage " + subjectNoun + " Groups");
     }
 
     public void ensureSignedOut()
