@@ -152,7 +152,7 @@ public class StudyTest extends StudyBaseTest
 
         attemptCreateExpectError("1", "does not exist in this study.", "bad List ");
         String id = pIDs.substring(0, pIDs.indexOf(","));
-        attemptCreateExpectError(id + "," + id, "ERROR: duplicate key value violates unique constraint", "Bad List 2");
+        attemptCreateExpectError(id + ", " + id, "duplicate key", "Bad List 2");
 
     }
 
