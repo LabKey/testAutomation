@@ -62,17 +62,17 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTextPresent("Positive", 10);
         assertTextPresent("Negative", 10);
 
-        clickMenuButton("Cohorts", "Initial cohort", "Negative");
+        clickMenuButton("Participant Groups", "Cohorts", "Negative", "Initial cohort");
         assertTextPresent("Count: 20"); // One participant has no cohorts.
-        clickMenuButton("Cohorts", "Initial cohort", "Positive");
+        clickMenuButton("Participant Groups", "Cohorts", "Positive", "Initial cohort");
         assertTextPresent("Count: 0"); // All participants initially negative
-        clickMenuButton("Cohorts", "Current cohort", "Negative");
+        clickMenuButton("Participant Groups", "Cohorts", "Negative", "Current cohort");
         assertTextPresent("Count: 0"); // All participants are positive by the last visit
-        clickMenuButton("Cohorts", "Current cohort", "Positive");
+        clickMenuButton("Participant Groups", "Cohorts", "Positive", "Current cohort");
         assertTextPresent("Count: 20"); // All participants are positive by the last visit
-        clickMenuButton("Cohorts", "Cohort as of data collection", "Negative");
+        clickMenuButton("Participant Groups", "Cohorts", "Negative", "Cohort as of data collection");
         assertTextPresent("Count: 10");
-        clickMenuButton("Cohorts", "Cohort as of data collection", "Positive");
+        clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
         assertTextPresent("Count: 10");
 
         clickLinkWithText("Reports");
@@ -213,23 +213,23 @@ public class CohortTest extends BaseSeleniumWebTest
         clickLinkWithText("Blood");
         assertTextPresent("Count: 20"); // 5 participants x 4 visits (was five visits, but one was just deleted)
 
-        clickMenuButton("Cohorts", "Initial cohort", "Negative");
+        clickMenuButton("Participant Groups", "Cohorts", "Negative", "Initial cohort");
         assertTextPresent("Count: 16"); // One participant has no cohorts.
-        clickMenuButton("Cohorts", "Initial cohort", "Positive");
+        clickMenuButton("Participant Groups", "Cohorts", "Positive", "Initial cohort");
         assertTextPresent("Count: 0"); // All participants initially negative
-        clickMenuButton("Cohorts", "Current cohort", "Negative");
+        clickMenuButton("Participant Groups", "Cohorts", "Negative", "Current cohort");
         assertTextPresent("Count: 4"); // Final visit (where Infected4 joins Positive cohort) has been deleted.
-        clickMenuButton("Cohorts", "Current cohort", "Positive");
+        clickMenuButton("Participant Groups", "Cohorts", "Positive", "Current cohort");
         assertTextPresent("Count: 12");
-        clickMenuButton("Cohorts", "Cohort as of data collection", "Negative");
+        clickMenuButton("Participant Groups", "Cohorts", "Negative", "Cohort as of data collection");
         assertTextPresent("Count: 10");
-        clickMenuButton("Cohorts", "Cohort as of data collection", "Positive");
+        clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
         assertTextPresent("Count: 6"); // Visit4 samples no longer have a cohort, and are thus not shown.
 
         // Check that participant view respects filter.
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Test Results");
-        clickMenuButton("Cohorts", "Cohort as of data collection", "Positive");
+        clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
         clickLinkWithText("Infected1");
         assertLinkNotPresentWithText("Previous Participant");
         clickLinkWithText("Next Participant");
