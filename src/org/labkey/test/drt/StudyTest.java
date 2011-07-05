@@ -245,7 +245,8 @@ public class StudyTest extends StudyBaseTest
 
         //save, close, reopen, verify change
         sleep(500);
-        clickButtonContainingText("Save",1000);
+        clickButtonContainingText("Save");
+        sleep(500);
         selectListName(listName);
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
 
