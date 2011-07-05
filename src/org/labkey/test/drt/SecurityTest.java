@@ -181,6 +181,8 @@ public class SecurityTest extends BaseSeleniumWebTest
         String resetUrl = userForgotPasswordWorkflowTest(username, password);
         
         userPasswordResetTest(username, resetUrl);
+
+        signIn();
     }
 
     protected static enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
@@ -200,7 +202,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         String[][] messages = {{"Your password must be six characters or more."}, {"Your password entries didn't match."}};
         attemptSetInvalidPasswords(PasswordAlterType.RESET_PASSWORD, passwords, messages);
 
-        //verify password- is there a helper for this?
+        resetPassword(resetUrl, NORMAL_USER, NORMAL_USER_PASSWORD);
     }
 
 //    protected static final int RESET_PASSWORD = 1;

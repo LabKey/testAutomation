@@ -176,6 +176,7 @@ public class UserBvtTest extends SecurityTest
         selenium.chooseOkOnNextConfirmation();
         clickButtonContainingText("Reset Password");
         assertTrue(selenium.getConfirmation().startsWith("You are about to clear the user's current password"));
+        waitForPageToLoad();
         clickLinkWithText("Done");
         // View reset password email.
         clickLinkWithText(PROJECT_NAME);
