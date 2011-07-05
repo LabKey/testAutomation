@@ -182,7 +182,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         
         userPasswordResetTest(username, resetUrl);
 
-        signIn();
+        simpleSignIn();
     }
 
     protected static enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
