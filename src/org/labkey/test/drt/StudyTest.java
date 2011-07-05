@@ -239,7 +239,7 @@ public class StudyTest extends StudyBaseTest
         log("IDs present after opening list: " + newPids);
 
         //remove first element
-        newPids = pIDs.substring(pIDs.indexOf(",")+1);
+        newPids = pIDs.substring(pIDs.indexOf(",")+2);
         setFormElement(ID_FIELD, newPids);
         log("edit list of IDs to: " + newPids);
 
