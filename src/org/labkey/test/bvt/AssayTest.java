@@ -396,7 +396,7 @@ public class AssayTest extends AbstractAssayTest
         setFilter("TestAssay1 Data", "SpecimenID", "Does Not Start With", "BAQ");
         // Subtract three falses for the assay match column that were filtered out, add one false
         // for the 'return false' that appears in the filter notification header javascript link.
-        assertEquals(countText("false"), totalFalses - 2);
+        assertEquals(countText("false"), totalFalses - 1);
 
         //Check to see that the bad specimen report includes the bad assay results and not the good ones
         //The report doesn't have top level UI (use a wiki) so just jump there.
