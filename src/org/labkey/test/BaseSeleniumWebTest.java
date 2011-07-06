@@ -181,6 +181,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return _fileUploadAvailable;
     }
 
+    //file upload helpers
+
+    protected void setFileValue(String webPartName, String fileName)
+    {
+        //iff IE or Firefox- can do the easy thing
+        setFormElement(webPartName,  new File (fileName));
+
+        //if chrome: harder, probably unsupported thing.
+    }
+
     public String getBrowserType()
     {
         return System.getProperty("selenium.browser", FIREFOX_BROWSER);
@@ -442,6 +452,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if ( isGuestModeTest() )
             return;
+        ensureSignedOut();
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view");
 
@@ -535,11 +546,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement("password2", newPassword);
 
         clickNavButton("Set Password");
-        clickButtonContainingText("Submit", defaultWaitForPage*3);
-        clickNavButton("Done");
+        if(isTextPresent("Sign Out"))
+        {
+            return;
+        }
+        else
+        {
+//            waitForPageToLoad();
+            clickButtonContainingText("Submit", defaultWaitForPage*3);
+            clickNavButton("Done");
 
-        signOut();
-        signIn(username, newPassword, true);
+            signOut();
+            signIn(username, newPassword, true);
+        }
     }
 
     protected void changePassword(String oldPassword, String password)
@@ -1170,7 +1189,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
-    private void ensureSignedInAsAdmin()
+    public void ensureSignedInAsAdmin()
     {
         goToHome();
         if(isTextPresent("Admin"))
@@ -3100,6 +3119,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return values;
     }
 
+    public List<String> getTableColumnValues(String tableName, String columnName)
+    {
+        int index = getColumnIndex(tableName, columnName);
+        return getTableColumnValues(tableName, index);
+    }
+
     // Returns the number of rows (both <tr> and <th>) in the specified table
     public int getTableRowCount(String tableName)
     {
@@ -4728,6 +4753,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Clicking on element " + locator + " at location " + coordString);
             super.clickAt(locator, coordString);
         }
+
+//        public void clickID(String id)
+//        {
+//        }
 
         @Override
         public void doubleClickAt(String locator, String coordString)

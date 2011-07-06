@@ -16,16 +16,20 @@
 
 package org.labkey.test.bvt;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
+import org.labkey.test.util.CustomizeViewsHelper;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * User: jeckels
@@ -50,6 +54,11 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_LUM_FILE2 = getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx";
     protected final String TEST_ASSAY_LUM_FILE3 = getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls";
     protected final String TEST_ASSAY_LUM_FILE4 = getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls";
+
+    protected final String TEST_ASSAY_MULTIPLE_STANDARDS_1 = getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (b12 IgA std).xls";
+    protected final String TEST_ASSAY_MULTIPLE_STANDARDS_2 = getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls";
+    protected final String TEST_ASSAY_MULTIPLE_STANDARDS_3 = getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgG-Biot (HIVIG std).xls";
+
     protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
@@ -62,6 +71,10 @@ public class LuminexTest extends AbstractQCAssayTest
     private static final String[] RTRANS_ESTLOGCONC_VALUES = {"-6.9", "-6.9", "4.3", "4.3", "0.4", "0.4", "-0.0", "-0.0", "-6.9", "-6.9",
             "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "4.3", "4.3", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9",
             "-6.9", "-0.6", "-0.6", "-6.9", "-6.9", "-6.9", "-6.9"};
+
+    public static final String ASSAY_ID_FIELD  = "name";
+    public static final String ASSAY_DATA_FILE_LOCATION_SOLO_FIELD = "__primary__";
+    public static final String ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD = "__primaryFile__";
 
     public String getAssociatedModuleDirectory()
     {
@@ -248,8 +261,260 @@ public class LuminexTest extends AbstractQCAssayTest
 
             runJavaTransformTest();
             runRTransformTest();
+
+            runMultipleCurveTest();
         }
     } //doTestSteps()
+
+    /**
+     * Test our ability to upload multiple files and set multiple standards
+     */
+    private void runMultipleCurveTest()
+    {
+        log("Creating test run with multiple standard curves");
+        String name = "multipleCurvesTestRun";
+
+        createNewAssayRun(name);
+
+        uploadMultipleCurveData();
+
+        String[] standardsNames = {"HIVIG", "b12IgA"};
+        checkStandardsCheckBoxesExist(standardsNames);
+
+        String[] possibleAnalytes = new String[] {"VRC A 5304 gp140 (62)", "VRC B gp140 (63)", "B.con.env03 140 CF (65)",
+                        "JRFL gp140 (66)", "Blank (53)"};
+        String[] possibleStandards = new String[] {"b12 IgA", "HIVIG"};
+
+        Map<String, Set<String>> analytesAndStandardsConfig = generateAnalytesAndStandardsConfig(possibleAnalytes, possibleStandards);
+        configureStandardsForAnalytes(analytesAndStandardsConfig, possibleStandards);
+
+
+
+        clickButton("Save and Finish");
+        clickLinkWithText(name);
+
+        //edit view to show Analyte Standard
+        clickMenuButtonAndContinue("Views", "Customize View");
+        sleep(1500);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/Standard");
+        CustomizeViewsHelper.applyCustomView(this);
+
+        List<List<String>> analytesAndStandards = getAnalytesAndStandards();
+
+        assertStandardsMatchExpected(analytesAndStandards, analytesAndStandardsConfig);
+    }
+
+    /**
+     *
+     * @param analytesAndStandards two lists of equal length, with corresponding names of analytes and the standards applied to them
+     * @param analytesAndStandardsConfig map of analyte names to the standards that should be applied to them.
+     */
+    private void assertStandardsMatchExpected( List<List<String>> analytesAndStandards, Map<String, Set<String>> analytesAndStandardsConfig)
+    {
+        String analyte;
+        String appliedStandards;
+        while(analytesAndStandards.get(0).size()>0)
+        {
+            analyte = analytesAndStandards.get(0).remove(0);
+            appliedStandards = analytesAndStandards.get(1).remove(0);
+            assertStandardsMatchExpected(analyte, appliedStandards, analytesAndStandardsConfig);
+        }
+    }
+
+    /**
+     *
+     * @param analyte name of analyte
+     * @param actualStandards standard applied to analyte on server
+     * @param analytesAndStandardsConfig map of all analytes to the appropriate standards
+     */
+    private void assertStandardsMatchExpected(String analyte, String actualStandards, Map<String, Set<String>> analytesAndStandardsConfig)
+    {
+        if(analyte.equals("Analyte"))//header
+            assertEquals(actualStandards, "Analyte Standard");
+        else
+        {
+            String[] standards = actualStandards.split(",");
+            Set expectedStandards = analytesAndStandardsConfig.get(analyte);
+            log("Analyte: " + analyte);
+            log("Expected standards: " + expectedStandards);
+            log("Actual standard: " + actualStandards);
+            assertEquals(standards.length, expectedStandards.size());
+            for(String s: standards)
+            {
+                assertTrue(expectedStandards.contains(s));
+            }
+        }
+    }
+
+    /**
+     * using the list of analytes and standards, select one or more standards for each analyte.  Expects at least three
+     * analytes and exactly two standards, and returns two analytes using different standards and the rest using both.
+     * This is based on the test data we're currently using, can be changed to accomodate future changes
+     *
+     * preconditions: none, does not interact with server
+     *
+     * @param possibleAnalytes list of possible analytes
+     * @param possibleStandards list of possible standards
+     * @return map.  Key is the name of the analyte, value is a set of standards to be used for that analyte
+     */
+    private Map<String,Set<String>> generateAnalytesAndStandardsConfig(String[] possibleAnalytes, String[] possibleStandards)
+    {
+        Map<String, Set<String>> analytesAndStandardsConfig =  new HashMap<String, Set<String>>();
+
+
+        //based on the assumption that there are five analytes and two possible standards:  update this if you need to test for more
+        Set<String> standardsForFirst = new HashSet(); standardsForFirst.add(possibleStandards[0]);
+        analytesAndStandardsConfig.put(possibleAnalytes[0], standardsForFirst);
+
+        Set<String> standardsForSecond = new HashSet(); standardsForSecond.add(possibleStandards[1]);
+        analytesAndStandardsConfig.put(possibleAnalytes[1], standardsForSecond);
+
+        Set standards = new HashSet();
+            standards.add(possibleStandards[0]);
+            standards.add(possibleStandards[1]);
+        for(int i = 2; i<possibleAnalytes.length; i++)
+        {
+            analytesAndStandardsConfig.put(possibleAnalytes[i], standards);
+        }
+
+        return analytesAndStandardsConfig;
+    }
+
+    /**
+     * check or uncheck the checkbox for the given standard and analyte
+     *
+     * @param analyte
+     * @param standard
+     * @param checked
+     */
+    protected void checkAnalyteAndStandardCheckBox(String analyte, String standard, boolean checked)
+    {
+        //remove punctuation, which is removed in titration name
+        analyte = analyte.replace("B.con", "b.con");
+        analyte = analyte.replace("Blank", "blank");
+        analyte = analyte.replace(" ","");
+        analyte = analyte.replace("(", "");
+        analyte = analyte.replace(")", "");
+        analyte = analyte.replace(".", "");
+
+        standard = standard.replace(" ", "");
+
+        String checkboxName = "titration_" + analyte + "_" + standard;
+        if(checked)
+            checkCheckbox(checkboxName);
+        else
+            uncheckCheckbox(checkboxName);
+    }
+
+    /**
+     * get list of all analytes and their standards, as shown on the server
+     * preconditions:  at TODO page
+     * postconditions:  unchanged
+     * @return
+     */
+    private List<List<String>> getAnalytesAndStandards()
+    {
+
+        List<String> analytes =  new LinkedList<String>();
+        List<String> standards = new LinkedList<String>();
+
+        while(isTextPresent("Next"))
+        {
+            analytes.addAll(getTableColumnValues("dataregion_TestAssayLuminex Data", "Analyte"));
+            standards.addAll(getTableColumnValues("dataregion_TestAssayLuminex Data", "Analyte Standard"));
+            clickLinkContainingText("Next");
+        }
+        clickLinkContainingText("First");
+
+        List<List<String>> ret = new LinkedList();
+        ret.add(analytes);
+        ret.add(1,standards);
+
+        return ret;
+    }
+
+    /**
+     * based on the instructions endcoded in the map, select the specified standards for each analyte
+     *
+     * preconditions:  on TODO page.  analytes and standards must exist
+     * postconditions: given check boxes checked and unchecked
+     *
+     * @param analytesAndTheirStandards map, where the keys are the analyte names and the values are sets of standard names,
+     *      corresponding to the standards that should be used for the analyte.
+     * @param standardsList list of all possible standards.  Important so that we know which boxes to uncheck when
+     *      configuring which standard to use
+     */
+    private void configureStandardsForAnalytes(Map<String, Set<String>> analytesAndTheirStandards, String[] standardsList)
+    {
+        Set<String> analytes = analytesAndTheirStandards.keySet();
+
+        for(String analyte : analytes)
+        {
+            Set<String> analyteStandards = analytesAndTheirStandards.get(analyte);
+            for(String standard: standardsList)
+            {
+                if(analyteStandards.contains(standard))
+                    checkAnalyteAndStandardCheckBox(analyte, standard, true);
+                else
+                    checkAnalyteAndStandardCheckBox(analyte, standard, false);
+            }
+        }
+    }
+
+    /**
+     * Verify that the "set this  as standard" checkboxes exist and are checked for the given standard names
+     * preconditions:  at analyte properties page
+     * postconditions:  unchanged
+     * @param standardsNames
+     */
+    private void checkStandardsCheckBoxesExist(String[] standardsNames)
+    {
+        for(int i=0; i<standardsNames.length; i++)
+        {
+            String s = standardsNames[i];
+            Locator l = Locator.name("_titrationRole_standard_"+s);
+            assertChecked(l);
+        }
+    }
+
+    /**
+     * upload the three files used for the multiple curve data test
+     * preconditions:  at assay run data import page
+     * postconditions: at data import: analyte properties page
+     */
+    private void uploadMultipleCurveData()
+    {
+        String[] files = {TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3};
+        for(int i=0; i<files.length; i++)
+        {
+            String formName = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
+
+            setFileValue(formName, files[i]);
+
+            sleep(500);
+
+            click(Locator.id("file-upload-add" + i));
+        }
+         clickButton("Next");
+    }
+
+    /**
+     * create new assay run with name name
+     * preconditions:  can see Project Folder, assay already exists
+     * postconditions: at data import screen for new test run
+     * @param name name to give new assay run
+     */
+    private void createNewAssayRun(String name)
+    {
+        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickLinkWithText(TEST_ASSAY_LUM);
+        clickButtonContainingText("Import Data");
+        waitForPageToLoad();
+        clickButtonContainingText("Next");
+        waitForPageToLoad();
+        setFormElement(ASSAY_ID_FIELD, name);
+    }
+
 
 
     /**
@@ -287,8 +552,7 @@ public class LuminexTest extends AbstractQCAssayTest
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         clickNavButton("Save & Close");
 
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkWithText(TEST_ASSAY_LUM);
+        goToTestAssayHome();
         clickNavButton("Import Data");
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
         clickNavButton("Next");
@@ -305,13 +569,20 @@ public class LuminexTest extends AbstractQCAssayTest
         }
     }
 
+    //helper function to go to test assay home from anywhere the project link is visible
+    private void goToTestAssayHome()
+    {
+        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickLinkWithText(TEST_ASSAY_LUM);
+    }
+
+    //requires drc and xtable packages installed in R
     protected void runRTransformTest()
     {
         log("Uploading Luminex run with a R transform script");
 
         // add the R transform script to the assay
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkWithText(TEST_ASSAY_LUM);
+        goToTestAssayHome();
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
