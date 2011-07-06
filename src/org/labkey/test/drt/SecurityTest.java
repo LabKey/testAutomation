@@ -182,7 +182,6 @@ public class SecurityTest extends BaseSeleniumWebTest
         
         userPasswordResetTest(username, resetUrl);
 
-//        simpleSignIn();
         ensureSignedInAsAdmin();
     }
 
