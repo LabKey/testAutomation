@@ -297,7 +297,14 @@ public class LuminexTest extends AbstractQCAssayTest
         clickMenuButtonAndContinue("Views", "Customize View");
         sleep(1500);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/Standard");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/StdCurve");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/FitProb");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/ResVar");
         CustomizeViewsHelper.applyCustomView(this);
+
+        assertTextPresent("FI = 0.465914 + (1.5417E+006 - 0.465914) / ((1 + (Conc / 122.733)^-0.173373))^7.64039");
+        assertTextPresent("0.9667");
+        assertTextPresent("0.1895");
 
         List<List<String>> analytesAndStandards = getAnalytesAndStandards();
 
