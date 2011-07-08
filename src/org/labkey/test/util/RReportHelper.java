@@ -59,7 +59,7 @@ public class RReportHelper
 
         test.setQueryEditorValue("script", script);
         ExtHelper.clickExtTab(test, "View");
-        test.sleep(3000); // TODO -- need to wait for old output to disappear (in some cases)
+        ExtHelper.waitForLoadingMaskToDisappear(test, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), test.getDefaultWaitForPage());
 
         Locator l = Locator.xpath("//div[@id='viewDiv']//pre");
