@@ -32,7 +32,7 @@ import java.io.File;
  */
 public class AssayTest extends AbstractAssayTest
 {
-    protected static final String TEST_ASSAY = "TestAssay1";
+    protected static final String TEST_ASSAY = "Test" + TRICKY_CHARACTERS + "Assay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
 
     protected static final String TEST_ASSAY_SET_PROP_EDIT = "NewTargetStudy";
@@ -380,20 +380,20 @@ public class AssayTest extends AbstractAssayTest
 
         assertTextPresent("Blood (Whole)", 4);
         int totalTrues = countText("true");
-        setFilter("TestAssay1 Data", "SpecimenID", "Starts With", "AssayTestControl");
+        setFilter(TEST_ASSAY + " Data", "SpecimenID", "Starts With", "AssayTestControl");
         // Subtract four trues for the assay match column that were filtered out
         assertEquals(countText("true"), totalTrues - 4);
 
         log("Check out the data for all of the runs");
         clickLinkWithText("view results");
-        clearAllFilters("TestAssay1 Data", "SpecimenID");
+        clearAllFilters(TEST_ASSAY + " Data", "SpecimenID");
         isTextPresent("2.0");
         assertTextPresent("7.0");
         assertTextPresent("18");
 
         assertTextPresent("Blood (Whole)", 7);
         int totalFalses = countText("false");
-        setFilter("TestAssay1 Data", "SpecimenID", "Does Not Start With", "BAQ");
+        setFilter(TEST_ASSAY + " Data", "SpecimenID", "Does Not Start With", "BAQ");
         // Subtract three falses for the assay match column that were filtered out, add one false
         // for the 'return false' that appears in the filter notification header javascript link.
         assertEquals(countText("false"), totalFalses - 1);
@@ -465,16 +465,16 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("Study Overview");
 
         log("Test participant counts and row counts in study overview");
-        String[] row2 = new String[]{"TestAssay1", "7", "1", "1", "1", "1", "1", "2"};
+        String[] row2 = new String[]{TEST_ASSAY, "7", "1", "1", "1", "1", "1", "2"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
         click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
         waitForPageToLoad();
-        row2 = new String[]{"TestAssay1", "7 / 8", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "2 / 3"};
+        row2 = new String[]{TEST_ASSAY, "7 / 8", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "2 / 3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         uncheckCheckbox("visitStatistic", "ParticipantCount");
         waitForPageToLoad();
-        row2 = new String[]{"TestAssay1", "8", "1", "1", "1", "1", "1", "3"};
+        row2 = new String[]{TEST_ASSAY, "8", "1", "1", "1", "1", "1", "3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
         clickLinkWithText("8");
@@ -546,7 +546,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         
         addWebPart("Assay Runs");
-        selectOptionByText("viewProtocolId", "General: TestAssay1");
+        selectOptionByText("viewProtocolId", "General: " + TEST_ASSAY);
         // assay runs has a details page that needs to be submitted
         clickButton("Submit", defaultWaitForPage);
 
@@ -576,7 +576,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(3, 2, 0);
 
         clickLinkWithText("view results");
-        clearAllFilters("TestAssay1 Data", "SpecimenID");
+        clearAllFilters(TEST_ASSAY + " Data", "SpecimenID");
         verifySpecimensPresent(3, 2, 3);
 
         log("Testing assay-study linkage");
@@ -591,7 +591,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(3, 2, 0);
 
         clickLinkWithText("view results");
-        clearAllFilters("TestAssay1 Data", "SpecimenID");
+        clearAllFilters(TEST_ASSAY + " Data", "SpecimenID");
         verifySpecimensPresent(3, 2, 3);
 
         // Verify that the correct copied to study column is present

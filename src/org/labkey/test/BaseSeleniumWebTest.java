@@ -98,6 +98,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
 
+    public static final String TRICKY_CHARACTERS = "><&/%\\' \"";
+
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
     public final static String IE_BROWSER = "*iexploreproxy";
@@ -3614,10 +3616,51 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Invoking Ext menu item handler '" + id + "'");
         //selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "').handler();");
-        String result = selenium.getEval("selenium.clickExtComponent('" + id + "');");
-        if (result != null)
-            return Boolean.parseBoolean(result);
-        return false;
+        String result = selenium.getEval("selenium.clickExtComponent(" + jsString(id.replace("&", "&amp;").replace("'", "&#039;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")) + ");");
+        return result != null && Boolean.parseBoolean(result);
+    }
+
+    static public String jsString(String s)
+    {
+        if (s == null)
+            return "''";
+
+        StringBuilder js = new StringBuilder(s.length() + 10);
+        js.append("'");
+        int len = s.length();
+        for (int i = 0 ; i<len ; i++)
+        {
+            char c = s.charAt(i);
+            switch (c)
+            {
+                case '\\':
+                    js.append("\\\\");
+                    break;
+                case '\n':
+                    js.append("\\n");
+                    break;
+                case '\r':
+                    js.append("\\r");
+                    break;
+                case '<':
+                    js.append("\\x3C");
+                    break;
+                case '>':
+                    js.append("\\x3E");
+                    break;
+                case '\'':
+                    js.append("\\'");
+                    break;
+                case '\"':
+                    js.append("\\\"");
+                    break;
+                default:
+                    js.append(c);
+                    break;
+            }
+        }
+        js.append("'");
+        return js.toString();
     }
 
     /**
