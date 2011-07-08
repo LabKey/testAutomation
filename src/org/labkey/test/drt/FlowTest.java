@@ -73,7 +73,6 @@ public class FlowTest extends BaseFlowTest
                 "FROM FCSAnalyses AS FCSAnalyses");
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
-        dumpScreenAndHtml("FlowTest-03-DRTQuery1-after-save");
 
         clickButton("Execute Query", 0);
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);

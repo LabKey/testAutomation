@@ -227,8 +227,6 @@ public class SecurityTest extends BaseSeleniumWebTest
                     attemptSetInvalidPassword(changeType, passwords[i], errors[i]);
 
             }
-//            if(changeType==RESET_PASSWORD)
-//                attemptSetInvalidPassword(changeType, passwords[i], errors[i]);
         }
     }
 
@@ -240,12 +238,12 @@ public class SecurityTest extends BaseSeleniumWebTest
                 fail("unsupported use of change password type");
                 break;
             case RESET_PASSWORD:
-                waitForPageToLoad();
                 setFormElement("password", passwords[0]);
                 String password2 = passwords[1];
                 if(password2==null) password2 = passwords[0];
                 setFormElement("password2", password2);
-                clickButtonContainingText("Set Password");
+                clickNavButton("Set Password");                
+                assertTextPresent(errors);
         }
     }
 

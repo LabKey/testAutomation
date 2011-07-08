@@ -554,7 +554,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         else
         {
-//            waitForPageToLoad();
             clickButtonContainingText("Submit", defaultWaitForPage*3);
             clickNavButton("Done");
 
