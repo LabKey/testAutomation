@@ -3557,19 +3557,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setLongTextField(String elementName, String text)
     {
-        setFormElement(elementName, "");
-        int offset = 0;
-        text = text.replace("'", "\\'").replace("\r\n", "\\n").replace("\n", "\\n");
-        while (offset < text.length())
-        {
-            String postString = text.substring(offset, Math.min(offset + MAX_TEXT_LENGTH, text.length()));
-            if (postString.length() > 1 && postString.charAt(postString.length() - 1) == '\\' && postString.charAt(postString.length() - 2) != '\\')
-                postString = postString.substring(0, postString.length() -1);
-
-            String evalString = "selenium.appendToFormField('" + elementName + "', '" + postString + "')";
-            selenium.getEval(evalString);
-            offset += postString.length();
-        }
+        setFormElement(elementName, text);      
     }
 
     public void setLongTextField(Locator loc, String text)
