@@ -16,6 +16,7 @@
 package org.labkey.test.daily;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.bvt.AbstractAssayTest;
 
@@ -126,8 +127,6 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(ASSAY_NAME);
 
-        clickNavButton("Import Data");
-
         // Look for TDxxx.xls files
         File dataRoot = new File(getLabKeyRoot(), "/sampledata/particleSize");
         File[] allFiles = dataRoot.listFiles(new FilenameFilter()
@@ -140,26 +139,24 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
 
         for(File file : allFiles)
         {
+            clickNavButton("Import Data");
             log("uploading " + file.getName());
             setFormElement("upload-run-field-file", file);
-            sleep(2500);
-            if (isMaterialPopupVisible())
+            Boolean newFormulation = true;
+            try{
+                ExtHelper.waitForExtDialog(this, "New Formulation", 2500);
+            }
+            catch(Throwable t){
+                newFormulation = false;
+            }
+            if (newFormulation)
             {
                 // if we don't have any material, submit an empty entry
                 click(getButtonLocator("Submit"));
             }
-            int seconds = 0;
-            while (!isTextPresent(file.getName()) && seconds < 10)
-            {
-                seconds++;
-                sleep(1000);
-            }
+            waitForText(file.getName(), WAIT_FOR_JAVASCRIPT);
             clickNavButton("Done");
-            clickLinkWithText("Import Data");
-            sleep(1000);
         }
-
-        clickButtonContainingText("Done");
 
         for (File file : allFiles)
         {
