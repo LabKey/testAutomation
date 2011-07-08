@@ -112,10 +112,10 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickWebpartMenuItem("Messages", "Email", "Administration");
 
         click(Locator.navButton("Update Settings"));
+        selenium.mouseDown("//li/a[text()='messages']");
+        Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@name='defaultEmailOption']/../../div");
 
-        Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@id='defaultEmailOption']/../../div");
-
-        waitForElement(Locator.xpath("//input[@id='defaultEmailOption']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//input[@name='defaultEmailOption']"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Update Folder Default", 0);
 
         waitForExtMaskToDisappear();
@@ -134,7 +134,6 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         selectOptionByText("rendererType", "Wiki Page");
         assertTextPresent("Admin Broadcast");
         submit();
-        clickLinkWithText(MSG1_TITLE);
         assertTextPresent(MSG1_TITLE);
         assertTextPresent(EXPIRES1);
         assertTextPresent("<b>x</b>");
@@ -147,7 +146,6 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         setFormElement("body", HTML_BODY);
         selectOptionByText("rendererType", "HTML");
         submit();
-        clickLinkWithText(MSG1_TITLE);
         assertTextPresent("1 x");
         assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
 
@@ -281,15 +279,14 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "New");
         setFormElement("emailList", USER2);
-        clickNavButton("Submit", 0);
-        assertAlert("Title must not be blank");
+        clickNavButton("Submit");
+        assertTextPresent("Title must not be blank");
         setFormElement("title", MSG3_TITLE);
         submit();
         assertTextPresent("This user doesn't have permission");
         setFormElement("emailList", USER1);
         selectOptionByText("assignedTo", USER3);
         submit();
-        clickLinkWithText(MSG3_TITLE);
         assertTextPresent("Members: "+USER1);
         assertTextPresent("Assigned To: "+USER3);
         impersonate(USER1);
