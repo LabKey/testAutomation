@@ -379,6 +379,8 @@ public class AssayTest extends AbstractAssayTest
         CustomizeViewsHelper.applyCustomView(this);
 
         assertTextPresent("Blood (Whole)", 4);
+
+        //getTableColumnValues("dataregion_" + TEST_ASSAY, )
         int totalTrues = countText("true");
         setFilter(TEST_ASSAY + " Data", "SpecimenID", "Starts With", "AssayTestControl");
         // Subtract four trues for the assay match column that were filtered out
@@ -396,7 +398,7 @@ public class AssayTest extends AbstractAssayTest
         setFilter(TEST_ASSAY + " Data", "SpecimenID", "Does Not Start With", "BAQ");
         // Subtract three falses for the assay match column that were filtered out, add one false
         // for the 'return false' that appears in the filter notification header javascript link.
-        assertEquals(countText("false"), totalFalses - 1);
+        assertEquals(countText("false"), totalFalses - 2);
 
         //Check to see that the bad specimen report includes the bad assay results and not the good ones
         //The report doesn't have top level UI (use a wiki) so just jump there.
