@@ -169,12 +169,6 @@ public class IssuesTest extends BaseSeleniumWebTest
         checkCheckbox("pickListColumns", "string5");
         clickNavButton("Update");
 
-        // UpdateRequiredFieldsAction
-        checkCheckbox("requiredFields", "Milestone");
-        checkCheckbox("requiredFields", "String4");
-        checkCheckbox("requiredFields", "String5");
-        clickNavButton("Update");
-
         // AddKeywordAction
         setFormElement(Locator.formElement("addMilestone", "keyword"), "2012");
         clickNavButton("Add Milestone");
@@ -194,6 +188,12 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement(Locator.formElement("addMyFifthString", "keyword"), "Polonium");
         clickNavButton("Add MyFifthString");
         assertTextPresent("Polonium");
+
+        // UpdateRequiredFieldsAction
+        checkCheckbox("requiredFields", "Milestone");
+        checkCheckbox("requiredFields", "String4");
+        checkCheckbox("requiredFields", "String5");
+        clickNavButton("Update");
 
         // ListAction (empty)
         clickNavButton("Back to Issues");
