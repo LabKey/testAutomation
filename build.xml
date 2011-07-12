@@ -49,6 +49,9 @@
     <property name="version" value="${product.version}"/>
 
 
+    <property name="clover.jar" location="C:\labkey_dev1\stedi\external\clover\clover-ant-3.1.0/lib/clover.jar"/>
+
+
     <target name="usage">
         <echo message="Valid Test Targets:" />
         <echo message="drt                run developer regression tests (short suite)" />
@@ -171,11 +174,13 @@
 
     <path id="test.build.classpath">
         <path refid="test.lib.classpath" />
+         <pathelement path="${clover.jar}"/>
     </path>
 
     <path id="test.run.classpath">
         <path refid="test.build.classpath"/>
         <pathelement location="${test.build.home}/classes" />
+         <pathelement path="${clover.jar}"/>
     </path>
 
     <target name="compile" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
@@ -374,9 +379,8 @@
         <echo message=" selenium.server.needs.starting: ${selenium.server.needs.starting}" />
     </target>
 
-    <target name="sub-selenium" depends="build-java-client,init-selenium">
+    <target name="sub-selenium" depends="build-java-client,init-selenium" >
         <antcall target="startSeleniumServer" />
-
         <condition property="no.selenium.server">
             <not >
                 <socket server="${sysprop.selenium.server}" port="${sysprop.selenium.server.port}"/>
