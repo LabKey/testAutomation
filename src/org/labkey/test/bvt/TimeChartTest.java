@@ -270,6 +270,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//table[contains(@class, 'x-item-disabled')]//button[text()='Save']"));
         simpleSignIn();
 
+        log("Create multi-measure time chart.");
+
         // check multi-measure calls to LABKEY.Visualization.getData API
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
@@ -294,6 +296,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
             waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
             for(int i = 0; i < GETDATA_API_TEST_COLNAMES[testIndex].length; i++){
+                waitForText(GETDATA_API_TEST_COLNAMES[testIndex][i], WAIT_FOR_JAVASCRIPT); // Table takes a moment to render.
                 assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_TEST_COLNAMES[testIndex][i], GETDATA_API_TEST_COLNAMES[testIndex][i]);
             }
             // check values in interval column for the first participant
