@@ -543,9 +543,9 @@ public class MS2BvtTest extends MS2TestBase
         CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", false);
         // XXX: selenium test can't move columns that require scrolling the column list
         //CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", false);
-        CustomizeViewsHelper.applyCustomView(this);
+        CustomizeViewsHelper.saveCustomView(this, "Test View");
 
-        assertTextBefore("K.TESGYGSESSLR.R", "K.HVSGKIIGFFY.-");
+        assertTextBefore(PEPTIDE1, PEPTIDE2);
         //assertTextBefore("gi|30519530|A38R_protein", "K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q");
 
         CustomizeViewsHelper.openCustomizeViewPanel(this);

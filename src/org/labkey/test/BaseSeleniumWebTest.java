@@ -3206,7 +3206,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public Locator.XPathLocator getButtonLocator(String text)
     {
-        // check for narmal button:
+        // check for normal button:
         Locator.XPathLocator locator = Locator.button(text);
         if (isElementPresent(locator))
             return locator;
