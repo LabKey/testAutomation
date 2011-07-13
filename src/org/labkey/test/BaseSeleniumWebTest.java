@@ -3566,7 +3566,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 return getFormElement(elementName).trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns
             }
-        }, elementName + " was not set.\nDiff:\n\n" + Diff.diff(text, getFormElement(elementName)), WAIT_FOR_JAVASCRIPT);
+        }, elementName + " was not set.", WAIT_FOR_JAVASCRIPT);
     }
 
     public void setLongTextField(Locator loc, String text)
