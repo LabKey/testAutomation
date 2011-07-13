@@ -380,11 +380,15 @@ public class AssayTest extends AbstractAssayTest
 
         assertTextPresent("Blood (Whole)", 4);
 
-        //getTableColumnValues("dataregion_" + TEST_ASSAY, )
-        int totalTrues = countText("true");
+        Locator.XPathLocator trueLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'true']");
+        int totalTrues = getXpathCount(trueLocator);
+        assertEquals(4, totalTrues);
+
         setFilter(TEST_ASSAY + " Data", "SpecimenID", "Starts With", "AssayTestControl");
-        // Subtract four trues for the assay match column that were filtered out
-        assertEquals(countText("true"), totalTrues - 4);
+
+        // verify that there are no trues showing for the assay match column that were filtered out
+        totalTrues = getXpathCount(trueLocator);
+        assertEquals(0, totalTrues);
 
         log("Check out the data for all of the runs");
         clickLinkWithText("view results");
@@ -394,11 +398,16 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("18");
 
         assertTextPresent("Blood (Whole)", 7);
-        int totalFalses = countText("false");
+
+        Locator.XPathLocator falseLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'false']");
+        int totalFalses = getXpathCount(falseLocator);
+        assertEquals(3, totalFalses);
+
         setFilter(TEST_ASSAY + " Data", "SpecimenID", "Does Not Start With", "BAQ");
-        // Subtract three falses for the assay match column that were filtered out, add one false
-        // for the 'return false' that appears in the filter notification header javascript link.
-        assertEquals(countText("false"), totalFalses - 2);
+
+        // verify the falses have been filtered out
+        totalFalses = getXpathCount(falseLocator);
+        assertEquals(0, totalFalses);
 
         //Check to see that the bad specimen report includes the bad assay results and not the good ones
         //The report doesn't have top level UI (use a wiki) so just jump there.
