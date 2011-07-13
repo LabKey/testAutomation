@@ -48,13 +48,6 @@ public class FlowTest extends BaseFlowTest
         return ret;
     }
 
-    protected void dumpScreenAndHtml(String name)
-    {
-        File dumpDir = ensureDumpDir();
-        dumpScreen(dumpDir, name);
-        dumpHtml(dumpDir, name);
-    }
-
     protected void doTestSteps()
     {
         init();
@@ -76,18 +69,6 @@ public class FlowTest extends BaseFlowTest
 
         clickButton("Execute Query", 0);
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
-        if (!selenium.isTextPresent("File Path Root"))
-        {
-            dumpScreenAndHtml("FlowTest-04-DRTQuery1-execute");
-            beginAt("/query" + containerPath + "/sourceQuery.view?schemaName=flow&query.queryName=DRTQuery1");
-            waitForExtReady();
-            dumpScreenAndHtml("FlowTest-04-DRTQuery1-source");
-            fail("** Didn't find 'File Path Root' in grid");
-        }
-        else
-        {
-            log("** Found 'File Path Root'");
-        }
 
         clickLinkWithText("Flow Dashboard");
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
