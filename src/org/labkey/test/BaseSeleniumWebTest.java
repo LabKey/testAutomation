@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.Diff;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -2242,7 +2243,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!checker.check())
         {
             _testTimeout = true;
-            fail(failMessage);
+            fail(failMessage + " ["+wait+"ms]");
         }
     }
 
@@ -3555,9 +3556,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
-    public void setLongTextField(String elementName, String text)
+    public void setLongTextField(final String elementName, final String text)
     {
-        setFormElement(elementName, text);      
+        setFormElement(elementName, text, true);
+        
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return getFormElement(elementName).trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns
+            }
+        }, elementName + " was not set.\nDiff:\n\n" + Diff.diff(text, getFormElement(elementName)), WAIT_FOR_JAVASCRIPT);
     }
 
     public void setLongTextField(Locator loc, String text)
