@@ -570,13 +570,11 @@ public class ClientAPITest extends BaseSeleniumWebTest
         clickNavButton("Save", 10000);
 
         setSourceFromFile("domainTest.js");
-
-        int limit = 30;
-        Locator loc = Locator.id(TEST_DIV_NAME);
-        while (!elementContains(loc, "Failed") && !elementContains(loc, "Updated") && limit-- > 0)
-            sleep(1000);
+        waitForText("Finished DomainTests.", 30000);
 
         assertElementContains(Locator.id(TEST_DIV_NAME), "Updated StudyProperties domain");
+        assertElementContains(Locator.id(TEST_DIV_NAME), "Did not find the");
+        assertElementContains(Locator.id(TEST_DIV_NAME), "Successfully updated the description");
     }
 
 
