@@ -80,8 +80,6 @@ public class FolderTest extends BaseSeleniumWebTest
         log("Ensure folders will be visible");
         selenium.windowMaximize();
 
-        //TODO: Use drag-and-drop to reorder folders.
-        //Blocked: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=12493
         clickNavButton("Change Display Order");
         checkRadioButton("resetToAlphabetical", "false");
         selectOptionByText(Locator.name("items"), PROJECT_NAME);
@@ -89,6 +87,21 @@ public class FolderTest extends BaseSeleniumWebTest
             clickNavButton("Move Up", 0);
         clickNavButton("Save");
 
+        // Use drag-and-drop to reorder folders.
+        log("Reorder Projects test");
+        reorderProjects(PROJECT_NAME, "Shared", Reorder.following, true);
+        sleep(500);
+        refresh();
+        // TODO : Figure out how to get the order of project names within the panel
+        //assertTextBefore("Shared", PROJECT_NAME);
+
+        clickNavButton("Change Display Order");
+        checkRadioButton("resetToAlphabetical", "false");
+        selectOptionByText(Locator.name("items"), PROJECT_NAME);
+        for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+PROJECT_NAME+"']")) > 0; i++)
+            clickNavButton("Move Up", 0);
+        clickNavButton("Save");
+                
         log("Reorder folders test");
         expandFolderNode("AB");
         reorderFolder("[ABB]", "[ABA]", Reorder.preceding, true);
@@ -99,11 +112,12 @@ public class FolderTest extends BaseSeleniumWebTest
 
         log("Illegal folder move test: Project demotion");
         moveFolder(PROJECT_NAME, "home", false, false);
+        ExtHelper.waitForExtDialog(this, "Change Display Order");  // it should only give option to reorder projects
+        clickNavButton("Cancel", 0);
 
-        //TODO: Blocked: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=12496
-        //log("Illegal folder move test: Folder promotion");
-        //expandFolderNode("");
-        //moveFolder("[A]", SERVER_ROOT, false, false);
+        log("Illegal folder move test: Folder promotion");
+        expandFolderNode("");
+        moveFolder("[A]", SERVER_ROOT, false, false);
 
         log("Move folder test");
         sleep(500); // wait for failed move ghost to disappear.
@@ -140,6 +154,19 @@ public class FolderTest extends BaseSeleniumWebTest
         assertTextBefore("[F]" ,"[C]");
     }
 
+    private void reorderProjects(String project, String targetProject, Reorder order, boolean successExpected)
+    {
+        log("Reorder project: '" + project + "' " + order.toString() + " '" + targetProject + "'");
+        waitForElement(Locator.xpath("//div/a/span[text()='"+project+"']"), WAIT_FOR_JAVASCRIPT);
+
+        dragAndDrop(Locator.xpath("//div/a/span[text()='"+project+"']"), Locator.xpath("//div/a/span[text()='" + targetProject + "']"), order == Reorder.preceding ? Position.top : Position.bottom);
+        if(successExpected)
+        {
+            ExtHelper.waitForExtDialog(this, "Change Display Order");
+            clickNavButton("Confirm Reorder", 0);
+        }
+    }
+    
     private void reorderFolder(String folder, String targetFolder, Reorder order, boolean successExpected)
     {
         log("Reorder folder: '" + folder + "' " + order.toString() + " '"  + targetFolder + "'");
