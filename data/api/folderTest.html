@@ -1,6 +1,3 @@
-<!--<script type="text/javascript">
-    LABKEY.requiresScript('seedrandom-min.js', true); // Javascript Math.random is not by default seedable!
-</script>-->
 <div id="start-test"></div>
 <script type="text/javascript">
 
@@ -15,23 +12,6 @@
         function createContainers(arr, path) {
 
             btn.setText('Running...');
-
-            var count = 0;
-            
-            function getName() {
-
-                count = count + 1;
-                return count;
-                /*var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-                var name = '';
-                Math.seedrandom('FolderTest');
-                for (var i=0; i < 8; i++) {
-                    var rnum = Math.floor(Math.random() * chars.length); // This call is seeded due to Math.seedrandom
-                    name += chars.substring(rnum,rnum+1);
-                }
-                return name;*/
-            }
-
             var chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
             
             function createHelper(arr, path, delta) {
