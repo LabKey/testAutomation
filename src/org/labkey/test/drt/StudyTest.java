@@ -99,10 +99,10 @@ public class StudyTest extends StudyBaseTest
         {
             emptyParticipantPickerList();
         }
-//        verifyStudyAndDatasets();
-//        waitForSpecimenImport();
-//        verifySpecimens();
-//        verifyParticipantComments();
+        verifyStudyAndDatasets();
+        waitForSpecimenImport();
+        verifySpecimens();
+        verifyParticipantComments();
     }
 
     protected static final String SUBJECT_NOUN = "Mouse";
