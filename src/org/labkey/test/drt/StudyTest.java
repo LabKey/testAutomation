@@ -657,32 +657,32 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Visit Import Mapping");
-        assertTableRowsEqual("customMapping", 2, VISIT_IMPORT_MAPPING.replace("SequenceNum", "Sequence Number"));
+        assertTableRowsEqual("customMapping", 2, VISIT_IMPORT_MAPPING.replace("SequenceNum", "Sequence Number Mapping"));
 
-        assertEquals("Incorrect number of gray cells", countTableCells(null, true), 40);
-        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false), 1);
-        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true), 18);
-        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", false), 1);
-        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", true), 1);
-        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", false), 1);
-        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", true), 1);
+        assertEquals("Incorrect number of gray cells", 60, countTableCells(null, true));
+        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 1, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false));
+        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 18, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true));
+        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", false));
+        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", true));
+        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
+        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         // Replace custom visit mapping and verify
         String replaceMapping = "Name\tSequenceNum\nBarBar\t4839\nFoofoo\t9732";
         clickLinkWithText("Replace Custom Mapping");
         setLongTextField("tsv", replaceMapping);
         clickNavButton("Submit");
-        assertTableRowsEqual("customMapping", 2, replaceMapping.replace("SequenceNum", "Sequence Number"));
+        assertTableRowsEqual("customMapping", 2, replaceMapping.replace("SequenceNum", "Sequence Number Mapping"));
         assertTextNotPresent("Cycle 10");
         assertTextNotPresent("All Done");
 
-        assertEquals("Incorrect number of gray cells", countTableCells(null, true), 36);
-        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false), 1);
-        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true), 18);
-        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", false), 1);
-        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", countTableCells("Soc Imp Log #%{S.3.2}", true), 0);
-        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", false), 1);
-        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", countTableCells("ConMeds Log #%{S.3.2}", true), 0);
+        assertEquals("Incorrect number of gray cells", 54, countTableCells(null, true));
+        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 1, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false));
+        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 18, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true));
+        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", false));
+        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", 0, countTableCells("Soc Imp Log #%{S.3.2}", true));
+        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
+        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         // Clear custom visit mapping and verify
         clickLinkWithText("Clear Custom Mapping");
