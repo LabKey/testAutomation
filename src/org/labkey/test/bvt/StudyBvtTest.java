@@ -177,7 +177,7 @@ public class StudyBvtTest extends StudyManualTest
         assertFormElementEquals(Locator.id("manualCohortAssignmentEnabled"), "on");
         clickLinkWithText(getFolderName());
         clickLinkWithText(DEMOGRAPHICS_DATASET);
-        clickMenuButton("Cohorts", GROUP_2);
+        clickMenuButton("Mouse Groups", "Cohorts", GROUP_2);
         clickMenuButton("QC State", "All data");
         assertTextPresent(MODIFIED_PARTICIPANT);
 
