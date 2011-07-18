@@ -22,11 +22,13 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.ExtHelper;
+
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,8 +75,13 @@ public class LuminexTest extends AbstractQCAssayTest
             "-6.9", "-0.6", "-0.6", "-6.9", "-6.9", "-6.9", "-6.9"};
 
     public static final String ASSAY_ID_FIELD  = "name";
-    public static final String ASSAY_DATA_FILE_LOCATION_SOLO_FIELD = "__primary__";
     public static final String ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD = "__primaryFile__";
+
+    public static final String DATA_TABLE_NAME = "dataregion_TestAssayLuminex Data";
+    private static final String EXCLUDE_COMMENT_FIELD = "comment";
+    public static final String EXCLUDE_SELECTED_BUTTON = "excludeselected";
+    protected static final String MULTIPLE_CURVE_ASSAY_RUN_NAME = "multipleCurvesTestRun";
+    protected static final String SAVE_CHANGES_BUTTON = "Save Changes";
 
     public String getAssociatedModuleDirectory()
     {
@@ -263,26 +270,289 @@ public class LuminexTest extends AbstractQCAssayTest
             runRTransformTest();
 
             runMultipleCurveTest();
+
+            runWellExclusionTest();
         }
     } //doTestSteps()
 
     /**
-     * Test our ability to upload multiple files and set multiple standards
+     * test of well exclusion- the ability to exclude certain wells or analytes and add ac oment as to why
+     * preconditions: LUMINEX project and assay list exist.  Having the Multiple Curve data will speed up execution
+     * but is not required
+     * postconditions:  multiple curve data will be present, certain wells will be marked excluded
      */
-    private void runMultipleCurveTest()
+    private void runWellExclusionTest()
+    {
+         ensureMultipleCurveDataPresent();
+
+         clickLinkContainingText(MULTIPLE_CURVE_ASSAY_RUN_NAME);
+
+        //ensure multiple curve data present
+        //there was a bug (never filed) that showed up with multiple curve data, so best to use that.
+
+        String[] analytes = getListOfAnalytesMultipleCurveData();
+
+        //"all" excludes all
+        String excludeAllWellName = "E1";
+        excludeAllAnalytesForSingleWellTest(excludeAllWellName);
+
+        String excludeOneWellName = "E1";
+        excludeOneAnalyteForSingleWellTest(excludeOneWellName, analytes[0]);
+
+        //excluding for one well excludes for duplicate wells
+        excludeAnalyteForAllWellsTest(analytes[1]);
+
+    }
+
+    private void excludeOneAnalyteForSingleWellTest(String wellName, String excludedAnalyte)
+    {
+        waitForAjaxLoad();
+        clickExclusionMenuIconForWell(wellName);
+
+        waitForAjaxLoad();
+        String exclusionComment = "exclude single analyte for single well";
+        setText(EXCLUDE_COMMENT_FIELD, exclusionComment);
+        clickRadioButtonById(EXCLUDE_SELECTED_BUTTON);
+        clickExcludeAnalyteCheckBox(excludedAnalyte, true);
+        clickButton(SAVE_CHANGES_BUTTON, 0);
+
+        Set<String> commentSet = new HashSet();
+        commentSet.add(exclusionComment);
+        excludeForSingleWellVerify(exclusionComment, new HashSet((Arrays.asList(new String[] {excludedAnalyte}))));
+    }
+
+    /**
+     * verify that a user can exclude every analyte for a single well, and that this
+     * successfully applies to both the original well and its duplicates
+     *
+     * preconditions:  at run screen, wellName exists
+     * postconditions: no change (exclusion is removed at end of test)
+     * @param wellName name of well to excluse
+     */
+    private void excludeAllAnalytesForSingleWellTest(String wellName)
+    {
+        clickExclusionMenuIconForWell(wellName);
+
+        String comment = "exclude all for single well";
+        setText(EXCLUDE_COMMENT_FIELD, comment);
+        waitForAjaxLoad();
+        clickButton(SAVE_CHANGES_BUTTON, 0);
+        waitForAjaxLoad();
+
+        excludeForSingleWellVerify(comment, new HashSet(Arrays.asList(getListOfAnalytesMultipleCurveData())));
+
+        //remove exclusions to leave in clean state
+        clickExclusionMenuIconForWell(wellName);
+        waitForAjaxLoad();
+        clickRadioButtonById("excludeselected");
+        clickButton(SAVE_CHANGES_BUTTON, 0);
+        waitForAjaxLoad();
+        clickButton("Yes", 0);
+    }
+
+    /**
+     * go through every well.  If they match the hardcoded well, description, and dilution values, and one of the analyte values given
+     * verify that the row has the expected comment
+     *
+     * @param expectedComment
+     * @param analytes
+     */
+    private void excludeForSingleWellVerify(String expectedComment, Set<String> analytes)
+    {
+        List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, new String[] {"Well", "Description", "Dilution", "Exclusion Comment", "Analyte"});
+        List<String> wells = vals.get(0);
+        List<String> descriptions = vals.get(1);
+        List<String> dilutions = vals.get(2);
+        List<String> comments = vals.get(3);
+        List<String> analytesPresent = vals.get(4);
+
+        String well;
+        String description;
+        String dilution;
+        String comment;
+        String analyte;
+
+        for(int i=0; i<wells.size(); i++)
+        {
+            well = wells.get(i);
+            log("well: " + well);
+            description= descriptions.get(i);
+            log("description: " + description);
+            dilution = dilutions.get(i);
+            log("dilution: " + dilution);
+            comment = comments.get(i);
+            log("Comment: "+ comment);
+            analyte= analytesPresent.get(i);
+            log("Analyte: " + analyte);
+
+            if(matchesWell(description, dilution, well) && analytes.contains(analyte))
+            {
+                assertEquals(expectedComment,comment);
+            }
+
+            if(expectedComment.equals(comment))
+            {
+                assertTrue(matchesWell(description, dilution, well) && analytes.contains(analyte));
+            }
+        }
+    }
+
+    //verifies if description, dilution, and well match the hardcoded values
+    private boolean matchesWell(String description, String dilution, String well)
+    {
+        if(!excludedWellDescription.equals(description))
+            return false;
+        if(!excludedWellDilution.equals(dilution))
+            return false;
+        return excludedWells.contains(well);
+    }
+
+    //currently hardcoded for E1
+    private String[] getReplicateWells()
+    {
+        return new String[] {"E1", "F1"};
+    }
+
+
+    /**
+     * verify a user can exclude a single analyte for all wells
+     * preconditions:  multiple curve data imported, on assay run page
+     * post conditions: specified analyte excluded from all wells, with comment "Changed for all analytes"
+     * @param analyte
+     */
+    private void excludeAnalyteForAllWellsTest(String analyte)
+    {
+        waitForAjaxLoad();
+        clickButtonContainingText("Exclude Analytes");
+        waitForText("Exclude Analytes from Analysis");
+        waitForAjaxLoad(); //the above wait isn't sufficient, the button still isn't ready
+        clickExcludeAnalyteCheckBox(analyte, true);
+        String comment = "Changed for all analytes";
+        setText(EXCLUDE_COMMENT_FIELD, comment);
+        waitForAjaxLoad();
+        clickButton(SAVE_CHANGES_BUTTON, 0);
+
+        Map<String, Set> analyteToExclusion = new HashMap();
+        Set<String> set = new HashSet();
+        set.add(comment);
+        analyteToExclusion.put(analyte, set);
+
+        analyteToExclusion = createExclusionMap(set, analyte);
+
+        compareColumnValuesAgainstExpected("Analyte", "Exclusion Comment", analyteToExclusion);
+    }
+
+    /**
+     * return a map that, for each key, has value value
+     * @param value
+     * @param key
+     * @return
+     */
+    private Map<String, Set> createExclusionMap(Set<String> value, String... key)
+    {
+        Map m  = new HashMap();
+
+        for(String k: key)
+        {
+            m.put(k, value);
+        }
+
+        return m;
+    }
+
+    /**
+     * click on the exclusion icon associated with the particular well
+     * preconditions:  at Test Result page
+     * postconditions: at Test Result Page with exclude Replicate Group From Analysis window up
+     * @param wellName
+     */
+    private void clickExclusionMenuIconForWell(String wellName)
+    {
+        Locator l = Locator.id(getLinkIDFromWellName(wellName));
+        click(l);
+        waitForAjaxLoad();
+    }
+
+
+    private String getLinkIDFromWellName(String wellName)
+    {
+        return "__changeExclusions__" + wellName;
+    }
+
+
+
+    private void clickExcludeAnalyteCheckBox(String analyte, boolean b)
+    {
+        if(b)
+            ExtHelper.prevClickFileBrowserFileCheckbox(this, analyte);
+        else
+            fail("not supported at this time");
+    }
+
+    private String excludedWellDescription = "Sample 6";
+    private String excludedWellDilution = "10.0";
+    private Set<String> excludedWells = new HashSet(Arrays.asList(new String[] {"E1", "F1"}));
+
+    private String[] getListOfAnalytesMultipleCurveData()
+    {
+        //TODO:  make this a dynamic list, acquired from the current data set, rather than hardcoded
+        return new String[] {"VRC A 5304 gp140 (62)", "VRC B gp140 (63)", "B.con.env03 140 CF (65)",
+                        "JRFL gp140 (66)", "Blank (53)"};
+    }
+
+
+
+    /**several tests use this data.  Rather that clean and import for each
+     * or take an unnecessary dependency of one to the other, this function
+     * checks if the data is already present and, if it is not, adds it
+     * preconditions:  Project TEST_ASSAY_PRJ_LUMINEX with Assay  TEST_ASSAY_LUM exists
+     * postconditions:  assay run
+     */
+    private void ensureMultipleCurveDataPresent()
+    {
+        goToTestRunList();
+
+        if(!isTextPresent(MULTIPLE_CURVE_ASSAY_RUN_NAME)) //right now this is a good enough check.  May have to be
+                                                    // more rigorous if tests start substantially altering data
+        {
+            startCreateMultipleCurveAssayRun();
+            clickButton("Save and Finish");
+        }
+    }
+
+    /**
+     * Goes to test run list for the common list used by all the tests
+     */
+    private void goToTestRunList()
+    {
+        goToHome();
+        clickLinkContainingText(TEST_ASSAY_PRJ_LUMINEX);
+        clickLinkContainingText(TEST_ASSAY_LUM);
+    }
+
+    private String startCreateMultipleCurveAssayRun()
     {
         log("Creating test run with multiple standard curves");
-        String name = "multipleCurvesTestRun";
+        String name = MULTIPLE_CURVE_ASSAY_RUN_NAME;
 
         createNewAssayRun(name);
 
         uploadMultipleCurveData();
 
+        return name;
+
+    }
+    /**
+     * Test our ability to upload multiple files and set multiple standards
+     */
+    private void runMultipleCurveTest()
+    {
+        String name = startCreateMultipleCurveAssayRun();
+
         String[] standardsNames = {"HIVIG", "b12IgA"};
         checkStandardsCheckBoxesExist(standardsNames);
 
-        String[] possibleAnalytes = new String[] {"VRC A 5304 gp140 (62)", "VRC B gp140 (63)", "B.con.env03 140 CF (65)",
-                        "JRFL gp140 (66)", "Blank (53)"};
+        String[] possibleAnalytes = getListOfAnalytesMultipleCurveData();
         String[] possibleStandards = new String[] {"b12 IgA", "HIVIG"};
 
         Map<String, Set<String>> analytesAndStandardsConfig = generateAnalytesAndStandardsConfig(possibleAnalytes, possibleStandards);
@@ -306,51 +576,66 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("0.9667");
         assertTextPresent("0.1895");
 
-        List<List<String>> analytesAndStandards = getAnalytesAndStandards();
+        compareColumnValuesAgainstExpected("Analyte", "Analyte Standard", analytesAndStandardsConfig);
 
-        assertStandardsMatchExpected(analytesAndStandards, analytesAndStandardsConfig);
+    }
+
+    private void compareColumnValuesAgainstExpected(String column1, String column2, Map column1toColumn2)
+    {
+        Set<String> set = new HashSet();
+        set.add( column2);
+        column1toColumn2.put(column1, set); //column headers
+
+        List<List<String>> columnVals = getColumnValues("dataregion_TestAssayLuminex Data", new String[] {column1, column2});
+
+        assertStandardsMatchExpected(columnVals, column1toColumn2);
+
     }
 
     /**
      *
-     * @param analytesAndStandards two lists of equal length, with corresponding names of analytes and the standards applied to them
-     * @param analytesAndStandardsConfig map of analyte names to the standards that should be applied to them.
+     * @param columnVals two lists of equal length, with corresponding names of analytes and the standards applied to them
+     * @param col1to2Map map of analyte names to the standards that should be applied to them.
      */
-    private void assertStandardsMatchExpected( List<List<String>> analytesAndStandards, Map<String, Set<String>> analytesAndStandardsConfig)
+    private void assertStandardsMatchExpected( List<List<String>> columnVals, Map<String, Set<String>> col1to2Map)
     {
-        String analyte;
-        String appliedStandards;
-        while(analytesAndStandards.get(0).size()>0)
+        String column1Val;
+        String column2Val;
+        while(columnVals.get(0).size()>0)
         {
-            analyte = analytesAndStandards.get(0).remove(0);
-            appliedStandards = analytesAndStandards.get(1).remove(0);
-            assertStandardsMatchExpected(analyte, appliedStandards, analytesAndStandardsConfig);
+            column1Val = columnVals.get(0).remove(0);
+            column2Val = columnVals.get(1).remove(0);
+            assertStandardsMatchExpected(column1Val, column2Val, col1to2Map);
         }
     }
 
     /**
      *
-     * @param analyte name of analyte
-     * @param actualStandards standard applied to analyte on server
-     * @param analytesAndStandardsConfig map of all analytes to the appropriate standards
+     * @param column1Val name of analyte
+     * @param column2Val standard applied to analyte on server
+     * @param colum1toColumn2Map map of all analytes to the appropriate standards
      */
-    private void assertStandardsMatchExpected(String analyte, String actualStandards, Map<String, Set<String>> analytesAndStandardsConfig)
+    private void assertStandardsMatchExpected(String column1Val, String column2Val, Map<String, Set<String>> colum1toColumn2Map)
     {
-        if(analyte.equals("Analyte"))//header
-            assertEquals(actualStandards, "Analyte Standard");
-        else
-        {
-            String[] standards = actualStandards.split(",");
-            Set expectedStandards = analytesAndStandardsConfig.get(analyte);
-            log("Analyte: " + analyte);
-            log("Expected standards: " + expectedStandards);
-            log("Actual standard: " + actualStandards);
-            assertEquals(standards.length, expectedStandards.size());
-            for(String s: standards)
+//        if(analyte.equals("Analyte"))//header
+//            assertEquals(actualStandards, "Exclusion Comment");
+//        else
+//        {
+            String[] splitCol2Val = column2Val.split(",");
+            Set<String> expectedCol2Vals = colum1toColumn2Map.get(column1Val);
+            log("Column1: " + column1Val);
+            log("Expected Column2: " + expectedCol2Vals);
+            log("Column2: " + column2Val);
+            if(expectedCol2Vals!=null)
             {
-                assertTrue(expectedStandards.contains(s));
+                assertEquals(splitCol2Val.length, expectedCol2Vals.size());
+
+                for(String s: splitCol2Val)
+                {
+                    assertTrue(expectedCol2Vals.contains(s));
+                }
             }
-        }
+//        }
     }
 
     /**
@@ -376,9 +661,9 @@ public class LuminexTest extends AbstractQCAssayTest
         Set<String> standardsForSecond = new HashSet(); standardsForSecond.add(possibleStandards[1]);
         analytesAndStandardsConfig.put(possibleAnalytes[1], standardsForSecond);
 
-        Set standards = new HashSet();
-            standards.add(possibleStandards[0]);
-            standards.add(possibleStandards[1]);
+        Set<String> standards = new HashSet();
+        standards.add(possibleStandards[0]);
+        standards.add(possibleStandards[1]);
         for(int i = 2; i<possibleAnalytes.length; i++)
         {
             analytesAndStandardsConfig.put(possibleAnalytes[i], standards);
@@ -413,37 +698,11 @@ public class LuminexTest extends AbstractQCAssayTest
             uncheckCheckbox(checkboxName);
     }
 
-    /**
-     * get list of all analytes and their standards, as shown on the server
-     * preconditions:  at TODO page
-     * postconditions:  unchanged
-     * @return
-     */
-    private List<List<String>> getAnalytesAndStandards()
-    {
-
-        List<String> analytes =  new LinkedList<String>();
-        List<String> standards = new LinkedList<String>();
-
-        while(isTextPresent("Next"))
-        {
-            analytes.addAll(getTableColumnValues("dataregion_TestAssayLuminex Data", "Analyte"));
-            standards.addAll(getTableColumnValues("dataregion_TestAssayLuminex Data", "Analyte Standard"));
-            clickLinkContainingText("Next");
-        }
-        clickLinkContainingText("First");
-
-        List<List<String>> ret = new LinkedList();
-        ret.add(analytes);
-        ret.add(1,standards);
-
-        return ret;
-    }
 
     /**
      * based on the instructions endcoded in the map, select the specified standards for each analyte
      *
-     * preconditions:  on TODO page.  analytes and standards must exist
+     * preconditions:  on multiple curve data page.  analytes and standards must exist
      * postconditions: given check boxes checked and unchecked
      *
      * @param analytesAndTheirStandards map, where the keys are the analyte names and the values are sets of standard names,
@@ -513,8 +772,7 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void createNewAssayRun(String name)
     {
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkWithText(TEST_ASSAY_LUM);
+        goToTestRunList();
         clickButtonContainingText("Import Data");
         waitForPageToLoad();
         clickButtonContainingText("Next");
@@ -550,6 +808,8 @@ public class LuminexTest extends AbstractQCAssayTest
         // add the transform script to the assay
         log("Uploading Luminex Runs with a transform script");
 
+
+        //TODO:  goToTestRunList
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
         click(Locator.linkWithText("manage assay design"));

@@ -55,6 +55,7 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -2373,6 +2374,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
 
     }
+
+    public void waitForText(final String text)
+    {
+         waitForText(text, defaultWaitForPage);
+    }
     public void waitForText(final String text, int wait)
     {
         String failMessage = text + " did not appear";
@@ -2820,14 +2826,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLink(getTabLinkId(tabname));
     }
 
-    public void clickImageWithAltText(String altText)
+    public void clickImageWithAltText(String altText, int millis)
     {
         log("Clicking first image with alt text " + altText );
         Locator l = Locator.tagWithAttribute("img", "alt", altText);
         boolean present = isElementPresent(l);
         if (!present)
             fail("Unable to find image with altText " + altText);
-        clickAndWait(l, defaultWaitForPage);
+        clickAndWait(l, millis);
+    }
+
+    public void clickImageWithAltText(String altText)
+    {
+        clickImageWithAltText(altText, defaultWaitForPage);
     }
 
     public int getImageWithAltTextCount(String altText)
@@ -3125,6 +3136,63 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         int index = getColumnIndex(tableName, columnName);
         return getTableColumnValues(tableName, index);
+    }
+
+
+
+    public void showAllInTable()
+    {
+        showNumberInTable("All");
+    }
+
+    public void showNumberInTable(String shareValue)
+    {
+
+        clickNavButton("Page Size",0);
+        waitForText("100 per page");
+        Locator l = Locator.id("Page Size:" + shareValue);
+        click(l);
+    }
+
+
+    public void show100InTable()
+    {
+        showNumberInTable("100");
+    }
+
+    /**get values for all specifed columns for all pages of the table
+     * preconditions:  must be on start page of table
+     * postconditions:  at start of table
+     * @param tableName
+     * @param columnNames
+     * @return
+     */
+    protected  List<List<String>> getColumnValues(String tableName, String... columnNames)
+    {
+        waitForAjaxLoad();
+        boolean moreThanOnePage = isTextPresent("Next");
+        if(moreThanOnePage)
+        {
+            showAllInTable();
+            waitForAjaxLoad();
+        }
+        List<List<String>> columns = new ArrayList<List<String>>();
+        for(int i=0; i<columnNames.length; i++)
+        {
+            columns.add(new ArrayList<String>());
+        }
+
+        for(int i=0; i<columnNames.length; i++)
+        {
+            columns.get(i).addAll(getTableColumnValues(tableName, columnNames[i]));
+        }
+
+        if(moreThanOnePage)
+        {
+            show100InTable();
+            waitForAjaxLoad();
+        }
+        return columns;
     }
 
     // Returns the number of rows (both <tr> and <th>) in the specified table
@@ -3757,6 +3825,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickRadioButtonById(String id)
     {
         click(Locator.radioButtonById(id));
+    }
+
+    public void clickRadioButtonById(String id, int millis)
+    {
+        clickAndWait(Locator.radioButtonById(id), millis);
+
     }
 
     public void clickCheckboxById(String id)
@@ -5300,5 +5374,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if(isTextPresent("Sign Out"))
             signOut();
+    }
+
+    /** we don't cope well with AJAX at the moment-
+     * we may click before something is loaded, or time out because
+     * we haven't correctly detected that something has in fact loaded.
+     * This method is designed to prevent me hand coding dozens of wait statements,
+     * although hopefully we'll eventually integrate waiting for AJAX into the individual
+     * functions and be able to get rid of it
+     */
+    public void waitForAjaxLoad()
+    {
+        sleep(5000);
+        //TODO
     }
 }
