@@ -89,8 +89,8 @@ public class FolderTest extends BaseSeleniumWebTest
 
         // Use drag-and-drop to reorder folders.
         log("Reorder Projects test");
-        reorderProjects(PROJECT_NAME, "Shared", Reorder.following, true);
-        sleep(500);
+        reorderProjects(PROJECT_NAME, "Shared", Reorder.preceding, true);
+        sleep(500); // Wait for folder move to complete.
         refresh();
         // TODO : Figure out how to get the order of project names within the panel
         //assertTextBefore("Shared", PROJECT_NAME);
@@ -157,9 +157,13 @@ public class FolderTest extends BaseSeleniumWebTest
     private void reorderProjects(String project, String targetProject, Reorder order, boolean successExpected)
     {
         log("Reorder project: '" + project + "' " + order.toString() + " '" + targetProject + "'");
-        waitForElement(Locator.xpath("//div/a/span[text()='"+project+"']"), WAIT_FOR_JAVASCRIPT);
+        Locator p = Locator.xpath("//div/a/span[text()='"+project+"']");
+        Locator t = Locator.xpath("//div/a/span[text()='"+targetProject+"']");
+        
+        waitForElement(p, WAIT_FOR_JAVASCRIPT);
+        waitForElement(t, WAIT_FOR_JAVASCRIPT);
 
-        dragAndDrop(Locator.xpath("//div/a/span[text()='"+project+"']"), Locator.xpath("//div/a/span[text()='" + targetProject + "']"), order == Reorder.preceding ? Position.top : Position.bottom);
+        dragAndDrop(p, t, order == Reorder.preceding ? Position.top : Position.bottom);
         if(successExpected)
         {
             ExtHelper.waitForExtDialog(this, "Change Display Order");
