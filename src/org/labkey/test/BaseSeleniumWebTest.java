@@ -1987,6 +1987,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
 
         clickLinkWithText("Folders");
+        waitForExtFolderTreeNode(project, 10000);
         clickNavButton("Delete");
         // in case there are sub-folders
         if (isNavButtonPresent("Delete All Folders"))
