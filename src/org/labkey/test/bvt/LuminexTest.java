@@ -655,19 +655,17 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
         //based on the assumption that there are five analytes and two possible standards:  update this if you need to test for more
-        Set<String> standardsForFirst = new HashSet(); standardsForFirst.add(possibleStandards[0]);
-        analytesAndStandardsConfig.put(possibleAnalytes[0], standardsForFirst);
+        Set<String> firstStandard = new HashSet(); firstStandard.add(possibleStandards[0]);
+        Set<String> secondStandard = new HashSet(); secondStandard.add(possibleStandards[1]);
+        Set<String> bothStandard = new HashSet();
+        bothStandard.add(possibleStandards[0]);
+        bothStandard.add(possibleStandards[1]);
 
-        Set<String> standardsForSecond = new HashSet(); standardsForSecond.add(possibleStandards[1]);
-        analytesAndStandardsConfig.put(possibleAnalytes[1], standardsForSecond);
-
-        Set<String> standards = new HashSet();
-        standards.add(possibleStandards[0]);
-        standards.add(possibleStandards[1]);
-        for(int i = 2; i<possibleAnalytes.length; i++)
-        {
-            analytesAndStandardsConfig.put(possibleAnalytes[i], standards);
-        }
+        analytesAndStandardsConfig.put(possibleAnalytes[0], bothStandard);
+        analytesAndStandardsConfig.put(possibleAnalytes[1], firstStandard);
+        analytesAndStandardsConfig.put(possibleAnalytes[2], firstStandard);
+        analytesAndStandardsConfig.put(possibleAnalytes[3], secondStandard);
+        analytesAndStandardsConfig.put(possibleAnalytes[4], secondStandard);
 
         return analytesAndStandardsConfig;
     }
