@@ -78,7 +78,7 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Import");
 
         // import custom visit mapping
-        importCustomVisitMapping();
+        importCustomVisitMappingAndVerify();
 
         // define forms
         clickLinkWithText("Manage Study");
@@ -140,6 +140,28 @@ public class StudyManualTest extends StudyTest
     }
 
 
+    protected void importCustomVisitMappingAndVerify()
+    {
+        // Import custom mapping
+        importCustomVisitMapping();
+
+        // Test clearing the custom mapping
+        clickLinkWithText("Clear Custom Mapping");
+        clickLinkWithText("OK");
+        assertTextPresent("The custom mapping is currently empty");
+        assertNavButtonPresent("Import Custom Mapping");
+        assertNavButtonNotPresent("Replace Custom Mapping");
+        assertNavButtonNotPresent("Clear Custom Mapping");
+        assertTextNotPresent("Vaccine 1");
+        assertTextNotPresent("Vaccination 1");
+        assertTextNotPresent("Cycle 10");
+        assertTextNotPresent("All Done");
+
+        // Import custom mapping again
+        importCustomVisitMapping();
+    }
+
+
     protected void importCustomVisitMapping()
     {
         if (!isLinkPresentContainingText("Visit Import Mapping"))
@@ -149,6 +171,8 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Import Custom Mapping");
         setLongTextField("tsv", VISIT_IMPORT_MAPPING);
         clickNavButton("Submit");
+
+        assertTextPresentInThisOrder("Cycle 10", "Vaccine 1", "Vaccination 1", "All Done");
     }
 
 

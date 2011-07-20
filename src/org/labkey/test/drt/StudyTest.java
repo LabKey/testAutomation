@@ -49,6 +49,8 @@ public class StudyTest extends StudyBaseTest
 
     protected static final String VISIT_IMPORT_MAPPING = "Name\tSequenceNum\n" +
         "Cycle 10\t10\n" +
+        "Vaccine 1\t201\n" +
+        "Vaccination 1\t201\n" +
         "Soc Imp Log #%{S.3.2}\t5500\n" +
         "ConMeds Log #%{S.3.2}\t9002\n" +
         "All Done\t9999";
@@ -323,7 +325,7 @@ public class StudyTest extends StudyBaseTest
 
         clickButtonContainingText("Add All");
 
-        List<String> idsInColumn =getTableColumnValues("dataregion_demoDataRegion",  1);
+        List<String> idsInColumn = getTableColumnValues("dataregion_demoDataRegion",  1);
         String idsInForm = getFormElement(ID_FIELD);
         assertIDListsMatch(idsInColumn, idsInForm);
 
@@ -684,17 +686,30 @@ public class StudyTest extends StudyBaseTest
         assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
         assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
-        // Clear custom visit mapping and verify
-        clickLinkWithText("Clear Custom Mapping");
-        clickLinkWithText("OK");
-        assertTextPresent("The custom mapping is currently empty");
-        assertNavButtonPresent("Import Custom Mapping");
-        assertNavButtonNotPresent("Replace Custom Mapping");
-        assertNavButtonNotPresent("Clear Custom Mapping");
-        assertTextNotPresent("BarBar");
-        assertTextNotPresent("FooFoo");
-        assertTextNotPresent("Cycle 10");
-        assertTextNotPresent("All Done");
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Types");
+        log("Verifying sequence numbers and visit names imported correctly");
+        List<String> sequenceNums = getTableColumnValues("dataregion_Dataset", "Sequence Num");
+        assertEquals(sequenceNums.get(0), "Sequence Num");
+        sequenceNums.remove(0);
+        assertEquals("Incorrect number of rows in Types dataset", 48, sequenceNums.size());
+
+        int sn101 = 0;
+        int sn201 = 0;
+
+        for (String seqNum : sequenceNums)
+        {
+            // Use startsWith because StudyTest and StudyBvtTest have different default format strings 
+            if (seqNum.startsWith("101.0"))
+                sn101++;
+            else if (seqNum.startsWith("201.0"))
+                sn201++;
+            else
+                fail("Unexpected sequence number: " + seqNum);
+        }
+
+        assertEquals("Incorrect count for sequence number 101.0", 24, sn101);
+        assertEquals("Incorrect count for sequence number 201.0", 24, sn201);
     }
 
     // Either param can be null
