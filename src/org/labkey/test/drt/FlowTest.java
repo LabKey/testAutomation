@@ -18,6 +18,7 @@ package org.labkey.test.drt;
 
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
@@ -76,23 +77,25 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for FCS files to be imported");
 
         // Should allow for import all directories containing FCS Files
+        waitForPageToLoad();
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.waitForImportDataEnabled(this);
-        waitForElement(ExtHelper.locateBrowserFileCheckbox("run2"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(ExtHelper.locateBrowserFileCheckbox("L04-060120-QUV-JS"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
         assertTextPresent("The following directories within '8color'");
-        assertTextPresent("8colordata (11 fcs files)");
-        assertTextPresent("run2 (1 fcs files)");
+        assertTextPresent("L02-060120-QUV-JS (25 fcs files)");
+        assertTextPresent("L04-060120-QUV-JS (14 fcs files)");
         clickNavButton("Cancel"); // go back to file-browser
 
-        // Entering 8colordata directory should allow import of current directory
+        // Entering L02-060120-QUV-JS directory should allow import of current directory
+        waitForPageToLoad();
         waitAndClick(Locator.fileTreeByName("8color"));
-        waitAndClick(Locator.fileTreeByName("8colordata"));
+        waitAndClick(Locator.fileTreeByName("L02-060120-QUV-JS"));
         waitForElement(ExtHelper.locateBrowserFileCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
-        selectImportDataAction("Current directory of 11 FCS Files");
-        assertTextPresent("The following directories within '8color" + File.separator + "8colordata'");
-        assertTextPresent("Current Directory (11 fcs files)");
-        assertTextNotPresent("run2");
+        selectImportDataAction("Current directory of 25 FCS Files");
+        assertTextPresent("The following directories within '8color" + File.separator + "L02-060120-QUV-JS'");
+        assertTextPresent("Current Directory (25 fcs files)");
+        assertTextNotPresent("L04-060120-QUV-JS");
         clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
@@ -132,7 +135,7 @@ public class FlowTest extends BaseFlowTest
         submit();
 
         clickLinkWithText("Define compensation calculation from scratch");
-        selectOptionByText("selectedRunId", "8colordata");
+        selectOptionByText("selectedRunId", "L02-060120-QUV-JS");
         submit();
 
         selectOptionByText("identifier=positiveKeywordName[3]", "Comp");
@@ -209,7 +212,7 @@ public class FlowTest extends BaseFlowTest
         selectOptionByText("subset", "Singlets/L/Live/3+/4+");
         selectOptionByText("xaxis", "comp-PE Cy7-A IFNg");
         selectOptionByText("yaxis", "comp-PE Green laser-A IL2");
-        submit(Locator.dom("document.forms[1]"));
+        submit(Locator.dom("document.forms['chooseGraph']")); // UNDONE: v
 
         // change the name of an analysis
         clickLinkWithText("Flow Dashboard");
@@ -228,10 +231,13 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for more FCS files to be imported");
 
+        waitForPageToLoad();
         waitAndClick(Locator.fileTreeByName("8color"));
+        ExtHelper.waitForImportDataEnabled(this);
+        waitForElement(ExtHelper.locateBrowserFileCheckbox("L04-060120-QUV-JS"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
-        assertTextNotPresent("8colordata");
-        assertTextPresent("run2");
+        assertTextNotPresent("L02-060120-QUV-JS");
+        assertTextPresent("L04-060120-QUV-JS");
         clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
 
@@ -245,7 +251,7 @@ public class FlowTest extends BaseFlowTest
         waitForPageToLoad();
 
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
-        selectOptionByText("ff_compensationMatrixOption", "Matrix: 8colordata comp matrix");
+        selectOptionByText("ff_compensationMatrixOption", "Matrix: L02-060120-QUV-JS comp matrix");
         waitForPageToLoad();
 
         checkCheckbox(".toggle");
@@ -264,19 +270,81 @@ public class FlowTest extends BaseFlowTest
         clickMenuButton("Views", "AllColumns");
         assertTextPresent("File Path Root");
 
-        // upload sample set
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Upload Sample Descriptions");
-        setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
-        selectOptionByText("idColumn1", "Exp Name");
-        selectOptionByText("idColumn2", "Well Id");
-        submit();
+        // Test sample set and ICS metadata
+        {
+            // upload sample set
+            clickLinkWithText("Flow Dashboard");
+            clickLinkWithText("Upload Sample Descriptions");
+            setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
+            selectOptionByText("idColumn1", "Exp Name");
+            selectOptionByText("idColumn2", "Well Id");
+            submit();
 
-        // join with FCSFile keywords
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Define sample description join fields");
-        selectOptionByText("ff_dataField", "EXPERIMENT NAME");
-        selectOptionByText("ff_dataField", "WELL ID");
+            // join with FCSFile keywords
+            clickLinkWithText("Flow Dashboard");
+            clickLinkWithText("Define sample description join fields");
+            selectOptionByText(Locator.name("ff_samplePropertyURI", 0), "Exp Name");
+            selectOptionByText(Locator.name("ff_samplePropertyURI", 1), "Well Id");
+            selectOptionByText(Locator.name("ff_dataField", 0), "EXPERIMENT NAME");
+            selectOptionByText(Locator.name("ff_dataField", 1), "WELL ID");
+            submit();
+            assertTextPresent("39 FCS files were linked to samples in this sample set.");
+
+            // add ICS metadata
+            clickLinkWithText("Protocol 'Flow'");
+            clickLinkWithText("Edit ICS Metadata");
+
+            // specify PTID and Visit columns
+            selectOptionByText("ff_participantColumn", "Sample PTID");
+            selectOptionByText("ff_visitColumn", "Sample Visit");
+
+            // specify forground-background match columns
+            assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
+            selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
+
+            // specify background values
+            selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
+            assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
+            setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
+            submit();
+
+            // verify sample set and background values can be displayed in the FCSAnalysis grid
+            clickLinkWithText("Flow Dashboard");
+            clickLinkWithText("29 FCS files");
+            // Uncomment when Issue 11448 is fixed
+            //clickLinkWithText("Show Graphs");
+            CustomizeViewsHelper.openCustomizeViewPanel(this);
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Count");
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Count");
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Freq_Of_Parent");
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets$SL:Count");
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<APC-A>)");
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<Alexa 680-A>)");
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<FITC-A>)");
+            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<PE Cy55-A>)");
+
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/PTID");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Visit");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Stim");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/(FSC-H:FSC-A)");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets(SSC-A:FSC-A)");
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
+            CustomizeViewsHelper.saveCustomView(this);
+
+            // check PTID value from sample set present
+            assertTextPresent("P02034");
+
+            // UNDONE: assert background values are correctly calculated
+
+            // check well details page for FCSFile has link to the sample
+            clickLinkWithText("91779.fcs-L02-060120-QUV-JS");
+            clickLinkWithText("91779.fcs");
+            assertLinkPresentWithText("L02-060120-QUV-JS-C01");
+        }
 
         // bug 4625
         clickLinkWithText("Flow Dashboard");
