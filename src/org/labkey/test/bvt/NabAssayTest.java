@@ -212,6 +212,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             setFormElement("cutoff1", "50");
             setFormElement("cutoff2", "70");
             setFormElement("virusName", "Nasty Virus");
+            setFormElement("virusID", "5433211");
             selectOptionByText("curveFitMethod", "Polynomial");
 
             for (int i = 0; i < 5; i++)
