@@ -232,6 +232,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for more FCS files to be imported");
 
         waitForPageToLoad();
+        waitAndClick(Locator.fileTreeByName("6color")); // try to avoid intermittent bug in file browser
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.waitForImportDataEnabled(this);
         waitForElement(ExtHelper.locateBrowserFileCheckbox("L04-060120-QUV-JS"), WAIT_FOR_JAVASCRIPT);
@@ -311,8 +312,7 @@ public class FlowTest extends BaseFlowTest
             // verify sample set and background values can be displayed in the FCSAnalysis grid
             clickLinkWithText("Flow Dashboard");
             clickLinkWithText("29 FCS files");
-            // Uncomment when Issue 11448 is fixed
-            //clickLinkWithText("Show Graphs");
+            clickLinkWithText("Show Graphs");
             CustomizeViewsHelper.openCustomizeViewPanel(this);
             CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Count");
             CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Count");
