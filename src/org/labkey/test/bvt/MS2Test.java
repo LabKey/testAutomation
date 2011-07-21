@@ -27,7 +27,7 @@ import org.labkey.test.util.ExtHelper;
 import java.io.File;
 import java.io.IOException;
 
-public class MS2BvtTest extends MS2TestBase
+public class MS2Test extends MS2TestBase
 {
 
     protected void doTestSteps()

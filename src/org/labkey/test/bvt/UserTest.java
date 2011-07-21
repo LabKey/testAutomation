@@ -24,7 +24,7 @@ import org.labkey.test.drt.SecurityTest;
  * User: Karl Lum
  * Date: Jan 11, 2007
  */
-public class UserBvtTest extends SecurityTest
+public class UserTest extends SecurityTest
 {
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile", "Pager",
                 "IM", "Description"};

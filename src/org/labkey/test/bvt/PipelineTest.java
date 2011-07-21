@@ -25,21 +25,20 @@ import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.ms1.params.PepMatchTestParams;
 import org.labkey.test.ms1.params.FeaturesTestParams;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 
 /**
- * <code>PipelineBvtTest</code>
+ * <code>PipelineTest</code>
  */
-public class PipelineBvtTest extends PipelineWebTestBase
+public class PipelineTest extends PipelineWebTestBase
 {
     protected static final int MAX_WAIT_SECONDS = 60*5;
 
     protected PipelineTestsBase _testSetMS2 = new PipelineTestsBase(this);
     protected PipelineTestsBase _testSetMS1 = new PipelineTestsBase(this);
 
-    public PipelineBvtTest()
+    public PipelineTest()
     {
         super("Pipeline BVT");
 

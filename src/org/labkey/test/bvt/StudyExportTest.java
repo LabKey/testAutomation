@@ -28,7 +28,7 @@ import java.io.File;
  * Date: Dec 8, 2006
  * Time: 4:30:24 PM
  */
-public class StudyBvtTest extends StudyManualTest
+public class StudyExportTest extends StudyManualTest
 {
     private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";
     private static final String DEMOGRAPHICS_DATASET = "DEM-1: Demographics";

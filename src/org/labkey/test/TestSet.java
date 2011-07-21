@@ -43,8 +43,8 @@ public enum TestSet
         WikiTest.class,
         ExpTest.class,
         AssayTest.class,
-        StudyBvtTest.class,
-        PipelineBvtTest.class,
+        StudyExportTest.class,
+        PipelineTest.class,
         FileContentTest.class,
         ClientAPITest.class,
         MissingValueIndicatorsTest.class,
@@ -60,8 +60,8 @@ public enum TestSet
         XTandemTest.class,
         MascotTest.class,
         SequestTest.class,
-        MS2BvtTest.class,
-        MS2BvtTestGZ.class,
+        MS2Test.class,
+        MS2TestGZ.class,
     }),
 
     Daily(600000, new Class[]
@@ -81,17 +81,17 @@ public enum TestSet
         ProgrammaticQCTest.class,
         SchemaBrowserTest.class,
         StudySecurityTest.class,
-        MS1Bvt.class,
+        MS1Test.class,
         UniprotAnnotationTest.class, //requires bootstrap
         HTTPApiTest.class,
-        MessagesBvtTest.class, //do we need both MessagesTest and MessagesBvtTest?
+        MessagesLongTest.class, //do we need both MessagesTest and MessagesLongTest?
         QuantitationTest.class,
         MessagesTest.class,
-        MS2BvtTest.class,
-        MS2BvtTestGZ.class,
+        MS2Test.class,
+        MS2TestGZ.class,
         WikiLongTest.class,
         ListTest.class,
-        UserBvtTest.class,
+        UserTest.class,
         IssuesTest.class,
         NabOldTest.class,
         CaBigTest.class,
@@ -164,7 +164,7 @@ public enum TestSet
 
     Study(new Class[] {
         StudyTest.class,
-        StudyBvtTest.class,
+        StudyExportTest.class,
         StudyManualTest.class,
         StudyExtraTest.class,
         CohortTest.class,

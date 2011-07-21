@@ -16,7 +16,7 @@
 
 package org.labkey.test.bvt;
 
-public class MS2BvtTestGZ extends MS2BvtTest
+public class MS2TestGZ extends MS2Test
 {
     protected void doTestSteps()
     {

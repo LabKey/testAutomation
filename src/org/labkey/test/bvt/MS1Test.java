@@ -28,7 +28,7 @@ import org.labkey.test.util.CustomizeViewsHelper;
  * Date: Nov 7, 2007
  * Time: 9:33:52 AM
  */
-public class MS1Bvt extends BaseSeleniumWebTest
+public class MS1Test extends BaseSeleniumWebTest
 {
     public static final String PROJ_MAIN = "~~MS1 BVT PROJECT~~"; //use spaces to test for url encoding issues
     public static final String MS1_FOLDER_TYPE = "MS1";

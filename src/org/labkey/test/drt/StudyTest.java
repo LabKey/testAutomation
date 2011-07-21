@@ -699,7 +699,7 @@ public class StudyTest extends StudyBaseTest
 
         for (String seqNum : sequenceNums)
         {
-            // Use startsWith because StudyTest and StudyBvtTest have different default format strings 
+            // Use startsWith because StudyTest and StudyExportTest have different default format strings
             if (seqNum.startsWith("101.0"))
                 sn101++;
             else if (seqNum.startsWith("201.0"))

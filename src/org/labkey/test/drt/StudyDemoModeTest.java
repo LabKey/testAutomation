@@ -28,7 +28,7 @@ import java.util.List;
 * Time: 7:06:56 AM
 */
 
-// Consider: roll this test into StudyBvtTest to avoid creating/deleting the study yet again 
+// Consider: roll this test into StudyExportTest to avoid creating/deleting the study yet again
 public class StudyDemoModeTest extends StudyBaseTest
 {
     @Override

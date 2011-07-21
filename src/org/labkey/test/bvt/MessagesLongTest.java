@@ -24,7 +24,7 @@ import org.labkey.test.util.ExtHelper;
  * User: tamram
  * Date: May 15, 2006
  */
-public class MessagesBvtTest extends BaseSeleniumWebTest
+public class MessagesLongTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String EXPIRES1 = "2107-07-19";
