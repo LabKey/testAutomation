@@ -512,7 +512,7 @@ public class MS2BvtTest extends MS2TestBase
         assertTextBefore("K.ERQPPPR.L", "K.KLHQK.L");
 
         log("Test customize view");
-        clickNavButton("Clear");
+        clickNavButton("Clear All");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewSort(this, "Charge", "Z", "Descending");
         CustomizeViewsHelper.addCustomizeViewSort(this, "Mass", "CalcMH+", "Descending");
