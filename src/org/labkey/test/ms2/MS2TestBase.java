@@ -56,6 +56,12 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         return "server/modules/ms2";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup() throws IOException
     {
         cleanPipe(_pipelinePath);

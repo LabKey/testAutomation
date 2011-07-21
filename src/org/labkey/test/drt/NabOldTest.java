@@ -38,6 +38,11 @@ public class NabOldTest extends BaseSeleniumWebTest
         return "server/modules/nab";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 
     @Override
     protected boolean isFileUploadTest()

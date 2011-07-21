@@ -91,6 +91,11 @@ public class WikiLongTest extends BaseSeleniumWebTest
         return "server/modules/wiki";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 
     @Override
     protected boolean isFileUploadTest()
@@ -479,14 +484,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText("Edit");
         deleteWikiPage();
         clickLinkWithText(WIKI_PAGE1_TITLE);
-        //add once bug with caching wiki title is fixed
-        //assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
-
-        log("delete project with copied wiki");
-        clickLinkWithText("Folders");
-        clickNavButton("Delete");
-        log("confirm delete");
-        clickNavButton("Delete");
+        assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
 
         //extended wiki test -- generate 2000 pages
 //        clickLinkWithText(PROJECT_NAME);

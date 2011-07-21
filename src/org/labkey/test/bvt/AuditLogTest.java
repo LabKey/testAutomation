@@ -41,6 +41,14 @@ public class AuditLogTest extends BaseSeleniumWebTest
         return "server/modules/audit";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return AUDIT_TEST_PROJECT;
+    }
+
+    protected void checkQueries(){} // Skip.  Project is deleted as part of test
+
     protected void doCleanup() throws Exception
     {
         deleteUser(AUDIT_TEST_USER);

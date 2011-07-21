@@ -181,6 +181,12 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         return "server/modules/query";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doTestSteps() throws Exception
     {
         createProject();

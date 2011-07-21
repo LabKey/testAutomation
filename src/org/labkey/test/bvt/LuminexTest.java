@@ -91,6 +91,12 @@ public class LuminexTest extends AbstractQCAssayTest
         return "server/modules/luminex";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return TEST_ASSAY_PRJ_LUMINEX;
+    }
+
     /**
      * Performs Luminex designer/upload/publish.
      */

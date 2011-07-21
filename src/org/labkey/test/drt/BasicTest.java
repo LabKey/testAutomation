@@ -39,6 +39,10 @@ public class BasicTest extends BaseSeleniumWebTest
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 
     protected void doTestSteps()
     {
@@ -114,7 +118,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         log("Test firefox version");
         String source = getHtmlSource();
-        assertTrue("The LabKey test suite requires Firefox 2.0, 3.0, 3.5, or 3.6", source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0") || source.contains("MSIE 8") || source.contains("MSIE 7"));
+        assertTrue("The LabKey test suite requires Firefox 2.0, 3.0, 3.5, 3.6, 4.0", source.contains("Firefox/4.0") || source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0") || source.contains("MSIE 8") || source.contains("MSIE 7"));
 
         log("Test webpart buttons");
         clickWebpartMenuItem("Messages", "Customize");      

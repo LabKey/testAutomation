@@ -57,6 +57,9 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws Exception
     {
+        log("creating project...");
+        createProject(PROJECT_NAME, "Study");
+
         ensureAdminMode();
         clickLinkWithText("Admin Console");
         if (isTextPresent("Microsoft SQL Server"))
@@ -64,9 +67,6 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
             log("NOTE: Database type is SQL Server...skipping test...re-enable this on SQL Server once the following bugs are resolved: 8451, 8452, 8453, 8454, 8455.");
             return;
         }
-
-        log("creating project...");
-        createProject(PROJECT_NAME, "Study");
 
         log("importing study...");
         setupPipeline();
@@ -128,6 +128,12 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";
+    }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
     }
 
     @Override

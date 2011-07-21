@@ -56,6 +56,12 @@ public class IssuesTest extends BaseSeleniumWebTest
         return "server/modules/issues";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup()
     {
         deleteUser(USER1);

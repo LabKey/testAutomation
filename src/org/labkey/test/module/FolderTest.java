@@ -36,6 +36,12 @@ public class FolderTest extends BaseSeleniumWebTest
     {
         return null;
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
     
     @Override
     protected void doCleanup() throws Exception

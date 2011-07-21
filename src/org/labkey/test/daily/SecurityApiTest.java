@@ -38,6 +38,12 @@ public class SecurityApiTest extends SimpleApiTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     protected void runUITests() throws Exception
     {
         //setup the project, users and groups

@@ -50,6 +50,12 @@ public class MessagesBvtTest extends BaseSeleniumWebTest
         return "server/modules/announcements";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void permissionCheck(String permission, boolean readAbility)
     {
         clickLinkWithText(PROJECT_NAME);

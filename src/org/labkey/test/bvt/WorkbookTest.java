@@ -38,6 +38,12 @@ public class WorkbookTest extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     public void doCleanup()
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}

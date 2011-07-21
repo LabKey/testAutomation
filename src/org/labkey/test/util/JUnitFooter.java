@@ -36,6 +36,12 @@ public class JUnitFooter extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return null;
+    }
+
+    @Override
     public void doCleanup()
     {
         // Delete any containers created by the test.

@@ -44,6 +44,12 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         return "server/modules/nab";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return TEST_ASSAY_PRJ_ELISPOT;
+    }
+
     /**
      * Performs Luminex designer/upload/publish.
      */

@@ -112,6 +112,12 @@ public class TimeChartTest extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     public void doTestSteps()
     {
         createProject(PROJECT_NAME);

@@ -89,6 +89,12 @@ public class DataRegionTest extends BaseSeleniumWebTest
         return null;
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup() throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}

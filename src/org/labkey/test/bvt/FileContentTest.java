@@ -48,6 +48,12 @@ public class FileContentTest extends BaseSeleniumWebTest
         return "server/modules/filecontent";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     public boolean isFileUploadTest()
     {
         return true;

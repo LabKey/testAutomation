@@ -545,4 +545,10 @@ public class MS1Bvt extends BaseSeleniumWebTest
     {
         return "server/modules/ms1";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJ_MAIN;
+    }
 }

@@ -72,6 +72,7 @@ public class JUnitTest extends TestSuite
         {
             _testFailed = false;
         }
+        protected String getProjectName() {return null;}
         protected void doTestSteps() throws Exception { }
         protected void doCleanup() throws Exception { }
         public String getAssociatedModuleDirectory() { return null; }

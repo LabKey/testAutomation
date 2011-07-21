@@ -276,4 +276,10 @@ public class AdaptiveVisualizationPerf extends BaseSeleniumWebTest
     {
         return "none";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return null;
+    }
 }

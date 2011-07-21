@@ -143,6 +143,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return WebTestHelper.getContextPath();
     }
 
+    protected abstract String getProjectName();
+
     @Override
     public void setUp() throws Exception
     {
@@ -1120,6 +1122,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             //make sure you're signed in as admin, because this won't work otherwise
             ensureSignedInAsAdmin();
 
+            checkQueries();
+
             checkLeaksAndErrors();
 
             checkActionCoverage();
@@ -1336,7 +1340,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Found " + leakCount + " in-use objects.  This is within the expected number of " + MAX_LEAK_LIMIT + ".");
     }
 
-
     public void checkErrors()
     {
 		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
@@ -1349,7 +1352,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("No new errors found.");
         goToHome();         // Don't leave on an empty page
     }
-
 
     public void checkExpectedErrors(int count)
     {
@@ -1380,6 +1382,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         popLocation();
     }
 
+    protected void checkQueries()
+    {
+        if(getProjectName() != null)
+        {
+            clickLinkWithText(getProjectName());
+            if(!"Query Schema Browser".equals(selenium.getTitle()))
+                goToSchemaBrowser();
+            validateQueries();
+        }
+    }
 
     private void checkActionCoverage()
     {
@@ -4805,6 +4817,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         Locator locButton = Locator.xpath("//button[text()='Start Validation']");
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
         waitForElement(locButton, WAIT_FOR_JAVASCRIPT);
+        checkCheckbox(Locator.id("lk-vq-subfolders"));
+        checkCheckbox(Locator.id("lk-vq-systemqueries"));
         click(locButton);
         waitForElement(locFinishMsg, 120000);
         //test for success
@@ -4839,7 +4853,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         DefaultSeleniumWrapper()
         {
-            super("localhost", getSeleniumServerPort(), getBrowser(), "http://localhost:"+getSeleniumServerPort()+"/selenium-server/RemoteRunner.html");
+            super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL());
         }
 
         private void log(String s)

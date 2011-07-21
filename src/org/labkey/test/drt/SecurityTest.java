@@ -52,6 +52,11 @@ public class SecurityTest extends BaseSeleniumWebTest
         return "server/modules/core";
     }
 
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup()
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}

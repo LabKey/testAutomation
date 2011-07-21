@@ -88,6 +88,12 @@ public class NabAssayTest extends AbstractQCAssayTest
         return "server/modules/nab";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return TEST_ASSAY_PRJ_NAB;
+    }
+
     /**
      * Performs Luminex designer/upload/publish.
      */

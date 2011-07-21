@@ -33,6 +33,11 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         return "server/modules/ms2";
     }
 
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doTestSteps() throws Exception
     {
         log("Starting UniprotAnnotationTest");

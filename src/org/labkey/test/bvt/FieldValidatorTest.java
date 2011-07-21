@@ -132,4 +132,10 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
     {
         return "server/modules/experiment";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 }

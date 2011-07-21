@@ -307,4 +307,10 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
     {
         return "server/modules/experiment";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 }

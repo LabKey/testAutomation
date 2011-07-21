@@ -262,4 +262,10 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     {
         return "server/modules/query";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return TEST_PROGRAMMATIC_QC_PRJ;
+    }
 }

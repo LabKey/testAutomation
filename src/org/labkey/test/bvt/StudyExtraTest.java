@@ -404,4 +404,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
     {
         return "server/modules/study";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 }

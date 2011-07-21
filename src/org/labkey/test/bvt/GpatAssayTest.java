@@ -49,6 +49,12 @@ public class GpatAssayTest extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     public void doCleanup()
     {
         try { deleteProject(PROJECT_NAME); } catch (Throwable e) { }

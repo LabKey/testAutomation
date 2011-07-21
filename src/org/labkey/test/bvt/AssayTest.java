@@ -88,6 +88,12 @@ public class AssayTest extends AbstractAssayTest
         return "server/modules/study";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return TEST_ASSAY_PRJ_SECURITY;
+    }
+
     /**
      * Cleanup entry point.
      */

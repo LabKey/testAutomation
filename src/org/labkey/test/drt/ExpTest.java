@@ -45,6 +45,12 @@ public class ExpTest extends BaseSeleniumWebTest
         return "server/modules/experiment";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup()
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}

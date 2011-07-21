@@ -113,6 +113,12 @@ public class ListTest extends BaseSeleniumWebTest
         return "server/modules/list";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup()
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}

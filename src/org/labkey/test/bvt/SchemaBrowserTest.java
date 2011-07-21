@@ -115,4 +115,10 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
     {
         return "server/modules/query";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 }

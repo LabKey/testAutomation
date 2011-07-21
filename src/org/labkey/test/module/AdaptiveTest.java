@@ -971,6 +971,12 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     public boolean isFileUploadTest()
     {
         return true;

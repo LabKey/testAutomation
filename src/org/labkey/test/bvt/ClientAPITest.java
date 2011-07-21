@@ -124,6 +124,12 @@ public class ClientAPITest extends BaseSeleniumWebTest
         return null;
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup() throws Exception
     {
         for (String user : EMAIL_RECIPIENTS)

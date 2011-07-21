@@ -33,6 +33,12 @@ public class CaBigTest extends BaseSeleniumWebTest
         return "server/modules/cabig";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup()
     {
         try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {/* */}

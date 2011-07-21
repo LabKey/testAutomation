@@ -45,6 +45,12 @@ public class ModuleAssayTest extends AbstractAssayTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     protected boolean isFileUploadTest()
     {
         return true;

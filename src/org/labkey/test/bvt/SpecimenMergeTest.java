@@ -49,6 +49,12 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     protected boolean isFileUploadTest()
     {
         return true;

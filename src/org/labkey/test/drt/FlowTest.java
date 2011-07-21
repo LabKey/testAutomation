@@ -36,6 +36,11 @@ public class FlowTest extends BaseFlowTest
         click(Locator.raw("//input[@value = '" + text + "']"));
     }
 
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     public int countEnabledInputs(String name)
     {
         List<Locator> inputs = findAllMatches(Locator.xpath("//input[@name='" + name + "']"));

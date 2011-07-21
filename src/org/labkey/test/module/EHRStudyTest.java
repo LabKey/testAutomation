@@ -98,6 +98,12 @@ public class EHRStudyTest extends SimpleApiTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     public boolean enableLinkCheck()
     {
         if ( super.enableLinkCheck() )

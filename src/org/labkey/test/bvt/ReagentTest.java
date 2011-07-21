@@ -42,6 +42,12 @@ public class ReagentTest extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
     protected void doCleanup() throws Exception
     {
         try { deleteProject(PROJECT_NAME); } catch (Throwable t) { }

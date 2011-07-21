@@ -50,4 +50,9 @@ public class ModuleTest extends BaseSeleniumWebTest
         return null;
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 }

@@ -57,6 +57,12 @@ public class TargetStudyTest extends AbstractAssayTest
     private String _study3Label = null;
 
     @Override
+    protected String getProjectName()
+    {
+        return TEST_ASSAY_PRJ_SECURITY;
+    }
+
+    @Override
     protected void doCleanup() throws Exception
     {
         try

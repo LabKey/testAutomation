@@ -134,6 +134,11 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
                 "</script>";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 
     @Override
     protected void doTestSteps() throws Exception

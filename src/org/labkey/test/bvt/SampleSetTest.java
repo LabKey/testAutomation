@@ -57,6 +57,12 @@ public class SampleSetTest extends BaseSeleniumWebTest
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doTestSteps()
     {
         createProject(PROJECT_NAME);

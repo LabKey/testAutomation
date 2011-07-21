@@ -53,6 +53,12 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         return "server/modules/core";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PERM_PROJECT_NAME;
+    }
+
     protected void doCleanup()
     {
         log(this.getClass().getName() + " Cleaning UP");

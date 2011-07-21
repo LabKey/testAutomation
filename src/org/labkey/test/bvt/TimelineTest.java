@@ -90,6 +90,12 @@ public class TimelineTest extends BaseSeleniumWebTest
         return "server/modules/timeline";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doCleanup() throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}

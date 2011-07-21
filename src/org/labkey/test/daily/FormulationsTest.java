@@ -286,4 +286,10 @@ public class FormulationsTest extends BaseSeleniumWebTest
     {
         return "none";
     }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
 }

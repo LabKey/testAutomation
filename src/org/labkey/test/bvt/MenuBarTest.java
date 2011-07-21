@@ -36,6 +36,12 @@ public class MenuBarTest extends BaseSeleniumWebTest
         return "server/modules/core";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void doTestSteps()
     {
 

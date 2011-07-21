@@ -33,6 +33,12 @@ public class JUnitHeader extends BaseSeleniumWebTest
     }
 
     @Override
+    protected String getProjectName()
+    {
+        return null;
+    }
+
+    @Override
     public void doCleanup(){ }
 
     @Override

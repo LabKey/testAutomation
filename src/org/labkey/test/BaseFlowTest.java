@@ -32,6 +32,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         return "server/modules/flow";
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
     protected void setFlowPipelineRoot(String rootPath)
     {
         setPipelineRoot(rootPath);
