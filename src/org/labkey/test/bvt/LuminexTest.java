@@ -70,9 +70,12 @@ public class LuminexTest extends AbstractQCAssayTest
     private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"1.0", "1.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "26430.8", "26556.2", "1.0", "1.0", "1.0",
             "1.0", "1.0", "1.0", "194.2", "198.8", "1.0", "1.0", "1.0", "1.0"};
-    private static final String[] RTRANS_ESTLOGCONC_VALUES = {"-6.9", "-6.9", "4.3", "4.3", "0.4", "0.4", "-0.0", "-0.0", "-6.9", "-6.9",
+    private static final String[] RTRANS_ESTLOGCONC_VALUES_5PL = {"-6.9", "-6.9", "4.3", "4.3", "0.4", "0.4", "-0.0", "-0.0", "-6.9", "-6.9",
             "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "4.3", "4.3", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9",
             "-6.9", "-0.6", "-0.6", "-6.9", "-6.9", "-6.9", "-6.9"};
+
+    private static final String[] RTRANS_ESTLOGCONC_VALUES_4PL = {"-6.9", "-6.9", "5.0", "5.0", "0.4", "0.4", "0.1", "0.1", "-6.9", "-6.9",
+            "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9"};
 
     public static final String ASSAY_ID_FIELD  = "name";
     public static final String ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD = "__primaryFile__";
@@ -853,20 +856,33 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
 
+        // add batch properties for transform and Ruminex version numbers
+        addField("Batch Fields", 5, "TransformVersion", "Transform Script Version", ListColumnType.String);
+        addField("Batch Fields", 6, "RuminexVersion", "Ruminex Version", ListColumnType.String);
+
         // add a run property for designation of which field to use for curve fit calc in transform
-        addField("Run Fields", 5, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
+        addField("Run Fields", 5, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
+        addField("Run Fields", 6, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
+        addField("Run Fields", 7, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
 
         // add the data properties for the calculated columns
         addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
-        addField("Data Fields", 1, "estLogConc", "Est Log Conc", ListColumnType.Double);
-        addField("Data Fields", 2, "estConc", "Est Conc", ListColumnType.Double);
-        addField("Data Fields", 3, "se", "SE", ListColumnType.Double);
+        addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
+        addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
+        addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);
+        addField("Data Fields", 4, "SE_5pl", "SE Rumi 5 PL", ListColumnType.Double);
+        addField("Data Fields", 5, "EstLogConc_4pl", "Est Log Conc Rumi 4 PL", ListColumnType.Double);
+        addField("Data Fields", 6, "EstConc_4pl", "Est Conc Rumi 4 PL", ListColumnType.Double);
+        addField("Data Fields", 7, "SE_4pl", "SE Rumi 4 PL", ListColumnType.Double);
 
         // set format to two decimal place for easier testing later
         setFormat("Data Fields", 0, "0.0");
-        setFormat("Data Fields", 1, "0.0");
         setFormat("Data Fields", 2, "0.0");
         setFormat("Data Fields", 3, "0.0");
+        setFormat("Data Fields", 4, "0.0");
+        setFormat("Data Fields", 5, "0.0");
+        setFormat("Data Fields", 6, "0.0");
+        setFormat("Data Fields", 7, "0.0");
 
         // save changes to assay design
         clickNavButton("Save & Close");
@@ -877,18 +893,19 @@ public class LuminexTest extends AbstractQCAssayTest
         clickNavButton("Import Data");
         clickNavButton("Next");
         setFormElement("name", "r script transformed assayId");
+        setFormElement("stndCurveFitInput", "FI");
         setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
         setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE4));
         clickNavButton("Next", 60000);
         clickNavButton("Save and Finish");
 
         // verify that the PDF of curves was generated
-        // TODO: add check for existance of PDF file in the Data Outputs section for the run
+        Locator l = Locator.tagWithAttribute("img", "src", "/labkey/_images/sigmoidal_curve.png");
+        click(l);
+        assertTextPresent("WithBlankBead.HIVIG_5PL.pdf");
+        assertTextPresent("WithBlankBead.HIVIG_4PL.pdf");
 
-        // verify that the Excel Run Properties were successfully passed through to the transform
-        // TODO: add check for the run properties that come from the excel file
-
-        // verfiy that the calculated values were generated by the transform script
+        // verfiy that the calculated values were generated by the transform script as expected
         clickLinkWithText("r script transformed assayId");
         setFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank", "Is Not Blank");
         assertTextPresent("1 - 32 of 32");
@@ -898,12 +915,20 @@ public class LuminexTest extends AbstractQCAssayTest
             assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "FI-Bkgd-Blank", RTRANS_FIBKGDBLANK_VALUES[i]);
         }
         clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
-        setFilter(TEST_ASSAY_LUM + " Data", "estLogConc", "Is Not Blank");
+        setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl", "Is Not Blank");
         assertTextPresent("1 - 32 of 32");
-        // check values in the est log conc column
-        for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES.length; i++)
+        // check values in the est log conc 5pl column
+        for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_5PL.length; i++)
         {
-            assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "Est Log Conc", RTRANS_ESTLOGCONC_VALUES[i]);
+            assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "Est Log Conc Rumi 5 PL", RTRANS_ESTLOGCONC_VALUES_5PL[i]);
+        }
+        clearFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl");
+        setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_4pl", "Is Not Blank");
+        assertTextPresent("1 - 16 of 16");
+        // check values in the est log conc 4pl column
+        for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_4PL.length; i++)
+        {
+            assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "Est Log Conc Rumi 4 PL", RTRANS_ESTLOGCONC_VALUES_4PL[i]);
         }
     }
 
