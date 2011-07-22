@@ -378,7 +378,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(TEST_DATA[0][3]);
 
         log("Test Customize View");
-        clickButton("Clear");
+        clickButton("Clear All");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol4.getName());
         CustomizeViewsHelper.addCustomizeViewFilter(this, _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
