@@ -68,6 +68,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
             return;
         }
 
+        clickLinkWithText(PROJECT_NAME);        
         log("importing study...");
         setupPipeline();
         importStudy();
