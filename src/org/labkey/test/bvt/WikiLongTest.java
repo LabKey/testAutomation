@@ -30,8 +30,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "WikiVerifyProject";
     private static final String PROJECT2_NAME = "WikiCopied";
-    private static final String PROJECT3_NAME = "WikiBvt Public Project";
-    private static final String PROJECT4_NAME = "WikiBvt Fourth Project";
+    private static final String PROJECT3_NAME = "WikiLong Public Project";
+    private static final String PROJECT4_NAME = "WikiLong Fourth Project";
     private static final String WIKI_PAGE1_TITLE = "Page 1 Wiki Title";
     private static final String WIKI_PAGE1_NAME= "Page 1 Wiki Name";
     private static final String WIKI_PAGE2_NAME = "Page 2 Wiki Name";
@@ -39,12 +39,15 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private static final String WIKI_PAGE3_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE3_NAME_TITLE = "Page 3 Wiki";
     private static final String WIKI_PAGE4_TITLE = "New Wiki";
+    private static final String WIKI_PAGE5_NAME = "Malformed";
+    private static final String WIKI_PAGE5_TITLE = "Malformed JavaScript Elements Should Work";
+
     private static final String DISC1_TITLE = "Let's Talk";
     private static final String DISC1_BODY = "I don't know how normal this wiki is";
     private static final String RESP1_TITLE = "Let's Keep Talking";
     private static final String RESP1_BODY = "I disagree";
-    private static final String USER1 = "user1@wikibvt.test";
-    private static final String USER2 = "user2@wikibvt.test";
+    private static final String USER1 = "user1@wikilong.test";
+    private static final String USER2 = "user2@wikilong.test";
     private static final String WIKI_PAGE3_WEBPART_TEST = "Best Gene Name";
     private static final String WIKI_NAVTREE_TITLE = "NavTree";
     private static final String WIKI_TERMS_TITLE = "Terms of Use";
@@ -72,6 +75,11 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
     private static final String WIKI_PAGE4_CONTENT =
             "This is wiki page <i>4</i><br/>${labkey.webPart(partName='Wiki TOC')}";
+
+    private static final String WIKI_PAGE5_CONTENT =
+            "    <script>\n" +
+            "        var foo = \"<form>Test</form>\";\n" +
+            "    </script>";
 
     private static final String NAVBAR1_CONTENT =
             "{labkey:tree|name=core.currentProject}";
@@ -158,6 +166,14 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithText(WIKI_PAGE2_NAME);
 
         searchFor(PROJECT_NAME, "Page AAA", 1, WIKI_PAGE2_TITLE);
+
+        log("test html wiki containing malformed javascript entities... we should allow this, see #");
+        createNewWikiPage();
+        setFormElement("name", WIKI_PAGE5_NAME);
+        setFormElement("title", WIKI_PAGE5_TITLE);
+        setWikiBody(WIKI_PAGE5_CONTENT);
+        saveWikiPage();
+        assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
 
         log("test create new html page with a webpart");
         createNewWikiPage("HTML");
