@@ -411,6 +411,13 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("Importing some data...");
         clickNavButton("Import Data");
         ListHelper.submitTsvData(this, LIST_DATA);
+
+        log("Create list in subfolder to prevent query validation failure");
+        ListHelper.createList(this, FOLDER_NAME, LIST_NAME,
+                ListHelper.ListColumnType.AutoInteger, "Key",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
+                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
     }
 
     private void doTestQueries()
