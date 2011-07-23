@@ -167,7 +167,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
         searchFor(PROJECT_NAME, "Page AAA", 1, WIKI_PAGE2_TITLE);
 
-        log("test html wiki containing malformed javascript entities... we should allow this, see #");
+        log("test html wiki containing malformed javascript entities... we should allow this, see #12268");
         createNewWikiPage();
         setFormElement("name", WIKI_PAGE5_NAME);
         setFormElement("title", WIKI_PAGE5_TITLE);
