@@ -24,7 +24,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.Diff;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -55,7 +54,6 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -781,6 +779,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private void checkForUpgrade()
     {
         boolean bootstrapped = false;
+
         // check to see if we're the first user:
         if (isTextPresent("You are the first user"))
         {
@@ -788,59 +787,29 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             assertTitleEquals("Register First User");
             log("Need to bootstrap");
             verifyInitialUserRedirects();
-            log("Trying to register some bad email addresses");
-            pushLocation();
-            setFormElement("email", "bogus@bogus@bogus");
-            clickLinkWithText("Register");
-            assertTextPresent("The string 'bogus@bogus@bogus' is not a valid email address. Please enter an email address in this form: user@domain.tld");
-            setFormElement("email", "");
-            clickLinkWithText("Register");
-            assertTextPresent("The string '' is not a valid email address. Please enter an email address in this form: user@domain.tld");
 
-            log("Registering with the test email address");
-            setText("email", PasswordUtil.getUsername());
-            clickLinkWithText("Register");
+            log("Testing bad email addresses");
+            verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
+            verifyInitialUserError(null, null, null, "Invalid email address: ");
+            assertTextNotPresent("null");
+
+            log("Testing bad passwords");
+            String email = PasswordUtil.getUsername();
+            verifyInitialUserError(email, null, null, "You must enter two passwords.");
+            verifyInitialUserError(email, "LongEnough", null, "You must enter two passwords.");
+            verifyInitialUserError(email, null, "LongEnough", "You must enter two passwords.");
+            verifyInitialUserError(email, "short", "short", "Your password must be six characters or more.");
+            verifyInitialUserError(email, email, email, "Your password must not match your email address.");
+            verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
+
+            log("Register the first user");
+            pushLocation();
+            verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword(), null);
 
             log("Attempting to register another initial user");
             popLocation();
             assertTextPresent("Initial user has already been created.");
-
-            selenium.goBack();
-            waitForPageToLoad();
-            assertTextPresent("Choose a password you'll use to access this server.");
-            assertTitleEquals("Choose a Password");
-
-            log("Testing bad passwords");
-            clickLinkWithText("Set Password");
-            assertTextPresent("You must enter two passwords.");
-
-            setFormElement("password", "LongEnough");
-            clickLinkWithText("Set Password");
-            assertTextPresent("You must enter two passwords.");
-
-            setFormElement("password2", "LongEnough");
-            clickLinkWithText("Set Password");
-            assertTextPresent("You must enter two passwords.");
-
-            setFormElement("password", "short");
-            setFormElement("password2", "short");
-            clickLinkWithText("Set Password");
-            assertTextPresent("Your password must be six characters or more.");
-
-            setFormElement("password", PasswordUtil.getUsername());
-            setFormElement("password2", PasswordUtil.getUsername());
-            clickLinkWithText("Set Password");
-            assertTextPresent("Your password must not match your email address.");
-
-            setFormElement("password", "LongEnough");
-            setFormElement("password2", "ButDontMatch");
-            clickLinkWithText("Set Password");
-            assertTextPresent("Your password entries didn't match.");
-
-            log("Set the test password");
-            setText("password", PasswordUtil.getPassword());
-            setText("password2", PasswordUtil.getPassword());
-            clickLinkWithText("Set Password");
+            goToHome();
         }
 
         if (bootstrapped || isTitleEqual("Sign In"))
@@ -909,6 +878,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             // Will fail if left navbar is not enabled in Home project. TODO: allow this, see #xxxx
             clickLinkWithText("Home");
         }
+    }
+
+
+    // Any arg can be null -- where's @Nullable?
+    private void verifyInitialUserError(String email, String password1, String password2, String expectedText)
+    {
+        if (null != email)
+            setFormElement("email", email);
+
+        if (null != password1)
+            setFormElement("password", password1);
+
+        if (null != password2)
+            setFormElement("password2", password2);
+
+        clickLinkWithText("Register");
+
+        if (null != expectedText)
+            assertTextPresent(expectedText);
     }
 
 
