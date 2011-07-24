@@ -100,7 +100,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
 
-    public static final String TRICKY_CHARACTERS = "><&/%\\' \"";
+    public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
@@ -3214,6 +3214,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return selenium.getXpathCount("//table[@id='" + tableName + "']/thead").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
     }
 
+    public void selectDropDownMenuItem(String menuName, String itemName)
+    {
+        Locator l = Locator.name(menuName);
+        mouseDown(l);
+
+        //TODO:  how do i select the item
+    }
+
 //TODO: getTableColumnCount.
 
     public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
@@ -3645,7 +3653,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             public boolean check()
             {
-                return getFormElement(elementName).trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns
+                return getFormElement(elementName).replace("\r", "").trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns, which are present in IE but absent in firefox
             }
         }, elementName + " was not set.", WAIT_FOR_JAVASCRIPT);
     }

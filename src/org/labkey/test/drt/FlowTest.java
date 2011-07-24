@@ -30,6 +30,8 @@ public class FlowTest extends BaseFlowTest
 {
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
+    private static final String JOIN_FIELD_LINK_TEXT = "Define sample description join fields";
+        String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
     private void clickButtonWithText(String text)
     {
@@ -318,6 +320,7 @@ public class FlowTest extends BaseFlowTest
             clickLinkWithText("Flow Dashboard");
             clickLinkWithText("29 FCS files");
             clickLinkWithText("Show Graphs");
+//            sleep(3000);
             CustomizeViewsHelper.openCustomizeViewPanel(this);
             CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Count");
             CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Count");
@@ -357,6 +360,111 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Make a copy of this analysis script");
         setFormElement("name", "QUV analysis");
         submit();
-        assertTextPresent("There is already a protocol named 'QUV analysis'");        
+        assertTextPresent("There is already a protocol named 'QUV analysis'");
+
+//        positivityReportTest();
     }
+
+
+//    private static final String POSITIVITY_REPORT_FOLDER = "FOLDER_NAME";
+//
+//    public void positivityReportTest()
+//    {
+//        ensurePositivityDataPresent();
+//
+//
+////         setConfigForPositivityTest();
+//
+//        String reportName = TRICKY_CHARACTERS + "positivity report";
+//        String reportDescription = TRICKY_CHARACTERS + "positivity report description";
+//
+//        createPositivityReport(reportName, reportDescription);
+//
+//        verifyReport(reportName, reportDescription);
+//
+//
+//
+//        //create positivity report
+//
+//            //set name =
+//
+//            //set Description
+//
+//            //choose subset
+//
+//        //verify report exists, is correct
+//
+//    }
+//
+//    private void verifyReport(String reportName, String reportDescription)
+//    {
+//
+//        waitForPipeline(containerPath);
+//
+//        goToFlowDashboard();
+//        clickLinkContainingText(reportName);
+//
+//
+//    }
+//
+//    private void createPositivityReport(String reportName, String description)
+//    {
+//        addWebPart("Flow Reports");
+//        clickLinkWithText("create positivity report");
+//
+//        setFormElement("reportName", reportName);
+//
+//        setFormElement("reportDescription", description);
+//
+//        Locator l = Locator.name("subset");
+//        click(l);
+//        selenium.typeKeys(l.toString(), "Singlets/L/Live/3+/4+/(!IFNg+&IL2+&!IL4+&!TNF+)");
+//
+//        clickButton("Save");
+//    }
+//
+////    private void setConfigForPositivityTest()
+////    {
+////        clickLinkContainingText(JOIN_FIELD_LINK_TEXT);
+////
+////        selectOptionByText("ff_samplePropertyURI", "ASSAY ID");
+////        selectOptionByText("ff_dataField", "EXPERIMENT NAME");
+////
+////        selectOptionByText(Locator.name("ff_samplePropertyURI",1), "SAMP ORD");
+////        selectOptionByText(Locator.name("ff_dataField",1), "Sample Order");
+////
+////
+////        clickLinkWithText("update");
+////        goToFlowDashboard();
+////
+////        //set metadata
+////        clickLinkWithText("Other settings");
+////        clickLinkWithText("Edit ICS Metadata");
+////
+////        selectDropDownMenuItem("ff_participantColumn", "Sample PTID");
+////        selectDropDownMenuItem("ff_visitColumn", "Sample VISITNO");
+////
+////        selectDropDownMenuItem("ff_MatchColumn", "Keyword Sample Order");
+////
+////        selectDropDownMenuItem("ff_backgroundFilterField", "Keyword Stim");
+////        selectDropDownMenuItem("ff_backgroundFilterOp", "Equals One of (e.g. 'a;b;c)");
+////        selectDropDownMenuItem("ff_backgroundFilterValue", "Neg Cont;negtrl");
+////
+////        clickLinkWithText("Set ICS Metadata");
+////
+////        goToFlowDashboard();
+////    }
+//
+//    private void ensurePositivityDataPresent()
+//    {
+//       log("do this manually");
+//        goToFlowDashboard();
+//
+//    }
+//
+//    private void goToFlowDashboard()
+//    {
+//       clickLinkWithText("Flow Dashboard");
+//    }
+
 }
