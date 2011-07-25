@@ -18,7 +18,7 @@ package org.labkey.test.module;
 
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.bvt.SimpleApiTest;
+import org.labkey.test.tests.SimpleApiTest;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 

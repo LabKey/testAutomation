@@ -16,14 +16,12 @@
 
 package org.labkey.test;
 
-import org.labkey.test.bvt.*;
-import org.labkey.test.daily.*;
-import org.labkey.test.drt.*;
 import org.labkey.test.module.*;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.QuantitationTest;
 import org.labkey.test.ms2.SequestTest;
+import org.labkey.test.tests.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +59,7 @@ public enum TestSet
         MascotTest.class,
         SequestTest.class,
         MS2Test.class,
-        MS2TestGZ.class,
+        MS2GZTest.class,
     }),
 
     Daily(600000, new Class[]
@@ -88,7 +86,7 @@ public enum TestSet
         QuantitationTest.class,
         MessagesTest.class,
         MS2Test.class,
-        MS2TestGZ.class,
+        MS2GZTest.class,
         WikiLongTest.class,
         ListTest.class,
         UserTest.class,
