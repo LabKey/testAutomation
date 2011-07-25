@@ -37,7 +37,7 @@ import java.util.Set;
  * User: jeckels
  * Date: Nov 20, 2007
  */
-public class LuminexTest extends AbstractQCAssayTest
+public class LuminexTest extends org.labkey.test.bvt.AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_LUMINEX = "Luminex Test";            //project for luminex test
 
@@ -146,9 +146,9 @@ public class LuminexTest extends AbstractQCAssayTest
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
 
-        ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListHelper.ListColumnType.String, "Participant ID");
-        ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListHelper.ListColumnType.Double, "Visit id");
-        ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListHelper.ListColumnType.String, "Index", participantCol, visitCol);
+        ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListColumnType.String, "Participant ID");
+        ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListColumnType.Double, "Visit id");
+        ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListColumnType.String, "Index", participantCol, visitCol);
         ListHelper.uploadData(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, "Index\tParticipantID\tVisitID\n" +
                 "1\tListParticipant1\t1001.1\n" +
                 "2\tListParticipant2\t1001.2\n" +
@@ -301,6 +301,10 @@ public class LuminexTest extends AbstractQCAssayTest
 
         String[] analytes = getListOfAnalytesMultipleCurveData();
 
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "ExclusionComment");
+        CustomizeViewsHelper.applyCustomView(this);
+
         //"all" excludes all
         String excludeAllWellName = "E1";
         excludeAllAnalytesForSingleWellTest(excludeAllWellName);
@@ -325,9 +329,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickExcludeAnalyteCheckBox(excludedAnalyte, true);
         clickButton(SAVE_CHANGES_BUTTON, 0);
 
-        Set<String> commentSet = new HashSet();
-        commentSet.add(exclusionComment);
-        excludeForSingleWellVerify(exclusionComment, new HashSet((Arrays.asList(new String[] {excludedAnalyte}))));
+        excludeForSingleWellVerify("Excluded for replicate group: " + exclusionComment, new HashSet<String>((Arrays.asList(excludedAnalyte))));
     }
 
     /**
@@ -348,7 +350,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton(SAVE_CHANGES_BUTTON, 0);
         waitForAjaxLoad();
 
-        excludeForSingleWellVerify(comment, new HashSet(Arrays.asList(getListOfAnalytesMultipleCurveData())));
+        excludeForSingleWellVerify("Excluded for replicate group: " + comment, new HashSet<String>(Arrays.asList(getListOfAnalytesMultipleCurveData())));
 
         //remove exclusions to leave in clean state
         clickExclusionMenuIconForWell(wellName);
@@ -368,7 +370,7 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void excludeForSingleWellVerify(String expectedComment, Set<String> analytes)
     {
-        List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, new String[] {"Well", "Description", "Dilution", "Exclusion Comment", "Analyte"});
+        List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, "Well", "Description", "Dilution", "Exclusion Comment", "Analyte");
         List<String> wells = vals.get(0);
         List<String> descriptions = vals.get(1);
         List<String> dilutions = vals.get(2);
@@ -441,8 +443,8 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForAjaxLoad();
         clickButton(SAVE_CHANGES_BUTTON, 0);
 
-        Map<String, Set> analyteToExclusion = new HashMap();
-        Set<String> set = new HashSet();
+        Map<String, Set<String>> analyteToExclusion = new HashMap<String, Set<String>>();
+        Set<String> set = new HashSet<String>();
         set.add(comment);
         analyteToExclusion.put(analyte, set);
 
@@ -457,9 +459,9 @@ public class LuminexTest extends AbstractQCAssayTest
      * @param key
      * @return
      */
-    private Map<String, Set> createExclusionMap(Set<String> value, String... key)
+    private Map<String, Set<String>> createExclusionMap(Set<String> value, String... key)
     {
-        Map m  = new HashMap();
+        Map<String, Set<String>> m  = new HashMap<String, Set<String>>();
 
         for(String k: key)
         {
@@ -500,7 +502,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private String excludedWellDescription = "Sample 6";
     private String excludedWellDilution = "10.0";
-    private Set<String> excludedWells = new HashSet(Arrays.asList(new String[] {"E1", "F1"}));
+    private Set<String> excludedWells = new HashSet<String>(Arrays.asList("E1", "F1"));
 
     private String[] getListOfAnalytesMultipleCurveData()
     {
@@ -589,16 +591,15 @@ public class LuminexTest extends AbstractQCAssayTest
 
     }
 
-    private void compareColumnValuesAgainstExpected(String column1, String column2, Map column1toColumn2)
+    private void compareColumnValuesAgainstExpected(String column1, String column2, Map<String, Set<String>> column1toColumn2)
     {
-        Set<String> set = new HashSet();
-        set.add( column2);
+        Set<String> set = new HashSet<String>();
+        set.add(column2);
         column1toColumn2.put(column1, set); //column headers
 
-        List<List<String>> columnVals = getColumnValues("dataregion_TestAssayLuminex Data", new String[] {column1, column2});
+        List<List<String>> columnVals = getColumnValues("dataregion_TestAssayLuminex Data", column1, column2);
 
         assertStandardsMatchExpected(columnVals, column1toColumn2);
-
     }
 
     /**
@@ -664,9 +665,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
         //based on the assumption that there are five analytes and two possible standards:  update this if you need to test for more
-        Set<String> firstStandard = new HashSet(); firstStandard.add(possibleStandards[0]);
-        Set<String> secondStandard = new HashSet(); secondStandard.add(possibleStandards[1]);
-        Set<String> bothStandard = new HashSet();
+        Set<String> firstStandard = new HashSet<String>(); firstStandard.add(possibleStandards[0]);
+        Set<String> secondStandard = new HashSet<String>(); secondStandard.add(possibleStandards[1]);
+        Set<String> bothStandard = new HashSet<String>();
         bothStandard.add(possibleStandards[0]);
         bothStandard.add(possibleStandards[1]);
 
