@@ -24,7 +24,6 @@ import static org.labkey.test.util.ListHelper.ListColumnType;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ import java.util.Set;
  * User: jeckels
  * Date: Nov 20, 2007
  */
-public class LuminexTest extends org.labkey.test.bvt.AbstractQCAssayTest
+public class LuminexTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_LUMINEX = "Luminex Test";            //project for luminex test
 
