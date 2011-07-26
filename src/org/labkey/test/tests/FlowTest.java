@@ -60,10 +60,8 @@ public class FlowTest extends BaseFlowTest
         return ret;
     }
 
-    protected void doTestSteps()
+    protected void queryTest()
     {
-        init();
-        String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
         beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
         createNewQuery("flow");
         setFormElement(Locator.nameOrId("ff_newQueryName"), "DRTQuery1");
@@ -81,10 +79,10 @@ public class FlowTest extends BaseFlowTest
 
         clickButton("Execute Query", 0);
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
+    }
 
-        clickLinkWithText("Flow Dashboard");
-        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
-        clickLinkWithText("Flow Dashboard");
+    protected void importFiles()
+    {
         clickLinkWithText("Browse for FCS files to be imported");
 
         // Should allow for import all directories containing FCS Files
@@ -166,8 +164,10 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("View Source");
         setLongTextField("script", this.getFileContents(QUV_ANALYSIS_SCRIPT));
         submit();
+    }
 
-        clickLinkWithText("Flow Dashboard");
+    protected void analysisFilterTest()
+    {
         clickLinkWithText("Other settings");
         clickLinkWithText("Edit FCS Analysis Filter");
         selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "Keyword/Stim");
@@ -281,82 +281,84 @@ public class FlowTest extends BaseFlowTest
         assertTextNotPresent("File Path Root");
         clickMenuButton("Views", "AllColumns");
         assertTextPresent("File Path Root");
+    }
 
-        // Test sample set and ICS metadata
-        {
-            // upload sample set
-            clickLinkWithText("Flow Dashboard");
-            clickLinkWithText("Upload Sample Descriptions");
-            setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
-            selectOptionByText("idColumn1", "Exp Name");
-            selectOptionByText("idColumn2", "Well Id");
-            submit();
+    // Test sample set and ICS metadata
+    protected void configureFiles()
+    {
 
-            // join with FCSFile keywords
-            clickLinkWithText("Flow Dashboard");
-            clickLinkWithText("Define sample description join fields");
-            selectOptionByText(Locator.name("ff_samplePropertyURI", 0), "Exp Name");
-            selectOptionByText(Locator.name("ff_samplePropertyURI", 1), "Well Id");
-            selectOptionByText(Locator.name("ff_dataField", 0), "EXPERIMENT NAME");
-            selectOptionByText(Locator.name("ff_dataField", 1), "WELL ID");
-            submit();
-            assertTextPresent("39 FCS files were linked to samples in this sample set.");
+        // upload sample set
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Upload Sample Descriptions");
+        setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
+        selectOptionByText("idColumn1", "Exp Name");
+        selectOptionByText("idColumn2", "Well Id");
+        submit();
 
-            // add ICS metadata
-            clickLinkWithText("Protocol 'Flow'");
-            clickLinkWithText("Edit ICS Metadata");
+        // join with FCSFile keywords
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Define sample description join fields");
+        selectOptionByText(Locator.name("ff_samplePropertyURI", 0), "Exp Name");
+        selectOptionByText(Locator.name("ff_samplePropertyURI", 1), "Well Id");
+        selectOptionByText(Locator.name("ff_dataField", 0), "EXPERIMENT NAME");
+        selectOptionByText(Locator.name("ff_dataField", 1), "WELL ID");
+        submit();
+        assertTextPresent("39 FCS files were linked to samples in this sample set.");
 
-            // specify PTID and Visit columns
-            selectOptionByText("ff_participantColumn", "Sample PTID");
-            selectOptionByText("ff_visitColumn", "Sample Visit");
+        // add ICS metadata
+        clickLinkWithText("Protocol 'Flow'");
+        clickLinkWithText("Edit ICS Metadata");
 
-            // specify forground-background match columns
-            assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
-            selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
+        // specify PTID and Visit columns
+        selectOptionByText("ff_participantColumn", "Sample PTID");
+        selectOptionByText("ff_visitColumn", "Sample Visit");
 
-            // specify background values
-            selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
-            assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
-            setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
-            submit();
+        // specify forground-background match columns
+        assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
+        selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
 
-            // verify sample set and background values can be displayed in the FCSAnalysis grid
-            clickLinkWithText("Flow Dashboard");
-            clickLinkWithText("29 FCS files");
-            clickLinkWithText("Show Graphs");
+        // specify background values
+        selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
+        assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
+        setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
+        submit();
+
+        // verify sample set and background values can be displayed in the FCSAnalysis grid
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("29 FCS files");
+        clickLinkWithText("Show Graphs");
 //            sleep(3000);
-            CustomizeViewsHelper.openCustomizeViewPanel(this);
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Count");
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Count");
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Freq_Of_Parent");
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets$SL:Count");
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<APC-A>)");
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<Alexa 680-A>)");
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<FITC-A>)");
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<PE Cy55-A>)");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Count");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Count");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Freq_Of_Parent");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets$SL:Count");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<APC-A>)");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<Alexa 680-A>)");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<FITC-A>)");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<PE Cy55-A>)");
 
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/PTID");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Visit");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Stim");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/(FSC-H:FSC-A)");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets(SSC-A:FSC-A)");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
-            CustomizeViewsHelper.saveCustomView(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/PTID");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Visit");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Stim");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/(FSC-H:FSC-A)");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets(SSC-A:FSC-A)");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
+        CustomizeViewsHelper.saveCustomView(this);
 
-            // check PTID value from sample set present
-            assertTextPresent("P02034");
+        // check PTID value from sample set present
+        assertTextPresent("P02034");
 
-            // UNDONE: assert background values are correctly calculated
+        // UNDONE: assert background values are correctly calculated
 
-            // check well details page for FCSFile has link to the sample
-            clickLinkWithText("91779.fcs-L02-060120-QUV-JS");
-            clickLinkWithText("91779.fcs");
-            assertLinkPresentWithText("L02-060120-QUV-JS-C01");
-        }
+        // check well details page for FCSFile has link to the sample
+        clickLinkWithText("91779.fcs-L02-060120-QUV-JS");
+        clickLinkWithText("91779.fcs");
+        assertLinkPresentWithText("L02-060120-QUV-JS-C01");
 
         // bug 4625
         clickLinkWithText("Flow Dashboard");
@@ -365,6 +367,25 @@ public class FlowTest extends BaseFlowTest
         setFormElement("name", "QUV analysis");
         submit();
         assertTextPresent("There is already a protocol named 'QUV analysis'");
+    }
+
+    protected void doTestSteps()
+    {
+        init();
+         containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
+        queryTest();
+
+        clickLinkWithText("Flow Dashboard");
+        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
+        clickLinkWithText("Flow Dashboard");
+
+        importFiles();
+
+        clickLinkWithText("Flow Dashboard");
+
+        analysisFilterTest();
+
+        configureFiles();
 
 //        positivityReportTest();
     }
