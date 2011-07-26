@@ -442,9 +442,10 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForAjaxLoad();
         clickButton(SAVE_CHANGES_BUTTON, 0);
 
+        String exclusionPrefix = "Excluded for analyte: ";
         Map<String, Set<String>> analyteToExclusion = new HashMap<String, Set<String>>();
         Set<String> set = new HashSet<String>();
-        set.add(comment);
+        set.add(exclusionPrefix + comment);
         analyteToExclusion.put(analyte, set);
 
         analyteToExclusion = createExclusionMap(set, analyte);
