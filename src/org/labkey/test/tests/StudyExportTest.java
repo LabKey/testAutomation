@@ -66,7 +66,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Manage Study");
         clickNavButton("Delete Study");
         checkCheckbox("confirm");
-        clickNavButton("Delete");
+        clickNavButton("Delete", WAIT_FOR_PAGE * 2); // TODO: Shorten wait (Issue 12731)
 
         log("Importing exported study (legacy formats)");
         clickNavButton("Import Study");
@@ -105,7 +105,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Manage Study");
         clickNavButton("Delete Study");
         checkCheckbox("confirm");
-        clickNavButton("Delete");
+        clickNavButton("Delete", WAIT_FOR_PAGE *2); // TODO: Shorten wait (Issue 12731)
 
         log("Importing exported study (xml formats)");
         clickNavButton("Import Study");

@@ -1973,8 +1973,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkPresentWithText(folderName);
         assertLinkPresentWithText(newParent);
     }
-
     public void deleteProject(String project)
+    {
+        
+        deleteProject(project, 90000); // Wait for 90 seconds for project deletion
+    }
+
+    public void deleteProject(String project, int wait)
     {
         log("Deleting project " + project);
         clickLinkWithText(project);
@@ -1994,8 +1999,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             clickNavButton("Delete All Folders");
         }
+        long startTime = System.currentTimeMillis();
         // confirm delete:
         clickNavButton("Delete");
+
+        if(isTextPresent(project))
+        {
+            log("Wait extra long for folder to finish deleting.");
+            while (isTextPresent(project) && System.currentTimeMillis() - startTime < wait)
+            {
+                sleep(5000);
+                refresh();
+            }
+        }
+        if (!isTextPresent(project)) log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
+        else fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
+
         // verify that we're not on an error page with a check for a project link:
         assertLinkNotPresentWithText(project);
     }
