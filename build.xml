@@ -1108,7 +1108,7 @@
                 <include name="instwin.r" />
           </fileset>
         </copy>
-        <condition property="r.path" value="${env.R_HOME}/R" else="R">
+        <condition property="r.path" value="${env.R_HOME}/bin/R.exe" else="R">
             <isset property="env.R_HOME"/>
         </condition>
         <condition property="rlabkey.windows">
@@ -1121,8 +1121,14 @@
 	<target name="install-rlabkey-binary" if="rlabkey.windows" >
 		<copy todir="${project.root}/sampledata/rlabkey" overwrite="true">
 			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.zip"/>        	
-		</copy>	
-		<exec dir="${project.root}/sampledata/rlabkey" executable="${r.path}term" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r" failifexecutionfails="false">
+		</copy>
+
+        <condition property="rterm.path" value="${env.R_HOME}/Rterm.exe"><available file="${env.R_HOME}/Rterm.exe"/></condition>
+        <condition property="rterm.path" value="${env.R_HOME}/bin/Rterm.exe"><available file="${env.R_HOME}/bin/Rterm.exe"/></condition>
+        <condition property="rterm.path" value="${env.R_HOME}/bin/i386/Rterm.exe"><available file="${env.R_HOME}/bin/i386/Rterm.exe"/></condition>
+        <condition property="rterm.path" value="${env.R_HOME}/bin/x64/Rterm.exe"><available file="${env.R_HOME}/bin/x64/Rterm.exe"/></condition>
+
+        <exec dir="${project.root}/sampledata/rlabkey" executable="${rterm.path}" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r" failifexecutionfails="false">
 		    <arg line="--vanilla" />
 		</exec>
 	</target>
