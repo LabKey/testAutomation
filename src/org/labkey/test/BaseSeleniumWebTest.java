@@ -3859,7 +3859,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void checkCheckbox(String name)
     {
-        checkCheckbox(Locator.name(name));
+        checkCheckbox(Locator.checkboxByName(name));
     }
 
     public void checkCheckboxByNameInDataRegion(String name)
@@ -3894,7 +3894,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void uncheckCheckbox(String name)
     {
-        uncheckCheckbox(Locator.name(name));
+        uncheckCheckbox(Locator.checkboxByName(name));
     }
 
     public void uncheckCheckbox(String name, String value)

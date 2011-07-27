@@ -181,8 +181,8 @@ public class LuminexTest extends AbstractQCAssayTest
             selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]", "StandardName1b");
             selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']", "StandardName2");
             selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[5]//input[@type='text']", "StandardName4");
-            selenium.click("//input[contains(@name,'unitsOfConcentrationCheckBox')]");
-            selenium.type("//input[@type='text' and contains(@name, 'unitsOfConcentration')]", "10 g/ml");
+            selenium.click("//input[contains(@name,'UnitsOfConcentrationCheckBox')]");
+            selenium.type("//input[@type='text' and contains(@name, 'UnitsOfConcentration')]", "10 g/ml");
             clickNavButton("Save and Finish");
 
             // Upload another run using a thaw list pasted in as a TSV
@@ -200,8 +200,8 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Next", 60000);
             assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
             assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
-            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsOfConcentration')]"));
-            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsOfConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'UnitsOfConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text' and contains(@name, 'UnitsOfConcentration')]"));
             clickNavButton("Save and Finish");
 
             // Upload another run using a thaw list that pointed at the list we uploaded earlier
@@ -223,8 +223,8 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Next", 60000);
             assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
             assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
-            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'unitsOfConcentration')]"));
-            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text' and contains(@name, 'unitsOfConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, 'UnitsOfConcentration')]"));
+            assertEquals("10 g/ml", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text' and contains(@name, 'UnitsOfConcentration')]"));
             clickNavButton("Save and Finish");
 
             log("Check that upload worked");
@@ -560,7 +560,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         String name = startCreateMultipleCurveAssayRun();
 
-        String[] standardsNames = {"HIVIG", "b12IgA"};
+        String[] standardsNames = {"HIVIG", "b12 IgA"};
         checkStandardsCheckBoxesExist(standardsNames);
 
         String[] possibleAnalytes = getListOfAnalytesMultipleCurveData();
@@ -575,8 +575,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(name);
 
         //edit view to show Analyte Standard
-        clickMenuButtonAndContinue("Views", "Customize View");
-        sleep(1500);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/Standard");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/StdCurve");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/FitProb");
@@ -642,7 +641,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
                 for(String s: splitCol2Val)
                 {
-                    assertTrue(expectedCol2Vals.contains(s));
+                    assertTrue("Expected " + expectedCol2Vals + " to contain" + s, expectedCol2Vals.contains(s));
                 }
             }
 //        }
@@ -689,16 +688,6 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     protected void checkAnalyteAndStandardCheckBox(String analyte, String standard, boolean checked)
     {
-        //remove punctuation, which is removed in titration name
-        analyte = analyte.replace("B.con", "b.con");
-        analyte = analyte.replace("Blank", "blank");
-        analyte = analyte.replace(" ","");
-        analyte = analyte.replace("(", "");
-        analyte = analyte.replace(")", "");
-        analyte = analyte.replace(".", "");
-
-        standard = standard.replace(" ", "");
-
         String checkboxName = "titration_" + analyte + "_" + standard;
         if(checked)
             checkCheckbox(checkboxName);
@@ -746,7 +735,7 @@ public class LuminexTest extends AbstractQCAssayTest
         for(int i=0; i<standardsNames.length; i++)
         {
             String s = standardsNames[i];
-            Locator l = Locator.name("_titrationRole_standard_"+s);
+            Locator l = Locator.checkboxByName("_titrationRole_standard_"+s);
             assertChecked(l);
         }
     }
