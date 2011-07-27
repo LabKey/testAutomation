@@ -150,6 +150,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
         toggleCheckboxByTitle("Pipeline");
         submit();
         addWebPart("Data Pipeline");
+        // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
+        // in IE testing
+        selenium.runScript("LABKEY.disablePipelineRefresh = true;");
         waitAndClickNavButton("Setup");
         setPipelineRoot(getPipelinePath());
     }
