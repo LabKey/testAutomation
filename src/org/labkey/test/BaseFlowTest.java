@@ -106,6 +106,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         assertTextNotPresent("Path does not exist");
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, getFolderName(), "Flow", null);
+
+        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
     }
 
     protected String getFolderName()

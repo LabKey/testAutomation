@@ -146,7 +146,7 @@ public class Locator
 
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a["+ NOT_HIDDEN +" and contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
+        return xpath("//a["+ NOT_HIDDEN +" and contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button') or contains(@class, 'labkey-menu-text-link')]/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator extButton(String text)

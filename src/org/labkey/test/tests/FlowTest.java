@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
@@ -60,7 +61,7 @@ public class FlowTest extends BaseFlowTest
         return ret;
     }
 
-    protected void queryTest()
+    protected void setupQuery()
     {
         beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
         createNewQuery("flow");
@@ -83,6 +84,7 @@ public class FlowTest extends BaseFlowTest
 
     protected void importFiles()
     {
+        goToFlowDashboard();
         clickLinkWithText("Browse for FCS files to be imported");
 
         // Should allow for import all directories containing FCS Files
@@ -168,6 +170,7 @@ public class FlowTest extends BaseFlowTest
 
     protected void analysisFilterTest()
     {
+        clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Other settings");
         clickLinkWithText("Edit FCS Analysis Filter");
         selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "Keyword/Stim");
@@ -284,11 +287,10 @@ public class FlowTest extends BaseFlowTest
     }
 
     // Test sample set and ICS metadata
-    protected void configureFiles()
+    protected void configureSampleSetAndMetadata()
     {
-
         // upload sample set
-        clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
         clickLinkWithText("Upload Sample Descriptions");
         setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
         selectOptionByText("idColumn1", "Exp Name");
@@ -322,9 +324,12 @@ public class FlowTest extends BaseFlowTest
         assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
         setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
         submit();
+    }
 
+    public void sampleSetAndMetadataTest()
+    {
         // verify sample set and background values can be displayed in the FCSAnalysis grid
-        clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
         clickLinkWithText("29 FCS files");
         clickLinkWithText("Show Graphs");
 //            sleep(3000);
@@ -359,9 +364,12 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("91779.fcs-L02-060120-QUV-JS");
         clickLinkWithText("91779.fcs");
         assertLinkPresentWithText("L02-060120-QUV-JS-C01");
+    }
 
+    public void copyAnalysisScriptTest()
+    {
         // bug 4625
-        clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
         clickLinkWithText("QUV analysis");
         clickLinkWithText("Make a copy of this analysis script");
         setFormElement("name", "QUV analysis");
@@ -372,124 +380,152 @@ public class FlowTest extends BaseFlowTest
     protected void doTestSteps()
     {
         init();
-         containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
-        queryTest();
-
-        clickLinkWithText("Flow Dashboard");
-        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
-        clickLinkWithText("Flow Dashboard");
+        containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
+        setupQuery();
 
         importFiles();
 
-        clickLinkWithText("Flow Dashboard");
-
         analysisFilterTest();
 
-        configureFiles();
+        configureSampleSetAndMetadata();
 
-//        positivityReportTest();
+        sampleSetAndMetadataTest();
+
+        positivityReportTest();
+
+        copyAnalysisScriptTest();
     }
 
 
-//    private static final String POSITIVITY_REPORT_FOLDER = "FOLDER_NAME";
-//
-//    public void positivityReportTest()
-//    {
-//        ensurePositivityDataPresent();
-//
-//
-////         setConfigForPositivityTest();
-//
-//        String reportName = TRICKY_CHARACTERS + "positivity report";
-//        String reportDescription = TRICKY_CHARACTERS + "positivity report description";
-//
-//        createPositivityReport(reportName, reportDescription);
-//
-//        verifyReport(reportName, reportDescription);
-//
-//
-//
-//        //create positivity report
-//
-//            //set name =
-//
-//            //set Description
-//
-//            //choose subset
-//
-//        //verify report exists, is correct
-//
-//    }
-//
-//    private void verifyReport(String reportName, String reportDescription)
-//    {
-//
-//        waitForPipeline(containerPath);
-//
-//        goToFlowDashboard();
-//        clickLinkContainingText(reportName);
-//
-//
-//    }
-//
-//    private void createPositivityReport(String reportName, String description)
-//    {
-//        addWebPart("Flow Reports");
-//        clickLinkWithText("create positivity report");
-//
-//        setFormElement("reportName", reportName);
-//
-//        setFormElement("reportDescription", description);
-//
-//        Locator l = Locator.name("subset");
-//        click(l);
-//        selenium.typeKeys(l.toString(), "Singlets/L/Live/3+/4+/(!IFNg+&IL2+&!IL4+&!TNF+)");
-//
-//        clickButton("Save");
-//    }
-//
-////    private void setConfigForPositivityTest()
-////    {
-////        clickLinkContainingText(JOIN_FIELD_LINK_TEXT);
-////
-////        selectOptionByText("ff_samplePropertyURI", "ASSAY ID");
-////        selectOptionByText("ff_dataField", "EXPERIMENT NAME");
-////
-////        selectOptionByText(Locator.name("ff_samplePropertyURI",1), "SAMP ORD");
-////        selectOptionByText(Locator.name("ff_dataField",1), "Sample Order");
-////
-////
-////        clickLinkWithText("update");
-////        goToFlowDashboard();
-////
-////        //set metadata
-////        clickLinkWithText("Other settings");
-////        clickLinkWithText("Edit ICS Metadata");
-////
-////        selectDropDownMenuItem("ff_participantColumn", "Sample PTID");
-////        selectDropDownMenuItem("ff_visitColumn", "Sample VISITNO");
-////
-////        selectDropDownMenuItem("ff_MatchColumn", "Keyword Sample Order");
-////
-////        selectDropDownMenuItem("ff_backgroundFilterField", "Keyword Stim");
-////        selectDropDownMenuItem("ff_backgroundFilterOp", "Equals One of (e.g. 'a;b;c)");
-////        selectDropDownMenuItem("ff_backgroundFilterValue", "Neg Cont;negtrl");
-////
-////        clickLinkWithText("Set ICS Metadata");
-////
-////        goToFlowDashboard();
-////    }
-//
-//    private void ensurePositivityDataPresent()
-//    {
-//       log("do this manually");
-//        goToFlowDashboard();
-//
-//    }
-//
-//    private void goToFlowDashboard()
-//    {
-//       clickLinkWithText("Flow Dashboard");
-//    }
+    public void positivityReportTest()
+    {
+        String reportName = "positivity report";
+        String reportDescription = "positivity report description";
+
+        createPositivityReport(reportName, reportDescription);
+        executeReport(reportName);
+        verifyReportError(reportName, "Error: labkey.data is empty");
+
+        updatePositivityReportFilter(reportName);
+        executeReport(reportName);
+        verifyReport(reportName);
+
+        deleteReport(reportName);
+        verifyDeleted(reportName);
+    }
+
+    private void createPositivityReport(String reportName, String description)
+    {
+        goToFlowDashboard();
+        addWebPart("Flow Reports");
+
+        clickLinkWithText("create positivity report");
+
+        setFormElement("reportName", reportName);
+        setFormElement("reportDescription", description);
+
+        Locator l = Locator.name("subset");
+        click(l);
+        //selenium.typeKeys(l.toString(), "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
+        setFormElement("subset", "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
+
+        // click on TriggerField trigger image
+        click(Locator.xpath("//input[@name='filter[4].property_subset']/../img"));
+        // Selenium XPath doesn't support attribute namespaces.
+        Locator CD4 = Locator.xpath("//div[contains(@class, 'x-tree-node-el') and @*='Singlets/L/Live/3+/4+']");
+        waitForElement(CD4, WAIT_FOR_JAVASCRIPT);
+        click(CD4);
+        selenium.fireEvent(Locator.name("filter[4].property_subset").toString(), "blur");
+
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='filter[4].property_stat']]"), "Count");
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='filter[4].op']]"), "Is Greater Than or Equal To");
+
+        // NOTE: this filter is set high so we filter out all of the data and produce an error message.
+        setFormElement("filter[4].value", "5000");
+
+        clickButton("Save");
+    }
+
+    private void updatePositivityReportFilter(String reportName)
+    {
+        goToFlowDashboard();
+
+        // Should only be one 'manage' menu since we've only created one flow report.
+        clickMenuButton("manage", "Edit");
+        setFormElement("filter[4].value", "100");
+        clickButton("Save");
+    }
+
+    private void executeReport(String reportName)
+    {
+        goToFlowDashboard();
+
+        clickLinkWithText(reportName);
+        clickButton("Execute Report");
+        waitForPipeline(containerPath);
+    }
+
+    private void verifyReportError(String reportName, String errorText)
+    {
+        goToFlowDashboard();
+        clickLinkWithText("Show Jobs");
+        clickLinkWithText("ERROR");
+
+        assertTitleContains(reportName);
+        assertTextPresent(errorText);
+        checkExpectedErrors(2);
+    }
+
+    private void verifyReport(String reportName)
+    {
+        beginAt("/flow" + containerPath + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, reportName + "/Raw P");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, reportName + "/Adjusted P");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, reportName + "/Response");
+        CustomizeViewsHelper.addCustomizeViewFilter(this, reportName + "/Response", "Response", "Equals", "1");
+        CustomizeViewsHelper.addCustomizeViewSort(this, "Name", "Ascending");
+        CustomizeViewsHelper.saveCustomView(this);
+
+        DataRegionTable table = new DataRegionTable("query", this, false);
+        assertEquals(4, table.getDataRowCount());
+        assertEquals("91926.fcs-L02-060120-QUV-JS", table.getDataAsText(0, "Name"));
+    }
+
+    private void deleteReport(String reportName)
+    {
+        goToFlowDashboard();
+
+        // Should only be one 'manage' menu since we've only created one flow report.
+        clickMenuButton("manage", "Delete");
+        clickButton("OK");
+    }
+
+    private void verifyDeleted(String reportName)
+    {
+        beginAt("/flow" + containerPath + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+        assertTextPresent("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.");
+    }
+
+    // if we aren't already on the Flow Dashboard, try to get there.
+    private void goToFlowDashboard()
+    {
+        String title = selenium.getTitle();
+        if (!title.startsWith("Flow Dashboard: "))
+        {
+            // All flow pages have a link back to the Flow Dashboard
+            if (isLinkPresentWithText("Flow Dashboard"))
+            {
+                clickLinkWithText("Flow Dashboard");
+            }
+            else
+            {
+                // If we are elsewhere, get back to the current test folder
+                clickLinkWithText(getProjectName());
+                clickLinkWithText(getFolderName());
+            }
+        }
+    }
 
 }
