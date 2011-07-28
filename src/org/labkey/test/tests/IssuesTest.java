@@ -226,21 +226,21 @@ public class IssuesTest extends BaseSeleniumWebTest
         selectOptionByText("area", "Area51");
         selectOptionByText("priority", "2");
         setFormElement("comment", "a bright flash of light");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         // test validate
         assertTextPresent("Field AssignedTo cannot be blank");
         selectOptionByText("assignedTo", getDisplayName());
-        clickNavButton("Submit");
+        clickNavButton("Save");
         assertTextPresent("Field Milestone cannot be blank");
         selectOptionByText("milestone", "2012");
-        clickNavButton("Submit");
+        clickNavButton("Save");
         assertTextPresent("Field MyFourthString cannot be blank");
         setFormElement("string4", "http://www.issues.test");
-        clickNavButton("Submit");
+        clickNavButton("Save");
         assertTextPresent("Field MyFifthString cannot be blank");
         selectOptionByText("string5", "Polonium");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         // find issueId - parse the text from first space to :
         String title = getLastPageTitle();
@@ -270,24 +270,24 @@ public class IssuesTest extends BaseSeleniumWebTest
         // UpdateAction
         clickLinkWithText("update");
         setFormElement("comment", "don't believe the hype");
-        clickNavButton("Submit");
+        clickNavButton("Save");
         searchFor(PROJECT_NAME, "2012", 1, ISSUE_TITLE_0);
 
         // ResolveAction
         clickLinkWithText("resolve");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         // ReopenAction
         clickLinkWithText("reopen");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         // ResolveAction
         clickLinkWithText("resolve");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         // CloseAction
         clickLinkWithText("close");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         // Test .lastFilter
         testLastFilter(issueId);
@@ -381,7 +381,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("comment", "No big whup");
         setFormElement("string4", "http://www.issues2.test");
         selectOptionByText("string5", "Cadmium");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         goToModule("Dumbster");
         pushLocation();
@@ -465,7 +465,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
 
         assertTextPresent("Field Title cannot be blank.");
-        clickNavButton("Return to Grid");
+        clickNavButton("Cancel");
     }
 
     private void checkRequiredField(String name, boolean select)
@@ -514,7 +514,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         selectOptionByText("assignedTo", getDisplayName());
         setFormElement("string4", "http://www.issues2.test");
         selectOptionByText("string5", "Cadmium");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         // assert both issues are present
         clickLinkWithText("return to grid");
