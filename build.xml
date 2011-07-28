@@ -1152,5 +1152,12 @@
         </java>
     </target>
 
+    <target name="clover_zip">
+        <!-- Create a stable file name so that TeamCity can serve it up directly through its own UI -->
+        <zip destfile="${test.log.output.dir}/TeamCity-Clover-Code-Coverage.zip" update="true" >
+                <zipfileset dir="${clover.output.dir}" />
+         </zip>
+    </target>
+
 </project>
 
