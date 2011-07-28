@@ -451,7 +451,7 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        clickMenuButton("manage", "Edit");
+        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text()='manage']"), "Edit");
         setFormElement("filter[4].value", "100");
         clickButton("Save");
     }
@@ -498,7 +498,7 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        clickMenuButton("manage", "Delete");
+        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text()='manage']"), "Delete");
         clickButton("OK");
     }
 
