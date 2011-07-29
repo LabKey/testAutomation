@@ -404,6 +404,7 @@ public class FlowTest extends BaseFlowTest
 
         createPositivityReport(reportName, reportDescription);
         executeReport(reportName);
+        //Issue 12400: Script exception in flow report if all data has been filtered out
         verifyReportError(reportName, "Error: labkey.data is empty");
 
         updatePositivityReportFilter(reportName);
@@ -437,6 +438,7 @@ public class FlowTest extends BaseFlowTest
         click(CD4);
         selenium.fireEvent(Locator.name("filter[4].property_subset").toString(), "blur");
 
+//        Issue 12630: add stat/threshold fo TCell filter to positivity report
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='filter[4].property_stat']]"), "Count");
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='filter[4].op']]"), "Is Greater Than or Equal To");
 
