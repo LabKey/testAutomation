@@ -3551,7 +3551,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filterType.toLowerCase());
         runMenuItemHandler(regionName + ":" + columnName + ":filter");
-        selenium.select("compare_1", "label=" + filterType);
+        ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         clickNavButton("OK");
     }
 
@@ -3559,7 +3559,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
         runMenuItemHandler(regionName + ":" + columnName + ":filter");
-        selenium.select("compare_1", "label=" + filterType);
+        ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
         clickNavButton("OK");
     }
@@ -3568,7 +3568,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
         runMenuItemHandler(regionName + ":" + columnName + ":filter");
-        selenium.select("compare_1", "label=" + filterType);
+        ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
         clickNavButton("OK", milliSeconds);
     }
@@ -3577,9 +3577,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + " " + filter1 + " and " + filter2Type.toLowerCase() + " " + filter2);
         runMenuItemHandler(regionName + ":" + columnName + ":filter");
-        selenium.select("compare_1", "label=" + filter1Type);
+        ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
         setFormElement("value_1", filter1);
-        selenium.select("compare_2", "label=" + filter2Type);
+        ExtHelper.selectComboBoxItem(this, "and", filter2Type); //Select combo box item.
         setFormElement("value_2", filter2);
         clickNavButton("OK");
     }
@@ -3598,7 +3598,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Clearing filter in " + regionName + " for " + columnName);
         runMenuItemHandler(regionName + ":" + columnName + ":filter");
-        clickNavButton("Clear All Filters");
+        clickNavButton("CLEAR ALL FILTERS");
     }
 
     final static int MAX_TEXT_LENGTH = 2000;

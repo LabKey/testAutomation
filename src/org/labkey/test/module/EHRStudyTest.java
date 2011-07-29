@@ -267,7 +267,7 @@ public class EHRStudyTest extends SimpleApiTest
         clickNavButton("Close", 0);
 
         log("Return Distinct Values - filtered");
-        setFilterAndWait(dataRegionName, "Id", "Does not Equal", PROTOCOL_MEMBER_IDS[1], 0);
+        setFilterAndWait(dataRegionName, "Id", "Does Not Equal", PROTOCOL_MEMBER_IDS[1], 0);
         waitForText("filtered", WAIT_FOR_JAVASCRIPT);
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
         ExtHelper.waitForExtDialog(this, "Return Distinct Values");

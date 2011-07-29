@@ -152,7 +152,7 @@ public class ListHelper
 
     public enum RangeType
     {
-        Equals("Equals"), NE("Does not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
+        Equals("Equals"), NE("Does Not Equal"), GT("Greater than"), GTE("Greater than or Equals"), LT("Less than"), LTE("Less than or Equals");
         private final String _description;
 
         private RangeType(String description)

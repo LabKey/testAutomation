@@ -175,7 +175,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithTitle(LAST_LINK);
 
         log("Setting a filter should go back to first page");
-        table.setFilter(NAME_COLUMN.getName(), "Does not Equal", "aqua");
+        table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
         assertTextPresent("1 - 5 of 15");
         assertEquals("black", table.getDataAsText(0, 3));
 

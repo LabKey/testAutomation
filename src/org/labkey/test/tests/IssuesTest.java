@@ -400,7 +400,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         selectOptionByText("priority", "0");
         setFormElement("notifyList", USER3);
         setFormElement("comment", "Oh Noez!");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         popLocation();
         assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//tr[position() <= '5']/td[text() = '" + PasswordUtil.getUsername() + "' and position() = '1']"));
@@ -462,7 +462,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Update");
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         assertTextPresent("Field Title cannot be blank.");
         clickNavButton("Cancel");
@@ -491,7 +491,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     private void viewSelectedDetailsTest()
     {
-        setFilter("Issues", "Status", "<has any value>");
+        setFilter("Issues", "Status", "Has Any Value");
         clickCheckbox(".toggle");
         clickNavButton("View Details");
         assertTextPresent("a bright flash of light");
@@ -523,7 +523,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextPresent(ISSUE_TITLE_1);
 
         // Filter out all pri-1 bugs; assert newly created issue is filtered out
-        setFilter("Issues", "Priority", "Does not Equal", "1");
+        setFilter("Issues", "Priority", "Does Not Equal", "1");
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent(ISSUE_TITLE_1);
 

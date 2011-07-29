@@ -248,7 +248,7 @@ public class MS2Test extends MS2TestBase
         setFilter("MS2Peptides", "Hyper", "Is Greater Than or Equal To", "14.6");
         assertTextNotPresent("K.RLLRSMVK.F");
         assertTextPresent("R.AEIDYANK.T");
-        setFilter("MS2Peptides", "Next", "Does not Equal", "9.5");
+        setFilter("MS2Peptides", "Next", "Does Not Equal", "9.5");
         assertTextNotPresent("R.AEIDYANK.T");
         setFilter("MS2Peptides", "B", "Is Less Than", "11.6");
         assertTextNotPresent("R.TIDPVIAR.K");
