@@ -39,7 +39,7 @@ public class ListTest extends BaseSeleniumWebTest
 {
     protected final static String PROJECT_NAME = "ListVerifyProject";
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
-    private final static String LIST_NAME = "Colors";
+    private final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     private final static String LIST_KEY_NAME = "Key";
     private final static String LIST_KEY_NAME2 = "Color";
@@ -577,7 +577,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("Query '" + LIST_NAME + "' in schema 'lists' doesn't exist.");
 
         clickNavButton("Folder");
-        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain Colors was deleted", 5);
+        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain " +LIST_NAME + " was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
 

@@ -99,6 +99,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
+    public static final String TRICKY_CHARACTERS_NO_QUOTES = "><&/% 1";
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
