@@ -399,8 +399,8 @@ public class FlowTest extends BaseFlowTest
 
     public void positivityReportTest()
     {
-        String reportName = "positivity report";
-        String reportDescription = "positivity report description";
+        String reportName = TRICKY_CHARACTERS + " positivity report";
+        String reportDescription = TRICKY_CHARACTERS + " positivity report description";
 
         createPositivityReport(reportName, reportDescription);
         executeReport(reportName);
@@ -482,11 +482,14 @@ public class FlowTest extends BaseFlowTest
     {
         beginAt("/flow" + containerPath + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
 
+        // HACK: need FieldKey.encodePart() in the test module
+        String reportNameEscaped = "><$A$S%\\' \"1 positivity report";
+
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, reportName + "/Raw P");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, reportName + "/Adjusted P");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, reportName + "/Response");
-        CustomizeViewsHelper.addCustomizeViewFilter(this, reportName + "/Response", "Response", "Equals", "1");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { reportNameEscaped, "Raw P" });
+        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { reportNameEscaped, "Adjusted P"});
+        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { reportNameEscaped, "Response"});
+        CustomizeViewsHelper.addCustomizeViewFilter(this, new String[] { reportNameEscaped, "Response"}, "Response", "Equals", "1");
         CustomizeViewsHelper.addCustomizeViewSort(this, "Name", "Ascending");
         CustomizeViewsHelper.saveCustomView(this);
 

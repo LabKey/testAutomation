@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import junit.framework.AssertionFailedError;
+import org.apache.commons.lang.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -96,6 +97,11 @@ public class CustomizeViewsHelper
         addCustomizeViewColumn(test, column_name, column_name);
     }
 
+    public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String[] fieldKeyParts)
+    {
+        addCustomizeViewItem(test, fieldKeyParts, StringUtils.join(fieldKeyParts, "/"), ViewItemType.Columns);
+    }
+
     public static void changeTab(BaseSeleniumWebTest test, ViewItemType tab)
     {
         if (test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]")))
@@ -113,43 +119,42 @@ public class CustomizeViewsHelper
         Sort
     }
 
-    private static void addCustomizeViewItem(BaseSeleniumWebTest test, String fieldKey, String column_name, ViewItemType type)
+    private static void addCustomizeViewItem(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, ViewItemType type)
     {
-        // fieldKey is the value contained in ext:tree-node-id
+        // fieldKey is the value contained in @fieldKey
         test.log("Adding " + column_name + " " + type.toString());
 
         changeTab(test, type);
 
-        String[] nodes = fieldKey.split("/");
+        String fieldKey = StringUtils.join(fieldKeyParts, "/");
         String nodePath = "";
 
         // Expand all nodes necessary to reveal the desired node.
-        for( int i = 0; i < nodes.length - 1; i ++ )
+        for( int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
-            nodePath += nodes[i].replace("\\", "/"); // un-escape slashes
+            nodePath += fieldKeyParts[i];
             try
             {
-                // Selenium XPath doesn't support attribute namespaces. Looking for fieldkey in @* should be good enough.
-                test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodePath + "']/img[1][contains(@class, 'plus')]"));
+                test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
             }
             catch(AssertionFailedError se)
             {
                 test.log("Unable to expand node (probably already expanded): " + nodePath);
                 // continue
             }
-            test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodePath + "']/img[1][contains(@class, 'minus')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             nodePath += "/";
         }
 
-        test.checkCheckbox(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + fieldKey.replace("\\", "/") + "']/input[@type='checkbox']"));
+        test.checkCheckbox(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(fieldKey) + "]/input[@type='checkbox']"));
     }
 
     public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String fieldKey, String column_name)
     {
-        // fieldKey is the value contained in ext:tree-node-id
+        // fieldKey is the value contained in @fieldKey
         test.log("Adding " + column_name + " column");
 
-        addCustomizeViewItem(test, fieldKey, column_name, ViewItemType.Columns);
+        addCustomizeViewItem(test, fieldKey.split("/"), column_name, ViewItemType.Columns);
     }
 
     public static void addCustomizeViewFilter(BaseSeleniumWebTest test, String fieldKey, String filter_type)
@@ -164,18 +169,23 @@ public class CustomizeViewsHelper
 
     public static void addCustomizeViewFilter(BaseSeleniumWebTest test, String fieldKey, String column_name, String filter_type, String filter)
     {
+        addCustomizeViewFilter(test, fieldKey.split("/"), column_name, filter_type, filter);
+    }
+
+    public static void addCustomizeViewFilter(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, String filter_type, String filter)
+    {
         if (filter.equals(""))
             test.log("Adding " + column_name + " filter of " + filter_type);
         else
             test.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
 
         changeTab(test, ViewItemType.Filter);
-        String itemXPath = itemXPath(ViewItemType.Filter, fieldKey);
+        String itemXPath = itemXPath(ViewItemType.Filter, fieldKeyParts);
 
         if (!test.isElementPresent(Locator.xpath(itemXPath)))
         {
             // Add filter if it doesn't exist
-            addCustomizeViewItem(test, fieldKey, column_name, ViewItemType.Filter);
+            addCustomizeViewItem(test, fieldKeyParts, column_name, ViewItemType.Filter);
             test.assertElementPresent(Locator.xpath(itemXPath));
         }
         else
@@ -205,9 +215,14 @@ public class CustomizeViewsHelper
         return "//div[contains(@class, 'test-" + type.toString().toLowerCase() + "-tab')]";
     }
 
+    private static String itemXPath(ViewItemType type, String[] fieldKeyParts)
+    {
+        return itemXPath(type, StringUtils.join(fieldKeyParts, "/"));
+    }
+
     private static String itemXPath(ViewItemType type, String fieldKey)
     {
-        return "//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey='" + fieldKey +"']";
+        return "//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(fieldKey) +"]";
     }
 
     private static String itemXPath(ViewItemType type, int item_index)
@@ -249,11 +264,16 @@ public class CustomizeViewsHelper
 
     public static void addCustomizeViewSort(BaseSeleniumWebTest test, String fieldKey, String column_name, String order)
     {
+        addCustomizeViewSort(test, fieldKey.split("/"), column_name, order);
+    }
+
+    public static void addCustomizeViewSort(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, String order)
+    {
         test.log("Adding " + column_name + " sort");
-        String itemXPath = itemXPath(ViewItemType.Sort, fieldKey);
+        String itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
 
         test.assertElementNotPresent(Locator.xpath(itemXPath));
-        addCustomizeViewItem(test, fieldKey, column_name, ViewItemType.Sort);
+        addCustomizeViewItem(test, fieldKeyParts, column_name, ViewItemType.Sort);
 
         ExtHelper.selectComboBoxItem(test, Locator.xpath(itemXPath), order);
     }
