@@ -2382,10 +2382,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
-
     public void waitForTextToDisappear(final String text, int wait)
     {
-        String failMessage = text + " did not disappear";
+        String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
         waitFor(new Checker()
         {
             public boolean check()
@@ -2393,13 +2392,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 return !isTextPresent(text);
             }
         }, failMessage, wait);
-
     }
 
     public void waitForText(final String text)
     {
          waitForText(text, defaultWaitForPage);
     }
+
     public void waitForText(final String text, int wait)
     {
         String failMessage = text + " did not appear";

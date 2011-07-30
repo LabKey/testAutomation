@@ -28,6 +28,8 @@ modules/miniassay/assay/simple/views/run.html -text
 modules/miniassay/assay/simple/views/upload.html -text
 modules/miniassay/config/module.properties -text
 modules/simpletest/config/module.xml -text
+modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
+modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
 modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text

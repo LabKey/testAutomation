@@ -25,7 +25,9 @@ public class Locator
 {
     private String loc;
     // XPATH fragments
-    public static final String NOT_HIDDEN = "not(ancestor::*[contains(@style,'visibility: hidden')])";
+    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'visibility: hidden')])";
+    public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
+
 
     protected Locator(String rawString)
     {

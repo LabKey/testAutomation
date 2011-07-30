@@ -173,6 +173,41 @@ selenium.getContainerId = function () {
     return win.LABKEY.container.id;
 };
 
+selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {
+    // find the grid view ext element
+    var domQuery = selenium.browserbot.getCurrentWindow().Ext.DomQuery;
+    var ext = selenium.browserbot.getCurrentWindow().Ext;
+
+    var el = domQuery.selectNode("div[class*='"+markerCls+"']");
+    if (el)
+    {
+        var grid = ext.getCmp(el.id);
+        if (grid)
+        {
+            if (idx == null) idx = grid.getStore().find(columnName, columnVal);
+            if (idx < grid.getStore().getCount())
+            {
+                if (idx >= 0)
+                {
+                    grid.getSelectionModel().selectRow(idx, keepExisting);
+                }
+                else
+                {
+                    throw new Error("Unable to locate " + columnName + ": " + columnVal);
+                }
+            }
+            else
+            {
+                throw new Error("No such row: " + idx);
+            }
+        }
+    }
+    else
+    {
+        throw new Error("Unable to locate grid panel: " + markerCls)
+    }
+};
+
 // firefox error console listener
 // http://sejq.blogspot.com/2008/12/can-selenium-detect-if-page-has.html
 // https://developer.mozilla.org/en/Console_service

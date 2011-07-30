@@ -53,6 +53,7 @@ public class Runner
 {
 
     // List of subject IDs to include data for
+    // Defined at: https://www.labkey.org/_webdav/O%27Connor/EHR%20Test%20Support/%40files/subjects.txt 
     static Set<String> subjectIds;
 
     // the name of the field where the above id is found
@@ -83,6 +84,8 @@ public class Runner
             "description",
             "surgeon",
             "source",
+            //project.tsv
+            "reqname",
             //protocol.tsv
             "inves",
             //blood draws (1008)
@@ -102,6 +105,7 @@ public class Runner
     );
 
     static Random random; // Initialized with a constant seed defined in subjects file
+    private static final String ANIMAL_PREFIX = "test";
 
     // to create and retrieve aliases for values during the run
 
@@ -111,7 +115,11 @@ public class Runner
 
         String get(String key)
         {
+            return get(key, "");
+        }
 
+        String get(String key, String prefix)
+        {
             if (!_aliases.containsKey(key))
             {
                 String rand;
@@ -120,8 +128,8 @@ public class Runner
                     rand = Integer.toString(random.nextInt(9999999));
                 }
                 while(_aliases.containsValue(rand)); // ensure unique ids
-                
-                _aliases.put(key, rand);
+
+                _aliases.put(key, prefix + rand);
             }
 
             return _aliases.get(key);
@@ -379,9 +387,14 @@ public class Runner
         reader = new BufferedReader(new FileReader(subjectListFile));
         random = new Random(Long.parseLong(reader.readLine())); // First line is seed.
 
+        while(!(line = reader.readLine()).equals("")){
+            subjectIds.add(line);
+            aliaser.get(line, ANIMAL_PREFIX); // Pre-generate aliases to ensure consistency.
+        }
+        // Animal IDs separated from non animal IDs by a single blank line.
         while((line = reader.readLine()) != null){
             subjectIds.add(line);
-            aliaser.get(line); // Pre-generate aliases to ensure consistency.
+            aliaser.get(line); // Pre-generate aliases to ensure consistency (non-animal id).
         }
 
         reader.close();

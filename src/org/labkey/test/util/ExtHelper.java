@@ -130,10 +130,22 @@ public class ExtHelper
         test.setFormElement(Locator.xpath(getExtDialogXPath(windowTitle) + "//input[contains(@class, 'x-form-field') and @type='"+inputType+"']"), text);
     }
 
+    public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String label, String text)
+    {
+        test.setFormElement(Locator.xpath("//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
+        test.fireEvent(Locator.xpath("//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+    }
+
+    public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label, String text)
+    {
+        test.setFormElement(Locator.xpath(getExtDialogXPath(windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
+        test.fireEvent(Locator.xpath(getExtDialogXPath(windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+    }
+
     public static String getExtDialogXPath(String windowTitle)
     {
-        return "//div[contains(@class, 'x-window') and not(contains(@class, 'x-window-')) and not(contains(@style, 'hidden')) and "+
-            ".//span[contains(@class, 'x-window-header-text') and contains(string(), '"+windowTitle+"')]]";
+        return "//div[contains(@class, 'x-window') and " + Locator.NOT_HIDDEN + " and "+
+            "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '"+windowTitle+"')]]";
     }
 
     public static void waitForLoadingMaskToDisappear(BaseSeleniumWebTest test, int wait)
@@ -275,8 +287,18 @@ public class ExtHelper
 
     public static void clickExtButton(BaseSeleniumWebTest test, String caption, int wait)
     {
+        clickExtButton(test, null, caption, wait);
+    }
+
+    public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption)
+    {
+        clickExtButton(test, windowTitle, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
+    }
+
+    public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption, int wait)
+    {
         test.log("Clicking Ext button with caption: " + caption);
-        Locator loc = Locator.xpath("//button[contains(./@class, 'x-btn-text') and text()='" + caption + "']");
+        Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(windowTitle):"")+"//button[contains(@class, 'x-btn-text') and text()='" + caption + "']");
         test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         if (wait > 0)
             test.clickAndWait(loc, wait);

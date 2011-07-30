@@ -135,8 +135,8 @@ public class WorkbookTest extends BaseSeleniumWebTest
 
     private enum WorkbookFolderType
     {
-        ASSAY_WORKBOOK("Assay Workbook"),
-        FILE_WORKBOOK("File Workbook"),
+        ASSAY_WORKBOOK("Assay Test Workbook"),
+        FILE_WORKBOOK("File Test Workbook"),
         DEFAULT_WORKBOOK("Workbook");
 
         private final String _type;

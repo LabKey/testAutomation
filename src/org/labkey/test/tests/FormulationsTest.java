@@ -44,6 +44,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String RAWMATERIALS_SET_NAME = "Raw Materials";
     private static final String TEMPERATURE_LIST = "Temperatures";
     private static final String TIME_LIST = "Timepoints";
+    private static final String TYPES_LIST = "FormulationTypes";
 
     private static final String COMPOUNDS_HEADER = "Compound Name\tFull Name\tType of Material\tCAS Number\tDensity\tMolecular Weight\n";
     private static final String COMPOUNDS_DATA_1 = "Alum\tAluminum Hydroxide\tadjuvant\t21645-51-2\t\t78.0\n";
@@ -61,6 +62,8 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String TEMPERATURE_DATA = "5\n25\n37\n60\n";
     private static final String TIME_HEADER = "Time\tSort\n";
     private static final String TIME_DATA = "T=0\t0\n1 wk\t7\n2 wk\t14\n1 mo\t30\n3 mo\t90\n6 mo\t180\n9 mo\t270\n12 mo\t360\n24 mo\t720\n36 mo\t1080\n";
+    private static final String TYPES_HEADER = "Type\n";
+    private static final String TYPES_DATA = "Emulsion\nAqueous\nPowder\nLiposome\nAlum\nNiosomes\n";
 
     private static final String PS_ASSAY = "Particle Size";
     private static final String PS_ASSAY_DESC = "IDRI Particle Size Data as provided by Nano and APS machine configurations.";
@@ -125,6 +128,14 @@ public class FormulationsTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, TIME_LIST, LIST_KEY_TYPE, "time", LIST_COL_SORT);
         ListHelper.clickImportData(this);
         ListHelper.submitTsvData(this, TIME_HEADER + TIME_DATA);
+
+        clickLinkWithText("Lists");
+
+        log("Add list -- " + TYPES_LIST);
+        ListHelper.createList(this, PROJECT_NAME, TYPES_LIST, LIST_KEY_TYPE, "type");
+        ListHelper.clickImportData(this);
+        setFormElement("ff_data", TYPES_HEADER + TYPES_DATA);
+        clickNavButton("Submit");
     }
 
     protected void setupCompounds()
@@ -189,14 +200,17 @@ public class FormulationsTest extends BaseSeleniumWebTest
         // Test empty combo
         log("Test empty combo");
         clickButton("Add Another Material", 0);
-        sleep(3000); // give form a chance to catch up
+        waitForExtMaskToDisappear();
         clickButton("Create", 0);
+        waitForExtMaskToDisappear();
         waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
         
         // Test empty concentration
         log("Test empty concentration");
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material2']]"), RAW_MATERIAL_2);
+        waitForExtMaskToDisappear();
         clickButton("Create", 0);
+        waitForExtMaskToDisappear();
         waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
 
         // Remove duplicate material

@@ -16,6 +16,7 @@
 
 package org.labkey.test.module;
 
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.tests.SimpleApiTest;
@@ -27,7 +28,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -43,18 +47,28 @@ public class EHRStudyTest extends SimpleApiTest
     private static final String FOLDER_NAME = "EHR";
     private static final String STUDY_ZIP = "/sampledata/study/EHR Study Anon.zip";
     private static final String SCRIPT_TEMPLATE = "/server/test/data/api/ehr-security-template.xml";
-    private static final String PROJECT_ID = "357658"; // project with one participant
-    private static final String PROJECT_MEMBER_ID = "2312318"; // PROJECT_ID's single participant
-    private static final String ROOM_ID = "2400443"; // room of PROJECT_MEMBER_ID
-    private static final String CAGE_ID = "5122545"; // cage of PROJECT_MEMBER_ID
+
+    //note: changed by BNB
+    private static final String PROJECT_ID = "640991"; // project with one participant
+    private static final String PROJECT_MEMBER_ID = "test2312318"; // PROJECT_ID's single participant
+    private static final String ROOM_ID = "6824778"; // room of PROJECT_MEMBER_ID
+    private static final String CAGE_ID = "3168659"; // cage of PROJECT_MEMBER_ID
+
     private static final String AREA_ID = "A1/AB190"; // arbitrary area
     private static final String PROTOCOL_ID = "g00101"; // Protocol with exactly 5 members
-    private static final String[] PROTOCOL_MEMBER_IDS = {"2008446", "3804589", "4551032", "5904521", "6390238"}; // Protocol members, sorted ASC alphabetically
-    private static final String[] MORE_ANIMAL_IDS = {"1020148","1099252","1112911","727088","9118022"}; // Some more, distinct, Ids
+    private static final String[] PROTOCOL_MEMBER_IDS = {"test2008446", "test3804589", "test4551032", "test5904521", "test6390238"}; // Protocol members, sorted ASC alphabetically
+    private static final String[] MORE_ANIMAL_IDS = {"test1020148","test1099252","test1112911","test727088","test4564246"}; // Some more, distinct, Ids
+    private static final String DEAD_ANIMAL_ID = "test9118022";
     private static final EHRUser DATA_ADMIN = new EHRUser("admin@ehrstudy.test", "EHR Administrators", EHRRole.DATA_ADMIN);
     private static final EHRUser REQUESTER = new EHRUser("requester@ehrstudy.test", "EHR Requestors", EHRRole.REQUESTER);
     private static final EHRUser BASIC_SUBMITTER = new EHRUser("basicsubmitter@ehrstudy.test", "EHR Basic Submitters", EHRRole.BASIC_SUBMITTER);
     private static final EHRUser FULL_SUBMITTER = new EHRUser("fullsubmitter@ehrstudy.test", "EHR Full Submitters", EHRRole.FULL_SUBMITTER);
+    private static final String TASK_TITLE = "Test weight task";
+    private static final String MPR_TASK_TITLE = "Test MPR task";
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    //xpath fragment
+    public static final String VISIBLE = "not(ancestor-or-self::*[contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display')])";
 
     private static class EHRUser
     {
@@ -115,7 +129,8 @@ public class EHRStudyTest extends SimpleApiTest
     protected Pattern[] getIgnoredElements()
     {
         return new Pattern[] {
-            Pattern.compile("qcstate", Pattern.CASE_INSENSITIVE)//qcstate IDs aren't predictable
+            Pattern.compile("qcstate", Pattern.CASE_INSENSITIVE),//qcstate IDs aren't predictable
+            Pattern.compile("stacktrace", Pattern.CASE_INSENSITIVE)
         };
     }
 
@@ -141,6 +156,7 @@ public class EHRStudyTest extends SimpleApiTest
             if (!isTextPresent(PROJECT_NAME)) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
             else fail("Test Project not finished deleting after 5 minutes");
         }
+        goToHome();
         try{deleteUser(DATA_ADMIN.getUser());}catch(Throwable T){}
         try{deleteUser(REQUESTER.getUser());}catch(Throwable T){}
         try{deleteUser(BASIC_SUBMITTER.getUser());}catch(Throwable T){}
@@ -150,6 +166,19 @@ public class EHRStudyTest extends SimpleApiTest
     @Override
     public void runUITests()
     {
+        initProject();
+        setupEhrPermissions();
+        defineQCStates();
+
+        animalHistoryTest();
+        quickSearchTest();
+        weightDataEntryTest();
+        mprDataEntryTest();
+        /* super.runApiTests() */
+    }
+
+    private void initProject()
+    {
         enableEmailRecorder();
 
         createProject(PROJECT_NAME);
@@ -157,7 +186,10 @@ public class EHRStudyTest extends SimpleApiTest
         enableModule(PROJECT_NAME, "EHR");
         clickLinkWithText(FOLDER_NAME);
         beginAt(getBaseURL()+"/ehr/"+PROJECT_NAME+"/"+FOLDER_NAME+"/_initEHR.view");
+        clickNavButton("Delete All", 0);
+        waitForText("Delete Complete", 120000);
         clickNavButton("Populate All", 0);
+        waitForText("Populate Complete", 120000);
         goToModule("Study");
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
 
@@ -172,26 +204,22 @@ public class EHRStudyTest extends SimpleApiTest
         addWebPart("Project Sponsors");
         addWebPart("Last EHR Sync");
 
-        log("Setup EHR Menu Bar.");
-        clickAdminMenuItem("Manage Project", "Project Settings");
-        clickLinkWithText("Menu Bar");
-        clickLinkWithText("Turn On Custom Menus");
+        // TODO: Menu Bar causing permission dialog to appear when impersonating/stopping impersonation
+        // TODO: Should use menu bar to access Animal History, Quick Search, and Data Entry pages.
+//        log("Setup EHR Menu Bar.");
+//        clickAdminMenuItem("Manage Project", "Project Settings");
+//        clickLinkWithText("Menu Bar");
+//        clickLinkWithText("Turn On Custom Menus");
         addWebPart("Electronic Health Record");
         addWebPart("Quick Search");
-
-        animalHistoryTest();
-        quickSearchTest();
-        setupEhrPermissions();
-        defineQCStates();
-        
-        /* super.runApiTests() */
     }
 
     private void animalHistoryTest()
     {
         String dataRegionName;
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
 
-        mouseOver(Locator.linkWithText("Electronic Health Record"));
         waitAndClick(Locator.linkWithText("Animal History"));
         waitForPageToLoad();
 
@@ -350,36 +378,40 @@ public class EHRStudyTest extends SimpleApiTest
     private void quickSearchTest()
     {
         log("Quick Search - Show Animal");
-        mouseOver(Locator.linkWithText("Quick Search"));
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement("animal", MORE_ANIMAL_IDS[0]);
         clickNavButton("Show Animal");
         assertTitleContains("Animal - "+MORE_ANIMAL_IDS[0]);
 
         log("Quick Search - Show Group");
-        mouseOver(Locator.linkWithText("Quick Search"));
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at WNPRC");
         clickNavButton("Show Group");
-        waitForText("1 - 44 of 44", WAIT_FOR_JAVASCRIPT);
+        waitForText("1 - 43 of 43", WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Project");
-        mouseOver(Locator.linkWithText("Quick Search"));
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='projectField']/.."), PROJECT_ID);
         clickNavButton("Show Project");
         waitForElement(Locator.linkWithText(PROJECT_ID), WAIT_FOR_JAVASCRIPT);
 
-        // TODO: blocked by 12225: Exception in ETLAuditViewFactory.addAuditEntry
         log("Quick Search - Show Protocol");
-        mouseOver(Locator.linkWithText("Quick Search"));
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='protocolField']/.."), PROTOCOL_ID);
         clickNavButton("Show Protocol");
         waitForElement(Locator.linkWithText(PROTOCOL_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Room");
-        mouseOver(Locator.linkWithText("Quick Search"));
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement("room", ROOM_ID);
         clickNavButton("Show Room");
@@ -412,10 +444,10 @@ public class EHRStudyTest extends SimpleApiTest
         popLocation();
         enterPermissionsUI();
         uncheckInheritedPermissions();
-        setPermissions(DATA_ADMIN.getGroup(), "Reader");
-        setPermissions(REQUESTER.getGroup(), "Reader");
-        setPermissions(BASIC_SUBMITTER.getGroup(), "Reader");
-        setPermissions(FULL_SUBMITTER.getGroup(), "Reader");
+        setPermissions(DATA_ADMIN.getGroup(), "Editor");
+        setPermissions(REQUESTER.getGroup(), "Editor");
+        setPermissions(BASIC_SUBMITTER.getGroup(), "Editor");
+        setPermissions(FULL_SUBMITTER.getGroup(), "Editor");
         savePermissions();
         ExtHelper.clickExtTab(this, "Study Security");
         waitAndClickNavButton("Study Security");
@@ -424,14 +456,274 @@ public class EHRStudyTest extends SimpleApiTest
         checkRadioButton(getRadioButtonLocator(REQUESTER.getGroup(), "READOWN"));
         checkRadioButton(getRadioButtonLocator(BASIC_SUBMITTER.getGroup(), "READOWN"));
         checkRadioButton(getRadioButtonLocator(FULL_SUBMITTER.getGroup(), "READOWN"));
-        clickNavButtonByIndex("Update", 1);
+        clickAndWait(Locator.id("groupUpdateButton"));
 
-        selectOptionByValue(Locator.xpath("//select[@name='"+DATA_ADMIN.getGroup()+"']"), DATA_ADMIN.getRole().toString());
-        selectOptionByValue(Locator.xpath("//select[@name='"+REQUESTER.getGroup()+"']"), REQUESTER.getRole().toString());
-        selectOptionByValue(Locator.xpath("//select[@name='"+BASIC_SUBMITTER.getGroup()+"']"), BASIC_SUBMITTER.getRole().toString());
-        selectOptionByValue(Locator.xpath("//select[@name='"+FULL_SUBMITTER.getGroup()+"']"), FULL_SUBMITTER.getRole().toString());
+        //"set all to..." combo-boxes don't work through selenium.
+        //selectOptionByText(Locator.xpath("//select[@name='"+DATA_ADMIN.getGroup()+"']"), DATA_ADMIN.getRole().toString());
+        //selectOptionByText(Locator.xpath("//select[@name='"+BASIC_SUBMITTER.getGroup()+"']"), BASIC_SUBMITTER.getRole().toString());
+        //selectOptionByText(Locator.xpath("//select[@name='"+FULL_SUBMITTER.getGroup()+"']"), FULL_SUBMITTER.getRole().toString());
+        //selectOptionByText(Locator.xpath("//select[@name='"+REQUESTER.getGroup()+"']"), REQUESTER.getRole().toString());
+        log("Set per-dataset permissions individually");
+        setPDP(DATA_ADMIN);
+        setPDP(BASIC_SUBMITTER);
+        setPDP(FULL_SUBMITTER);
+        setPDP(REQUESTER);
+
+        waitFor(new Checker(){
+            public boolean check(){
+                return "EHR Data Admin".equals(getSelectedOptionText(Locator.name("dataset.1061", 0))) &&
+                       "EHR Basic Submitter".equals(getSelectedOptionText(Locator.name("dataset.1061", 1))) &&
+                       "EHR Full Submitter".equals(getSelectedOptionText(Locator.name("dataset.1061", 2))) &&
+                       "EHR Requestor".equals(getSelectedOptionText(Locator.name("dataset.1061", 3)));
+            }
+        }, "Per-dataset permission not set", WAIT_FOR_JAVASCRIPT);
 
         clickNavButton("Save");
+    }
+
+    private void setPDP(EHRUser user)
+    {
+        int col = selenium.getXpathCount("//table[@id='datasetSecurityFormTable']//th[.='"+user.getGroup()+"']/preceding-sibling::*").intValue() + 1;
+        int rowCt = getTableRowCount("datasetSecurityFormTable");
+        for (int i = 3; i <= rowCt; i++) // xpath indexing is 1 based
+        {
+            selectOptionByText(Locator.xpath("//table[@id='datasetSecurityFormTable']/tbody/tr["+i+"]/td["+col+"]//select"), user.getRole().toString());
+        }
+    }
+
+    private void weightDataEntryTest()
+    {
+        log("Test weight data entry");
+        impersonate(FULL_SUBMITTER.getUser());
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        waitAndClick(Locator.linkWithText("Enter Data"));
+        waitForPageToLoad();
+
+        log("Create weight measurement task.");
+        waitAndClick(Locator.linkWithText("Enter Weights"));
+        waitForPageToLoad();
+        waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("title", TASK_TITLE);
+        ExtHelper.selectComboBoxItem(this, "Assigned To", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
+
+        log("Add blank weight entries");
+        clickButton("Add Record", 0);
+        waitForElement(Locator.xpath("//div[./label[text()='Id:']]//input[not(@disabled)]"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByLabel(this, "Id", "noSuchAnimal");
+        waitForText("Id not found", WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByLabel(this, "Id", DEAD_ANIMAL_ID);
+        waitForText(DEAD_ANIMAL_ID, WAIT_FOR_JAVASCRIPT);
+
+        waitForElement(Locator.button("Add Batch"), WAIT_FOR_JAVASCRIPT);
+        clickButton("Add Batch", 0);
+        ExtHelper.waitForExtDialog(this, "");
+        ExtHelper.setExtFormElementByLabel(this, "", "Cage", CAGE_ID);
+        ExtHelper.clickExtButton(this, "", "Submit", 0);
+        waitForText(PROJECT_MEMBER_ID, WAIT_FOR_JAVASCRIPT);
+        clickButton("Add Batch", 0);
+        ExtHelper.waitForExtDialog(this, "");
+        ExtHelper.setExtFormElementByLabel(this, "", "Id(s)", MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
+        ExtHelper.clickExtButton(this, "", "Submit", 0);
+        waitForText(MORE_ANIMAL_IDS[0], WAIT_FOR_JAVASCRIPT);
+        waitForText(MORE_ANIMAL_IDS[1], WAIT_FOR_JAVASCRIPT);
+        waitForText(MORE_ANIMAL_IDS[2], WAIT_FOR_JAVASCRIPT);
+        waitForText(MORE_ANIMAL_IDS[3], WAIT_FOR_JAVASCRIPT);
+        waitForText(MORE_ANIMAL_IDS[4], WAIT_FOR_JAVASCRIPT);
+
+        selectRecord("weight", MORE_ANIMAL_IDS[0], true);
+        selectRecord("weight", MORE_ANIMAL_IDS[1], true);
+        selectRecord("weight", MORE_ANIMAL_IDS[2], true);
+        clickNavButton("Delete Selected", 0);
+        ExtHelper.waitForExtDialog(this, "Confirm");
+        ExtHelper.clickExtButton(this, "Yes", 0);
+        waitForElementToDisappear(Locator.tagWithText("div", PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.tagWithText("div", MORE_ANIMAL_IDS[0]), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.tagWithText("div", MORE_ANIMAL_IDS[1]), WAIT_FOR_JAVASCRIPT);
+
+        clickNavButton("Save & Close");
+
+        waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
+        ExtHelper.clickExtTab(this, "All Active Tasks");
+        waitForElement(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        ExtHelper.clickExtTab(this, "Active Tasks By Room");
+        waitForElement(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        ExtHelper.clickExtTab(this, "Active Tasks By Id");
+        waitForElement(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+
+        stopImpersonating();
+
+        log("Fulfil measurement task");
+        impersonate(BASIC_SUBMITTER.getUser());
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        waitAndClick(Locator.linkWithText("Enter Data"));
+        waitForPageToLoad();
+        waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+
+        String href = getAttribute(Locator.linkWithText(TASK_TITLE), "href");
+        beginAt(href);
+        waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+        waitForTextToDisappear("Loading...", WAIT_FOR_JAVASCRIPT);
+        selectRecord("weight", PROJECT_MEMBER_ID, false);
+        ExtHelper.setExtFormElementByLabel(this, "Weight (kg)", "3.333");
+        selectRecord("weight", MORE_ANIMAL_IDS[3], false);
+        ExtHelper.setExtFormElementByLabel(this, "Weight (kg)", "4.444");
+        selectRecord("weight", MORE_ANIMAL_IDS[4], false);
+        ExtHelper.setExtFormElementByLabel(this, "Weight (kg)", "5.555");
+
+        clickNavButton("Submit for Review");
+        stopImpersonating();
+
+        log("Verify Measurements");
+        impersonate(DATA_ADMIN.getUser());
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        waitAndClick(Locator.linkWithText("Enter Data"));
+        waitForPageToLoad();
+        waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.clickExtTab(this, "Review Required");
+        waitForElement(Locator.xpath("//div[contains(@class, 'review-requested-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'review-requested-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        String href2 = getAttribute(Locator.linkWithText(TASK_TITLE), "href");
+        beginAt(href2);
+        waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Validate", 0);
+        waitForElement(Locator.xpath("//button[text() = 'Submit Final' and "+Locator.ENABLED+"]"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Submit Final", 0);
+        ExtHelper.waitForExtDialog(this, "Finalize Form");
+        ExtHelper.clickExtButton(this, "Finalize Form", "Yes");
+
+        stopImpersonating();
+
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        waitAndClick(Locator.linkWithText("Browse All Datasets"));
+        waitForPageToLoad();
+        clickLinkWithText("Weight");
+        waitForPageToLoad();
+
+        setFilter("query", "date", "Equals", DATE_FORMAT.format(new Date()));
+        assertTextPresent("3.333", "4.444", "5.555");
+        assertTextPresent("Completed", 3);
+    }
+
+    private void mprDataEntryTest()
+    {
+        log("Test MPR data entry.");
+        impersonate(FULL_SUBMITTER.getUser());
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        waitAndClick(Locator.linkWithText("Enter Data"));
+        waitForPageToLoad();
+
+        log("Create weight measurement task.");
+        waitAndClick(Locator.linkWithText("Enter MPR"));
+        waitForPageToLoad();
+        // Wait for page to fully render.
+        waitForText("Treatments", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("Id"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByLabel(this, "Id", PROJECT_MEMBER_ID);
+        waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
+        setFormElement("title", MPR_TASK_TITLE);
+        ExtHelper.selectComboBoxItem(this, "Assigned To", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
+
+        sleep(1000);
+
+        clickNavButton("Save & Close");
+
+        waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
+        ExtHelper.clickExtTab(this, "All Active Tasks");
+        waitForElement(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        ExtHelper.clickExtTab(this, "Active Tasks By Room");
+        waitForElement(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        ExtHelper.clickExtTab(this, "Active Tasks By Id");
+        waitForElement(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        stopImpersonating();
+
+        log("Fulfil MPR task");
+        impersonate(BASIC_SUBMITTER.getUser());
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        waitAndClick(Locator.linkWithText("Enter Data"));
+        waitForPageToLoad();
+        waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+VISIBLE+"]//table"), WAIT_FOR_JAVASCRIPT);
+        String href = getAttribute(Locator.linkWithText(MPR_TASK_TITLE), "href");
+        beginAt(href);
+
+        // Wait for page to fully render.
+        waitForText("Treatments", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("Id"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID + "\u00A0");
+        ExtHelper.selectComboBoxItem(this, "Type", "Physical Exam\u00A0");
+        setFormElement("remark", "Bonjour");
+        setFormElement("performedby", BASIC_SUBMITTER.getUser());
+
+        log("Add treatments record.");
+        waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+        clickVisibleButton("Add Record");
+        setFormElement(Locator.xpath("//div[./div/span[text()='Treatments']]//input[@name='enddate']/..//input[contains(@id, 'date')]"), DATE_FORMAT.format(new Date()));
+        ExtHelper.selectComboBoxItem(this, "Code", "Antibiotic");
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='code']/.."), "amoxicillin (c-54620)\u00a0");
+        ExtHelper.selectComboBoxItem(this, "Route", "oral\u00a0");
+        setFormElement("concentration", "5");
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='conc_units']/.."), "mg/tablet\u00a0");
+        //TODO: assert units
+        setFormElement("dosage", "2");
+        click(Locator.xpath("//img["+VISIBLE+" and contains(@class, 'x-form-search-trigger')]"));
+        waitForElement(Locator.xpath("//div[@class='x-form-invalid-msg']"), WAIT_FOR_JAVASCRIPT);
+        setMPRField("Treatments", "remark", "Yum");
+        setMPRField("Treatments", "performedby", BASIC_SUBMITTER.getUser());
+
+
+//        log("Add blood draw record.");
+//        ExtHelper.clickExtTab(this, "Blood Draws");
+//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-blood_draws-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+//        clickVisibleButton("Add Record");
+//
+//        log("Add recovery observation");
+//        ExtHelper.clickExtTab(this, "Recovery Observations");
+//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-clinical_observations-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+//        clickVisibleButton("Add Record");
+//
+//        log("Add procedure code");
+//        ExtHelper.clickExtTab(this, "Procedure Codes");
+//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-procedure_codes-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+//        clickVisibleButton("Add Record");
+//
+//        log("Add housing record.");
+//        ExtHelper.clickExtTab(this, "Housing Moves/Restraint");
+//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-housing-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+//        clickVisibleButton("Add Record");
+//
+//        log("Add weight record.");
+//        ExtHelper.clickExtTab(this, "Weight");
+//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+//        clickVisibleButton("Add Record");
+//
+//        log("Add charge");
+//        ExtHelper.clickExtTab(this, "Charges");
+//        waitForElement(Locator.xpath("/*//*["+VISIBLE+" and not(contains(@class, 'x-hide-display')) and contains(@class,'ehr-charges-records-grid')]"), WAIT_FOR_JAVASCRIPT);
+//        clickVisibleButton("Add Record");
+
+        clickNavButton("Save & Close");
+
+        stopImpersonating();
+    }
+
+    private void setMPRField(String tabName, String fieldName, String value)
+    {
+        setFormElement(Locator.xpath("//div[./div/span[text()='"+tabName+"']]//*[(self::input or self::textarea) and @name='"+fieldName+"']"), value);
+        fireEvent(Locator.xpath("//div[./div/span[text()='"+tabName+"']]//*[(self::input or self::textarea) and @name='"+fieldName+"']"), SeleniumEvent.blur);
     }
 
     @Override
@@ -482,14 +774,15 @@ public class EHRStudyTest extends SimpleApiTest
 
     private void crawlReportTabs()
     {
-        String tabs[] = {"-Assignments", "Active Assignments", "Assignment History",
-                         "-Clin Path", "Bacteriology", "Chemistry:Blood Chemistry Results", "Clinpath Runs", "Hematology:Hematology Results", "Immunology:Immunology Results", "Parasitology", "Urinalysis:Urinalysis Results", "Viral Challenges", "Virology",
-                         "-Clinical", "Abstract:Active Assignments", "Clinical Encounters", "Clinical Remarks", "Diarrhea Report", "Drug Administration", "Full History", "Full History Plus Obs", "Irregular Obs:Irregular Observations", "Surgical History", "Tasks", "Treatment Orders", "Treatment Schedule", "Weights:Weight",
-                         "-Colony Management", "Arrival/Departure:Arrivals", "Behavior Remarks", "Birth Records", "Housing - Active", "Housing History", "Inbreeding Coefficients", "Kinship", "Menstrual Data", "Pedigree:Offspring", "Pregnancies", "Roommate History", "TB Tests",
-                         "-Pathology", "Biopsies", "Biopsy Diagnosis", "Histology", "Necropsies", "Necropsy Diagnosis",
-                         "-Physical Exam", "Alopecia", "Body Condition", "Dental Status", "Exams", "Teeth", "Vitals",
-                         "-Today At WNPRC", "Irregular Observations", "Obs/Treatment:Obs/Treatments", "Problem List", /*"Today's History",*/ "Treatment Schedule", 
-                         "-General", "Blood Draw History", "Charges", "Current Blood", "Deaths", "Demographics", "Major Events", "Notes", "Abstract:Active Assignments"};
+        String tabs[] = {/*"-Assay", "MHC SSP Typing", "Viral Loads", */ //Bad queries on test server.
+                         "-Assignments", "Active Assignments", "Assignment History",
+                         "-Clin Path", "Bacteriology", "Chemistry:Chemistry Results", "Clinpath Runs", "Hematology:Hematology Results", "Immunology:Immunology Results", "Parasitology", "Urinalysis:Urinalysis Results", "Viral Challenges", "Virology",
+                         "-Clinical", "Abstract:Active Assignments", "Clinical Encounters", "Clinical Remarks", "Diarrhea Calendar", "Full History", "Full History Plus Obs", "Irregular Obs:Irregular Observations", "Problem List", "Procedure Codes", "Surgical History", "Tasks", "Treatment Orders", "Treatments", "Treatment Schedule", "Weights:Weight",
+                         "-Colony Management", "Behavior Remarks", "Birth Records", "Housing - Active", "Housing History", "Inbreeding Coefficients", "Kinship", "Menses Calendar", "Menses Observations:Irregular Observations", "Pedigree:Offspring", /*"Pedigree Plot",*/ "Pregnancies", "TB Tests",
+                         "-Pathology", "Biopsies", "Histology", "Morphologic Diagnosis", "Necropsies",
+                         "-Physical Exam", "Alopecia", "Body Condition", "Dental Status", "Exams", "PE Findings", "Teeth", "Vitals",
+                         "-Today At WNPRC", "Irregular Observations", "Obs/Treatment:Obs/Treatments", "Problem List", "Today's History", "Treatments - Morning", "Treatments - Afternoon", "Treatments - Evening", "Treatments - Master", "Unresolved Problem List", "Today's Blood Draws", 
+                         "-General", "Arrival/Departure:Arrival", "Blood Draw History", "Charges", "Current Blood", "Deaths", "Demographics", "Major Events", "Notes", "Abstract:Active Assignments"};
 
         log("Check all Animal History report tabs");
         for (String tab : tabs)
@@ -514,7 +807,8 @@ public class EHRStudyTest extends SimpleApiTest
         }
 
         //Clear out lingering text on report pages
-        mouseOver(Locator.linkWithText("Electronic Health Record"));
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
         waitAndClick(Locator.linkWithText("Animal History"));
         waitForPageToLoad();
     }
@@ -661,5 +955,16 @@ public class EHRStudyTest extends SimpleApiTest
         // Specific to the EHR Animal History page.
         waitForElement(Locator.xpath("//table[@name='webpart' and ./*/*/*/a[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), WAIT_FOR_JAVASCRIPT);
         return getAttribute(Locator.xpath("//table[@name='webpart' and ./*/*/*/a[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), "id").substring(11);
+    }
+
+    private void selectRecord(String query, String Id, boolean keepExisting)
+    {
+        getWrapper().getEval("selenium.selectExtGridItem('Id','" + Id + "', null, 'ehr-" + query + "-records-grid', "+keepExisting+");");
+        if(!keepExisting)waitForElement(Locator.xpath("//div[@id='Id']/a[text()='"+Id+"']"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void clickVisibleButton(String text)
+    {
+        click(Locator.xpath("//button[text()='"+text+"' and "+VISIBLE+" and not(contains(@class, 'x-hide-display'))]"));
     }
 }
