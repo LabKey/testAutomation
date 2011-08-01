@@ -2004,16 +2004,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         // confirm delete:
         clickNavButton("Delete");
 
-        if(isTextPresent(project))
+        if(isLinkPresentWithText(project))
         {
             log("Wait extra long for folder to finish deleting.");
-            while (isTextPresent(project) && System.currentTimeMillis() - startTime < wait)
+            while (isLinkPresentWithText(project) && System.currentTimeMillis() - startTime < wait)
             {
                 sleep(5000);
                 refresh();
             }
         }
-        if (!isTextPresent(project)) log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
+        if (!isLinkPresentWithText(project)) log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
         else fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
 
         // verify that we're not on an error page with a check for a project link:
