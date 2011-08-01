@@ -134,8 +134,11 @@ public class FormulationsTest extends BaseSeleniumWebTest
         log("Add list -- " + TYPES_LIST);
         ListHelper.createList(this, PROJECT_NAME, TYPES_LIST, LIST_KEY_TYPE, "type");
         ListHelper.clickImportData(this);
-        setFormElement("ff_data", TYPES_HEADER + TYPES_DATA);
-        clickNavButton("Submit");
+        setFormElement(Locator.id("tsv3"), TYPES_HEADER + TYPES_DATA);
+        clickNavButton("Submit", 0);
+        ExtHelper.waitForExtDialog(this, "Success");
+        assertTextPresent("6 rows inserted.");
+        ExtHelper.clickExtButton(this, "Success", "OK");
     }
 
     protected void setupCompounds()
