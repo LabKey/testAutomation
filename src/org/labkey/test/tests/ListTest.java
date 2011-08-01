@@ -426,9 +426,12 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test that the right filters are present for each type");
         runMenuItemHandler("qwp3:" + _listCol4.getName() + ":filter");
-        assertTrue(!isElementPresent(Locator.raw("//option[@value='startswith']")));
-        assertTrue(isElementPresent(Locator.raw("//option[@value='isblank']")));
-        clickImgButtonNoNav("Cancel");
+        ExtHelper.waitForExtDialog(this, "Show Rows Where " + _listCol4.getLabel());
+        click(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
+
+        assertElementNotPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
+        assertElementPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
+        ExtHelper.clickExtButton(this, "Show Rows Where " + _listCol4.getLabel(), "CANCEL", 0);
 
         log("Test that filters don't affect multiple web parts");
         assertTextPresent(TEST_DATA[1][0], 2);
@@ -573,7 +576,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test exporting a nonexistent list returns a 404");
         selenium.open(WebTestHelper.getBaseURL() + "/query/" + PROJECT_NAME + "/exportRowsTsv.view?schemaName=lists&query.queryName=" + LIST_NAME);
-        assertEquals(getResponseCode(), 404);
+        assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME + "' in schema 'lists' doesn't exist.");
 
         clickNavButton("Folder");
