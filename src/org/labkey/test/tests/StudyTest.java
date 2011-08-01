@@ -77,7 +77,7 @@ public class StudyTest extends StudyBaseTest
 
     protected void doCleanup() throws Exception //child class cleanup method throws Exception
     {
-        emptyParticipantPickerList();
+        try{emptyParticipantPickerList();}catch(Throwable t){ /* Ignore */ }
         super.doCleanup();
     }
 
