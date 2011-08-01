@@ -22,6 +22,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
 import org.labkey.test.util.JSONHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 
@@ -67,6 +68,13 @@ public class ScriptValidationTest extends SimpleModuleTest
         clickLinkWithText(getProjectName());
         doTestTransformation();
         doTestValidation();
+
+        log("Create list in subfolder to prevent query validation failure");
+        ListHelper.createList(this, getProjectName(), LIST_NAME,
+                ListHelper.ListColumnType.AutoInteger, "Key",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
+                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
     }
 
     private void doTestTransformation() throws Exception
