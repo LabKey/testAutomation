@@ -34,10 +34,6 @@ import java.util.regex.Matcher;
  */
 public class FlowJoQueryTest extends BaseFlowTest
 {
-    @Override
-    protected void checkQueries() // skip query validation
-    { /* TODO: Remove. Blocked by Issue 12711: Sample flow query, DeviationFromMean, is not valid */ }
-
     protected void doTestSteps() throws Exception
     {
         init();
@@ -61,7 +57,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         toggleCheckboxByTitle("Flow");
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
         createQuery(PROJECT_NAME, "PassFailQuery", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
-        createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
+        //createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
         createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), "", true);
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), "", true);
         clickLinkWithText(getFolderName());
