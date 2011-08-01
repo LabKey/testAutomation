@@ -276,7 +276,7 @@ public class SearchTest extends StudyTest
             File file = new File(getLabKeyRoot() + "/common.properties");
             setFormElement("formFiles[0]", file);
         }
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         SearchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
         SearchHelper.enqueueSearchItem(ISSUE_BODY, Locator.linkContainingText(ISSUE_TITLE));

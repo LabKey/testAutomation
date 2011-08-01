@@ -66,7 +66,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_0);
-        clickNavButton("Submit");
+        clickNavButton("Save");
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
 
         clickLinkWithText(FOLDER_NAME);
@@ -77,7 +77,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_1);
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         clickLinkWithText(PROJECT_NAME_2);
         addWebPart("Issues List");
@@ -87,7 +87,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickNavButton("Back to Issues");
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_2);
-        clickNavButton("Submit");
+        clickNavButton("Save");
         
         RReportHelper.ensureRConfig(this);
     }
