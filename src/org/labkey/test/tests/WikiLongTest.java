@@ -500,7 +500,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText("Edit");
         deleteWikiPage();
         clickLinkWithText(WIKI_PAGE1_TITLE);
-        assertLinkNotPresentWithText(WIKI_PAGE2_TITLE);
+        assertLinkPresentWithTextCount(WIKI_PAGE2_TITLE, 1);
 
         //extended wiki test -- generate 2000 pages
 //        clickLinkWithText(PROJECT_NAME);
