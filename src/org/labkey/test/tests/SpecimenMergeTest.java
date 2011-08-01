@@ -102,7 +102,7 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
         // Check there was an error in the specimen merge.
         clickLinkWithText("ERROR");
         assertTextPresent("lab20");
-        assertTextPresent("Conflicting specimens found for GlobalUniqueId(s): AAA07XK5-02");
+        assertTextPresent("Conflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
         checkExpectedErrors(2);
     }
 
