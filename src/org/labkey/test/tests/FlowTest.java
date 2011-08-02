@@ -466,7 +466,7 @@ public class FlowTest extends BaseFlowTest
     private void verifyReportError(String reportName, String errorText)
     {
         goToFlowDashboard();
-        clickLinkWithText("Show Jobs");
+        clickLinkContainingText("Show Jobs");
         clickLinkWithText("ERROR");
 
         assertTitleContains(reportName);
