@@ -42,7 +42,11 @@ public class FolderTest extends BaseSeleniumWebTest
     {
         return PROJECT_NAME;
     }
-    
+
+    @Override
+    protected void checkQueries() // skip query validation
+    { /* Too many folder to check queries. */ }
+
     @Override
     protected void doCleanup() throws Exception
     {
