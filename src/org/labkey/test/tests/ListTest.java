@@ -76,7 +76,7 @@ public class ListTest extends BaseSeleniumWebTest
             LIST_ROW1 + "\t" + "String";
     private final static String TEST_FAIL = "testfail";
     private final static String TEST_VIEW = "list_view";
-    private final static String LIST2_NAME = "Cars";
+    private final static String LIST2_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
     private final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
     private final static String LIST2_KEY_NAME = "Car";
 
@@ -556,9 +556,15 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(LIST2_KEY3);
         assertTextNotPresent(LIST2_KEY4);
 
-        log("Test deleting data");
+        log("Get URL to test exporting deleted list.");
         clickLinkWithText("Lists");
-        clickAndWait(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/../td[3]/a"));
+        clickAndWait(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/..//a[text()='view data']"));
+        clickNavButton("Export", 0);
+        selenium.mouseDown("//a//span[contains(text(), 'Text')]");
+        String exportUrl = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "href");
+        clickLinkWithText("View Design");
+
+        log("Test deleting data");
         clickDeleteList();
         clickNavButton("OK");
 
@@ -575,7 +581,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("List does not exist");
 
         log("Test exporting a nonexistent list returns a 404");
-        selenium.open(WebTestHelper.getBaseURL() + "/query/" + PROJECT_NAME + "/exportRowsTsv.view?schemaName=lists&query.queryName=" + LIST_NAME);
+        selenium.open(WebTestHelper.getBaseURL() + exportUrl.substring(WebTestHelper.getContextPath().length()));
         assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME + "' in schema 'lists' doesn't exist.");
 
