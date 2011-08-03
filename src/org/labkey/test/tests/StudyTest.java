@@ -312,15 +312,8 @@ public class StudyTest extends StudyBaseTest
 
         if(filtered)
         {
-            try
-            {
-                setFilter("demoDataRegion", "DEMasian", "Equals", "0");
-            }
-            catch (SeleniumException e)
-            {
-                //eat the exception, this isn't a real time out, it's caused
-                //by the helper function using NavButton rather than regular Button
-            }
+            setFilterAndWait("demoDataRegion", "DEMasian", "Equals", "0", 0);
+            waitForText("Filter", WAIT_FOR_JAVASCRIPT);
         }
 
         clickButtonContainingText("Add All");

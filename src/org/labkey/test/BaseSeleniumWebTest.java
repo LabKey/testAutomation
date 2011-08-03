@@ -1862,6 +1862,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             if (inheritPermissions)
             {
+                // wait for the selected tree node to render
+                Locator treeNode = Locator.xpath("//div[contains(@class, 'x-tree-node-current')]//span[text() = " + Locator.xq(child) + "]");
+                waitForElement(treeNode, WAIT_FOR_JAVASCRIPT);
+
                 checkInheritedPermissions();
                 savePermissions();
             }
@@ -1885,6 +1889,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             if (inheritPermissions)
             {
+                // wait for the selected tree node to render
+                Locator treeNode = Locator.xpath("//div[contains(@class, 'x-tree-node-current')]//span[text() = " + Locator.xq(child) + "]");
+                waitForElement(treeNode, WAIT_FOR_JAVASCRIPT);
+
                 checkInheritedPermissions();
                 savePermissions();
             }
