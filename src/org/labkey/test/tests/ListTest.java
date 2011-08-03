@@ -714,8 +714,8 @@ public class ListTest extends BaseSeleniumWebTest
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'line-through'))]"));
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'bold'))]"));
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'italic'))]"));
-        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'color: #00FFFF'))]")); // Cyan text
-        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'background-color: #FF0000'))]")); // Red background
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'color: rgb(0, 255, 255)'))]")); // Cyan text
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'background-color: rgb(255, 0, 0)'))]")); // Red background
         assertElementNotPresent(Locator.xpath("//td[text() = 'false' and @style]")); // No style on false items
         assertElementPresent(Locator.xpath("//td[text()='5' and not(contains(@style, 'bold')) and not(contains(@style, 'line-through'))]"));
         assertElementPresent(Locator.xpath("//td[text()='6' and contains(@style, 'bold') and not(contains(@style, 'line-through'))]"));
