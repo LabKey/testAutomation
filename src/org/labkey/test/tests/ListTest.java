@@ -571,10 +571,10 @@ public class ListTest extends BaseSeleniumWebTest
 //        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
 
         //TODO:  uncomment this
-//        doRenameFieldsTest();
-//        doUploadTest();
-//        customFormattingTest();
-//        customizeURLTest();
+        doRenameFieldsTest();
+        doUploadTest();
+        customFormattingTest();
+        customizeURLTest();
     }
 
     private void filterTest()
