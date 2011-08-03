@@ -3556,11 +3556,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFilter(String regionName, String columnName, String filterType, String filter)
     {
+        setUpFilter(regionName, columnName, filterType, filter);
+        clickNavButton("OK");
+    }
+
+    public void setUpFilter(String regionName, String columnName, String filterType, String filter)
+    {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
         runMenuItemHandler(regionName + ":" + columnName + ":filter");
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
-        clickNavButton("OK");
     }
 
     public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
