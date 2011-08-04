@@ -70,16 +70,15 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
     private static final String VIS_ASSAY = "Visual";
     private static final String VIS_ASSAY_DESC = "IDRI Visual Data.";
-    
+
+    private static final String HPLC_ASSAY = "HPLC";
+    private static final String HPLC_ASSAY_DESC = "IDRI HPLC Assay Data";
+
     @Override
     protected void doCleanup() throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
-
-    @Override
-    protected void checkQueries() // skip query validation
-    { /* TODO: Remove. Blocked by Issue 12732: Bad queries in IDRI modules. */ }
     
     @Override
     protected void doTestSteps() throws Exception
@@ -96,6 +95,8 @@ public class FormulationsTest extends BaseSeleniumWebTest
         defineVisualAssay();
         uploadVisualAssayData();
         validateVisualAssayData();
+
+        defineHPLCAssay();
         // Test Concentrations
         //
     }
@@ -386,6 +387,37 @@ public class FormulationsTest extends BaseSeleniumWebTest
         assertTextPresent("Color changed.");
         assertTextPresent(TRICKY_CHARACTERS);
         assertTextPresent("This is a passing comment.");
+    }
+
+    protected void defineHPLCAssay()
+    {
+        clickLinkWithText(PROJECT_NAME);
+
+        log("Defining HPLC Assay");
+        clickLinkWithText("Manage Assays");
+        clickNavButton("New Assay Design");
+
+        assertTextPresent("Visual Formulation Time-Point Data");
+        checkRadioButton("providerName", "HLPC"); // this is a known typo
+        clickNavButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+        selenium.type("//input[@id='AssayDesignerName']", HPLC_ASSAY);
+        selenium.type("//textarea[@id='AssayDesignerDescription']", HPLC_ASSAY_DESC);
+
+        // Batch Properties
+        assertTextPresent("No fields have been defined.");
+
+        // Run Properties
+        assertTextPresent("LotNumber");
+
+        // Result Properties
+        assertTextPresent("Timepoint");
+        assertTextPresent("Temperature");
+        assertTextPresent("Concentration");
+
+        clickNavButton("Save", 0);
+        waitForText("Save successful.", 10000);
     }
 
     protected void performSearch()
