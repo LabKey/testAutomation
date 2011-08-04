@@ -67,6 +67,9 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
     private static final String PS_ASSAY = "Particle Size";
     private static final String PS_ASSAY_DESC = "IDRI Particle Size Data as provided by Nano and APS machine configurations.";
+
+    private static final String VIS_ASSAY = "Visual";
+    private static final String VIS_ASSAY_DESC = "IDRI Visual Data.";
     
     @Override
     protected void doCleanup() throws Exception
@@ -90,6 +93,9 @@ public class FormulationsTest extends BaseSeleniumWebTest
         defineParticleSizeAssay();
         uploadParticleSizeData();
 
+        defineVisualAssay();
+        uploadVisualAssayData();
+        validateVisualAssayData();
         // Test Concentrations
         //
     }
@@ -195,7 +201,8 @@ public class FormulationsTest extends BaseSeleniumWebTest
         log("Test Duplicate Material");
         clickButton("Add Another Material", 0);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material1']]"), RAW_MATERIAL_1);
-        waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
+//        waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
+        sleep(2000);
         setFormElements("input", "concentration", new String[]{"25.4", "66.2"});
         clickButton("Create", 0);
         waitForText("Duplicate source materials are not allowed.", WAIT_FOR_JAVASCRIPT);
@@ -211,10 +218,9 @@ public class FormulationsTest extends BaseSeleniumWebTest
         // Test empty concentration
         log("Test empty concentration");
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material2']]"), RAW_MATERIAL_2);
-        waitForExtMaskToDisappear();
+        waitForText("%v/vol", WAIT_FOR_JAVASCRIPT);
         clickButton("Create", 0);
-        waitForExtMaskToDisappear();
-        waitForText("Invalid material", WAIT_FOR_JAVASCRIPT);
+        waitForText("Invalid material.", WAIT_FOR_JAVASCRIPT);
 
         // Remove duplicate material
         log("Remove duplicate material");
@@ -284,6 +290,102 @@ public class FormulationsTest extends BaseSeleniumWebTest
             setFormElement("upload-run-field-file", file);
             sleep(2500);
         }
+    }
+
+    protected void defineVisualAssay()
+    {
+        clickLinkWithText(PROJECT_NAME);
+
+        log("Defining Visual Assay");
+        clickLinkWithText("Manage Assays");
+        clickNavButton("New Assay Design");
+
+        assertTextPresent("Visual Formulation Time-Point Data");
+        checkRadioButton("providerName", "Visual");
+        clickNavButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+        selenium.type("//input[@id='AssayDesignerName']", VIS_ASSAY);
+        selenium.type("//textarea[@id='AssayDesignerDescription']", VIS_ASSAY_DESC);
+
+        // Batch Properties
+        assertTextPresent("No fields have been defined.");
+
+        // Run Properties
+        assertTextPresent("LotNumber");
+
+        // Result Properties
+        assertTextPresent("PhaseSeparation");
+        assertTextPresent("ColorChange");
+        assertTextPresent("ForeignObject");
+
+        clickNavButton("Save", 0);
+        waitForText("Save successful.", 10000);
+    }
+
+    protected void uploadVisualAssayData()
+    {
+        clickLinkWithText(PROJECT_NAME);
+
+        log("Uploading Visual Data");
+        clickLinkWithText(VIS_ASSAY);
+        clickNavButton("Import Data");
+
+        waitForText("What is the Lot Number?", WAIT_FOR_JAVASCRIPT);
+        setFormElement("lot", FORMULATION);
+        clickButton("Next", 0);
+
+        waitForText("What temperatures are you examining?");
+        checkRadioButton("time", "1 mo");
+        clickButton("Next", 0);
+        waitForText("Please complete this page to continue.");
+
+        checkCheckbox("temp", "5C");
+        checkCheckbox("temp", "60C");
+        clickButton("Next", 0);
+
+        waitForText("State of " + FORMULATION + " at 1 mo");
+        checkRadioButton("5C", "fail");
+        checkRadioButton("60C", "pass");
+        clickButton("Next", 0);
+
+        waitForText("Additional Comments for passing");
+        setFormElement("comment60C", "This is a passing comment.");
+        clickButton("Next", 0);
+
+        waitForText("Failure Criteria for 5C");
+        clickButton("Next", 0);
+        waitForText("At least one criteria must be marked as a failure.");
+
+        checkCheckbox("failed");    // color change
+        checkCheckbox("failed", 2); // foreign object
+
+        setFormElement("color", "Color changed.");
+        setFormElement("foreign", TRICKY_CHARACTERS);
+        clickButton("Next", 0);
+
+        waitForText("Visual Inspection Summary Report");
+        assertTextPresent("Color: Color changed.");
+        assertTextBefore("5C", "60C");
+        assertTextBefore("Failed", "Passed");
+        clickButton("Submit", 0);
+
+        waitForText("Updated successfully.");
+        clickLinkWithText("More Visual Inspection");
+        waitForText("Formulation Lot Information");
+        waitAndClick(Locator.xpath("//div[@id='wizard-window']//div[contains(@class,'x-tool-close')]"));
+    }
+
+    protected void validateVisualAssayData()
+    {
+        // Assumes starting where uploadVisualAssayData left
+        clickLinkWithText("Visual Batches");
+        clickLinkWithText("view runs");
+        clickLinkWithText(FORMULATION);
+
+        assertTextPresent("Color changed.");
+        assertTextPresent(TRICKY_CHARACTERS);
+        assertTextPresent("This is a passing comment.");
     }
 
     protected void performSearch()
