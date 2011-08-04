@@ -29,17 +29,18 @@ import org.labkey.test.util.ListHelper;
 public class CustomizeViewTest extends BaseSeleniumWebTest
 {
     public static final String PROJECT_NAME = "CustomizeViewTest";
-    public static final String LIST_NAME = "People";
+    public static final String LIST_NAME = "People" + INJECT_CHARS_1;
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
 
+    private final static String LAST_NAME_COLUMN = "LastName" + INJECT_CHARS_2;
     private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
             {
-                    new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
-                    new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
-                    new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age")
+                    new ListHelper.ListColumn("FirstName", "First Name" + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
+                    new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
+                    new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
             };
     static
     {
@@ -78,23 +79,23 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         createList();
 
         log("** Show only LastName and Age");
-        setColumns("LastName", "Age");
+        setColumns(LAST_NAME_COLUMN, "Age");
         assertTextPresent("Norbertson");
         assertTextNotPresent("First Name");
 
-        log("** Add filter: FirstName starts with 'J'");
-        addFilter("LastName", "Starts With", "J");
+        log("** Add filter: LastName starts with 'J'");
+        addFilter(LAST_NAME_COLUMN, "Starts With", "J");
         assertTextNotPresent("Norbertson");
         assertTextPresent("Janeson");
         assertTextPresent("Johnson");
 
-        log("** Add another filter: FirstName != 'Johnson'");
-        addFilter("LastName", "Does Not Equal", "Johnson");
+        log("** Add another filter: LastName != 'Johnson'");
+        addFilter(LAST_NAME_COLUMN, "Does Not Equal", "Johnson");
         assertTextPresent("Janeson");
         assertTextNotPresent("Johnson");
 
         log("** Remove filter");
-        removeFilter("LastName");
+        removeFilter(LAST_NAME_COLUMN);
         assertTextPresent("Johnson");
         assertTextPresent("Norbertson");
 
@@ -109,8 +110,8 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
 
         log("** Set column title and SUM aggregate");
         assertTextNotPresent("Oldness Factor");
-        setColumnProperties("Age", "Oldness Factor", "SUM");
-        assertTextPresent("Oldness");
+        setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, "SUM");
+        assertTextPresent("Oldness Factor" + INJECT_CHARS_2);
         assertTextPresent("Total:");
         assertTextPresent("279");
 
@@ -118,6 +119,9 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         setColumnProperties("Age", null, null);
         assertTextNotPresent("Oldness Factor");
         assertTextNotPresent("Total:");
+
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.saveCustomView(this, "Saved-" + INJECT_CHARS_1);
 
         // TODO: pin, unpin, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links,
 
@@ -172,21 +176,21 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.clearCustomizeViewColumns(this);
         for (String fieldKey : fieldKeys)
-            CustomizeViewsHelper.addCustomizeViewColumn(this, fieldKey);
+            CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { fieldKey });
         CustomizeViewsHelper.applyCustomView(this);
     }
 
     void addFilter(String fieldKey, String op, String value)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewFilter(this, fieldKey, op, value);
+        CustomizeViewsHelper.addCustomizeViewFilter(this, new String[] { fieldKey }, fieldKey, op, value);
         CustomizeViewsHelper.applyCustomView(this);
     }
 
     void addSort(String fieldKey, String order)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewSort(this, fieldKey, order);
+        CustomizeViewsHelper.addCustomizeViewSort(this, new String[] { fieldKey }, fieldKey, order);
         CustomizeViewsHelper.applyCustomView(this);
     }
 

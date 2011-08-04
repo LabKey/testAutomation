@@ -18,13 +18,12 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 public class FileContentTest extends BaseSeleniumWebTest
 {
@@ -194,7 +193,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             signOut();
 
             // Test that renderAs can be observed through a login
-            beginAt("files/" + encode(PROJECT_NAME) + "/" + filename + "?renderAs=INLINE");
+            beginAt("files/" + EscapeUtil.encode(PROJECT_NAME) + "/" + filename + "?renderAs=INLINE");
             assertTitleEquals("Sign In");
 
             log("Test renderAs through login and ensure that page is rendered inside of server UI");
@@ -233,11 +232,6 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertTextBefore("file uploaded", "annotations updated");
             assertTextBefore("annotations updated", "file deleted");
         }
-    }
-
-    private static String encode(String data) throws UnsupportedEncodingException
-    {
-        return URLEncoder.encode(data, "UTF-8").replace("+","%20");
     }
 
     private enum FileTab

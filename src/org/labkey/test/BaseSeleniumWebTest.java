@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -100,6 +101,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "><&/% 1";
+
+    public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
+    public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>;P";
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
@@ -2197,7 +2201,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public String getTextInTable(String dataRegion, int row, int column)
     {
-        return selenium.getText("//table[@id='"+dataRegion+"']/tbody/tr["+row+"]/td["+column+"]");
+        String id = Locator.xq(dataRegion);
+        return selenium.getText("//table[@id="+id+"]/tbody/tr["+row+"]/td["+column+"]");
     }
 
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
@@ -3543,21 +3548,24 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearSort(String regionName, String columnName, int wait)
     {
         log("Clearing sort in " + regionName + " for " + columnName);
-        if (runMenuItemHandler(regionName + ":" + columnName + ":" + "clear"));
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
+        if (runMenuItemHandler(id));
             waitForPageToLoad(wait);
     }
 
     public void setSort(String regionName, String columnName, SortDirection direction, int wait)
     {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
-        if (runMenuItemHandler(regionName + ":" + columnName + ":" + direction.toString().toLowerCase()))
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":" + direction.toString().toLowerCase());
+        if (runMenuItemHandler(id))
             waitForPageToLoad(wait);
     }
 
     public void setFilter(String regionName, String columnName, String filterType)
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filterType.toLowerCase());
-        runMenuItemHandler(regionName + ":" + columnName + ":filter");
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
+        runMenuItemHandler(id);
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         clickNavButton("OK");
     }
@@ -3571,7 +3579,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setUpFilter(String regionName, String columnName, String filterType, String filter)
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
-        runMenuItemHandler(regionName + ":" + columnName + ":filter");
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(id);
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
     }
@@ -3579,7 +3588,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
     {
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
-        runMenuItemHandler(regionName + ":" + columnName + ":filter");
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(id);
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
         clickNavButton("OK", milliSeconds);
@@ -3588,7 +3598,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
     {
         log("Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + " " + filter1 + " and " + filter2Type.toLowerCase() + " " + filter2);
-        runMenuItemHandler(regionName + ":" + columnName + ":filter");
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(id);
         ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
         setFormElement("value_1", filter1);
         ExtHelper.selectComboBoxItem(this, "and", filter2Type); //Select combo box item.
@@ -3599,7 +3610,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearFilter(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        runMenuItemHandler(regionName + ":" + columnName + ":clear-filter");
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear-filter");
+        runMenuItemHandler(id);
         waitForPageToLoad();
     }
 
@@ -3609,7 +3621,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearAllFilters(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        runMenuItemHandler(regionName + ":" + columnName + ":filter");
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
+        runMenuItemHandler(id);
         clickNavButton("CLEAR ALL FILTERS");
     }
 
@@ -3721,51 +3734,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Invoking Ext menu item handler '" + id + "'");
         //selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "').handler();");
-        String result = selenium.getEval("selenium.clickExtComponent(" + jsString(id.replace("&", "&amp;").replace("'", "&#039;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")) + ");");
+        String result = selenium.getEval("selenium.clickExtComponent(" + EscapeUtil.jsString(EscapeUtil.filter(id)) + ");");
         return result != null && Boolean.parseBoolean(result);
-    }
-
-    static public String jsString(String s)
-    {
-        if (s == null)
-            return "''";
-
-        StringBuilder js = new StringBuilder(s.length() + 10);
-        js.append("'");
-        int len = s.length();
-        for (int i = 0 ; i<len ; i++)
-        {
-            char c = s.charAt(i);
-            switch (c)
-            {
-                case '\\':
-                    js.append("\\\\");
-                    break;
-                case '\n':
-                    js.append("\\n");
-                    break;
-                case '\r':
-                    js.append("\\r");
-                    break;
-                case '<':
-                    js.append("\\x3C");
-                    break;
-                case '>':
-                    js.append("\\x3E");
-                    break;
-                case '\'':
-                    js.append("\\'");
-                    break;
-                case '\"':
-                    js.append("\\\"");
-                    break;
-                default:
-                    js.append(c);
-                    break;
-            }
-        }
-        js.append("'");
-        return js.toString();
     }
 
     /**
@@ -3811,24 +3781,28 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private void clickDataRegionPageLink(String dataRegionName, String title)
     {
-        clickAndWait(Locator.xpath("//table[@id='dataregion_header_" + dataRegionName + "']//div/a[@title='" + title + "']"));
+        String id = Locator.xq("dataregion_header_" + dataRegionName);
+        clickAndWait(Locator.xpath("//table[@id=" + id + "]//div/a[@title='" + title + "']"));
     }
 
     public int getDataRegionRowCount(String dataRegionName)
     {
-        return selenium.getXpathCount("//table[@id='dataregion_" + dataRegionName + "']/tbody/tr[contains(@class, 'labkey-row') or contains(@class, 'labkey-alternate-row')]").intValue();
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        return selenium.getXpathCount("//table[@id=" + id + "]/tbody/tr[contains(@class, 'labkey-row') or contains(@class, 'labkey-alternate-row')]").intValue();
     }
 
     /** Sets selection state for rows of the data region on the current page. */
     public void checkAllOnPage(String dataRegionName)
     {
-        checkCheckbox(Locator.raw("document.forms['" + dataRegionName + "'].elements['.toggle']"));
+        String id = EscapeUtil.jsString(dataRegionName);
+        checkCheckbox(Locator.raw("document.forms[" + id + "].elements['.toggle']"));
     }
 
     /** Clears selection state for rows of the data region on the current page. */
     public void uncheckAllOnPage(String dataRegionName)
     {
-        Locator toggle = Locator.raw("document.forms['" + dataRegionName + "'].elements['.toggle']");
+        String id = EscapeUtil.jsString(dataRegionName);
+        Locator toggle = Locator.raw("document.forms[" + id + "].elements['.toggle']");
         checkCheckbox(toggle);
         uncheckCheckbox(toggle);
     }
@@ -3836,19 +3810,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     /** Sets selection state for single rows of the data region. */
     public void checkDataRegionCheckbox(String dataRegionName, String value)
     {
-        checkCheckbox(Locator.xpath("//form[@id='" + dataRegionName + "']//input[@name='.select' and @value='" + value + "']"));
+        String id = Locator.xq(dataRegionName);
+        checkCheckbox(Locator.xpath("//form[@id=" + id + "]//input[@name='.select' and @value='" + value + "']"));
     }
 
     /** Sets selection state for single rows of the data region. */
     public void checkDataRegionCheckbox(String dataRegionName, int index)
     {
-        checkCheckbox(Locator.raw("document.forms['" + dataRegionName + "'].elements['.select'][" + index + "]"));
+        String id = EscapeUtil.jsString(dataRegionName);
+        checkCheckbox(Locator.raw("document.forms[" + id + "].elements['.select'][" + index + "]"));
     }
 
     /** Sets selection state for single rows of the data region. */
     public void uncheckDataRegionCheckbox(String dataRegionName, int index)
     {
-        uncheckCheckbox(Locator.raw("document.forms['" + dataRegionName + "'].elements['.select'][" + index + "]"));
+        String id = EscapeUtil.jsString(dataRegionName);
+        uncheckCheckbox(Locator.raw("document.forms[" + id + "].elements['.select'][" + index + "]"));
     }
 
     public void toggleCheckboxByTitle(String title)

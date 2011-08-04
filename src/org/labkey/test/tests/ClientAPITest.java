@@ -7,11 +7,10 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.apache.commons.lang.StringUtils;
-
-import java.net.URLEncoder;
 
 /**
  * Copyright (c) 2008-2011 LabKey Corporation
@@ -338,7 +337,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         clickButton("Get SVG", 0);
         String svgText = getFormElement(Locator.id("svgtext"));
 
-        String url = WebTestHelper.getBaseURL() + "/visualization/" + PROJECT_NAME + "/" + URLEncoder.encode(FOLDER_NAME, "UTF-8").replace("+","%20")+ "/exportPDF.view";
+        String url = WebTestHelper.getBaseURL() + "/visualization/" + PROJECT_NAME + "/" + EscapeUtil.encode(FOLDER_NAME)+ "/exportPDF.view";
         HttpClient httpClient = WebTestHelper.getHttpClient(url);
         PostMethod method = null;
 

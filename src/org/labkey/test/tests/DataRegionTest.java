@@ -18,8 +18,11 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,7 +38,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
     private static final String LAST_LINK = "Last Page";
 
     private static final String PROJECT_NAME = "DataRegionProject";
-    private static final String LIST_NAME = "WebColors";
+    private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
     private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";
 
@@ -102,6 +105,15 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws Exception
     {
+        createList();
+
+        URL url = getURL();
+        dataRegionTest(url, INJECT_CHARS_1);
+        dataRegionTest(url, INJECT_CHARS_2);
+    }
+
+    private void createList()
+    {
         log("Create project: " + PROJECT_NAME);
         createProject(PROJECT_NAME);
 
@@ -110,8 +122,25 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         log("Upload data");
         ListHelper.uploadData(this, PROJECT_NAME, LIST_NAME, LIST_DATA);
+    }
 
-        table = new DataRegionTable("query", this);
+    private void dataRegionTest(URL url, String dataRegionName) throws Exception
+    {
+        log("** Beginning test for dataRegionName: " + dataRegionName);
+
+        // Issue 11392: DataRegion name escaping in button menus.  Append evil dataRegionName parameter.
+        try
+        {
+            String encodedName = EscapeUtil.encode(dataRegionName);
+            url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile() + "&dataRegionName=" + encodedName);
+        }
+        catch (MalformedURLException mue)
+        {
+            throw new RuntimeException(mue);
+        }
+        beginAt(url.getFile());
+
+        table = new DataRegionTable(dataRegionName, this);
         assertEquals(TOTAL_ROWS, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertEquals("#FFFF00", table.getDataAsText(15, 4));

@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * DataRegionTable class
@@ -324,9 +325,10 @@ public class DataRegionTable
     {
         URL url = _test.getURL();
         String file = url.getFile();
-        file = file.replaceAll("&" + param + "=\\p{Alnum}+?", "");
+        String encodedParam = EscapeUtil.encode(param);
+        file = file.replaceAll("&" + Pattern.quote(encodedParam) + "=\\p{Alnum}+?", "");
         if (newValue != null)
-            file += "&" + param + "=" + newValue;
+            file += "&" + encodedParam + "=" + EscapeUtil.encode(newValue);
 
         try
         {
