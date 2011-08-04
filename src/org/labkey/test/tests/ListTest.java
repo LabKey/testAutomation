@@ -636,10 +636,12 @@ public class ListTest extends BaseSeleniumWebTest
         runMenuItemHandler(TABLE_NAME + ":" + columnName + ":filter");
 
         if(filter1!=null)
-            assertTextPresent(filter1);
+        {
+            assertEquals("Filter 1 value was not populated when reopening.", getFormElement("value_1"), filter1);
+        }
 
         if(filter2!=null)
-            assertTextPresent(filter2);
+            assertEquals("Filter 2 value was not populated when reopening.", getFormElement("value_2"), filter2);
 
         clickButtonContainingText("CANCEL");
 
@@ -660,6 +662,8 @@ public class ListTest extends BaseSeleniumWebTest
     private Object[][] generateValidFilterArgsAndResponses()
     {
         Object[][] ret = {
+                //Issue 12799
+                {_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", "9;7", null, null, new String[] {"Light","Robust"}, new String[] {"Mellow","Zany"}},
                 {_listCol1.getName(), "Equals", "Zany", null, null, new String[] {"Zany"}, new String[] {"Mellow","Robust","Light"}},
                 {_listCol1.getName(), "Starts With", "Z", null, null, new String[] {"Zany"}, new String[] {"Mellow","Robust","Light"}},
                 {_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[] {"Mellow","Robust","Light"}, new String[] {"Zany"}},
@@ -669,7 +673,6 @@ public class ListTest extends BaseSeleniumWebTest
                 {_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
                 //filter is case insensitive
                 {_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {"Fire","Water", "Earth"}, new String[] {"Light"}},
-                //Issue 12799
 //                {_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {"Mellow"}, new String[] {"Zany","Robust","Light"}},
                 {_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
                 {_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {"Zany"}, new String[] {"Mellow","Light","Robust"}},
