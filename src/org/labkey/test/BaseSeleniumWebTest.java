@@ -2193,10 +2193,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return count;
     }
 
-    public void assertTextNotPresent(String text)
+    public void assertTextNotPresent(String... texts)
     {
-        text = text.replace("&nbsp;", " ");
-        assertFalse("Text '" + text + "' was present", isTextPresent(text));
+        for(String text : texts)
+        {
+            text = text.replace("&nbsp;", " ");
+            assertFalse("Text '" + text + "' was present", isTextPresent(text));
+
+        }
     }
 
     public String getTextInTable(String dataRegion, int row, int column)
@@ -3597,13 +3601,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
     {
-        log("Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + " " + filter1 + " and " + filter2Type.toLowerCase() + " " + filter2);
+        String log =    "Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + " " + filter1;
+        if(filter2Type!=null)
+        {
+            log+=   " and " + filter2Type.toLowerCase() + " " + filter2;
+        }
+        log( log );
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         runMenuItemHandler(id);
         ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
         setFormElement("value_1", filter1);
-        ExtHelper.selectComboBoxItem(this, "and", filter2Type); //Select combo box item.
-        setFormElement("value_2", filter2);
+        if(filter2Type!=null)
+        {
+            ExtHelper.selectComboBoxItem(this, "and", filter2Type); //Select combo box item.
+            setFormElement("value_2", filter2);
+        }
         clickNavButton("OK");
     }
 

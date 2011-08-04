@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
@@ -570,7 +571,6 @@ public class ListTest extends BaseSeleniumWebTest
 //        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
 //        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
 
-        //TODO:  uncomment this
         doRenameFieldsTest();
         doUploadTest();
         customFormattingTest();
@@ -605,8 +605,79 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[1][0], 1);
 
         clickLinkContainingText(LIST_NAME);
-        invalidFiltersGenerateCorrectErrorTest();
 
+        invalidFiltersGenerateCorrectErrorTest();
+        
+        validFiltersGenerateCorrectResultsTest();
+
+        filterCancelButtonWorksTest();
+    }
+
+    //Issue 12787: Canceling filter dialog requires two clicks
+    private void filterCancelButtonWorksTest()
+    {
+        String id = EscapeUtil.filter(TABLE_NAME + ":" + _listCol4.getName() + ":filter");
+        runMenuItemHandler(id);
+
+        clickButton("CANCEL",0);
+        waitForExtMaskToDisappear();
+
+        assertTextNotPresent("Show Rows Where");
+    }
+
+    private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
+            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
+    {
+        setFilter(TABLE_NAME, columnName, filter1Type, filter1, filter2Type, filter2);
+        assertTextPresent(textPresentAfterFilter);
+        assertTextNotPresent(textNotPresentAfterFilter);
+
+        //open filter
+        runMenuItemHandler(TABLE_NAME + ":" + columnName + ":filter");
+
+        if(filter1!=null)
+            assertTextPresent(filter1);
+
+        if(filter2!=null)
+            assertTextPresent(filter2);
+
+        clickButtonContainingText("CANCEL");
+
+        clickButton("Clear All");
+
+    }
+
+    public void validFiltersGenerateCorrectResultsTest()
+    {
+        Object[][] testArgs = generateValidFilterArgsAndResponses();
+
+        for(Object[] args : testArgs)
+        {
+            validFilterGeneratesCorrectResultsTest((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String[]) args[5], (String[]) args[6]);
+        }
+    }
+
+    private Object[][] generateValidFilterArgsAndResponses()
+    {
+        Object[][] ret = {
+                {_listCol1.getName(), "Equals", "Zany", null, null, new String[] {"Zany"}, new String[] {"Mellow","Robust","Light"}},
+                {_listCol1.getName(), "Starts With", "Z", null, null, new String[] {"Zany"}, new String[] {"Mellow","Robust","Light"}},
+                {_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[] {"Mellow","Robust","Light"}, new String[] {"Zany"}},
+                //can't check for the absence of thing you're excluding, since it will be present in the filter text
+                {_listCol1.getName(), "Does Not Equal", "Zany", null, null, new String[] {"Mellow","Robust","Light"}, new String[] {"Water"}},
+                {_listCol3.getName(), "Equals", "true", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
+                {_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
+                //filter is case insensitive
+                {_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {"Fire","Water", "Earth"}, new String[] {"Light"}},
+                //Issue 12799
+//                {_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {"Mellow"}, new String[] {"Zany","Robust","Light"}},
+                {_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
+                {_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {"Zany"}, new String[] {"Mellow","Light","Robust"}},
+                {_listCol4.getName(), "Is Blank", "", null, null, new String[] {}, new String[] {"Mellow","Light","Robust", "Zany"}},
+
+        };
+
+        return ret;
     }
 
     private void invalidFiltersGenerateCorrectErrorTest()
