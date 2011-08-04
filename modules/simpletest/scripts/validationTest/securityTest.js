@@ -13,7 +13,7 @@ function doTest()
 {
     var errors = [];
 
-    var containerPath = "/serverSideJavascriptTest";
+    var containerPath = "ServerSideJavascriptTest";
     var userEmail = "securitytest@validation.test";
     var groupName = "validationTest group";
     var currentUser = LABKEY.Security.currentUser;
@@ -30,10 +30,10 @@ function doTest()
 
     //LABKEY.Security.createContainer()
     var container = LABKEY.Security.createContainer({
-        name: containerPath.substring(containerPath.lastIndexOf("/")+1),
-        containerPath: containerPath.substring(0, containerPath.lastIndexOf("/"))
+        name: containerPath, //.substring(containerPath.lastIndexOf("/")+1),
+        containerPath: '/'//containerPath.substring(0, containerPath.lastIndexOf("/"))
     });
-    if( container.path != containerPath )
+    if( container.path != "/" + containerPath )
         errors[errors.length] = new Error("Security.createContainer() = "+Ext.util.JSON.encode(container));
 
     // LABKEY.Security.createGroup()
@@ -74,59 +74,57 @@ function doTest()
     if( typeof result === undefined )
         errors[errors.length] = new Error("Security.getSecurableResources() = "+Ext.util.JSON.encode(result));
 
-    // TODO: Test APIs blocked by issue 12205
-    // https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=12205
-    // needs callback
     // LABKEY.Security.getGroupsForCurrentUser()
-//    result = LABKEY.Security.getGroupsForCurrentUser({
-//        containerPath: containerPath
-//    });
-//    console.log("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
-//    if( !result.groups )
-//        errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
+    result = LABKEY.Security.getGroupsForCurrentUser({
+        containerPath: containerPath
+    });
+    console.log("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
+    if( !result.groups )
+        errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
+    else if( result.groups.length != 3 )
+        errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
 
-    //needs callback
-//    result = LABKEY.Security.getContainers({
-//        containerPath: container
-//    });
-//    console.log("getContainers: " + result);
+    // LABKEY.Security.getContainers()
+    result = LABKEY.Security.getContainers({
+        containerPath: containerPath
+    });
+    if( !result.id )
+        errors[errors.length] = new Error("Security.getContainers() = "+Ext.util.JSON.encode(result));
 
-    //needs callback
-//    result = LABKEY.Security.getGroupPermissions({
-//        containerPath: container
-//    });
-//    console.log("getGroupPermissions: " + result);
+    // LABKEY.Security.getGroupPermissions()
+    result = LABKEY.Security.getGroupPermissions({
+        containerPath: containerPath
+    });
+    if( !result.container || !result.container.groups )
+        errors[errors.length] = new Error("Security.getGroupPermissions() = "+Ext.util.JSON.encode(result));
 
-    //needs callback
-//    result = LABKEY.Security.getGroupsForCurrentUser({
-//        containerPath: container
-//    });
-//    console.log("getGroupsForCurrentUser: " + result);
+    // LABKEY.Security.getUsers()
+    result = LABKEY.Security.getUsers({
+        groupId: group.id,
+        containerPath: containerPath
+    });
+    if( !result.users )
+        errors[errors.length] = new Error("Security.getUsers() = "+Ext.util.JSON.encode(result));
 
-    //needs callback
-//    result = LABKEY.Security.getUsers({
-//        group: group,
-//        containerPath: container
-//    });
-//    console.log("getUsers: " + result);
+    // LABKEY.Security.getUserPermissions()
+    var permissions = LABKEY.Security.getUserPermissions({
+        userEmail: userEmail,
+        containerPath: containerPath
+    });
+    if( !permissions.container || !permissions.user || permissions.user.userId!=user.userId )
+        errors[errors.length] = new Error("Security.getUserPermissions() = "+Ext.util.JSON.encode(permissions));
 
-    //needs callback
-//    var permissions = LABKEY.Security.getUserPermissions({
-//        userEmail: userEmail,
-//        containerPath: container
-//    });
-//    console.log("getUserPermissions: " + result);
-
-//    result = LABKEY.Security.hasPerms({
-//        perms:permissions,
-//        perm:LABKEY.Security.permissions.read
-//    });
-//    console.log("hasPerms: " + result);
+    result = LABKEY.Security.hasPermission({
+        perms:permissions,
+        perm:LABKEY.Security.permissions.read
+    });
+    if ( result != 0 )
+        errors[errors.length] = new Error("Security.hasPermission() = "+Ext.util.JSON.encode(result));
 
     //ECmaError: scripts/labkey/Security.js: 923
 //    result = LABKEY.Security.getRoles({
 //    });
-//    console.log("getRoles: " + result);
+//    errors[errors.length] = new Error("Security.getRoles() = "+Ext.util.JSON.encode(result));
 
     // LABKEY.Security.removeGroupMembers()
     result = LABKEY.Security.removeGroupMembers({
