@@ -96,7 +96,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         uploadVisualAssayData();
         validateVisualAssayData();
 
-        defineHPLCAssay();
+//        defineHPLCAssay();
         // Test Concentrations
         //
     }
