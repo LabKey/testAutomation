@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import junit.framework.AssertionFailedError;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -462,5 +463,28 @@ public class CustomizeViewsHelper
             aggregate = "[None]";
         ExtHelper.selectComboBoxItem(test, Locator.xpath("//div[contains(@class, 'x-window')]//input[@name='aggregate']/.."), aggregate);
         test.clickButton("OK", 0);
+    }
+
+    /**
+     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
+     *      or at least first element on page)
+     * post-conditions:  grid has R view of name name
+     * @param test
+     * @param view   string to enter in view box (null for default)
+     * @param name name to give new R view
+     */
+    public static void createRView(BaseSeleniumWebTest test, String view, String name)
+    {
+        test.clickMenuButtonAndContinue("Views", "Create", "R View");
+        test.waitForPageToLoad();
+
+        if(view!=null)
+            Assert.fail("Unimplemented");
+
+        test.clickButton("Save", 0);
+
+
+        test.setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
+        ExtHelper.clickExtButton(test, "Save");
     }
 }

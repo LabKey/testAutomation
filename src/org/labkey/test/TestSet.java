@@ -65,6 +65,7 @@ public enum TestSet
     Daily(600000, new Class[]
     {
         BasicTest.class,
+        EmbeddedWebPartTest.class,
         ModuleAssayTest.class,
         SpecimenTest.class,
         StudyExtraTest.class,
@@ -126,7 +127,8 @@ public enum TestSet
         FlowTest.class,
         SecurityTest.class,
         WikiTest.class,
-        GpatAssayTest.class, 
+        GpatAssayTest.class,
+        EmbeddedWebPartTest.class,
     }),
 
     Cluster(new Class[]

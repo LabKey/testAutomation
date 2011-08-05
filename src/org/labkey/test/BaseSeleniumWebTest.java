@@ -101,6 +101,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "><&/% 1";
+    //Issue 12774: Need to filter folder names .  Add the +,=,<>,[] back in when this is fixed (or remove it entirely, if that's what we decide)
+    //and also =,[,],"
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$^&*()_{}|:',."; // "~!@$^&*()_+{}|:\"<>-=[]\',.'";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
     public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>;P";
@@ -2153,6 +2156,43 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             text = text.replace("&nbsp;", " ");
             assertTrue("Text '" + text + "' was not present", isTextPresent(text));
         }
+    }
+
+    //takes the arguments used to set a filter and transforms them into the description in the grid view
+    //then verifies that this description is present
+    public void assertFilterTextPresent(String column, String type, String value)
+    {
+        String desc = type + value;
+        if(type.contains("Equals One Of"))
+        {
+            desc = "IS ONE OF (" + value.replace(";", ", ") + "))";
+        }
+        else if(type.equals("Equals"))
+        {
+            desc = column +  " = " + value;
+        }
+        else if(type.contains("Start") || type.contains("Contain"))    //Starts With, Does Not Start With, Contains, Does not Contain
+        {
+            desc = column + " " + type.toUpperCase() + " " + value;
+        }
+        else if(type.equals("Does Not Equal"))
+        {
+            desc = column + " <> " + value;
+        }
+        else if(type.contains("Greater"))
+        {
+            desc = column + " >";
+            if(type.contains("Equal To"))
+                desc+="=";
+            desc += " " + value;
+        }
+        else if(type.contains("Blank"))
+        {
+            desc = "NULL";
+        }
+
+        assertTextPresent(desc);
+
     }
 
     public void assertTextPresent(String text, int amount)
