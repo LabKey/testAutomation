@@ -5071,10 +5071,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             setTimeout("" + millis);
             _testTimeout = true;
-            // Workaround for selenium issue 408 http://code.google.com/p/selenium/issues/detail?id=408
-            // TODO: remove workaround when we upgrade to selenium 2.x (currently in alpha)
-            // super.open(url);
-            commandProcessor.doCommand("open", new String[] {url,"true"});
+            super.open(url);
+            // commandProcessor.doCommand("open", new String[] {url,"true"}); // Workaround for XHR errors. http://code.google.com/p/selenium/issues/detail?id=408
             _testTimeout = false;
         }
 
