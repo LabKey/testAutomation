@@ -631,6 +631,8 @@ public class ListTest extends BaseSeleniumWebTest
         setFilter(TABLE_NAME, columnName, filter1Type, filter1, filter2Type, filter2);
         assertTextPresent(textPresentAfterFilter);
         assertTextNotPresent(textNotPresentAfterFilter);
+        //make sure we show user a description of what's going on.  See 11.2-3_make_filters_work.docx
+        assertFilterTextPresent(columnName, filter1Type, filter1);
 
         //open filter
         runMenuItemHandler(TABLE_NAME + ":" + columnName + ":filter");
