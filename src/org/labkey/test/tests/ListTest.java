@@ -676,7 +676,7 @@ public class ListTest extends BaseSeleniumWebTest
                 //filter is case insensitive
                 {_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {"Fire","Water", "Earth"}, new String[] {"Light"}},
 //                {_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {"Mellow"}, new String[] {"Zany","Robust","Light"}},
-                {_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
+                {_listCol4.getName(), "Is Greater Than Or Equal To", "9", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
                 {_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {"Zany"}, new String[] {"Mellow","Light","Robust"}},
                 {_listCol4.getName(), "Is Blank", "", null, null, new String[] {}, new String[] {"Mellow","Light","Robust", "Zany"}},
 
