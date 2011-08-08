@@ -469,9 +469,12 @@
 
         <antcall target="stopSeleniumServer" />
 
-        <fail message="${sysprop.suiteToUse} FAILED" if="suite.failed" />
+        <ant target="fail_message" inheritall="true"/>
     </target>
 
+    <target name="fail_message" if="suite.failed">
+        <echo message="${sysprop.suiteToUse} FAILED"/>
+    </target>
 
     <target name="startSeleniumServer" description="start selenium server" if="selenium.server.needs.starting" depends="init-selenium">
         <echo message="Starting selenium server on local server, port ${sysprop.selenium.server.port}."/>
@@ -1050,7 +1053,8 @@
                 <size value="0" units="k" when="more" />
             </fileset>
         </copy>
-        <fail message="${sysprop.suite} FAILED" if="suite.failed" />
+
+        <ant target="fail_message" inheritall="true"/>
     </target>
 
     <!-- for testing the TestHelper ui -->
