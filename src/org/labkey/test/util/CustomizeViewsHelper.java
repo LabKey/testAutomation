@@ -475,6 +475,7 @@ public class CustomizeViewsHelper
      */
     public static void createRView(BaseSeleniumWebTest test, String view, String name)
     {
+        test.waitForText(("Views"));
         test.clickMenuButtonAndContinue("Views", "Create", "R View");
         test.waitForPageToLoad();
 
