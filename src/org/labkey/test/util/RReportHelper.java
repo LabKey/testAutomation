@@ -126,7 +126,7 @@ public class RReportHelper
 
         test.clickLinkWithText("Admin Console");
         test.clickLinkWithText("views and scripting");
-        test.log("Check if it already is configured");
+        test.log("Check if R already is configured");
 
         try
         {

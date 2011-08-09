@@ -781,7 +781,7 @@ public class EHRStudyTest extends SimpleApiTest
                          "-Colony Management", "Behavior Remarks", "Birth Records", "Housing - Active", "Housing History", "Inbreeding Coefficients", "Kinship", "Menses Calendar", "Menses Observations:Irregular Observations", "Pedigree:Offspring", /*"Pedigree Plot",*/ "Pregnancies", "TB Tests",
                          "-Pathology", "Biopsies", "Histology", "Morphologic Diagnosis", "Necropsies",
                          "-Physical Exam", "Alopecia", "Body Condition", "Dental Status", "Exams", "PE Findings", "Teeth", "Vitals",
-                         "-Today At WNPRC", "Irregular Observations", "Obs/Treatment:Obs/Treatments", "Problem List", "Today's History", "Treatments - Morning", "Treatments - Afternoon", "Treatments - Evening", "Treatments - Master", "Unresolved Problem List", "Today's Blood Draws", 
+                         "-Today At WNPRC", "Irregular Observations", "Obs/Treatment:Obs/Treatments", "Problem List", /*"Today's History",*/ "Treatments - Morning", "Treatments - Afternoon", "Treatments - Evening", "Treatments - Master", "Unresolved Problem List", /*"Today's Blood Draws",*/
                          "-General", "Arrival/Departure:Arrival", "Blood Draw History", "Charges", "Current Blood", "Deaths", "Demographics", "Major Events", "Notes", "Abstract:Active Assignments"};
 
         log("Check all Animal History report tabs");

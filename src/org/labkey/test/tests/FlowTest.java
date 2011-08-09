@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -55,6 +56,16 @@ public class FlowTest extends BaseFlowTest
             ret ++;
         }
         return ret;
+    }
+
+    @Override
+    protected void init()
+    {
+        // fail fast if R is not configured
+        // R is needed for the positivity report
+        RReportHelper.ensureRConfig(this);
+
+        super.init();
     }
 
     protected void setupQuery()
