@@ -101,6 +101,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "><&/% 1";
+    //#,? or %
     //Issue 12774: Need to filter folder names .  Add the +,=,<>,[] back in when this is fixed (or remove it entirely, if that's what we decide)
     //and also =,[,],"
     public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$^&*()_{}|:',."; // "~!@$^&*()_+{}|:\"<>-=[]\',.'";

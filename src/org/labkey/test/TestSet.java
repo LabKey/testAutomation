@@ -16,6 +16,7 @@
 
 package org.labkey.test;
 
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.module.*;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
@@ -51,6 +52,7 @@ public enum TestSet
         ViabilityTest.class,
         ButtonCustomizationTest.class,
         ReagentTest.class,
+        FilterTest.class
     }),
 
     MS2(new Class[]
@@ -198,7 +200,8 @@ public enum TestSet
         ExternalSchemaTest.class,
         ListTest.class,
         IssuesTest.class,
-        ScriptValidationTest.class
+        ScriptValidationTest.class,
+        FilterTest.class
     }),
 
     IDRI(new Class[] {

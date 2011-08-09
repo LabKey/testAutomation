@@ -40,7 +40,7 @@ public class ListTest extends BaseSeleniumWebTest
 {
     protected final static String PROJECT_NAME = "ListVerifyProject";
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
-    private final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
+    protected final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     private final static String LIST_KEY_NAME = "Key";
     private final static String LIST_KEY_NAME2 = "Color";
@@ -49,13 +49,13 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String ALIASED_KEY_NAME = "Material";
     private final static String HIDDEN_TEXT = "Hidden";
     private ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
-    private ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
-    private final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
-    private final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
-    private final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
-    private final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
-    private final ListColumn _listCol6 = new ListColumn("AliasedColumn", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
-    private final static String[][] TEST_DATA = {
+    protected ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
+    protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
+    protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
+    protected final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
+    protected final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
+    protected final ListColumn _listCol6 = new ListColumn("AliasedColumn", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
+    protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
             { "true", "false", "true", "false"},
@@ -132,13 +132,22 @@ public class ListTest extends BaseSeleniumWebTest
         return true;
     }
 
-    protected void doTestSteps()
+    protected void setUpListFinish()
     {
+        log("Add data to existing rows");
+        clickImportData();
+        setFormElement("text", LIST_DATA2);
+        submitImportTsv();
+    }
+
+    protected void setUpList(String projectName)
+    {
+
         log("Setup project and list module");
-        createProject(PROJECT_NAME);
+        createProject(projectName);
 
         log("Add list -- " + LIST_NAME);
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
+        ListHelper.createList(this, projectName, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
         clickEditDesign();
@@ -197,6 +206,7 @@ public class ListTest extends BaseSeleniumWebTest
         setColumnType(4, _listCol4.getType());
         setFormElement(Locator.id("propertyDescription"), _listCol4.getDescription());
 
+
         // Create "Hidden Field" and remove from all views.
         clickNavButton("Add Field", 0);
         setColumnName(5, _listCol5.getName());
@@ -236,10 +246,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTableCellTextEquals("dataregion_query", 1, 5, _listCol3.getLabel()); // Colummns...
         assertTableCellTextEquals("dataregion_query", 1, 6, _listCol2.getLabel()); // ...swapped.
 
-        log("Add data to existing rows");
-        clickImportData();
-        setFormElement("text", LIST_DATA2);
-        submitImportTsv();
+        setUpListFinish();
 
         log("Check that data was added correctly");
         assertTextPresent(TEST_DATA[0][0]);
@@ -368,6 +375,11 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickNavButton("Cancel");
+    }
+
+    protected void doTestSteps()
+    {
+        setUpList(PROJECT_NAME);
 
         log("Test Sort and Filter in Data View");
         setSort("query", _listCol1.getName(), SortDirection.ASC);
@@ -605,152 +617,10 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[1][0], 1);
 
         clickLinkContainingText(LIST_NAME);
-
-        invalidFiltersGenerateCorrectErrorTest();
-        
-        validFiltersGenerateCorrectResultsTest();
-
-        filterCancelButtonWorksTest();
-    }
-
-    //Issue 12787: Canceling filter dialog requires two clicks
-    private void filterCancelButtonWorksTest()
-    {
-        String id = EscapeUtil.filter(TABLE_NAME + ":" + _listCol4.getName() + ":filter");
-        runMenuItemHandler(id);
-
-        clickButton("CANCEL",0);
-        waitForExtMaskToDisappear();
-
-        assertTextNotPresent("Show Rows Where");
-    }
-
-    private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
-            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
-    {
-        setFilter(TABLE_NAME, columnName, filter1Type, filter1, filter2Type, filter2);
-        assertTextPresent(textPresentAfterFilter);
-        assertTextNotPresent(textNotPresentAfterFilter);
-        //make sure we show user a description of what's going on.  See 11.2-3_make_filters_work.docx
-        assertFilterTextPresent(columnName, filter1Type, filter1);
-
-        //open filter
-        runMenuItemHandler(TABLE_NAME + ":" + columnName + ":filter");
-
-        if(filter1!=null)
-        {
-            assertEquals("Filter 1 value was not populated when reopening.", getFormElement("value_1"), filter1);
-        }
-
-        if(filter2!=null)
-            assertEquals("Filter 2 value was not populated when reopening.", getFormElement("value_2"), filter2);
-
-        clickButtonContainingText("CANCEL");
-
-        clickButton("Clear All");
-
-    }
-
-    public void validFiltersGenerateCorrectResultsTest()
-    {
-        Object[][] testArgs = generateValidFilterArgsAndResponses();
-
-        for(Object[] args : testArgs)
-        {
-            validFilterGeneratesCorrectResultsTest((String) args[0], (String) args[1], (String) args[2], (String) args[3], (String) args[4], (String[]) args[5], (String[]) args[6]);
-        }
-    }
-
-    private Object[][] generateValidFilterArgsAndResponses()
-    {
-        Object[][] ret = {
-                //Issue 12799
-                {_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", "9;7", null, null, new String[] {"Light","Robust"}, new String[] {"Mellow","Zany"}},
-                {_listCol1.getName(), "Equals", "Zany", null, null, new String[] {"Zany"}, new String[] {"Mellow","Robust","Light"}},
-                {_listCol1.getName(), "Starts With", "Z", null, null, new String[] {"Zany"}, new String[] {"Mellow","Robust","Light"}},
-                {_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[] {"Mellow","Robust","Light"}, new String[] {"Zany"}},
-                //can't check for the absence of thing you're excluding, since it will be present in the filter text
-                {_listCol1.getName(), "Does Not Equal", "Zany", null, null, new String[] {"Mellow","Robust","Light"}, new String[] {"Water"}},
-                {_listCol3.getName(), "Equals", "true", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
-                {_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
-                //filter is case insensitive
-                {_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {"Fire","Water", "Earth"}, new String[] {"Light"}},
-//                {_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {"Mellow"}, new String[] {"Zany","Robust","Light"}},
-                {_listCol4.getName(), "Is Greater Than Or Equal To", "9", null, null, new String[] {"Zany","Robust"}, new String[] {"Mellow","Light"}},
-                {_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {"Zany"}, new String[] {"Mellow","Light","Robust"}},
-                {_listCol4.getName(), "Is Blank", "", null, null, new String[] {}, new String[] {"Mellow","Light","Robust", "Zany"}},
-
-        };
-
-        return ret;
-    }
-
-    private void invalidFiltersGenerateCorrectErrorTest()
-    {
-        String[][] testArgs = generateInvalidFilterTestArgs();
-
-        for(String[] argSet : testArgs)
-        {
-            invalidFiltersGenerateCorrectErrorTest(argSet[0], argSet[1],
-                argSet[2], argSet[3], argSet[4]);
-        }
-
     }
 
 
-    private void invalidFiltersGenerateCorrectErrorTest(String
-                        regionName, String columnName, String filterType,
-                        String filterValue, String expectedError)
-    {
-        log("attempt to set filter column: " + columnName + ". With filter type: " + filterType + ".  And fitler value: " + filterValue);
-        if(filterType==null)
-            setFilter(regionName, columnName, filterType);
-        else
-            setUpFilter(regionName, columnName, filterType,
-                filterValue);
-        clickButton("OK",0);
-        assertTextPresent(expectedError);
-        clickButton("CANCEL", 0);
-        waitForExtMaskToDisappear();
 
-    }
-
-    public static final String TABLE_NAME = "query";
-    public static final String EMPTY_FILTER_VAL_ERROR_MSG = "You must enter a value";
-
-    private String[][] generateInvalidFilterTestArgs()
-    {
-        String[][] args = {
-                {TABLE_NAME, getBooleanColumnName(), "Equals", "foo", "foo is not a valid boolean"},
-                {TABLE_NAME, getStringColumnName(), "Equals", "", EMPTY_FILTER_VAL_ERROR_MSG},
-                {TABLE_NAME, getDateColumnName(), "Equals", TRICKY_CHARACTERS, TRICKY_CHARACTERS + " is not a valid date"},
-                {TABLE_NAME, getIntColumnName(), "Equals", "ab123", "ab123 is not a valid integer"},
-                {TABLE_NAME, getIntColumnName(), "Equals", "", EMPTY_FILTER_VAL_ERROR_MSG},
-        };
-
-        return args;
-    }
-
-    private String getStringColumnName()
-    {
-        return _listCol1.getName();
-    }
-
-    private String getBooleanColumnName()
-    {
-        return _listCol3.getName();
-    }
-
-
-    private String getDateColumnName()
-    {
-        return _listCol2.getName();
-    }
-
-    private String getIntColumnName()
-    {
-        return _listCol4.getName();
-    }
 
     /*                Issue 11825: Create test for "Clear Sort"
         sort by a parameter, than clear sort.
