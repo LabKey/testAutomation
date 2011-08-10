@@ -226,7 +226,7 @@ public class MS2Test extends MS2TestBase
 
         log("Test Scan, Z, Hyper, Next, B, Y, and Expect filters");
         pushLocation();
-        setFilter("MS2Peptides", "Scan", "Is Greater Than", "6", "Is Less Than or Equal To", "100");
+        setFilter("MS2Peptides", "Scan", "Is Greater Than", "6", "Is Less Than Or Equal To", "100");
         assertTextNotPresent("K.FANIGDVIVASVK.Q");
         assertTextPresent("-.MELFSNELLYK.T");
         assertTextNotPresent("K.TESGYGSESSLR.R");
@@ -245,7 +245,7 @@ public class MS2Test extends MS2TestBase
         setFilter("MS2Peptides", "Charge", "Equals", "2");
         assertTextNotPresent("R.APPSTQESESPR.Q");
         assertTextPresent("R.TIDPVIAR.K");
-        setFilter("MS2Peptides", "Hyper", "Is Greater Than or Equal To", "14.6");
+        setFilter("MS2Peptides", "Hyper", "Is Greater Than Or Equal To", "14.6");
         assertTextNotPresent("K.RLLRSMVK.F");
         assertTextPresent("R.AEIDYANK.T");
         setFilter("MS2Peptides", "Next", "Does Not Equal", "9.5");
