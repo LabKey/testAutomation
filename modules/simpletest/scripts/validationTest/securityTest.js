@@ -30,8 +30,8 @@ function doTest()
 
     //LABKEY.Security.createContainer()
     var container = LABKEY.Security.createContainer({
-        name: containerPath, //.substring(containerPath.lastIndexOf("/")+1),
-        containerPath: '/'//containerPath.substring(0, containerPath.lastIndexOf("/"))
+        name: containerPath,
+        containerPath: '/'
     });
     if( container.path != "/" + containerPath )
         errors[errors.length] = new Error("Security.createContainer() = "+Ext.util.JSON.encode(container));
