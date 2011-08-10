@@ -81,7 +81,13 @@ function doTest()
     console.log("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
     if( !result.groups )
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
-    else if( result.groups.length != 3 )
+    else if( result.groups.length >= 3
+            && result.groups[0].id != -3
+            && result.groups[0].name != 'Guests'
+            && result.groups[1].id != -2
+            && result.groups[1].name != 'All Site Users'
+            && result.groups[2].id != -1
+            && result.groups[2].name != 'Site Administrators')
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
 
     // LABKEY.Security.getContainers()
