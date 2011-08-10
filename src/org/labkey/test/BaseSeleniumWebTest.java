@@ -104,7 +104,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     //#,? or %
     //Issue 12774: Need to filter folder names .  Add the +,=,<>,[] back in when this is fixed (or remove it entirely, if that's what we decide)
     //and also =,[,],"
-    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$^&*()_{}|:',."; // "~!@$^&*()_+{}|:\"<>-=[]\',.'";
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$^&()_{}|:',<.>-="; // "~!@$^&*()_+{}|:\"<>-=[]\',.'";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
     public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>;P";
@@ -2139,6 +2139,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public boolean isTextPresent(String text)
     {
+        if(text==null)
+            return true;
+
         //Need to unencode here? Selenium turns &nbsp; into space???
         text = text.replace("&nbsp;", " ");
         return selenium.isTextPresent(text);
@@ -2152,6 +2155,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     /** Verifies that all the strings are present in the page */
     public void assertTextPresent(String... texts)
     {
+        if(texts==null)
+            return;
+
         for (String text : texts)
         {
             text = text.replace("&nbsp;", " ");
@@ -2236,6 +2242,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTextNotPresent(String... texts)
     {
+        if(texts==null)
+            return;
+
         for(String text : texts)
         {
             text = text.replace("&nbsp;", " ");

@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import junit.framework.Assert;
+import org.labkey.experimentQuery.xml.Folder;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
@@ -23,8 +25,9 @@ import java.io.File;
 
 public class TimeChartTest extends BaseSeleniumWebTest
 {
-    private static final String PROJECT_NAME = "TimeChartTest Project";
-    private static final String FOLDER_NAME = "Demo Study";
+//    /?TODO:  Folder names should contain TRICKY_CHARACTERS, don't due to Issue 12830
+    private static final String PROJECT_NAME =  TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "TimeChartTest Project";
+    private static final String FOLDER_NAME =  "Demo Study";
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
 
     private static final String REPORT_NAME_1 = "TimeChartTest Report";
@@ -117,13 +120,50 @@ public class TimeChartTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    @Override
-    public void doTestSteps()
+    public void configureStudy()
     {
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
 
+
+    }
+
+    @Override
+    public void doTestSteps()
+    {
+        configureStudy();
+
+        createChartTest();
+
+        stdDevRegressionTest();
+
+        visualizationTest();
+
+        generateChartPerParticipantTest();
+
+        saveTest();
+
+        timeChartPermissionsTest();
+
+        multiMeasureTimeChartTest();
+    }
+
+    private void generateChartPerParticipantTest()
+    {
+
+        ExtHelper.clickExtTab(this, "Chart(s)");
+        checkRadioButton("chart_layout", "per_subject");
+        setFormElement("chart-title-textfield", CHART_TITLE);
+        fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur);
+        assertTextPresent(CHART_TITLE, 5);
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // re-select participant
+        waitForText(CHART_TITLE+": 249320127", WAIT_FOR_JAVASCRIPT);
+        assertTextPresent(CHART_TITLE, 6);
+    }
+
+    private void createChartTest()
+    {
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "Time Chart");
@@ -143,88 +183,11 @@ public class TimeChartTest extends BaseSeleniumWebTest
         click(Locator.xpath(ExtHelper.getExtDialogXPath(CHOOSE_MEASURE_DIALOG)+"//dl[./dt/em[text()='Cutoff Percentage (3)']]"));
         clickNavButton("Select", 0);
         waitForText("No data found", WAIT_FOR_JAVASCRIPT);
+    }
 
-        // Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
-        log("StdDev regression check");
-        clickNavButton("Remove Measure", 0);
-        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Add Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='StdDev']]"));
-        clickNavButton("Select", 0);
-        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
+    private void saveTest()
+    {
 
-        log("Check visualization");
-        clickNavButton("Remove Measure", 0);
-        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Add Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "viral");
-        pressEnter(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
-        assertEquals("", 1, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-list-body-inner')]/dl")));
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='HIV Test Results']]"));
-        clickNavButton("Select", 0);
-        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
-        assertTextNotPresent("No data found");
-
-        clickNavButton("View Data", 0);
-        waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT);
-        mouseDown(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker')]/div")); // Select all participants checkbox
-        waitForText("1 - 38 of 38", WAIT_FOR_JAVASCRIPT);
-        ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // de-select one participant
-        waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
-
-        log("Test X-Axis");
-        clickNavButton("View Chart(s)", 0);
-        ExtHelper.clickExtTab(this, "X-Axis");
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='x-axis-interval-combo']/.."), "Weeks");
-        waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
-        setFormElement("x-axis-label-textfield", X_AXIS_LABEL);
-        fireEvent(Locator.name("x-axis-label-textfield"), SeleniumEvent.blur);
-        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='x-axis-interval-combo']/.."), "Days");
-        assertTextNotPresent("Days Since Start Date"); // Label shouldn't change automatically once it has been set manually
-        checkRadioButton("xaxis_range", "manual");
-        setFormElement(Locator.xpath("//input[@name='xaxis_range']/../../input[1]"), "20");
-        fireEvent(Locator.xpath("//input[@name='xaxis_range']/../../input[1]"), SeleniumEvent.blur);
-        setFormElement(Locator.xpath("//input[@name='xaxis_range']/../../input[2]"), "40");
-        fireEvent(Locator.xpath("//input[@name='xaxis_range']/../../input[2]"), SeleniumEvent.blur);
-        mouseDown(Locator.xpath("/html/body"));
-        assertTextNotPresent("15");
-        assertTextNotPresent("45");
-
-        log("Test Y-Axis");
-        ExtHelper.clickExtTab(this, "Y-Axis");
-        setFormElement("y-axis-label-textfield", Y_AXIS_LABEL);
-        fireEvent(Locator.name("y-axis-label-textfield"), SeleniumEvent.blur);
-        waitForText(Y_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
-        checkRadioButton("yaxis_range", "manual");
-        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), "200000");
-        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), SeleniumEvent.blur);
-        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), "400000");
-        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), SeleniumEvent.blur);
-        waitForText("400,000", WAIT_FOR_JAVASCRIPT);
-        assertTextNotPresent("500,000");
-        assertTextNotPresent("200,000");
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Scale:']]/div/div"), "Log");
-        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), "10000");
-        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), SeleniumEvent.blur);
-        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), "1000000");
-        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), SeleniumEvent.blur);
-        waitForText("1,000,000", WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("10,000", "100,000", "1,000,000");
-        assertTextNotPresent("500,000");
-
-        ExtHelper.clickExtTab(this, "Chart(s)");
-        checkRadioButton("chart_layout", "per_subject");
-        setFormElement("chart-title-textfield", CHART_TITLE);
-        fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur);
-        assertTextPresent(CHART_TITLE, 5);
-        ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // re-select participant
-        waitForText(CHART_TITLE+": 249320127", WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(CHART_TITLE, 6);
 
         ExtHelper.clickExtTab(this, "Overview");
         setFormElement("reportName", REPORT_NAME_1);
@@ -254,29 +217,127 @@ public class TimeChartTest extends BaseSeleniumWebTest
         assertTextPresent(CHART_TITLE, 6);
         pushLocation();
         pushLocation();
+    }
 
-        log("Check Time Chart Permissions");
-        createUser(USER1, null);
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
-        setUserPermissions(USER1, "Reader");
-        setSiteGroupPermissions("Guests", "Reader");
-        clickNavButton("Save and Finish");
-        impersonate(USER1);
-        popLocation(); // Saved chart
-        waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
-        assertElementNotVisible(Locator.button("Save"));
-        assertElementPresent(Locator.button("Save As"));
-        clickLinkWithText(FOLDER_NAME);
-        assertTextNotPresent(REPORT_NAME_2);
-        stopImpersonating();
-        signOut();
-        popLocation(); // Saved chart
-        waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
-        assertElementNotVisible(Locator.button("Save"));
-        assertElementNotVisible(Locator.button("Save As"));
-        simpleSignIn();
+    private void visualizationTest()
+    {
+        log("Check visualization");
+        clickNavButton("Remove Measure", 0);
+        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Add Measure", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "viral");
+        pressEnter(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
+        assertEquals("", 1, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-list-body-inner')]/dl")));
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='HIV Test Results']]"));
+        clickNavButton("Select", 0);
+        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent("No data found");
 
+        clickNavButton("View Data", 0);
+        waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT);
+        mouseDown(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker')]/div")); // Select all participants checkbox
+        waitForText("1 - 38 of 38", WAIT_FOR_JAVASCRIPT);
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // de-select one participant
+        waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
+
+        log("Test X-Axis");
+        clickNavButton("View Chart(s)", 0);
+
+        ExtHelper.clickExtTab(this, "X-Axis");
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='x-axis-interval-combo']/.."), "Weeks");
+        waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
+        setFormElement("x-axis-label-textfield", X_AXIS_LABEL);
+        fireEvent(Locator.name("x-axis-label-textfield"), SeleniumEvent.blur);
+        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='x-axis-interval-combo']/.."), "Days");
+        assertTextNotPresent("Days Since Start Date"); // Label shouldn't change automatically once it has been set manually
+//        checkRadioButton("xaxis_range", "manual");
+//        setFormElement(Locator.xpath("//input[@name='xaxis_range']/../../input[1]"), "20");
+//        fireEvent(Locator.xpath("//input[@name='xaxis_range']/../../input[1]"), SeleniumEvent.blur);
+//        setFormElement(Locator.xpath("//input[@name='xaxis_range']/../../input[2]"), "40");
+//        fireEvent(Locator.xpath("//input[@name='xaxis_range']/../../input[2]"), SeleniumEvent.blur);
+//        mouseDown(Locator.xpath("/html/body"));
+//        assertTextNotPresent("15");
+//        assertTextNotPresent("45");
+        setAxisValue("x", "15", "40", X_AXIS_LABEL, null, null, new String[] {"15", "45"});
+
+        log("Test Y-Axis");
+        setAxisValue("y", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {"500,000","200,000"});
+//        ExtHelper.clickExtTab(this, "Y-Axis");
+//        setFormElement("y-axis-label-textfield", Y_AXIS_LABEL);
+//        fireEvent(Locator.name("y-axis-label-textfield"), SeleniumEvent.blur);
+//        waitForText(Y_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+//        checkRadioButton("yaxis_range", "manual");
+//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), "200000");
+//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), SeleniumEvent.blur);
+//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), "400000");
+//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), SeleniumEvent.blur);
+//        waitForText("400,000", WAIT_FOR_JAVASCRIPT);
+//        assertTextNotPresent("500,000");
+//        assertTextNotPresent("200,000");
+
+        setAxisValue("y", "10000", "1000000", null,"Log", new String[] {"10,000", "100,000", "1,000,000"}, new String[] {"500,000"});
+//        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Scale:']]/div/div"), "Log");
+//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), "10000");
+//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), SeleniumEvent.blur);
+//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), "1000000");
+//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), SeleniumEvent.blur);
+//        waitForText("1,000,000", WAIT_FOR_JAVASCRIPT);
+//        assertTextPresent("10,000", "100,000", "1,000,000");
+//        assertTextNotPresent("500,000");
+    }
+
+    /**
+     *
+     * @param axis must be X or Y, case is unimportant
+     * @param lowerBound
+     * @param upperBound
+     * @param textNotPresent intended to be used for numbers that should no longer be present in the axes.
+     *                      ideally we'd calculate this automatically, but that's too complicated a problem for now
+     *                      TODO:  calculate not-present number automatically
+     */
+    protected void setAxisValue(String axis, String lowerBound, String upperBound, String label, String scale, String[] textPresent, String[] textNotPresent)
+    {
+        axis = axis.toLowerCase(); //don't want to worry about case for the rest of the function
+        if(!(axis.equals("x") || axis.equals("y")))
+        {
+            Assert.fail("Invalid axis marker");
+        }
+        ExtHelper.clickExtTab(this, axis.toUpperCase() + "-Axis");
+
+
+        if(scale!=null)
+        {
+            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Scale:']]/div/div"), scale);
+        }
+
+        if(label!=null)
+        {
+            setFormElement(axis + "-axis-label-textfield", label);
+        }
+
+        fireEvent(Locator.name(axis + "-axis-label-textfield"), SeleniumEvent.blur);
+        waitForText(label, WAIT_FOR_JAVASCRIPT);
+        checkRadioButton(axis + "axis_range", "manual");
+        setFormElement(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[1]"), lowerBound);
+        fireEvent(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[1]"), SeleniumEvent.blur);
+        setFormElement(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[2]"), upperBound);
+        fireEvent(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[2]"), SeleniumEvent.blur);
+        mouseDown(Locator.xpath("/html/body"));
+
+        if(textPresent!=null)
+            waitForText((textPresent[0]), WAIT_FOR_JAVASCRIPT);
+
+        assertTextPresent(textPresent);
+        assertTextNotPresent(textNotPresent);
+
+
+    }
+
+    private void multiMeasureTimeChartTest()
+    {
         log("Create multi-measure time chart.");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
@@ -353,6 +414,45 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
             testIndex++;
         }
+    }
+
+    private void timeChartPermissionsTest()
+    {
+        log("Check Time Chart Permissions");
+        createUser(USER1, null);
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        setUserPermissions(USER1, "Reader");
+        setSiteGroupPermissions("Guests", "Reader");
+        clickNavButton("Save and Finish");
+        impersonate(USER1);
+        popLocation(); // Saved chart
+        waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
+        assertElementNotVisible(Locator.button("Save"));
+        assertElementPresent(Locator.button("Save As"));
+        clickLinkWithText(FOLDER_NAME);
+        assertTextNotPresent(REPORT_NAME_2);
+        stopImpersonating();
+        signOut();
+        popLocation(); // Saved chart
+        waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
+        assertElementNotVisible(Locator.button("Save"));
+        assertElementNotVisible(Locator.button("Save As"));
+        simpleSignIn();
+    }
+
+    // Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
+    private void stdDevRegressionTest()
+    {
+        log("StdDev regression check");
+        clickNavButton("Remove Measure", 0);
+        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Add Measure", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='StdDev']]"));
+        clickNavButton("Select", 0);
+        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
