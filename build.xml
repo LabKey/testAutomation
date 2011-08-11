@@ -469,7 +469,7 @@
 
         <antcall target="stopSeleniumServer" />
 
-        <ant target="fail_message" inheritall="true"/>
+        <antcall target="fail_message" inheritall="true"/>
     </target>
 
     <target name="fail_message" if="suite.failed">
