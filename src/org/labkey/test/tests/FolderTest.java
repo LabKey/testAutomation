@@ -138,6 +138,17 @@ public class FolderTest extends BaseSeleniumWebTest
         expandNavFolders("[A]", "[AB]", "[ABA]");
         assertTextBefore("[ABB]", "[ABBA]");
 
+
+        //Issue 12762: Provide way to cancel a folder move
+        log("Cancel folder move test");
+        sleep(500); // wait for failed move ghost to disappear.
+        expandFolderNode("ABA");
+        moveFolder("[ABBA]", "[F]", true, false, false);
+        sleep(500); // Wait for folder move to complete.
+        refresh();
+        expandNavFolders("[A]", "[AB]", "[ABA]", "[F]");
+        assertTextBefore("[ABB]", "[ABBA]");
+
         log("Illegal multiple folder move: non-siblings");
         expandFolderNode("A");
         expandFolderNode("B");
@@ -196,7 +207,7 @@ public class FolderTest extends BaseSeleniumWebTest
 
     private enum Reorder {following, preceding}
 
-    private void moveFolder(String folder, String targetFolder, boolean successExpected, boolean multiple)
+    private void moveFolder(String folder, String targetFolder, boolean successExpected, boolean multiple, boolean confirmMove)
     {
         log("Move folder: '" + folder + "' into '"  + targetFolder + "'");
         dragAndDrop(Locator.xpath(PROJECT_FOLDER_XPATH + "//div/a/span[text()='"+folder+"']"), Locator.xpath("//div/a/span[text()='"+targetFolder+"']"), Position.middle);
@@ -207,11 +218,23 @@ public class FolderTest extends BaseSeleniumWebTest
                 assertTextPresent("You are moving multiple folders.");
             else
                 assertTextPresent("You are moving folder '"+folder+"'");
-            clickNavButton("Confirm Move", 0);
-            if (multiple) ExtHelper.waitForExtDialog(this, "Moving Folders");
-            ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+            if(confirmMove)
+            {
+                clickNavButton("Confirm Move", 0);
+                if (multiple) ExtHelper.waitForExtDialog(this, "Moving Folders");
+                ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+            }
+            else
+            {
+                clickNavButton("Cancel", 0);
+            }
         }
         //TODO: else {confirm failure}
+    }
+
+    private void moveFolder(String folder, String targetFolder, boolean successExpected, boolean multiple)
+    {
+        moveFolder(folder, targetFolder, successExpected, multiple, true);
     }
 
     // Specific to this test's folder naming scheme. Digs to requested folder. Adds brackets.
