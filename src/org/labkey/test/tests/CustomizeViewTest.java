@@ -124,6 +124,7 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         CustomizeViewsHelper.saveCustomView(this, "Saved-" + INJECT_CHARS_1);
 
         // TODO: pin, unpin, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links,
+        saveFilterTest();
 
 
         log("** Test HTML/JavaScript escaping");
@@ -137,6 +138,27 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
                 return null;
             }
         }, null);
+    }
+
+    //Issue 12577: Save link in view/filter bar doesn't work
+    //Issue 12103: Report names appear in random order on Views menu
+    private void saveFilterTest()
+    {
+        String fieldKey = LAST_NAME_COLUMN;
+        String op = "Starts With";
+        String value = "J";
+        String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz"};
+
+        for(String name : viewNames)
+        {
+            CustomizeViewsHelper.openCustomizeViewPanel(this);
+            CustomizeViewsHelper.addCustomizeViewFilter(this, new String[] { fieldKey }, fieldKey, op, value);
+            CustomizeViewsHelper.saveCustomView(this, name);
+        }
+
+        clickMenuButton("Views", "default");
+        clickButton("Views", 0);
+        assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }
 
     private void createList()
