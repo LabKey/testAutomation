@@ -146,6 +146,10 @@ src/org/labkey/test/tests/IssuesTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
 src/org/labkey/test/tests/ListTest.java -text
+src/org/labkey/test/tests/LuminexExcludableWellsTest.java -text
+src/org/labkey/test/tests/LuminexJavaTransformTest.java -text
+src/org/labkey/test/tests/LuminexMultipleCurvesTest.java -text
+src/org/labkey/test/tests/LuminexRTransformTest.java -text
 src/org/labkey/test/tests/LuminexTest.java -text
 src/org/labkey/test/tests/MS1Test.java -text
 src/org/labkey/test/tests/MS2GZTest.java -text

@@ -61,10 +61,22 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         return new Pattern[0];
     }
 
+    protected void ensureConfigured()
+    {
+
+    }
+
+    protected void cleanUp()
+    {
+
+    }
+
     protected final void doTestSteps() throws Exception
     {
+        ensureConfigured();
         runUITests();
         runApiTests();
+        cleanUp();
     }
 
     protected abstract void runUITests() throws Exception;

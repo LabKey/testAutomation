@@ -16,7 +16,6 @@
 
 package org.labkey.test;
 
-import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.module.*;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
@@ -120,7 +119,15 @@ public enum TestSet
 //        EHRStudyTest.class,
         GpatAssayTest.class,
         FolderTest.class,
-        StudyDemoModeTest.class
+        StudyDemoModeTest.class,
+    }),
+
+    MiniTest(new Class[]
+    {
+        LuminexExcludableWellsTest.class,
+        LuminexMultipleCurvesTest.class,
+        LuminexJavaTransformTest.class,
+        LuminexRTransformTest.class,
     }),
 
     IE(new Class[]
