@@ -127,7 +127,7 @@ public class FilterTest extends ListTest
     private Object[][] generateValidFilterArgsAndResponses()
     {
         Object[][] ret = {
-                //Issue 12799
+                //Issue 12197
                 {_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", "9;7", null, null, new String[] {TEST_DATA[1][3],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][0]}},
                 {_listCol1.getName(), "Equals", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}},
                 {_listCol1.getName(), "Starts With", "Z", null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}},
@@ -196,6 +196,7 @@ public class FilterTest extends ListTest
 
     protected void checkFilterWasApplied(String[] textPresentAfterFilter, String[] textNotPresentAfterFilter, String columnName, String filter1Type, String filter1, String filter2Type, String filter2 )
     {
+        waitForTextToDisappear("Loading", defaultWaitForPage);
         assertTextPresent(textPresentAfterFilter);
         assertTextNotPresent(textNotPresentAfterFilter);
         //make sure we show user a description of what's going on.  See 11.2-3_make_filters_work.docx
