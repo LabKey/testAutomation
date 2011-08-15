@@ -728,8 +728,9 @@ public class ListTest extends BaseSeleniumWebTest
         ExtHelper.clickExtButton(this, "Apply Conditional Format Where IntCol", "OK", 0);
         // Switch the order of filters so that >7 takes precedence over >5
         checkCheckbox("Strikethrough", 1);
+        selenium.windowMaximize();
         dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
-
+        assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
         clickNavButton("Save", 0);
         waitAndClickNavButton("Done");
 
@@ -739,8 +740,8 @@ public class ListTest extends BaseSeleniumWebTest
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'line-through'))]"));
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'bold'))]"));
         assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'italic'))]"));
-        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'color: rgb(0, 255, 255)'))]")); // Cyan text
-        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'background-color: rgb(255, 0, 0)'))]")); // Red background
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'color: rgb(0, 255, 255)') or contains(@style, 'color: #00FFFF'))]")); // Cyan text
+        assertElementNotPresent(Locator.xpath("//td[text() = 'true' and not(contains(@style, 'background-color: rgb(255, 0, 0)') or contains(@style, 'color: #FF0000'))]")); // Red background
         assertElementNotPresent(Locator.xpath("//td[text() = 'false' and @style]")); // No style on false items
         assertElementPresent(Locator.xpath("//td[text()='5' and not(contains(@style, 'bold')) and not(contains(@style, 'line-through'))]"));
         assertElementPresent(Locator.xpath("//td[text()='6' and contains(@style, 'bold') and not(contains(@style, 'line-through'))]"));
