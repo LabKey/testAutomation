@@ -82,12 +82,14 @@ function doTest()
     if( !result.groups )
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
     else if( result.groups.length >= 3
-            && result.groups[0].id != -3
-            && result.groups[0].name != 'Guests'
-            && result.groups[1].id != -2
-            && result.groups[1].name != 'All Site Users'
-            && result.groups[2].id != -1
-            && result.groups[2].name != 'Site Administrators')
+            // User should be in at least 3 groups (id): Guests (-3), All Site Users (-2), and Site Administrators (-1)
+            // They should be in order by group Id; possibly starting with the Developers (-4) group.
+            && result.groups[(result.groups[0].id * -1) - 3].id != -3
+            && result.groups[(result.groups[0].id * -1) - 3].name != 'Guests'
+            && result.groups[(result.groups[0].id * -1) - 2].id != -2
+            && result.groups[(result.groups[0].id * -1) - 2].name != 'All Site Users'
+            && result.groups[(result.groups[0].id * -1) - 1].id != -1
+            && result.groups[(result.groups[0].id * -1) - 1].name != 'Site Administrators')
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
 
     // LABKEY.Security.getContainers()
