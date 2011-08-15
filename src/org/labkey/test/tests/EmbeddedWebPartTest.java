@@ -54,6 +54,7 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
 
         clickButton("Save & Close");
         waitForPageToLoad();
+        waitForText("Display Name");
 
         String rViewName = TRICKY_CHARACTERS + "new R view";
         CustomizeViewsHelper.createRView(this, null, rViewName);
