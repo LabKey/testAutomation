@@ -93,14 +93,8 @@ public class StudyTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
-        try
-        {
-            manageSubjectClassificationTest();
-        }
-        finally
-        {
-            emptyParticipantPickerList();
-        }
+        manageSubjectClassificationTest();
+        emptyParticipantPickerList(); // Delete participant lists to avoid interfering with api test.
         verifyStudyAndDatasets();
         waitForSpecimenImport();
         verifySpecimens();
