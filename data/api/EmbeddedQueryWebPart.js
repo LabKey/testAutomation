@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+ */
 <div id='queryTestDiv1'/>
 <script type="text/javascript">
 var myFilters = [
