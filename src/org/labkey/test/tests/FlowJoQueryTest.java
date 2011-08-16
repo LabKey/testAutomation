@@ -108,7 +108,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickMenuButton("Query", "Comparison");
         waitForPageToLoad(longWaitForPage);
         assertTextNotPresent("No data to show");
-        setFilterAndWait("query", "AbsDifference", "Is Greater Than or Equal To", "25", longWaitForPage);
+        setFilterAndWait("query", "AbsDifference", "Is Greater Than Or Equal To", "25", longWaitForPage);
         assertTextPresent("No data to show");
     }
 }
