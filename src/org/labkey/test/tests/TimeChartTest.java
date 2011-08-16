@@ -25,8 +25,9 @@ import java.io.File;
 
 public class TimeChartTest extends BaseSeleniumWebTest
 {
-//    /?TODO:  Folder names should contain TRICKY_CHARACTERS, don't due to Issue 12830
-    private static final String PROJECT_NAME =  TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "TimeChartTest Project";
+//    /?TODO:  Folder and Project names should contain TRICKY_CHARACTERS, don't due to Issue 12830
+    private static final String PROJECT_NAME =  "TimeChartTest Project";
+//    private static final String PROJECT_NAME =  TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "TimeChartTest Project";
     private static final String FOLDER_NAME =  "Demo Study";
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
 
@@ -125,8 +126,6 @@ public class TimeChartTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
-
-
     }
 
     @Override
@@ -261,10 +260,10 @@ public class TimeChartTest extends BaseSeleniumWebTest
 //        mouseDown(Locator.xpath("/html/body"));
 //        assertTextNotPresent("15");
 //        assertTextNotPresent("45");
-        setAxisValue("x", "15", "40", X_AXIS_LABEL, null, null, new String[] {"15", "45"});
+        setAxisValue("X", "15", "40", X_AXIS_LABEL, null, null, new String[] {"15", "45"});
 
         log("Test Y-Axis");
-        setAxisValue("y", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {"500,000","200,000"});
+        setAxisValue("Left", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {"500,000","200,000"});
 //        ExtHelper.clickExtTab(this, "Y-Axis");
 //        setFormElement("y-axis-label-textfield", Y_AXIS_LABEL);
 //        fireEvent(Locator.name("y-axis-label-textfield"), SeleniumEvent.blur);
@@ -278,7 +277,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
 //        assertTextNotPresent("500,000");
 //        assertTextNotPresent("200,000");
 
-        setAxisValue("y", "10000", "1000000", null,"Log", new String[] {"10,000", "100,000", "1,000,000"}, new String[] {"500,000"});
+        setAxisValue("Left", "10000", "1000000", null,"Log", new String[] {"10,000", "100,000", "1,000,000"}, new String[] {"500,000"});
 //        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Scale:']]/div/div"), "Log");
 //        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), "10000");
 //        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), SeleniumEvent.blur);
@@ -300,13 +299,12 @@ public class TimeChartTest extends BaseSeleniumWebTest
      */
     protected void setAxisValue(String axis, String lowerBound, String upperBound, String label, String scale, String[] textPresent, String[] textNotPresent)
     {
-        axis = axis.toLowerCase(); //don't want to worry about case for the rest of the function
-        if(!(axis.equals("x") || axis.equals("y")))
+        if(!(axis.equals("X") || axis.equals("Left") || axis.equals("Right")))
         {
             Assert.fail("Invalid axis marker");
         }
-        ExtHelper.clickExtTab(this, axis.toUpperCase() + "-Axis");
-
+        ExtHelper.clickExtTab(this, axis + "-Axis");
+        axis = axis.toLowerCase(); //don't want to worry about case for the rest of the function
 
         if(scale!=null)
         {
