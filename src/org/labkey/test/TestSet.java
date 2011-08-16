@@ -231,6 +231,10 @@ public enum TestSet
             AdaptiveVisualizationPerf.class
     }),
 
+    EHR(new Class[]{
+            EHRStudyTest.class
+    }),
+
     CONTINUE(new Class[] {})
     {
         public boolean isSuite()
