@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-SELECT Models.Name
+SELECT Models.RowId, Models.Name
 FROM Models
 WHERE Models.ManufacturerId IN (SELECT Manufacturers.RowId FROM Manufacturers WHERE Manufacturers.Name = 'Toyota')
 
