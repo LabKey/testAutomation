@@ -116,7 +116,7 @@ public class TimelineTest extends BaseSeleniumWebTest
 
         apiTest();
         //clear the test page so the crawler doesn't refetch a test and cause errors
-        clearTestPage();
+        removeTestPage();
     }
 
     private void createWebPart()
@@ -148,13 +148,11 @@ public class TimelineTest extends BaseSeleniumWebTest
         assertTextPresent("Hi Jane I am the description");
     }
 
-    private void clearTestPage()
+    private void removeTestPage()
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickLinkWithText(FOLDER_NAME);
-        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
-        setWikiBody("<p>Test Complete.</p>");
-        saveWikiPage();
+        removeWebPart(WIKIPAGE_NAME);
     }
 
     private void createList()

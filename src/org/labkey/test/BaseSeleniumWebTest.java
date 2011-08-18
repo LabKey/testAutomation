@@ -2093,6 +2093,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         throw new RuntimeException("Could not find webpart with name: " + webPartName);
     }
 
+    public void removeWebPart(String webPartTitle)
+    {
+        click(Locator.xpath("//tr[./th[@title='"+webPartTitle+"']]//a[./img[@title='Remove From Page']]"));
+    }
 
     public boolean isTitleEqual(String match)
     {
