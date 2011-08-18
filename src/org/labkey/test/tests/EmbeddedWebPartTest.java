@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
 
 /**
@@ -40,9 +41,11 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
 
     public void configure()
     {
+        RReportHelper.ensureRConfig(this);
         log("Setup project and list module");
         createProject(getProjectName());
         resetTracker = new ResetTracker(this);
+//        clickLink(getProjectName());
 
     }
 
