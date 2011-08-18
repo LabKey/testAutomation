@@ -219,4 +219,5 @@ src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/ResetTracker.java -text
 src/org/labkey/test/util/SearchHelper.java -text
 src/org/labkey/test/util/StopSelenium.java -text
+src/org/labkey/test/util/StudyHelper.java -text
 /upgrade_stress_test.cmd -text
