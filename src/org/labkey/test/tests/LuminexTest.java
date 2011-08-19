@@ -39,7 +39,7 @@ import java.util.Set;
  */
 public class LuminexTest extends AbstractQCAssayTest
 {
-    private final static String TEST_ASSAY_PRJ_LUMINEX = "Luminex Test";            //project for luminex test
+    private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
     protected static final String TEST_ASSAY_LUM = "TestAssayLuminex";
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
@@ -111,16 +111,6 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         if(getConfigStatus()!=Configured.CONFIGURED)
         {
-            cleanUp();
-            try
-            {
-                tearDown();
-            }
-            catch (Exception e)
-            {
-                Assert.fail(e.getStackTrace().toString());
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
             configure();
         }
     }
