@@ -104,7 +104,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         clickLinkWithText("edit");
         setFormElement("body", MSG1_BODY);
         if (isFileUploadAvailable())
-            assertTextPresent("Delete");
+            assertTextPresent("remove");
         submit();
         assertTextPresent(MSG1_BODY);
 
