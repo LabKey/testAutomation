@@ -191,6 +191,7 @@
     </target>
 
     <target name="compileIfDirty" unless="testClassesUpToDate">
+        <antcall target="test_with_clover" />
         <antcall target="clean" />
         <antcall target="prepare" />
         <javac srcdir="${test.src.home}"
@@ -207,6 +208,10 @@
             </fileset>
         </copy>
         <touch file="${test.build.uptodate}" />
+    </target>
+
+    <target name="test_with_clover" if="test.with.clover">
+        <ant target="with_clover" antfile="${project.root}/server/build.xml" inheritall="false"/>
     </target>
 
     <target name="build-java-client" description="calls the jar task in the remoteapi/java/build.xml">
@@ -1076,6 +1081,10 @@
                classpathref="test.build.classpath">
         </javac>
 
+        <condition property="clover.class.path" value="${tomcat.home}/lib" else="">
+            <isset property="test.with.clover"/>
+        </condition>
+
         <mkdir dir="${project.root}/sampledata/qc"/>
         <jar destfile="${project.root}/sampledata/qc/validator.jar">
             <fileset dir="${project.root}/build/client-api/java/classes"/>
@@ -1087,6 +1096,7 @@
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.labkey.AssayValidator"/>
+                <attribute name="Class-Path" value="${clover.class.path}"/>
             </manifest>
         </jar>
         <jar destfile="${project.root}/sampledata/qc/transform.jar">
@@ -1099,6 +1109,7 @@
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.labkey.AssayTransform"/>
+                <attribute name="Class-Path" value="${clover.class.path}"/>
             </manifest>
         </jar>
     </target>
@@ -1112,14 +1123,18 @@
                 <include name="instwin.r" />
           </fileset>
         </copy>
-        <condition property="r.path" value="${env.R_HOME}/bin/R.exe" else="R">
-            <isset property="env.R_HOME"/>
+        <condition property="r.path" value="${env.R_HOME}/bin/R.exe">
+            <available file="${env.R_HOME}/bin/R.exe"/>
+        </condition>
+        <condition property="r.path" value="${env.R_HOME}/R.exe" else="R">
+                <isset property="env.R_HOME"/>
         </condition>
         <condition property="rlabkey.windows">
         	<os family="windows"/>
         </condition>
         <antcall target="install-rlabkey-binary"/>
         <antcall target="install-rlabkey-source"/>
+        <antcall target="install-ruminex"/>
 
     </target>
 	<target name="install-rlabkey-binary" if="rlabkey.windows" >
@@ -1144,6 +1159,12 @@
 			    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
 		</exec>
 	 </target>
+
+    <target name="install-ruminex" >
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey"  failifexecutionfails="false" searchpath="true">
+		    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}\tools\Ruminex\Ruminex_0.0.6.tar.gz" />
+		</exec>
+    </target>
 
     <target name="studysampler" depends="compile">
         <copy file="${test.src.home}/org/labkey/test/studysampler/words.txt" todir="${test.build.home}/classes/"/>
