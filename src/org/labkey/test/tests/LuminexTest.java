@@ -611,9 +611,9 @@ public class LuminexTest extends AbstractQCAssayTest
         CustomizeViewsHelper.applyCustomView(this);
 
         //Issue 12943
-//        assertTextPresent("FI = 0.465914 + (1.5417E+006 - 0.465914) / ((1 + (Conc / 122.733)^-0.173373))^7.64039");
-        assertTextPresent("0.9667");
-        assertTextPresent("0.1895");
+//        assertTextPresent("BioPlex curve fit for VRC A 5304 gp140 (62) in plate 3", "FI = 0.465914 + (1.5417E+006 - 0.465914) / ((1 + (Conc / 122.733)^-0.173373))^7.64039");
+//        assertTextPresent("BioPlex FitProb for VRC A 5304 gp140 (62) in plate 3", "0.9667");
+//        assertTextPresent("BioPlex ResVar for VRC A 5304 gp140 (62) in plate 3", "0.1895");
 
         compareColumnValuesAgainstExpected("Analyte", "Analyte Standard", analytesAndStandardsConfig);
 
