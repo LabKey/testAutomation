@@ -31,6 +31,8 @@ public class SecurityTestExtended extends SecurityTest
 
     protected void doTestSteps()
     {
+
+        clonePermissionsTest();
         cantReachAdminToolFromUserAccount(true);
     }
 }

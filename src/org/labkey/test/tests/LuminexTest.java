@@ -346,6 +346,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void excludeOneAnalyteForSingleWellTest(String wellName, String excludedAnalyte)
     {
         waitForAjaxLoad();
+        waitForText("Well Role");
         clickExclusionMenuIconForWell(wellName);
 
         waitForAjaxLoad();
@@ -599,7 +600,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
 
-        clickButton("Save and Finish");
+        clickButton("Save and Finish", 120000);
         clickLinkWithText(name);
 
         //edit view to show Analyte Standard
@@ -869,7 +870,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_LUM);
     }
 
-    //requires drc and xtable packages installed in R
+    //requires drc, Ruminex and xtable packages installed in R
     protected void runRTransformTest()
     {
         log("Uploading Luminex run with a R transform script");

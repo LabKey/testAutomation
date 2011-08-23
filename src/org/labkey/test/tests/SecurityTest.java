@@ -198,7 +198,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     /**
      * Precondtions:  able to reset user's password at resetUrl, db in weak-password mode
      */
-    private void userPasswordResetTest(String username, String resetUrl)
+    protected void userPasswordResetTest(String username, String resetUrl)
     {
         ensureSignedOut();
 
@@ -339,7 +339,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     }
 
 
-    private void guestTest()
+    protected void guestTest()
     {
         clickLinkWithText(PROJECT_NAME);
         enterPermissionsUI();
@@ -363,7 +363,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         stopImpersonating();
     }
 
-    private void displayNameTest()
+    protected void displayNameTest()
     {
         //set display name to user's email minus domain
         String oldDisplayName = getDisplayName();
@@ -389,7 +389,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickNavButton("Submit");
     }
 
-    private void clonePermissionsTest()
+    protected void clonePermissionsTest()
     {
         // create admin templates, plus test bogus & duplicate email addresses
         createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
@@ -422,7 +422,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers");
     }
 
-    private void checkGroupMembership(String userName, String groupName)
+    protected void checkGroupMembership(String userName, String groupName)
     {
         clickLinkWithText("Site Users");
 
@@ -452,7 +452,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         fail("Unable to verify group membership of cloned user privileges");
     }
 
-    private void tokenAuthenticationTest()
+    protected void tokenAuthenticationTest()
     {
         clickLinkWithText(PROJECT_NAME);
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
@@ -513,13 +513,13 @@ public class SecurityTest extends BaseSeleniumWebTest
     }
 
 
-    private void assertFailureAuthenticationToken(String xml)
+    protected void assertFailureAuthenticationToken(String xml)
     {
         assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
     }
 
 
-    private void assertSuccessAuthenticationToken(String xml, String token, String email, int permissions)
+    protected void assertSuccessAuthenticationToken(String xml, String token, String email, int permissions)
     {
         String correct = "<TokenAuthentication success=\"true\" token=\"" + token + "\" email=\"" + email + "\" permissions=\"" + permissions + "\"/>";
         assertTrue(xml.startsWith(correct));
@@ -613,7 +613,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     }
 
 
-    private void impersonationTest()
+    protected void impersonationTest()
     {
         String testUserDisplayName = getDisplayName();
 
@@ -646,7 +646,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
     }
 
-    private void passwordStrengthTest()
+    protected void passwordStrengthTest()
     {
         String[] passwords = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
         String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
