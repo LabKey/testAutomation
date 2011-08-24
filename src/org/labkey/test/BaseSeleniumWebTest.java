@@ -2960,15 +2960,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
 
-    //selenium table locators are unreliable.
-//    public String getTableCellText(String tableName, int row, int column)
-//    {
-//        return selenium.getTable(tableName + "." + row + "." + column);
-//    }
-
+    //TODO: selenium table locators are unreliable for some grids. Find a solution.
     public String getTableCellText(String tableName, int row, int column)
     {
-        return getText(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr["+(row+1)+"]/*[(name()='TH' or name()='TD') and position() = "+(column+1)+"]"));
+        return selenium.getTable(tableName + "." + row + "." + column);
     }
 
     public String getTableCellText(String tableName, int row, String columnTitle)
