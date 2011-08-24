@@ -81,7 +81,7 @@ public class LuminexTest extends AbstractQCAssayTest
     public static final String ASSAY_ID_FIELD  = "name";
     public static final String ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD = "__primaryFile__";
 
-    public static final String DATA_TABLE_NAME = "dataregion_TestAssayLuminex Data";
+    public static final String DATA_TABLE_NAME = "dataregion_"+TEST_ASSAY_LUM+" Data";
     private static final String EXCLUDE_COMMENT_FIELD = "comment";
     public static final String EXCLUDE_SELECTED_BUTTON = "excludeselected";
     protected static final String MULTIPLE_CURVE_ASSAY_RUN_NAME = "multipleCurvesTestRun";
@@ -304,9 +304,9 @@ public class LuminexTest extends AbstractQCAssayTest
         if(isFileUploadAvailable())
         {
 
-            runJavaTransformTest();
-            runRTransformTest();
-            runMultipleCurveTest();
+//            runJavaTransformTest();
+//            runRTransformTest();
+//            runMultipleCurveTest();
             runWellExclusionTest();
         }
     } //doTestSteps()
@@ -346,16 +346,14 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void excludeOneAnalyteForSingleWellTest(String wellName, String excludedAnalyte)
     {
-        waitForAjaxLoad();
         waitForText("Well Role");
         clickExclusionMenuIconForWell(wellName);
 
-        waitForAjaxLoad();
         String exclusionComment = "exclude single analyte for single well";
         setText(EXCLUDE_COMMENT_FIELD, exclusionComment);
         clickRadioButtonById(EXCLUDE_SELECTED_BUTTON);
         clickExcludeAnalyteCheckBox(excludedAnalyte, true);
-        clickButton(SAVE_CHANGES_BUTTON, 0);
+        clickButton(SAVE_CHANGES_BUTTON);
 
         excludeForSingleWellVerify("Excluded for replicate group: " + exclusionComment, new HashSet<String>((Arrays.asList(excludedAnalyte))));
     }
@@ -374,19 +372,16 @@ public class LuminexTest extends AbstractQCAssayTest
 
         String comment = "exclude all for single well";
         setText(EXCLUDE_COMMENT_FIELD, comment);
-        waitForAjaxLoad();
-        clickButton(SAVE_CHANGES_BUTTON, 0);
-        waitForAjaxLoad();
+        clickButton(SAVE_CHANGES_BUTTON);
 
         excludeForSingleWellVerify("Excluded for replicate group: " + comment, new HashSet<String>(Arrays.asList(getListOfAnalytesMultipleCurveData())));
 
         //remove exclusions to leave in clean state
         clickExclusionMenuIconForWell(wellName);
-        waitForAjaxLoad();
         clickRadioButtonById("excludeselected");
         clickButton(SAVE_CHANGES_BUTTON, 0);
-        waitForAjaxLoad();
-        clickButton("Yes", 0);
+        ExtHelper.waitForExtDialog(this, "Warning");
+        clickButton("Yes");
     }
 
     /**
@@ -461,15 +456,13 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void excludeAnalyteForAllWellsTest(String analyte)
     {
-        waitForAjaxLoad();
         clickButtonContainingText("Exclude Analytes");
-        waitForText("Exclude Analytes from Analysis");
-        waitForAjaxLoad(); //the above wait isn't sufficient, the button still isn't ready
+        ExtHelper.waitForExtDialog(this, "Exclude Analytes from Analysis");
         clickExcludeAnalyteCheckBox(analyte, true);
         String comment = "Changed for all analytes";
         setText(EXCLUDE_COMMENT_FIELD, comment);
-        waitForAjaxLoad();
-        clickButton(SAVE_CHANGES_BUTTON, 0);
+        waitForElement(Locator.xpath("//table[@id='saveBtn' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
+        clickButton(SAVE_CHANGES_BUTTON);
 
         String exclusionPrefix = "Excluded for analyte: ";
         Map<String, Set<String>> analyteToExclusion = new HashMap<String, Set<String>>();
@@ -508,9 +501,9 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void clickExclusionMenuIconForWell(String wellName)
     {
-        Locator l = Locator.id(getLinkIDFromWellName(wellName));
-        click(l);
-        waitForAjaxLoad();
+        waitAndClick(Locator.id(getLinkIDFromWellName(wellName)));
+        ExtHelper.waitForExtDialog(this, "Exclude Replicate Group from Analysis");
+        waitForElement(Locator.xpath("//table[@id='saveBtn' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
     }
 
 

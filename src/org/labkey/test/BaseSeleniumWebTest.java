@@ -2960,9 +2960,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
 
+    //selenium table locators are unreliable.
+//    public String getTableCellText(String tableName, int row, int column)
+//    {
+//        return selenium.getTable(tableName + "." + row + "." + column);
+//    }
+
     public String getTableCellText(String tableName, int row, int column)
     {
-        return selenium.getTable(tableName + "." + row + "." + column);
+        return getText(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr["+(row+1)+"]/*[(name()='TH' or name()='TD') and position() = "+(column+1)+"]"));
     }
 
     public String getTableCellText(String tableName, int row, String columnTitle)
@@ -3047,17 +3053,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTrue("Table cells not equal: " + tableNameA + "." + String.valueOf(rowA) + "." + String.valueOf(columnA) + " & " + tableNameB + "." + String.valueOf(rowB) + "." + String.valueOf(columnB), areTableCellsEqual(tableNameA, rowA, columnA, tableNameB, rowB, columnB));
     }
 
+    /*
+    getColumnIndex works for standard labkey data grids
+     */
     public int getColumnIndex(String tableName, String columnTitle)
     {
-        assertTextPresent(columnTitle);
-        for(int col = 0; col < 100; col++) // TODO: Find out how wide the table is.
-        {
-            if(getTableCellText(tableName, 1, col).equals(columnTitle))
-            {
-                return col;
-            }
-        }
-        return -1;
+        assertElementPresent(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[2]/td[./div/.='"+columnTitle+"']"));
+        int col = selenium.getXpathCount("//table[@id='"+tableName+"']/tbody/tr[2]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").intValue();
+
+        return col;
     }
 
     // Specifies cell values in a TSV string -- values are separated by tabs, rows are separated by \n
@@ -3238,11 +3242,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void showNumberInTable(String shareValue)
     {
-
         clickNavButton("Page Size",0);
         waitForText("100 per page");
         Locator l = Locator.id("Page Size:" + shareValue);
-        click(l);
+        clickAndWait(l);
     }
 
 
@@ -3260,12 +3263,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     protected  List<List<String>> getColumnValues(String tableName, String... columnNames)
     {
-        waitForAjaxLoad();
         boolean moreThanOnePage = isTextPresent("Next");
         if(moreThanOnePage)
         {
             showAllInTable();
-            waitForAjaxLoad();
         }
         List<List<String>> columns = new ArrayList<List<String>>();
         for(int i=0; i<columnNames.length; i++)
@@ -3281,7 +3282,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if(moreThanOnePage)
         {
             show100InTable();
-            waitForAjaxLoad();
         }
         return columns;
     }
@@ -3292,15 +3292,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return selenium.getXpathCount("//table[@id='" + tableName + "']/thead").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
     }
 
-    public void selectDropDownMenuItem(String menuName, String itemName)
+    public int getTableColumnCount(String tableId)
     {
-        Locator l = Locator.name(menuName);
-        mouseDown(l);
-
-        //TODO:  how do i select the item
+        return getXpathCount(Locator.xpath("//table[@id='"+tableId+"']/colgroup/col"));
     }
-
-//TODO: getTableColumnCount.
 
     public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
     {
@@ -5458,18 +5453,5 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if(isTextPresent("Sign Out"))
             signOut();
-    }
-
-    /** we don't cope well with AJAX at the moment-
-     * we may click before something is loaded, or time out because
-     * we haven't correctly detected that something has in fact loaded.
-     * This method is designed to prevent me hand coding dozens of wait statements,
-     * although hopefully we'll eventually integrate waiting for AJAX into the individual
-     * functions and be able to get rid of it
-     */
-    public void waitForAjaxLoad()
-    {
-        sleep(5000);
-        //TODO
     }
 }
