@@ -304,9 +304,9 @@ public class LuminexTest extends AbstractQCAssayTest
         if(isFileUploadAvailable())
         {
 
-//            runJavaTransformTest();
-//            runRTransformTest();
-//            runMultipleCurveTest();
+            runJavaTransformTest();
+            runRTransformTest();
+            runMultipleCurveTest();
             runWellExclusionTest();
         }
     } //doTestSteps()
