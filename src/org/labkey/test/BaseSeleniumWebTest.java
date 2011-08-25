@@ -970,7 +970,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         gotoAdminConsole();
         clickLinkWithText("site settings");
-        selenium.openWindow("", "systemMaintenance");
+//        selenium.openWindow("", "systemMaintenance");
         clickLinkWithText("Run system maintenance now", false);
         smStart = System.currentTimeMillis();
     }
@@ -2453,6 +2453,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
+    public void waitForTextToDisappear(final String text)
+    {
+        waitForTextToDisappear(text, defaultWaitForPage);
+    }
+
     public void waitForTextToDisappear(final String text, int wait)
     {
         String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
@@ -2963,7 +2968,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     //TODO: selenium table locators are unreliable for some grids. Find a solution.
     public String getTableCellText(String tableName, int row, int column)
     {
-        return selenium.getTable(tableName + "." + row + "." + column);
+        return getText(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr["+(row+1)+"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = "+(column+1)+"]/descendant-or-self::*[text()]"));
     }
 
     public String getTableCellText(String tableName, int row, String columnTitle)
@@ -5404,17 +5409,29 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      *
      * @param actionName
      */
+    /**
+     * For invoking pipeline actions from the file web part. Displays the import data
+     * dialog and selects and submits the specified action.
+     *
+     * @param actionName
+     */
     public void selectImportDataAction(String actionName)
     {
         sleep(100);
         ExtHelper.waitForFileGridReady(this);
         ExtHelper.waitForImportDataEnabled(this);
+        selectImportDataActionNoWaitForGrid(actionName);
+    }
+
+    public void selectImportDataActionNoWaitForGrid(String actionName)
+    {
         clickNavButton("Import Data", 0);
 
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction']/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = ExtHelper.getExtElementId(this, "btn_submit");
         clickAndWait(Locator.id(id));
     }
+
 
     public DatabaseInfo getDatabaseInfo()
     {

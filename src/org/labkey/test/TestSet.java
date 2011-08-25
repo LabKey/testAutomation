@@ -61,6 +61,7 @@ public enum TestSet
         SequestTest.class,
         MS2Test.class,
         MS2GZTest.class,
+        LibraTest.class,
     }),
 
     Daily(600000, new Class[]
@@ -120,6 +121,7 @@ public enum TestSet
         GpatAssayTest.class,
         FolderTest.class,
         StudyDemoModeTest.class,
+        LibraTest.class,
     }),
 
     MiniTest(new Class[]

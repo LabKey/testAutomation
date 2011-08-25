@@ -145,6 +145,7 @@ src/org/labkey/test/tests/IDRIParticleSizeTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
+src/org/labkey/test/tests/LibraTest.java -text
 src/org/labkey/test/tests/ListTest.java -text
 src/org/labkey/test/tests/LuminexExcludableWellsTest.java -text
 src/org/labkey/test/tests/LuminexJavaTransformTest.java -text
