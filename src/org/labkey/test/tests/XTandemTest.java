@@ -83,6 +83,19 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextNotPresent("K.VFHFVR.Q");
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
+        log("Test peptide details page");
+        selenium.openWindow("", "pep");
+        clickLinkWithText(PEPTIDE2, false);
+        selenium.waitForPopUp("pep", "10000");
+        selenium.selectWindow("pep");
+        assertTextPresent("gi|4689022|ribosomal_protein_");  // Check for protein
+        assertTextPresent("CAexample_mini.pep.xml - bov_sample/CAexample_mini (test2)"); // Check for run name
+        assertTextPresent("1373.4690"); // Check for mass
+        waitForText("44.0215"); // Look for b3+ ions, populated bu JavaScript
+        assertTextPresent("87.0357", "130.0499");
+        selenium.close();
+        selenium.selectWindow(null);
+
         log("Test exporting");
         pushLocation();
         addUrlParameter("exportAsWebPage=true");

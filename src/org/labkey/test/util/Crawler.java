@@ -92,6 +92,8 @@ public class Crawler
             new ControllerActionId("login", "disable"),
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("ms2", "showParamsFile"),
+            // Tested directly in XTandemTest
+            new ControllerActionId("ms2", "showPeptide"),
             new ControllerActionId("project", "deleteWebPart"),
             new ControllerActionId("project", "moveWebPart"),
             new ControllerActionId("query", "printRows"),
