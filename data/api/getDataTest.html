@@ -356,7 +356,6 @@
 
         // set the values in the form
         configForm.getForm().findField('configCount').setValue(configs.length);
-        configForm.getForm().findField('configTitle').setValue(configs[configCounter].title);
 
         // call the getData API with the new config measures
         LABKEY.Visualization.getData({
@@ -371,7 +370,10 @@
                     allowChooseQuery: false,
                     allowChooseView: false,
                     title: "",
-                    frame: "none"
+                    frame: "none",
+                    success: function() {
+                        configForm.getForm().findField('configTitle').setValue(configs[configCounter].title);
+                    }
                 });
             },
             failure : function(info, response, options) {LABKEY.Utils.displayAjaxErrorResponse(response, options);},

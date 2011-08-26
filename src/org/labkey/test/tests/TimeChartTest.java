@@ -395,11 +395,10 @@ public class TimeChartTest extends BaseSeleniumWebTest
         int testIndex = 0;
         while(testIndex < testCount){
             // check title is present
-            assertTextPresent(GETDATA_API_TEST_TITLES[testIndex]);
+            waitForText(GETDATA_API_TEST_TITLES[testIndex], WAIT_FOR_JAVASCRIPT); 
             // check # of rows
             waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
             waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
-            waitForText(GETDATA_API_TEST_TITLES[testIndex], WAIT_FOR_JAVASCRIPT); // Table takes a moment to render.
             // check column headers
             for(int i = 0; i < GETDATA_API_TEST_COLNAMES[testIndex].length; i++){
                 assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_TEST_COLNAMES[testIndex][i], GETDATA_API_TEST_COLNAMES[testIndex][i]);
@@ -514,8 +513,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
         selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP3_NAME+"', null, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+GROUP3_NAME+"']"));
         clickNavButton("Delete Selected", 0);
-        ExtHelper.waitForExtDialog(this, "Delete Category");
-        ExtHelper.clickExtButton(this, "Delete Category", "Yes", 0);
+        ExtHelper.waitForExtDialog(this, "Delete Group");
+        ExtHelper.clickExtButton(this, "Delete Group", "Yes", 0);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         waitForTextToDisappear(GROUP3_NAME, WAIT_FOR_JAVASCRIPT);
 
