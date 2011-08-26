@@ -80,6 +80,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         doTestQueries();
         doTestQueryViews();
         doTestReports();
+        doTestParameterizedQueries();
     }
     
     private void doTestCustomFolder()
@@ -138,10 +139,12 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 Maps.<String, Object>of("ManufacturerId", fordId,
                                         "Name", "Focus"),
                 Maps.<String, Object>of("ManufacturerId", fordId,
-                                        "Name", "F150")
+                                        "Name", "F150"),
+                Maps.<String, Object>of("ManufacturerId", fordId,
+                                        "Name", "Pinto")
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
-        assertEquals("Expected to insert 4 rows.", 4, insertResp.getRowsAffected().intValue());
+        assertEquals("Expected to insert 5 rows.", 5, insertResp.getRowsAffected().intValue());
 
         Long priusId = null;
         Long f150Id = null;
@@ -470,6 +473,26 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("\"name\"");
         assertTextPresent("\"age\"");
         assertTextPresent("\"crazy\"");
+    }
+
+    private void doTestParameterizedQueries()
+    {
+        log("Create embedded QWP to test parameterized query.");
+        clickLinkWithText(FOLDER_NAME);
+        goToModule("Wiki");
+        createNewWikiPage();
+        setFormElement("wiki-input-name", "Parameterized QWP");
+        setWikiBody(getFileContents("/server/test/modules/simpletest/views/parameterizedQWP.html"));
+        clickNavButton("Save & Close");
+
+        log("Check that parameterized query doesn't cause page load.");
+        setFormElement(Locator.id("headerSearchInput"), MODULE_NAME);
+        setFormElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), "P");
+        clickNavButton("Submit", 0);
+        waitForText("Manufacturer");
+        assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("headerSearchInput")));
+        assertTextPresent("Pinto");
+        assertTextNotPresent("Prius");
     }
 
     protected void assertModuleDeployed(String moduleName)

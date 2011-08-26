@@ -35,6 +35,8 @@ modules/simpletest/folderTypes/customFolder.foldertype.xml -text
 modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text
+modules/simpletest/queries/vehicle/ParamParamVehicles.sql -text
+modules/simpletest/queries/vehicle/ParameterizedVehicles.sql -text
 modules/simpletest/queries/vehicle/Toyotas.sql -text
 modules/simpletest/queries/vehicle/Vehicles/VehiclesInCurrentAndSubfolders.qview.xml -text
 modules/simpletest/queries/vehicle/colors.js -text
@@ -56,6 +58,7 @@ modules/simpletest/views/Simple[!!-~]Module[!!-~]Web[!!-~]Part.webpart.xml -text
 modules/simpletest/views/begin.html -text
 modules/simpletest/views/model.html -text
 modules/simpletest/views/other.html -text
+modules/simpletest/views/parameterizedQWP.html -text
 modules/simpletest/views/vehicle.html -text
 modules/simpletest/views/webpart.html -text
 /resetDRT.cmd -text
