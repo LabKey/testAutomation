@@ -38,7 +38,7 @@ public class LibraTest extends MS2Test
         Locator l = Locator.xpath("//span[contains(text(),'Libra')]");
         click(l);
         ExtHelper.clickFileBrowserFileCheckbox(this, "iTRAQ.search.xar.xml");
-        selectImportDataActionNoWaitForGrid("Import Experiment");
+        selectImportDataAction("Import Experiment");
         waitForTextToDisappear("LOADING");
         refresh();
 
