@@ -970,7 +970,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         gotoAdminConsole();
         clickLinkWithText("site settings");
-//        selenium.openWindow("", "systemMaintenance");
+        selenium.openWindow("", "systemMaintenance");
         clickLinkWithText("Run system maintenance now", false);
         smStart = System.currentTimeMillis();
     }
