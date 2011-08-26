@@ -216,4 +216,12 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickLinkContainingText(studyName);
         clickLinkContainingText("Manage Study");
     }
+
+    //must be in folder whose designation you wish to change.
+    protected void setStudyRedesign()
+    {
+        clickAdminMenuItem("Manage Project", "Folder Settings");
+        checkRadioButton("folderType", "Study Redesign");
+        clickButton("Update Folder");
+    }
 }

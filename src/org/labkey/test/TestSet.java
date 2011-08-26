@@ -121,6 +121,7 @@ public enum TestSet
         GpatAssayTest.class,
         FolderTest.class,
         StudyDemoModeTest.class,
+        StudyRedesignTest.class,
         LibraTest.class,
     }),
 
