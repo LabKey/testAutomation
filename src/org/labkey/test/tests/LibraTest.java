@@ -48,6 +48,7 @@ public class LibraTest extends MS2Test
         clickLinkContainingText(runName);
     }
 
+
     String runName = "itraq/iTRAQ (Libra)";
     int normalizationCount = 8;
 
