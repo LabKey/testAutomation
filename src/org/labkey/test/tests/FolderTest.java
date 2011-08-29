@@ -184,6 +184,8 @@ public class FolderTest extends BaseSeleniumWebTest
         waitForElement(p, WAIT_FOR_JAVASCRIPT);
         waitForElement(t, WAIT_FOR_JAVASCRIPT);
 
+        sleep(1000); //TODO: Figure out what to wait for
+
         dragAndDrop(p, t, order == Reorder.preceding ? Position.top : Position.bottom);
         if(successExpected)
         {
@@ -196,6 +198,9 @@ public class FolderTest extends BaseSeleniumWebTest
     {
         log("Reorder folder: '" + folder + "' " + order.toString() + " '"  + targetFolder + "'");
         waitForElement(Locator.xpath("//div/a/span[text()='"+folder+"']"), WAIT_FOR_JAVASCRIPT);
+
+        sleep(1000); //TODO: Figure out what to wait for
+
         dragAndDrop(Locator.xpath(PROJECT_FOLDER_XPATH + "//div/a/span[text()='"+folder+"']"), Locator.xpath(PROJECT_FOLDER_XPATH + "//div/a/span[text()='"+targetFolder+"']"), order == Reorder.preceding ? Position.top : Position.bottom);
         if(successExpected)
         {
@@ -210,6 +215,10 @@ public class FolderTest extends BaseSeleniumWebTest
     private void moveFolder(String folder, String targetFolder, boolean successExpected, boolean multiple, boolean confirmMove)
     {
         log("Move folder: '" + folder + "' into '"  + targetFolder + "'");
+        waitForElement(Locator.xpath("//div/a/span[text()='"+folder+"']"), WAIT_FOR_JAVASCRIPT);
+
+        sleep(1000); //TODO: Figure out what to wait for
+
         dragAndDrop(Locator.xpath(PROJECT_FOLDER_XPATH + "//div/a/span[text()='"+folder+"']"), Locator.xpath("//div/a/span[text()='"+targetFolder+"']"), Position.middle);
         if(successExpected)
         {
