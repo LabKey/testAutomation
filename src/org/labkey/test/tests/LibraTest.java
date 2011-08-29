@@ -1,19 +1,14 @@
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
-import sun.security.krb5.Checksum;
-
-import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 
 /**
  * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/19/11
  * Time: 3:32 PM
- * To change this template use File | Settings | File Templates.
  */
 public class LibraTest extends MS2Test
 {
@@ -34,9 +29,7 @@ public class LibraTest extends MS2Test
         clickLinkContainingText(getProjectName());
 
         clickButtonContainingText("Process and Import Data");
-        sleep(5000);
-        Locator l = Locator.xpath("//span[contains(text(),'Libra')]");
-        click(l);
+        waitAndClick(Locator.fileTreeByName("Libra"));
         ExtHelper.clickFileBrowserFileCheckbox(this, "iTRAQ.search.xar.xml");
         selectImportDataAction("Import Experiment");
         waitForTextToDisappear("LOADING");
@@ -59,8 +52,7 @@ public class LibraTest extends MS2Test
         waitForText("Grouping");
         selenium.select("viewTypeGrouping", "Standard");
         clickButtonContainingText("Go");
-        waitForText("Peptide");
-        sleep(200);
+        waitForElement(Locator.id("dataregion_MS2Peptides"), WAIT_FOR_JAVASCRIPT);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         addNormalizationCount();
 
