@@ -1127,7 +1127,7 @@
             <available file="${env.R_HOME}/bin/R.exe"/>
         </condition>
         <condition property="r.path" value="${env.R_HOME}/R.exe" else="R">
-                <isset property="env.R_HOME"/>
+            <isset property="env.R_HOME"/>
         </condition>
         <condition property="rlabkey.windows">
         	<os family="windows"/>
@@ -1137,16 +1137,10 @@
         <antcall target="install-ruminex"/>
 
     </target>
-	<target name="install-rlabkey-binary" if="rlabkey.windows" >
+	<target name="install-rlabkey-binary" if="R.present" depends="locate_R">
 		<copy todir="${project.root}/sampledata/rlabkey" overwrite="true">
-			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.zip"/>        	
+			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.zip"/>
 		</copy>
-
-        <condition property="rterm.path" value="${env.R_HOME}/Rterm.exe"><available file="${env.R_HOME}/Rterm.exe"/></condition>
-        <condition property="rterm.path" value="${env.R_HOME}/bin/Rterm.exe"><available file="${env.R_HOME}/bin/Rterm.exe"/></condition>
-        <condition property="rterm.path" value="${env.R_HOME}/bin/i386/Rterm.exe"><available file="${env.R_HOME}/bin/i386/Rterm.exe"/></condition>
-        <condition property="rterm.path" value="${env.R_HOME}/bin/x64/Rterm.exe"><available file="${env.R_HOME}/bin/x64/Rterm.exe"/></condition>
-
         <exec dir="${project.root}/sampledata/rlabkey" executable="${rterm.path}" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r" failifexecutionfails="false">
 		    <arg line="--vanilla" />
 		</exec>
@@ -1160,10 +1154,33 @@
 		</exec>
 	 </target>
 
-    <target name="install-ruminex" >
+    <target name="install-ruminex" if="R.present" depends="locate_R">
+		<copy tofile="${project.root}/sampledata/rlabkey/Ruminex.tar.gz" overwrite="true">
+			<fileset  dir="${project.root}/tools/Ruminex" includes="Ruminex*.tar.gz"/>
+		</copy>
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey"  failifexecutionfails="false" searchpath="true">
-		    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}\tools\Ruminex\Ruminex_0.0.6.tar.gz" />
+		    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Ruminex.tar.gz" />
 		</exec>
+    </target>
+
+    <target name="locate_R">
+        <condition property="rterm.path" value="${env.R_HOME}/Rterm.exe"><available file="${env.R_HOME}/Rterm.exe"/></condition>
+        <condition property="rterm.path" value="${env.R_HOME}/bin/Rterm.exe"><available file="${env.R_HOME}/bin/Rterm.exe"/></condition>
+        <condition property="rterm.path" value="${env.R_HOME}/bin/i386/Rterm.exe"><available file="${env.R_HOME}/bin/i386/Rterm.exe"/></condition>
+        <condition property="rterm.path" value="${env.R_HOME}/bin/x64/Rterm.exe"><available file="${env.R_HOME}/bin/x64/Rterm.exe"/></condition>
+        <condition property="R.present">
+            <or>
+                <and>
+                    <available file="${r.path}"/>
+                    <available file="${rterm.path}"/>
+                </and>
+                <not><isset property="rlabkey.windows"/></not>
+            </or>
+        </condition>
+        <antcall target="fail_R"/>
+    </target>
+    <target name="fail_R" unless="R.present">
+        <echo message="Unable to locate R.exe and/or Rterm.exe.  Please ensure that R is installed and R_HOME is configured correctly."/>
     </target>
 
     <target name="studysampler" depends="compile">
