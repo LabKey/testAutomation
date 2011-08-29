@@ -259,40 +259,11 @@ public class TimeChartTest extends BaseSeleniumWebTest
         waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='x-axis-interval-combo']/.."), "Days");
         assertTextNotPresent("Days Since Start Date"); // Label shouldn't change automatically once it has been set manually
-//        checkRadioButton("xaxis_range", "manual");
-//        setFormElement(Locator.xpath("//input[@name='xaxis_range']/../../input[1]"), "20");
-//        fireEvent(Locator.xpath("//input[@name='xaxis_range']/../../input[1]"), SeleniumEvent.blur);
-//        setFormElement(Locator.xpath("//input[@name='xaxis_range']/../../input[2]"), "40");
-//        fireEvent(Locator.xpath("//input[@name='xaxis_range']/../../input[2]"), SeleniumEvent.blur);
-//        mouseDown(Locator.xpath("/html/body"));
-//        assertTextNotPresent("15");
-//        assertTextNotPresent("45");
         setAxisValue("X", "15", "40", X_AXIS_LABEL, null, null, new String[] {"15", "45"});
 
         log("Test Y-Axis");
         setAxisValue("Left", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {"500,000","200,000"});
-//        ExtHelper.clickExtTab(this, "Y-Axis");
-//        setFormElement("y-axis-label-textfield", Y_AXIS_LABEL);
-//        fireEvent(Locator.name("y-axis-label-textfield"), SeleniumEvent.blur);
-//        waitForText(Y_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
-//        checkRadioButton("yaxis_range", "manual");
-//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), "200000");
-//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), SeleniumEvent.blur);
-//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), "400000");
-//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), SeleniumEvent.blur);
-//        waitForText("400,000", WAIT_FOR_JAVASCRIPT);
-//        assertTextNotPresent("500,000");
-//        assertTextNotPresent("200,000");
-
         setAxisValue("Left", "10000", "1000000", null,"Log", new String[] {"10,000", "100,000", "1,000,000"}, new String[] {"500,000"});
-//        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Scale:']]/div/div"), "Log");
-//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), "10000");
-//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[1]"), SeleniumEvent.blur);
-//        setFormElement(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), "1000000");
-//        fireEvent(Locator.xpath("//input[@name='yaxis_range']/../../input[2]"), SeleniumEvent.blur);
-//        waitForText("1,000,000", WAIT_FOR_JAVASCRIPT);
-//        assertTextPresent("10,000", "100,000", "1,000,000");
-//        assertTextNotPresent("500,000");
     }
 
     /**
@@ -438,10 +409,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
         ExtHelper.clickExtTab(this, "Chart(s)");
         assertElementPresent(Locator.xpath("//li[starts-with(@id, 'series-selector-tabpanel') and contains(@class, 'active')]//span[text()='Participants']"));
-        assertElementPresent(Locator.xpath("//li[starts-with(@id, 'series-selector-tabpanel') and contains(@class, 'disabled')]//span[text()='Groups']"));
         checkRadioButton("chart_layout", "per_group");
         assertElementPresent(Locator.xpath("//li[starts-with(@id, 'series-selector-tabpanel') and contains(@class, 'active')]//span[text()='Groups']"));
-        assertElementPresent(Locator.xpath("//li[starts-with(@id, 'series-selector-tabpanel') and contains(@class, 'disabled')]//span[text()='Participants']"));
         log("Verify one line per measure per participant. All groups.");
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 3); // One chart per group.
