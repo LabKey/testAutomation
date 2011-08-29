@@ -56,6 +56,11 @@ public class LibraTest extends MS2Test
     protected void doTestSteps()
     {
         configure();
+        waitForText("Grouping");
+        selenium.select("viewTypeGrouping", "Standard");
+        clickButtonContainingText("Go");
+        waitForText("Peptide");
+        sleep(200);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         addNormalizationCount();
 
