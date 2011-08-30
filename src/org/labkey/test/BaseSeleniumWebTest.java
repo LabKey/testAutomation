@@ -2443,7 +2443,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitForElementToDisappear(final Locator locator, int wait)
     {
-        String failMessage = "Element with locator " + locator + " was still present after [" + wait + "ms]";
+        String failMessage = "Element with locator " + locator + " was still present.";
         waitFor(new Checker()
         {
             public boolean check()
