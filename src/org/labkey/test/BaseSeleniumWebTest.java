@@ -5360,7 +5360,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         if (!expectError)
             assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertEquals(getCompleteCount(statusValues), completeJobsExpected);
+        assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(statusValues));
     }
 
     // Note: unverified
