@@ -186,7 +186,6 @@ if (browserVersion.isChrome) {
                 if (msg.message != null &&
                     msg.message.indexOf("[JavaScript Error:") == 0 &&
                     msg.message.indexOf("setting a property that has only a getter") == -1 &&
-                    msg.message.indexOf("ctx.measureText is not a function") == -1 &&
                     msg.message.indexOf("{file: \"chrome://") == -1 &&
                     msg.message.indexOf("XULElement.selectedIndex") == -1 && // Ignore known Firefox Issue
                     msg.message.indexOf("xulrunner-1.9.0.14/components/FeedProcessor.js") == -1) // Firefox problem
