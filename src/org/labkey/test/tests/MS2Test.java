@@ -59,7 +59,7 @@ public class MS2Test extends MS2TestBase
     protected void doCleanup() throws IOException
     {
         cleanPipe(SEARCH_TYPE);
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        try {deleteProject(PROJECT_NAME); } catch (Throwable ignored) {}
     }
 
     protected void goTestIt(String testFile1, String testFile2)
@@ -1042,7 +1042,7 @@ public class MS2Test extends MS2TestBase
         setFormElement("hypothesis", RUN_GROUP1_HYPOTHESIS);
         setFormElement("comments", RUN_GROUP1_COMMENTS);
         clickNavButton("Submit");
-//        clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
+        clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         assertTextPresent(RUN_GROUP1_NAME1);
         assertTextPresent(RUN_GROUP1_HYPOTHESIS);
         assertTextPresent(RUN_GROUP1_COMMENTS);
