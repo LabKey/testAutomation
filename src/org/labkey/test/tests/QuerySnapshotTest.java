@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.tests.StudyBaseTest;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 
@@ -53,6 +52,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         setFolderName(FOLDER_2);
         importStudy();
 
+        waitForStudyLoad(FOLDER_1);
         waitForStudyLoad(FOLDER_2);
     }
 

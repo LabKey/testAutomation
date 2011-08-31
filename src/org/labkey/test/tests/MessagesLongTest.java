@@ -141,6 +141,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent("Admin Broadcast");
         submit();
         assertTextPresent(MSG1_TITLE);
+        clickLinkWithText("view message or respond");
         assertTextPresent(EXPIRES1);
         assertTextPresent("<b>x</b>");
         clickNavButton("Delete Message");
@@ -156,6 +157,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
 
         log("Check that edit works");
+        clickLinkWithText("view message or respond");
         clickLinkWithText("edit");
         setFormElement("body", MSG1_BODY);
         submit();
@@ -293,6 +295,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("emailList", USER1);
         selectOptionByText("assignedTo", USER3);
         submit();
+        clickLinkWithText("view message or respond");
         assertTextPresent("Members: "+USER1);
         assertTextPresent("Assigned To: "+USER3);
         impersonate(USER1);
