@@ -83,6 +83,7 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextNotPresent("K.VFHFVR.Q");
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
+        /* Disable until Linux TeamCity agents have Firefox 3.5+: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=12994
         log("Test peptide details page");
         selenium.openWindow("", "pep");
         clickLinkWithText(PEPTIDE2, false);
@@ -95,6 +96,7 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextPresent("87.0357", "130.0499");
         selenium.close();
         selenium.selectWindow(null);
+        */
 
         log("Test exporting");
         pushLocation();
