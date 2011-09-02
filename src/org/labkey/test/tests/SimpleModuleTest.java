@@ -228,7 +228,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         }
         catch (CommandException ex)
         {
-            assertEquals("The row is from the wrong container.", ex.getMessage());
+            assertEquals(401, ex.getStatusCode());
+    //            assertEquals("The row is from the wrong container.", ex.getMessage());
         }
 
         // Make sure that the schema isn't resolved if the module is not enabled in the container
@@ -310,7 +311,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         }
         catch (CommandException ex)
         {
-            assertEquals("The row is from the wrong container.", ex.getMessage());
+            assertEquals(401, ex.getStatusCode());
+//            assertEquals("The row is from the wrong container.", ex.getMessage());
         }
     }
 
