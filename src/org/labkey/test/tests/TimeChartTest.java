@@ -572,7 +572,9 @@ public class TimeChartTest extends BaseSeleniumWebTest
         assertTextPresent("10");
 
         ExtHelper.clickExtTab(this, "Overview");
-        clickNavButton("Save");
+        clickNavButton("Save", 0);
+        ExtHelper.waitForExtDialog(this, "Success");
+        ExtHelper.clickExtButton(this, "Success", "OK", 0);
     }
 
     private void timeChartPermissionsTest()
