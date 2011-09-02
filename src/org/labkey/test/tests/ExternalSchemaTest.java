@@ -224,7 +224,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         }
         catch (CommandException ex)
         {
-            assertEquals("401: User does not have permission to perform this operation", ex.getMessage());
+            assertEquals(401,ex.getStatusCode());
         }
 
     }
