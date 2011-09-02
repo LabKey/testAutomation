@@ -2487,6 +2487,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
+    public void waitForText(final String text, final int count, int wait)
+    {
+        String failMessage = "'"+text+"' was not present "+count+" times.";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return countText(text) == count;
+            }
+        }, failMessage, wait);
+    }
+
     protected final String firstForm = "//td[@id='bodypanel']//form[1]";
 
     public void submit()
@@ -3576,6 +3588,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFormElement(Locator element, String text)
     {
         setFormElement(element.toString(), text);
+        fireEvent(element, SeleniumEvent.blur);
     }
 
     public void setFormElement(Locator element, String text, boolean suppressValueLogging)

@@ -155,6 +155,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
         multiMeasureTimeChartTest();
 
         participantGroupTimeChartTest();
+
+        multiAxisTimeChartTest();
     }
 
     private void generateChartPerParticipantTest()
@@ -344,7 +346,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
         clickLinkWithText("view");
         waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("Days Since Start Date", 2); // Y-Axis labels for each measure
+        assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
         assertTextPresent(CHART_TITLE+": Lymphocytes", 1); // Title
         assertTextPresent(CHART_TITLE+": CD4", 1); // Title
 
@@ -403,7 +405,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
         clickLinkWithText("view");
         waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("Days Since Start Date", 2); // Y-Axis labels for each measure
+        assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
         assertTextPresent(CHART_TITLE+": Lymphocytes", 1); // Title
         assertTextPresent(CHART_TITLE+": CD4", 1); // Title
 
@@ -434,13 +436,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
         log("Verify one line per measure per participant. 2/3 groups.");
         ExtHelper.prevClickFileBrowserFileCheckbox(this, GROUP2_NAME);
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return countText(CHART_TITLE) == 2;
-            }
-        }, "", WAIT_FOR_JAVASCRIPT); // One chart per group.
+        waitForText(CHART_TITLE, 2, WAIT_FOR_JAVASCRIPT); // One chart per group.
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
         assertTextPresent(GROUP1_PTIDS[0]+" CD4", 11);
@@ -512,13 +508,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
         log("Verify one line per measure per participant.");
         ExtHelper.prevClickFileBrowserFileCheckbox(this, GROUP2_NAME); // reselect.
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return countText(CHART_TITLE) == 2;
-            }
-        }, "", WAIT_FOR_JAVASCRIPT); // One chart per group.
+        waitForText(CHART_TITLE, 2, WAIT_FOR_JAVASCRIPT); // One chart per group.
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
         assertTextPresent(GROUP1_PTIDS[0]+" CD4", 11);
@@ -535,6 +525,54 @@ public class TimeChartTest extends BaseSeleniumWebTest
         assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" CD4", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 0);
+    }
+
+    private void multiAxisTimeChartTest()
+    {
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Manage Views");
+        waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
+        clickLinkWithText("view");
+        waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("Days Since Start Date", 1); // X-Axis label for one selected group.
+        ExtHelper.clickExtTab(this, "Measures");
+        clickNavButton("Add Measure", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//dl[./dt/em[starts-with(text(), 'Hemoglobin')]]"));
+        clickNavButton("Select", 0);
+        waitForText(GROUP1_PTIDS[0]+" Hemoglobin");
+        //sadly, can't get data from within svg.
+//        String transform = getAttribute(Locator.xpath("//a[starts-with(@title, '"+GROUP1_PTIDS[0]+" Hemoglobin:')]/path"), "transform");
+//        double height = Double.parseDouble(transform.substring(transform.indexOf(" "), transform.indexOf(")") - 1));
+        ExtHelper.selectComboBoxItem(this, "Draw y-axis on", "Right");
+        ExtHelper.clickExtTab(this, "Right-Axis");
+        setText("right-axis-label-textfield", "Hemogoblins");
+
+        checkRadioButton("rightaxis_range", "manual");
+        setFormElement(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[1]"), "12"); //Min
+        setFormElement(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[2]"), "16"); //Max
+        fireEvent(Locator.name("right-axis-label-textfield"), SeleniumEvent.blur);
+        waitForText("Hemogoblins");
+        assertTextNotPresent("17.0");
+        assertTextPresent("16.0");
+        assertTextPresent("12.5");
+        assertTextNotPresent("11.5");
+//        String newTransform = getAttribute(Locator.xpath("//a[starts-with(@title, '"+GROUP1_PTIDS[0]+" Hemoglobin:')]/path"), "transform");
+//        double newHeight = Double.parseDouble(transform.substring(newTransform.indexOf(" "), newTransform.indexOf(")") - 1));
+//        assertTrue("Hemoglobin not graphed relative to right axis.", newHeight < height);        
+
+        checkRadioButton("rightaxis_range", "automatic");
+        assertTextPresent("17.0");
+        assertTextPresent("11.5");
+        ExtHelper.selectComboBoxItem(this, "Scale", "Log");
+        assertTextNotPresent("17.0");
+        assertTextNotPresent("11.5");
+        assertTextPresent("100");
+        assertTextPresent("10");
+
+        ExtHelper.clickExtTab(this, "Overview");
+        clickNavButton("Save");
     }
 
     private void timeChartPermissionsTest()
