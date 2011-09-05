@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
@@ -79,6 +80,7 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
 
         resetTracker.startTrackingRefresh();
 
+        waitForElement(Locator.xpath("//table[contains(@class, 'labkey-data-region')]"), WAIT_FOR_JAVASCRIPT);
         clickMenuButtonAndContinue("Views", rViewName);
 
         resetTracker.assertWasNotRefreshed();
