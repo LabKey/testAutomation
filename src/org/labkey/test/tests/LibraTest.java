@@ -68,6 +68,7 @@ public class LibraTest extends MS2Test
         selenium.select("viewTypeGrouping", "Standard");
         clickButtonContainingText("Go");
         waitForElement(Locator.id("dataregion_MS2Peptides"), WAIT_FOR_JAVASCRIPT);
+        sleep(200);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         addNormalizationCount();
 
@@ -77,7 +78,6 @@ public class LibraTest extends MS2Test
         checkForITRAQNormalization();
 
         proteinProphetTest();
-        //TODO:  activate these                                                      g
         groupTest();
         specificProteinTest();
     }
