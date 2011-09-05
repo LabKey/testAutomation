@@ -23,6 +23,7 @@ import org.labkey.test.util.Maps;
 import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.test.util.RReportHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -458,14 +459,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
     private void doTestReports()
     {
-        //check that R script engine is insalled, otherwise skip
-        clickLinkWithText("Admin Console");
-        clickLinkWithText("views and scripting");
-        if(!isREngineConfigured())
-        {
-            log("R scripting engine is not configured--skipping R report test.");
-            return;
-        }
+        RReportHelper.ensureRConfig(this);
 
         log("Testing module-based reports...");
         clickLinkWithText(getProjectName());
