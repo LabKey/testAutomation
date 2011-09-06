@@ -9,241 +9,122 @@
 </script>
 
 <script type="text/javascript">
-    var dateMeasure = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"x-axis",
-            "label":"Days Since Date",
-            "timeAxis":"true",
-            "range":{
-                "type":"automatic"
-            }
-        },
-        "dateOptions":{
+    function getDateOptions(query, dateName)
+    {
+        var options = {
+            "dateCol":{
+                "name":dateName,
+                "queryName":query,
+                "schemaName":"study"
+            },
             "interval":"Days",
             "zeroDateCol":{
-                "id":1,
                 "name":"date",
-                "label":"Date",
-                "longlabel":"Date (Demographics)",
-                "description":"",
-                "isUserDefined":false,
                 "queryName":"Demographics",
-                "schemaName":"study",
-                "type":"TIMESTAMP"
+                "schemaName":"study"
             }
-        },
-        "measure":{
-            "id":1,
-            "name":"date",
-            "label":"Date",
-            "longlabel":"Date (Lab Results)",
-            "description":"",
-            "isUserDefined":false,
-            "queryName":"Lab Results",
-            "schemaName":"study",
-            "type":"TIMESTAMP"
-        }
-    };
+        };
+        return options;
+    }
 
     var cd4Measure = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"CD4+ (cells/mm3)",
-            "scale":"linear",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("Lab Results", "date"),
         "measure":{
-            "id":20,
             "name":"CD4",
-            "label":"CD4+ (cells/mm3)",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"Lab Results",
-            "schemaName":"study",
-            "type":"INTEGER"
+            "schemaName":"study"
         },
         "dimension":null
     };
 
     var hemoglobinMeasure = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"Hemoglobin",
-            "scale":"linear",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("Lab Results", "ParticipantVisit/VisitDate"),
         "measure":{
-            "id":21,
             "name":"Hemoglobin",
-            "label":"Hemoglobin",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"Lab Results",
-            "schemaName":"study",
-            "type":"DOUBLE"
+            "schemaName":"study"
         },
         "dimension":null
     };
 
     var weightMeasure = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"Weight (kg)",
-            "scale":"linear",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("Physical Exam", "ParticipantVisit/VisitDate"),
         "measure":{
-            "id":22,
-            "name":"Weight_kg",
-            "label":"Weight (kg)",
-            "description":"",
-            "isUserDefined":false,
+        "name":"Weight_kg",
             "queryName":"Physical Exam",
-            "schemaName":"study",
-            "type":"INTEGER"
+            "schemaName":"study"
         },
         "dimension":null
     };
 
     var vlMeasure = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"Viral Load Quantified (copies/ml)",
-            "scale":"log",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("HIV Test Results", "ParticipantVisit/VisitDate"),
         "measure":{
-            "id":22,
             "name":"HIVLoadQuant",
-            "label":"Viral Load Quantified (copies/ml)",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"HIV Test Results",
-            "schemaName":"study",
-            "type":"INTEGER"
+            "schemaName":"study"
         },
         "dimension":null
     };
 
     var luminexMeasureNonNull = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"ObsConc",
-            "scale":"log",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("LuminexAssay", "ParticipantVisit/VisitDate"),
         "measure":{
-            "id":22,
             "name":"ObsConc",
-            "label":"ObsConc",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"LuminexAssay",
             "schemaName":"study",
-            "allowNullResults": false,
-            "type":"DOUBLE"
+            "allowNullResults": false
         },
         "dimension":null
     };
 
     var luminexMeasureNullAllowed = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"ObsConc",
-            "scale":"log",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("LuminexAssay", "ParticipantVisit/VisitDate"),
         "measure":{
-            "id":22,
             "name":"ObsConc",
-            "label":"ObsConc",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"LuminexAssay",
             "schemaName":"study",
-            "allowNullResults": true,
-            "type":"DOUBLE"
+            "allowNullResults": true
         },
         "dimension":null
     };
 
     var luminexMeasureNonNullWithDimension = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"ObsConc",
-            "scale":"log",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("LuminexAssay", "ParticipantVisit/VisitDate"),
         "measure":{
-            "id":22,
             "name":"ObsConc",
-            "label":"ObsConc",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"LuminexAssay",
             "schemaName":"study",
-            "allowNullResults": false,
-            "type":"DOUBLE"
+            "allowNullResults": false
         },
         "dimension":{
             "name":"AnalyteName",
-            "label":"Analyte Name",
             "queryName":"LuminexAssay",
             "schemaName":"study",
-            "type":"VARCHAR",
             "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
         }
     };
 
     var luminexMeasureNullAllowedWithDimension = {
-        "axis":{
-            "multiSelect":"false",
-            "name":"y-axis",
-            "label":"ObsConc",
-            "scale":"log",
-            "range":{
-                "type":"automatic"
-            }
-        },
+        "time": "date",
+        "dateOptions": getDateOptions("LuminexAssay", "ParticipantVisit/VisitDate"),
         "measure":{
-            "id":22,
             "name":"ObsConc",
-            "label":"ObsConc",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"LuminexAssay",
             "schemaName":"study",
-            "allowNullResults": true,
-            "type":"DOUBLE"
+            "allowNullResults": true
         },
         "dimension":{
             "name":"AnalyteName",
-            "label":"Analyte Name",
             "queryName":"LuminexAssay",
             "schemaName":"study",
-            "type":"VARCHAR",
             "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
         }
     };
@@ -256,27 +137,21 @@
             "values":["249318596","249320107","249320127","249320489","249320897"]
         },
         {
-            "id":1,
             "name":"date",
-            "label":"Date",
-            "longlabel":"Date (Lab Results)",
-            "description":"",
-            "isUserDefined":false,
             "queryName":"Lab Results",
-            "schemaName":"study",
-            "type":"TIMESTAMP"
+            "schemaName":"study"
         }
     ];
 
     var configs = [
-        {title: 'Single Measure', measures: [dateMeasure, cd4Measure]},
-        {title: 'Two Measures from the same dataset', measures: [dateMeasure, cd4Measure, hemoglobinMeasure]},
-        {title: 'Two Measures from different datasets', measures: [dateMeasure, cd4Measure, weightMeasure]},
-        {title: 'Two Measures from different datasets (#2)', measures: [dateMeasure, cd4Measure, vlMeasure]},
-        {title: 'Two Measures - without dimension selected for second, inner join', measures: [dateMeasure, cd4Measure, luminexMeasureNonNull]},
-        {title: 'Two Measures - without dimension selected for second, outer join', measures: [dateMeasure, cd4Measure, luminexMeasureNullAllowed]},
-        {title: 'Two Measures - WITH dimension selected for second, inner join', measures: [dateMeasure, cd4Measure, luminexMeasureNonNullWithDimension]},
-        {title: 'Two Measures - WITH dimension selected for second, outer join', measures: [dateMeasure, cd4Measure, luminexMeasureNullAllowedWithDimension]}
+        {title: 'Single Measure', measures: [cd4Measure]},
+        {title: 'Two Measures from the same dataset', measures: [cd4Measure, hemoglobinMeasure]},
+        {title: 'Two Measures from different datasets', measures: [cd4Measure, weightMeasure]},
+        {title: 'Two Measures from different datasets (#2)', measures: [cd4Measure, vlMeasure]},
+        {title: 'Two Measures - without dimension selected for second, inner join', measures: [cd4Measure, luminexMeasureNonNull]},
+        {title: 'Two Measures - without dimension selected for second, outer join', measures: [cd4Measure, luminexMeasureNullAllowed]},
+        {title: 'Two Measures - WITH dimension selected for second, inner join', measures: [cd4Measure, luminexMeasureNonNullWithDimension]},
+        {title: 'Two Measures - WITH dimension selected for second, outer join', measures: [cd4Measure, luminexMeasureNullAllowedWithDimension]}
     ];
 
     var measureNames = [
@@ -366,7 +241,9 @@
                     schemaName: data.schemaName,
                     queryName: data.queryName,
                     dataRegionName: 'apiTestDataRegion',
-                    sort: 'study_LabResults_ParticipantId,Days,'+measureNames[configCounter],
+                    sort: 'study_LabResults_ParticipantId,'
+                            + (configs[configCounter].measures.length > 1 ? 'study_LabResults_date_Days,' : 'Days,')
+                            + measureNames[configCounter],
                     allowChooseQuery: false,
                     allowChooseView: false,
                     title: "",

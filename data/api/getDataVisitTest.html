@@ -1,0 +1,235 @@
+<div id="getData-config-form-div"></div>
+<br/>
+<div id="getData-grid-div"></div>
+
+<script type="text/javascript">
+    LABKEY.requiresClientAPI(true);
+    LABKEY.requiresVisualization();
+    Ext.QuickTips.init();
+</script>
+
+<script type="text/javascript">
+    var cd4Measure = {
+        "measure":{
+            "name":"CD4",
+            "queryName":"Lab Results",
+            "schemaName":"study"
+        },
+        "dimension":null,
+        "time": "visit"
+    };
+
+    var hemoglobinMeasure = {
+        "measure":{
+            "name":"Hemoglobin",
+            "queryName":"Lab Results",
+            "schemaName":"study"
+        },
+        "dimension":null,
+        "time": "visit"
+    };
+
+    var weightMeasure = {
+        "measure":{
+            "name":"Weight_kg",
+            "queryName":"Physical Exam",
+            "schemaName":"study"
+        },
+        "dimension":null,
+        "time": "visit"
+    };
+
+    var vlMeasure = {
+        "measure":{
+            "name":"HIVLoadQuant",
+            "queryName":"HIV Test Results",
+            "schemaName":"study"
+        },
+        "dimension":null,
+        "time": "visit"
+    };
+
+    var luminexMeasureNonNull = {
+        "measure":{
+            "name":"ObsConc",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": false
+        },
+        "dimension":null,
+        "time": "visit"
+    };
+
+    var luminexMeasureNullAllowed = {
+        "measure":{
+            "name":"ObsConc",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": true
+        },
+        "dimension":null,
+        "time": "visit"
+    };
+
+    var luminexMeasureNonNullWithDimension = {
+        "measure":{
+            "name":"ObsConc",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": false
+        },
+        "dimension":{
+            "name":"AnalyteName",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
+        },
+        "time": "visit"
+    };
+
+    var luminexMeasureNullAllowedWithDimension = {
+        "measure":{
+            "name":"ObsConc",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": true
+        },
+        "dimension":{
+            "name":"AnalyteName",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
+        },
+        "time": "visit"
+    };
+
+    var sortArray = [
+        {
+            "name":"ParticipantId",
+            "schemaName":"study",
+            "queryName":"Lab Results",
+            "values":["249318596","249320107","249320127","249320489","249320897"]
+        },
+        {
+            "name":"ParticipantVisit/sequencenum",
+            "queryName":"Lab Results",
+            "schemaName":"study"
+        }
+    ];
+
+    var configs = [
+        {title: 'Single Measure', measures: [cd4Measure]},
+        {title: 'Two Measures from the same dataset', measures: [cd4Measure, hemoglobinMeasure]},
+        {title: 'Two Measures from different datasets', measures: [cd4Measure, weightMeasure]},
+        {title: 'Two Measures from different datasets (#2)', measures: [cd4Measure, vlMeasure]},
+        {title: 'Two Measures - without dimension selected for second, inner join', measures: [cd4Measure, luminexMeasureNonNull]},
+        {title: 'Two Measures - without dimension selected for second, outer join', measures: [cd4Measure, luminexMeasureNullAllowed]},
+        {title: 'Two Measures - WITH dimension selected for second, inner join', measures: [cd4Measure, luminexMeasureNonNullWithDimension]},
+        {title: 'Two Measures - WITH dimension selected for second, outer join', measures: [cd4Measure, luminexMeasureNullAllowedWithDimension]}
+    ];
+
+    var measureNames = [
+        "study_LabResults_CD4",
+        "study_LabResults_Hemoglobin",
+        "study_PhysicalExam_Weight_kg",
+        "study_HIVTestResults_HIVLoadQuant",
+        "study_LuminexAssay_ObsConc",
+        "study_LuminexAssay_ObsConc",
+        "IL-10 (23)::study_LuminexAssay_ObsConc_MAX",
+        "IL-10 (23)::study_LuminexAssay_ObsConc_MAX"
+    ];
+
+    var configCounter = -1;
+    var configForm;
+
+    //Lots of async script loading. Make sure everything is loaded before starting
+    LABKEY.Utils.onTrue({
+        testCallback:function() {return Ext.isReady && LABKEY.vis},
+        //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
+        successCallback:function () {init.defer(100)},
+        errorCallback:doError
+    });
+
+    function doError(param) {
+        throw param;
+    }
+
+    function init(){
+        configForm = new Ext.FormPanel({
+            renderTo: 'getData-config-form-div',
+            frame: false,
+            items: [{
+                xtype: 'numberfield',
+                fieldLabel: 'Current Config ',
+                name: 'currentConfig',
+                value: 0,
+                allowBlank: false,
+                width: 30
+            },
+            {
+                xtype: 'numberfield',
+                fieldLabel: 'Total Number ',
+                name: 'configCount',
+                value: 0,
+                allowBlank: false,
+                width: 30
+            },
+            {
+                xtype: 'displayfield',
+                fieldLabel: 'Config Title ',
+                name: 'configTitle',
+                width: 500
+            }],
+            buttons: [{
+                xtype: 'button',
+                name: 'nextBtn',
+                text: 'Next',
+                handler: changeGrid
+            }],
+            buttonAlign: 'left'
+        });
+
+        changeGrid();
+    }
+
+    function changeGrid(){
+        // increment the config counter
+        configCounter++;
+        configForm.getForm().findField('currentConfig').setValue(configCounter);
+
+        // check that config exists for current value of counter
+        if(configCounter >= configs.length){
+            alert("Config does not exist: " + configCounter);
+            return;
+        }
+
+        // set the values in the form
+        configForm.getForm().findField('configCount').setValue(configs.length);
+
+        // call the getData API with the new config measures
+        LABKEY.Visualization.getData({
+            success: function(data){
+                // show the results in a query webpart using the temp queryName provided in the result
+                new LABKEY.QueryWebPart({
+                    renderTo: 'getData-grid-div',
+                    schemaName: data.schemaName,
+                    queryName: data.queryName,
+                    dataRegionName: 'apiTestDataRegion',
+                    sort: 'study_LabResults_ParticipantId,study_LabResults_ParticipantVisitsequencenum,'+measureNames[configCounter],
+                    allowChooseQuery: false,
+                    allowChooseView: false,
+                    title: "",
+                    frame: "none",
+                    success: function() {
+                        configForm.getForm().findField('configTitle').setValue(configs[configCounter].title);
+                    }
+                });
+            },
+            failure : function(info, response, options) {LABKEY.Utils.displayAjaxErrorResponse(response, options);},
+            measures: configs[configCounter].measures,
+            sorts: sortArray,
+            scope: this
+        });
+    }
+
+</script>

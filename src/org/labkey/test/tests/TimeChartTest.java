@@ -72,15 +72,26 @@ public class TimeChartTest extends BaseSeleniumWebTest
         "1 - 33 of 33"
     };
 
-    private static final String[][] GETDATA_API_TEST_COLNAMES = {
+    private static final String[][] GETDATA_API_DATETEST_COLNAMES = {
         {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Study Lab Results Participant Visit Visit Date", "Study Lab Results Participant Visit Visit Date Days", "Study Lab Results Date Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Study Lab Results Date Days", "Study Physical Exam Participant Visit Visit Date Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Study Lab Results Date Days", "Study HIVTest Results Participant Visit Visit Date Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
+        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"}
+    };
+
+    private static final String[][] GETDATA_API_VISITTEST_COLNAMES = {
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order"},
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Hemoglobin"},
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Physical Exam Weight Kg"},
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study HIVTest Results HIVLoad Quant"},
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"},
+        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"}
     };
 
     private static final String[][] GETDATA_API_TEST_DAYS = {
@@ -92,6 +103,17 @@ public class TimeChartTest extends BaseSeleniumWebTest
         {"44", "44", "44", "79", "79", "79", "108", "108", "108", "190", "190", "190", "246", "246", "246", "276", "303", "335", "364", "394"},
         {"44", "79", "108", "190", "246"},
         {"44", "79", "108", "190", "246"}
+    };
+
+    private static final String[][] GETDATA_API_TEST_VISITLABEL = {
+        {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
+        {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
+        {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
+        {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
+        {"Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9"},
+        {"Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
+        {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9"},
+        {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"}
     };
 
     private static final String[] GETDATA_API_TEST_MEASURES = {
@@ -250,6 +272,14 @@ public class TimeChartTest extends BaseSeleniumWebTest
         ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // de-select one participant
         waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
 
+        // verify column headers for date based plotting option
+        assertTextPresent("Study HIVTest Results Participant Id");
+        assertTextPresent("Study HIVTest Results Participant Visit Visit Date");
+        assertTextPresent("Study HIVTest Results HIVLoad Quant");
+        assertTextPresent("Study Demographics Start Date");
+        assertTextPresent("Days");
+        assertTextNotPresent("sequencenum");
+
         log("Test X-Axis");
         clickNavButton("View Chart(s)", 0);
 
@@ -350,7 +380,13 @@ public class TimeChartTest extends BaseSeleniumWebTest
         assertTextPresent(CHART_TITLE+": Lymphocytes", 1); // Title
         assertTextPresent(CHART_TITLE+": CD4", 1); // Title
 
-        // check multi-measure calls to LABKEY.Visualization.getData API
+        getDataDateTest();
+        getDataVisitTest();
+    }
+
+    private void getDataDateTest()
+    {
+        // check multi-measure calls to LABKEY.Visualization.getData API requesting date information
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         // create new wiki to add to Demo study folder
@@ -359,7 +395,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
         setFormElement("name", WIKIPAGE_NAME);
         setFormElement("title", WIKIPAGE_NAME);
         // insert JS for getData calls and querywebpart
-        setWikiBody(getFileContents("server/test/data/api/getDataTest.html"));
+        setWikiBody(getFileContents("server/test/data/api/getDataDateTest.html"));
         saveWikiPage();
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
 
@@ -373,12 +409,52 @@ public class TimeChartTest extends BaseSeleniumWebTest
             waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
             waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
-            for(int i = 0; i < GETDATA_API_TEST_COLNAMES[testIndex].length; i++){
-                assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_TEST_COLNAMES[testIndex][i], GETDATA_API_TEST_COLNAMES[testIndex][i]);
+            for(int i = 0; i < GETDATA_API_DATETEST_COLNAMES[testIndex].length; i++){
+                assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_DATETEST_COLNAMES[testIndex][i], GETDATA_API_DATETEST_COLNAMES[testIndex][i]);
             }
             // check values in interval column for the first participant
             for(int i = 0; i < GETDATA_API_TEST_DAYS[testIndex].length; i++){
-                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, "Days", GETDATA_API_TEST_DAYS[testIndex][i]);
+                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, GETDATA_API_DATETEST_COLNAMES[testIndex][GETDATA_API_DATETEST_COLNAMES[testIndex].length - 1], GETDATA_API_TEST_DAYS[testIndex][i]);
+            }
+            // check values in measure column
+            for(int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++){
+                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, GETDATA_API_TEST_MEASURES[testIndex], GETDATA_API_TEST_MEASURE_VALUES[testIndex][i]);
+            }
+
+            if(testIndex < testCount-1)
+                clickNavButton("Next", 0);
+
+            testIndex++;
+        }
+    }
+
+    private void getDataVisitTest()
+    {
+        // check multi-measure calls to LABKEY.Visualization.getData API requesting visit information
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+        // insert JS for getData calls and querywebpart
+        setWikiBody(getFileContents("server/test/data/api/getDataVisitTest.html"));
+        saveWikiPage();
+        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+
+        // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
+        int testCount = Integer.parseInt(getFormElement(Locator.name("configCount")));
+        int testIndex = 0;
+        while(testIndex < testCount){
+            // check title is present
+            waitForText(GETDATA_API_TEST_TITLES[testIndex], WAIT_FOR_JAVASCRIPT);
+            // check # of rows
+            waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
+            waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
+            // check column headers
+            for(int i = 0; i < GETDATA_API_VISITTEST_COLNAMES[testIndex].length; i++){
+                assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_VISITTEST_COLNAMES[testIndex][i], GETDATA_API_VISITTEST_COLNAMES[testIndex][i]);
+            }
+            // check values in interval column for the first participant
+            for(int i = 0; i < GETDATA_API_TEST_VISITLABEL[testIndex].length; i++){
+                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, "Study Lab Results Participant Visit Visit Label", GETDATA_API_TEST_VISITLABEL[testIndex][i]);
             }
             // check values in measure column
             for(int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++){

@@ -8,7 +8,8 @@ data/api/domainTest.js -text
 data/api/ehr-security-template.xml -text
 data/api/extIntegrationTest.html -text
 data/api/folderTest.html -text
-data/api/getDataTest.html -text
+data/api/getDataDateTest.html -text
+data/api/getDataVisitTest.html -text
 data/api/gridTest.js -text
 data/api/http-api.xml -text
 data/api/lineChartTest.js -text
