@@ -81,13 +81,11 @@ public class WorkbookTest extends BaseSeleniumWebTest
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
         waitForElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), "Renamed"+DEFAULT_WORKBOOK_NAME);
-        fireEvent(Locator.xpath("//input[contains(@value, '"+DEFAULT_WORKBOOK_NAME+"')]"), SeleniumEvent.blur);
         assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // Clear description
         click(Locator.xpath("//div[@id='wb-description']"));
         setFormElement(Locator.xpath("//textarea"), ""); // textarea is a barely used tag, so this xpath is sufficient for now.
-        fireEvent(Locator.xpath("//textarea"), SeleniumEvent.blur);
         waitForText("No description provided. Click to add one.", WAIT_FOR_JAVASCRIPT); // Takes a moment to appear.
 
         // Check that title and description are saved
