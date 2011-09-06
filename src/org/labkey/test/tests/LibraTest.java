@@ -67,8 +67,8 @@ public class LibraTest extends MS2Test
         waitForText("Grouping");
         selenium.select("viewTypeGrouping", "Standard");
         clickButtonContainingText("Go");
-        waitForElement(Locator.id("dataregion_MS2Peptides"), WAIT_FOR_JAVASCRIPT);
-        sleep(200);
+        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
+        sleep(200); // Views menu isn't actually ready yet.
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         addNormalizationCount();
 
@@ -141,6 +141,8 @@ public class LibraTest extends MS2Test
     {
         clickMenuButton("Views", "ProteinProphet");
 
+        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
+        sleep(200); // Views menu isn't actually ready yet.
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         for(int i=1; i<=normalizationCount; i++)
         {
