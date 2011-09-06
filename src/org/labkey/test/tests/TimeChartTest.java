@@ -624,11 +624,12 @@ public class TimeChartTest extends BaseSeleniumWebTest
         ExtHelper.selectComboBoxItem(this, "Draw y-axis on", "Right");
         ExtHelper.clickExtTab(this, "Right-Axis");
         setText("right-axis-label-textfield", "Hemogoblins");
+        fireEvent(Locator.name("right-axis-label-textfield"), SeleniumEvent.blur);
 
         checkRadioButton("rightaxis_range", "manual");
         setFormElement(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[1]"), "12"); //Min
         setFormElement(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[2]"), "16"); //Max
-        fireEvent(Locator.name("right-axis-label-textfield"), SeleniumEvent.blur);
+        fireEvent(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[2]"), SeleniumEvent.blur);
         waitForText("Hemogoblins");
         assertTextNotPresent("17.0");
         assertTextPresent("16.0");
