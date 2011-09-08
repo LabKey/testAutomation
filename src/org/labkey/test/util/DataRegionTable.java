@@ -23,7 +23,9 @@ import org.apache.commons.lang.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -45,9 +47,6 @@ public class DataRegionTable
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
         this(tableName, test, true);
-
-        // Already being created at the beginning of tests before tables are on the page.
-        // _test.assertElementPresent(Locator.xpath("//table[@id='" + getHtmlName() + "']"));
     }
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors)
@@ -117,7 +116,7 @@ public class DataRegionTable
 
     public Locator.XPathLocator xpath(int row, int col)
     {
-        return Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+3) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
+        return Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+4+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
     }
 
     public void clickLink(int row, int col)
@@ -135,10 +134,9 @@ public class DataRegionTable
         
         try
         {
-            int sel = (_selectors ? 1 : 0);
-            for (int col = 0; getDataAsText(0, col) != null; col++)
+            for (int col = 0; getDataAsText(-1, col) != null; col++)
             {
-                String header = _test.getText(Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[2]/td[" + (col+sel+1) + "]/div"));
+                String header = getDataAsText(-1, col);
                 String headerName = header.split("\n")[0];
                 headerName = headerName.replaceAll(" ", "");
                 if (!StringUtils.isEmpty(headerName))
@@ -148,14 +146,31 @@ public class DataRegionTable
                     return col;
                 }
             }
-            _test.log("Column '" + name + "' not found");
         }
         catch (Exception e)
         {            
             // _test.log("Failed to get column named " + name);
         }
 
+        _test.log("Column '" + name + "' not found");
         return -1;
+    }
+
+    public List<String> getColumnDataAsText(String name)
+    {
+        int col = getColumn(name);
+        int rowCount = getDataRowCount();
+        List<String> columnText = new ArrayList<String>();
+
+        if (col >= 0)
+        {
+            for (int row = 0; row < rowCount; row++)
+            {
+                columnText.add(getDataAsText(row, col));
+            }
+        }
+
+        return columnText;
     }
 
     /** Find the row number for the given primary key. */
@@ -172,7 +187,7 @@ public class DataRegionTable
         {
             while (true)
             {
-                String value = _test.getAttribute(Locator.xpath("//table[@id='dataregion_query']//tr[" + (row+3) + "]//input[@name='.select']/"), "value");
+                String value = _test.getAttribute(Locator.xpath("//table[@id='" + getHtmlName() +"']//tr[" + (row+3) + "]//input[@name='.select']/"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;
@@ -190,10 +205,13 @@ public class DataRegionTable
     public String getDataAsText(int row, int column)
     {
         String ret = null;
+
         try
         {
-            ret = _test.getTableCellText(getHtmlName(), row + 2, column + (_selectors ? 1 : 0));
-        } catch(Exception ignore) {}
+            ret = _test.getTableCellText(getHtmlName(), row + 4, column + (_selectors ? 1 : 0));
+        }
+        catch(Exception ignore) {}
+
         return ret;
     }
 
@@ -223,7 +241,12 @@ public class DataRegionTable
 
     public void setFilter(String columnName, String filterType, String filter)
     {
-        _test.setFilter(_tableName, columnName, filterType, filter);
+        setFilter(columnName, filterType, filter, BaseSeleniumWebTest.WAIT_FOR_PAGE);
+    }
+
+    public void setFilter(String columnName, String filterType, String filter, int waitMillis)
+    {
+        _test.setFilter(_tableName, columnName, filterType, filter, waitMillis);
     }
 
     public void clearFilter(String columnName)

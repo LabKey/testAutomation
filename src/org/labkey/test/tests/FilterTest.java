@@ -33,16 +33,12 @@ import org.labkey.test.util.ExtHelper;
  */
 public class FilterTest extends ListTest
 {
-//
-//
     protected final static String PROJECT_NAME = "FilterVerifyProject";
-//
-    protected  String rViewName =  TRICKY_CHARACTERS + "R view";
+    protected String rViewName = TRICKY_CHARACTERS + "R view";
+
     public void doTestSteps()
     {
         setUpList(PROJECT_NAME);
-//        setUpListFinish();
-////        clickLinkContainingText(LIST_NAME);
         CustomizeViewsHelper.createRView(this, null, rViewName);
         filterTest();
     }
@@ -51,7 +47,6 @@ public class FilterTest extends ListTest
     protected void filterTest()
     {
         log("Filter Test");
-//        clickLinkContainingText(LIST_NAME);
 
         invalidFiltersGenerateCorrectErrorTest();
 

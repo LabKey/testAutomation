@@ -468,7 +468,12 @@ public class AssayTest extends AbstractAssayTest
         assertElementPresent(Locator.xpath("//select[@name='targetStudy']/option[.='" +
                 getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY1) + "']"));
 
+        // Make sure the selected study is Study1
+        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY1));
+
         clickNavButton("Next");
+        assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY1 + " Study: Verify Results");
+
         clickNavButton("Copy to Study");
 
         log("Verifying that the data was published");

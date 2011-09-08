@@ -128,7 +128,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
             instance.waitForPageToLoad();
         }
         instance.log("searching for audit entry: " + msg);
-        DataRegionTable table = new DataRegionTable("audit", instance);
+        DataRegionTable table = new DataRegionTable("audit", instance, false);
         int i = table.getColumn(column);
         assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
     }

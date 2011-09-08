@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -516,25 +517,28 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Checking data in aliased AUC columns");
         // Check that aliased AUC column show data from correct columns.  Any changes in the default location/quantity of columns will require adjustment of column indices.
-        assertTableCellTextEquals("dataregion_" + TEST_ASSAY_NAB + " Data",  2, CURVE_IC80_COL_TITLE, "");//ptid 1 A, Curve IC 80. Should be blank.
-        assertTableCellTextEquals("dataregion_" + TEST_ASSAY_NAB + " Data",  7, CURVE_IC70_COL_TITLE, "");//ptid 1 B, Curve IC 70. Should be blank.
-        for(int i = 2; i <= 6; i++)
+        DataRegionTable table = new DataRegionTable(TEST_ASSAY_NAB + " Data", this);
+
+        assertEquals("", table.getDataAsText(0, CURVE_IC80_COL_TITLE)); //ptid 1 A, Curve IC 80. Should be blank.
+        assertEquals("", table.getDataAsText(5, CURVE_IC70_COL_TITLE)); //ptid 1 B, Curve IC 70. Should be blank.
+
+        for(int i = 0; i < 5; i++)
         {
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, AUC_COL_TITLE, i, AUC_POLY_COL_TITLE); //AUC = AUC_poly
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, CURVE_IC50_COL_TITLE, i, CURVE_IC50_POLY_COL_TITLE); //Curve IC50 = Curve_IC50_poly
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, CURVE_IC70_COL_TITLE, i, CURVE_IC70_POLY_COL_TITLE); //Curve IC70 = Curve_IC70_poly
+            assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_POLY_COL_TITLE));        //AUC = AUC_poly
+            assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_POLY_COL_TITLE)); //Curve IC50 = Curve_IC50_poly
+            assertEquals(table.getDataAsText(i, CURVE_IC70_COL_TITLE), table.getDataAsText(i, CURVE_IC70_POLY_COL_TITLE)); //Curve IC70 = Curve_IC70_poly
         }
-        for(int i = 7; i <= 11; i++)
+        for(int i = 5; i < 10; i++)
         {
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, AUC_COL_TITLE, i, AUC_4PL_COL_TITLE); //AUC = AUC_4pl
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, CURVE_IC50_COL_TITLE, i, CURVE_IC50_4PL_COL_TITLE); //Curve IC50 = Curve_IC50_4pl
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, CURVE_IC80_COL_TITLE, i, CURVE_IC80_4PL_COL_TITLE); //Curve IC80 = Curve_IC80_4pl
+            assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_4PL_COL_TITLE));        //AUC = AUC_4pl
+            assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_4PL_COL_TITLE)); //Curve IC50 = Curve_IC50_4pl
+            assertEquals(table.getDataAsText(i, CURVE_IC80_COL_TITLE), table.getDataAsText(i, CURVE_IC80_4PL_COL_TITLE)); //Curve IC80 = Curve_IC80_4pl
         }
-        for(int i = 12; i <= 16; i++)
+        for(int i = 10; i < 15; i++)
         {
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, AUC_COL_TITLE, i, AUC_5PL_COL_TITLE); //AUC = AUC_5pl
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, CURVE_IC50_COL_TITLE, i, CURVE_IC50_5PL_COL_TITLE); //Curve IC50 = Curve_IC50_5pl
-            assertTableCellsEqual("dataregion_" + TEST_ASSAY_NAB + " Data",  i, CURVE_IC80_COL_TITLE, i, CURVE_IC80_5PL_COL_TITLE); //Curve IC80 = Curve_IC80_5pl
+            assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_5PL_COL_TITLE));        //AUC = AUC_5pl
+            assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_5PL_COL_TITLE)); //Curve IC50 = Curve_IC50_5pl
+            assertEquals(table.getDataAsText(i, CURVE_IC80_COL_TITLE), table.getDataAsText(i, CURVE_IC80_5PL_COL_TITLE)); //Curve IC80 = Curve_IC80_5pl
         }
     }
 
@@ -542,24 +546,27 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Checking data in aliased AUC columns in Study");
         // check copied AUC data.
+        DataRegionTable table = new DataRegionTable("Dataset", this);
         setSort("Dataset", "ParticipantId", SortDirection.ASC);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_poly", AUC_POLY_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_4pl", AUC_4PL_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_5pl", AUC_5PL_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_poly",        AUC_POLY_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_4pl",         AUC_4PL_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_5pl",         AUC_5PL_COL_TITLE);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_4pl", CURVE_IC50_4PL_STUDY_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl", CURVE_IC80_4PL_STUDY_COL_TITLE);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
         CustomizeViewsHelper.saveCustomView(this);
-        assertTableCellsEqual("dataregion_Dataset",  2, AUC_STUDY_COL_TITLE, 2, AUC_POLY_STUDY_COL_TITLE); //AUC = AUC_poly
-        assertTableCellsEqual("dataregion_Dataset",  3, AUC_STUDY_COL_TITLE, 3, AUC_4PL_STUDY_COL_TITLE); //AUC = AUC_4pl
-        assertTableCellsEqual("dataregion_Dataset",  2, CURVE_IC50_STUDY_COL_TITLE, 2, CURVE_IC50_POLY_STUDY_COL_TITLE); //CurveIC50 = CurveIC50_poly
-        assertTableCellsEqual("dataregion_Dataset",  3, CURVE_IC50_STUDY_COL_TITLE, 3, CURVE_IC50_4PL_STUDY_COL_TITLE); //CurveIC50 = CurveIC50_4pl
-        assertTableCellsEqual("dataregion_Dataset",  2, CURVE_IC70_STUDY_COL_TITLE, 2, CURVE_IC70_POLY_STUDY_COL_TITLE); //CurveIC70 = CurveIC70_poly
-        assertTableCellsEqual("dataregion_Dataset",  3, CURVE_IC80_STUDY_COL_TITLE, 3, CURVE_IC80_4PL_STUDY_COL_TITLE); //CurveIC80 = CurveIC80_4pl
-        assertTableCellTextEquals("dataregion_Dataset",  2, CURVE_IC80_STUDY_COL_TITLE, ""); //IC80 = blank
-        assertTableCellTextEquals("dataregion_Dataset",  3, CURVE_IC70_STUDY_COL_TITLE, ""); //IC70 = blank
+
+        assertEquals(table.getDataAsText(0, AUC_STUDY_COL_TITLE),        table.getDataAsText(0, AUC_POLY_STUDY_COL_TITLE));        //AUC = AUC_poly
+        assertEquals(table.getDataAsText(1, AUC_STUDY_COL_TITLE),        table.getDataAsText(1, AUC_4PL_STUDY_COL_TITLE));         //AUC = AUC_4pl
+        assertEquals(table.getDataAsText(0, CURVE_IC50_STUDY_COL_TITLE), table.getDataAsText(0, CURVE_IC50_POLY_STUDY_COL_TITLE)); //CurveIC50 = CurveIC50_poly
+        assertEquals(table.getDataAsText(1, CURVE_IC50_STUDY_COL_TITLE), table.getDataAsText(1, CURVE_IC50_4PL_STUDY_COL_TITLE));  //CurveIC50 = CurveIC50_4pl
+        assertEquals(table.getDataAsText(0, CURVE_IC70_STUDY_COL_TITLE), table.getDataAsText(0, CURVE_IC70_POLY_STUDY_COL_TITLE)); //CurveIC70 = CurveIC70_poly
+        assertEquals(table.getDataAsText(1, CURVE_IC80_STUDY_COL_TITLE), table.getDataAsText(1, CURVE_IC80_4PL_STUDY_COL_TITLE));  //CurveIC80 = CurveIC80_4pl
+
+        assertEquals("", table.getDataAsText(0, CURVE_IC80_STUDY_COL_TITLE)); //IC80 = blank
+        assertEquals("", table.getDataAsText(1, CURVE_IC70_STUDY_COL_TITLE)); //IC70 = blank
     }
 
     /**
@@ -616,9 +623,11 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         // verify the fit error was generated by the transform script
         clickLinkWithText("transformed assayId");
-        for(int i = 2; i <= 6; i++)
+
+        DataRegionTable table = new DataRegionTable(TEST_ASSAY_NAB + " Data", this);
+        for(int i = 0; i < 5; i++)
         {
-            assertTableCellTextEquals("dataregion_" + TEST_ASSAY_NAB + " Data",  i, "Fit Error", "0.0");
+            assertEquals("0.0", table.getDataAsText(i, "Fit Error"));
         }
     }
 

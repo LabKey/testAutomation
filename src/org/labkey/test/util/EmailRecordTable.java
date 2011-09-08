@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.Locator;
 import org.apache.commons.lang.StringUtils;
@@ -29,15 +30,30 @@ public class EmailRecordTable extends DataRegionTable
 
     private boolean _recordOn;
 
-    public EmailRecordTable(PipelineWebTestBase test)
+    public EmailRecordTable(BaseSeleniumWebTest test)
     {
         super("EmailRecord", test, false);
     }
 
+    @Override
     public int getDataRowCount()
     {
         // This mock data region always has a hidden row at the end.
         return super.getDataRowCount() - 1;
+    }
+
+    @Override
+    public String getDataAsText(int row, int column)
+    {
+        String ret = null;
+
+        try
+        {
+            ret = _test.getTableCellText(getHtmlName(), row + 2, column);
+        }
+        catch(Exception ignore) {}
+
+        return ret;
     }
 
     public void startRecording()
@@ -87,8 +103,8 @@ public class EmailRecordTable extends DataRegionTable
 
         if (rows > 0)
         {
-            int colTo = getColumn("To");
-            int colFrom = getColumn("From");
+            int colTo      = getColumn("To");
+            int colFrom    = getColumn("From");
             int colMessage = getColumn("Message");
             for (int i = 0; i < rows; i++)
             {

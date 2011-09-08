@@ -303,16 +303,17 @@ public class StudyTest extends StudyBaseTest
     {
         createStudy();
         setFormElement(LABEL_FIELD, listName);
+        DataRegionTable table = new DataRegionTable("demoDataRegion", this, true);
 
         if(filtered)
         {
-            setFilterAndWait("demoDataRegion", "DEMasian", "Equals", "0", 0);
+            table.setFilter("DEMasian", "Equals", "0", 0);
             waitForText("Filter", WAIT_FOR_JAVASCRIPT);
         }
 
         clickButtonContainingText("Add All");
 
-        List<String> idsInColumn = getTableColumnValues("dataregion_demoDataRegion",  1);
+        List<String> idsInColumn = table.getColumnDataAsText("Mouse Id");
         String idsInForm = getFormElement(ID_FIELD);
         assertIDListsMatch(idsInColumn, idsInForm);
 
@@ -330,8 +331,8 @@ public class StudyTest extends StudyBaseTest
     private void assertIDListsMatch(List<String> idsInColumn, String idsInForm)
     {
         //assert same size
-        int columnCount = idsInColumn.size()-1; //the first entry in column count is the name
-        int formCount = idsInForm.length() - idsInForm.replace(",", "").length() + 1; //number of commas + 1 = number of entries
+        int columnCount = idsInColumn.size()-2; //the first entry in column count is the name
+        int formCount = idsInForm.length() - idsInForm.replace(",", "").length() - 1; //number of commas + 1 = number of entries
         assertEquals(columnCount, formCount);
     }
 
@@ -676,9 +677,9 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("Types");
         log("Verifying sequence numbers and visit names imported correctly");
-        List<String> sequenceNums = getTableColumnValues("dataregion_Dataset", "Sequence Num");
-        assertEquals(sequenceNums.get(0), "Sequence Num");
-        sequenceNums.remove(0);
+
+        DataRegionTable table = new DataRegionTable("Dataset", this, true);
+        List<String> sequenceNums = table.getColumnDataAsText("Sequence Num");
         assertEquals("Incorrect number of rows in Types dataset", 48, sequenceNums.size());
 
         int sn101 = 0;

@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -175,9 +176,11 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
         assertTextPresent(TEST_DATA[3][2]);
-        assertTableCellTextEquals("dataregion_query", 2, 6, "true");
-        assertTableCellTextEquals("dataregion_query", 3, 6, "false");
-        assertTableCellTextEquals("dataregion_query", 4, 6, "true");
+
+        DataRegionTable table = new DataRegionTable("query", this);
+        assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
+        assertEquals("false", table.getDataAsText(1, _listCol3.getLabel()));
+        assertEquals("true",  table.getDataAsText(2, _listCol3.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
@@ -190,9 +193,11 @@ public class ListTest extends BaseSeleniumWebTest
         setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox("quf_JewelTone");
         submit();
-        assertTableCellTextEquals("dataregion_query", 2, 6, "true");
-        assertTableCellTextEquals("dataregion_query", 3, 6, "true");
-        assertTableCellTextEquals("dataregion_query", 4, 6, "false");
+
+        table = new DataRegionTable("query", this);
+        assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
+        assertEquals("true",  table.getDataAsText(1, _listCol3.getLabel()));
+        assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickLinkWithText("Lists");
@@ -243,8 +248,9 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[3][2]);
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
-        assertTableCellTextEquals("dataregion_query", 1, 5, _listCol3.getLabel()); // Colummns...
-        assertTableCellTextEquals("dataregion_query", 1, 6, _listCol2.getLabel()); // ...swapped.
+        table = new DataRegionTable("query", this);
+        assertEquals(_listCol3.getLabel(), table.getDataAsText(-1, _listCol3.getLabel())); // Colummns...
+        assertEquals(_listCol2.getLabel(), table.getDataAsText(-1, _listCol2.getLabel())); // ...swapped.
 
         setUpListFinish();
 
@@ -293,7 +299,9 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[1][3]);
         assertTextPresent(TEST_DATA[2][3]);
         assertTextPresent(TEST_DATA[3][3]);
-        assertTableCellTextEquals("dataregion_query", 5, 5, "false");
+        table = new DataRegionTable("query", this);
+        assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
+        assertEquals("false", table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
         dataregionToEditDesign();
@@ -527,9 +535,7 @@ public class ListTest extends BaseSeleniumWebTest
         popLocation();
 
         log("Test edit row");
-        if (getTableCellText("dataregion_query", 2, 3).compareTo(LIST2_KEY3) != 0)
-            clickLinkWithText(LIST2_KEY_NAME);
-        clickLinkWithText("edit");
+        clickLinkWithText("edit", 0);
         selectOptionByText("quf_Color", TEST_DATA[1][1]);
         selectOptionByText("quf_Owner", LIST2_FOREIGN_KEY_OUTSIDE);
         submit();

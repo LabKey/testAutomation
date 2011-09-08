@@ -18,6 +18,8 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.EmailRecordTable;
+import org.labkey.test.util.EmailRecordTable.EmailMessage;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -93,12 +95,6 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         clickLinkWithText("view open Issues");
         assertNavButtonPresent("New Issue");
-
-//        pushLocation();
-//        clickNavButton("Email Preferences");
-//        checkCheckbox("emailPreference", "8");
-//        clickNavButton("Update");
-//        popLocation();
 
         // quick security test
         // TODO push lots of locations as we go and move this test to end
@@ -263,8 +259,6 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText("return to grid");
 
         //Click the issue id based on the text issue title
-        //String xpath = "//td/a[text() = '" + ISSUE_TITLE_0 + "']/../../td[2]/a";
-        //clickAndWait(Locator.xpath(xpath));
         clickLinkWithText("" + issueId);
 
         // UpdateAction
@@ -385,12 +379,19 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         goToModule("Dumbster");
         pushLocation();
-        assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + PasswordUtil.getUsername() + "' and position() = '1']"));
-        assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + USER1 + "' and position() = '1']"));
-        assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + USER2 + "' and position() = '1']"));
+
+        EmailRecordTable emailTable = new EmailRecordTable(this);
+        EmailMessage message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been opened and assigned to " + USER1);
+
+        // Presumed to get the first message
+        assertTrue("User did not receive issue notification",      PasswordUtil.getUsername().equals(message.getTo()[0]));
+        assertTrue(USER2 + " did not receieve issue notification", USER2.equals(emailTable.getDataAsText(1, "To")));
+        assertTrue(USER1 + " did not receieve issue notification", USER1.equals(emailTable.getDataAsText(2, "To")));
+
+        assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
+
         assertTextPresent("Customized template line: Cadmium", 3);
         assertTextNotPresent("This line shouldn't appear");
-        assertTableCellContains(EMAILRECORD_TABLE, 3, 3, ISSUE_TITLE_2);
 
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
@@ -403,9 +404,12 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Save");
 
         popLocation();
-        assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//tr[position() <= '5']/td[text() = '" + PasswordUtil.getUsername() + "' and position() = '1']"));
-        assertElementPresent(Locator.xpath("//table[@id='dataregion_EmailRecord']//tr[position() <= '5']/td[text() = '" + USER3 + "' and position() = '1']"));
-        assertTableCellContains(EMAILRECORD_TABLE, 3, 3, ISSUE_TITLE_2);
+
+        emailTable = new EmailRecordTable(this);
+        message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been updated");
+
+        assertTrue(USER3 + " did not receieve updated issue notification", USER3.equals(message.getTo()[0]));
+        assertTrue("User did not receive updated issue notification",      PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
 
         stopImpersonating();
     }

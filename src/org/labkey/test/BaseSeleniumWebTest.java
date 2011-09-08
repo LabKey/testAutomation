@@ -3336,7 +3336,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Returns the number of rows (both <tr> and <th>) in the specified table
     public int getTableRowCount(String tableName)
     {
-        return selenium.getXpathCount("//table[@id='" + tableName + "']/thead").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
+        return selenium.getXpathCount("//table[@id='" + tableName + "']/thead/tr").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
     }
 
     public int getTableColumnCount(String tableId)
@@ -3688,8 +3688,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFilter(String regionName, String columnName, String filterType, String filter)
     {
+        setFilter(regionName, columnName, filterType, filter, WAIT_FOR_PAGE);
+    }
+
+    public void setFilter(String regionName, String columnName, String filterType, String filter, int waitMillis)
+    {
         setUpFilter(regionName, columnName, filterType, filter);
-        clickNavButton("OK");
+        clickNavButton("OK", waitMillis);
     }
 
     public void setUpFilter(String regionName, String columnName, String filterType, String filter)

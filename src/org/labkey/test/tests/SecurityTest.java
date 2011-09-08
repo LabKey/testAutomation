@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
@@ -637,10 +638,12 @@ public class SecurityTest extends BaseSeleniumWebTest
         selectOptionByText("view", "User events");
         waitForPageToLoad();
 
-        String createdBy = getTableCellText("dataregion_audit", 4, 1);
-        String impersonatedBy = getTableCellText("dataregion_audit", 4, 2);
-        String user = getTableCellText("dataregion_audit", 4, 3);
-        String comment = getTableCellText("dataregion_audit", 4, 4);
+        DataRegionTable table = new DataRegionTable("audit", this, false);
+
+        String createdBy      = table.getDataAsText(2, 1);
+        String impersonatedBy = table.getDataAsText(2, 2);
+        String user           = table.getDataAsText(2, 3);
+        String comment        = table.getDataAsText(2, 4);
 
         assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
