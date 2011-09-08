@@ -219,9 +219,6 @@ public class QuerySnapshotTest extends StudyBaseTest
         
         createQuerySnapshot(CROSS_STUDY_SNAPSHOT, true, false, "keyField", 3);
 
-        // need to use 054 now... make sure load is complete
-        waitForStudyLoad(FOLDER_1);
-
         // verify refresh from both datasets
         clickLinkWithText(FOLDER_1);
         clickLinkWithText("DEM-1: Demographics");

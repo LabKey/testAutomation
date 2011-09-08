@@ -30,7 +30,7 @@ public class FolderTest extends BaseSeleniumWebTest
     private static final String FOLDER_CREATION_FILE = "folderTest.html";
     private static final String PROJECT_FOLDER_XPATH = "//li[@class='x-tree-node' and ./div/a/span[text()='"+PROJECT_NAME+"']]";
     private static final String SERVER_ROOT = "LabKey Server Projects";
-    
+
     @Override
     public String getAssociatedModuleDirectory()
     {
@@ -52,7 +52,7 @@ public class FolderTest extends BaseSeleniumWebTest
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
-    
+
     @Override
     protected void doTestSteps() throws Exception
     {
@@ -111,7 +111,7 @@ public class FolderTest extends BaseSeleniumWebTest
         for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+PROJECT_NAME+"']")) > 0; i++)
             clickNavButton("Move Up", 0);
         clickNavButton("Save");
-                
+
         log("Reorder folders test");
         expandFolderNode("AB");
         reorderFolder("[ABB]", "[ABA]", Reorder.preceding, true);
@@ -180,7 +180,7 @@ public class FolderTest extends BaseSeleniumWebTest
         log("Reorder project: '" + project + "' " + order.toString() + " '" + targetProject + "'");
         Locator p = Locator.xpath("//div/a/span[text()='"+project+"']");
         Locator t = Locator.xpath("//div/a/span[text()='"+targetProject+"']");
-        
+
         waitForElement(p, WAIT_FOR_JAVASCRIPT);
         waitForElement(t, WAIT_FOR_JAVASCRIPT);
 
@@ -193,7 +193,7 @@ public class FolderTest extends BaseSeleniumWebTest
             clickNavButton("Confirm Reorder", 0);
         }
     }
-    
+
     private void reorderFolder(String folder, String targetFolder, Reorder order, boolean successExpected)
     {
         log("Reorder folder: '" + folder + "' " + order.toString() + " '"  + targetFolder + "'");

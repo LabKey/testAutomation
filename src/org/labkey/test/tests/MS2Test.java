@@ -539,7 +539,7 @@ public class MS2Test extends MS2TestBase
         assertTextNotPresent("SeqHits");
         assertTextPresent("gi|27805893|guanine_nucleotid");
 
-        //TODO: Blocked by issue #12579 
+        //TODO: Blocked by issue #12579
 //        log("Test changing order of sorts and columns");
 //        CustomizeViewsHelper.openCustomizeViewPanel(this);
 //        CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", false);
