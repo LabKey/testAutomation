@@ -27,8 +27,11 @@ import org.labkey.test.Locator;
 public class StudyRedesignTest extends StudyBaseTest
 {
 
-    protected String[] someDataSets = {"Dataset Browse","AE-1:(VTN) AE Log", "MV-1: Missed Visit", "RCF-1: Reactogenicity-Day 2"};
     private static final String DATA_BROWSE_TABLE_NAME = "";
+    private static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
+    private static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
+            BITS[2]+BITS[3]+TRICKY_CHARACTERS_NO_QUOTES, BITS[3]+BITS[4]+TRICKY_CHARACTERS_NO_QUOTES, BITS[4]+BITS[5]+TRICKY_CHARACTERS_NO_QUOTES};
+    private static final String[] someDataSets = {"Dataset Browse","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", "Group: " + CATEGORIES[3], "AE-1:(VTN) AE Log"};
 
     @Override
     protected void doCreateSteps()
@@ -41,6 +44,7 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForPipelineJobsToComplete(1, "study import", false);
         waitForSpecimenImport();
         setStudyRedesign();
+        setupDatasetCategories();
     }
 
     @Override
@@ -64,9 +68,42 @@ public class StudyRedesignTest extends StudyBaseTest
         //TODO:  waiting on hypermove fix
 //        datasetBrowseClickDataTest();
 
-
+        log("Verify dataset category sorting.");
+        setDataBrowseSearch(BITS[4]);
+        waitForTextToDisappear(BITS[2]);
+        assertTextPresent("Group: ", 2); // Two groups contain text.
+        // 10 datasets(CATEGORIES[3]) + 7 datasets(CATEGORIES[4]) - 1 hidden dataset
+        assertEquals("Incorrect number of datasets after filter", 16, getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
+        collapseCategory(CATEGORIES[3]);
+        assertEquals("Incorrect number of datasets after filter", 6, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
     }
 
+    private void clickExt4HeaderMenu(String title, String selection)
+    {
+        click(Locator.xpath("//div[./span[@class='x4-column-header-text' and text() = '"+title+"']]/div[@class='x4-column-header-trigger']"));
+        click(Locator.xpath("//div[@role='menuitem']/a/span[text()='"+selection+"']"));
+    }
+
+    private void setDataBrowseSearch(String value)
+    {
+        setFormElement(Locator.xpath("//div[contains(@class, 'dataset-search')]//input"), value);
+    }
+
+    private void collapseCategory(String group)
+    {
+        log("Collapse category: " + group);
+        assertElementPresent(Locator.xpath("//div[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and @class='x4-grid-group-title' and text()='Group: "+group+"']"));
+        click(Locator.xpath("//div[@class='x4-grid-group-title' and text()='Group: "+group+"']"));
+        waitForElement(Locator.xpath("//tr[contains(@class, 'collapsed')]//div[@class='x4-grid-group-title' and text()='Group: "+group+"']"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void expandCategory(String group)
+    {
+        log("Expand category: " + group);
+        assertElementPresent(Locator.xpath("//div[ancestor-or-self::tr[contains(@class, 'collapsed')] and @class='x4-grid-group-title' and text()='Group: "+group+"']"));
+        click(Locator.xpath("//div[@class='x4-grid-group-title' and text()='Group: "+group+"']"));
+        waitForElement(Locator.xpath("//div[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and @class='x4-grid-group-title' and text()='Group: "+group+"']"), WAIT_FOR_JAVASCRIPT);
+    }
 
     private void datasetBrowseClickDataTest()
     {
@@ -89,6 +126,23 @@ public class StudyRedesignTest extends StudyBaseTest
                 {"AE-1:(VTN) AE Log", "", ""},
         };
         return ret;  //To change body of created methods use File | Settings | File Templates.
+    }
+
+    private void setupDatasetCategories()
+    {
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("Change Properties");
+
+        int dsCount = getXpathCount(Locator.xpath("//input[@name='extraData']"));
+        assertEquals("Unexpected number of Datasets.", 47, dsCount);
+        int i;
+        for (i = 0; i < dsCount; i++)
+        {
+            setFormElement(Locator.name("extraData", i), CATEGORIES[i/10]);
+        }
+        uncheckCheckbox("visible", dsCount - 1); // Set last dataset to not be visible.
+        clickNavButton("Save");
     }
 
     private void clickSingleDataSet(String title, String source, String type, boolean testDelete)
