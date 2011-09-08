@@ -131,6 +131,7 @@ public enum TestSet
         LuminexMultipleCurvesTest.class,
         LuminexJavaTransformTest.class,
         LuminexRTransformTest.class,
+        LuminexEC50Test.class
     }),
 
     IE(new Class[]

@@ -236,6 +236,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return browser + browserPath;
     }
 
+    public void refreshIfIE()
+    {
+        if(getBrowser().startsWith(IE_BROWSER))
+            refresh();
+    }
+
     static String getStreamContentsAsString(InputStream is) throws IOException
     {
         StringBuilder contents = new StringBuilder();
@@ -2847,6 +2853,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, 0);
     }
 
+    public void clickAt(Locator l, String coord)
+    {
+        selenium.clickAt(l.toString(), coord);
+    }
+
     public void clickAndWait(Locator l)
     {
         clickAndWait(l, defaultWaitForPage);
@@ -2858,6 +2869,24 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.click(l.toString());
         if (millis > 0)
             waitForPageToLoad(millis);
+    }
+
+    public void clickAtAndWait(Locator l, int millis, String coord)
+    {
+        assertElementPresent(l);
+        selenium.clickAt(l.toString(), coord);
+        if (millis > 0)
+            waitForPageToLoad(millis);
+
+    }
+
+    public void clickAtAndWait(Locator l, String coord, int millis)
+    {
+        assertElementPresent(l);
+        selenium.clickAt(l.toString(), coord);
+        if (millis > 0)
+            waitForPageToLoad(millis);
+
     }
 
     public void clickLink(String linkId)
@@ -3441,6 +3470,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("No button found with text \"" + text + "\"");
     }
 
+
+    public void clickButtonAt(String text, int waitMillis, String coord)
+    {
+        Locator.XPathLocator buttonLocator = getButtonLocator(text);
+        if (buttonLocator != null)
+            clickAtAndWait(buttonLocator, waitMillis, coord);
+        else
+            fail("No button found with text \"" + text + "\"");
+    }
+
     public void clickButtonContainingText(String text)
     {
         clickButtonContainingText(text, 0);
@@ -3469,6 +3508,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickNavButton(String buttonText, int waitMillis)
     {
         clickButton(buttonText, waitMillis);
+    }
+
+    public void clickNavButtonAt(String buttonText, int waitMillis, String coord)
+    {
+        clickButtonAt(buttonText, waitMillis, "1,1");
     }
 
     public void clickNavButtonByIndex(String buttonText, int index, int wait)
@@ -4965,6 +5009,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             log("Clicking on element " + locator + " at location " + coordString);
             super.clickAt(locator, coordString);
+        }
+
+        public void clickAt(Locator l, String coord)
+        {
+            clickAt(l.toString().substring(6), coord);
         }
 
 //        public void clickID(String id)

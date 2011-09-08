@@ -62,6 +62,9 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_2 = getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls";
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_3 = getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgG-Biot (HIVIG std).xls";
 
+    private String EC50_SUMMARY_FILE = "/sampledata/Luminex/20110718, USMHRP, RV144 Case Control, Set 1, Plate 3, IgG-Biot (summary).xlsx" ;
+    private String EC50_RAW_FILE = "/sampledata/Luminex/20110718, USMHRP, RV144 Case Control, Set 1, Plate 3, IgG-Biot (raw).xlsx";
+
     protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
@@ -86,6 +89,11 @@ public class LuminexTest extends AbstractQCAssayTest
     public static final String EXCLUDE_SELECTED_BUTTON = "excludeselected";
     protected static final String MULTIPLE_CURVE_ASSAY_RUN_NAME = "multipleCurvesTestRun";
     protected static final String SAVE_CHANGES_BUTTON = "Save Changes";
+
+    private String EC50_RUN_NAME = "EC50";
+    private String rum4 = "Rumi Four Parameter";
+    private String rum5 = "Rumi Five FourParameter";
+    private String trapezoidal = "Trapezoidal";
 
     public String getAssociatedModuleDirectory()
     {
@@ -308,8 +316,69 @@ public class LuminexTest extends AbstractQCAssayTest
             runRTransformTest();
             runMultipleCurveTest();
             runWellExclusionTest();
+            runEC50Test();
         }
     } //doTestSteps()
+
+    protected void runEC50Test()
+    {
+//        ensureConfigured();
+        ensureRTransformPresent();
+        createNewAssayRun(EC50_RUN_NAME);
+        uploadEC50Data();
+//        ensureMultipleCurveDataPresent();
+//        ensureEC50DataPresent();
+        clickButtonContainingText("Save and Finish");
+
+        //add transform script
+        goToSchemaBrowser();
+        selectQuery("assay", "TestAssayLuminex CurveFit");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        assertTextPresent("Rumi Four Parameter");
+
+        waitForText("52110875");
+        
+        checkEC50data();
+        sleep(60000);
+    }
+
+    private void checkEC50data()
+    {
+        List<String> formula = getTableColumnValues("dataregion_query", "Curve Type");
+        List<String> ec50 = getTableColumnValues("dataregion_query", "EC50");
+        List<String> auc= getTableColumnValues("dataregion_query", "AUC");
+        List<String> inflectionPoint = getTableColumnValues("dataregion_query", "Inflection");
+
+        log("Write this");
+        for(int i=0; i<formula.size(); i++)
+        {
+            if(formula.get(i).equals(rum4))
+            {
+                //ec50=populated=inflectionPoint
+                assertEquals(ec50.get(i), inflectionPoint.get(i));
+                //auc=unpopulated
+                assertEquals("", auc.get(i));
+            }
+            else if(formula.get(i).equals(rum5))
+            {
+
+                assertEquals("", ec50.get(i));
+                assertEquals("", auc.get(i));
+            }
+            else if(formula.get(i).equals(trapezoidal))
+            {
+                //ec50 should not be populated
+                assertEquals("", ec50.get(i));
+                //auc=populated
+                assertTrue( "AUC was unpopulated for row " + i, ((String) auc.get(i)).length()>0);
+            }
+        }
+
+//        formula = getTableColumnValues()
+
+        //you are here
+    }
 
     /**
      * test of well exclusion- the ability to exclude certain wells or analytes and add ac oment as to why
@@ -426,7 +495,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
             if(expectedComment.equals(comment))
             {
-                assertTrue(matchesWell(description, dilution, well) && analytes.contains(analyte));
+                assertTrue(matchesWell(description, dilution, well));
+                assertTrue(analytes.contains(analyte));
             }
         }
     }
@@ -522,7 +592,7 @@ public class LuminexTest extends AbstractQCAssayTest
             fail("not supported at this time");
     }
 
-    private String excludedWellDescription = "Sample 2";
+    private String excludedWellDescription = "Sample 6";
     private String excludedWellDilution = "10.0";
     private Set<String> excludedWells = new HashSet<String>(Arrays.asList("E1", "F1"));
 
@@ -772,6 +842,17 @@ public class LuminexTest extends AbstractQCAssayTest
     private void uploadMultipleCurveData()
     {
         String[] files = {TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3};
+        addFilesToAssayRun(files);
+    }
+
+    private void uploadEC50Data()
+    {
+        String[] files = {EC50_RAW_FILE};
+        uploadMultipleCurveData();
+    }
+
+    private void addFilesToAssayRun(String[] files)
+    {
         for(int i=0; i<files.length; i++)
         {
             String formName = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
@@ -783,6 +864,7 @@ public class LuminexTest extends AbstractQCAssayTest
             click(Locator.id("file-upload-add" + i));
         }
          clickButton("Next");
+
     }
 
     /**
@@ -864,10 +946,18 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_LUM);
     }
 
+    protected boolean R_TRANSFORM_SET = false;
+    protected void ensureRTransformPresent()
+    {
+        if(!R_TRANSFORM_SET)
+            runRTransformTest();
+    }
+
     //requires drc, Ruminex and xtable packages installed in R
     protected void runRTransformTest()
     {
         log("Uploading Luminex run with a R transform script");
+
 
         // add the R transform script to the assay
         goToTestAssayHome();
@@ -963,6 +1053,9 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             assertTableCellTextEquals("dataregion_" + TEST_ASSAY_LUM + " Data",  i+2, "Est Log Conc Rumi 4 PL", RTRANS_ESTLOGCONC_VALUES_4PL[i]);
         }
+
+
+        R_TRANSFORM_SET = true;
     }
 
     private void setFormat(String where, int index, String formatStr)
