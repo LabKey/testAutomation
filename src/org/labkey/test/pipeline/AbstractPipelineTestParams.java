@@ -250,13 +250,13 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
         int wait = BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT;
         _test.log("Choose existing protocol " + getProtocolName());
-        _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ), 0);
+        _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ), wait*12); // seems very long
         _test.selectOptionByText("protocol", getProtocolName());
-//        _test.sleep(wait);
+        _test.sleep(wait);
 
         _test.log("Start data processing");
         clickSubmitButton();
-//        _test.sleep(wait);
+        _test.sleep(wait);
     }
 
     protected abstract void clickSubmitButton();
