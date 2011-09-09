@@ -91,8 +91,8 @@ public class LuminexTest extends AbstractQCAssayTest
     protected static final String SAVE_CHANGES_BUTTON = "Save Changes";
 
     private String EC50_RUN_NAME = "EC50";
-    private String rum4 = "Rumi Four Parameter";
-    private String rum5 = "Rumi Five FourParameter";
+    private String rum4 = "Four Parameter";
+    private String rum5 = "Five FourParameter";
     private String trapezoidal = "Trapezoidal";
 
     public String getAssociatedModuleDirectory()
@@ -335,7 +335,7 @@ public class LuminexTest extends AbstractQCAssayTest
         selectQuery("assay", "TestAssayLuminex CurveFit");
         waitForText("view data");
         clickLinkContainingText("view data");
-        assertTextPresent("Rumi Four Parameter");
+        assertTextPresent("Four Parameter");
 
         waitForText("52110875");
         
