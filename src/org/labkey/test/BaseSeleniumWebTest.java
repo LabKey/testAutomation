@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -3321,9 +3322,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             columns.add(new ArrayList<String>());
         }
 
+        DataRegionTable table = new DataRegionTable(tableName, this);
         for(int i=0; i<columnNames.length; i++)
         {
-            columns.get(i).addAll(getTableColumnValues(tableName, columnNames[i]));
+            columns.get(i).addAll(table.getColumnDataAsText(columnNames[i]));
         }
 
         if(moreThanOnePage)

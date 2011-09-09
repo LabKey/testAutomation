@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StudyHelper;
 
@@ -73,36 +74,36 @@ public class TimeChartTest extends BaseSeleniumWebTest
     };
 
     private static final String[][] GETDATA_API_DATETEST_COLNAMES = {
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Study Lab Results Participant Visit Visit Date", "Study Lab Results Participant Visit Visit Date Days", "Study Lab Results Date Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Study Lab Results Date Days", "Study Physical Exam Participant Visit Visit Date Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Study Lab Results Date Days", "Study HIVTest Results Participant Visit Visit Date Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
-        {"Study Lab Results Participant Id", "Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"}
+        {"Study Lab Results Date", "Study Lab Results CD4", "Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Study Lab Results Participant Visit Visit Date", "Study Lab Results Participant Visit Visit Date Days", "Study Lab Results Date Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Study Lab Results Date Days", "Study Physical Exam Participant Visit Visit Date Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Study Lab Results Date Days", "Study HIVTest Results Participant Visit Visit Date Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"}
     };
 
     private static final String[][] GETDATA_API_VISITTEST_COLNAMES = {
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order"},
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Hemoglobin"},
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Physical Exam Weight Kg"},
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study HIVTest Results HIVLoad Quant"},
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"},
-        {"Study Lab Results Participant Id", "Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"}
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order"},
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Hemoglobin"},
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Physical Exam Weight Kg"},
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study HIVTest Results HIVLoad Quant"},
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"},
+        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"}
     };
 
-    private static final String[][] GETDATA_API_TEST_DAYS = {
-        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
-        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
-        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
-        {"44", "79", "108", "190", "246", "276", "303", "335", "364", "394"},
-        {"44", "44", "44", "79", "79", "79", "108", "108", "108", "190", "190", "190", "246", "246", "246"},
-        {"44", "44", "44", "79", "79", "79", "108", "108", "108", "190", "190", "190", "246", "246", "246", "276", "303", "335", "364", "394"},
-        {"44", "79", "108", "190", "246"},
-        {"44", "79", "108", "190", "246"}
+    private static final double[][] GETDATA_API_TEST_DAYS = {
+        {44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0,},
+        {44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0,},
+        {44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0,},
+        {44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0,},
+        {44.0, 44.0, 44.0, 79.0, 79.0, 79.0, 108.0, 108.0, 108.0, 190.0, 190.0, 190.0, 246.0, 246.0, 246.0,},
+        {44.0, 44.0, 44.0, 79.0, 79.0, 79.0, 108.0, 108.0, 108.0, 190.0, 190.0, 190.0, 246.0, 246.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0,},
+        {44.0, 79.0, 108.0, 190.0, 246.0,},
+        {44.0, 79.0, 108.0, 190.0, 246.0,}
     };
 
     private static final String[][] GETDATA_API_TEST_VISITLABEL = {
@@ -127,15 +128,15 @@ public class TimeChartTest extends BaseSeleniumWebTest
         "IL-10 (23)"
     };
 
-    private static final String[][] GETDATA_API_TEST_MEASURE_VALUES = {
-        {"43", "520", "420", "185", "261", "308", "177", "144", "167", "154"},
-        {"14.5", "16.0", "12.2", "15.5", "13.9", "13.7", "12.9", "11.1", "13.2", "16.1"},
-        {"86", "84", "83", "80", "79", "79", "79", "78", "77", "75"},
-        {"4345", "3452", "98354", "32453", "324234", "345452", "235671", "456674", "567432", "653465"},
-        {"35.87", "40.07", "52.74", "13.68", "28.35", "42.38", "2.82", "5.19", "7.99", "5.12", "6.69", "32.33", "3.09", "5.76", "12.49"},
-        {"35.87", "40.07", "52.74", "13.68", "28.35", "42.38", "2.82", "5.19", "7.99", "5.12", "6.69", "32.33", "3.09", "5.76", "12.49"},
-        {"40.07", "42.38", "7.99", "32.33", "12.49"},
-        {"40.07", "42.38", "7.99", "32.33", "12.49"}
+    private static final double[][] GETDATA_API_TEST_MEASURE_VALUES = {
+        {543.0, 520.0, 420.0, 185.0, 261.0, 308.0, 177.0, 144.0, 167.0, 154.0},
+        {14.5, 16.0, 12.2, 15.5, 13.9, 13.7, 12.9, 11.1, 13.2, 16.1},
+        {86.0, 84.0, 83.0, 80.0, 79.0, 79.0, 79.0, 78.0, 77.0, 75.0},
+        {4345.0, 3452.0, 98354.0, 32453.0, 324234.0, 345452.0, 235671.0, 456674.0, 567432.0, 653465},
+        {35.87, 40.07, 52.74, 13.68, 28.35, 42.38, 2.82, 5.19, 7.99, 5.12, 6.69, 32.33, 3.09, 5.76, 12.49},
+        {35.87, 40.07, 52.74, 13.68, 28.35, 42.38, 2.82, 5.19, 7.99, 5.12, 6.69, 32.33, 3.09, 5.76, 12.49},
+        {40.07, 42.38, 7.99, 32.33, 12.49},
+        {40.07, 42.38, 7.99, 32.33, 12.49}
     };
 
     @Override
@@ -409,16 +410,31 @@ public class TimeChartTest extends BaseSeleniumWebTest
             waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
             waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
-            for(int i = 0; i < GETDATA_API_DATETEST_COLNAMES[testIndex].length; i++){
-                assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_DATETEST_COLNAMES[testIndex][i], GETDATA_API_DATETEST_COLNAMES[testIndex][i]);
+            DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
+            for (int i = 0; i < GETDATA_API_DATETEST_COLNAMES[testIndex].length; i++)
+            {
+                int colIndex = table.getColumn(GETDATA_API_DATETEST_COLNAMES[testIndex][i]);
+                assertEquals("Unexpected column index", i, colIndex);
             }
             // check values in interval column for the first participant
-            for(int i = 0; i < GETDATA_API_TEST_DAYS[testIndex].length; i++){
-                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, GETDATA_API_DATETEST_COLNAMES[testIndex][GETDATA_API_DATETEST_COLNAMES[testIndex].length - 1], GETDATA_API_TEST_DAYS[testIndex][i]);
+            for (int i = 0; i < GETDATA_API_TEST_DAYS[testIndex].length; i++)
+            {
+                try
+                {
+                    double value = Double.parseDouble(table.getDataAsText(i, GETDATA_API_DATETEST_COLNAMES[testIndex][GETDATA_API_DATETEST_COLNAMES[testIndex].length - 1]));
+                    assertEquals("Unexpected interval value", GETDATA_API_TEST_DAYS[testIndex][i], value);
+                }
+                catch(NumberFormatException e){}                    
             }
             // check values in measure column
-            for(int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++){
-                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, GETDATA_API_TEST_MEASURES[testIndex], GETDATA_API_TEST_MEASURE_VALUES[testIndex][i]);
+            for (int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++)
+            {
+                try
+                {
+                    double value = Double.parseDouble(table.getDataAsText(i, GETDATA_API_TEST_MEASURES[testIndex]));
+                    assertEquals("Unexpected measure value", GETDATA_API_TEST_MEASURE_VALUES[testIndex][i], value);
+                }
+                catch(NumberFormatException e){}
             }
 
             if(testIndex < testCount-1)
@@ -449,16 +465,26 @@ public class TimeChartTest extends BaseSeleniumWebTest
             waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
             waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
-            for(int i = 0; i < GETDATA_API_VISITTEST_COLNAMES[testIndex].length; i++){
-                assertTableCellTextEquals("dataregion_apiTestDataRegion",  1, GETDATA_API_VISITTEST_COLNAMES[testIndex][i], GETDATA_API_VISITTEST_COLNAMES[testIndex][i]);
+            DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
+            for (int i = 0; i < GETDATA_API_VISITTEST_COLNAMES[testIndex].length; i++)
+            {
+                int colIndex = table.getColumn(GETDATA_API_VISITTEST_COLNAMES[testIndex][i]);
+                assertEquals("Unexpected column index", i, colIndex);
             }
             // check values in interval column for the first participant
-            for(int i = 0; i < GETDATA_API_TEST_VISITLABEL[testIndex].length; i++){
-                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, "Study Lab Results Participant Visit Visit Label", GETDATA_API_TEST_VISITLABEL[testIndex][i]);
+            for (int i = 0; i < GETDATA_API_TEST_VISITLABEL[testIndex].length; i++)
+            {
+                assertEquals(GETDATA_API_TEST_VISITLABEL[testIndex][i], table.getDataAsText(i, "Study Lab Results Participant Visit Visit Label"));
             }
             // check values in measure column
-            for(int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++){
-                assertTableCellContains("dataregion_apiTestDataRegion",  i+2, GETDATA_API_TEST_MEASURES[testIndex], GETDATA_API_TEST_MEASURE_VALUES[testIndex][i]);
+            for (int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++)
+            {
+                try
+                {
+                    double value = Double.parseDouble(table.getDataAsText(i, GETDATA_API_TEST_MEASURES[testIndex]));
+                    assertEquals("Unexpected measure value", GETDATA_API_TEST_MEASURE_VALUES[testIndex][i], value);
+                }
+                catch(NumberFormatException e){}                    
             }
 
             if(testIndex < testCount-1)
