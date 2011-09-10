@@ -75,13 +75,13 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
     private static final String[][] GETDATA_API_DATETEST_COLNAMES = {
         {"Study Lab Results Date", "Study Lab Results CD4", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Study Lab Results Participant Visit Visit Date", "Study Lab Results Participant Visit Visit Date Days", "Study Lab Results Date Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Study Lab Results Date Days", "Study Physical Exam Participant Visit Visit Date Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Study Lab Results Date Days", "Study HIVTest Results Participant Visit Visit Date Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Study Lab Results Date Days", "Study Luminex Assay Participant Visit Visit Date Days"}
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Study Lab Results Participant Visit Visit Date", "Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"},
+        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
     };
 
     private static final String[][] GETDATA_API_VISITTEST_COLNAMES = {
@@ -414,7 +414,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
             for (int i = 0; i < GETDATA_API_DATETEST_COLNAMES[testIndex].length; i++)
             {
                 int colIndex = table.getColumn(GETDATA_API_DATETEST_COLNAMES[testIndex][i]);
-                assertEquals("Unexpected column index", i, colIndex);
+                assertEquals("Unexpected column index for '" + GETDATA_API_DATETEST_COLNAMES[testIndex][i] + "'", i, colIndex);
             }
             // check values in interval column for the first participant
             for (int i = 0; i < GETDATA_API_TEST_DAYS[testIndex].length; i++)
@@ -422,7 +422,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
                 try
                 {
                     double value = Double.parseDouble(table.getDataAsText(i, GETDATA_API_DATETEST_COLNAMES[testIndex][GETDATA_API_DATETEST_COLNAMES[testIndex].length - 1]));
-                    assertEquals("Unexpected interval value", GETDATA_API_TEST_DAYS[testIndex][i], value);
+                    assertEquals("Unexpected interval value for row " + i, GETDATA_API_TEST_DAYS[testIndex][i], value);
                 }
                 catch(NumberFormatException e){}                    
             }
