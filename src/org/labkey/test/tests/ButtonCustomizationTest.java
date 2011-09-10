@@ -91,7 +91,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
 
     private String getJavaScriptCustomizer()
     {
-        return "<div id='queryTestDiv1'/>\n" +
+        return "<div id='queryTestDiv1'></div>\n" +
                 "<script type=\"text/javascript\">\n" +
                 "var qwp1 = new LABKEY.QueryWebPart({\n" +
                 "    renderTo: 'queryTestDiv1',\n" +

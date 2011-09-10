@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.labkey.test.tests;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/7/11
  * Time: 3:58 PM
- * To change this template use File | Settings | File Templates.
  */
 
-import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExtHelper;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter

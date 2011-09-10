@@ -22,11 +22,9 @@ import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/4/11
  * Time: 3:23 PM
- * To change this template use File | Settings | File Templates.
  */
 public class EmbeddedWebPartTest extends BaseSeleniumWebTest
 {
@@ -69,7 +67,7 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
         clickLinkContainingText("Source", 0, false);
         setFormElement("name", TRICKY_CHARACTERS + "wiki page");
 
-        setWikiBody(getFileContents("server/test/data/api/EmbeddedQueryWebPart.js"));
+        setWikiBody(getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));
 
         clickButton("Save & Close");
         waitForPageToLoad();

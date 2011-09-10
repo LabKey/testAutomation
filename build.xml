@@ -83,6 +83,9 @@
         <echo message="'Test' from the name.  For MS2Test.java, valid test names include"/>
         <echo message="MS2, ms2, and MS2Test."/>
         <echo message=""/>
+        <echo message="To specify a named test suite (e.g., Flow, Wiki, IE) to be run or cleaned, use:"/>
+        <echo message="    ant test -Dsuite={name}"/>
+        <echo message=""/>
         <echo message="To continue to run all tests even if there is a failure, add:"/>
         <echo message="    -DhaltOnError=false"/>
         <echo message=""/>

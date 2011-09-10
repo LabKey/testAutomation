@@ -49,7 +49,7 @@ public class TimelineTest extends BaseSeleniumWebTest
 
     private static final String CLIENTAPI_HEADER =
         "<script type=\"text/javascript\">LABKEY.requiresClientAPI();</script>\n" +
-         "<script src='/labkey/timeline.js'></script>\n" +
+        "<script src='/labkey/timeline.js'></script>\n" +
         "<script src='/labkey/similetimeline/bundle.js'></script>\n" +
         "<script src='/labkey/similetimeline/scripts/l10n/en/timeline.js'></script>\n" +
         "<script src='/labkey/similetimeline/scripts/l10n/en/labellers.js'></script>\n";
@@ -70,7 +70,7 @@ public class TimelineTest extends BaseSeleniumWebTest
             "    // Since the above code has already executed, we can access the init method immediately:\n" +
             "    Ext.onReady(demoNamespace.myModule.init, demoNamespace.myModule, true);\n" +
             "</script>\n" +
-            "<div id=\"" + TEST_DIV_NAME + "\" style='height:400' />";
+            "<div id=\"" + TEST_DIV_NAME + "\" style='height:400'></div>";
 
     private static final String TIMELINE_TEST_SRC = "    var tl = LABKEY.Timeline.create({\n" +
             "        renderTo:'testDiv',\n" +

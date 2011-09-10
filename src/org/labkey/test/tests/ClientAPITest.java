@@ -91,7 +91,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "    // Since the above code has already executed, we can access the init method immediately:\n" +
             "    Ext.onReady(demoNamespace.myModule.init, demoNamespace.myModule, true);\n" +
             "</script>\n" +
-            "<div id=\"" + TEST_DIV_NAME + "\" />";
+            "<div id=\"" + TEST_DIV_NAME + "\"></div>";
 
     private static final String EMAIL_SRC_TEMPLATE =
             "function errorHandler(errorInfo, options, responseObj)\n" +
@@ -247,7 +247,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     {
         while (waitSeconds-- > 0)
         {
-            log("Waiting for div to render...");
+            log("Waiting for " + TEST_DIV_NAME + " div to render...");
             String divHtml = selenium.getEval("this.browserbot.getCurrentWindow().document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
             if (divHtml.length() > 0)
                 return divHtml;

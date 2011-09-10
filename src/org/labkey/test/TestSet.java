@@ -175,6 +175,17 @@ public enum TestSet
         FlowImportTest.class,
     }),
 
+    // Many (but not all) of the tests that use wiki functionality
+    Wiki(new Class[] {
+        WikiTest.class,
+        WikiLongTest.class,
+        ClientAPITest.class,
+        ButtonCustomizationTest.class,
+        EmbeddedWebPartTest.class,
+        IDRIParticleSizeTest.class,
+        TimelineTest.class
+    }),
+
     Study(new Class[] {
         StudyTest.class,
         StudyExportTest.class,
