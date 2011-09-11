@@ -192,6 +192,7 @@ public class StudyTest extends StudyBaseTest
 
         clickButtonContainingText("Delete Selected");
         clickButtonContainingText("Yes");
+        refreshIfIE();
         waitForTextToDisappear(listName, defaultWaitForPage);
 
     }
@@ -264,8 +265,8 @@ public class StudyTest extends StudyBaseTest
 
         // select the report and click the delete button
         waitForElement(report, 10000);
-        selenium.mouseDown(report.toString());
-        selenium.click(report.toString());
+        selenium.mouseDownAt(report.toString(), "1,1");
+        selenium.clickAt(report.toString(), "1, 1");
     }
 
     /**

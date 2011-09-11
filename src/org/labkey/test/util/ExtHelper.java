@@ -240,10 +240,13 @@ public class ExtHelper
 
     public static void selectComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
     {
-        test.click(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"));
-        test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        test.click(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"));
-        test.mouseDown(Locator.xpath("/html/body"));
+        test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");
+        if(test.getBrowser().equals(test.IE_BROWSER))
+            test.sleep(500);
+        else
+            test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
+        test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
     }
 
     public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
