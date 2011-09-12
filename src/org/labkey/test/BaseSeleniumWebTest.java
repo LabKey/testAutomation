@@ -4876,6 +4876,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             click(loc);
         }
         waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaName + "']"), 1000);
+        waitForText(schemaName + " Schema");
     }
 
     public boolean isQueryPresent(String schemaName, String queryName)

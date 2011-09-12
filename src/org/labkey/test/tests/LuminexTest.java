@@ -58,6 +58,11 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_LUM_FILE2 = getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx";
     protected final String TEST_ASSAY_LUM_FILE3 = getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls";
     protected final String TEST_ASSAY_LUM_FILE4 = getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls";
+    protected final String TEST_ASSAY_LUM_FILE5 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 1.xls";
+    protected final String TEST_ASSAY_LUM_FILE6 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 2.xls";
+    protected final String TEST_ASSAY_LUM_FILE7 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 3.xls";
+    protected final String TEST_ASSAY_LUM_FILE8 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 4.xls";
+    protected final String TEST_ASSAY_LUM_FILE9 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 5.xls";
 
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_1 = getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (b12 IgA std).xls";
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_2 = getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls";
@@ -169,10 +174,78 @@ public class LuminexTest extends AbstractQCAssayTest
         selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
 
+        // add batch properties for transform and Ruminex version numbers
+        addField("Batch Fields", 5, "TransformVersion", "Transform Script Version", ListColumnType.String);
+        addField("Batch Fields", 6, "RuminexVersion", "Ruminex Version", ListColumnType.String);
+
+        // add run properties for designation of which field to use for curve fit calc in transform
+        addField("Run Fields", 5, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
+        addField("Run Fields", 6, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
+        addField("Run Fields", 7, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
+
+        // add run properties for use with the Guide Set test
+        addField("Run Fields", 8, "Isotype", "Isotype", ListColumnType.String);
+        addField("Run Fields", 9, "Conjugate", "Conjugate", ListColumnType.String);        
+
+        // add analyte property for tracking lot number
+        addField("Analyte Properties", 8, "LotNumber", "Lot Number", ListColumnType.String);
+
+        // add the data properties for the calculated columns
+        addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
+        addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
+        addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
+        addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);
+        addField("Data Fields", 4, "SE_5pl", "SE Rumi 5 PL", ListColumnType.Double);
+        addField("Data Fields", 5, "EstLogConc_4pl", "Est Log Conc Rumi 4 PL", ListColumnType.Double);
+        addField("Data Fields", 6, "EstConc_4pl", "Est Conc Rumi 4 PL", ListColumnType.Double);
+        addField("Data Fields", 7, "SE_4pl", "SE Rumi 4 PL", ListColumnType.Double);
+        addField("Data Fields", 8, "Slope_4pl", "Slope_4pl", ListColumnType.Double);
+        addField("Data Fields", 9, "Lower_4pl", "Lower_4pl", ListColumnType.Double);
+        addField("Data Fields", 10, "Upper_4pl", "Upper_4pl", ListColumnType.Double);
+        addField("Data Fields", 11, "Inflection_4pl", "Inflection_4pl", ListColumnType.Double);
+
+        // set format to two decimal place for easier testing later
+        setFormat("Data Fields", 0, "0.0");
+        setFormat("Data Fields", 2, "0.0");
+        setFormat("Data Fields", 3, "0.0");
+        setFormat("Data Fields", 4, "0.0");
+        setFormat("Data Fields", 5, "0.0");
+        setFormat("Data Fields", 6, "0.0");
+        setFormat("Data Fields", 7, "0.0");
+        setFormat("Data Fields", 8, "0.0");
+        setFormat("Data Fields", 9, "0.0");
+        setFormat("Data Fields", 10, "0.0");
+        setFormat("Data Fields", 11, "0.0");
+
         sleep(1000);
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
 
+        configStatus = Configured.CONFIGURED;
+    }
+
+
+    /**
+     * Performs Luminex designer/upload/publish.
+     */
+    protected void runUITests()
+    {
+        log("Starting Assay BVT Test");
+
+        if(isFileUploadAvailable())
+        {
+            runUploadAndCopyTest();
+            runJavaTransformTest();
+            runRTransformTest();
+            runMultipleCurveTest();
+            runWellExclusionTest();
+            runEC50Test();
+            runGuideSetTest();
+        }
+    } //doTestSteps()
+
+    protected void runUploadAndCopyTest()
+    {
         ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListColumnType.String, "Participant ID");
         ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListColumnType.Double, "Visit id");
         ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListColumnType.String, "Index", participantCol, visitCol);
@@ -298,28 +371,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("100.1");
         assertTextPresent(TEST_ASSAY_LUM_RUN_NAME2);
         assertTextPresent("LX10005314302");
-
-        configStatus = Configured.CONFIGURED;
     }
-
-
-    /**
-     * Performs Luminex designer/upload/publish.
-     */
-    protected void runUITests()
-    {
-        log("Starting Assay BVT Test");
-
-        if(isFileUploadAvailable())
-        {
-
-            runJavaTransformTest();
-            runRTransformTest();
-            runMultipleCurveTest();
-            runWellExclusionTest();
-            runEC50Test();
-        }
-    } //doTestSteps()
 
     protected void runEC50Test()
     {
@@ -333,7 +385,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //add transform script
         goToSchemaBrowser();
-        selectQuery("assay", "TestAssayLuminex CurveFit");
+        selectQuery("assay", TEST_ASSAY_LUM + " CurveFit");
         waitForText("view data");
         clickLinkContainingText("view data");
         assertTextPresent("Four Parameter");
@@ -967,37 +1019,6 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
 
-        // add batch properties for transform and Ruminex version numbers
-        addField("Batch Fields", 5, "TransformVersion", "Transform Script Version", ListColumnType.String);
-        addField("Batch Fields", 6, "RuminexVersion", "Ruminex Version", ListColumnType.String);
-
-        // add run properties for designation of which field to use for curve fit calc in transform
-        addField("Run Fields", 5, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
-        addField("Run Fields", 6, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
-        addField("Run Fields", 7, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
-
-        // add analyte property for tracking lot number
-        addField("Analyte Properties", 8, "LotNumber", "Lot Number", ListColumnType.String);
-
-        // add the data properties for the calculated columns
-        addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
-        addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
-        addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
-        addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);
-        addField("Data Fields", 4, "SE_5pl", "SE Rumi 5 PL", ListColumnType.Double);
-        addField("Data Fields", 5, "EstLogConc_4pl", "Est Log Conc Rumi 4 PL", ListColumnType.Double);
-        addField("Data Fields", 6, "EstConc_4pl", "Est Conc Rumi 4 PL", ListColumnType.Double);
-        addField("Data Fields", 7, "SE_4pl", "SE Rumi 4 PL", ListColumnType.Double);
-
-        // set format to two decimal place for easier testing later
-        setFormat("Data Fields", 0, "0.0");
-        setFormat("Data Fields", 2, "0.0");
-        setFormat("Data Fields", 3, "0.0");
-        setFormat("Data Fields", 4, "0.0");
-        setFormat("Data Fields", 5, "0.0");
-        setFormat("Data Fields", 6, "0.0");
-        setFormat("Data Fields", 7, "0.0");
-
         // save changes to assay design
         clickNavButton("Save & Close");
 
@@ -1066,5 +1087,275 @@ public class LuminexTest extends AbstractQCAssayTest
         ListHelper.clickRow(this, prefix, index);
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Format']"));
         setFormElement("propertyFormat", formatStr);
+    }
+
+    //requires drc, Ruminex and xtable packages installed in R
+    protected void runGuideSetTest()
+    {
+        log("Uploading Luminex run with a R transform script for Guide Set test");
+
+        String[] names = {"Guide Set Plate 1", "Guide Set Plate 2", "Guide Set Plate 3", "Guide Set Plate 4", "Guide Set Plate 5"};
+        String[] files = {TEST_ASSAY_LUM_FILE5, TEST_ASSAY_LUM_FILE6, TEST_ASSAY_LUM_FILE7, TEST_ASSAY_LUM_FILE8, TEST_ASSAY_LUM_FILE9};
+        String[] analytes = {"GS Analyte (1)", "GS Analyte (2)"};
+
+        // add the R transform script to the assay
+        goToTestAssayHome();
+        click(Locator.linkWithText("manage assay design"));
+        clickLinkWithText("edit assay design");
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
+        // save changes to assay design
+        clickNavButton("Save & Close");
+
+        // manually add guide sets for both of the analytes that we are going to uplaod
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        for (String analyte : analytes)
+        {
+            clickNavButton("Insert New");
+            waitForText("Insert " + TEST_ASSAY_LUM + " GuideSet");
+            setFormElement("quf_AnalyteName", analyte);
+            checkCheckbox("quf_CurrentGuideSet");
+            setFormElement("quf_Conjugate", "PE");
+            setFormElement("quf_Isotype", "IgG");
+            setFormElement("quf_TitrationName", "HIVIG");
+            clickNavButton("Submit");
+        }
+        waitForText(TEST_ASSAY_LUM + " GuideSet");
+        // hold on to the guide set ids for use later
+        Map<String, Integer> guideSetIds = new HashMap<String, Integer>();
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        DataRegionTable table = new DataRegionTable("query", this);
+        guideSetIds.put(table.getDataAsText(0, "Analyte Name"), Integer.parseInt(table.getDataAsText(0, "Row Id")));
+        guideSetIds.put(table.getDataAsText(1, "Analyte Name"), Integer.parseInt(table.getDataAsText(1, "Row Id")));
+
+        // upload the the first 2 files (these will get the current guide sets applied)
+        for (int i = 0; i < 2; i++)
+        {
+            goToTestAssayHome();
+            clickNavButton("Import Data");
+            clickNavButton("Next");
+            setFormElement("name", names[i]);
+            setFormElement("isotype", "IgG");
+            setFormElement("conjugate", "PE");
+            setFormElement("__primaryFile__", new File(files[i]));
+            clickNavButton("Next", 60000);
+            uncheckCheckbox("_titrationRole_standard_HIVIG");
+            checkCheckbox("_titrationRole_qccontrol_HIVIG");
+            clickNavButton("Save and Finish");
+        }
+
+        // see if the proper guide sets got applied at upload time for these 2 files
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " AnalyteTitration");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/RowId");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Titration/RowId");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSet/RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        table = new DataRegionTable("query", this);
+        for (String analyte : analytes)
+        {
+            table.setFilter("Analyte", "Equals", analyte);
+            int count = table.getDataRowCount();
+            for (int i = 0; i < count; i++)
+            {
+                assertEquals("Unexpected guide set assigned to AnalyteTitration", guideSetIds.get(analyte).intValue(), Integer.parseInt(table.getDataAsText(i, "Guide Set Row Id")));
+            }
+            table.clearFilter("Analyte");
+        }
+
+        // change the current guide set for one of the analytes
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        table = new DataRegionTable("query", this);
+        table.setFilter("RowId", "Equals", guideSetIds.get(analytes[0]).toString());
+        // click the edit link for the fitlered guide set
+        table.clickLink(0, 0);
+        // set the guide set to not be active (i.e. not current guide set)
+        uncheckCheckbox("quf_CurrentGuideSet");
+        clickNavButton("Submit");
+        table = new DataRegionTable("query", this);
+        // verify that the guide set is not 'current'
+        assertEquals("Expected current guide set to be false", "false", table.getDataAsText(0, "Current Guide Set"));
+        table.clearFilter("RowId");
+        // insert a new 'current' guide set for the first analyte
+        clickNavButton("Insert New");
+        waitForText("Insert " + TEST_ASSAY_LUM + " GuideSet");
+        setFormElement("quf_AnalyteName", analytes[0]);
+        checkCheckbox("quf_CurrentGuideSet");
+        setFormElement("quf_Conjugate", "PE");
+        setFormElement("quf_Isotype", "IgG");
+        setFormElement("quf_TitrationName", "HIVIG");
+        clickNavButton("Submit");
+        // hold on to the new guide set id
+        table = new DataRegionTable("query", this);
+        table.setFilter("AnalyteName", "Equals", analytes[0]);
+        table.setFilter("CurrentGuideSet", "Equals", "true");
+        guideSetIds.put(table.getDataAsText(0, "Analyte Name"), Integer.parseInt(table.getDataAsText(0, "Row Id")));
+
+        // upload the second set of 3 files (these will get the new current guide sets applied)
+        for (int i = 2; i < names.length; i++)
+        {
+            goToTestAssayHome();
+            clickNavButton("Import Data");
+            clickNavButton("Next");
+            setFormElement("name", names[i]);
+            setFormElement("isotype", "IgG");
+            setFormElement("conjugate", "PE");
+            setFormElement("__primaryFile__", new File(files[i]));
+            clickNavButton("Next", 60000);
+            uncheckCheckbox("_titrationRole_standard_HIVIG");
+            checkCheckbox("_titrationRole_qccontrol_HIVIG");
+            clickNavButton("Save and Finish");
+        }
+
+        // see if the 3 uploaded runs got the correct 'current' guide set applied
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " AnalyteTitration");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/RowId");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Titration/RowId");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSet/RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        table = new DataRegionTable("query", this);
+        for (String analyte : analytes)
+        {
+            table.setFilter("GuideSet/RowId", "Equals", guideSetIds.get(analyte).toString());
+            if (analyte.equals("GS Analyte (1)"))
+                assertEquals("Expected guide set to be assigned to 3 records", 3, table.getDataRowCount());
+            else if (analyte.equals("GS Analyte (2)"))
+                assertEquals("Expected guide set to be assigned to 5 records", 5, table.getDataRowCount());
+            table.clearFilter("GuideSet/RowId");
+        }
+
+        // test the manage guide set page for adding records to the current guide set
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        table = new DataRegionTable("query", this);
+        table.setFilter("AnalyteName", "Equals", analytes[0]);
+        table.setFilter("CurrentGuideSet", "Equals", "true");
+        table.clickLink(0, table.getColumn("Current Guide Set"));
+        waitForText("Manage Guide Set");
+        waitForText("Guide Set Plate 5");
+        // verify that the non-current guide set text is not present and the save button is
+        assertTextNotPresent("The selected guide set is not a currently active guide set. Only current guide sets are editable at this time.");
+        assertTextPresent("Save");
+        // check the guide set ID and analyte name in the top set of labels
+        // TODO
+        //Locator l = Locator.tagWithId("label", "guideSetIdLabel");
+        //assertEquals(guideSetIds.get(analytes[0]), .text);
+        // add two records from the "All Runs" grid to the guide run set
+        click(Locator.tagWithId("span", "allRunsRow_3"));
+        click(Locator.tagWithId("span", "allRunsRow_4"));
+        // add a comment to the guide set
+        ExtHelper.setExtFormElementByLabel(this, "Comment", "testing guide set comment");
+        // save the changes
+        ExtHelper.clickExtButton(this, "Save", 0);
+        
+        // go to the GuideSet table to verify the changes to the comment
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        table = new DataRegionTable("query", this);
+        table.setFilter("RowId", "Equals", guideSetIds.get(analytes[0]).toString());
+        assertEquals("Unexpected comment for guide set id " + guideSetIds.get(analytes[0]).toString(), "testing guide set comment", table.getDataAsText(0, "Comment"));
+
+        // go to the GuideSetCurveFit table to verify the calculated threshold values for the EC50 and AUC
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSetCurveFit");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSetId/RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        table = new DataRegionTable("query", this);
+        // verify the row count, average, and standard deviation for the EC50 values
+        table.setFilter("GuideSetId/RowId", "Equals", guideSetIds.get(analytes[0]).toString());
+        table.setFilter("CurveType", "Equals", "Four Parameter");
+        assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[0]).toString(), 2, Integer.parseInt(table.getDataAsText(0, "Run Count")));
+        assertEquals("Unexpected EC50 average for guide set " + guideSetIds.get(analytes[0]).toString(), 177.2, Double.parseDouble(table.getDataAsText(0, "EC50Average")));
+        assertEquals("Unexpected EC50 StdDev for guide set " + guideSetIds.get(analytes[0]).toString(), 18.42, Double.parseDouble(table.getDataAsText(0, "EC50Std Dev")));
+        table.clearFilter("CurveType");
+        // verify the row count, average, and standard deviation for the AUC values
+        table.setFilter("CurveType", "Equals", "Trapezoidal");
+        assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[0]).toString(), 2, Integer.parseInt(table.getDataAsText(0, "Run Count")));
+        assertEquals("Unexpected AUC average for guide set " + guideSetIds.get(analytes[0]).toString(), 8664.66	, Double.parseDouble(table.getDataAsText(0, "AUCAverage")));
+        assertEquals("Unexpected AUC StdDev for guide set " + guideSetIds.get(analytes[0]).toString(), 520.55, Double.parseDouble(table.getDataAsText(0, "AUCStd Dev")));
+        
+        // test that you can't edit a non-current guide set
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        table = new DataRegionTable("query", this);
+        table.setFilter("AnalyteName", "Equals", analytes[0]);
+        table.setFilter("CurrentGuideSet", "Equals", "false");
+        table.clickLink(0, table.getColumn("Current Guide Set"));
+        waitForText("Manage Guide Set");
+        waitForText("Guide Set ID");
+        // TODO: check the guide set ID and analyte name
+        assertTextPresent("The selected guide set is not a currently active guide set. Only current guide sets are editable at this time.");
+        assertTextNotPresent("Save");
+
+        // change the set of runs (by adding and removing) in the current guide set for analyte0
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        table = new DataRegionTable("query", this);
+        table.setFilter("AnalyteName", "Equals", analytes[0]);
+        table.setFilter("CurrentGuideSet", "Equals", "true");
+        table.clickLink(0, table.getColumn("Current Guide Set"));
+        waitForText("Manage Guide Set");
+        waitForText("Guide Set Plate 5");
+        // remove a record from the "Runs Assigned to This Guide Set" grid
+        click(Locator.tagWithId("span", "guideRunSetRow_0"));
+        // add two different records from the "All Runs" grid
+        click(Locator.tagWithId("span", "allRunsRow_0"));
+        click(Locator.tagWithId("span", "allRunsRow_1"));
+        // save the changes
+        ExtHelper.clickExtButton(this, "Save", 0);
+
+        // go to the GuideSetCurveFit table to verify the calculated threshold values for the EC50 and AUC
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSetCurveFit");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSetId/RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        table = new DataRegionTable("query", this);
+        // verify the row count, average, and standard deviation for the EC50 values
+        table.setFilter("GuideSetId/RowId", "Equals", guideSetIds.get(analytes[0]).toString());
+        table.setFilter("CurveType", "Equals", "Four Parameter");
+        assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[0]).toString(), 3, Integer.parseInt(table.getDataAsText(0, "Run Count")));
+        assertEquals("Unexpected EC50 average for guide set " + guideSetIds.get(analytes[0]).toString(), 178.83, Double.parseDouble(table.getDataAsText(0, "EC50Average")));
+        assertEquals("Unexpected EC50 StdDev for guide set " + guideSetIds.get(analytes[0]).toString(), 36.0, Double.parseDouble(table.getDataAsText(0, "EC50Std Dev")));
+        table.clearFilter("CurveType");
+        // verify the row count, average, and standard deviation for the AUC values
+        table.setFilter("CurveType", "Equals", "Trapezoidal");
+        assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[0]).toString(), 3, Integer.parseInt(table.getDataAsText(0, "Run Count")));
+        assertEquals("Unexpected AUC average for guide set " + guideSetIds.get(analytes[0]).toString(), 7221.14	, Double.parseDouble(table.getDataAsText(0, "AUCAverage")));
+        assertEquals("Unexpected AUC StdDev for guide set " + guideSetIds.get(analytes[0]).toString(), 994.74, Double.parseDouble(table.getDataAsText(0, "AUCStd Dev")));
     }
 }

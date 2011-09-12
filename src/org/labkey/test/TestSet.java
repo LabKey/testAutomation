@@ -128,11 +128,13 @@ public enum TestSet
 
     MiniTest(new Class[]
     {
+        LuminexUpoadAndCopyTest.class,
         LuminexExcludableWellsTest.class,
         LuminexMultipleCurvesTest.class,
         LuminexJavaTransformTest.class,
         LuminexRTransformTest.class,
-        LuminexEC50Test.class
+        LuminexEC50Test.class,
+        LuminexGuideSetTest.class
     }),
 
     IE(new Class[]
