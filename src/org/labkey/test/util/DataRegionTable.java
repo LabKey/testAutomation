@@ -43,6 +43,7 @@ public class DataRegionTable
     protected boolean _selectors;
     protected Map<String, Integer> _mapColumns = new HashMap<String, Integer>();
     protected Map<String, Integer> _mapRows = new HashMap<String, Integer>();
+    protected int _columnCount;
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
@@ -54,6 +55,7 @@ public class DataRegionTable
         _tableName = tableName;
         _selectors = selectors;
         reload(test);
+        _columnCount = _test.getTableColumnCount(getHtmlName());
     }
 
     public String getTableName()
@@ -134,16 +136,19 @@ public class DataRegionTable
         
         try
         {
-            for (int col = 0; getDataAsText(-1, col) != null; col++)
+            for (int col = 0; col < _columnCount; col++)
             {
                 String header = getDataAsText(-1, col);
-                String headerName = header.split("\n")[0];
-                headerName = headerName.replaceAll(" ", "");
-                if (!StringUtils.isEmpty(headerName))
-                    _mapColumns.put(headerName, col);
-                if (headerName.equals(name))
+                if( header != null )
                 {
-                    return col;
+                    String headerName = header.split("\n")[0];
+                    headerName = headerName.replaceAll(" ", "");
+                    if (!StringUtils.isEmpty(headerName))
+                        _mapColumns.put(headerName, col);
+                    if (headerName.equals(name))
+                    {
+                        return col;
+                    }
                 }
             }
         }
@@ -187,7 +192,7 @@ public class DataRegionTable
         {
             while (true)
             {
-                String value = _test.getAttribute(Locator.xpath("//table[@id='" + getHtmlName() +"']//tr[" + (row+3) + "]//input[@name='.select']/"), "value");
+                String value = _test.getAttribute(Locator.xpath("//table[@id='" + getHtmlName() +"']//tr[" + (row+5) + "]//input[@name='.select']/"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;
