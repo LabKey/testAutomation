@@ -142,6 +142,9 @@ public enum TestSet
         WikiTest.class,
         GpatAssayTest.class,
         EmbeddedWebPartTest.class,
+        AssayTest.class,
+        FolderTest.class,
+        StudyTest.class
     }),
 
     Cluster(new Class[]
