@@ -162,7 +162,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickImageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".mzXML.image..itms.png (Run Output)");
         assertLinkPresentWithTextCount("msPicture", 2);
         beginAt(getAttribute(Locator.xpath("//img[contains(@src, 'showFile.view')]"), "src"));
-        if(getBrowserType().startsWith(FIREFOX_BROWSER)) //Issue 13025
+        // Firefox sets the title of the page when we view an image separately from an HTML page, so use that to verify
+        // that we got something that matches what we expect. IE doesn't do this, so assume that we're good if we don't
+        // get a 404, error message, etc
+        if(getBrowserType().startsWith(FIREFOX_BROWSER))
             assertTitleContains("showFile.view (PNG Image, 910x540 pixels)");
         popLocation();
 
