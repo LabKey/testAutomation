@@ -31,7 +31,7 @@ public class CustomizeViewsHelper
 {
     public static void openCustomizeViewPanel(BaseSeleniumWebTest test)
     {
-        test.clickMenuButtonAndContinue("Views", "Customize View");
+        ExtHelper.clickExtMenuButton(test, false, Locator.navButton("Views"), "Customize View");
         test.waitForElement(Locator.xpath("//button[text()='View Grid']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 

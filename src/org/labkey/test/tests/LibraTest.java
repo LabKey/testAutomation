@@ -43,11 +43,12 @@ public class LibraTest extends MS2Test
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe/iTRAQ/");
         clickLinkContainingText(getProjectName());
 
-        clickButtonContainingText("Process and Import Data");
+        clickButton("Process and Import Data");
         waitAndClick(Locator.fileTreeByName("Libra"));
         ExtHelper.clickFileBrowserFileCheckbox(this, "iTRAQ.search.xar.xml");
         selectImportDataAction("Import Experiment");
         waitForTextToDisappear("LOADING");
+        sleep(200); // Takes a moment for run to appear after import.
         refresh();
 
         //set xar
@@ -66,9 +67,7 @@ public class LibraTest extends MS2Test
         configure();
         waitForText("Grouping");
         selenium.select("viewTypeGrouping", "Standard");
-        clickButtonContainingText("Go");
-        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
-        sleep(200); // Views menu isn't actually ready yet.
+        clickNavButton("Go");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         addNormalizationCount();
 
@@ -142,7 +141,6 @@ public class LibraTest extends MS2Test
         clickMenuButton("Views", "ProteinProphet");
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
-        sleep(200); // Views menu isn't actually ready yet.
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         for(int i=1; i<=normalizationCount; i++)
         {

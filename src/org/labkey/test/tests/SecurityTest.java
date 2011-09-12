@@ -285,7 +285,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickLinkContainingText("Sign In");
         clickLinkContainingText("Forgot your password?");
         setText("email", username);
-        clickButtonContainingText("Submit");
+        clickButtonContainingText("Submit", 0);
 
 //        clickButtonContainingText("Home");
         signIn();
@@ -314,7 +314,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         String newPassword = password +"1";
         clickLinkContainingText("Site Users");
         clickLinkContainingText(username);
-        clickButtonContainingText("Reset Password");
+        clickButtonContainingText("Reset Password", 0);
         getConfirmationAndWait();
         clickNavButton("Done");
 

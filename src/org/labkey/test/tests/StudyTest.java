@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -166,7 +167,7 @@ public class StudyTest extends StudyBaseTest
 
         setFormElement(LABEL_FIELD, newListName);
 
-        clickButtonContainingText("Save");
+        clickButtonContainingText("Save", 0);
 
         waitForTextToDisappear(listName, 2*defaultWaitForPage);
         assertTextPresent(newListName);
@@ -183,17 +184,20 @@ public class StudyTest extends StudyBaseTest
     {
         selectListName(listName);
 
-        clickButtonContainingText("Delete Selected");
+        clickButtonContainingText("Delete Selected", 0);
 
         //make sure we can change our minds
-        clickButtonContainingText("No");
+        ExtHelper.waitForExtDialog(this, "Delete Group");
+        clickButtonContainingText("No", 0);
+        waitForExtMaskToDisappear();
         assertTextPresent(listName);
 
 
-        clickButtonContainingText("Delete Selected");
-        clickButtonContainingText("Yes");
-        refreshIfIE();
-        waitForTextToDisappear(listName, defaultWaitForPage);
+        clickButtonContainingText("Delete Selected", 0);
+        ExtHelper.waitForExtDialog(this, "Delete Group");
+        clickButtonContainingText("Yes", 0);
+        waitForExtMaskToDisappear();
+        waitForTextToDisappear(listName);
 
     }
 
@@ -210,11 +214,10 @@ public class StudyTest extends StudyBaseTest
 
         setFormElement(LABEL_FIELD, listName);
         setFormElement(ID_FIELD, ids);
-        sleep(500);
-        clickButtonContainingText("Save");
+        clickButtonContainingText("Save", 0);
         waitForText(expectedError, 5*defaultWaitForPage);
-        clickButtonContainingText("OK");
-        clickButtonContainingText("Cancel");
+        clickButtonContainingText("OK", 0);
+        clickButtonContainingText("Cancel", 0);
         assertTextNotPresent(listName);
     }
 
@@ -241,9 +244,9 @@ public class StudyTest extends StudyBaseTest
         log("edit list of IDs to: " + newPids);
 
         //save, close, reopen, verify change
-        sleep(500);
-        clickButtonContainingText("Save");
-        sleep(500);
+        ExtHelper.waitForExtDialog(this, "Define Mouse Group");
+        clickButtonContainingText("Save", 0);
+        waitForExtMaskToDisappear();
         selectListName(listName);
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
 
@@ -254,7 +257,7 @@ public class StudyTest extends StudyBaseTest
 
         assertEquals(newPids, pidsAfterEdit );
 
-        clickButtonContainingText("Cancel");
+        clickButtonContainingText("Cancel", 0);
     }
 
     // select the list name from the main classification page
@@ -278,7 +281,7 @@ public class StudyTest extends StudyBaseTest
     private void cancelCreateClassificationList()
     {
         createStudy();
-        clickButtonContainingText("Cancel");
+        clickButtonContainingText("Cancel", 0);
     }
 
     /**preconditions: at participant picker main page
@@ -312,13 +315,13 @@ public class StudyTest extends StudyBaseTest
             waitForText("Filter", WAIT_FOR_JAVASCRIPT);
         }
 
-        clickButtonContainingText("Add All");
+        clickButtonContainingText("Add All", 0);
 
         List<String> idsInColumn = table.getColumnDataAsText("Mouse Id");
         String idsInForm = getFormElement(ID_FIELD);
         assertIDListsMatch(idsInColumn, idsInForm);
 
-        clickButtonContainingText("Save");
+        clickButtonContainingText("Save", 0);
 
         return idsInForm;
     }

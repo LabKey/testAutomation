@@ -174,7 +174,7 @@ public class UserTest extends SecurityTest
         clickLinkWithText("Site Users");
         clickLinkWithText(NORMAL_USER);
         selenium.chooseOkOnNextConfirmation();
-        clickButtonContainingText("Reset Password");
+        clickButtonContainingText("Reset Password", 0);
         assertTrue(selenium.getConfirmation().startsWith("You are about to clear the user's current password"));
         waitForPageToLoad();
         clickLinkWithText("Done");

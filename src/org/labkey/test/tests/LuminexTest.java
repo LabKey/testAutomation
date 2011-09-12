@@ -329,7 +329,7 @@ public class LuminexTest extends AbstractQCAssayTest
         uploadEC50Data();
 //        ensureMultipleCurveDataPresent();
 //        ensureEC50DataPresent();
-        clickButtonContainingText("Save and Finish");
+        clickButtonContainingText("Save and Finish", 0);
 
         //add transform script
         goToSchemaBrowser();
@@ -528,7 +528,7 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void excludeAnalyteForAllWellsTest(String analyte)
     {
-        clickButtonContainingText("Exclude Analytes");
+        clickButtonContainingText("Exclude Analytes", 0);
         ExtHelper.waitForExtDialog(this, "Exclude Analytes from Analysis");
         clickExcludeAnalyteCheckBox(analyte, true);
         String comment = "Changed for all analytes";
@@ -879,9 +879,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         goToTestRunList();
         clickButtonContainingText("Import Data");
-        waitForPageToLoad();
         clickButtonContainingText("Next");
-        waitForPageToLoad();
         setFormElement(ASSAY_ID_FIELD, name);
     }
 

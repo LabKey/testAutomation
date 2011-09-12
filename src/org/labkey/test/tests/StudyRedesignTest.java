@@ -150,7 +150,7 @@ public class StudyRedesignTest extends StudyBaseTest
         Locator l = Locator.tagWithText("div", title);
         click(l);
         assertTextPresentInThisOrder(title, "Source: " + source, "Type: " + type);
-        clickButtonContainingText("View");
+        clickButtonContainingText("View", 0);
         assertTextPresent(title);
         selenium.goBack();
         if(testDelete)

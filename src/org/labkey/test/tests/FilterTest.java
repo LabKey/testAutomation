@@ -196,7 +196,7 @@ public class FilterTest extends ListTest
         if(filter2!=null)
             assertEquals("Filter 2 value was not populated when reopening.", getFormElement("value_2"), filter2);
 
-        clickButtonContainingText("CANCEL");
+        clickButtonContainingText("CANCEL", 0);
 
         clickButton("Clear All");
     }

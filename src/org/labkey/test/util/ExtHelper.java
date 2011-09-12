@@ -43,7 +43,7 @@ public class ExtHelper
      */
     public static void clickExtMenuButton(BaseSeleniumWebTest test, boolean wait, Locator menu, String ... subMenuLabels)
     {
-        test.clickAndWait(menu, 0);
+        test.click(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
