@@ -123,6 +123,7 @@ public enum TestSet
         StudyDemoModeTest.class,
         StudyRedesignTest.class,
         LibraTest.class,
+        AncillaryStudyTest.class,
     }),
 
     MiniTest(new Class[]
@@ -201,6 +202,7 @@ public enum TestSet
         ReportTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
+        AncillaryStudyTest.class,
     }),
 
     Assays(new Class[] {
