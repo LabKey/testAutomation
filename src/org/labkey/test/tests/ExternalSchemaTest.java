@@ -283,8 +283,9 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         }
         catch (CommandException ex)
         {
-            assertEquals("The row is from the wrong container.", ex.getMessage());
-            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
+            assertEquals(401, ex.getStatusCode());
+//            assertEquals("The row is from the wrong container.", ex.getMessage());
+//            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
         
         try
@@ -295,8 +296,9 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         }
         catch (CommandException ex)
         {
-            assertEquals("The row is from the wrong container.", ex.getMessage());
-            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
+            assertEquals(401, ex.getStatusCode());
+//            assertEquals("The row is from the wrong container.", ex.getMessage());
+//            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
         
         deleteViaJavaApi(containerPath, cn, pks);
