@@ -1257,9 +1257,8 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("The selected guide set is not a currently active guide set. Only current guide sets are editable at this time.");
         assertTextPresent("Save");
         // check the guide set ID and analyte name in the top set of labels
-        // TODO
-        //Locator l = Locator.tagWithId("label", "guideSetIdLabel");
-        //assertEquals(guideSetIds.get(analytes[0]), .text);
+        assertTextPresentInThisOrder("Guide Set ID:", guideSetIds.get(analytes[0]).toString());
+        assertTextPresentInThisOrder("Analyte:", analytes[0]);
         // add two records from the "All Runs" grid to the guide run set
         click(Locator.tagWithId("span", "allRunsRow_3"));
         click(Locator.tagWithId("span", "allRunsRow_4"));
@@ -1310,10 +1309,12 @@ public class LuminexTest extends AbstractQCAssayTest
         table = new DataRegionTable("query", this);
         table.setFilter("AnalyteName", "Equals", analytes[0]);
         table.setFilter("CurrentGuideSet", "Equals", "false");
+        String nonCurrentId = table.getDataAsText(0, "Row Id");
         table.clickLink(0, table.getColumn("Current Guide Set"));
         waitForText("Manage Guide Set");
         waitForText("Guide Set ID");
-        // TODO: check the guide set ID and analyte name
+        assertTextPresentInThisOrder("Guide Set ID:", nonCurrentId);
+        assertTextPresentInThisOrder("Analyte:", analytes[0]);
         assertTextPresent("The selected guide set is not a currently active guide set. Only current guide sets are editable at this time.");
         assertTextNotPresent("Save");
 
