@@ -76,6 +76,10 @@ public class AncillaryStudyTest extends StudyBaseTest
         //Wizard page 2 - participant group
         waitForElement(Locator.radioButtonByName("renderType"), WAIT_FOR_JAVASCRIPT);
         assertWizardError("Next", "You must select an existing group or create a new one.");
+        checkRadioButton("renderType", "all");
+
+        // kbl: commented out current wizard only allows existing participant groups or all participants (although this could change)
+/*
         checkRadioButton("renderType", "new");
         waitForElement(Locator.xpath("//table[@id='dataregion_demoDataRegion']"), WAIT_FOR_JAVASCRIPT);
         assertWizardError("Next", "Mouse Category Label required.");
@@ -88,6 +92,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         uncheckDataRegionCheckbox("demoDataRegion", 1);
         clickNavButton("Add Selected", 0);
         sleep(1000); // wait for specimen Ids to appear in form.
+*/
         clickNavButton("Next", 0);
 
         //Wizard page 3 - select datasets
@@ -121,11 +126,4 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         return PROJECT_NAME;
     }
-
-    @Override
-    public void validateQueries()
-    {
-        // TODO: Remove: 13027: Ancillary study: Query validation exception
-    }
-
 }
