@@ -42,7 +42,7 @@ public class LuminexTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
-    protected static final String TEST_ASSAY_LUM = "TestAssayLuminex";
+    protected static final String TEST_ASSAY_LUM = TRICKY_CHARACTERS_NO_QUOTES + "TestAssayLuminex";
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
 
     protected static final String TEST_ASSAY_LUM_ANALYTE_PROP_NAME = "testAssayAnalyteProp";
@@ -1089,6 +1089,9 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("propertyFormat", formatStr);
     }
 
+    protected String isotype = "IgG" + TRICKY_CHARACTERS;
+    protected String conjugate = TRICKY_CHARACTERS + "PE";
+
     //requires drc, Ruminex and xtable packages installed in R
     protected void runGuideSetTest()
     {
@@ -1118,8 +1121,8 @@ public class LuminexTest extends AbstractQCAssayTest
             waitForText("Insert " + TEST_ASSAY_LUM + " GuideSet");
             setFormElement("quf_AnalyteName", analyte);
             checkCheckbox("quf_CurrentGuideSet");
-            setFormElement("quf_Conjugate", "PE");
-            setFormElement("quf_Isotype", "IgG");
+            setFormElement("quf_Conjugate", conjugate);
+            setFormElement("quf_Isotype", isotype);
             setFormElement("quf_TitrationName", "HIVIG");
             clickNavButton("Submit");
         }
@@ -1140,8 +1143,8 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Import Data");
             clickNavButton("Next");
             setFormElement("name", names[i]);
-            setFormElement("isotype", "IgG");
-            setFormElement("conjugate", "PE");
+            setFormElement("isotype", isotype);
+            setFormElement("conjugate", conjugate);
             setFormElement("__primaryFile__", new File(files[i]));
             clickNavButton("Next", 60000);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
@@ -1195,8 +1198,8 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("Insert " + TEST_ASSAY_LUM + " GuideSet");
         setFormElement("quf_AnalyteName", analytes[0]);
         checkCheckbox("quf_CurrentGuideSet");
-        setFormElement("quf_Conjugate", "PE");
-        setFormElement("quf_Isotype", "IgG");
+        setFormElement("quf_Conjugate", conjugate);
+        setFormElement("quf_Isotype",isotype);
         setFormElement("quf_TitrationName", "HIVIG");
         clickNavButton("Submit");
         // hold on to the new guide set id
@@ -1212,8 +1215,8 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Import Data");
             clickNavButton("Next");
             setFormElement("name", names[i]);
-            setFormElement("isotype", "IgG");
-            setFormElement("conjugate", "PE");
+            setFormElement("isotype", isotype);
+            setFormElement("conjugate", conjugate);
             setFormElement("__primaryFile__", new File(files[i]));
             clickNavButton("Next", 60000);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
