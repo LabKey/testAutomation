@@ -2204,6 +2204,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 desc+="=";
             desc += " " + value;
         }
+        else if(type.contains("Less"))
+        {
+            desc = column + " <";
+            if(type.contains("Equal To"))
+                desc+="=";
+            desc += " " + value;
+        }
         else if(type.contains("Blank"))
         {
             desc = "NULL";
@@ -3484,7 +3491,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickButtonContainingText(String text)
     {
-        clickButtonContainingText(text, defaultWaitForPage);
+        clickButtonContainingText(text, 0);
     }
 
     public void clickButtonContainingText(String text, int waitMills)
@@ -3801,7 +3808,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         // If domain hasn't been saved yet, the 'OK' prompt will not appear.
         Locator.XPathLocator buttonLocator = getButtonLocator("OK");
-        // TODO: Be smarter about this.  Might miss the OK that should be there. 
         if (buttonLocator != null)
         {
             // Confirm the deletion

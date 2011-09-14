@@ -48,7 +48,7 @@ public class CustomizeViewsHelper
 
     public static void applyCustomView(BaseSeleniumWebTest test, int waitMillis)
     {
-        test.clickNavButton("View Grid", waitMillis);
+        test.clickNavButtonAt("View Grid", waitMillis, "1,1");
     }
 
     public static void saveDefaultView(BaseSeleniumWebTest test)
