@@ -546,7 +546,6 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Checking data in aliased AUC columns in Study");
         // check copied AUC data.
-        DataRegionTable table = new DataRegionTable("Dataset", this);
         setSort("Dataset", "ParticipantId", SortDirection.ASC);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_poly",        AUC_POLY_COL_TITLE);
@@ -558,6 +557,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
         CustomizeViewsHelper.saveCustomView(this);
 
+        DataRegionTable table = new DataRegionTable("Dataset", this);
         assertEquals(table.getDataAsText(0, AUC_STUDY_COL_TITLE),        table.getDataAsText(0, AUC_POLY_STUDY_COL_TITLE));        //AUC = AUC_poly
         assertEquals(table.getDataAsText(1, AUC_STUDY_COL_TITLE),        table.getDataAsText(1, AUC_4PL_STUDY_COL_TITLE));         //AUC = AUC_4pl
         assertEquals(table.getDataAsText(0, CURVE_IC50_STUDY_COL_TITLE), table.getDataAsText(0, CURVE_IC50_POLY_STUDY_COL_TITLE)); //CurveIC50 = CurveIC50_poly
