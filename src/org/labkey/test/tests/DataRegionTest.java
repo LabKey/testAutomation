@@ -140,7 +140,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         }
         beginAt(url.getFile());
 
-        table = new DataRegionTable(dataRegionName, this);
+        table = new DataRegionTable(dataRegionName, this, false, true, true);
         assertEquals(TOTAL_ROWS, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertEquals("#FFFF00", table.getDataAsText(15, 4));
