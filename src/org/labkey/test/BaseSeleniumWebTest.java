@@ -3606,9 +3606,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.typeSilent(elementName, text);
     }
 
-    public void setFormElement(String elementName, String text)
+    public void setFormElement(String element, String text)
     {
-        setFormElement(Locator.name(elementName), text, false);
+        setFormElement(Locator.raw(element), text, false);
     }
 
     public void setFormElement(Locator element, String text, boolean suppressValueLogging)
@@ -3623,10 +3623,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
-    public void setFormElement(String elementName, File file)
+    public void setFormElement(String element, File file)
     {
         assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
-        setFormElement(Locator.name(elementName), file.getAbsolutePath());
+        setFormElement(Locator.raw(element), file.getAbsolutePath());
     }
 
     public void setFormElement(Locator element, String text)
