@@ -3014,17 +3014,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
 
-//    //TODO: selenium table locators are unreliable for some grids. Find a solution.
-    public String getTableCellText(String tableName, int row, int column)
+    public String getTableCellText(String tableId, int row, int column)
     {
-        return selenium.getTable(tableName + "." + row + "." + column);
+        return getText(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]/tbody/tr["+(row+1)+"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = "+(column+1)+"]"));
     }
-
-    //TODO: Solution in progress. Breaks with blank cells.
-//    public String getTableCellText(String tableName, int row, int column)
-//    {
-//        return getText(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr["+(row+1)+"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = "+(column+1)+"]/descendant-or-self::*[text()]"));
-//    }
 
     public String getTableCellText(String tableName, int row, String columnTitle)
     {
@@ -3058,12 +3051,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTableCellContains(String tableName, int row, int column, String... strs)
     {
-        String cellAddress = tableName + "." + String.valueOf(row) +  "." + String.valueOf(column);
-        String cellText = selenium.getTable(cellAddress);
+        String cellText = getTableCellText(tableName, row, column);
 
         for (String str : strs)
         {
-            assertTrue(cellAddress + " should contain \'" + str + "\'", cellText.contains(str));
+            assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\'", cellText.contains(str));
         }
     }
 
@@ -3074,12 +3066,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTableCellNotContains(String tableName, int row, int column, String... strs)
     {
-        String cellAddress = tableName + "." + String.valueOf(row) +  "." + String.valueOf(column);
-        String cellText = selenium.getTable(cellAddress);
+        String cellText = getTableCellText(tableName, row, column);
 
         for (String str : strs)
         {
-            assertFalse(cellAddress + " should not contain \'" + str + "\'", cellText.contains(str));
+            assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
         }
     }
 
@@ -3113,8 +3104,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public int getColumnIndex(String tableName, String columnTitle)
     {
-        assertElementPresent(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[2]/td[./div/.='"+columnTitle+"']"));
-        int col = selenium.getXpathCount("//table[@id='"+tableName+"']/tbody/tr[2]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").intValue();
+        assertElementPresent(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']"));
+        int col = selenium.getXpathCount("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").intValue();
 
         return col;
     }
@@ -3345,12 +3336,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Returns the number of rows (both <tr> and <th>) in the specified table
     public int getTableRowCount(String tableName)
     {
-        return selenium.getXpathCount("//table[@id='" + tableName + "']/thead/tr").intValue() + selenium.getXpathCount("//table[@id='" + tableName + "']/tbody/tr").intValue();
+        return selenium.getXpathCount("//table[@id=" + Locator.xq(tableName) + "]/thead/tr").intValue() + selenium.getXpathCount("//table[@id=" + Locator.xq(tableName) + "]/tbody/tr").intValue();
     }
 
     public int getTableColumnCount(String tableId)
     {
-        return getXpathCount(Locator.xpath("//table[@id='"+tableId+"']/colgroup/col"));
+        return getXpathCount(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]/colgroup/col"));
     }
 
     public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
@@ -3491,7 +3482,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickButtonContainingText(String text)
     {
-        clickButtonContainingText(text, 0);
+        clickButtonContainingText(text, defaultWaitForPage);
     }
 
     public void clickButtonContainingText(String text, int waitMills)
@@ -3617,14 +3608,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFormElement(String elementName, String text)
     {
-        setFormElement(elementName, text, false);
+        setFormElement(Locator.name(elementName), text, false);
     }
 
-    public void setFormElement(String elementName, String text, boolean suppressValueLogging)
+    public void setFormElement(Locator element, String text, boolean suppressValueLogging)
     {
         try
         {
-            selenium.type(elementName, text, suppressValueLogging);
+            selenium.type(element.toString(), text, suppressValueLogging);
         }
         catch (SeleniumException e)
         {
@@ -3635,18 +3626,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFormElement(String elementName, File file)
     {
         assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
-        selenium.type(elementName, file.getAbsolutePath());
+        setFormElement(Locator.name(elementName), file.getAbsolutePath());
     }
 
     public void setFormElement(Locator element, String text)
     {
         setFormElement(element.toString(), text);
         fireEvent(element, SeleniumEvent.blur);
-    }
-
-    public void setFormElement(Locator element, String text, boolean suppressValueLogging)
-    {
-        setFormElement(element.toString(), text, suppressValueLogging);
     }
 
     public void setFormElements(String tagName, String formElementName, String[] values)
@@ -3777,6 +3763,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // UNDONE: move usages to use ListHelper
+    @Deprecated
     public void addField(String areaTitle, int index, String name, String label, ListHelper.ListColumnType type)
     {
         String prefix = getPropertyXPath(areaTitle);
@@ -3789,6 +3776,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // UNDONE: move usages to use ListHelper
+    @Deprecated
     public void addLookupField(String areaTitle, int index, String name, String label, ListHelper.LookupInfo type)
     {
         String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
@@ -3801,6 +3789,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // UNDONE: move usages to ListHelper
+    @Deprecated
     public void deleteField(String areaTitle, int index)
     {
         String prefix = getPropertyXPath(areaTitle);
@@ -3808,6 +3797,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         // If domain hasn't been saved yet, the 'OK' prompt will not appear.
         Locator.XPathLocator buttonLocator = getButtonLocator("OK");
+        // TODO: Be smarter about this.  Might miss the OK that should be there. 
         if (buttonLocator != null)
         {
             // Confirm the deletion
@@ -3818,7 +3808,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setLongTextField(final String elementName, final String text)
     {
-        setFormElement(elementName, text, true);
+        setFormElement(Locator.name(elementName), text, true);
         
         waitFor(new Checker()
         {

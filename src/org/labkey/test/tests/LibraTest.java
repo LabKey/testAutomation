@@ -153,9 +153,7 @@ public class LibraTest extends MS2Test
         checkForITRAQQuantitation();
 
 
-        int columnHeader = getColumnIndex("dataregion_MS2Peptides", "iTRAQ Quantitation Ratio 1");
-        String text = getProteinProphetTableCell(2, columnHeader);
-        assertEquals("0.71", text);
+        assertTableCellTextEquals("dataregion_MS2Peptides", 2, "iTRAQ Quantitation Ratio 1", "0.71");
 
         Locator img = Locator.xpath("//img[contains(@id,'MS2Peptides-Handle')]");
         click(img);

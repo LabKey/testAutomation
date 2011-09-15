@@ -44,18 +44,25 @@ public class DataRegionTable
     protected Map<String, Integer> _mapColumns = new HashMap<String, Integer>();
     protected Map<String, Integer> _mapRows = new HashMap<String, Integer>();
     protected int _columnCount;
+    protected int _headerRows;
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
-        this(tableName, test, true);
+        this(tableName, test, true, true);
     }
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors)
+    {
+        this(tableName, test, selectors, true);
+    }
+
+    public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors, boolean extraHeaders)
     {
         _tableName = tableName;
         _selectors = selectors;
         reload(test);
         _columnCount = _test.getTableColumnCount(getHtmlName());
+        _headerRows = extraHeaders?4:2;
     }
 
     public String getTableName()
@@ -94,7 +101,8 @@ public class DataRegionTable
 
     public int getDataRowCount()
     {
-        return getDataRowCount(1);
+        return _test.getTableRowCount(getHtmlName()) - _headerRows;
+//        return getDataRowCount(1);
     }
     
     public int getDataRowCount(int div)
@@ -118,7 +126,7 @@ public class DataRegionTable
 
     public Locator.XPathLocator xpath(int row, int col)
     {
-        return Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+4+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
+        return Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+_headerRows+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
     }
 
     public void clickLink(int row, int col)
@@ -213,7 +221,7 @@ public class DataRegionTable
 
         try
         {
-            ret = _test.getTableCellText(getHtmlName(), row + 4, column + (_selectors ? 1 : 0));
+            ret = _test.getTableCellText(getHtmlName(), row + _headerRows, column + (_selectors ? 1 : 0));
         }
         catch(Exception ignore) {}
 
