@@ -23,6 +23,8 @@ import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TimeChartTest extends BaseSeleniumWebTest
 {
@@ -62,6 +64,12 @@ public class TimeChartTest extends BaseSeleniumWebTest
         "Two Measures - WITH dimension selected for second, inner join",
         "Two Measures - WITH dimension selected for second, outer join"
     };
+
+    private static final String[] GETDATA_API_TEST_TITLES_AGGREGATE = {
+            "Single Measure (date)",
+            "Two Measures from the same dataset (date)",
+    };
+
     private static final String[] GETDATA_API_TEST_NUMROWS = {
         "1 - 33 of 33", 
         "1 - 33 of 33", 
@@ -71,6 +79,12 @@ public class TimeChartTest extends BaseSeleniumWebTest
         "1 - 83 of 83",
         "1 - 25 of 25",
         "1 - 33 of 33"
+    };
+
+    private static final String[] GETDATA_API_TEST_NUMROWS_AGGREGATE = {
+            "1 - 22 of 22",
+            "1 - 22 of 22",
+
     };
 
     private static final String[][] GETDATA_API_DATETEST_COLNAMES = {
@@ -180,6 +194,70 @@ public class TimeChartTest extends BaseSeleniumWebTest
         participantGroupTimeChartTest();
 
         multiAxisTimeChartTest();
+
+        aggregateTimeChartTest();
+
+    }
+
+    private void aggregateTimeChartTest()
+    {
+        aggregateTimeChartUITest();
+        // bug 13061
+//        aggregateTimeChartSQLTest();
+    }
+
+    private void aggregateTimeChartSQLTest()
+    {
+        sqlTest(testDataAPI + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE, GETDATA_API_TEST_NUMROWS_AGGREGATE, null, null, null, null, null);
+    }
+
+    //depends on:  participantGroupTimeChartTest
+    private void aggregateTimeChartUITest()
+    {
+        goToTimeChartScreenAndStartChooseMeasure();
+
+        //choose measure
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(CHOOSE_MEASURE_DIALOG)+"//dl[./dt/em[starts-with(text(), 'CD4+')]]"));
+        clickNavButton("Select", 0);
+
+
+        //set to aggregate
+        ExtHelper.clickExtTab(this, "Chart(s)");
+        checkRadioButton("chart_layout", "per_group");
+                                  // TODO:  talk to trey
+        sleep(500);
+        clickCheckbox("Show Aggregate");
+        waitForTextToDisappear("loading");
+        clickCheckbox("Show Individual Lines");
+        waitForTextToDisappear("loading");
+
+
+
+        clickAt(ExtHelper.locateBrowserFileCheckbox("Some Participants"), "1,1");
+        clickAt(ExtHelper.locateBrowserFileCheckbox("Other Participants"), "1,1");
+        waitForText("Please select at least one group");
+
+        clickAt(ExtHelper.locateBrowserFileCheckbox("Some Participants"), "1,1");
+        waitForTextToDisappear("loading");
+
+        ExtHelper.clickExtTab(this, "Overview");
+        setFormElement("reportName", "Aggregate");
+        setFormElement("reportDescription", REPORT_DESCRIPTION);
+        ExtHelper.clickExtButton(this,"Save");
+
+    }
+
+    private void goToTimeChartScreenAndStartChooseMeasure()
+    {
+
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Time Chart");
+
+        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Choose a Measure", 0);
+        ExtHelper.waitForExtDialog(this, CHOOSE_MEASURE_DIALOG);
     }
 
     private void generateChartPerParticipantTest()
@@ -385,56 +463,90 @@ public class TimeChartTest extends BaseSeleniumWebTest
         getDataVisitTest();
     }
 
+    private String testDataAPI = "server/test/data/api";
     private void getDataDateTest()
+    {
+        sqlTest(testDataAPI+"/getDataDateTest.html", GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
+    }
+
+
+    private void sqlTest(String htmlPage, String[][] columnHeaders, String[][] stringCheck, double[][] numbercheck, String[] measure, double[][] measureValue)
+    {
+        sqlTest(htmlPage, GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, columnHeaders, stringCheck, numbercheck, measure, measureValue);
+    }
+
+    private void sqlTest(String htmlPage, String[] testTitles, String[] testNumRows, String[][] columnHeaders, String[][] stringCheck, double[][] numbercheck, String[] measure, double[][] measureValue)
     {
         // check multi-measure calls to LABKEY.Visualization.getData API requesting date information
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        // create new wiki to add to Demo study folder
-        addWebPart("Wiki");
-        createNewWikiPage("HTML");
-        setFormElement("name", WIKIPAGE_NAME);
-        setFormElement("title", WIKIPAGE_NAME);
+        // create new wiki to add to Demo study folder, or edit existing one
+        if(isTextPresent(WIKIPAGE_NAME))
+        {
+            clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+        }
+        else
+        {
+            addWebPart("Wiki");
+            createNewWikiPage("HTML");
+            setFormElement("name", WIKIPAGE_NAME);
+            setFormElement("title", WIKIPAGE_NAME);
+        }
         // insert JS for getData calls and querywebpart
-        setWikiBody(getFileContents("server/test/data/api/getDataDateTest.html"));
+        setWikiBody(getFileContents(htmlPage));
         saveWikiPage();
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+
+
 
         // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
         int testCount = Integer.parseInt(getFormElement(Locator.name("configCount")));
         int testIndex = 0;
         while(testIndex < testCount){
             // check title is present
-            waitForText(GETDATA_API_TEST_TITLES[testIndex], WAIT_FOR_JAVASCRIPT); 
+            waitForText(testTitles[testIndex], WAIT_FOR_JAVASCRIPT);
             // check # of rows
-            waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
+            waitForText(testNumRows[testIndex], WAIT_FOR_JAVASCRIPT);
             waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
             DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
-            for (int i = 0; i < GETDATA_API_DATETEST_COLNAMES[testIndex].length; i++)
+            for (int i = 0; i < columnHeaders[testIndex].length; i++)
             {
-                int colIndex = table.getColumn(GETDATA_API_DATETEST_COLNAMES[testIndex][i]);
-                assertEquals("Unexpected column index for '" + GETDATA_API_DATETEST_COLNAMES[testIndex][i] + "'", i, colIndex);
+                int colIndex = table.getColumn(columnHeaders[testIndex][i]);
+                assertEquals("Unexpected column index for '" + columnHeaders[testIndex][i] + "'", i, colIndex);
             }
             // check values in interval column for the first participant
-            for (int i = 0; i < GETDATA_API_TEST_DAYS[testIndex].length; i++)
+            if(numbercheck!=null)
             {
-                try
+                for (int i = 0; i < numbercheck[testIndex].length; i++)
                 {
-                    double value = Double.parseDouble(table.getDataAsText(i, GETDATA_API_DATETEST_COLNAMES[testIndex][GETDATA_API_DATETEST_COLNAMES[testIndex].length - 1]));
-                    assertEquals("Unexpected interval value for row " + i, GETDATA_API_TEST_DAYS[testIndex][i], value);
+                    try
+                    {
+                        double value = Double.parseDouble(table.getDataAsText(i, columnHeaders[testIndex][columnHeaders[testIndex].length - 1]));
+                        assertEquals("Unexpected interval value for row " + i, numbercheck[testIndex][i], value);
+                    }
+                    catch(NumberFormatException e){}
                 }
-                catch(NumberFormatException e){}                    
+            }
+            if(stringCheck!=null)
+            {
+                for (int i = 0; i < stringCheck[testIndex].length; i++)
+                {
+                    assertEquals(stringCheck[testIndex][i], table.getDataAsText(i, "Study Lab Results Participant Visit Visit Label"));
+                }
             }
             // check values in measure column
-            for (int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++)
+            if(measureValue!=null)
             {
-                try
+                for (int i = 0; i < measureValue[testIndex].length; i++)
                 {
-                    double value = Double.parseDouble(table.getDataAsText(i, GETDATA_API_TEST_MEASURES[testIndex]));
-                    assertEquals("Unexpected measure value", GETDATA_API_TEST_MEASURE_VALUES[testIndex][i], value);
+                    try
+                    {
+                        double value = Double.parseDouble(table.getDataAsText(i, measure[testIndex]));
+                        assertEquals("Unexpected measure value", measureValue[testIndex][i], value);
+                    }
+                    catch(NumberFormatException e){}
                 }
-                catch(NumberFormatException e){}
             }
 
             if(testIndex < testCount-1)
@@ -442,56 +554,12 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
             testIndex++;
         }
+
     }
 
     private void getDataVisitTest()
     {
-        // check multi-measure calls to LABKEY.Visualization.getData API requesting visit information
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
-        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
-        // insert JS for getData calls and querywebpart
-        setWikiBody(getFileContents("server/test/data/api/getDataVisitTest.html"));
-        saveWikiPage();
-        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
-
-        // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
-        int testCount = Integer.parseInt(getFormElement(Locator.name("configCount")));
-        int testIndex = 0;
-        while(testIndex < testCount){
-            // check title is present
-            waitForText(GETDATA_API_TEST_TITLES[testIndex], WAIT_FOR_JAVASCRIPT);
-            // check # of rows
-            waitForText(GETDATA_API_TEST_NUMROWS[testIndex], WAIT_FOR_JAVASCRIPT);
-            waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
-            // check column headers
-            DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
-            for (int i = 0; i < GETDATA_API_VISITTEST_COLNAMES[testIndex].length; i++)
-            {
-                int colIndex = table.getColumn(GETDATA_API_VISITTEST_COLNAMES[testIndex][i]);
-                assertEquals("Unexpected column index", i, colIndex);
-            }
-            // check values in interval column for the first participant
-            for (int i = 0; i < GETDATA_API_TEST_VISITLABEL[testIndex].length; i++)
-            {
-                assertEquals(GETDATA_API_TEST_VISITLABEL[testIndex][i], table.getDataAsText(i, "Study Lab Results Participant Visit Visit Label"));
-            }
-            // check values in measure column
-            for (int i = 0; i < GETDATA_API_TEST_MEASURE_VALUES[testIndex].length; i++)
-            {
-                try
-                {
-                    double value = Double.parseDouble(table.getDataAsText(i, GETDATA_API_TEST_MEASURES[testIndex]));
-                    assertEquals("Unexpected measure value", GETDATA_API_TEST_MEASURE_VALUES[testIndex][i], value);
-                }
-                catch(NumberFormatException e){}                    
-            }
-
-            if(testIndex < testCount-1)
-                clickNavButton("Next", 0);
-
-            testIndex++;
-        }
+        sqlTest("server/test/data/api/getDataVisitTest.html", GETDATA_API_VISITTEST_COLNAMES, GETDATA_API_TEST_VISITLABEL, null, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
     }
 
     private void participantGroupTimeChartTest()
