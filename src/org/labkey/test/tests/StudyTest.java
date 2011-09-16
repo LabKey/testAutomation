@@ -682,7 +682,7 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("Types");
         log("Verifying sequence numbers and visit names imported correctly");
 
-        DataRegionTable table = new DataRegionTable("Dataset", this, true, true, true);
+        DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
         List<String> sequenceNums = table.getColumnDataAsText("Sequence Num");
         assertEquals("Incorrect number of rows in Types dataset", 48, sequenceNums.size());
 

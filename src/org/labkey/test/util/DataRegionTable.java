@@ -45,26 +45,24 @@ public class DataRegionTable
     protected Map<String, Integer> _mapRows = new HashMap<String, Integer>();
     protected int _columnCount;
     protected int _headerRows;
-    protected boolean _bothButtonBars;
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
-        this(tableName, test, true, true, false);
+        this(tableName, test, true, true);
     }
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors)
     {
-        this(tableName, test, selectors, true, false);
+        this(tableName, test, selectors, true);
     }
 
-    public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors, boolean floatingHeaders, boolean bothButtonBars)
+    public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors, boolean floatingHeaders)
     {
         _tableName = tableName;
         _selectors = selectors;
         reload(test);
         _columnCount = _test.getTableColumnCount(getHtmlName());
         _headerRows = 2 + (floatingHeaders?2:0);
-        _bothButtonBars = bothButtonBars;
     }
 
     public String getTableName()
@@ -80,6 +78,11 @@ public class DataRegionTable
     public void reload(BaseSeleniumWebTest test)
     {
         _test = test;
+    }
+
+    private boolean bottomBarPresent()
+    {
+        return _test.isElementPresent(Locator.xpath("//table[starts-with(@id, 'dataregion_footer_')]"));
     }
 
     private String getJSParam(String func, int i, boolean bStr)
@@ -103,10 +106,15 @@ public class DataRegionTable
 
     public int getDataRowCount()
     {
-        return _test.getTableRowCount(getHtmlName()) - (_headerRows + (_bothButtonBars?1:0));
-//        return getDataRowCount(1);
+        int rows = 0;
+        rows = _test.getTableRowCount(getHtmlName()) - (_headerRows + (bottomBarPresent()?1:0));
+
+        if (rows == 1 && "No data to show.".equals(getDataAsText(0, 0)))
+            rows = 0;
+
+        return rows;
     }
-    
+
     public int getDataRowCount(int div)
     {
         int rows = 0;
