@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.CustomizeViewsHelper;
 
 import java.io.File;
 
@@ -193,6 +194,51 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertTextPresent("Antigen 8 Mean");
         assertTextPresent("Antigen 8 Median");
         assertTextPresent("blood");
+
+        // test color hilighting of sample and antigen well groups
+        checkRadioButton("sampleGroup", 1);
+        assertElementPresent(getLocatorForHilightedWell("lk_sample_Specimen_2", "1023.0"));
+        assertElementPresent(getLocatorForHilightedWell("lk_sample_Specimen_2", "1021.0"));
+        assertElementPresent(getLocatorForHilightedWell("lk_sample_Specimen_2", "1028.0"));
+
+        // antigen well group
+        checkRadioButton("sampleGroup", 5);
+        assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "765.0"));
+        assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "591.0"));
+        assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "257.0"));
+
+        // verify customization of the run details view is possible
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Mean");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Median");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 8_Mean");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 8_Median");
+        CustomizeViewsHelper.saveCustomView(this, "Without Antigen7&8");
+
+        clickMenuButton("Views", "default");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Mean");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Median");
+        CustomizeViewsHelper.saveDefaultView(this);
+
+        clickMenuButton("Views", "Without Antigen7&8");
+        assertTextNotPresent("Antigen 7 Mean");
+        assertTextNotPresent("Antigen 7 Median");
+        assertTextNotPresent("Antigen 8 Mean");
+        assertTextNotPresent("Antigen 8 Median");
+        
+        clickMenuButton("Views", "default");
+        assertTextNotPresent("Antigen 7 Mean");
+        assertTextNotPresent("Antigen 7 Median");
+        assertTextPresent("Antigen 8 Mean");
+        assertTextPresent("Antigen 8 Median");
+    }
+
+    private Locator getLocatorForHilightedWell(String className, String count)
+    {
+        String xpath = String.format("//div[contains(@class, '%s') and contains(@style, 'background-color: rgb(18, 100, 149);')]//a[contains(text(), %s)]",
+                className, count);
+        return Locator.xpath(xpath);
     }
 
     /**
