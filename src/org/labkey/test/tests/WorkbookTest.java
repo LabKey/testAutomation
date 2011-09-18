@@ -154,7 +154,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
     private void createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
         clickLinkWithText(project);
-        clickNavButton("Create New Workbook");
+        clickNavButton("Insert New");
 
         setFormElement("workbookTitle", title);
         setFormElement("workbookDescription", description);
