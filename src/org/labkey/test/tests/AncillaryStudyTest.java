@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.StudyHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,9 +29,13 @@ import org.labkey.test.util.ExtHelper;
 public class AncillaryStudyTest extends StudyBaseTest
 {
     private static final String PROJECT_NAME = "AncillaryStudyTest Project";
-    private static final String STUDY_NAME = "Ancillary Study";
-    private static final String PARTICIPANT_GROUP = "Ancillary Group";
+    private static final String STUDY_NAME = "Special Emphasis Study";
+    private static final String STUDY_DESCRIPTION = "Ancillary study created by AncillaryStudyTest.";
     private static final String[] DATASETS = {"AE-1:(VTN) AE Log","APX-1: Abbreviated Physical Exam","BRA-1: Behavioral Risk Assessment (Page 1)","BRA-2: Behavioral Risk Assessment (Page 2)","CM-1:(Ph I/II) Concomitant Medications Log","CPF-1: Follow-up Chemistry Panel","CPS-1: Screening Chemistry Panel","DEM-1: Demographics","DOV-1: Discontinuation of Vaccination","ECI-1: Eligibility Criteria"};
+    private static final String PARTICIPANT_GROUP = "Ancillary Group";
+    private static final String[] PTIDS = {"999320016", "999320518", "999320529", "999320533", "999320541", "999320557", "999320565", "999320576", "999320582", "999320590"};
+    private static final String PARTICIPANT_GROUP_BAD = "Bad Ancillary Group";
+    private static final String[] PTIDS_BAD = {"999320004", "999320007", "999320010", "999320016", "999320018", "999320021", "999320029", "999320033", "999320036","999320038"};
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -57,10 +62,12 @@ public class AncillaryStudyTest extends StudyBaseTest
         importStudy();
         startSpecimenImport(2);
         waitForPipelineJobsToComplete(2, "study import", false);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", PTIDS);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", PTIDS_BAD);
+        createAncillaryStudy();
     }
 
-    @Override
-    public void doVerifySteps()
+    private void createAncillaryStudy()
     {
         clickLinkWithText("My Study");
         clickLinkWithText("Manage Study");
@@ -70,13 +77,22 @@ public class AncillaryStudyTest extends StudyBaseTest
         
         //Wizard page 1 - location
         ExtHelper.waitForExtDialog(this, "Create New Study");
+        setFormElement("studyName", STUDY_NAME);
+        setFormElement("studyDescription", STUDY_DESCRIPTION);
         setFormElement("studyFolder", "/"+PROJECT_NAME+"/"+STUDY_NAME);
         clickNavButton("Next", 0);
 
         //Wizard page 2 - participant group
         waitForElement(Locator.radioButtonByName("renderType"), WAIT_FOR_JAVASCRIPT);
         assertWizardError("Next", "You must select an existing group or create a new one.");
-        checkRadioButton("renderType", "all");
+        waitAndClick(Locator.xpath("//div[contains(@class, 'testParticipantGroups')]//em[text()='Ancillary Group']"));
+
+        log("Check participant group.");
+        assertEquals("Did not find expected number of participants", PTIDS.length, getXpathCount(Locator.xpath("//div[contains(@class, 'testParticipantGroups')]//em[text() = '"+PTIDS[0]+"']/../../../dl")));
+        for (String ptid : PTIDS)
+        {
+            assertElementPresent(Locator.xpath("//div[contains(@class, 'testParticipantGroups')]//em[text() = '"+ptid+"']"));
+        }
 
         // kbl: commented out current wizard only allows existing participant groups or all participants (although this could change)
 /*
@@ -110,10 +126,59 @@ public class AncillaryStudyTest extends StudyBaseTest
         setFormElement(Locator.name("studyFolder"), "/"+PROJECT_NAME+"/"+STUDY_NAME);
         clickNavButton("Next", 0);
         clickNavButton("Next", 0);
-        clickNavButton("Finish", 0);
-        waitForExtMaskToDisappear();
+        clickNavButton("Finish");
     }
 
+    @Override
+    public void doVerifySteps()
+    {
+        waitForText(PTIDS[0]);
+        for( String str : PTIDS )
+        {
+            assertLinkPresentWithText(str);
+        }
+        for( String str : DATASETS )
+        {
+            assertLinkPresentWithText(str);
+        }
+
+        assertTextPresent("10 Datasets");
+        assertTextPresent("10 mice");
+
+        verifyModifyParticipantGroup(STUDY_NAME);
+        verifyModifyParticipantGroup(getFolderName());
+    }
+
+    private void verifyModifyParticipantGroup(String study)
+    {
+        clickLinkWithText(study);
+        log("Modify " + study + " participant group.");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Mouse Groups");
+        waitForText(PARTICIPANT_GROUP);
+        selenium.getEval("selenium.selectExtGridItem('label', '"+PARTICIPANT_GROUP+"', null, 'participantCategoriesGrid', null, false)");
+        click(Locator.xpath("//*[text()='"+PARTICIPANT_GROUP+"']"));
+        clickNavButton("Edit Selected", 0);
+        ExtHelper.waitForExtDialog(this, "Define Mouse Group");
+        String csp = PTIDS[0];
+        for( int i = 1; i < PTIDS.length - 1; i++ )
+            csp += ","+PTIDS[i];
+        setFormElement("categoryIdentifiers", csp);
+        ExtHelper.clickExtButton(this, "Define Mouse Group", "Save", 0);
+        waitForExtMaskToDisappear();
+
+        log("Verify that modified participant group has not effect on ancillary study.");
+        clickLinkWithText(STUDY_NAME);
+        waitForText("Filter:"); // Wait for participant list to appear.
+        if(isElementPresent(Locator.linkWithText("Show all")))
+            clickLinkWithText("Show all", false);
+        
+        for( String str : PTIDS )
+        {
+            waitForElement(Locator.linkWithText(str), WAIT_FOR_JAVASCRIPT);
+        }
+    }
+        
     private void assertWizardError(String button, String error)
     {
         clickNavButton(button, 0);

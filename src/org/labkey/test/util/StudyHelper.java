@@ -29,16 +29,21 @@ public class StudyHelper
 
     public static void createParticipantGroup(BaseSeleniumWebTest test, String projectName, String studyFolder, String groupName, String... ptids)
     {
-        if( !test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage Participant Groups']")) )
+        createCustomParticipantGroup(test, projectName, studyFolder, groupName, "Participant", ptids);
+    }
+
+    public static void createCustomParticipantGroup(BaseSeleniumWebTest test, String projectName, String studyFolder, String groupName, String participantString, String... ptids)
+    {
+        if( !test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
             test.clickLinkWithText(projectName);
             test.clickLinkWithText(studyFolder);
             test.clickLinkWithText("Manage Study");
-            test.clickLinkWithText("Manage Participant Groups");
+            test.clickLinkWithText("Manage "+participantString+" Groups");
         }
-        test.log("Create Participant Group: " + groupName);
+        test.log("Create "+participantString+" Group: " + groupName);
         test.clickNavButton("Create", 0);
-        ExtHelper.waitForExtDialog(test, "Define Participant Group");
+        ExtHelper.waitForExtDialog(test, "Define "+participantString+" Group");
         test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.setFormElement("categoryLabel", groupName);
         if( ptids.length > 0 )
@@ -48,8 +53,8 @@ public class StudyHelper
                 csp += ","+ptids[i];
             test.setFormElement("categoryIdentifiers", csp);
         }
-        ExtHelper.clickExtButton(test, "Define Participant Group", "Save", 0);
-        ExtHelper.waitForLoadingMaskToDisappear(test, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        ExtHelper.clickExtButton(test, "Define "+participantString+" Group", "Save", 0);
+        test.waitForExtMaskToDisappear();
     }
 
 }
