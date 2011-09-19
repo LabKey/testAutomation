@@ -175,8 +175,9 @@ public class LuminexTest extends AbstractQCAssayTest
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
 
         // add batch properties for transform and Ruminex version numbers
-        addField("Batch Fields", 5, "TransformVersion", "Transform Script Version", ListColumnType.String);
-        addField("Batch Fields", 6, "RuminexVersion", "Ruminex Version", ListColumnType.String);
+        addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
+        addField("Batch Fields", 6, "TransformVersion", "Transform Script Version", ListColumnType.String);
+        addField("Batch Fields", 7, "RuminexVersion", "Ruminex Version", ListColumnType.String);
 
         // add run properties for designation of which field to use for curve fit calc in transform
         addField("Run Fields", 5, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
@@ -185,7 +186,10 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // add run properties for use with the Guide Set test
         addField("Run Fields", 8, "Isotype", "Isotype", ListColumnType.String);
-        addField("Run Fields", 9, "Conjugate", "Conjugate", ListColumnType.String);        
+        addField("Run Fields", 9, "Conjugate", "Conjugate", ListColumnType.String);
+        addField("Run Fields", 10, "NotebookNo", "Notebook Number", ListColumnType.String);
+        addField("Run Fields", 11, "AssayType", "Assay Type", ListColumnType.String);
+        addField("Run Fields", 12, "ExpPerformer", "Experiment Performer", ListColumnType.String);
 
         // add analyte property for tracking lot number
         addField("Analyte Properties", 8, "LotNumber", "Lot Number", ListColumnType.String);
@@ -1141,10 +1145,14 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             goToTestAssayHome();
             clickNavButton("Import Data");
+            setFormElement("network", "NETWORK1");
             clickNavButton("Next");
             setFormElement("name", names[i]);
             setFormElement("isotype", isotype);
             setFormElement("conjugate", conjugate);
+            setFormElement("notebookNo", "Notebook1");
+            setFormElement("assayType", "Experimental");
+            setFormElement("expPerformer", "TECH1");
             setFormElement("__primaryFile__", new File(files[i]));
             clickNavButton("Next", 60000);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
@@ -1213,10 +1221,14 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             goToTestAssayHome();
             clickNavButton("Import Data");
+            setFormElement("network", "NETWORK2");
             clickNavButton("Next");
             setFormElement("name", names[i]);
             setFormElement("isotype", isotype);
             setFormElement("conjugate", conjugate);
+            setFormElement("notebookNo", "Notebook2");
+            setFormElement("assayType", "Experimental");
+            setFormElement("expPerformer", "TECH2");
             setFormElement("__primaryFile__", new File(files[i]));
             clickNavButton("Next", 60000);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
