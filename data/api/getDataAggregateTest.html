@@ -116,6 +116,12 @@
         }
     };
 
+    var ptidMeasure = {
+        "name":"ParticipantId",
+        "schemaName":"study",
+        "queryName":"Lab Results"
+    };
+
     var groupMeasure = {
         "name": 'GroupId',
         "queryName": 'ParticipantGroupMap',
@@ -233,7 +239,7 @@
             failure : function(info, response, options) {LABKEY.Utils.displayAjaxErrorResponse(response, options);},
             measures: configs[configCounter].measures,
             groupBys: [groupMeasure],
-            //sorts: [groupMeasure, visitMeasure],
+            sorts: [ptidMeasure],
             scope: this
         });
     }
