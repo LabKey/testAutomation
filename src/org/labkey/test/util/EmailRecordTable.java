@@ -32,7 +32,7 @@ public class EmailRecordTable extends DataRegionTable
 
     public EmailRecordTable(BaseSeleniumWebTest test)
     {
-        super("EmailRecord", test, false);
+        super("EmailRecord", test, false, false);
     }
 
     @Override
@@ -40,20 +40,6 @@ public class EmailRecordTable extends DataRegionTable
     {
         // This mock data region always has a hidden row at the end.
         return super.getDataRowCount() - 1;
-    }
-
-    @Override
-    public String getDataAsText(int row, int column)
-    {
-        String ret = null;
-
-        try
-        {
-            ret = _test.getTableCellText(getHtmlName(), row + 2, column);
-        }
-        catch(Exception ignore) {}
-
-        return ret;
     }
 
     public void startRecording()
