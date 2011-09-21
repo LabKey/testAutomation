@@ -69,7 +69,8 @@ public class ExperimentRunTable extends DataRegionTable
         
         for (int i = 0; i < _listNames.size(); i++)
         {
-            if (_listNames.get(i).indexOf(name) != -1)
+            String s = _listNames.get(i);
+            if (s != null && s.indexOf(name) != -1)
                 return i;
         }
 
