@@ -67,7 +67,19 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
     private static final String[] GETDATA_API_TEST_TITLES_AGGREGATE = {
             "Single Measure (date)",
+            "Single Measure (visit)",
             "Two Measures from the same dataset (date)",
+            "Two Measures from the same dataset (visit)",
+            "Two Measures from different datasets (date)",
+            "Two Measures from different datasets (visit)",
+            "Two Measures - without dimension selected for second, inner join (date)",
+            "Two Measures - without dimension selected for second, inner join (visit)",
+            "Two Measures - without dimension selected for second, outer join (date)",
+            "Two Measures - without dimension selected for second, outer join (visit)",
+            "Two Measures - WITH dimension selected for second, inner join (date)",
+            "Two Measures - WITH dimension selected for second, inner join (visit)",
+            "Two Measures - WITH dimension selected for second, outer join (date)",
+            "Two Measures - WITH dimension selected for second, outer join (visit)",
     };
 
     private static final String[] GETDATA_API_TEST_NUMROWS = {
@@ -82,6 +94,18 @@ public class TimeChartTest extends BaseSeleniumWebTest
     };
 
     private static final String[] GETDATA_API_TEST_NUMROWS_AGGREGATE = {
+            "1 - 22 of 22",
+            "1 - 22 of 22",
+            "1 - 22 of 22",
+            "1 - 22 of 22",
+            "1 - 22 of 22",
+            "1 - 22 of 22",
+            "1 - 15 of 15",
+            "1 - 15 of 15",
+            "1 - 22 of 22",
+            "1 - 22 of 22",
+            "1 - 15 of 15",
+            "1 - 15 of 15",
             "1 - 22 of 22",
             "1 - 22 of 22",
 
@@ -152,6 +176,26 @@ public class TimeChartTest extends BaseSeleniumWebTest
         {40.07, 42.38, 7.99, 32.33, 12.49},
         {40.07, 42.38, 7.99, 32.33, 12.49}
     };
+    private static final String[][] GETDATA_API_COLNAMES_AGGREGATE = {
+            {"Days", "Aggregate Count", "Study Lab Results CD4"},
+            {"Study Lab Results Participant Visitsequencenum",  "Aggregate Count", "Study Lab Results CD4"},
+            {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
+            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
+            {"Days", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
+            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
+            {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
+            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
+            {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
+            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
+
+
+
+
+    };
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -203,12 +247,12 @@ public class TimeChartTest extends BaseSeleniumWebTest
     {
         aggregateTimeChartUITest();
         // bug 13061
-//        aggregateTimeChartSQLTest();
+        aggregateTimeChartSQLTest();
     }
 
     private void aggregateTimeChartSQLTest()
     {
-        sqlTest(testDataAPI + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE, GETDATA_API_TEST_NUMROWS_AGGREGATE, null, null, null, null, null);
+        sqlTest(testDataAPI + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE, GETDATA_API_TEST_NUMROWS_AGGREGATE,  GETDATA_API_COLNAMES_AGGREGATE, null, null, null, null);
     }
 
     //depends on:  participantGroupTimeChartTest
