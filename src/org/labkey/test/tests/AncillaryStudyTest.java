@@ -47,29 +47,30 @@ public class AncillaryStudyTest extends StudyBaseTest
     public void doCleanup()
     {
         // Delete any containers and users created by the test.
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Exception e)
-        {
-        }
+//        try
+//        {
+//            deleteProject(PROJECT_NAME);
+//        }
+//        catch (Exception e)
+//        {
+//        }
     }
 
     @Override
     public void doCreateSteps()
     {
-        importStudy();
-        startSpecimenImport(2);
-        waitForPipelineJobsToComplete(2, "study import", false);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", PTIDS_BAD);
+//        importStudy();
+//        startSpecimenImport(2);
+//        waitForPipelineJobsToComplete(2, "study import", false);
+//        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", PTIDS);
+//        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", PTIDS_BAD);
         createAncillaryStudy();
     }
 
     private void createAncillaryStudy()
     {
-        clickLinkWithText("My Study");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Manage Study");
 
         log("Create Special Emphasis Study.");
@@ -77,9 +78,9 @@ public class AncillaryStudyTest extends StudyBaseTest
         
         //Wizard page 1 - location
         ExtHelper.waitForExtDialog(this, "Create New Study");
-        setFormElement("studyName", STUDY_NAME);
+        setFormElement("studyName", getFolderName());
         setFormElement("studyDescription", STUDY_DESCRIPTION);
-        setFormElement("studyFolder", "/"+PROJECT_NAME+"/"+STUDY_NAME);
+        selectStudyLocation();
         clickNavButton("Next", 0);
 
         //Wizard page 2 - participant group
@@ -124,25 +125,37 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickNavButton("Previous", 0);
         setFormElement("studyName", STUDY_NAME);
         setFormElement(Locator.name("studyFolder"), "/"+PROJECT_NAME+"/"+STUDY_NAME);
+        selectStudyLocation();
         clickNavButton("Next", 0);
         clickNavButton("Next", 0);
         clickNavButton("Finish");
     }
 
+    private void selectStudyLocation()
+    {
+        clickNavButton("Change", 0);
+        ExtHelper.waitForExtDialog(this, "Choose Study Location");
+        click(Locator.xpath(ExtHelper.getExtDialogXPath("Choose Study Location") + "//span[string() = '"+PROJECT_NAME+"']"));
+        ExtHelper.clickExtButton(this, "Choose Study Location", "Select", 0);
+        waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath("Choose Study Location")), WAIT_FOR_JAVASCRIPT);
+    }
+
     @Override
     public void doVerifySteps()
     {
-        waitForText(PTIDS[0]);
-        for( String str : PTIDS )
-        {
-            assertLinkPresentWithText(str);
-        }
+        assertTextPresent("10 Datasets");
+        clickLinkWithText("Manage Datasets");
         for( String str : DATASETS )
         {
             assertLinkPresentWithText(str);
         }
 
-        assertTextPresent("10 Datasets");
+        clickLinkWithText("Shortcuts");
+        waitForText(PTIDS[0]);
+        for( String str : PTIDS )
+        {
+            assertLinkPresentWithText(str);
+        }
         assertTextPresent("10 mice");
 
         verifyModifyParticipantGroup(STUDY_NAME);
@@ -167,12 +180,11 @@ public class AncillaryStudyTest extends StudyBaseTest
         ExtHelper.clickExtButton(this, "Define Mouse Group", "Save", 0);
         waitForExtMaskToDisappear();
 
-        log("Verify that modified participant group has not effect on ancillary study.");
+        log("Verify that modified participant group has no effect on ancillary study.");
         clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Shortcuts");
         waitForText("Filter:"); // Wait for participant list to appear.
-        if(isElementPresent(Locator.linkWithText("Show all")))
-            clickLinkWithText("Show all", false);
-        
+
         for( String str : PTIDS )
         {
             waitForElement(Locator.linkWithText(str), WAIT_FOR_JAVASCRIPT);

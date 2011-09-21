@@ -3616,6 +3616,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         try
         {
             selenium.type(element.toString(), text, suppressValueLogging);
+            fireEvent(element, SeleniumEvent.blur);
         }
         catch (SeleniumException e)
         {
@@ -3632,7 +3633,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFormElement(Locator element, String text)
     {
         setFormElement(element.toString(), text);
-        fireEvent(element, SeleniumEvent.blur);
     }
 
     public void setFormElements(String tagName, String formElementName, String[] values)
