@@ -25,8 +25,11 @@ import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: adam
@@ -151,6 +154,58 @@ public class StudyTest extends StudyBaseTest
         String id = pIDs.substring(0, pIDs.indexOf(","));
         attemptCreateExpectError(id + ", " + id, "is specified more than once, duplicates are not allowed in a group", "Bad List 2");
 
+        // test creating a participant group directly from a data grid
+        clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("DEM-1: Demographics");
+
+        // verify warn on no selection
+        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group from Selection");
+        waitForText("At least one " + SUBJECT_NOUN + " must be selected");
+        clickButtonContainingText("OK", 0);
+
+        DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
+        for (int i=0; i < 5; i++)
+            table.checkCheckbox(i);
+
+        // verify the selected list of identifiers is passed to the participant group wizard
+        String[] selectedIDs = new String[]{"999320016","999320518","999320529","999320541","999320533"};
+        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group from Selection");
+        verifySubjectIDsInWizard(selectedIDs);
+
+        // save the new group and use it
+        setFormElement(LABEL_FIELD, "Participant Group from Grid");
+        clickButtonContainingText("Save", 0);
+
+        // the dataregion get's ajaxed into place, wait until the new group appears in the menu
+        Locator menu = Locator.navButton(SUBJECT_NOUN + " Groups");
+        waitForElement(menu, WAIT_FOR_JAVASCRIPT);
+        Locator menuItem = Locator.menuItem("Participant Group from Grid");
+        for (int i = 0; i < 10; i++)
+        {
+            click(menu);
+            if (isElementPresent(menuItem))
+                break;
+            else
+                sleep(1000);
+        }
+        clickMenuButton(SUBJECT_NOUN + " Groups", "Participant Group from Grid");
+        for (String identifier : selectedIDs)
+            assertTextPresent(identifier);
+    }
+
+    private void verifySubjectIDsInWizard(String[] ids)
+    {
+        Locator textArea = Locator.xpath("//textarea[@id='categoryIdentifiers']");
+        waitForElement(textArea, WAIT_FOR_JAVASCRIPT);
+        String subjectIDs = getFormElement(textArea);
+        Set<String> identifiers = new HashSet<String>();
+
+        for (String subjectId : subjectIDs.split(","))
+            identifiers.add(subjectId);
+
+        // validate...
+        if (!identifiers.containsAll(Arrays.asList(ids)))
+            fail("The Participant Group wizard did not contain the subject IDs : " + ids);
     }
 
     /** verify that we can change a list's name

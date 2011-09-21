@@ -63,31 +63,59 @@
     <test name="group categories" type="get">
         <url>participant-group/StudyVerifyProject/My%20Study/getParticipantCategories.view?</url>
         <response>{
-            "categories": [
+        "categories": [
             {
-            "shared": false,
-            "autoUpdate": false,
-            "label": "Controller",
-            "type": "list",
-            "participantIds": ["999320016", "999320010", "999320018", "999320021", "999320029"]
+                "shared": false,
+                "autoUpdate": false,
+                "label": "Participant Group from Grid",
+                "type": "list",
+                "participantIds": [
+                    "999320016",
+                    "999320518",
+                    "999320529",
+                    "999320541",
+                    "999320533"
+                ]
             },
             {
-            "shared": false,
-            "autoUpdate": false,
-            "label": "Elite Controller",
-            "type": "list",
-            "participantIds": ["999320033", "999320036", "999320038"]
+                "shared": false,
+                "autoUpdate": false,
+                "label": "Controller",
+                "type": "list",
+                "participantIds": [
+                    "999320016",
+                    "999320010",
+                    "999320018",
+                    "999320021",
+                    "999320029"
+                ]
             },
             {
-            "shared": false,
-            "autoUpdate": false,
-            "label": "Non Controller",
-            "type": "list",
-            "participantIds": ["999320170", "999320173", "999320176"]
+                "shared": false,
+                "autoUpdate": false,
+                "label": "Elite Controller",
+                "rowId": 317,
+                "type": "list",
+                "participantIds": [
+                    "999320033",
+                    "999320036",
+                    "999320038"
+                ]
+            },
+            {
+                "shared": false,
+                "autoUpdate": false,
+                "label": "Non Controller",
+                "type": "list",
+                "participantIds": [
+                    "999320170",
+                    "999320173",
+                    "999320176"
+                ]
             }
-            ],
-            "success": true
-            }
+        ],
+        "success": true
+        }
         </response>
     </test>
     <test name="delete category" type="post">
