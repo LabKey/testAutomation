@@ -47,23 +47,23 @@ public class AncillaryStudyTest extends StudyBaseTest
     public void doCleanup()
     {
         // Delete any containers and users created by the test.
-//        try
-//        {
-//            deleteProject(PROJECT_NAME);
-//        }
-//        catch (Exception e)
-//        {
-//        }
+        try
+        {
+            deleteProject(PROJECT_NAME);
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     @Override
     public void doCreateSteps()
     {
-//        importStudy();
-//        startSpecimenImport(2);
-//        waitForPipelineJobsToComplete(2, "study import", false);
-//        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", PTIDS);
-//        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", PTIDS_BAD);
+        importStudy();
+        startSpecimenImport(2);
+        waitForPipelineJobsToComplete(2, "study import", false);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", PTIDS);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", PTIDS_BAD);
         createAncillaryStudy();
     }
 
