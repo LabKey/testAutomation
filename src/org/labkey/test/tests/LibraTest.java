@@ -158,18 +158,6 @@ public class LibraTest extends MS2Test
         Locator img = Locator.xpath("//img[contains(@id,'MS2Peptides-Handle')]");
         click(img);
         checkForITRAQNormalization();
-
-
-        //To change body of created methods use File | Settings | File Templates.
-    }
-
-    //I have no idea why this works when getTableCellText doesn't.
-    protected String getProteinProphetTableCell(int row, int column)
-    {
-        Locator l = Locator.xpath("//table[@id='dataregion_MS2Peptides']/tbody/tr[" + (row+1) + "]/td["+ (column+1) + "]");
-        String text = getText(l);
-
-        return text;
     }
 
     @Override
