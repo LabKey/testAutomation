@@ -58,11 +58,11 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_LUM_FILE2 = getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx";
     protected final String TEST_ASSAY_LUM_FILE3 = getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls";
     protected final String TEST_ASSAY_LUM_FILE4 = getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls";
-    protected final String TEST_ASSAY_LUM_FILE5 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 1.xls";
-    protected final String TEST_ASSAY_LUM_FILE6 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 2.xls";
-    protected final String TEST_ASSAY_LUM_FILE7 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 3.xls";
-    protected final String TEST_ASSAY_LUM_FILE8 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 4.xls";
-    protected final String TEST_ASSAY_LUM_FILE9 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set Plate 5.xls";
+    protected final String TEST_ASSAY_LUM_FILE5 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 1.xls";
+    protected final String TEST_ASSAY_LUM_FILE6 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 2.xls";
+    protected final String TEST_ASSAY_LUM_FILE7 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls";
+    protected final String TEST_ASSAY_LUM_FILE8 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls";
+    protected final String TEST_ASSAY_LUM_FILE9 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls";
 
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_1 = getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (b12 IgA std).xls";
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_2 = getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls";
