@@ -125,7 +125,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         {
             selenium.getEval("selenium.selectExtGridItem('Label', '"+DATASETS[i]+"', null, 'studyWizardDatasetList', true)");
         }
-        assertWizardError("Finish", "An error occurred trying to load: A study already exists in the destination folder.");
+        assertWizardError("Finish", "An error occurred trying to create the study: A study already exists in the destination folder.");
 
         clickNavButton("Previous", 0);
         clickNavButton("Previous", 0);
