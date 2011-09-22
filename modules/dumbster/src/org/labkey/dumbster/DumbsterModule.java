@@ -66,4 +66,10 @@ public class DumbsterModule extends DefaultModule
         if (AppProps.getInstance().isMailRecorderEnabled())
             DumbsterManager.get().start();
     }
+
+    @Override
+    public boolean isAutoUninstall()
+    {
+        return true;
+    }
 }
