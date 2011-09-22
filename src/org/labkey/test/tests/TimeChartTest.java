@@ -271,7 +271,7 @@ public class TimeChartTest extends BaseSeleniumWebTest
         checkRadioButton("chart_layout", "per_group");
                                   // TODO:  talk to trey
         sleep(500);
-        clickCheckbox("Show Aggregate");
+        clickCheckbox("Show Mean");
         waitForTextToDisappear("loading");
         clickCheckbox("Show Individual Lines");
         waitForTextToDisappear("loading");
