@@ -221,7 +221,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void setStudyRedesign()
     {
         clickAdminMenuItem("Manage Project", "Folder Settings");
-        checkRadioButton("folderType", "Study Redesign");
+        checkRadioButton("folderType", "Study Redesign (ITN)");
         clickButton("Update Folder");
     }
 }
