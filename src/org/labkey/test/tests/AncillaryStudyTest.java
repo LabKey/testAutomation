@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StudyHelper;
 
@@ -31,11 +32,16 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String PROJECT_NAME = "AncillaryStudyTest Project";
     private static final String STUDY_NAME = "Special Emphasis Study";
     private static final String STUDY_DESCRIPTION = "Ancillary study created by AncillaryStudyTest.";
-    private static final String[] DATASETS = {"AE-1:(VTN) AE Log","APX-1: Abbreviated Physical Exam","BRA-1: Behavioral Risk Assessment (Page 1)","BRA-2: Behavioral Risk Assessment (Page 2)","CM-1:(Ph I/II) Concomitant Medications Log","CPF-1: Follow-up Chemistry Panel","CPS-1: Screening Chemistry Panel","DEM-1: Demographics","DOV-1: Discontinuation of Vaccination","ECI-1: Eligibility Criteria"};
+    private static final String[] DATASETS = {"APX-1: Abbreviated Physical Exam","AE-1:(VTN) AE Log","BRA-1: Behavioral Risk Assessment (Page 1)","BRA-2: Behavioral Risk Assessment (Page 2)","CM-1:(Ph I/II) Concomitant Medications Log","CPF-1: Follow-up Chemistry Panel","CPS-1: Screening Chemistry Panel","DEM-1: Demographics","DOV-1: Discontinuation of Vaccination","ECI-1: Eligibility Criteria"};
     private static final String PARTICIPANT_GROUP = "Ancillary Group";
     private static final String[] PTIDS = {"999320016", "999320518", "999320529", "999320533", "999320541", "999320557", "999320565", "999320576", "999320582", "999320590"};
     private static final String PARTICIPANT_GROUP_BAD = "Bad Ancillary Group";
     private static final String[] PTIDS_BAD = {"999320004", "999320007", "999320010", "999320016", "999320018", "999320021", "999320029", "999320033", "999320036","999320038"};
+    private static final String SEQ_NUMBER = "1001"; //These should alphabetically precede all exesting sequence numbers.
+    private static final String SEQ_NUMBER2 = "1002";
+    private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
+                                                     PTIDS[0] + "\t"+SEQ_NUMBER+"\n" +
+                                                     PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -124,10 +130,10 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickNavButton("Previous", 0);
         clickNavButton("Previous", 0);
         setFormElement("studyName", STUDY_NAME);
-        setFormElement(Locator.name("studyFolder"), "/"+PROJECT_NAME+"/"+STUDY_NAME);
         selectStudyLocation();
         clickNavButton("Next", 0);
         clickNavButton("Next", 0);
+        checkRadioButton("autoRefresh", "false");
         clickNavButton("Finish");
     }
 
@@ -160,6 +166,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         verifyModifyParticipantGroup(STUDY_NAME);
         verifyModifyParticipantGroup(getFolderName());
+        verifyModifyDataset();
     }
 
     private void verifyModifyParticipantGroup(String study)
@@ -173,6 +180,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         click(Locator.xpath("//*[text()='"+PARTICIPANT_GROUP+"']"));
         clickNavButton("Edit Selected", 0);
         ExtHelper.waitForExtDialog(this, "Define Mouse Group");
+        waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         String csp = PTIDS[0];
         for( int i = 1; i < PTIDS.length - 1; i++ )
             csp += ","+PTIDS[i];
@@ -189,6 +197,75 @@ public class AncillaryStudyTest extends StudyBaseTest
         {
             waitForElement(Locator.linkWithText(str), WAIT_FOR_JAVASCRIPT);
         }
+    }
+
+    private void verifyModifyDataset()
+    {
+        //INSERT
+        log("Insert rows into source dataset");
+        clickLinkWithText(getFolderName());
+        clickLinkWithText(DATASETS[0]);
+        clickNavButton("Import Data");
+        setFormElement(Locator.name("text"), EXTRA_DATASET_ROWS);
+        clickNavButton("Submit", 0);
+        waitAndClickNavButton("OK");
+
+        log("Verify changes in Ancillary Study. (insert)");
+        clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText(DATASETS[0]);
+        clickNavButton("View Data");
+        clickMenuButton("Views", "Edit Snapshot");
+        clickNavButton("Update Snapshot", 0);
+        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
+        waitForPageToLoad();
+        DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
+        assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
+        assertTextPresent(SEQ_NUMBER + ".0");
+        table.getColumnDataAsText("Sequence Num");
+
+        //UPDATE
+        log("Modify row in source dataset");
+        clickLinkWithText(getFolderName());
+        clickLinkWithText(DATASETS[0]);
+        clickLinkWithText("edit", 1);
+        setFormElement(Locator.name("quf_SequenceNum"), SEQ_NUMBER2);
+        clickNavButton("Submit");
+
+        log("Verify changes in Ancillary Study. (modify)");
+        clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText(DATASETS[0]);
+        clickNavButton("View Data");
+        clickMenuButton("Views", "Edit Snapshot");
+        clickNavButton("Update Snapshot", 0);
+        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
+        waitForPageToLoad();
+        table = new DataRegionTable("Dataset", this, true, true);
+        assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
+        assertTextPresent(SEQ_NUMBER2 + ".0");
+        assertTextNotPresent(SEQ_NUMBER + ".0");
+
+        //DELETE
+        log("Delete row from source dataset");
+        clickLinkWithText(getFolderName());
+        clickLinkWithText(DATASETS[0]);
+        checkCheckbox(".select", 1);
+        clickNavButton("Delete");
+        assertConfirmation("Delete selected row from this dataset?");
+
+        log("Verify changes in Ancillary Study. (delete)");
+        clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText(DATASETS[0]);
+        clickNavButton("View Data");
+        clickMenuButton("Views", "Edit Snapshot");
+        clickNavButton("Update Snapshot", 0);
+        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
+        waitForPageToLoad();
+        table = new DataRegionTable("Dataset", this, true, true);
+        assertEquals("Dataset does not reflect changes in source study.", 20, table.getDataRowCount());
+        assertTextNotPresent(SEQ_NUMBER + ".0", SEQ_NUMBER2 + ".0");
     }
         
     private void assertWizardError(String button, String error)
