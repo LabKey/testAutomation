@@ -16,11 +16,9 @@
 package org.labkey.test.tests;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 6/22/11
  * Time: 11:40 AM
- * To change this template use File | Settings | File Templates.
  */
 
 /**This class is for security related tests that should be run only weekly,
@@ -31,7 +29,6 @@ public class SecurityTestExtended extends SecurityTest
 
     protected void doTestSteps()
     {
-
         clonePermissionsTest();
         cantReachAdminToolFromUserAccount(true);
     }
