@@ -178,19 +178,19 @@ public class TimeChartTest extends BaseSeleniumWebTest
     };
     private static final String[][] GETDATA_API_COLNAMES_AGGREGATE = {
             {"Days", "Aggregate Count", "Study Lab Results CD4"},
-            {"Study Lab Results Participant Visitsequencenum",  "Aggregate Count", "Study Lab Results CD4"},
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum",  "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
-            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
-            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
-            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
-            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
-            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
-            {"Study Lab Results Participant Visitsequencenum", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
 
 
 
