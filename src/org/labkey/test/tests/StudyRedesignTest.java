@@ -58,8 +58,8 @@ public class StudyRedesignTest extends StudyBaseTest
     private void datasetBrowserWebPartTest()
     {
         log("Dataset Browser test");
-        clickLinkContainingText("Clinical and Assay Data");
-        addWebPart(datasetBrowse);
+        clickLinkContainingText("Data Analysis");
+        //addWebPart(datasetBrowse); // Present by default
         waitForText(someDataSets[3]);
         assertTextPresent("Dataset Browse", "Name", "Type", "Access");
 
