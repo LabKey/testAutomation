@@ -141,7 +141,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         clickNavButton("Change", 0);
         ExtHelper.waitForExtDialog(this, "Choose Study Location");
-        click(Locator.xpath(ExtHelper.getExtDialogXPath("Choose Study Location") + "//span[string() = '"+PROJECT_NAME+"']"));
+        waitAndClick(Locator.xpath(ExtHelper.getExtDialogXPath("Choose Study Location") + "//span[string() = '"+PROJECT_NAME+"']"));
         ExtHelper.clickExtButton(this, "Choose Study Location", "Select", 0);
         waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath("Choose Study Location")), WAIT_FOR_JAVASCRIPT);
     }
