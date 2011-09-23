@@ -546,7 +546,8 @@ public class IssuesTest extends BaseSeleniumWebTest
     {
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Query");
-        setFormElement("schemaName", "issues");
+        selenium.select("//select[@name='schemaName']", "issues");
+//        setFormElement("schemaName", "issues");
         submit();
         clickLinkWithText("Issues Queries");
         createNewQuery("issues");
