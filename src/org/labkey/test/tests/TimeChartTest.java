@@ -225,6 +225,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
         stdDevRegressionTest();
 
+        visitBasedChartTest();
+
         visualizationTest();
 
         generateChartPerParticipantTest();
@@ -340,10 +342,34 @@ public class TimeChartTest extends BaseSeleniumWebTest
         waitForText("No data found", WAIT_FOR_JAVASCRIPT);
     }
 
+    private void visitBasedChartTest()
+    {
+        clickNavButton("Remove Measure", 0);
+        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Add Measure", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='HIV Test Results']]"));
+        clickNavButton("Select", 0);
+        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
+
+        ExtHelper.clickExtTab(this, "X-Axis");
+        checkRadioButton("chartType", "visit");
+        waitForTextToDisappear("Days Since Start Date");
+        waitForText("20080613");
+        assertTextPresentInThisOrder("20080613", "20080716", "20080730", "20080814", "20080902", "20080926", "20081203", "20090106", "20090118", "20090208", "20090217", "20090316");
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[contains(@class, 'x-item-disabled')]/input"));
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x-item-disabled')]/input"));
+
+        checkRadioButton("chartType", "date");
+        waitForText("Days Since Start Date");
+        assertTextNotPresent("20080613", "20080716", "20080730", "20080814", "20080902", "20080926", "20081203", "20090106", "20090118", "20090208", "20090217", "20090316");
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[not(contains(@class, 'x-item-disabled'))]/input"));
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[not(contains(@class, 'x-item-disabled'))]/input"));
+    }
+
     private void saveTest()
     {
-
-
         ExtHelper.clickExtTab(this, "Overview");
         setFormElement("reportName", REPORT_NAME_1);
         setFormElement("reportDescription", REPORT_DESCRIPTION);
