@@ -100,7 +100,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                     for (ApiTestCase test : parseTests(testFile))
                     {
                         tests++;
-                        log("Starting new test case: " + StringUtils.trimToEmpty(test.getName()));
+                        log("Starting new test case: \"" + StringUtils.trimToEmpty(test.getName()) + "\" in file " + testFile.getPath());
                         sendRequestDirect(testFile.getName(), test.getUrl(), test.getType(), test.getFormData(), test.getReponse(), test.isFailOnMatch(), username, password, expectErrors);
                         log("test case completed");
                     }

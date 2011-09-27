@@ -1,5 +1,5 @@
 <ApiTests xmlns="http://labkey.org/query/xml">
-    <test name="recorded test case" type="post">
+    <test name="recorded test case 1" type="post">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/insertRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <formData>{ "schemaName": "lists",
@@ -31,7 +31,7 @@
         </response>
     </test>
 
-    <test name="recorded test case" type="get">
+    <test name="recorded test case 2" type="get">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <response><![CDATA[{"schemaName":"lists",
@@ -172,7 +172,7 @@
     </test>
 
 
-    <test name="recorded test case" type="post">
+    <test name="recorded test case 3" type="post">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/insertRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <formData>{ "schemaName": "lists",
@@ -230,7 +230,7 @@
         </response>
     </test>
 
-    <test name="recorded test case" type="get">
+    <test name="recorded test case 4" type="get">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <response><![CDATA[{"schemaName":"lists",
@@ -367,7 +367,7 @@
 "rowCount":8}]]></response>
     </test>
 
-    <test name="recorded test case" type="post">
+    <test name="recorded test case 5" type="post">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/updateRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <formData>{ "schemaName": "lists",
@@ -410,7 +410,7 @@
         </response>
     </test>
 
-    <test name="recorded test case" type="get">
+    <test name="recorded test case 6" type="get">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <response><![CDATA[{"schemaName":"lists",
@@ -547,7 +547,7 @@
 "rowCount":8}]]></response>
     </test>
 
-    <test name="recorded test case" type="post">
+    <test name="recorded test case 7" type="post">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/deleteRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <formData>{ "schemaName": "lists",
@@ -577,7 +577,7 @@
         </response>
     </test>
 
-    <test name="recorded test case" type="get">
+    <test name="recorded test case 8" type="get">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/selectRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
         <response><![CDATA[{"schemaName":"lists",
