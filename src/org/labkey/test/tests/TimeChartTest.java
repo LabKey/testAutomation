@@ -18,12 +18,14 @@ package org.labkey.test.tests;
 import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TimeChartTest extends BaseSeleniumWebTest
@@ -50,6 +52,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
     private static final String[] GROUP1_PTIDS = {"249318596", "249320107"};
     private static final String[] GROUP2_PTIDS = {"249320127", "249320489"};
     private static final String[] GROUP3_PTIDS = {"249320489"/*Duplicate from group 2*/, "249320897", "249325717"};
+
+    private static final String[] VISIT_STRINGS = {"20080613", "20080716", "20080730", "20080814", "20080902", "20080926", "20081203", "20090106", "20090118", "20090208", "20090217", "20090316"};
 
     private static final String USER1 = "user1@timechart.test";
 
@@ -357,13 +361,44 @@ public class TimeChartTest extends BaseSeleniumWebTest
         checkRadioButton("chartType", "visit");
         waitForTextToDisappear("Days Since Start Date");
         waitForText("20080613");
-        assertTextPresentInThisOrder("20080613", "20080716", "20080730", "20080814", "20080902", "20080926", "20081203", "20090106", "20090118", "20090208", "20090217", "20090316");
+        assertTextPresentInThisOrder(VISIT_STRINGS);
         assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[contains(@class, 'x-item-disabled')]/input"));
         assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x-item-disabled')]/input"));
 
+        log("Check visit data.");
+        clickNavButton("View Data", 0);
+        waitForText("1 - 33 of 33");
+
+        String tableId = getAttribute(Locator.xpath("//table[starts-with(@id, 'dataregion_') and contains(@class, 'labkey-data-region')]"), "id");
+        String tableName = tableId.substring(tableId.indexOf('_') + 1, tableId.length());
+        DataRegionTable table = new DataRegionTable(tableName, this, false, true);
+        List displayOrders = table.getColumnDataAsText("Study HIVTest Results Participant Visit Visit Display Order");
+        for (Object str : displayOrders)
+        {
+            assertEquals("Display order should default to zero.", "0", str.toString());            
+        }
+
+        List visits = table.getColumnDataAsText("Study HIVTest Results Participant Visitsequencenum");
+        for(int i = 0; i < visits.size(); i++ )
+        {
+            String visitSn = visits.get(i).toString(); // Sequence numbers are displayed with scientific notation.
+            String visit;
+            visit = visitSn.substring(0, visitSn.indexOf("E")).replace(".", ""); // 2.0080804E7 => 20080804
+            if( visit.length() < 8 )
+                visit += "0"; // 2008063 => 20080630
+            visits.set(i, visit);
+        }
+        for( String str : VISIT_STRINGS )
+        {
+            assertTrue("Not all visits present in data table.", visits.contains(str));
+        }
+
+        clickNavButton("View Chart(s)", 0);
+        waitForTextToDisappear("1 - 33 of 33");
+        log("Revert to Date-based chart.");
         checkRadioButton("chartType", "date");
         waitForText("Days Since Start Date");
-        assertTextNotPresent("20080613", "20080716", "20080730", "20080814", "20080902", "20080926", "20081203", "20090106", "20090118", "20090208", "20090217", "20090316");
+        assertTextNotPresent(VISIT_STRINGS);
         assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[not(contains(@class, 'x-item-disabled'))]/input"));
         assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[not(contains(@class, 'x-item-disabled'))]/input"));
     }
