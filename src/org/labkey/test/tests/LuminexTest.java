@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class LuminexTest extends AbstractQCAssayTest
 {
-    private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project9";            //project for luminex test
+    private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
     protected static final String TEST_ASSAY_LUM =  "TestAssayLuminex";
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
@@ -1346,15 +1346,9 @@ public class LuminexTest extends AbstractQCAssayTest
     private void setIsoAndConjugate()
     {
         log("unimplemented");
-        Locator l = Locator.id("isotype-combo-box");
-        clickAt(l, "1,1");
-        l = Locator.tagWithText("div", isotype);
-        clickAt(l,  ("1,1"));
+        ExtHelper.selectComboBoxItem(this,"Isotype", isotype);
 
-        l = Locator.id("conjugate-combo-box");
-        clickAt(l, "1,1");
-        l = Locator.tagWithText("div", conjugate);
-        clickAt(l,  ("1,1"));
+        ExtHelper.selectComboBoxItem(this,"Conjugate", conjugate);
 
     }
 
@@ -1396,6 +1390,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         clickButton("Save",0);
         waitForExtMaskToDisappear();
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
 
     }
 
