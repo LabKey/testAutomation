@@ -159,7 +159,7 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("DEM-1: Demographics");
 
         // verify warn on no selection
-        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group from Selection");
+        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From selection");
         waitForText("At least one " + SUBJECT_NOUN + " must be selected");
         clickButtonContainingText("OK", 0);
 
@@ -169,7 +169,7 @@ public class StudyTest extends StudyBaseTest
 
         // verify the selected list of identifiers is passed to the participant group wizard
         String[] selectedIDs = new String[]{"999320016","999320518","999320529","999320541","999320533"};
-        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group from Selection");
+        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From selection");
         verifySubjectIDsInWizard(selectedIDs);
 
         // save the new group and use it
