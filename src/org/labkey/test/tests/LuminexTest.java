@@ -27,6 +27,9 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
+import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -190,6 +193,7 @@ public class LuminexTest extends AbstractQCAssayTest
         addField("Run Fields", 10, "NotebookNo", "Notebook Number", ListColumnType.String);
         addField("Run Fields", 11, "AssayType", "Assay Type", ListColumnType.String);
         addField("Run Fields", 12, "ExpPerformer", "Experiment Performer", ListColumnType.String);
+        addField("Run Fields", 13, "TestDate", "Test Date", ListColumnType.DateTime);
 
         // add analyte property for tracking lot number
         addField("Analyte Properties", 8, "LotNumber", "Lot Number", ListColumnType.String);
@@ -1096,12 +1100,13 @@ public class LuminexTest extends AbstractQCAssayTest
     protected String isotype = "IgG";
     protected String conjugate = "PE";
 
+    protected DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
     //requires drc, Ruminex, rlabkey and xtable packages installed in R
     protected void runGuideSetTest()
     {
         log("Uploading Luminex run with a R transform script for Guide Set test");
 
-        String[] names = {"Guide Set Plate 1", "Guide Set Plate 2", "Guide Set Plate 3", "Guide Set Plate 4", "Guide Set Plate 5"};
         String[] files = {TEST_ASSAY_LUM_FILE5, TEST_ASSAY_LUM_FILE6, TEST_ASSAY_LUM_FILE7, TEST_ASSAY_LUM_FILE8, TEST_ASSAY_LUM_FILE9};
         String[] analytes = {"GS Analyte (1)", "GS Analyte (2)"};
 
@@ -1114,19 +1119,25 @@ public class LuminexTest extends AbstractQCAssayTest
         // save changes to assay design
         clickNavButton("Save & Close");
 
-        // upload the the  files
-        for (int i = 0; i < 5; i++)
+        // setup the testDate variable
+        Calendar testDate = Calendar.getInstance();
+        testDate.add(Calendar.DATE, -files.length);
+
+        // upload the first set of files (2 runs)
+        for (int i = 0; i < 2; i++)
         {
             goToTestAssayHome();
             clickNavButton("Import Data");
-            setFormElement("network", "NETWORK1");
+            setFormElement("network", "NETWORK" + (i+1));
             clickNavButton("Next");
-            setFormElement("name", names[i]);
+            setFormElement("name", "Guide Set Plate " + (i+1));
             setFormElement("isotype", isotype);
             setFormElement("conjugate", conjugate);
-            setFormElement("notebookNo", "Notebook1");
+            setFormElement("notebookNo", "Notebook" + (i+1));
             setFormElement("assayType", "Experimental");
-            setFormElement("expPerformer", "TECH1");
+            setFormElement("expPerformer", "TECH" + (i+1));
+            testDate.add(Calendar.DATE, 1);
+            setFormElement("testDate", df.format(testDate.getTime()));
             setFormElement("__primaryFile__", new File(files[i]));
             clickNavButton("Next", 60000);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
@@ -1134,89 +1145,90 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Save and Finish");
         }
 
-        //create guide sets
-        goToLevyJohnsonGraphPage();
+        // verify that the uploaded runs do not have associated guide sets
+//        verifyGuideSetsNotApplied();
 
-        createGuideSets();
+        //create initial guide sets for the 2 analytes
+        goToLeveyJenningsGraphPage("HIVIG");
+        createInitialGuideSets();
 
-
-        //verify LJ page
-        waitForText("Comment: edited analyte 2");
-        assertTextPresent("Tracking Data");
-        assertElementPresent( Locator.id("EC50TrendPlotDiv"));
-
-        click(Locator.tagWithText("span", "AUC"));
-        waitForTextToDisappear("Loading");
-        assertElementPresent( Locator.id("AUCTrendPlotDiv"));
-
-
-        click(Locator.tagWithText("span", "High MFI"));
-        waitForTextToDisappear("Loading");
-        assertElementPresent( Locator.id("MaxMFITrendPlotDiv"));
-
+        // check guide set IDs and make sure appropriate runs are associated to created guide sets
         Map<String, Integer> guideSetIds = getGuideSetIdMap();
-        verifyGuideSetsApplied(guideSetIds, analytes);
+        verifyGuideSetsApplied(guideSetIds, analytes, 2);
 
+        // verify the guide set threshold values for the first set of runs
+        int[] rowCounts = {2, 2};
+        double[] ec50Averages = {177.20, 43423.37};
+        double[] ec50StdDevs = {18.42, 798.51};
+        double[] aucAverages = {8664.66, 80853.29};
+        double[] aucStdDevs = {520.55, 6522.66};
+        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec50Averages, ec50StdDevs, aucAverages, aucStdDevs);
 
+        // upload the final set of runs (2 runs)
+        for (int i = 2; i < files.length; i++)
+        {
+            goToTestAssayHome();
+            clickNavButton("Import Data");
+            setFormElement("network", "NETWORK" + (i+1));
+            clickNavButton("Next");
+            setFormElement("name", "Guide Set Plate " + (i+1));
+            setFormElement("isotype", isotype);
+            setFormElement("conjugate", conjugate);
+            setFormElement("notebookNo", "Notebook" + (i+1));
+            setFormElement("assayType", "Experimental");
+            setFormElement("expPerformer", "TECH" + (i+1));
+            testDate.add(Calendar.DATE, 1);
+            setFormElement("testDate", df.format(testDate.getTime()));
+            setFormElement("__primaryFile__", new File(files[i]));
+            clickNavButton("Next", 60000);
+            uncheckCheckbox("_titrationRole_standard_HIVIG");
+            checkCheckbox("_titrationRole_qccontrol_HIVIG");
+            clickNavButton("Save and Finish");
+        }
+
+        // verify that the newly uploaded runs got the correct guide set applied to them
+        verifyGuideSetsApplied(guideSetIds, analytes, 5);
+
+        //verify Levey-Jennings report R plots are displayed without errors
+        verifyLeveyJenningsRplots();
+
+        // test the manage guide set page for adding records to the current guide set
+//        goToSchemaBrowser();
+//        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+//        waitForText("view data");
+//        clickLinkContainingText("view data");
+//        DataRegionTable table = new DataRegionTable("query", this);
+//        table.setFilter("AnalyteName", "Equals", analytes[0]);
+//        table.setFilter("CurrentGuideSet", "Equals", "true");
+//        table.clickLink(0, table.getColumn("Current Guide Set"));
+//        waitForText("Manage Guide Set");
+//        waitForText("Guide Set Plate 5");
+//        // verify that the non-current guide set text is not present and the save button is
+//        assertTextNotPresent("The selected guide set is not a currently active guide set. Only current guide sets are editable at this time.");
+//        assertTextPresent("Save");
+//        // check the guide set ID and analyte name in the top set of labels
+//        assertTextPresentInThisOrder("Guide Set ID:", guideSetIds.get(analytes[0]).toString());
+//        assertTextPresentInThisOrder("Analyte:", analytes[0]);
+//        // add two records from the "All Runs" grid to the guide run set
+//        click(Locator.tagWithId("span", "allRunsRow_3"));
+//        click(Locator.tagWithId("span", "allRunsRow_4"));
+//        // add a comment to the guide set
+//        ExtHelper.setExtFormElementByLabel(this, "Comment", "testing guide set comment");
+//        // save the changes
+//        ExtHelper.clickExtButton(this, "Save", 0);
 //
-//        // test the manage guide set page for adding records to the current guide set
-        goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
-        waitForText("view data");
-        clickLinkContainingText("view data");
-        DataRegionTable table = new DataRegionTable("query", this);
-        table.setFilter("AnalyteName", "Equals", analytes[0]);
-        table.setFilter("CurrentGuideSet", "Equals", "true");
-        table.clickLink(0, table.getColumn("Current Guide Set"));
-        waitForText("Manage Guide Set");
-        waitForText("Guide Set Plate 5");
-        // verify that the non-current guide set text is not present and the save button is
-        assertTextNotPresent("The selected guide set is not a currently active guide set. Only current guide sets are editable at this time.");
-        assertTextPresent("Save");
-        // check the guide set ID and analyte name in the top set of labels
-        assertTextPresentInThisOrder("Guide Set ID:", guideSetIds.get(analytes[0]).toString());
-        assertTextPresentInThisOrder("Analyte:", analytes[0]);
-        // add two records from the "All Runs" grid to the guide run set
-        click(Locator.tagWithId("span", "allRunsRow_3"));
-        click(Locator.tagWithId("span", "allRunsRow_4"));
-        // add a comment to the guide set
-        ExtHelper.setExtFormElementByLabel(this, "Comment", "testing guide set comment");
-        // save the changes
-        ExtHelper.clickExtButton(this, "Save", 0);
+//        // go to the GuideSet table to verify the changes to the comment
+//        goToSchemaBrowser();
+//        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+//        waitForText("view data");
+//        clickLinkContainingText("view data");
+//        CustomizeViewsHelper.openCustomizeViewPanel(this);
+//        CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
+//        CustomizeViewsHelper.applyCustomView(this);
+//        table = new DataRegionTable("query", this);
+//        table.setFilter("RowId", "Equals", guideSetIds.get(analytes[0]).toString());
+//        assertEquals("Unexpected comment for guide set id " + guideSetIds.get(analytes[0]).toString(), "testing guide set comment", table.getDataAsText(0, "Comment"));
 //
-        // go to the GuideSet table to verify the changes to the comment
-        goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
-        waitForText("view data");
-        clickLinkContainingText("view data");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
-        CustomizeViewsHelper.applyCustomView(this);
-        table = new DataRegionTable("query", this);
-        table.setFilter("RowId", "Equals", guideSetIds.get(analytes[0]).toString());
-        assertEquals("Unexpected comment for guide set id " + guideSetIds.get(analytes[0]).toString(), "testing guide set comment", table.getDataAsText(0, "Comment"));
-//
-        // go to the GuideSetCurveFit table to verify the calculated threshold values for the EC50 and AUC
-        goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " GuideSetCurveFit");
-        waitForText("view data");
-        clickLinkContainingText("view data");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSetId/RowId");
-        CustomizeViewsHelper.applyCustomView(this);
-        table = new DataRegionTable("query", this);
-        // verify the row count, average, and standard deviation for the EC50 values
-        table.setFilter("GuideSetId/RowId", "Equals", guideSetIds.get(analytes[0]).toString());
-        table.setFilter("CurveType", "Equals", "Four Parameter");
-        assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[0]).toString(), 3, Integer.parseInt(table.getDataAsText(0, "Run Count")));
-        assertEquals("Unexpected EC50 average for guide set " + guideSetIds.get(analytes[0]).toString(), 187.39, Double.parseDouble(table.getDataAsText(0, "EC50Average")));
-        assertEquals("Unexpected EC50 StdDev for guide set " + guideSetIds.get(analytes[0]).toString(), 21.93, Double.parseDouble(table.getDataAsText(0, "EC50Std Dev")));
-        table.clearFilter("CurveType");
-        // verify the row count, average, and standard deviation for the AUC values
-        table.setFilter("CurveType", "Equals", "Trapezoidal");
-        assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[0]).toString(), 3, Integer.parseInt(table.getDataAsText(0, "Run Count")));
-        assertEquals("Unexpected AUC average for guide set " + guideSetIds.get(analytes[0]).toString(), 8120.72	, Double.parseDouble(table.getDataAsText(0, "AUCAverage")));
-        assertEquals("Unexpected AUC StdDev for guide set " + guideSetIds.get(analytes[0]).toString(), 1011.47, Double.parseDouble(table.getDataAsText(0, "AUCStd Dev")));
 
         //TODO: test that you can't edit a non-current guide set
 //        goToSchemaBrowser();
@@ -1277,7 +1289,49 @@ public class LuminexTest extends AbstractQCAssayTest
 //        assertEquals("Unexpected AUC StdDev for guide set " + guideSetIds.get(analytes[0]).toString(), 994.74, Double.parseDouble(table.getDataAsText(0, "AUCStd Dev")));
     }
 
-    private void verifyGuideSetsApplied(Map<String, Integer> guideSetIds, String[] analytes)
+    private void verifyLeveyJenningsRplots()
+    {
+        goToLeveyJenningsGraphPage("HIVIG");
+        setUpGuideSet("GS Analyte (2)");
+
+        // check ec50 trending R plot
+        click(Locator.tagWithText("span", "EC50"));
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        assertElementPresent( Locator.id("EC50TrendPlotDiv"));
+        assertElementPresent( Locator.id("EC50TrendPdfDiv"));
+        assertTextPresent("PDF output file (click to download)");
+
+        // check auc trending R plot
+        click(Locator.tagWithText("span", "AUC"));
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        assertElementPresent( Locator.id("AUCTrendPlotDiv"));
+        assertElementPresent( Locator.id("AUCTrendPdfDiv"));
+        assertTextPresent("PDF output file (click to download)");
+
+        // check high mfi trending R plot
+        click(Locator.tagWithText("span", "High MFI"));
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        assertElementPresent( Locator.id("MaxMFITrendPlotDiv"));
+        assertElementPresent( Locator.id("MaxMFITrendPdfDiv"));
+        assertTextPresent("PDF output file (click to download)");
+    }
+
+    private void verifyGuideSetsNotApplied()
+    {
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " AnalyteTitration");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        DataRegionTable table = new DataRegionTable("query", this);
+        table.setFilter("GuideSet", "Is Not Blank", "");
+        assertEquals("Expected no guide set assignments", 0, table.getDataRowCount()); // todo: why isn't this working
+        table.clearFilter("GuideSet");
+    }
+
+    private void verifyGuideSetsApplied(Map<String, Integer> guideSetIds, String[] analytes, int expectedRunCount)
     {
 
         // see if the 3 uploaded runs got the correct 'current' guide set applied
@@ -1294,10 +1348,7 @@ public class LuminexTest extends AbstractQCAssayTest
         for (String analyte : analytes)
         {
             table.setFilter("GuideSet/RowId", "Equals", guideSetIds.get(analyte).toString());
-            if (analyte.equals("GS Analyte (1)"))
-                assertEquals("Expected guide set to be assigned to 3 records", 3, table.getDataRowCount());
-            else if (analyte.equals("GS Analyte (2)"))
-                assertEquals("Expected guide set to be assigned to 5 records", 5, table.getDataRowCount());
+            assertEquals("Expected guide set to be assigned to " + expectedRunCount + " records", expectedRunCount, table.getDataRowCount());
             table.clearFilter("GuideSet/RowId");
         }
 
@@ -1320,27 +1371,29 @@ public class LuminexTest extends AbstractQCAssayTest
         return guideSetIds;
     }
 
-    private void createGuideSets()
+    private void createInitialGuideSets()
     {
-        createGuideSetAnalyte1();
-        createGuideSetAnalyte2();
-    }
+        setUpGuideSet("GS Analyte (1)");
+        createGuideSet("GS Analyte (1)", true);
+        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_0"}, "Analyte 1");
 
-    private void createGuideSetAnalyte2()
-    {
-        createGuideSet("GS Analyte (2)", new String[] {"allRunsRow_0", "allRunsRow_1", "allRunsRow_3", "allRunsRow_4"}, "Analyte2");
+        setUpGuideSet("GS Analyte (2)");
+        createGuideSet("GS Analyte (2)", true);
+        editGuideSet(new String[] {"allRunsRow_1"}, "Analyte 2");
 
         //edit a guide set
         log("attempt to edit guide set after creation");
         clickButtonContainingText("Edit", 0);
-        Locator l =  Locator.id("allRunsRow_2");
-        waitForElement(l, defaultWaitForPage);
-        clickAt(l, "1,1");
-        setText("commentTextField", "edited analyte 2");
-        clickButton("Save",0);
-        waitForExtMaskToDisappear();
+        editGuideSet(new String[] {"allRunsRow_0"}, "edited analyte 2");
+    }
 
-        //create a new guide set
+    private void createGuideSetAnalyte2()
+    {
+//        //create a new guide set
+//        setUpGuideSet("GS Analyte (2)");
+//        createGuideSet("GS Analyte (2)", false);
+//        editGuideSet(new String[] {"allRunsRow_1"}, "new analyte 2 guide set");
+//        TODO: apply guide set
     }
 
     private void setIsoAndConjugate()
@@ -1352,14 +1405,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
     }
 
-    public void createGuideSetAnalyte1()
-    {
-        createGuideSet( "GS Analyte (1)", new String[] {"allRunsRow_4", "allRunsRow_3", "allRunsRow_1"}, "Analyte 1");
-    }
-
     private void setUpGuideSet(String analyte)
     {
-
         waitForText(analyte);
         Locator l = Locator.tagContainingText("div", analyte);
         clickAt(l, "1,1");
@@ -1368,23 +1415,44 @@ public class LuminexTest extends AbstractQCAssayTest
 
         l = Locator.buttonContainingText("Reset Graph");
         clickAt(l,  "1,1");
-        sleep(500);
-        l = Locator.buttonContainingText("New");
-        clickAt(l,  "1,1");
+
+        // wait for the test headers in the guide set and tracking data regions
+        waitForText(analyte + " - " + isotype + " " + conjugate);
+        waitForText("Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
     }
 
     private void addAnalyteRows(String[] rows)
     {
         for(String row: rows)
         {
-            clickAt(Locator.id(row), "1,1");
+            Locator l = Locator.id(row);
+            waitForElement(l, defaultWaitForPage);
+            clickAt(l, "1,1");
         }
 
     }
-    private void createGuideSet(String analyte, String[] rows, String comment)
+    private void createGuideSet(String analyte, boolean initialGuideSet)
     {
-        setUpGuideSet(analyte);
-        sleep(5000);
+        if (initialGuideSet)
+            waitForText("No current guide set for the selected graph parameters");
+        clickButtonContainingText("New", 0);
+        if (!initialGuideSet)
+        {
+            waitForText("Creating a new guide set will set the current guide set to be inactive. Would you like to proceed?");
+            clickButton("Yes", 0);
+        }
+        waitForText("A new guide set has successfully been created.");
+        clickButton("OK", 0);
+    }
+
+    private void editGuideSet(String[] rows, String comment)
+    {
+        String today = df.format(Calendar.getInstance().getTime());
+
+        waitForText("Manage Guide Set...");
+        waitForText("Guide Set ID:");
+        assertTextPresentInThisOrder("Created:", today);
+
         addAnalyteRows(rows);
         setText("commentTextField", comment);
 
@@ -1393,15 +1461,46 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
 
+        waitForText("Created: " + today + "; Comment: " + comment);
     }
 
-    private void goToLevyJohnsonGraphPage()
+    private void goToLeveyJenningsGraphPage(String titrationName)
     {
         goToSchemaBrowser();
         selectQuery("assay", TEST_ASSAY_LUM + " Titration");
         waitForText("view data");
         clickLinkContainingText("view data");
-        clickLinkContainingText("HIVIG");
+        clickLinkContainingText(titrationName);
+        waitForText(titrationName + " Levey-Jennings Plots");
+    }
 
+    private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, double[] ec50Averages, double[] ec50StdDevs, double[] aucAverages, double[] aucStdDevs)
+    {
+        // go to the GuideSetCurveFit table to verify the calculated threshold values for the EC50 and AUC
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " GuideSetCurveFit");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSetId/RowId");
+        CustomizeViewsHelper.applyCustomView(this);
+        DataRegionTable table = new DataRegionTable("query", this);
+        for (int i = 0; i < analytes.length; i++)
+        {
+            // verify the row count, average, and standard deviation for the EC50 values
+            table.setFilter("GuideSetId/RowId", "Equals", guideSetIds.get(analytes[i]).toString());
+            table.setFilter("CurveType", "Equals", "Four Parameter");
+            assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[i]).toString(), rowCounts[i], Integer.parseInt(table.getDataAsText(0, "Run Count")));
+            assertEquals("Unexpected EC50 average for guide set " + guideSetIds.get(analytes[i]).toString(), ec50Averages[i], Double.parseDouble(table.getDataAsText(0, "EC50Average")));
+            assertEquals("Unexpected EC50 StdDev for guide set " + guideSetIds.get(analytes[i]).toString(), ec50StdDevs[i], Double.parseDouble(table.getDataAsText(0, "EC50Std Dev")));
+            table.clearFilter("CurveType");
+            // verify the row count, average, and standard deviation for the AUC values
+            table.setFilter("CurveType", "Equals", "Trapezoidal");
+            assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[i]).toString(), rowCounts[i], Integer.parseInt(table.getDataAsText(0, "Run Count")));
+            assertEquals("Unexpected AUC average for guide set " + guideSetIds.get(analytes[i]).toString(), aucAverages[i]	, Double.parseDouble(table.getDataAsText(0, "AUCAverage")));
+            assertEquals("Unexpected AUC StdDev for guide set " + guideSetIds.get(analytes[i]).toString(), aucStdDevs[i], Double.parseDouble(table.getDataAsText(0, "AUCStd Dev")));
+            table.clearFilter("CurveType");
+            table.clearFilter("GuideSetId/RowId");
+        }
     }
 }
