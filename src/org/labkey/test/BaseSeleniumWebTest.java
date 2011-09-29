@@ -560,7 +560,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if(resetUrl!=null)
             beginAt(resetUrl);
 
-        assertTextPresent(new String[] {username, "Choose a password you'll use to access this server","Passwords must be six characters or more and must not match your email address"});
+        assertTextPresent(new String[] {username, "Choose a password you'll use to access this server","six characters or more, cannot match email addres"});
 
         setFormElement("password", newPassword);
         setFormElement("password2", newPassword);
@@ -797,10 +797,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         boolean bootstrapped = false;
 
         // check to see if we're the first user:
-        if (isTextPresent("You are the first user"))
+        if (isTextPresent("Welcome! We see that this is your first time logging in."))
         {
             bootstrapped = true;
-            assertTitleEquals("Register First User");
+            assertTitleEquals("Account Setup");
             log("Need to bootstrap");
             verifyInitialUserRedirects();
 
@@ -834,17 +834,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if (isTitleEqual("Sign In"))
                 simpleSignIn();
 
-            String upgradeButtonText = (isNavButtonPresent("Install") ? "Install" : (isNavButtonPresent("Upgrade") ? "Upgrade" : null));
+            String upgradeText = "Please wait, this page will automatically update with progress information.";
+            boolean performingUpgrade = isTextPresent(upgradeText);
 
-            if (null != upgradeButtonText)
+            if (performingUpgrade)
             {
-                verifyUpgradeRedirect(upgradeButtonText);
+                verifyUpgradeRedirect(upgradeText);
 
                 // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
                 signOut();
                 simpleSignIn();
-
-                clickNavButton(upgradeButtonText);
 
                 int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
 
@@ -885,9 +884,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                     // check for any additional upgrade pages inserted after module upgrade
                     if (isNavButtonPresent("Next"))
                         clickNavButton("Next");
+                }
 
-                    // Save the default site config properties
-                    clickNavButton("Save");
+                if (isLinkPresentContainingText("Skip these steps and go to the Home page"))
+                {
+                    clickLinkContainingText("Skip these steps and go to the Home page");
                 }
             }
 
@@ -909,7 +910,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (null != password2)
             setFormElement("password2", password2);
 
-        clickLinkWithText("Register");
+        clickLinkWithText("Next");
 
         if (null != expectedText)
             assertTextPresent(expectedText);
@@ -918,15 +919,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     private void verifyInitialUserRedirects()
     {
-        String initialText = "You are the first user";
+        String initialText = "Welcome! We see that this is your first time logging in.";
 
         // These should NOT redirect to the upgrade page
         beginAt("/login/resetPassword.view");
         assertTextPresent(initialText);
         beginAt("/admin/maintenance.view");
         assertTextPresent(initialText);
-
-        verifyStandardRedirects(initialText);
     }
 
 
@@ -937,30 +936,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertTextNotPresent(buttonText);
         beginAt("/admin/maintenance.view");
         assertTextNotPresent(buttonText);
-
-        verifyStandardRedirects(buttonText);
     }
 
-
-    private void verifyStandardRedirects(String assertText)
-    {
-        // These should all redirect to the upgrade page
-        goToHome();
-        assertTextPresent(assertText);
-        beginAt("/nab/home/begin.view");  // A Spring action
-        assertTextPresent(assertText);
-        beginAt("/test/begin.view");      // Another Spring action
-        assertTextPresent(assertText);
-        beginAt("/test/permNone.view");   // A Spring action with no permissions
-        assertTextPresent(assertText);
-        beginAt("/admin/credits.view");   // An admin Spring action with no permissions
-        assertTextPresent(assertText);
-        beginAt("/admin/begin.view");     // An admin Spring action requiring admin permissions
-        assertTextPresent(assertText);
-
-        // Back to upgrade process
-        goToHome();
-    }
 
     public void disableMaintenance()
     {
