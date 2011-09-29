@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StudyHelper;
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,6 +43,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
                                                      PTIDS[0] + "\t"+SEQ_NUMBER+"\n" +
                                                      PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
+    private static final File PROTOCOL_DOC = new File(getSampleDataPath() + "/study/Protocol.txt");
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -86,6 +88,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         ExtHelper.waitForExtDialog(this, "Create New Study");
         setFormElement("studyName", getFolderName());
         setFormElement("studyDescription", STUDY_DESCRIPTION);
+        setFormElement("protocolDoc", PROTOCOL_DOC);
         selectStudyLocation();
         clickNavButton("Next", 0);
 
@@ -167,6 +170,8 @@ public class AncillaryStudyTest extends StudyBaseTest
         verifyModifyParticipantGroup(STUDY_NAME);
         verifyModifyParticipantGroup(getFolderName());
         verifyModifyDataset();
+        //verifyProtocolDocument(); //TODO: Waiting for protocol webpart.
+        verifyImportExport();
     }
 
     private void verifyModifyParticipantGroup(String study)
@@ -267,7 +272,34 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertEquals("Dataset does not reflect changes in source study.", 20, table.getDataRowCount());
         assertTextNotPresent(SEQ_NUMBER + ".0", SEQ_NUMBER2 + ".0");
     }
+
+    private void verifyImportExport()
+    {
+        StudyHelper.exportStudy(this, STUDY_NAME);
+        goToModule("Pipeline");
+        clickNavButton("Process and Import Data");
+
+        waitAndClick(Locator.fileTreeByName("export"));
+        waitForText("participant_groups.xml");
+        log("Verify protocol document in export");
+        waitAndClick(Locator.fileTreeByName("protocolDocs"));
+        waitForText(PROTOCOL_DOC.getName());
+
+        waitAndClick(Locator.fileTreeByName("datasets"));
+        waitForText("datasets_metadata.xml");
+        assertTextPresent(".tsv", 10);
+        assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset300.tsv", "dataset420.tsv", "dataset423.tsv");
+
+        //TODO: 13132: Study reload doesn't delete participant groups
+//        log("Verify reloading study");
+//        waitAndClick(Locator.fileTreeByName("export"));
+//        waitForText("study.xml");
+//        ExtHelper.waitForImportDataEnabled(this);
+//        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
+//        selectImportDataAction("Reload Study");
         
+    }
+
     private void assertWizardError(String button, String error)
     {
         clickNavButton(button, 0);

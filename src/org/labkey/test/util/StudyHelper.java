@@ -57,4 +57,22 @@ public class StudyHelper
         test.waitForExtMaskToDisappear();
     }
 
+    public static void exportStudy(BaseSeleniumWebTest test, String folder)
+    {
+        exportStudy(test, folder, true, false);
+    }
+
+    public static void exportStudy(BaseSeleniumWebTest test, String folder, boolean useXmlFormat, boolean zipFile)
+    {
+        test.clickLinkWithText(folder);
+        test.clickLinkWithText("Manage Study");
+        test.clickNavButton("Export Study");
+
+        test.assertTextPresentInThisOrder("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents", "Queries", "Custom Views", "Reports", "Lists");
+
+        test.checkRadioButton("format", useXmlFormat ? "new" : "old");
+        test.checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
+        test.clickNavButton("Export");
+    }
+
 }
