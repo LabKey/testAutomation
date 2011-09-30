@@ -308,6 +308,12 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitForTextToDisappear(error);
     }
 
+    @Override
+    public boolean isFileUploadTest()
+    {
+        return true;
+    }
+
     public String getProjectName()
     {
         return PROJECT_NAME;
