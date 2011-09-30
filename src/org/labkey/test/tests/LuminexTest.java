@@ -1040,6 +1040,11 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
         setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE4));
         clickNavButton("Next", 60000);
+        // make sure the Standard checkboxes are checked
+        checkCheckbox("_titrationRole_standard_HIVIG");
+        checkCheckbox("titration_CN54 (1)_HIVIG");
+        checkCheckbox("titration_Con S (2)_HIVIG");
+        checkCheckbox("titration_Blank (3)_HIVIG");
         // set LotNumber for the first analyte
         selenium.type("//input[@type='text' and contains(@name, '_LotNumber')][1]", TEST_ANALYTE_LOT_NUMBER);
         clickNavButton("Save and Finish");
