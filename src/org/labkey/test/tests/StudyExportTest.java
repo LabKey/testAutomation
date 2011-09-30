@@ -173,6 +173,7 @@ public class StudyExportTest extends StudyManualTest
 
         // verify manual cohorts
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Cohorts");
         assertFormElementEquals(Locator.id("manualCohortAssignmentEnabled"), "on");
         clickLinkWithText(getFolderName());
@@ -183,6 +184,7 @@ public class StudyExportTest extends StudyManualTest
 
         // verify visit display order
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Visits");
         assertTextBefore("Cycle 3", MODIFIED_VISIT);
 
@@ -505,6 +507,7 @@ public class StudyExportTest extends StudyManualTest
     private void changeDatasetOrder(String value)
     {
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Change Display Order");
         selectOptionByValue("items", value);
@@ -521,6 +524,7 @@ public class StudyExportTest extends StudyManualTest
     protected void setDatasetCategory(String dataset, String category)
     {
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
         clickNavButton("Edit Definition");
@@ -547,6 +551,7 @@ public class StudyExportTest extends StudyManualTest
     private void modifyDatasetColumn(String dataset)
     {
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
         clickNavButton("Edit Definition");
@@ -563,6 +568,7 @@ public class StudyExportTest extends StudyManualTest
     private void setFormatStrings()
     {
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         setText("dateFormat", DATE_FORMAT);
         setText("numberFormat", NUMBER_FORMAT);
@@ -572,6 +578,7 @@ public class StudyExportTest extends StudyManualTest
     private void setManualCohorts()
     {
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Cohorts");
         clickRadioButtonById("manualCohortAssignmentEnabled");
         waitForPageToLoad();
@@ -596,6 +603,7 @@ public class StudyExportTest extends StudyManualTest
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "fileImportDataset");

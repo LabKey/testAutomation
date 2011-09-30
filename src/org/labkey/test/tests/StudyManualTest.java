@@ -64,7 +64,7 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Create Study");
 
         // change study label
-        clickLinkWithText("Change Label");
+        clickLinkWithText("Change Label or Description");
         setFormElement("label", getStudyLabel());
         clickNavButton("Update");
         assertTextPresent(getStudyLabel());
@@ -164,7 +164,10 @@ public class StudyManualTest extends StudyTest
     protected void importCustomVisitMapping()
     {
         if (!isLinkPresentContainingText("Visit Import Mapping"))
+        {
+            clickLinkWithText("Manage Study");
             clickLinkWithText("Manage Visits");
+        }
 
         clickLinkWithText("Visit Import Mapping");
         clickNavButton("Import Custom Mapping");
