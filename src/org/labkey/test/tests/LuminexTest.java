@@ -1220,8 +1220,8 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec50Averages2, ec50StdDevs2, aucAverages2, aucStdDevs2);
 
         // test the start and end date filter for the report
-//        goToLeveyJenningsGraphPage("HIVIG");
-//        applyStartAndEndDateFilter();
+        goToLeveyJenningsGraphPage("HIVIG");
+        applyStartAndEndDateFilter();
     }
 
     private void verifyLeveyJenningsRplots()
@@ -1472,7 +1472,8 @@ public class LuminexTest extends AbstractQCAssayTest
         endDate.add(Calendar.DATE, -1);
         setFormElement("start-date-field", df.format(startDate.getTime()));
         setFormElement("end-date-field", df.format(endDate.getTime()));
-        fireEvent(Locator.id("end-date-field"), SeleniumEvent.change); // TODO: why isn't this working?
+        // click a different element on the page to trigger the date change event
+        clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate 5"), "1,1");
         clickButton("Refresh Graph", 0);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
