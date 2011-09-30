@@ -253,6 +253,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         // Dummy visit map data (probably non-sensical), but enough to get a placeholder created for dataset #1:
         setFormElement("content", "20|S|Only Visit|1|1|1|1|1|1|1");
         clickNavButton("Import");
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Define Dataset Schemas");
         clickLinkWithText("Bulk Import Schemas");
