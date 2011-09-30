@@ -1249,8 +1249,8 @@ public class LuminexTest extends AbstractQCAssayTest
         click(Locator.tagWithText("span", "High MFI"));
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        assertElementPresent( Locator.id("MaxMFITrendPlotDiv"));
-        assertElementPresent( Locator.id("MaxMFITrendPdfDiv"));
+        assertElementPresent( Locator.id("High MFITrendPlotDiv"));
+        assertElementPresent( Locator.id("High MFITrendPdfDiv"));
         assertTextPresent("PDF output file (click to download)");
     }
 
@@ -1347,7 +1347,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // wait for the test headers in the guide set and tracking data regions
         waitForText(analyte + " - " + isotype + " " + conjugate);
-        waitForText("Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
+        waitForText("HIVIG Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         assertTextPresent("PDF output file (click to download)");
