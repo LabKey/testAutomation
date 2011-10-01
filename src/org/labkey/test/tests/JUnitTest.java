@@ -132,6 +132,7 @@ public class JUnitTest extends TestSuite
                 Object json = JSONValue.parse(response);
                 if (json == null &&
                         response.contains("<title>Upgrade Status</title>") ||
+                        response.contains("<title>Upgrade Modules</title>") ||
                         response.contains("<title>Account Setup</title>") ||
                         response.contains("This server is being upgraded to a new version of LabKey Server."))
                 {
