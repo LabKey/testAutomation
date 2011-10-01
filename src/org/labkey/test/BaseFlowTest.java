@@ -55,6 +55,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             try
             {
+                log("Deleting pipeline work directory: " + dir);
                 FileUtils.deleteDirectory(dir);
             }
             catch (IOException e)

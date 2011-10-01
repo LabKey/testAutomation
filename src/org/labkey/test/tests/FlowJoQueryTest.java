@@ -99,10 +99,11 @@ public class FlowJoQueryTest extends BaseFlowTest
         submit();
 
         // Only run LabKeyScript on sample wells
+        // NOTE: we use 'Contains' since it is case-insensitive. Some values are Non-comp and other are Non-Comp.
         clickLinkWithText("Edit Settings");
         selectOptionByText(Locator.name("ff_filter_field", 0), "Comp");
-        selectOptionByText(Locator.name("ff_filter_op", 0), "Equals");
-        setFormElement(Locator.name("ff_filter_value", 0), "Non-comp"); clickNavButton("Update");
+        selectOptionByText(Locator.name("ff_filter_op", 0), "Contains");
+        setFormElement(Locator.name("ff_filter_value", 0), "non-comp"); clickNavButton("Update");
 
         clickLinkWithText("Analyze some runs");
         selectOptionByValue("ff_targetExperimentId", "");

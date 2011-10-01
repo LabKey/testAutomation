@@ -2002,7 +2002,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         long startTime = System.currentTimeMillis();
         // confirm delete:
-        clickNavButton("Delete");
+        log("Starting delete of project '" + project + "'...");
+        clickNavButton("Delete", longWaitForPage);
 
         if(isLinkPresentWithText(project))
         {
