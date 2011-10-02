@@ -105,7 +105,14 @@ public class MessagesTest extends BaseSeleniumWebTest
         clickLinkWithText("edit");
         setFormElement("body", MSG1_BODY);
         if (isFileUploadAvailable())
+        {
             assertTextPresent("remove");
+            clickLinkWithText("remove", false);
+            waitForText("This cannot be undone");
+            clickButton("OK", 0);
+            waitForTextToDisappear("remove");
+            assertTextNotPresent("common.properties");
+        }
         submit();
         assertTextPresent(MSG1_BODY);
 
