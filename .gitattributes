@@ -37,6 +37,7 @@ modules/simpletest/folderTypes/customFolder.foldertype.xml -text
 modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text
+modules/simpletest/queries/study/verifyAssay.js -text
 modules/simpletest/queries/vehicle/ParamParamVehicles.sql -text
 modules/simpletest/queries/vehicle/ParameterizedVehicles.sql -text
 modules/simpletest/queries/vehicle/Toyotas.sql -text
