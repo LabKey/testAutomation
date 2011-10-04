@@ -43,7 +43,8 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
                                                      PTIDS[0] + "\t"+SEQ_NUMBER+"\n" +
                                                      PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
-    private static final File PROTOCOL_DOC = new File(getSampleDataPath() + "/study/Protocol.txt");
+    private final File PROTOCOL_DOC = new File( getLabKeyRoot() + getSampleDataPath() + "/Protocol.txt");
+    private final File PROTOCOL_DOC2 = new File( getLabKeyRoot() + getSampleDataPath() + "/Protocol2.txt");
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -61,6 +62,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         }
         catch (Exception e)
         {
+            /* ingnore */
         }
     }
 
@@ -88,6 +90,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         ExtHelper.waitForExtDialog(this, "Create New Study");
         setFormElement("studyName", getFolderName());
         setFormElement("studyDescription", STUDY_DESCRIPTION);
+        assertTrue(PROTOCOL_DOC.exists());
         setFormElement("protocolDoc", PROTOCOL_DOC);
         selectStudyLocation();
         clickNavButton("Next", 0);
@@ -133,7 +136,6 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickNavButton("Previous", 0);
         clickNavButton("Previous", 0);
         setFormElement("studyName", STUDY_NAME);
-        selectStudyLocation();
         clickNavButton("Next", 0);
         clickNavButton("Next", 0);
         checkRadioButton("autoRefresh", "false");
@@ -154,6 +156,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         assertTextPresent("Ancillary study created by AncillaryStudyTest");
         clickLinkWithText("Manage Study");
+        assertTextPresent("10 Datasets");
         clickLinkWithText("Manage Datasets");
         for( String str : DATASETS )
         {
@@ -171,7 +174,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         verifyModifyParticipantGroup(STUDY_NAME);
         verifyModifyParticipantGroup(getFolderName());
         verifyModifyDataset();
-        //verifyProtocolDocument(); //TODO: Waiting for protocol webpart.
+        verifyProtocolDocument();
         verifyImportExport();
     }
 
@@ -277,6 +280,26 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertTextNotPresent(SEQ_NUMBER + ".0", SEQ_NUMBER2 + ".0");
     }
 
+    private void verifyProtocolDocument()
+    {
+        clickLinkWithText(STUDY_NAME);
+        assertTextPresent(STUDY_DESCRIPTION);
+        assertElementPresent(Locator.xpath("//a[contains(@href, 'name="+PROTOCOL_DOC.getName()+"')]"));
+        clickAndWait(Locator.xpath("//a[./span[@title='Click to Edit']]"));
+
+        setFormElement("label", "Extra " + STUDY_NAME);
+        setFormElement("description", "Extra " + STUDY_DESCRIPTION);
+        clickLinkWithText("Attach a file", false);
+        waitForElement(Locator.id("formFile0"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.id("formFile0"), PROTOCOL_DOC2.toString());
+        clickNavButton("Update");
+        assertLinkPresentWithText(PROTOCOL_DOC.getName());
+        assertLinkPresentWithText(PROTOCOL_DOC2.getName());
+        assertTextPresent("Protocol documents:");
+        assertTextPresent("Extra " + STUDY_NAME);
+        assertTextPresent("Extra " + STUDY_DESCRIPTION);
+    }
+
     private void verifyImportExport()
     {
         StudyHelper.exportStudy(this, STUDY_NAME);
@@ -291,7 +314,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         waitAndClick(Locator.fileTreeByName("datasets"));
         waitForText("datasets_metadata.xml");
-        assertTextPresent(".tsv", 10);
+        assertTextPresent(".tsv", 10 * 3);
         assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset300.tsv", "dataset420.tsv", "dataset423.tsv");
 
         //TODO: 13132: Study reload doesn't delete participant groups

@@ -68,7 +68,7 @@ public class StudyHelper
         test.clickLinkWithText("Manage Study");
         test.clickNavButton("Export Study");
 
-        test.assertTextPresentInThisOrder("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents", "Queries", "Custom Views", "Reports", "Lists");
+        test.assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents", "Queries", "Custom Views", "Reports", "Lists");
 
         test.checkRadioButton("format", useXmlFormat ? "new" : "old");
         test.checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
