@@ -152,7 +152,7 @@ public class StudyTest extends StudyBaseTest
 
         attemptCreateExpectError("1", "does not exist in this study.", "bad List ");
         String id = pIDs.substring(0, pIDs.indexOf(","));
-        attemptCreateExpectError(id + ", " + id, "is specified more than once, duplicates are not allowed in a group", "Bad List 2");
+        attemptCreateExpectError(id + ", " + id, "Duplicates are not allowed in a group", "Bad List 2");
 
         // test creating a participant group directly from a data grid
         clickLinkWithText(STUDY_NAME);
