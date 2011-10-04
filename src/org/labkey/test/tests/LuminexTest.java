@@ -1222,6 +1222,9 @@ public class LuminexTest extends AbstractQCAssayTest
         // test the start and end date filter for the report
         goToLeveyJenningsGraphPage("HIVIG");
         applyStartAndEndDateFilter();
+
+        // test the y-axis scale
+        applyLogYAxisScale();
     }
 
     private void verifyLeveyJenningsRplots()
@@ -1235,7 +1238,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("EC50TrendPlotDiv"));
         assertElementPresent( Locator.id("EC50TrendPdfDiv"));
-        assertTextPresent("PDF output file (click to download)");
+        waitForText("PDF output file (click to download)");
 
         // check auc trending R plot
         click(Locator.tagWithText("span", "AUC"));
@@ -1243,7 +1246,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("AUCTrendPlotDiv"));
         assertElementPresent( Locator.id("AUCTrendPdfDiv"));
-        assertTextPresent("PDF output file (click to download)");
+        waitForText("PDF output file (click to download)");
 
         // check high mfi trending R plot
         click(Locator.tagWithText("span", "High MFI"));
@@ -1251,7 +1254,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("High MFITrendPlotDiv"));
         assertElementPresent( Locator.id("High MFITrendPdfDiv"));
-        assertTextPresent("PDF output file (click to download)");
+        waitForText("PDF output file (click to download)");
     }
 
     private void verifyGuideSetsNotApplied()
@@ -1350,7 +1353,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("HIVIG Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        assertTextPresent("PDF output file (click to download)");
+        waitForText("PDF output file (click to download)");
     }
 
     private void addRemoveGuideSetRuns(String[] rows)
@@ -1454,7 +1457,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the plot is reloaded
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        assertTextPresent("PDF output file (click to download)");
+        waitForText("PDF output file (click to download)");
     }
 
     private void applyStartAndEndDateFilter()
@@ -1477,7 +1480,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Refresh Graph", 0);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        assertTextPresent("PDF output file (click to download)");
+        waitForText("PDF output file (click to download)");
         // check that only 3 runs are now present
         for (int i = 4; i > 1; i--)
         {
@@ -1485,5 +1488,14 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate 5"));
         assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate 1"));
+    }
+
+    private void applyLogYAxisScale()
+    {
+        setUpGuideSet("GS Analyte (2)");
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@id='scale-combo-box']/.."), "Log");
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        waitForText("PDF output file (click to download)");
     }
 }
