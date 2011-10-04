@@ -152,7 +152,8 @@ public class AncillaryStudyTest extends StudyBaseTest
     @Override
     public void doVerifySteps()
     {
-        assertTextPresent("10 Datasets");
+        assertTextPresent("Ancillary study created by AncillaryStudyTest");
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         for( String str : DATASETS )
         {
@@ -217,6 +218,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (insert)");
         clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
         clickNavButton("View Data");
@@ -239,6 +241,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (modify)");
         clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
         clickNavButton("View Data");
@@ -261,6 +264,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (delete)");
         clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
         clickNavButton("View Data");
