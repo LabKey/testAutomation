@@ -183,20 +183,17 @@ public class LuminexTest extends AbstractQCAssayTest
         addField("Batch Fields", 7, "RuminexVersion", "Ruminex Version", ListColumnType.String);
 
         // add run properties for designation of which field to use for curve fit calc in transform
-        addField("Run Fields", 5, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
-        addField("Run Fields", 6, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
-        addField("Run Fields", 7, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
+        addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
+        addField("Run Fields", 9, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
+        addField("Run Fields", 10, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
 
         // add run properties for use with the Guide Set test
-        addField("Run Fields", 8, "Isotype", "Isotype", ListColumnType.String);
-        addField("Run Fields", 9, "Conjugate", "Conjugate", ListColumnType.String);
-        addField("Run Fields", 10, "NotebookNo", "Notebook Number", ListColumnType.String);
-        addField("Run Fields", 11, "AssayType", "Assay Type", ListColumnType.String);
-        addField("Run Fields", 12, "ExpPerformer", "Experiment Performer", ListColumnType.String);
-        addField("Run Fields", 13, "TestDate", "Test Date", ListColumnType.DateTime);
+        addField("Run Fields", 11, "NotebookNo", "Notebook Number", ListColumnType.String);
+        addField("Run Fields", 12, "AssayType", "Assay Type", ListColumnType.String);
+        addField("Run Fields", 13, "ExpPerformer", "Experiment Performer", ListColumnType.String);
 
         // add analyte property for tracking lot number
-        addField("Analyte Properties", 8, "LotNumber", "Lot Number", ListColumnType.String);
+        addField("Analyte Properties", 7, "LotNumber", "Lot Number", ListColumnType.String);
 
         // add the data properties for the calculated columns
         addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
