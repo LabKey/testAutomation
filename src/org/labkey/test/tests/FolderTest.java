@@ -153,15 +153,19 @@ public class FolderTest extends BaseSeleniumWebTest
         expandFolderNode("A");
         expandFolderNode("B");
         selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[A]/[AA]', false)");
+        sleep(100);
         selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[B]/[BA]', true)");
         sleep(500);
         moveFolder("[AA]", "[C]", false, true);
+        waitForExtMaskToDisappear(); // shouldn't be a confirmation dialog.
 
         log("Move multiple folders");
-        expandFolderNode("AB");
         sleep(500); // wait for failed move ghost to disappear.
+        expandFolderNode("AB");
         selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[D]', false)");
+        sleep(100);
         selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[E]', true)");
+        sleep(100);
         selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[F]', true)");
         sleep(500);
         moveFolder("[D]", "[AB]", true, true);
@@ -238,7 +242,6 @@ public class FolderTest extends BaseSeleniumWebTest
                 clickNavButton("Cancel", 0);
             }
         }
-        //TODO: else {confirm failure}
     }
 
     private void moveFolder(String folder, String targetFolder, boolean successExpected, boolean multiple)
