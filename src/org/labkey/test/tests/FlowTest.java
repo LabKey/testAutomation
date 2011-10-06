@@ -520,24 +520,4 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.");
     }
 
-    // if we aren't already on the Flow Dashboard, try to get there.
-    private void goToFlowDashboard()
-    {
-        String title = selenium.getTitle();
-        if (!title.startsWith("Flow Dashboard: "))
-        {
-            // All flow pages have a link back to the Flow Dashboard
-            if (isLinkPresentWithText("Flow Dashboard"))
-            {
-                clickLinkWithText("Flow Dashboard");
-            }
-            else
-            {
-                // If we are elsewhere, get back to the current test folder
-                clickLinkWithText(getProjectName());
-                clickLinkWithText(getFolderName());
-            }
-        }
-    }
-
 }

@@ -17,10 +17,12 @@
 package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 abstract public class BaseFlowTest extends BaseSeleniumWebTest
 {
@@ -116,6 +118,27 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         return getClass().getSimpleName();
     }
 
+    // if we aren't already on the Flow Dashboard, try to get there.
+    protected void goToFlowDashboard()
+    {
+        String title = selenium.getTitle();
+        if (!title.startsWith("Flow Dashboard: "))
+        {
+            // All flow pages have a link back to the Flow Dashboard
+            if (isLinkPresentWithText("Flow Dashboard"))
+            {
+                clickLinkWithText("Flow Dashboard");
+            }
+            else
+            {
+                // If we are elsewhere, get back to the current test folder
+                clickLinkWithText(getProjectName());
+                clickLinkWithText(getFolderName());
+            }
+        }
+    }
+
+
     protected void gotoProjectQuery()
     {
         beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=flow");
@@ -180,6 +203,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             assertFormElementNotEquals(Locator.name("runFilePathRoot"), "");
         }
 
+        // Analysis engine can only be selected when no FCS files are associated with the run
+        if (fcsPath != null || existingKeywordRun)
+            importAnalysis_analysisEngine(containerPath, "noEngine");
+
+        importAnalysis_analysisOptions(containerPath, null);
+
         importAnalysis_analysisFolder(containerPath, analysisName, existingAnalysisFolder);
 
         importAnalysis_confirm(containerPath, workspacePath, fcsPath, existingKeywordRun, analysisName, existingAnalysisFolder);
@@ -188,8 +217,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importAnalysis_viaPipeline(String workspacePath)
     {
         log("browse pipeline to begin import analysis wizard");
-        if (!selenium.getTitle().startsWith("Flow Dashboard:"))
-            clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
         clickLinkContainingText("FCS files to be imported");
 
         if (workspacePath.startsWith("/"))
@@ -215,16 +243,14 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importAnalysis_begin(String containerPath)
     {
         log("begin import analysis wizard");
-        if (!selenium.getTitle().startsWith("Flow Dashboard:"))
-            clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
         clickLinkWithText("Import FlowJo Workspace Analysis");
-        assertTitleEquals("Import Analysis: Start: " + containerPath);
-        clickNavButton("Begin");
+        assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
     }
 
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
-        assertTitleEquals("Import Analysis: Upload Workspace: " + containerPath);
+        assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
         sleep(500);
         ExtHelper.selectTreeItem(this, workspacePath);
 //        assertFormElementEquals("workspace.path", workspacePath);
@@ -233,27 +259,44 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void importAnalysis_FCSFiles(String containerPath, String fcsPath, boolean existingRun)
     {
-        assertTitleEquals("Import Analysis: Associate FCS Files: " + containerPath);
+        assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         if (existingRun)
         {
             selectOptionByText("existingKeywordRunId", fcsPath);
-            clickNavButton("Next");
         }
         else if (fcsPath != null)
         {
             ExtHelper.selectTreeItem(this, fcsPath);
-            clickNavButton("Next");
         }
         else
         {
-            setFormElement(Locator.name("runFilePathRoot"), ""); // XXX: clicking the Skip button doesn't clear selections
-            clickNavButton("Skip");
+            // XXX: clicking the radio button doesn't clear selection for some reason
+            setFormElement(Locator.name("runFilePathRoot"), "");
+            clickRadioButtonById("noFCSFiles");
         }
+        clickNavButton("Next");
+    }
+
+    protected void importAnalysis_analysisEngine(String containerPath, String engineId)
+    {
+        assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
+        clickRadioButtonById(engineId);
+        clickNavButton("Next");
+    }
+
+    protected void importAnalysis_analysisOptions(String containerPath, List<String> groupNames)
+    {
+        assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
+        if (groupNames != null && groupNames.size() > 0)
+        {
+            setFormElement("importGroupNames", StringUtils.join(groupNames, ","));
+        }
+        clickNavButton("Next");
     }
 
     protected void importAnalysis_analysisFolder(String containerPath, String analysisName, boolean existing)
     {
-        assertTitleEquals("Import Analysis: Choose Analysis Folder: " + containerPath);
+        assertTitleEquals("Import Analysis: Analysis Folder: " + containerPath);
         if (existing)
         {
             selectOptionByText("existingAnalysisId", analysisName);

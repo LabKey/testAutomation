@@ -27,6 +27,12 @@ import org.labkey.test.util.DataRegionTable;
  */
 public class FlowImportTest extends BaseFlowTest
 {
+    @Override
+    protected void doCleanup() throws Exception
+    {
+        super.doCleanup();
+    }
+
     protected void doTestSteps() throws Exception
     {
         init();
@@ -34,6 +40,7 @@ public class FlowImportTest extends BaseFlowTest
         // set pipeline root
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
 
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
         String workspacePath = "/flowjoquery/microFCS/microFCS.xml";
@@ -55,10 +62,12 @@ public class FlowImportTest extends BaseFlowTest
         importAnalysis_begin(containerPath);
         importAnalysis_uploadWorkspace(containerPath, workspacePath);
         // assert analysis run doesn't show up in list of keyword runs
-        assertTextNotPresent("Option 2: Choose previously uploaded directory of FCS files:");
+        assertTextNotPresent("Previously imported FCS file run");
         // assert microFCS directory is selected in the pipeline tree browser since it contains the .fcs files used by the workspace
         //assertEquals("/flowjoquery/microFCS", getTreeSelection("tree"));
         importAnalysis_FCSFiles(containerPath, fcsFilePath, false);
+        importAnalysis_analysisEngine(containerPath, "noEngine");
+        importAnalysis_analysisOptions(containerPath, null);
         // assert previous analysis folder is available in drop down
         assertTextPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(containerPath, analysisFolder, true);
@@ -75,9 +84,11 @@ public class FlowImportTest extends BaseFlowTest
         log("** import same FlowJo workspace again");
         importAnalysis_begin(containerPath);
         importAnalysis_uploadWorkspace(containerPath, workspacePath);
-        assertTextPresent("Option 2: Choose previously uploaded directory of FCS files:");
+        assertTextPresent("Previously imported FCS file run");
         // assert keyword run shows up in list of keyword runs
         importAnalysis_FCSFiles(containerPath, "microFCS", true);
+        importAnalysis_analysisEngine(containerPath, "noEngine");
+        importAnalysis_analysisOptions(containerPath, null);
         // assert FlowJoAnalysis analysis folder doesn't show up in list of folders
         assertTextNotPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(containerPath, analysisFolder + "_1", false);
