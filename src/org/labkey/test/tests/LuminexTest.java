@@ -66,19 +66,17 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_LUM_FILE7 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls";
     protected final String TEST_ASSAY_LUM_FILE8 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls";
     protected final String TEST_ASSAY_LUM_FILE9 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls";
+    protected final String TEST_ASSAY_LUM_FILE10 = getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx";
 
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_1 = getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (b12 IgA std).xls";
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_2 = getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls";
     protected final String TEST_ASSAY_MULTIPLE_STANDARDS_3 = getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgG-Biot (HIVIG std).xls";
 
-    private String EC50_SUMMARY_FILE = "/sampledata/Luminex/20110718, USMHRP, RV144 Case Control, Set 1, Plate 3, IgG-Biot (summary).xlsx" ;
-    private String EC50_RAW_FILE = "/sampledata/Luminex/20110718, USMHRP, RV144 Case Control, Set 1, Plate 3, IgG-Biot (raw).xlsx";
-
     protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
-    private static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/transform_v1.R";
+    private static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/tomaras_luminex_transform.R";
     private static final String RTRANSFORM_SCRIPT_FILE2 = "/resources/transformscripts/blank_bead_subtraction.R";
     private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"1.0", "1.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "26430.8", "26556.2", "1.0", "1.0", "1.0",
@@ -376,6 +374,62 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("100.1");
         assertTextPresent(TEST_ASSAY_LUM_RUN_NAME2);
         assertTextPresent("LX10005314302");
+
+        // Upload another run that has both Raw and Summary data in the same excel file
+        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickLinkWithText(TEST_ASSAY_LUM);
+        clickNavButton("Import Data");
+        clickNavButton("Next");
+        setFormElement("name", "raw and summary");
+        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE10));
+        clickNavButton("Next", 60000);
+        clickNavButton("Save and Finish");
+
+        clickLinkWithText("raw and summary");
+        // make sure the Summary, StdDev, and DV columns are visible
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Summary");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "StdDev");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "CV");
+        CustomizeViewsHelper.applyCustomView(this);
+        // show all rows (> 100 in full data file)
+        clickNavButton("Page Size", 0);
+        clickLinkWithText("Show All");
+
+        // check that both the raw and summary data were uploaded together
+        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
+        assertEquals("Unexpected number of data rows for both raw and summary data", 108, table.getDataRowCount());
+        // check the number of rows of summary data
+        table.setFilter("Summary", "Equals", "true");
+        assertEquals("Unexpected number of data rows for summary data", 36, table.getDataRowCount());
+        table.clearFilter("Summary");
+        // check the number of rows of raw data
+        table.setFilter("Summary", "Equals", "false");
+        assertEquals("Unexpected number of data rows for raw data", 72, table.getDataRowCount());
+        table.clearFilter("Summary");
+        // check the row count at the analyte level
+        table.setFilter("Analyte", "Equals", "Analyte1");
+        assertEquals("Unexpected number of data rows for Analyte1", 36, table.getDataRowCount());
+
+        // check the StdDev and % CV for a few samples
+        checkStdDevAndCV("Analyte1", "S10", 3, "0.35", "9.43%");
+        checkStdDevAndCV("Analyte2", "S4", 3, "3.18", "4.80%");
+        checkStdDevAndCV("Analyte3", "S8", 3, "1.77", "18.13%");
+    }
+
+    private void checkStdDevAndCV(String analyte, String type, int rowCount, String stddev, String cv)
+    {
+        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
+        table.setFilter("Analyte", "Equals", analyte);
+        table.setFilter("Type", "Equals", type);
+        assertEquals("Unexpected number of data rows for " + analyte + "/" + type, rowCount, table.getDataRowCount());
+        for (int i = 1; i < rowCount; i++) // TODO: change to start at zero when Issue 13166 fixed 
+        {
+            assertEquals("Wrong StdDev", stddev, table.getDataAsText(i, "StdDev"));
+            assertEquals("Wrong %CV", cv, table.getDataAsText(i, "CV"));
+        }
+        table.clearFilter("Type");
+        table.clearFilter("Analyte");
     }
 
     protected void runEC50Test()
@@ -906,7 +960,6 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void uploadEC50Data()
     {
-        String[] files = {EC50_RAW_FILE};
         uploadMultipleCurveData();
     }
 
@@ -1042,6 +1095,8 @@ public class LuminexTest extends AbstractQCAssayTest
         checkCheckbox("titration_CN54 (1)_HIVIG");
         checkCheckbox("titration_Con S (2)_HIVIG");
         checkCheckbox("titration_Blank (3)_HIVIG");
+        // make sure that that QC Control checkbox is checked
+        checkCheckbox("_titrationRole_qccontrol_HIVIG");
         // set LotNumber for the first analyte
         selenium.type("//input[@type='text' and contains(@name, '_LotNumber')][1]", TEST_ANALYTE_LOT_NUMBER);
         clickNavButton("Save and Finish");
@@ -1051,6 +1106,7 @@ public class LuminexTest extends AbstractQCAssayTest
         click(l);
         assertLinkPresentWithText("WithBlankBead.HIVIG_5PL.pdf");
         assertLinkPresentWithText("WithBlankBead.HIVIG_4PL.pdf");
+        assertLinkPresentWithText("WithBlankBead.HIVIG_QC_Curves.pdf");
 
         // verify that hte lot number value are as expected
         clickLinkWithText("r script transformed assayId");
@@ -1126,13 +1182,14 @@ public class LuminexTest extends AbstractQCAssayTest
         testDate.add(Calendar.DATE, -files.length);
 
         // upload the first set of files (2 runs)
+        boolean displayingRowId = false;
         for (int i = 0; i < 2; i++)
         {
             goToTestAssayHome();
             clickNavButton("Import Data");
             setFormElement("network", "NETWORK" + (i+1));
             clickNavButton("Next");
-            setFormElement("name", "Guide Set Plate " + (i+1));
+            setFormElement("name", "Guide Set plate " + (i+1));
             setFormElement("isotype", isotype);
             setFormElement("conjugate", conjugate);
             setFormElement("notebookNo", "Notebook" + (i+1));
@@ -1145,6 +1202,8 @@ public class LuminexTest extends AbstractQCAssayTest
             uncheckCheckbox("_titrationRole_standard_HIVIG");
             checkCheckbox("_titrationRole_qccontrol_HIVIG");
             clickNavButton("Save and Finish");
+
+            displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
         }
 
         //verify that the uploaded runs do not have associated guide sets
@@ -1173,7 +1232,7 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Import Data");
             setFormElement("network", "NETWORK" + (i+1));
             clickNavButton("Next");
-            setFormElement("name", "Guide Set Plate " + (i+1));
+            setFormElement("name", "Guide Set plate " + (i+1));
             setFormElement("isotype", isotype);
             setFormElement("conjugate", conjugate);
             setFormElement("notebookNo", "Notebook" + (i+1));
@@ -1186,6 +1245,8 @@ public class LuminexTest extends AbstractQCAssayTest
             uncheckCheckbox("_titrationRole_standard_HIVIG");
             checkCheckbox("_titrationRole_qccontrol_HIVIG");
             clickNavButton("Save and Finish");
+
+            displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
         }
 
         // verify that the newly uploaded runs got the correct guide set applied to them
@@ -1205,7 +1266,7 @@ public class LuminexTest extends AbstractQCAssayTest
         editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs");
 
         // apply the new guide set to a run
-        applyGuideSetToRun("Guide Set Plate 5", "create new analyte 2 guide set with 3 runs");
+        applyGuideSetToRun("Guide Set plate 5", "create new analyte 2 guide set with 3 runs");
 
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
@@ -1463,7 +1524,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 5; i > 0; i--)
         {
-            clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate " + i), i+",1");
+            clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set plate " + i), i+",1");
         }
         // set start and end date filter
         Calendar startDate = Calendar.getInstance();
@@ -1473,7 +1534,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("start-date-field", df.format(startDate.getTime()));
         setFormElement("end-date-field", df.format(endDate.getTime()));
         // click a different element on the page to trigger the date change event
-        clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate 5"), "1,1");
+        clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set plate 5"), "1,1");
         clickButton("Refresh Graph", 0);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
@@ -1481,10 +1542,10 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that only 3 runs are now present
         for (int i = 4; i > 1; i--)
         {
-            clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate " + i), (i-3)+",1");
+            clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set plate " + i), (i-3)+",1");
         }
-        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate 5"));
-        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set Plate 1"));
+        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set plate 5"));
+        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set plate 1"));
     }
 
     private void applyLogYAxisScale()
@@ -1494,5 +1555,24 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         waitForText("PDF output file (click to download)");
+    }
+
+    private boolean verifyRunFileAssociations(boolean displayingRowId, int index)
+    {
+        // verify that the PDF of curves file was generated along with the xls file and the Rout file
+        if (!displayingRowId)
+        {
+            CustomizeViewsHelper.openCustomizeViewPanel(this);
+            CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
+            CustomizeViewsHelper.applyCustomView(this);
+            displayingRowId = true;
+        }
+        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
+        clickLinkWithText(table.getDataAsText(0, "Row Id"));
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves.pdf", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".tomaras_luminex_transform.Rout", 3);
+
+        return true;
     }
 }

@@ -20,7 +20,7 @@ package org.labkey.test.tests;
  * Date: Sep 12, 2011
  * Time: 10:33:36 AM
  */
-public class LuminexUpoadAndCopyTest extends LuminexTest
+public class LuminexUploadAndCopyTest extends LuminexTest
 {
     protected void runUITests()
     {
