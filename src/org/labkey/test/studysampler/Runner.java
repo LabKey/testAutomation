@@ -188,7 +188,9 @@ public class Runner
 
         // List of lists to be skipped
         Set<File> clearTargets = new HashSet<File>();
-        clearTargets.add(new File(studyRoot + "/lists/deleted_records.tsv")); // contains scattered subject ids
+
+        //NOTE: this list has been removed from the EHR, so this line is no longer needed
+//        clearTargets.add(new File(studyRoot + "/lists/deleted_records.tsv")); // contains scattered subject ids
 
         // Get a set of lists to be minimized
         Set<File> minimizeTargets = new HashSet<File>();

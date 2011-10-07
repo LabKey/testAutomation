@@ -199,10 +199,10 @@ public class EHRStudyTest extends SimpleApiTest
         clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
         clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
         clickWebpartMenuItem("Pages", false, "Layout", "Remove From Page");
-        addWebPart("EHR Navigation");
+        //addWebPart("EHR Navigation");
         addWebPart("EHR Datasets");
         addWebPart("Project Sponsors");
-        addWebPart("Last EHR Sync");
+        //addWebPart("Last EHR Sync");
 
         // TODO: Menu Bar causing permission dialog to appear when impersonating/stopping impersonation
         // TODO: Should use menu bar to access Animal History, Quick Search, and Data Entry pages.
@@ -776,13 +776,13 @@ public class EHRStudyTest extends SimpleApiTest
     {
         String tabs[] = {/*"-Assay", "MHC SSP Typing", "Viral Loads", */ //Bad queries on test server.
                          "-Assignments", "Active Assignments", "Assignment History",
-                         "-Clin Path", "Bacteriology", "Chemistry:Chemistry Results", "Clinpath Runs", "Hematology:Hematology Results", "Immunology:Immunology Results", "Parasitology", "Urinalysis:Urinalysis Results", "Viral Challenges", "Virology",
+                         "-Clin Path", "Bacteriology", "Chemistry:By Panel", "Clinpath Runs", "Hematology:By Panel", "Immunology:By Panel", "Parasitology", "Urinalysis:By Panel", "Viral Challenges", "Virology",
                          "-Clinical", "Abstract:Active Assignments", "Clinical Encounters", "Clinical Remarks", "Diarrhea Calendar", "Full History", "Full History Plus Obs", "Irregular Obs:Irregular Observations", "Problem List", "Procedure Codes", "Surgical History", "Tasks", "Treatment Orders", "Treatments", "Treatment Schedule", "Weights:Weight",
                          "-Colony Management", "Behavior Remarks", "Birth Records", "Housing - Active", "Housing History", "Inbreeding Coefficients", "Kinship", "Menses Calendar", "Menses Observations:Irregular Observations", "Pedigree:Offspring", /*"Pedigree Plot",*/ "Pregnancies", "TB Tests",
                          "-Pathology", "Biopsies", "Histology", "Morphologic Diagnosis", "Necropsies",
                          "-Physical Exam", "Alopecia", "Body Condition", "Dental Status", "Exams", "PE Findings", "Teeth", "Vitals",
                          "-Today At WNPRC", "Irregular Observations", "Obs/Treatment:Obs/Treatments", "Problem List", /*"Today's History",*/ "Treatments - Morning", "Treatments - Afternoon", "Treatments - Evening", "Treatments - Master", "Unresolved Problem List", /*"Today's Blood Draws",*/
-                         "-General", "Arrival/Departure:Arrival", "Blood Draw History", "Charges", "Current Blood", "Deaths", "Demographics", "Major Events", "Notes", "Abstract:Active Assignments"};
+                         "-General", "Arrival/Departure:Arrivals", "Blood Draw History", "Charges", "Current Blood", "Deaths", "Demographics", "Major Events", "Notes", "Abstract:Active Assignments"};
 
         log("Check all Animal History report tabs");
         for (String tab : tabs)
