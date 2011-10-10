@@ -1117,8 +1117,7 @@
         </jar>
     </target>
 
-    <target name="stage-rlabkey">
-        <mkdir dir="${project.root}/sampledata/rlabkey"/>
+    <target name="stage-rlabkey" depends="stage-rlabkey-init, install-rlabkey, install-ruminex">
         <copy todir="${project.root}/sampledata/rlabkey">
             <fileset dir="${project.root}/remoteapi/r/test">
                 <include name="listArchive.zip"/>
@@ -1126,51 +1125,132 @@
                 <include name="instwin.r" />
           </fileset>
         </copy>
-        <condition property="r.path" value="${env.R_HOME}/bin/R.exe">
-            <available file="${env.R_HOME}/bin/R.exe"/>
-        </condition>
-        <condition property="r.path" value="${env.R_HOME}/R.exe" else="R">
-            <isset property="env.R_HOME"/>
-        </condition>
-        <condition property="rlabkey.windows">
-        	<os family="windows"/>
-        </condition>
-        <antcall target="install-rlabkey-binary"/>
-        <antcall target="install-rlabkey-source"/>
-        <antcall target="install-ruminex"/>
-
     </target>
-	<target name="install-rlabkey-binary" if="R.present" depends="locate_R">
+
+    <target name="stage-rlabkey-init">
+        <mkdir dir="${project.root}/sampledata/rlabkey"/>
+    </target>
+
+    <target name="install-rlabkey" depends="stage-rlabkey-init, install-rlabkey-binary, install-rlabkey-source">
+    </target>
+
+    <macrodef name="check-R-package-installed">
+        <attribute name="package" />
+        <attribute name="property" default="@{package}"/>
+        <sequential>
+            <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey"
+                  input="${project.root}/tools/Rpackages/check-installed.R"
+                  failifexecutionfails="true" searchpath="true"
+                  resultproperty="@{property}.exitcode">
+                <arg line="--slave --vanilla --args @{package}"/>
+            </exec>
+
+            <uptodate targetfile="${project.root}/sampledata/rlabkey/@{package}" property="@{property}.uptodate">
+                <srcfiles dir="${project.root}/tools/Rpackages" includes="@{package}*.tar.gz" />
+            </uptodate>
+
+            <condition property="@{property}.installed" value="true">
+                <and>
+                    <equals arg1="${@{property}.exitcode}" arg2="0" />
+                    <isset property="@{property}.uptodate" />
+                </and>
+            </condition>
+
+            <condition property="@{property}.uninstalled" value="true">
+                <or>
+                    <equals arg1="${@{property}.exitcode}" arg2="1" />
+                    <not><isset property="@{property}.uptodate" /></not>
+                </or>
+            </condition>
+        </sequential>
+    </macrodef>
+
+	<target name="install-rlabkey-binary" if="R.present" depends="locate-R">
 		<copy todir="${project.root}/sampledata/rlabkey" overwrite="true">
 			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.zip"/>
 		</copy>
         <exec dir="${project.root}/sampledata/rlabkey" executable="${rterm.path}" osfamily="windows" input="${project.root}/sampledata/rlabkey/instwin.r" failifexecutionfails="false">
-		    <arg line="--vanilla" />
+		    <arg line="--vanilla --quiet" />
 		</exec>
 	</target>
-	<target name="install-rlabkey-source" unless="rlabkey.windows" >
+
+	<target name="install-rlabkey-source" unless="rlabkey.windows" depends="locate-R">
 		<copy tofile="${project.root}/sampledata/rlabkey/Rlabkey.tar.gz" overwrite="true">
 			<fileset  dir="${project.root}/remoteapi/r/latest" includes="Rlabkey*.tar.gz"/>
 		</copy>
+        <!--
+         R won't install library dependencies when run from "CMD INSTALL" command line and won't install
+         local tar.gz packages properly via 'install.packages()' in a script. So we need to install
+         in two R invocations: one for dependencies and one for the package itself.
+         -->
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
+              input="${project.root}/tools/Rpackages/install-rlabkey-dependencies.R">
+            <arg line="--vanilla --quiet"/>
+        </exec>
 		<exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
 			    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Rlabkey.tar.gz"/>
 		</exec>
 	 </target>
 
-    <target name="install-ruminex" if="R.present" depends="locate_R">
-		<copy tofile="${project.root}/sampledata/rlabkey/Ruminex.tar.gz" overwrite="true">
-			<fileset  dir="${project.root}/tools/Ruminex" includes="Ruminex*.tar.gz"/>
-		</copy>
+    <target name="check-ruminex-installed" if="R.present" depends="stage-rlabkey-init, locate-R">
+        <check-R-package-installed package="Ruminex" />
+    </target>
+
+    <target name="install-ruminex" if="Ruminex.uninstalled" depends="check-ruminex-installed">
+        <copy tofile="${project.root}/sampledata/rlabkey/Ruminex.tar.gz" overwrite="true">
+            <fileset  dir="${project.root}/tools/Rpackages" includes="Ruminex*.tar.gz"/>
+        </copy>
+        <!--
+         R won't install library dependencies when run from "CMD INSTALL" command line and won't install
+         local tar.gz packages properly via 'install.packages()' in a script. So we need to install
+         in two R invocations: one for dependencies and one for the package itself.
+         -->
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
+              input="${project.root}/tools/Rpackages/install-ruminex-dependencies.R">
+            <arg line="--vanilla --quiet"/>
+        </exec>
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey"  failifexecutionfails="false" searchpath="true">
-		    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Ruminex.tar.gz" />
+            <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/Ruminex.tar.gz" />
+        </exec>
+    </target>
+
+    <target name="check-flowWorkspace-installed" if="R.present" depends="stage-rlabkey-init, locate-R">
+        <check-R-package-installed package="flowWorkspace"/>
+    </target>
+
+    <target name="install-flowWorkspace" if="flowWorkspace.uninstalled" depends="check-flowWorkspace-installed">
+        <copy tofile="${project.root}/sampledata/rlabkey/flowWorkspace.tar.gz" overwrite="true">
+            <fileset dir="${project.root}/tools/Rpackages" includes="flowWorkspace*.tar.gz"/>
+        </copy>
+        <!--
+         R won't install library dependencies when run from "CMD INSTALL" command line and won't install
+         local tar.gz packages properly via 'install.packages()' in a script. So we need to install
+         in two R invocations: one for dependencies and one for the package itself.
+         -->
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
+              input="${project.root}/tools/Rpackages/install-flowWorkspace-dependencies.R">
+            <arg line="--vanilla --quiet"/>
+        </exec>
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
+		    <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowWorkspace.tar.gz" />
 		</exec>
     </target>
 
-    <target name="locate_R">
+    <target name="locate-R">
+        <condition property="rlabkey.windows">
+            <os family="windows"/>
+        </condition>
+
+        <condition property="r.path" value="${env.R_HOME}/bin/R.exe"><available file="${env.R_HOME}/bin/R.exe"/></condition>
+        <condition property="r.path" value="${env.R_HOME}/bin/R"><available file="${env.R_HOME}/bin/R"/></condition>
+        <condition property="r.path" value="${env.R_HOME}/R.exe"><available file="${env.R_HOME}/R.exe"/></condition>
+        <condition property="r.path" value="${env.R_HOME}/R" else="R"><isset property="env.R_HOME"/></condition>
+
         <condition property="rterm.path" value="${env.R_HOME}/Rterm.exe"><available file="${env.R_HOME}/Rterm.exe"/></condition>
         <condition property="rterm.path" value="${env.R_HOME}/bin/Rterm.exe"><available file="${env.R_HOME}/bin/Rterm.exe"/></condition>
         <condition property="rterm.path" value="${env.R_HOME}/bin/i386/Rterm.exe"><available file="${env.R_HOME}/bin/i386/Rterm.exe"/></condition>
         <condition property="rterm.path" value="${env.R_HOME}/bin/x64/Rterm.exe"><available file="${env.R_HOME}/bin/x64/Rterm.exe"/></condition>
+
         <condition property="R.present">
             <or>
                 <and>
@@ -1181,7 +1261,10 @@
             </or>
         </condition>
         <antcall target="fail_R"/>
+        <echo message="r.path: ${r.path}"/>
+        <echo message="rterm.path: ${rterm.path}"/>
     </target>
+
     <target name="fail_R" unless="R.present">
         <echo message="Unable to locate R.exe and/or Rterm.exe.  Please ensure that R is installed and R_HOME is configured correctly."/>
     </target>
