@@ -1283,6 +1283,24 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // test the y-axis scale
         applyLogYAxisScale();
+//        guideSetApiTest();
+    }
+
+
+    private void guideSetApiTest()
+    {
+        javascriptReadTest();
+    }
+
+    private void javascriptReadTest()
+    {
+        clickLinkContainingText(getProjectName());
+        assertTextNotPresent("GS Analyte");
+        addWebPart("Wiki");
+        createNewWikiPage("HTML");
+        setWikiBody(getFileContents("server/test/data/api/LuminexGuideSetRead.html"));
+        saveWikiPage();
+        assertTextPresentInThisOrder("Analyte- RowId", "GS Analyte", "AnalyteTitration- Analyte", "CurveFit- RowId", "GuideSet- RowId", "inserted via javascript", "CurveFit- GuideSetId", "177.203");
     }
 
     private void verifyLeveyJenningsRplots()
