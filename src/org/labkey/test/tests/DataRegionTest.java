@@ -109,7 +109,8 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         URL url = getURL();
         dataRegionTest(url, INJECT_CHARS_1);
-        dataRegionTest(url, INJECT_CHARS_2);
+        if(!getBrowser().startsWith(IE_BROWSER)) //Issue 13174: List name blocked as cross site scripting error
+            dataRegionTest(url, INJECT_CHARS_2);
     }
 
     private void createList()
