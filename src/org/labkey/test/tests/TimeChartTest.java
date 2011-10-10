@@ -274,7 +274,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
         //set to aggregate
         ExtHelper.clickExtTab(this, "Chart(s)");
-        checkRadioButton("chart_layout", "per_group");
+        checkRadioButton("subject_selection", "groups");
+        checkRadioButton("number_of_charts", "per_group");
                                   // TODO:  talk to trey
         sleep(500);
         clickCheckbox("Show Mean");
@@ -314,7 +315,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
     {
 
         ExtHelper.clickExtTab(this, "Chart(s)");
-        checkRadioButton("chart_layout", "per_subject");
+        checkRadioButton("subject_selection", "subjects");
+        checkRadioButton("number_of_charts", "per_subject");
         setFormElement("chart-title-textfield", CHART_TITLE);
         fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur);
         assertTextPresent(CHART_TITLE, 5);
@@ -547,7 +549,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
         click(Locator.xpath(ExtHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//dl[./dt/em[starts-with(text(), 'Lymphs')]]"));
         clickNavButton("Select", 0);
         ExtHelper.clickExtTab(this, "Chart(s)");
-        checkRadioButton("chart_layout", "per_dimension");
+        checkRadioButton("subject_selection", "subjects");
+        checkRadioButton("number_of_charts", "per_dimension");
         setFormElement("chart-title-textfield", CHART_TITLE);
         fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur );
         ExtHelper.clickExtTab(this, "Overview");
@@ -686,7 +689,8 @@ public class TimeChartTest extends BaseSeleniumWebTest
 
         ExtHelper.clickExtTab(this, "Chart(s)");
         assertElementPresent(Locator.xpath("//li[starts-with(@id, 'series-selector-tabpanel') and contains(@class, 'active')]//span[text()='Participants']"));
-        checkRadioButton("chart_layout", "per_group");
+        checkRadioButton("subject_selection", "groups");
+        checkRadioButton("number_of_charts", "per_group");
         assertElementPresent(Locator.xpath("//li[starts-with(@id, 'series-selector-tabpanel') and contains(@class, 'active')]//span[text()='Groups']"));
         log("Verify one line per measure per participant. All groups.");
         waitForText(CHART_TITLE);
