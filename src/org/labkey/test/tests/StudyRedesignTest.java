@@ -31,7 +31,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
     private static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
             BITS[2]+BITS[3]+TRICKY_CHARACTERS_NO_QUOTES, BITS[3]+BITS[4]+TRICKY_CHARACTERS_NO_QUOTES, BITS[4]+BITS[5]+TRICKY_CHARACTERS_NO_QUOTES};
-    private static final String[] someDataSets = {"Dataset Browse","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", "Category: " + CATEGORIES[3], "AE-1:(VTN) AE Log"};
+    private static final String[] someDataSets = {"Data Views","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", "Category: " + CATEGORIES[3], "AE-1:(VTN) AE Log"};
 
     @Override
     protected void doCreateSteps()
@@ -53,14 +53,12 @@ public class StudyRedesignTest extends StudyBaseTest
         datasetBrowserWebPartTest();
     }
 
-    private static final String datasetBrowse = "Dataset Browse (Experimental)";
-
     private void datasetBrowserWebPartTest()
     {
-        log("Dataset Browser test");
+        log("Data Views Test");
         clickLinkContainingText("Data Analysis");
         waitForText(someDataSets[3]);
-        assertTextPresent("Dataset Browse", "Name", "Type", "Access");
+        assertTextPresent("Data Views", "Name", "Type", "Access");
 
         assertDataDisplayedAlphabetically();
 
@@ -114,7 +112,6 @@ public class StudyRedesignTest extends StudyBaseTest
         for(Object[] val : vals)
         {
             clickSingleDataSet((String) val[0], (String) val[1], (String) val[2], true);
-
         }
     }
 
