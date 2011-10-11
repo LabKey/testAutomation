@@ -161,6 +161,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(LIST_DESCRIPTION);
 
         log("Test upload data");
+        //Issue 13163:  this doesn't work in IE
         clickImportData();
         submitImportTsv("Form contains no data");
         setFormElement("text", TEST_FAIL);
