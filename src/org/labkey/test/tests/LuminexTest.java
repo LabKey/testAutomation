@@ -423,7 +423,7 @@ public class LuminexTest extends AbstractQCAssayTest
         table.setFilter("Analyte", "Equals", analyte);
         table.setFilter("Type", "Equals", type);
         assertEquals("Unexpected number of data rows for " + analyte + "/" + type, rowCount, table.getDataRowCount());
-        for (int i = 1; i < rowCount; i++) // TODO: change to start at zero when Issue 13166 fixed 
+        for (int i = 0; i < rowCount; i++)  
         {
             assertEquals("Wrong StdDev", stddev, table.getDataAsText(i, "StdDev"));
             assertEquals("Wrong %CV", cv, table.getDataAsText(i, "CV"));
