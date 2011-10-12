@@ -567,7 +567,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     /**
-     * go through every well.  If they match the hardcoded well, description, and dilution values, and one of the analyte values given
+     * go through every well.  If they match the hardcoded well, description, and type values, and one of the analyte values given
      * verify that the row has the expected comment
      *
      * @param expectedComment
@@ -575,16 +575,16 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void excludeForSingleWellVerify(String expectedComment, Set<String> analytes)
     {
-        List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, "Well", "Description", "Dilution", "Exclusion Comment", "Analyte");
+        List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, "Well", "Description", "Type", "Exclusion Comment", "Analyte");
         List<String> wells = vals.get(0);
         List<String> descriptions = vals.get(1);
-        List<String> dilutions = vals.get(2);
+        List<String> types = vals.get(2);
         List<String> comments = vals.get(3);
         List<String> analytesPresent = vals.get(4);
 
         String well;
         String description;
-        String dilution;
+        String type;
         String comment;
         String analyte;
 
@@ -594,32 +594,32 @@ public class LuminexTest extends AbstractQCAssayTest
             log("well: " + well);
             description= descriptions.get(i);
             log("description: " + description);
-            dilution = dilutions.get(i);
-            log("dilution: " + dilution);
+            type = types.get(i);
+            log("type: " + type);
             comment = comments.get(i);
             log("Comment: "+ comment);
             analyte= analytesPresent.get(i);
             log("Analyte: " + analyte);
 
-            if(matchesWell(description, dilution, well) && analytes.contains(analyte))
+            if(matchesWell(description, type, well) && analytes.contains(analyte))
             {
                 assertEquals(expectedComment,comment);
             }
 
             if(expectedComment.equals(comment))
             {
-                assertTrue(matchesWell(description, dilution, well));
+                assertTrue(matchesWell(description, type, well));
                 assertTrue(analytes.contains(analyte));
             }
         }
     }
 
-    //verifies if description, dilution, and well match the hardcoded values
-    private boolean matchesWell(String description, String dilution, String well)
+    //verifies if description, type, and well match the hardcoded values
+    private boolean matchesWell(String description, String type, String well)
     {
         if(!excludedWellDescription.equals(description))
             return false;
-        if(!excludedWellDilution.equals(dilution))
+        if(!excludedWellType.equals(type))
             return false;
         return excludedWells.contains(well);
     }
@@ -706,7 +706,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     private String excludedWellDescription = "Sample 2";
-    private String excludedWellDilution = "10.0";
+    private String excludedWellType = "X25";
     private Set<String> excludedWells = new HashSet<String>(Arrays.asList("E1", "F1"));
 
     private String[] getListOfAnalytesMultipleCurveData()
