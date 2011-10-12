@@ -1283,7 +1283,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // test the y-axis scale
         applyLogYAxisScale();
-//        guideSetApiTest();
+        guideSetApiTest();
     }
 
 
@@ -1298,9 +1298,29 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("GS Analyte");
         addWebPart("Wiki");
         createNewWikiPage("HTML");
-        setWikiBody(getFileContents("server/test/data/api/LuminexGuideSetRead.html"));
+        setWikiBody(getFileContents("server/test/data/api/LuminexGuideSet.html"));
         saveWikiPage();
-        assertTextPresentInThisOrder("Analyte- RowId", "GS Analyte", "AnalyteTitration- Analyte", "CurveFit- RowId", "GuideSet- RowId", "inserted via javascript", "CurveFit- GuideSetId", "177.203");
+        assertTextPresentInThisOrder("TestAssayLuminex Analyte", "TestAssayLuminex AnalyteTitration", "TestAssayLuminex CurveFit", "TestAssayLuminex GuideSet", "TestAssayLuminex GuideSetCurveFit");
+
+        DataRegionTable drt = new DataRegionTable("GuideSetQWP", this);
+
+        click(Locator.id("button_commitLegal"));
+        waitForText("inserted via javascript");
+
+        assertEquals("inserted via javascript",  new DataRegionTable("GuideSetQWP", this).getDataAsText(3, "Comment"));
+        assertEquals("Updated GuideSet via javascript",  new DataRegionTable("GuideSetQWP", this).getDataAsText(0, "Comment"));
+        assertEquals("Updated name",  new DataRegionTable("AnalyteQWP", this).getDataAsText(0, "Name"));
+        assertEquals("Updated name",  new DataRegionTable("AnalyteTitrationQWP", this).getDataAsText(0, -1));
+
+        String[] buttonsForUnauthorized = {"button_updateCurveFit", "button_updateGuideSetCurveFit"};
+
+        for(String buttonId:  buttonsForUnauthorized)
+        {
+            click(Locator.id(buttonId));
+            waitForText("Unauthorized");
+            clickButtonContainingText("OK", 0);
+            waitForExtMaskToDisappear();
+        }
     }
 
     private void verifyLeveyJenningsRplots()

@@ -1,0 +1,260 @@
+
+<input type="button" value="Commit legal actions" onClick="updateAndInsert();" id="button_commitLegal"/>
+<input type="button" value="Attempt update CurveFit"  onClick="updateCurveFit();" id="button_updateCurveFit"/>
+<input type="button" value="Attempt update GuideSetCurveFit"  onClick="updateGuideSetCurveFit();" id="button_updateGuideSetCurveFit"/>
+<div id='myDivAnalyte'></div>
+<div id='myDivAnalyteTitration'></div>
+<div id='myDivCurveFit'></div>
+<div id='myDivGuideSet'></div>
+<div id='myDivGuideSetCurveFit'></div>
+
+<script type="text/javascript">
+
+        var myGrid = null;
+
+        function loadAnalyteTitration()
+        {
+            new LABKEY.QueryWebPart({
+               dataRegionName: 'AnalyteTitrationQWP',
+               title: 'TestAssayLuminex AnalyteTitration',
+               schemaName: 'assay',
+               sql: 'SELECT x.Analyte, x.Titration FROM "TestAssayLuminex AnalyteTitration" AS x',
+               sort: 'Analyte, Titration',
+               renderTo: 'myDivAnalyteTitration'
+            });
+
+
+
+           new LABKEY.ext.Store({
+              autoLoad: true,
+              schemaName: 'assay',
+              queryName: 'TestAssayLuminex AnalyteTitration',
+              columns: 'RowId',
+              listeners: {
+                  scope: this,
+                  'load': function(store, records, options) {
+                      // you can check things like the number of records in the store
+                      idAnalyteTitration =  records[0].get("AnalyteId");
+
+                  }
+              }
+           });
+        }
+
+        var idGuideSetCurveFit;
+        var idAnalyteTitration;
+        var idAnalyte;
+        var idGuideSet;
+        var idCurveFit;
+
+        function loadGuideSetCurveFit()
+        {
+            new LABKEY.QueryWebPart({
+               dataRegionName: 'GuideSetCurveFitQWP',
+               title: 'TestAssayLuminex GuideSetCurveFit',
+               schemaName: 'assay',
+               sql: 'SELECT x.GuideSetId, x.AUCAverage, x.EC50Average FROM "TestAssayLuminex GuideSetCurveFit" AS x',
+               sort: 'GuideSetId',
+               renderTo: 'myDivGuideSetCurveFit',
+              success: function(dataRegion, result) {
+                   console.log(dataRegion);
+                   console.log(result);
+              }
+            });
+
+
+
+           new LABKEY.ext.Store({
+              autoLoad: true,
+              schemaName: 'assay',
+              queryName: 'TestAssayLuminex GuideSetCurveFit',
+              columns: 'RowId',
+              listeners: {
+                  scope: this,
+                  'load': function(store, records, options) {
+                      // you can check things like the number of records in the store
+                      idGuideSetCurveFit =  records[0].get("GuideSetId");
+
+                  }
+              }
+           });
+        }
+
+
+       function loadGuideSet()
+       {
+           new LABKEY.QueryWebPart({
+              dataRegionName: 'GuideSetQWP',
+              title: 'TestAssayLuminex GuideSet',
+              schemaName: 'assay',
+              sql: 'SELECT x.RowId, x.AnalyteName, x.Conjugate, x.Isotype, x.Comment FROM "TestAssayLuminex GuideSet" AS x',
+              sort: 'RowId',
+              renderTo: 'myDivGuideSet',
+              success: function(dataRegion, result) {
+                   console.log(dataRegion);
+                   console.log(result);
+              }
+           });
+
+           new LABKEY.ext.Store({
+              autoLoad: true,
+              schemaName: 'assay',
+              queryName: 'TestAssayLuminex GuideSet',
+              columns: 'RowId, AnalyteName, Conjugate, Isotype, Comment',
+              listeners: {
+                  scope: this,
+                  'load': function(store, records, options) {
+                      // you can check things like the number of records in the store
+                      idGuideSet =  records[0].get("RowId");
+
+                  }
+              }
+           });
+       }
+
+        function loadAnalyte()
+        {
+            new LABKEY.QueryWebPart({
+               dataRegionName: 'AnalyteQWP',
+               title: 'TestAssayLuminex Analyte',
+               schemaName: 'assay',
+               sql: 'SELECT x.RowId, x.Name FROM "TestAssayLuminex Analyte" AS x',
+               sort: 'RowId',
+               renderTo: 'myDivAnalyte'
+            });
+
+
+
+           new LABKEY.ext.Store({
+              autoLoad: true,
+              schemaName: 'assay',
+              queryName: 'TestAssayLuminex Analyte',
+              columns: 'RowId',
+              listeners: {
+                  scope: this,
+                  'load': function(store, records, options) {
+                      // you can check things like the number of records in the store
+                      idAnalyte=  records[0].get("RowId");
+
+                  }
+              }
+           });
+        }
+
+
+
+        function loadCurveFit()
+        {
+            new LABKEY.QueryWebPart({
+               dataRegionName: 'CurveFitQWP',
+               title: 'TestAssayLuminex CurveFit',
+               schemaName: 'assay',
+               sql: 'SELECT x.RowId, x.EC50, x.AUC FROM "TestAssayLuminex CurveFit" AS x',
+               sort: 'RowId',
+               renderTo: 'myDivCurveFit'
+            });
+
+
+           new LABKEY.ext.Store({
+              autoLoad: true,
+              schemaName: 'assay',
+              queryName: 'TestAssayLuminex CurveFit',
+              columns: 'RowId',
+              listeners: {
+                  scope: this,
+                  'load': function(store, records, options) {
+                      // you can check things like the number of records in the store
+                      idCurveFit =  records[0].get("RowId");
+
+                  }
+              }
+           });
+        }
+
+        function updateUpdatables()
+        {
+            LABKEY.Query.updateRows({
+                schemaName: 'assay',
+                queryName: 'TestAssayLuminex GuideSet',
+                rows: [{rowId:idGuideSet, "Comment":"Updated GuideSet via javascript"}]
+
+                    })
+
+
+
+            LABKEY.Query.updateRows({
+                schemaName: 'assay',
+                queryName: 'TestAssayLuminex Analyte',
+                rows: [{rowId:idAnalyte, "Name":"Updated name"}]
+
+                    })
+
+//            LABKEY.Query.updateRows({
+//                schemaName: 'assay',
+//                queryName: 'TestAssayLuminex AnalyteTitration',
+//                rows: [{rowId:idAnalyteTitration, "MaxFI":"99999"}]
+//
+//                    })
+
+//            LABKEY.Query.updateRows({
+//                schemaName: 'assay',
+//                queryName: 'TestAssayLuminex GuideSetCurveFit',
+//                rows: [{rowId:idGuideSetCurveFit, "Comment":"Updated GuideSetCurveFit via javascript"}]
+//
+//                    })
+
+
+        }
+
+        function insertInsertables()
+        {
+
+            var results = LABKEY.Query.insertRows({
+            schemaName: "assay",
+            queryName: "TestAssayLuminex GuideSet",
+            rows: [
+
+                {'analytename':'GS Analyte (1)', 'comment':'inserted via javascript'}
+            ]});
+        }
+
+        function updateAndInsert()
+        {
+            insertInsertables();
+            updateUpdatables();
+
+            loadGuideSet();
+            loadAnalyte();
+            loadAnalyteTitration();
+        }
+
+        function updateCurveFit()
+        {
+            LABKEY.Query.updateRows({
+                schemaName: 'assay',
+                queryName: 'TestAssayLuminex CurveFit',
+                rows: [{rowId:idCurveFit, "RowId":"Updated name"}]
+
+             });
+        }
+
+        function updateGuideSetCurveFit()
+        {
+            LABKEY.Query.updateRows({
+                schemaName: 'assay',
+                queryName: 'TestAssayLuminex GuideSetCurveFit',
+                rows: [{GuideSetId:idGuideSetCurveFit, "RunCount":"5"}]
+
+             });
+        }
+
+
+    loadAnalyte();
+    loadAnalyteTitration();
+    loadAnalyteTitration();
+    loadAnalyteTitration();
+    loadCurveFit();
+    loadGuideSet();
+    loadGuideSetCurveFit();
+//    updateAndInsert();
+</script>
