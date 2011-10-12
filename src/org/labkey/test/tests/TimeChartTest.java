@@ -276,21 +276,20 @@ public class TimeChartTest extends BaseSeleniumWebTest
         ExtHelper.clickExtTab(this, "Chart(s)");
         checkRadioButton("subject_selection", "groups");
         checkRadioButton("number_of_charts", "per_group");
-                                  // TODO:  talk to trey
-        sleep(500);
+
+        waitForText("Lab Results: " + GROUP1_NAME);
         clickCheckbox("Show Mean");
-        waitForTextToDisappear("loading");
         clickCheckbox("Show Individual Lines");
-        waitForTextToDisappear("loading");
 
-
-
-        clickAt(ExtHelper.locateBrowserFileCheckbox("Some Participants"), "1,1");
-        clickAt(ExtHelper.locateBrowserFileCheckbox("Other Participants"), "1,1");
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, GROUP1_NAME);
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, GROUP2_NAME);
         waitForText("Please select at least one group");
 
-        clickAt(ExtHelper.locateBrowserFileCheckbox("Some Participants"), "1,1");
-        waitForTextToDisappear("loading");
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, GROUP1_NAME);
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, GROUP2_NAME);
+        checkRadioButton("number_of_charts", "per_dimension");
+        waitForText("Lab Results: CD4");
+        assertTextPresent("Lab Results:");
 
         ExtHelper.clickExtTab(this, "Overview");
         setFormElement("reportName", "Aggregate");
