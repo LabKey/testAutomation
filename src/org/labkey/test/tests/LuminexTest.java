@@ -1300,7 +1300,14 @@ public class LuminexTest extends AbstractQCAssayTest
         createNewWikiPage("HTML");
         setWikiBody(getFileContents("server/test/data/api/LuminexGuideSet.html"));
         saveWikiPage();
-        assertTextPresentInThisOrder("TestAssayLuminex Analyte", "TestAssayLuminex AnalyteTitration", "TestAssayLuminex CurveFit", "TestAssayLuminex GuideSet", "TestAssayLuminex GuideSetCurveFit");
+
+        // QueryWebParts are being loaded via AJAX, so wait for them to show up
+        String[] titles = {"TestAssayLuminex Analyte", "TestAssayLuminex AnalyteTitration", "TestAssayLuminex CurveFit", "TestAssayLuminex GuideSet", "TestAssayLuminex GuideSetCurveFit"};
+        for (String title : titles)
+        {
+            waitForText(title);
+        }
+        assertTextPresentInThisOrder(titles);
 
         DataRegionTable drt = new DataRegionTable("GuideSetQWP", this);
 
