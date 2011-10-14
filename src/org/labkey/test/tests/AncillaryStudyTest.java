@@ -87,7 +87,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickNavButton("Create New Study", 0);
         
         //Wizard page 1 - location
-        ExtHelper.waitForExtDialog(this, "Create New Study");
+        ExtHelper.waitForExtDialog(this, "Create Ancillary Study");
         setFormElement("studyName", getFolderName());
         setFormElement("studyDescription", STUDY_DESCRIPTION);
         assertTrue(PROTOCOL_DOC.exists());
@@ -156,7 +156,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         assertTextPresent("Ancillary study created by AncillaryStudyTest");
         clickLinkWithText("Manage Study");
-        assertTextPresent("10 Datasets");
+        assertTextPresent("14 Datasets");
         clickLinkWithText("Manage Datasets");
         for( String str : DATASETS )
         {
@@ -314,8 +314,10 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         waitAndClick(Locator.fileTreeByName("datasets"));
         waitForText("datasets_metadata.xml");
-        assertTextPresent(".tsv", 10 * 3);
-        assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset300.tsv", "dataset420.tsv", "dataset423.tsv");
+        assertTextPresent(".tsv", 14 * 3);
+        assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset125.tsv",
+                "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset200.tsv",
+                "dataset300.tsv", "dataset350.tsv", "dataset420.tsv", "dataset423.tsv", "dataset490.tsv");
 
         //TODO: 13132: Study reload doesn't delete participant groups
 //        log("Verify reloading study");
