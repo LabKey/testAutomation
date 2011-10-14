@@ -226,7 +226,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 log("Warning: Internet Explorer cannot do file uploads!");
                 //browser = IE_UPLOAD_BROWSER;
-                //_fileUploadAvailable = true;
+                _fileUploadAvailable = true;
             }
             else if (browser.startsWith(FIREFOX_BROWSER))
             {
@@ -2436,6 +2436,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitForElementToDisappear(final Locator locator, int wait)
     {
         String failMessage = "Element with locator " + locator + " was still present.";
+//        if(locator.toString().contains("xt") && getBrowser().equals("*iexploreproxy"))
+//        {
+//            // IE can't detect some ext elements disappearing
+//            sleep(10000);
+//            return;
+//        }
         waitFor(new Checker()
         {
             public boolean check()
@@ -2453,6 +2459,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitForTextToDisappear(final String text, int wait)
     {
         String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
+//        if(getBrowser().equals("*iexploreproxy"))
+//        {
+//            // IE can't detect some ext elements disappearing
+//            sleep(10000);
+//            return;
+//        }
         waitFor(new Checker()
         {
             public boolean check()
@@ -5329,7 +5341,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
 
             clickLinkWithText("Manage Files");
-            clickNavButton("Process and Import Data");
+            waitAndClickNavButton("Process and Import Data");
             sleep(1000);
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.

@@ -361,11 +361,7 @@ public class ListHelper
             test.waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             test.clickNavButton("Add Field", 0);
             test.setFormElement(Locator.name("ff_name" + i),  col.getName());
-            TAB(test, Locator.name("ff_name" +i));
             test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
-            TAB(test, Locator.name("ff_label" +i));
-            test.setFormElement(Locator.name("ff_type" + i), col.getType().toString());
-            TAB(test, Locator.name("ff_type" +i));
             test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
 
             if (col.isMvEnabled())
@@ -374,33 +370,31 @@ public class ListHelper
             if (col.isRequired())
                 clickRequired(test, "");
 
+            // Set type.
             LookupInfo lookup = col.getLookup();
+            // click the combobox trigger image
+            test.click(Locator.xpath("//input[@name='ff_type" + i + "']/../img"));
+            // click lookup checkbox
+            ExtHelper.waitForExtDialog(test, "Choose field type:", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : col.getType().toString()) + "']/../input[@name = 'rangeURI']"));
+
             if (lookup != null)
             {
-                // click the combobox trigger image
-                test.click(Locator.xpath("//input[@name='ff_type" + i + "']/../img"));
-               // click lookup checkbox
-                test.waitForElement(Locator.xpath("//label[text()='Lookup']/../input"),BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-                test.click(Locator.xpath("//label[text()='Lookup']/../input"));
-
                 if (lookup.getFolder() != null)
                 {
                     test.setFormElement(Locator.tagWithName("input","lookupContainer"), lookup.getFolder());
-                    TAB(test,Locator.tagWithName("input","container"));
                 }
 
                 test.setFormElement(Locator.tagWithName("input","schema"), lookup.getSchema());
-                TAB(test, Locator.tagWithName("input","schema"));
 
                 test.setFormElement(Locator.tagWithName("input","table"), lookup.getTable());
-                TAB(test, Locator.tagWithName("input","table"));
-                
-                //test.clickNavButton("Apply", 0);
-                test.click(Locator.tagWithText("button","Apply"));
-                
-                // wait a while to make sure rangeURI is set (async check)
-                test.sleep(1000);
             }
+                
+            //test.clickNavButton("Apply", 0);
+            test.click(Locator.tagWithText("button","Apply"));
+
+            // wait a while to make sure rangeURI is set (async check)
+            test.sleep(1000);
 
             if (col.getFormat() != null)
             {
