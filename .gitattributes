@@ -144,6 +144,7 @@ src/org/labkey/test/tests/FileContentTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
 src/org/labkey/test/tests/FlowImportTest.java -text
 src/org/labkey/test/tests/FlowJoQueryTest.java -text
+src/org/labkey/test/tests/FlowNormalizationTest.java -text
 src/org/labkey/test/tests/FlowTest.java -text
 src/org/labkey/test/tests/FolderTest.java -text
 src/org/labkey/test/tests/FormulationsTest.java -text

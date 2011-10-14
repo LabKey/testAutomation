@@ -179,6 +179,7 @@ public enum TestSet
         FlowTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
+        FlowNormalizationTest.class
     }),
 
     // Many (but not all) of the tests that use wiki functionality

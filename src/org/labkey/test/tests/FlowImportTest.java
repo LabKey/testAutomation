@@ -21,6 +21,8 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
 
+import java.util.Arrays;
+
 /**
  * User: kevink
  * Date: Mar 31, 2009
@@ -67,7 +69,7 @@ public class FlowImportTest extends BaseFlowTest
         //assertEquals("/flowjoquery/microFCS", getTreeSelection("tree"));
         importAnalysis_FCSFiles(containerPath, fcsFilePath, false);
         importAnalysis_analysisEngine(containerPath, "noEngine");
-        importAnalysis_analysisOptions(containerPath, null);
+        importAnalysis_analysisOptions(containerPath, Arrays.asList("All Samples"), false, null, null);
         // assert previous analysis folder is available in drop down
         assertTextPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(containerPath, analysisFolder, true);
@@ -88,7 +90,7 @@ public class FlowImportTest extends BaseFlowTest
         // assert keyword run shows up in list of keyword runs
         importAnalysis_FCSFiles(containerPath, "microFCS", true);
         importAnalysis_analysisEngine(containerPath, "noEngine");
-        importAnalysis_analysisOptions(containerPath, null);
+        importAnalysis_analysisOptions(containerPath, Arrays.asList("All Samples"), false, null, null);
         // assert FlowJoAnalysis analysis folder doesn't show up in list of folders
         assertTextNotPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(containerPath, analysisFolder + "_1", false);

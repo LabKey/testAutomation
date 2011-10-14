@@ -22,6 +22,7 @@ import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 abstract public class BaseFlowTest extends BaseSeleniumWebTest
@@ -172,31 +173,30 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, String analysisName, boolean viaPipeline)
     {
-        importAnalysis(containerPath, workspacePath, fcsPath, false, analysisName, false, viaPipeline);
+        ImportAnalysisOptions options = new ImportAnalysisOptions(containerPath, workspacePath, fcsPath, false, analysisName, false, viaPipeline);
+        importAnalysis(options);
     }
 
-    protected void importAnalysis(String containerPath, String workspacePath,
-                                  String fcsPath, boolean existingKeywordRun,
-                                  String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)
+    protected void importAnalysis(ImportAnalysisOptions options)
     {
-        if (viaPipeline)
+        if (options.isViaPipeline())
         {
-            importAnalysis_viaPipeline(workspacePath);
+            importAnalysis_viaPipeline(options.getWorkspacePath());
         }
         else
         {
-            importAnalysis_begin(containerPath);
-            importAnalysis_uploadWorkspace(containerPath, workspacePath);
+            importAnalysis_begin(options.getContainerPath());
+            importAnalysis_uploadWorkspace(options.getContainerPath(), options.getWorkspacePath());
         }
-        importAnalysis_FCSFiles(containerPath, fcsPath, existingKeywordRun);
-        if (fcsPath == null)
+        importAnalysis_FCSFiles(options.getContainerPath(), options.getFcsPath(), options.isExistingKeywordRun());
+        if (options.getFcsPath() == null)
         {
             assertFormElementEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
             assertFormElementEquals(Locator.name("runFilePathRoot"), "");
         }
         else
         {
-            if (existingKeywordRun)
+            if (options.isExistingKeywordRun())
                 assertFormElementNotEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
             else
                 assertFormElementEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
@@ -204,14 +204,14 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
 
         // Analysis engine can only be selected when no FCS files are associated with the run
-        if (fcsPath != null || existingKeywordRun)
-            importAnalysis_analysisEngine(containerPath, "noEngine");
+        if (options.getFcsPath() != null || options.isExistingKeywordRun())
+            importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
 
-        importAnalysis_analysisOptions(containerPath, null);
+        importAnalysis_analysisOptions(options.getContainerPath(), options.getImportGroupNames(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationParameters());
 
-        importAnalysis_analysisFolder(containerPath, analysisName, existingAnalysisFolder);
+        importAnalysis_analysisFolder(options.getContainerPath(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
-        importAnalysis_confirm(containerPath, workspacePath, fcsPath, existingKeywordRun, analysisName, existingAnalysisFolder);
+        importAnalysis_confirm(options.getContainerPath(), options.getWorkspacePath(), options.getFcsPath(), options.isExistingKeywordRun(), options.getAnalysisName(), options.isExistingAnalysisFolder());
     }
 
     protected void importAnalysis_viaPipeline(String workspacePath)
@@ -284,12 +284,21 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("Next");
     }
 
-    protected void importAnalysis_analysisOptions(String containerPath, List<String> groupNames)
+    protected void importAnalysis_analysisOptions(String containerPath, List<String> groupNames, boolean rEngineNormalization, String rEngineNormalizationReference, String rEngineNormalizationParameters)
     {
         assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
         if (groupNames != null && groupNames.size() > 0)
         {
             setFormElement("importGroupNames", StringUtils.join(groupNames, ","));
+        }
+        if (rEngineNormalization)
+        {
+            checkCheckbox("rEngineNormalization");
+            // UNDONE: set rEngineNormalizationReference, rEngineNormalizationParameters
+        }
+        else
+        {
+            uncheckCheckbox("rEngineNormalization");
         }
         clickNavButton("Next");
     }
@@ -324,5 +333,132 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("Finish");
         waitForPipeline(containerPath);
         log("finished import analysis wizard");
+    }
+
+    protected static class ImportAnalysisOptions
+    {
+        private final String _containerPath;
+        private final String _workspacePath;
+        private final String _fcsPath;
+        private final boolean _existingKeywordRun;
+        private final String _analysisEngine;
+        private final List<String> _importGroupNames;
+        private final boolean _rEngineNormalization;
+        private final String _rEngineNormalizationReference;
+        private final String _rEngineNormalizationParameters;
+        private final String _analysisName;
+        private final boolean _existingAnalysisFolder;
+        private final boolean _viaPipeline;
+
+        public ImportAnalysisOptions(
+                String containerPath,
+                String workspacePath,
+                String fcsPath,
+                boolean existingKeywordRun,
+                String analysisName,
+                boolean existingAnalysisFolder,
+                boolean viaPipeline)
+        {
+            _containerPath = containerPath;
+            _workspacePath = workspacePath;
+            _fcsPath = fcsPath;
+            _existingKeywordRun = existingKeywordRun;
+            _analysisEngine = "noEngine";
+            _importGroupNames = Arrays.asList("All Samples");
+            _rEngineNormalization = false;
+            _rEngineNormalizationReference = null;
+            _rEngineNormalizationParameters = null;
+            _analysisName = analysisName;
+            _existingAnalysisFolder = existingAnalysisFolder;
+            _viaPipeline = viaPipeline;
+        }
+
+        public ImportAnalysisOptions(
+                String containerPath,
+                String workspacePath,
+                String fcsPath,
+                boolean existingKeywordRun,
+                String analysisEngine,
+                List<String> importGroupNames,
+                boolean rEngineNormalization,
+                String rEngineNormalizationReference,
+                String rEngineNormalizationParameters,
+                String analysisName,
+                boolean existingAnalysisFolder,
+                boolean viaPipeline)
+        {
+            _containerPath = containerPath;
+            _workspacePath = workspacePath;
+            _fcsPath = fcsPath;
+            _existingKeywordRun = existingKeywordRun;
+            _analysisEngine = analysisEngine;
+            _importGroupNames = importGroupNames;
+            _rEngineNormalization = rEngineNormalization;
+            _rEngineNormalizationReference = rEngineNormalizationReference;
+            _rEngineNormalizationParameters = rEngineNormalizationParameters;
+            _analysisName = analysisName;
+            _existingAnalysisFolder = existingAnalysisFolder;
+            _viaPipeline = viaPipeline;
+        }
+
+        public String getContainerPath()
+        {
+            return _containerPath;
+        }
+
+        public String getWorkspacePath()
+        {
+            return _workspacePath;
+        }
+
+        public String getFcsPath()
+        {
+            return _fcsPath;
+        }
+
+        public boolean isExistingKeywordRun()
+        {
+            return _existingKeywordRun;
+        }
+
+        public String getAnalysisEngine()
+        {
+            return _analysisEngine;
+        }
+
+        public List<String> getImportGroupNames()
+        {
+            return _importGroupNames;
+        }
+
+        public boolean isREngineNormalization()
+        {
+            return _rEngineNormalization;
+        }
+
+        public String getREngineNormalizationReference()
+        {
+            return _rEngineNormalizationReference;
+        }
+
+        public String getREngineNormalizationParameters()
+        {
+            return _rEngineNormalizationParameters;
+        }
+
+        public String getAnalysisName()
+        {
+            return _analysisName;
+        }
+
+        public boolean isExistingAnalysisFolder()
+        {
+            return _existingAnalysisFolder;
+        }
+
+        public boolean isViaPipeline()
+        {
+            return _viaPipeline;
+        }
     }
 }
