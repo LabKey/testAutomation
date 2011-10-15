@@ -291,14 +291,19 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             setFormElement("importGroupNames", StringUtils.join(groupNames, ","));
         }
-        if (rEngineNormalization)
+
+        // R normalization options only present if rEngine as selected
+        if (isFormElementPresent("rEngineNormalization"))
         {
-            checkCheckbox("rEngineNormalization");
-            // UNDONE: set rEngineNormalizationReference, rEngineNormalizationParameters
-        }
-        else
-        {
-            uncheckCheckbox("rEngineNormalization");
+            if (rEngineNormalization)
+            {
+                checkCheckbox("rEngineNormalization");
+                // UNDONE: set rEngineNormalizationReference, rEngineNormalizationParameters
+            }
+            else
+            {
+                uncheckCheckbox("rEngineNormalization");
+            }
         }
         clickNavButton("Next");
     }
