@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
