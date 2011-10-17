@@ -989,6 +989,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         goToTestRunList();
         clickButtonContainingText("Import Data");
+        checkRadioButton("participantVisitResolver", "SampleInfo");
         clickButtonContainingText("Next");
         setFormElement(ASSAY_ID_FIELD, name);
     }
