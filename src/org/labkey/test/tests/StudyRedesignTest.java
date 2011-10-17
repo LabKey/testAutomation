@@ -70,9 +70,9 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForTextToDisappear(BITS[2]);
         assertTextPresent("Category: ", 2); // Two categories contain text.
         // 10 datasets(CATEGORIES[3]) + 7 datasets(CATEGORIES[4]) - 1 hidden dataset
-        assertEquals("Incorrect number of datasets after filter", 16, getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
+        assertEquals("Incorrect number of datasets after filter", 17, getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
         collapseCategory(CATEGORIES[3]);
-        assertEquals("Incorrect number of datasets after filter", 6, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+        assertEquals("Incorrect number of datasets after filter", 7, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
     }
 
     private void clickExt4HeaderMenu(String title, String selection)
