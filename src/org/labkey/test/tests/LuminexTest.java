@@ -440,7 +440,7 @@ public class LuminexTest extends AbstractQCAssayTest
         uploadEC50Data();
 //        ensureMultipleCurveDataPresent();
 //        ensureEC50DataPresent();
-        clickButtonContainingText("Save and Finish", 0);
+        clickButton("Save and Finish", 2*WAIT_FOR_PAGE);
 
         //add transform script
         goToSchemaBrowser();
@@ -449,15 +449,15 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkContainingText("view data");
         assertTextPresent("Four Parameter");
 
-        waitForText("52110875");
+        waitForText("4.469697");
         
         checkEC50data();
-        sleep(60000);
     }
 
     private void checkEC50data()
     {
         DataRegionTable table = new DataRegionTable("query", this);
+        List<String> analyte = table.getColumnDataAsText("Analyte");
         List<String> formula = table.getColumnDataAsText("Curve Type");
         List<String> ec50 = table.getColumnDataAsText("EC50");
         List<String> auc= table.getColumnDataAsText("AUC");
@@ -483,8 +483,9 @@ public class LuminexTest extends AbstractQCAssayTest
             {
                 //ec50 should not be populated
                 assertEquals("", ec50.get(i));
-                //auc=populated
-                assertTrue( "AUC was unpopulated for row " + i, ((String) auc.get(i)).length()>0);
+                //auc=populated (for all non-blank analytes)
+                if (!analyte.get(i).startsWith("Blank"))
+                    assertTrue( "AUC was unpopulated for row " + i, ((String) auc.get(i)).length()>0);
             }
         }
 
