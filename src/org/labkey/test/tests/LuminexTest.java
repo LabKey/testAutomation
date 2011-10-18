@@ -933,7 +933,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     /**
-     * Verify that the "set this  as standard" checkboxes exist and are checked for the given standard names
+     * Verify that the "set this  as standard" checkboxes exist and can be checked for the given standard names
      * preconditions:  at analyte properties page
      * postconditions:  unchanged
      * @param standardsNames
@@ -944,6 +944,7 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             String s = standardsNames[i];
             Locator l = Locator.checkboxByName("_titrationRole_standard_"+s);
+            checkCheckbox(l);
             assertChecked(l);
         }
     }
@@ -1194,6 +1195,8 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement("name", "Guide Set plate " + (i+1));
             setFormElement("isotype", isotype);
             setFormElement("conjugate", conjugate);
+            setFormElement("stndCurveFitInput", "");
+            setFormElement("unkCurveFitInput", "");
             setFormElement("notebookNo", "Notebook" + (i+1));
             setFormElement("assayType", "Experimental");
             setFormElement("expPerformer", "TECH" + (i+1));
@@ -1223,8 +1226,8 @@ public class LuminexTest extends AbstractQCAssayTest
         int[] rowCounts = {2, 2};
         double[] ec50Averages = {177.20, 43423.37};
         double[] ec50StdDevs = {18.42, 798.51};
-        double[] aucAverages = {8664.66, 80853.29};
-        double[] aucStdDevs = {520.55, 6522.66};
+        double[] aucAverages = {8662.50, 80851.83};
+        double[] aucStdDevs = {521.79, 6523.08};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec50Averages, ec50StdDevs, aucAverages, aucStdDevs);
 
         // upload the final set of runs (2 runs)
@@ -1237,6 +1240,8 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement("name", "Guide Set plate " + (i+1));
             setFormElement("isotype", isotype);
             setFormElement("conjugate", conjugate);
+            setFormElement("stndCurveFitInput", "");
+            setFormElement("unkCurveFitInput", "");
             setFormElement("notebookNo", "Notebook" + (i+1));
             setFormElement("assayType", "Experimental");
             setFormElement("expPerformer", "TECH" + (i+1));
@@ -1275,8 +1280,8 @@ public class LuminexTest extends AbstractQCAssayTest
         int[] rowCounts2 = {2, 3};
         double[] ec50Averages2 = {177.20, 42157.90};
         double[] ec50StdDevs2 = {18.42, 4834.06};
-        double[] aucAverages2 = {8664.66, 85268.55};
-        double[] aucStdDevs2 = {520.55, 738.49};
+        double[] aucAverages2 = {8662.50, 85268.04};
+        double[] aucStdDevs2 = {521.79, 738.55};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec50Averages2, ec50StdDevs2, aucAverages2, aucStdDevs2);
 
         // test the start and end date filter for the report
