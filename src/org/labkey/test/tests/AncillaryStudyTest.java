@@ -177,7 +177,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         verifyModifyDataset();
         verifyProtocolDocument();
 //        verifySpecimens(); // TODO: check specimens after modifying participant lists.  Blocked by #13199
-        verifyImportExport();
+//        verifyExportImport(); // TODO: blocked, #13207 Import with protocol doc broken.
     }
 
     private void verifyModifyParticipantGroup(String study)
@@ -331,7 +331,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertElementNotPresent(Locator.linkWithText("Manage Requestability Rules"));
     }
 
-    private void verifyImportExport()
+    private void verifyExportImport()
     {
         StudyHelper.exportStudy(this, STUDY_NAME);
         goToModule("Pipeline");
@@ -350,14 +350,13 @@ public class AncillaryStudyTest extends StudyBaseTest
                 "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset200.tsv",
                 "dataset300.tsv", "dataset350.tsv", "dataset420.tsv", "dataset423.tsv", "dataset490.tsv");
 
-        //TODO: 13132: Study reload doesn't delete participant groups
-//        log("Verify reloading study");
-//        waitAndClick(Locator.fileTreeByName("export"));
-//        waitForText("study.xml");
-//        ExtHelper.waitForImportDataEnabled(this);
-//        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
-//        selectImportDataAction("Reload Study");
-        
+        log("Verify reloading study");
+        waitAndClick(Locator.fileTreeByName("export"));
+        waitForText("study.xml");
+        ExtHelper.waitForImportDataEnabled(this);
+        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
+        selectImportDataAction("Reload Study");
+        waitForPipelineJobsToComplete(1, "study import", false);
     }
 
     private void assertWizardError(String button, String error)
