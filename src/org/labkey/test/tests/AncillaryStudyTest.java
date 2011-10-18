@@ -171,10 +171,12 @@ public class AncillaryStudyTest extends StudyBaseTest
         }
         assertTextPresent("10 mice");
 
+        verifySpecimens();
         verifyModifyParticipantGroup(STUDY_NAME);
         verifyModifyParticipantGroup(getFolderName());
         verifyModifyDataset();
         verifyProtocolDocument();
+//        verifySpecimens(); // TODO: check specimens after modifying participant lists.  Blocked by #13199
         verifyImportExport();
     }
 
@@ -298,6 +300,35 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertTextPresent("Protocol documents:");
         assertTextPresent("Extra " + STUDY_NAME);
         assertTextPresent("Extra " + STUDY_DESCRIPTION);
+    }
+
+    private void verifySpecimens()
+    {
+        log("Verify copied specimens");
+        clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Specimen Data");
+        clickLinkWithText("By Specimen");
+        DataRegionTable table = new DataRegionTable("SpecimenSummary", this, false, true);
+        assertEquals("Did not find expected number of specimens.", 5, table.getDataRowCount() - 1); // 5 specimens + 1 total row
+        assertEquals("Incorrect total vial count.", "44", table.getDataAsText(5, "Vial Count"));
+        clickLinkWithText("Specimen Data");
+        clickLinkWithText("By Vial");
+        table = new DataRegionTable("SpecimenDetail", this, false, true);
+        assertEquals("Did not find expected number of vials.", 44, table.getDataRowCount() - 1); // 44 vials + 1 total row
+
+        log("Verify that Ancillary study doesn't support requests.");
+        clickLinkWithText("Manage");
+        assertTextNotPresent("Specimen Repository Settings");
+        assertTextNotPresent("Specimen Request Settings");
+        assertTextPresent("NOTE: specimen repository and request settings are not available for ancillary studies.");
+        assertElementNotPresent(Locator.linkWithText("Change Repository Type"));
+        assertElementNotPresent(Locator.linkWithText("Manage Display and Behavior"));
+        assertElementNotPresent(Locator.linkWithText("Manage Request Statuses"));
+        assertElementNotPresent(Locator.linkWithText("Manage Actors and Groups"));
+        assertElementNotPresent(Locator.linkWithText("Manage Default Requirements"));
+        assertElementNotPresent(Locator.linkWithText("Manage New Request Form"));
+        assertElementNotPresent(Locator.linkWithText("Manage Notifications"));
+        assertElementNotPresent(Locator.linkWithText("Manage Requestability Rules"));
     }
 
     private void verifyImportExport()
