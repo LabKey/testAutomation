@@ -200,7 +200,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
 
         log("Test edit and adding new field with imported data present");
-        clickLinkWithText("Lists");
+        clickTab("List");
         clickLinkWithText("view design");
         clickEditDesign();
         setColumnName(1,_listCol1.getName());
@@ -557,7 +557,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(LIST2_KEY4);
 
         log("Get URL to test exporting deleted list.");
-        clickLinkWithText("Lists");
+        clickTab("List");
         clickAndWait(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/..//a[text()='view data']"));
         clickNavButton("Export", 0);
         selenium.mouseDown("//a//span[contains(text(), 'Text')]");
