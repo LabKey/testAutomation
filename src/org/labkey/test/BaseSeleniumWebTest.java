@@ -1228,7 +1228,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
-    private boolean skipCleanup()
+    protected boolean skipCleanup()
     {
         return "false".equals(System.getProperty("clean"));
     }

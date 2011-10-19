@@ -150,8 +150,11 @@ public class TimelineTest extends BaseSeleniumWebTest
 
     private void removeTestPage()
     {
-        clickLinkWithText(FOLDER_NAME);
-        removeWebPart(WIKIPAGE_NAME);
+        if (enableLinkCheck())
+        {
+            clickLinkWithText(FOLDER_NAME);
+            removeWebPart(WIKIPAGE_NAME);
+        }
     }
 
     private void createList()
