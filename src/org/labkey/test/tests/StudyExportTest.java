@@ -463,6 +463,13 @@ public class StudyExportTest extends StudyManualTest
         clickMenuButton("QC State", "All data");
         assertTextPresent(TEST_ADD_ENTRY);
 
+        // Make sure that we can view its participant page immediately
+        pushLocation();
+        clickLinkWithText(TEST_ADD_ENTRY);
+        assertTextPresent("Mouse - " + TEST_ADD_ENTRY);
+        assertTextPresent("DEM-1: Demographics");
+        popLocation();
+
         log("Test deleting rows in a dataset");
         checkCheckbox(Locator.raw("//input[contains(@value, '999320529')]"));
         clickNavButton("Delete", 0);
