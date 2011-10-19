@@ -34,12 +34,14 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String STUDY_NAME = "Special Emphasis Study";
     private static final String STUDY_DESCRIPTION = "Ancillary study created by AncillaryStudyTest.";
     private static final String[] DATASETS = {"APX-1: Abbreviated Physical Exam","AE-1:(VTN) AE Log","BRA-1: Behavioral Risk Assessment (Page 1)","BRA-2: Behavioral Risk Assessment (Page 2)","CM-1:(Ph I/II) Concomitant Medications Log","CPF-1: Follow-up Chemistry Panel","CPS-1: Screening Chemistry Panel","DEM-1: Demographics","DOV-1: Discontinuation of Vaccination","ECI-1: Eligibility Criteria"};
+    private static final String[] DEPENDENT_DATASETS = {"EVC-1: Enrollment Vaccination", "FPX-1: Final Complete Physical Exam", "IV-1:Interim Visit", "TM-1: Termination"};
     private static final String PARTICIPANT_GROUP = "Ancillary Group";
     private static final String[] PTIDS = {"999320016", "999320518", "999320529", "999320533", "999320541", "999320557", "999320565", "999320576", "999320582", "999320590"};
     private static final String PARTICIPANT_GROUP_BAD = "Bad Ancillary Group";
     private static final String[] PTIDS_BAD = {"999320004", "999320007", "999320010", "999320016", "999320018", "999320021", "999320029", "999320033", "999320036","999320038"};
     private static final String SEQ_NUMBER = "1001"; //These should alphabetically precede all exesting sequence numbers.
     private static final String SEQ_NUMBER2 = "1002";
+    private static final String UPDATED_DATASET_VAL = "Esperanto";
     private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
                                                      PTIDS[0] + "\t"+SEQ_NUMBER+"\n" +
                                                      PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
@@ -156,7 +158,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         assertTextPresent("Ancillary study created by AncillaryStudyTest");
         clickLinkWithText("Manage Study");
-        assertTextPresent("14 Datasets");
+        assertTextPresent((DATASETS.length + DEPENDENT_DATASETS.length) + " Datasets");
         clickLinkWithText("Manage Datasets");
         for( String str : DATASETS )
         {
@@ -176,6 +178,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         verifyModifyParticipantGroup(getFolderName());
         verifyModifyDataset();
         verifyProtocolDocument();
+        verifyDatasets();
 //        verifySpecimens(); // TODO: check specimens after modifying participant lists.  Blocked by #13199
 //        verifyExportImport(); // TODO: blocked, #13207 Import with protocol doc broken.
     }
@@ -302,6 +305,33 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertTextPresent("Extra " + STUDY_DESCRIPTION);
     }
 
+    private void verifyDatasets()
+    {
+        log("Verify Linked Datasets");
+        clickLinkWithText(getFolderName());
+        clickLinkWithText(DEPENDENT_DATASETS[0]);
+        clickLinkWithText("edit");
+        setFormElement(Locator.name("quf_formlang"), UPDATED_DATASET_VAL);
+        clickNavButton("Submit");
+
+        clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("Clinical and Assay Data");
+        for(String dataset : DATASETS)
+        {
+            assertLinkPresentWithText(dataset);
+        }
+        for(String dataset : DEPENDENT_DATASETS)
+        {
+            assertLinkPresentWithText(dataset);
+        }
+        clickLinkWithText(DEPENDENT_DATASETS[0]);
+        assertTextNotPresent(UPDATED_DATASET_VAL);
+        clickMenuButton("Views", "Edit Snapshot");
+        clickNavButton("Update Snapshot");
+        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
+        assertTextPresent(UPDATED_DATASET_VAL);
+    }
+
     private void verifySpecimens()
     {
         log("Verify copied specimens");
@@ -345,7 +375,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         waitAndClick(Locator.fileTreeByName("datasets"));
         waitForText("datasets_metadata.xml");
-        assertTextPresent(".tsv", 14 * 3);
+        assertTextPresent(".tsv", (DATASETS.length + DEPENDENT_DATASETS.length) * 3);
         assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset125.tsv",
                 "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset200.tsv",
                 "dataset300.tsv", "dataset350.tsv", "dataset420.tsv", "dataset423.tsv", "dataset490.tsv");

@@ -4142,7 +4142,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isChecked(inherited))
             click(inherited);
         waitForElement(Locator.permissionRendered(), defaultWaitForPage);
-        assertTrue("Validate checkbox is set to inherit permissions", isChecked(inherited));
+        assertTrue("Failed to check inherit permissions checkbox.", isChecked(inherited));
     }
 
 
