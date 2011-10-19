@@ -95,7 +95,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private static final String EXCLUDE_COMMENT_FIELD = "comment";
     public static final String EXCLUDE_SELECTED_BUTTON = "excludeselected";
     protected static final String MULTIPLE_CURVE_ASSAY_RUN_NAME = "multipleCurvesTestRun";
-    protected static final String SAVE_CHANGES_BUTTON = "Save Changes";
+    protected static final String SAVE_CHANGES_BUTTON = "Save";
 
     private String EC50_RUN_NAME = "EC50";
     private String rum4 = "Four Parameter";
