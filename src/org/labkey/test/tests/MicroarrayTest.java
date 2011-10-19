@@ -215,6 +215,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         assertTextPresent(SAMPLE_SET);
 
         log("Test run outputs/ data files");
+        clickTab("Microarray Dashboard");
         clickLinkWithText(ASSAY_NAME);
         clickLinkWithText(MAGEML_FILE2);
         assertTextPresent("115468002");
