@@ -150,8 +150,7 @@ public class TimelineTest extends BaseSeleniumWebTest
 
     private void removeTestPage()
     {
-        if (!isTextPresent(WIKIPAGE_NAME))
-            clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText(FOLDER_NAME);
         removeWebPart(WIKIPAGE_NAME);
     }
 
