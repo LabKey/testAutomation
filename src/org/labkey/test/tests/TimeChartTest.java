@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TimeChartTest extends BaseSeleniumWebTest
+public class TimeChartTest extends StudyBaseTest
 {
 //    /?TODO:  Folder and Project names should contain TRICKY_CHARACTERS, don't due to Issue 12830
     private static final String PROJECT_NAME =  "TimeChartTest Project";
@@ -251,13 +251,20 @@ public class TimeChartTest extends BaseSeleniumWebTest
         setPipelineRoot(getLabKeyRoot() + SAMPLE_DATA_PATH);
     }
 
-    @Override
-    public void doTestSteps()
+    protected File[] getTestFiles()
+    {
+        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/timechart-api.xml")};
+    }
+
+    protected void doCreateSteps()
     {
         configureStudy();
 
         configureVisitStudy();
+    }
 
+    public void doVerifySteps()
+    {
         createChartTest();
 
         stdDevRegressionTest();

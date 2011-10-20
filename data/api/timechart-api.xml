@@ -1,0 +1,72 @@
+<ApiTests xmlns="http://labkey.org/query/xml">
+    <test name="recorded test case" type="get">
+    <url>visualization/TimeChartTest%20Project/Demo%20Study/getVisualizationTypes.view?</url>
+    <response>{
+        "types": [
+            {
+                "subjectNounSingular": "Participant",
+                "TimepointType": "date",
+                "label": "Time Chart",
+                "subjectColumn": "ParticipantId",
+                "type": "line",
+                "subjectNounPlural": "Participants"
+            },
+            {
+                "subjectNounSingular": "Participant",
+                "TimepointType": "date",
+                "isGrid": true,
+                "label": "Data Grid (Time)",
+                "subjectColumn": "ParticipantId",
+                "type": "dataGridTime",
+                "subjectNounPlural": "Participants"
+            },
+            {
+                "subjectNounSingular": "Participant",
+                "TimepointType": "date",
+                "isGrid": true,
+                "label": "Data Grid (X/Y)",
+                "subjectColumn": "ParticipantId",
+                "type": "dataGridScatter",
+                "subjectNounPlural": "Participants"
+            }
+        ],
+        "success": true
+    }</response>
+      </test>
+    <test name="recorded test case" type="get">
+        <url>visualization/TimeChartTest%20Project/Demo%20Visit%20Study/getVisualizationTypes.view?</url>
+        <response>{
+        "types": [
+            {
+                "enabled": true,
+                "subjectNounSingular": "Mouse",
+                "TimepointType": "visit",
+                "label": "Time Chart",
+                "subjectColumn": "MouseId",
+                "type": "line",
+                "subjectNounPlural": "Mice"
+            },
+            {
+                "subjectNounSingular": "Mouse",
+                "TimepointType": "visit",
+                "isGrid": true,
+                "label": "Data Grid (Time)",
+                "subjectColumn": "MouseId",
+                "type": "dataGridTime",
+                "subjectNounPlural": "Mice"
+            },
+            {
+                "subjectNounSingular": "Mouse",
+                "TimepointType": "visit",
+                "isGrid": true,
+                "label": "Data Grid (X/Y)",
+                "subjectColumn": "MouseId",
+                "type": "dataGridScatter",
+                "subjectNounPlural": "Mice"
+            }
+        ],
+        "success": true
+    }</response>
+    </test>
+
+</ApiTests>
