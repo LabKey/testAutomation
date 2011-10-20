@@ -1265,12 +1265,12 @@ public class LuminexTest extends AbstractQCAssayTest
         // remove a run from the current guide set
         setUpGuideSet("GS Analyte (2)");
         clickButtonContainingText("Edit", 0);
-        editGuideSet(new String[] {"guideRunSetRow_0"}, "analyte 2 guide set run removed");
+        editGuideSet(new String[] {"guideRunSetRow_0"}, "analyte 2 guide set run removed", false);
 
         // create a new guide set for the second analyte so that we can test the apply guide set
         setUpGuideSet("GS Analyte (2)");
         createGuideSet("GS Analyte (2)", false);
-        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs");
+        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs", true);
 
         // apply the new guide set to a run
         applyGuideSetToRun("Guide Set plate 5", "create new analyte 2 guide set with 3 runs");
@@ -1425,16 +1425,16 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         setUpGuideSet("GS Analyte (1)");
         createGuideSet("GS Analyte (1)", true);
-        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_0"}, "Analyte 1");
+        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_0"}, "Analyte 1", true);
 
         setUpGuideSet("GS Analyte (2)");
         createGuideSet("GS Analyte (2)", true);
-        editGuideSet(new String[] {"allRunsRow_1"}, "Analyte 2");
+        editGuideSet(new String[] {"allRunsRow_1"}, "Analyte 2", true);
 
         //edit a guide set
         log("attempt to edit guide set after creation");
         clickButtonContainingText("Edit", 0);
-        editGuideSet(new String[] {"allRunsRow_0"}, "edited analyte 2");
+        editGuideSet(new String[] {"allRunsRow_0"}, "edited analyte 2", false);
     }
 
     private void setIsoAndConjugate()
@@ -1485,22 +1485,41 @@ public class LuminexTest extends AbstractQCAssayTest
             waitForText("Creating a new guide set will set the current guide set to be inactive. Would you like to proceed?");
             clickButton("Yes", 0);
         }
-        waitForText("A new guide set has successfully been created.");
-        clickButton("OK", 0);
     }
 
-    private void editGuideSet(String[] rows, String comment)
+    private void editGuideSet(String[] rows, String comment, boolean creating)
     {
         String today = df.format(Calendar.getInstance().getTime());
 
-        waitForText("Manage Guide Set...");
-        waitForText("Guide Set ID:");
-        assertTextPresentInThisOrder("Created:", today);
+        if (creating)
+        {
+            waitForText("Create Guide Set...");
+            waitForText("Guide Set ID:");
+            assertTextPresent("TBD", 2);
+        }
+        else
+        {
+            waitForText("Manage Guide Set...");
+            waitForText("Guide Set ID:");
+            assertTextPresentInThisOrder("Created:", today);
+        }
+
 
         addRemoveGuideSetRuns(rows);
         setText("commentTextField", comment);
 
-        clickButton("Save",0);
+        if (creating)
+        {
+            assertElementNotPresent(Locator.button("Save"));
+            assertElementPresent(Locator.button("Create"));
+            clickButton("Create",0);
+        }
+        else
+        {
+            assertElementNotPresent(Locator.button("Create"));
+            assertElementPresent(Locator.button("Save"));
+            clickButton("Save",0);
+        }
         waitForExtMaskToDisappear();
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
