@@ -254,7 +254,7 @@ public class ReportTest extends StudyBaseTest
         if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
                 fail("There was an error running the script");
-        assertTextPresent("Error executing command");
+        assertTextPresent("Error");//("Error executing command");
 //        assertTextPresent("Error: object \"badString\" not found");
         // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
         assertTextPresent("Error: object ");
