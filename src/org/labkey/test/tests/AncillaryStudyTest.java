@@ -94,7 +94,8 @@ public class AncillaryStudyTest extends StudyBaseTest
         setFormElement("studyDescription", STUDY_DESCRIPTION);
         assertTrue(PROTOCOL_DOC.exists());
         setFormElement("protocolDoc", PROTOCOL_DOC);
-        selectStudyLocation();
+        clickNavButton("Change", 0);
+        selenium.doubleClick(Locator.xpath(ExtHelper.getExtDialogXPath("Create Ancillary Study") + "//span[string() = '"+PROJECT_NAME+"']").toString());
         clickNavButton("Next", 0);
 
         //Wizard page 2 - participant group
@@ -142,15 +143,6 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickNavButton("Next", 0);
         checkRadioButton("autoRefresh", "false");
         clickNavButton("Finish");
-    }
-
-    private void selectStudyLocation()
-    {
-        clickNavButton("Change", 0);
-        ExtHelper.waitForExtDialog(this, "Choose Study Location");
-        waitAndClick(Locator.xpath(ExtHelper.getExtDialogXPath("Choose Study Location") + "//span[string() = '"+PROJECT_NAME+"']"));
-        ExtHelper.clickExtButton(this, "Choose Study Location", "Select", 0);
-        waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath("Choose Study Location")), WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
@@ -318,7 +310,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText("Clinical and Assay Data");
         for(String dataset : DATASETS)
         {
-            assertLinkPresentWithText(dataset);
+            waitForText(dataset);
         }
         for(String dataset : DEPENDENT_DATASETS)
         {
