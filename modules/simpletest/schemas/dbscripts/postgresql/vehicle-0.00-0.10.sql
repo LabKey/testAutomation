@@ -16,21 +16,24 @@
 
 CREATE SCHEMA vehicle;
 
-CREATE TABLE vehicle.Colors (
+CREATE TABLE vehicle.Colors
+(
     Name VARCHAR(30) NOT NULL,
     Hex TEXT,
 
     CONSTRAINT PK_Colors PRIMARY KEY (Name)
 );
 
-CREATE TABLE vehicle.Manufacturers (
+CREATE TABLE vehicle.Manufacturers
+(
     RowId SERIAL NOT NULL,
     Name VARCHAR(255) NOT NULL,
 
     CONSTRAINT PK_Manufacturers PRIMARY KEY (RowId)
 );
 
-CREATE TABLE vehicle.Models (
+CREATE TABLE vehicle.Models
+(
     RowId SERIAL NOT NULL,
     ManufacturerId INT NOT NULL,
     Name VARCHAR(255) NOT NULL,
@@ -39,7 +42,8 @@ CREATE TABLE vehicle.Models (
     CONSTRAINT FK_Models_Manufacturers FOREIGN KEY (ManufacturerId) REFERENCES vehicle.Manufacturers(RowId)
 );
 
-CREATE TABLE vehicle.Vehicles (
+CREATE TABLE vehicle.Vehicles
+(
     RowId SERIAL NOT NULL,
     Container ENTITYID NOT NULL,
     CreatedBy USERID NOT NULL,

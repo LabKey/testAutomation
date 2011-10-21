@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 
-EXEC sp_addapprole 'vehicle', 'password'
-GO
+EXEC sp_addapprole 'vehicle', 'password';
 
-CREATE TABLE vehicle.Colors (
+CREATE TABLE vehicle.Colors
+(
     Name NVARCHAR(30) NOT NULL,
     Hex TEXT,
 
     CONSTRAINT PK_Colors PRIMARY KEY (Name)
-)
-GO
+);
 
-CREATE TABLE vehicle.Manufacturers (
+CREATE TABLE vehicle.Manufacturers
+(
     RowId INT IDENTITY(1,1),
     Name NVARCHAR(255) NOT NULL,
 
     CONSTRAINT PK_Manufacturers PRIMARY KEY (RowId)
-)
-GO
+);
 
-CREATE TABLE vehicle.Models (
+CREATE TABLE vehicle.Models
+(
     RowId INT IDENTITY(1,1),
     ManufacturerId INT NOT NULL,
     Name NVARCHAR(255) NOT NULL,
 
     CONSTRAINT PK_Models PRIMARY KEY (RowId),
     CONSTRAINT FK_Models_Manufacturers FOREIGN KEY (ManufacturerId) REFERENCES vehicle.Manufacturers(RowId)
-)
-GO
+);
 
-CREATE TABLE vehicle.Vehicles (
+CREATE TABLE vehicle.Vehicles
+(
     RowId INT IDENTITY(1,1) NOT NULL,
     Container ENTITYID NOT NULL,
     CreatedBy USERID NOT NULL,
@@ -61,5 +61,4 @@ CREATE TABLE vehicle.Vehicles (
     CONSTRAINT PK_Vehicles PRIMARY KEY (RowId),
     CONSTRAINT FK_Vehicles_Models FOREIGN KEY (ModelId) REFERENCES vehicle.Models(RowId),
     CONSTRAINT FK_Vehicles_Colors FOREIGN KEY (Color) REFERENCES vehicle.Colors(Name)
-)
-GO
+);
