@@ -5,37 +5,40 @@
 <script type="text/javascript">
     LABKEY.requiresClientAPI(true);
     LABKEY.requiresVisualization();
-    Ext.QuickTips.init();
 </script>
 
 <script type="text/javascript">
+
+function init() {
+
+    Ext.QuickTips.init();
+
     function getDateOptions(query, dateName)
     {
-        var options = {
-            "dateCol":{
-                "name":dateName,
-                "queryName":query,
-                "schemaName":"study"
+        return {
+            dateCol : {
+                name:dateName,
+                queryName:query,
+                schemaName:"study"
             },
-            "interval":"Days",
-            "zeroDateCol":{
-                "name":"date",
-                "queryName":"Demographics",
-                "schemaName":"study"
+            interval:"Days",
+            zeroDateCol:{
+                name:"date",
+                queryName:"Demographics",
+                schemaName:"study"
             }
         };
-        return options;
     }
 
     function getTimeConfig(config, timeType, dateName)
     {
-        var newConfig = Ext.apply({}, {
-            measure: Ext.apply({}, config.measure),
-            dimension: Ext.apply({}, config.dimension)
-        });
-        Ext.apply(newConfig, {"time": timeType});
+        var newConfig = {
+            measure   : config.measure,
+            dimension : config.dimension
+        };
+        Ext.apply(newConfig, {time: timeType});
         if (timeType == "date")
-            Ext.apply(newConfig, {"dateOptions": getDateOptions(config.measure.queryName, dateName)});
+            Ext.apply(newConfig, {dateOptions: getDateOptions(config.measure.queryName, dateName)});
         return newConfig;
     }
 
@@ -45,7 +48,7 @@
             "queryName":"Lab Results",
             "schemaName":"study"
         },
-        "dimension":null        
+        "dimension":null
     };
 
     var hemoglobinMeasure = {
@@ -152,22 +155,14 @@
     ];
 
     var configCounter = -1;
-    var configForm;
-
-    //Lots of async script loading. Make sure everything is loaded before starting
-    LABKEY.Utils.onTrue({
-        testCallback:function() {return Ext.isReady && LABKEY.vis},
-        //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
-        successCallback:function () {init.defer(100)},
-        errorCallback:doError
-    });
 
     function doError(param) {
         throw param;
     }
 
-    function init(){
-        configForm = new Ext.FormPanel({
+    function formInit() {
+
+        var configForm = new Ext.FormPanel({
             renderTo: 'getData-config-form-div',
             frame: false,
             items: [{
@@ -178,20 +173,20 @@
                 allowBlank: false,
                 width: 30
             },
-            {
-                xtype: 'numberfield',
-                fieldLabel: 'Total Number ',
-                name: 'configCount',
-                value: 0,
-                allowBlank: false,
-                width: 30
-            },
-            {
-                xtype: 'displayfield',
-                fieldLabel: 'Config Title ',
-                name: 'configTitle',
-                width: 500
-            }],
+                {
+                    xtype: 'numberfield',
+                    fieldLabel: 'Total Number ',
+                    name: 'configCount',
+                    value: 0,
+                    allowBlank: false,
+                    width: 30
+                },
+                {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Config Title ',
+                    name: 'configTitle',
+                    width: 500
+                }],
             buttons: [{
                 xtype: 'button',
                 name: 'nextBtn',
@@ -201,13 +196,13 @@
             buttonAlign: 'left'
         });
 
-        changeGrid();
+        changeGrid(configForm);
     }
 
-    function changeGrid(){
+    function changeGrid(form){
         // increment the config counter
         configCounter++;
-        configForm.getForm().findField('currentConfig').setValue(configCounter);
+        form.getForm().findField('currentConfig').setValue(configCounter);
 
         // check that config exists for current value of counter
         if(configCounter >= configs.length){
@@ -216,13 +211,13 @@
         }
 
         // set the values in the form
-        configForm.getForm().findField('configCount').setValue(configs.length);
+        form.getForm().findField('configCount').setValue(configs.length);
 
         // call the getData API with the new config measures
         LABKEY.Visualization.getData({
             success: function(data){
                 // show the results in a query webpart using the temp queryName provided in the result
-                new LABKEY.QueryWebPart({
+                var qwp = new LABKEY.QueryWebPart({
                     renderTo: 'getData-grid-div',
                     schemaName: data.schemaName,
                     queryName: data.queryName,
@@ -232,7 +227,7 @@
                     title: "",
                     frame: "none",
                     success: function() {
-                        configForm.getForm().findField('configTitle').setValue(configs[configCounter].title);
+                        form.getForm().findField('configTitle').setValue(configs[configCounter].title);
                     }
                 });
             },
@@ -243,5 +238,16 @@
             scope: this
         });
     }
+
+    //Lots of async script loading. Make sure everything is loaded before starting
+    LABKEY.Utils.onTrue({
+        testCallback:function() {return Ext.isReady && LABKEY.vis && window.pv},
+        //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
+        successCallback:function () {formInit.defer(100)},
+        errorCallback:doError
+    });
+}
+
+Ext.onReady(init);
 
 </script>
