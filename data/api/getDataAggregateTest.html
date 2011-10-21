@@ -155,6 +155,7 @@ function init() {
     ];
 
     var configCounter = -1;
+    var configForm;
 
     function doError(param) {
         throw param;
@@ -162,7 +163,7 @@ function init() {
 
     function formInit() {
 
-        var configForm = new Ext.FormPanel({
+        configForm = new Ext.FormPanel({
             renderTo: 'getData-config-form-div',
             frame: false,
             items: [{
@@ -196,13 +197,13 @@ function init() {
             buttonAlign: 'left'
         });
 
-        changeGrid(configForm);
+        changeGrid();
     }
 
-    function changeGrid(form){
+    function changeGrid(){
         // increment the config counter
         configCounter++;
-        form.getForm().findField('currentConfig').setValue(configCounter);
+        configForm.getForm().findField('currentConfig').setValue(configCounter);
 
         // check that config exists for current value of counter
         if(configCounter >= configs.length){
@@ -211,7 +212,7 @@ function init() {
         }
 
         // set the values in the form
-        form.getForm().findField('configCount').setValue(configs.length);
+        configForm.getForm().findField('configCount').setValue(configs.length);
 
         // call the getData API with the new config measures
         LABKEY.Visualization.getData({
@@ -227,7 +228,7 @@ function init() {
                     title: "",
                     frame: "none",
                     success: function() {
-                        form.getForm().findField('configTitle').setValue(configs[configCounter].title);
+                        configForm.getForm().findField('configTitle').setValue(configs[configCounter].title);
                     }
                 });
             },
