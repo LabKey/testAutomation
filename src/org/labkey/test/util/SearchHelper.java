@@ -93,7 +93,7 @@ public class SearchHelper
         else
         {
             test.setFormElement(Locator.id("headerSearchInput"), searchTerm);
-            test.clickAndWait(Locator.xpath("//input[@src = '/labkey/_images/search.png']"));
+            test.clickAndWait(Locator.xpath("//img[@src = '/labkey/_images/search.png']"));
         }
     }
 
