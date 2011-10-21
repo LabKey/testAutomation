@@ -440,7 +440,7 @@ public class LuminexTest extends AbstractQCAssayTest
         uploadEC50Data();
 //        ensureMultipleCurveDataPresent();
 //        ensureEC50DataPresent();
-        clickButton("Save and Finish", 2*WAIT_FOR_PAGE);
+        clickButton("Save and Finish", 2 * WAIT_FOR_PAGE);
 
         //add transform script
         goToSchemaBrowser();
@@ -1190,7 +1190,7 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             goToTestAssayHome();
             clickNavButton("Import Data");
-            setFormElement("network", "NETWORK" + (i+1));
+            setFormElement("network", "NETWORK" + (i + 1));
             clickNavButton("Next");
             setFormElement("name", "Guide Set plate " + (i+1));
             setFormElement("isotype", isotype);
@@ -1235,7 +1235,7 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             goToTestAssayHome();
             clickNavButton("Import Data");
-            setFormElement("network", "NETWORK" + (i+1));
+            setFormElement("network", "NETWORK" + (i + 1));
             clickNavButton("Next");
             setFormElement("name", "Guide Set plate " + (i+1));
             setFormElement("isotype", isotype);
@@ -1288,9 +1288,27 @@ public class LuminexTest extends AbstractQCAssayTest
         goToLeveyJenningsGraphPage("HIVIG");
         applyStartAndEndDateFilter();
 
+        excludableWellsWithTransformTest();
         // test the y-axis scale
         applyLogYAxisScale();
         guideSetApiTest();
+    }
+
+    private void excludableWellsWithTransformTest()
+    {
+        clickLinkContainingText(getProjectName());
+        clickLinkContainingText(TEST_ASSAY_LUM);
+        clickLinkContainingText("Guide Set plate 5");
+
+        log("Exclude well from from run");
+        clickExclusionMenuIconForWell("A6,B6");
+        clickButton("Save");
+        waitForExtMaskToDisappear();
+        goToLeveyJenningsGraphPage("HIVIG");
+        setUpGuideSet("GS Analyte (2)");
+        assertTextPresent("28040.11");
+
+
     }
 
 
