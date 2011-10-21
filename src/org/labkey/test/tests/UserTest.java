@@ -74,12 +74,14 @@ public class UserTest extends SecurityTest
         assertTextPresent("Last Name");
         assertTextPresent("Active");
 
+        click(Locator.id("userMenuPopupLink"));
         clickLinkWithText("My Account");
         assertTextPresent("User Id");
         assertTextPresent("Last Login");
 
         impersonate(NORMAL_USER);
 
+        click(Locator.id("userMenuPopupLink"));
         clickLinkWithText("My Account");
 
         assertTextNotPresent("User Id");
@@ -190,12 +192,14 @@ public class UserTest extends SecurityTest
 
         clickButton("Set Password");
 
+        click(Locator.id("userMenuPopupLink"));
         clickLinkWithText("Sign Out");
         clickLinkWithText("Sign In");
         setText("email", NORMAL_USER);
         setText("password", TEST_PASSWORD);
         clickButton("Sign In");
-        assertTextPresent("Sign Out", NORMAL_USER);
+        assertSignOutAndMyAccountPresent();
+        assertTextPresent(NORMAL_USER);
         assertTextNotPresent("Sign In");
 
         signOut();

@@ -489,6 +489,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
         }
 
+        assertSignOutAndMyAccountPresent();
+    }
+
+    public void assertSignOutAndMyAccountPresent()
+    {
+        assertElementPresent(Locator.id("userMenuPopupLink"));
+        click(Locator.id("userMenuPopupLink"));
         assertTextPresent("Sign Out");
         assertTextPresent("My Account");
     }
@@ -508,8 +515,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if ( isTextPresent("Type in your email address and password") )
                 fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
 
-            assertTextPresent("Sign Out");
-            assertTextPresent("My Account");
+            assertSignOutAndMyAccountPresent();
         }
     }
 
@@ -566,11 +572,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement("password2", newPassword);
 
         clickNavButton("Set Password");
-        if(isTextPresent("Sign Out"))
-        {
-            return;
-        }
-        else
+
+        if(!isElementPresent(Locator.id("userMenuPopupLink")))
         {
             clickButtonContainingText("Submit", defaultWaitForPage*3);
             clickNavButton("Done");
@@ -582,6 +585,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void changePassword(String oldPassword, String password)
     {
+        click(Locator.id("userMenuPopupLink"));
         clickLinkWithText("My Account");
         clickNavButton("Change Password");
 
@@ -655,7 +659,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             pushLocation();
 
-            if ( isElementPresent(Locator.linkWithText("Stop Impersonating") )) stopImpersonating();
+            if (isElementPresent(Locator.id("userMenuPopupLink")))
+            {
+                click(Locator.id("userMenuPopupLink"));
+                if (isTextPresent("Stop Impersonating"))
+                {
+                     stopImpersonating();
+                }
+            }
 
             beginAt("/login/configureDbLogin.view");
 
@@ -1183,7 +1194,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if(isTextPresent("Admin"))
             return;
 
-        if(isTextPresent("Sign Out"))
+        if(isElementPresent(Locator.id("userMenuPopupLink")))
             signOut();
 
         signIn();
@@ -4280,6 +4291,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void impersonate(String fakeUser)
     {
         log("impersonating user : " + fakeUser);
+        if (isElementPresent(Locator.id("userMenuPopupLink")))
+        {
+            click(Locator.id("userMenuPopupLink"));
+        }
         assertTextNotPresent("Stop Impersonating");
         gotoAdminConsole();
         selectOptionByText(Locator.id("email").toString(), fakeUser);
@@ -4293,8 +4308,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String fakeUser = _impersonationStack.pop();
         log("Ending impersonation");
         assertEquals(fakeUser,getDisplayName());
+        click(Locator.id("userMenuPopupLink"));
         clickLinkWithText("Stop Impersonating");
-        assertTextPresent("Sign Out");
+        assertSignOutAndMyAccountPresent();
         goToHome();
         assertFalse(fakeUser.equals(getDisplayName()));
     }
@@ -4302,6 +4318,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void projectImpersonate(String fakeUser)
     {
         log("impersonating user at project level : " + fakeUser);
+        if (isElementPresent(Locator.id("userMenuPopupLink")))
+        {
+            click(Locator.id("userMenuPopupLink"));
+        }
         assertTextNotPresent("Stop Impersonating");
         ensureAdminMode();
         enterPermissionsUI();
@@ -4821,9 +4841,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     // Return display name that's currently shown in the header
     public String getDisplayName()
     {
-        return getText(Locator.id("header.user.friendlyName"));
+        return getText(Locator.id("userMenuPopupText"));
     }
-
 
 	public String getHtmlSource()
 	{
@@ -5526,7 +5545,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void ensureSignedOut()
     {
-        if(isTextPresent("Sign Out"))
+        if(isElementPresent(Locator.id("userMenuPopupLink")))
             signOut();
     }
 }
