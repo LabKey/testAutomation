@@ -18,11 +18,9 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/16/11
  * Time: 3:22 PM
- * To change this template use File | Settings | File Templates.
  */
 public class StudyRedesignTest extends StudyBaseTest
 {
@@ -32,6 +30,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
             BITS[2]+BITS[3]+TRICKY_CHARACTERS_NO_QUOTES, BITS[3]+BITS[4]+TRICKY_CHARACTERS_NO_QUOTES, BITS[4]+BITS[5]+TRICKY_CHARACTERS_NO_QUOTES};
     private static final String[] someDataSets = {"Data Views","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", CATEGORIES[3], "AE-1:(VTN) AE Log"};
+    private static final String REPORT_NAME = "TestReport";
 
     @Override
     protected void doCreateSteps()
@@ -45,6 +44,20 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForSpecimenImport();
         setStudyRedesign();
         setupDatasetCategories();
+        log("Create report for data view webpart test.");
+        goToModule("Study");
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "R View");
+        clickNavButton("Save", 0);
+        waitForText("Please enter a view name:");
+        setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
+        clickNavButton("Save");
+//        log("Create query for data view webpart.");
+//        goToSchemaBrowser();
+//        createNewQuery("study");
+//        setFormElement("ff_newQueryName", "testquery");
+//        clickNavButton("Create and Edit Source");
+//        clickNavButton("Save & Finish");
     }
 
     @Override
@@ -89,9 +102,9 @@ public class StudyRedesignTest extends StudyBaseTest
     private void collapseCategory(String category)
     {
         log("Collapse category: " + category);
-        assertElementPresent(Locator.xpath("//div[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and @class='x4-grid-group-title' and text()='" + category + "']"));
-        click(Locator.xpath("//div[@class='x4-grid-group-title' and text()='" + category + "']"));
-        waitForElement(Locator.xpath("//tr[contains(@class, 'collapsed')]//div[@class='x4-grid-group-title' and text()='" + category + "']"), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and @class='x4-grid-group-title' and contains(text(), '" + category + "')]"));
+        click(Locator.xpath("//div[@class='x4-grid-group-title' and contains(text(), '" + category + "')]"));
+        waitForElement(Locator.xpath("//tr[contains(@class, 'collapsed')]//div[@class='x4-grid-group-title' and contains(text(), '" + category + "')]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void expandCategory(String category)
@@ -121,7 +134,7 @@ public class StudyRedesignTest extends StudyBaseTest
         Object[][] ret = {
                 {"AE-1:(VTN) AE Log", "", ""},
         };
-        return ret;  //To change body of created methods use File | Settings | File Templates.
+        return ret;
     }
 
     private void setupDatasetCategories()
