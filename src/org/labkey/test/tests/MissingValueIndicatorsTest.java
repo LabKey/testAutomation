@@ -215,7 +215,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         setFormElement("quf_name", "Sid");
         setFormElement("quf_sex", "male");
         selectOptionByValue("quf_ageMVIndicator", "Z");
-        submit();
+        clickNavButton("Submit");
         assertNoLabkeyErrors();
         assertTextPresent("Sid");
         assertTextPresent("male");
