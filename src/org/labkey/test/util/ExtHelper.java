@@ -58,6 +58,15 @@ public class ExtHelper
             test.click(itemLocator);
     }
 
+    public static void clickExtDropDownMenu(BaseSeleniumWebTest test, String menuId, String value)
+    {
+        Locator menu = Locator.id(menuId);
+        test.click(menu);
+        Locator element = Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='" + value + "']");
+        test.waitForElement(element,  test.WAIT_FOR_PAGE);
+        test.click(element);
+    }
+
     public static void selectFolderManagementTreeItem(BaseSeleniumWebTest test, String path, boolean keepExisting)
     {
         test.getWrapper().getEval("selenium.selectFolderManagementItem('" + path + "', " + keepExisting +");");
@@ -241,11 +250,11 @@ public class ExtHelper
     public static void selectComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
     {
         test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");
-        if(test.getBrowser().equals(test.IE_BROWSER))
+        if(test.getBrowser().startsWith(test.IE_BROWSER))
         {
             test.sleep(500);
-        test.clickAt(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), "1,1");
-        test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
+            test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
+            test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
         }
         else
         {
@@ -255,7 +264,7 @@ public class ExtHelper
         }
     }
 
-    public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
+    public static void      selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
     {
         selectComboBoxItem(test, Locator.xpath("//div[./label[text()='"+label+":']]/div/div"), selection);
     }
