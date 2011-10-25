@@ -710,7 +710,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void ensureAdminMode()
     {
         //Now switch to admin mode if available
-        if (!isLinkPresentWithText("Projects"))
+        if (!isLinkPresentWithText("Admin"))
             clickAdminMenuItem("Show Navigation Bar");
     }
 
@@ -1761,12 +1761,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                     "This project may already exist, or its name appears elsewhere in the UI.");
         clickLinkWithText("Create Project");
         setText("name", projectName);
-        if (null != folderType)
-            checkRadioButton("folderType", folderType);
+
+        if (null != folderType && !folderType.equals("None"))
+            click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input"));
         else
-            checkRadioButton("folderType", "None");
-        submit();
-        clickNavButton("Save and Finish");
+            click(Locator.xpath("//div[./label[text()='Custom']]/input"));
+
+        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
+        waitForPageToLoad();
+
+        //second page of the wizard
+        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
+        waitForPageToLoad();
+
+        //third page of wizard
+        waitAndClick(Locator.xpath("//button[./span[text()='Finish']]"));
+        waitForPageToLoad();
+
         _createdProjects.add(projectName);
     }
 
@@ -1857,27 +1868,43 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForExtFolderTreeNode(_active, 10000);
         clickNavButton("Create Subfolder");
         setText("name", child);
-        checkRadioButton("folderType", folderType);
-        submit();
 
-        _createdFolders.add(new FolderIdentifier(project, child));
-        if (!"None".equals(folderType))
-        {
-            if (inheritPermissions)
+        if (null != folderType && !folderType.equals("None"))
+            click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input"));
+        else {
+            click(Locator.xpath("//div[./label[text()='Custom']]/input"));
+
+
+            if (tabsToAdd != null)
             {
-                // wait for the selected tree node to render
-                Locator treeNode = Locator.xpath("//div[contains(@class, 'x-tree-node-current')]//span[text() = " + Locator.xq(child) + "]");
-                waitForElement(treeNode, WAIT_FOR_JAVASCRIPT);
-
-                checkInheritedPermissions();
-                savePermissions();
+                for (String tabname : tabsToAdd)
+                    waitAndClick(Locator.xpath("//div[./label[text()='"+tabname+"']]/input"));
             }
-            waitAndClickNavButton("Save and Finish"); //Leave permissions where they are
-            if (null == tabsToAdd || tabsToAdd.length == 0)
-                return;
 
-            clickLinkWithText("Folder Settings");
         }
+
+        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
+        _createdFolders.add(new FolderIdentifier(project, child));
+        waitForPageToLoad();
+
+        //second page of the wizard
+        if (inheritPermissions)
+        {
+            //nothing needed, this is the default
+        }
+        else {
+            waitAndClick(Locator.xpath("//div[./label[text()='My User Only']]/input"));
+        }
+
+        waitAndClick(Locator.xpath("//button[./span[text()='Finish']]")); //Leave permissions where they are
+        waitForPageToLoad();
+
+        //unless we need addtional tabs, we end here.
+        if (null == tabsToAdd || tabsToAdd.length == 0)
+            return;
+
+        clickLinkWithText("Folder Settings");
+
         // verify that we're on the customize tabs page, then submit:
         assertTextPresent("Folder Settings: /" + project);
 
@@ -1890,17 +1917,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         submit();
         if ("None".equals(folderType))
         {
-            if (inheritPermissions)
-            {
-                // wait for the selected tree node to render
-                Locator treeNode = Locator.xpath("//div[contains(@class, 'x-tree-node-current')]//span[text() = " + Locator.xq(child) + "]");
-                waitForElement(treeNode, WAIT_FOR_JAVASCRIPT);
-
-                checkInheritedPermissions();
-                savePermissions();
-            }
-            waitAndClickNavButton("Save and Finish");
-
             if (tabsToAdd != null)
             {
                 for (String tabname : tabsToAdd)
