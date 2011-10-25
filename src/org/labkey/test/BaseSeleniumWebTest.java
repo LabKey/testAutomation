@@ -1760,6 +1760,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         clickLinkWithText("Create Project");
+        waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setText("name", projectName);
 
         if (null != folderType && !folderType.equals("None"))
@@ -1867,6 +1868,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         // click last index, since this text appears in the nav tree
         waitForExtFolderTreeNode(_active, 10000);
         clickNavButton("Create Subfolder");
+        waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setText("name", child);
 
         if (null != folderType && !folderType.equals("None"))
