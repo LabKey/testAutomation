@@ -822,9 +822,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             log("Testing bad passwords");
             String email = PasswordUtil.getUsername();
-            verifyInitialUserError(email, null, null, "You must enter two passwords.");
-            verifyInitialUserError(email, "LongEnough", null, "You must enter two passwords.");
-            verifyInitialUserError(email, null, "LongEnough", "You must enter two passwords.");
+            verifyInitialUserError(email, null, null, "You must enter a password.");
+            verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
+            verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
             verifyInitialUserError(email, "short", "short", "Your password must be six characters or more.");
             verifyInitialUserError(email, email, email, "Your password must not match your email address.");
             verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
