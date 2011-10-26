@@ -176,32 +176,38 @@
             LABKEY.Query.updateRows({
                 schemaName: 'assay',
                 queryName: 'TestAssayLuminex GuideSet',
-                rows: [{rowId:idGuideSet, "Comment":"Updated GuideSet via javascript"}]
-
-                    })
-
-
+                rows: [{rowId:idGuideSet, "Comment":"Updated GuideSet via javascript"}],
+                success: function(data) {
+                    loadGuideSet();
+                }
+            });
 
             LABKEY.Query.updateRows({
                 schemaName: 'assay',
                 queryName: 'TestAssayLuminex Analyte',
-                rows: [{rowId:idAnalyte, "Name":"Updated name"}]
-
-                    })
+                rows: [{rowId:idAnalyte, "Name":"Updated name"}],
+                success: function(data) {
+                    loadAnalyte();
+                }
+            });
 
 //            LABKEY.Query.updateRows({
 //                schemaName: 'assay',
 //                queryName: 'TestAssayLuminex AnalyteTitration',
-//                rows: [{rowId:idAnalyteTitration, "MaxFI":"99999"}]
-//
-//                    })
+//                rows: [{rowId:idAnalyteTitration, "MaxFI":"99999"}],
+//                success: function(data) {
+//                    loadAnalyteTitration();
+//                }
+//            });
 
 //            LABKEY.Query.updateRows({
 //                schemaName: 'assay',
 //                queryName: 'TestAssayLuminex GuideSetCurveFit',
-//                rows: [{rowId:idGuideSetCurveFit, "Comment":"Updated GuideSetCurveFit via javascript"}]
-//
-//                    })
+//                rows: [{rowId:idGuideSetCurveFit, "Comment":"Updated GuideSetCurveFit via javascript"}],
+//                success: function(data) {
+//                    loadGuideSetCurveFit();
+//                }
+//             });
 
 
         }
@@ -210,22 +216,19 @@
         {
 
             var results = LABKEY.Query.insertRows({
-            schemaName: "assay",
-            queryName: "TestAssayLuminex GuideSet",
-            rows: [
-
-                {'analytename':'GS Analyte (1)', 'comment':'inserted via javascript'}
-            ]});
+                schemaName: "assay",
+                queryName: "TestAssayLuminex GuideSet",
+                rows: [{'analytename':'GS Analyte (1)', 'comment':'inserted via javascript'}],
+                success: function(data) {
+                    loadGuideSet();
+                }
+            });
         }
 
         function updateAndInsert()
         {
             insertInsertables();
             updateUpdatables();
-
-            loadGuideSet();
-            loadAnalyte();
-            loadAnalyteTitration();
         }
 
         function updateCurveFit()
@@ -251,10 +254,7 @@
 
     loadAnalyte();
     loadAnalyteTitration();
-    loadAnalyteTitration();
-    loadAnalyteTitration();
     loadCurveFit();
     loadGuideSet();
     loadGuideSetCurveFit();
-//    updateAndInsert();
 </script>

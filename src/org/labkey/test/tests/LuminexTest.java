@@ -1338,9 +1338,10 @@ public class LuminexTest extends AbstractQCAssayTest
 
         click(Locator.id("button_commitLegal"));
         waitForText("inserted via javascript");
-
         assertEquals("inserted via javascript",  new DataRegionTable("GuideSetQWP", this).getDataAsText(3, "Comment"));
+        waitForText("Updated GuideSet via javascript");
         assertEquals("Updated GuideSet via javascript",  new DataRegionTable("GuideSetQWP", this).getDataAsText(0, "Comment"));
+        waitForText("Updated name");
         assertEquals("Updated name",  new DataRegionTable("AnalyteQWP", this).getDataAsText(0, "Name"));
 
         String[] buttonsForUnauthorized = {"button_updateCurveFit", "button_updateGuideSetCurveFit"};
