@@ -103,7 +103,7 @@ public class MS2Test extends MS2TestBase
             refresh();
         }
         clickLinkWithText("MS2 Dashboard");
-        assertLinkPresentContainingText("MS2 Experiment Runs");
+        assertLinkPresentContainingText("MS2 Runs");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME);
 
         log("Verify run view.");
@@ -1074,7 +1074,7 @@ public class MS2Test extends MS2TestBase
 
         log("Test customizing view to include the run groups");
         clickLinkWithText("MS2 Dashboard");
-        clickLinkWithText("MS2 Experiment Runs");
+        clickLinkWithText("MS2 Runs");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "RunGroups/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);

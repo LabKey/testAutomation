@@ -86,8 +86,8 @@ public class BasicTest extends BaseSeleniumWebTest
 
         // verify that messages is still present:
         assertLinkPresentWithText("Messages");
-        addWebPart("MS2 Experiment Runs");
-        assertLinkPresentWithText("MS2 Experiment Runs");
+        addWebPart("MS2 Runs");
+        assertLinkPresentWithText("MS2 Runs");
 
         addWebPart("Search");
         setFormElement("query", "labkey");

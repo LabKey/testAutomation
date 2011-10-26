@@ -230,9 +230,9 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         assertLinkPresentWithText(mascotDatLabel);
 */
 
-        assertLinkPresentWithText("MS2 Experiment Runs");
+        assertLinkPresentWithText("MS2 Runs");
         log("Navigate to MS2 runs.");
-        clickLinkWithText("MS2 Experiment Runs");
+        clickLinkWithText("MS2 Runs");
 
         log("Navigate to Pipeline status.");
         //was: clickTab("Pipeline");
