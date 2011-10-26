@@ -710,7 +710,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void ensureAdminMode()
     {
         //Now switch to admin mode if available
-        if (!isLinkPresentWithText("Admin"))
+        if (!isElementPresent(Locator.id("leftmenupanel")))
             clickAdminMenuItem("Show Navigation Bar");
     }
 
