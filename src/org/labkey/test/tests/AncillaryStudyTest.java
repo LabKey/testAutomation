@@ -99,16 +99,21 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickNavButton("Next", 0);
 
         //Wizard page 2 - participant group
-        waitForElement(Locator.radioButtonByName("renderType"), WAIT_FOR_JAVASCRIPT);
-        assertWizardError("Next", "You must select an existing group or create a new one.");
-        waitAndClick(Locator.xpath("//div[contains(@class, 'testParticipantGroups')]//em[text()='Ancillary Group']"));
+        Locator groupLocator = Locator.xpath("//span[contains(text(),  '" + PARTICIPANT_GROUP + "')]");
+        waitForElement(groupLocator, WAIT_FOR_JAVASCRIPT);
+        assertWizardError("Next", "You must select at least one Mouse group.");
+        waitAndClick(groupLocator);
 
         log("Check participant group.");
-        assertEquals("Did not find expected number of participants", PTIDS.length, getXpathCount(Locator.xpath("//div[contains(@class, 'testParticipantGroups')]//em[text() = '"+PTIDS[0]+"']/../../../dl")));
+        Locator.XPathLocator ptidLocator = Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[@class='testParticipantGroups']/text()");
+        waitForElement(ptidLocator, WAIT_FOR_JAVASCRIPT);
+        assertEquals("Did not find expected number of participants", PTIDS.length, getXpathCount(ptidLocator));
         for (String ptid : PTIDS)
         {
-            assertElementPresent(Locator.xpath("//div[contains(@class, 'testParticipantGroups')]//em[text() = '"+ptid+"']"));
+            assertElementPresent(Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[@class='testParticipantGroups' and text() = '" + ptid + "']"));
         }
+
+        selenium.getEval("selenium.selectExtGridItem(null, null, 0, 'studyWizardParticipantList', false)");
 
         // kbl: commented out current wizard only allows existing participant groups or all participants (although this could change)
 /*
