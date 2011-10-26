@@ -49,7 +49,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME, "Collaboration");
         clickAdminMenuItem("Manage Project", "Project Settings");
         checkRadioButton("folderDisplayMode", "IN_MENU");
-        clickButtonContainingText("Save Properties");
+        clickButtonContainingText("Save");
         clickLinkWithText("Menu Bar");
         clickButtonContainingText("Turn On Custom Menus");
         addWebPart("AssayList2");

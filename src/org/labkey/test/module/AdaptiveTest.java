@@ -886,7 +886,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         File file = new File(cssPath, cssFile);
         setFormElement("customStylesheet", file.toString());
-        clickNavButton("Save Resources");
+        clickNavButton("Save");
     }
 
     public void verifyMailRecord(String messageTo, String messageSubject, String... messageContents)
