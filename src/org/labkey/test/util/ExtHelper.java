@@ -104,7 +104,7 @@ public class ExtHelper
 
     public static void waitForExtDialog(final BaseSeleniumWebTest test, String title, int timeout)
     {
-        final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'x-window-header-text') and contains(string(), '" + title + "')]");
+        final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
 
         test.waitFor(new BaseSeleniumWebTest.Checker()
         {
@@ -136,7 +136,7 @@ public class ExtHelper
 
     public static void setExtFormElementByType(BaseSeleniumWebTest test, String windowTitle, String inputType, String text)
     {
-        test.setFormElement(Locator.xpath(getExtDialogXPath(windowTitle) + "//input[contains(@class, 'x-form-field') and @type='"+inputType+"']"), text);
+        test.setFormElement(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//input[contains(@class, 'form-field') and @type='"+inputType+"']"), text);
     }
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String label, String text)
@@ -147,14 +147,30 @@ public class ExtHelper
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label, String text)
     {
-        test.setFormElement(Locator.xpath(getExtDialogXPath(windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
-        test.fireEvent(Locator.xpath(getExtDialogXPath(windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+        test.setFormElement(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
+        test.fireEvent(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
     }
 
+    @Deprecated
     public static String getExtDialogXPath(String windowTitle)
     {
         return "//div[contains(@class, 'x-window') and " + Locator.NOT_HIDDEN + " and "+
-            "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '"+windowTitle+"')]]";
+            "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '" + windowTitle + "')]]";
+    }
+
+    public static String getExtDialogXPath(BaseSeleniumWebTest test, String windowTitle)
+    {
+        String ext3Dialog = "//div[contains(@class, 'x-window') and " + Locator.NOT_HIDDEN + " and "+
+            "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '" + windowTitle + "')]]";
+        String ext4Dialog = "//div[contains(@class, 'x4-window') and @role='dialog' and " + Locator.NOT_HIDDEN + " and "+
+            "./div/div/div/div/span[contains(@class, 'x4-window-header-text') and contains(string(), '" + windowTitle + "')]]";
+        if( test.isElementPresent(Locator.xpath(ext3Dialog)) )
+            return ext3Dialog;
+        else if( test.isElementPresent(Locator.xpath(ext4Dialog)) )
+            return ext4Dialog;
+        else
+            BaseSeleniumWebTest.fail("Unable to locate Ext dialog: '" + windowTitle + "'");
+        return null; // unreachable
     }
 
     public static void waitForLoadingMaskToDisappear(BaseSeleniumWebTest test, int wait)
@@ -316,12 +332,36 @@ public class ExtHelper
     public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption, int wait)
     {
         test.log("Clicking Ext button with caption: " + caption);
-        Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(windowTitle):"")+"//button[contains(@class, 'x-btn-text') and text()='" + caption + "']");
+        Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(test, windowTitle):"")+"//button[(contains(@class, 'x-btn-text') and text()='" + caption + "') or (@role='button' and ./span[text()='" + caption + "'])]");
         test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         if (wait > 0)
             test.clickAndWait(loc, wait);
         else
             test.click(loc);
+    }
+
+    public static void checkCheckbox(BaseSeleniumWebTest test, String label)
+    {
+        Locator checkbox = Locator.ext4Checkbox(label);
+        if(!isChecked(test, label))
+            test.click(checkbox);
+        if(!isChecked(test, label))
+            BaseSeleniumWebTest.fail("Failed to check checkbox '" + label + "'.");
+    }
+
+    public static void uncheckCheckbox(BaseSeleniumWebTest test, String label)
+    {
+        Locator checkbox = Locator.ext4Checkbox(label);
+        if(isChecked(test, label))
+            test.click(checkbox);
+        if(isChecked(test, label))
+            BaseSeleniumWebTest.fail("Failed to uncheck checkbox '" + label + "'.");
+    }
+
+    private static boolean isChecked(BaseSeleniumWebTest test, String label)
+    {
+        String checked = test.getAttribute(Locator.ext4Checkbox(label), "aria-checked");
+        return checked.equalsIgnoreCase("true");
     }
 
     private static String jsString(String s)

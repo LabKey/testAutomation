@@ -138,12 +138,12 @@ public class Locator
 
     public static XPathLocator button(String text)
     {
-        return xpath("//button["+ NOT_HIDDEN +" and text() = '" + text + "']");
+        return xpath("//button["+ NOT_HIDDEN +" and descendant-or-self::*[text() = '" + text + "']]");
     }
 
     public static XPathLocator buttonContainingText(String text)
     {
-        return xpath("//button["+ NOT_HIDDEN +" and contains(text(), '" + text + "')]");
+        return xpath("//button["+ NOT_HIDDEN +" and descendant-or-self::*[contains(text(), '" + text + "')]]");
     }
 
     public static XPathLocator navButton(String text)
@@ -174,6 +174,11 @@ public class Locator
     public static XPathLocator extButtonContainingText(String text)
     {
         return xpath("//button[@class='x-btn-text' and contains(text(), " + xq(text) + ")]");
+    }
+
+    public static XPathLocator ext4Checkbox(String label)
+    {
+        return xpath("//input[@role = 'checkbox' and following-sibling::label[text()='" + label + "']]");
     }
 
     public static XPathLocator navButtonDisabled(String text)

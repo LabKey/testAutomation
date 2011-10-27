@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * User: elvan
@@ -31,6 +32,10 @@ public class StudyRedesignTest extends StudyBaseTest
             BITS[2]+BITS[3]+TRICKY_CHARACTERS_NO_QUOTES, BITS[3]+BITS[4]+TRICKY_CHARACTERS_NO_QUOTES, BITS[4]+BITS[5]+TRICKY_CHARACTERS_NO_QUOTES};
     private static final String[] someDataSets = {"Data Views","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", CATEGORIES[3], "AE-1:(VTN) AE Log"};
     private static final String REPORT_NAME = "TestReport";
+    private static final String WEBPART_TITLE = "TestDataViews";
+    private static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
+    private static final String NEW_CATEGORY = "A New Category";
+    private static final String NEW_DESCRIPTION = "Description set in data views webpart";
 
     @Override
     protected void doCreateSteps()
@@ -63,10 +68,10 @@ public class StudyRedesignTest extends StudyBaseTest
     @Override
     protected void doVerifySteps()
     {
-        datasetBrowserWebPartTest();
+        dataViewsWebpartTest();
     }
 
-    private void datasetBrowserWebPartTest()
+    private void dataViewsWebpartTest()
     {
         log("Data Views Test");
         clickLinkContainingText("Data Analysis");
@@ -81,11 +86,65 @@ public class StudyRedesignTest extends StudyBaseTest
         log("Verify dataset category sorting.");
         setDataBrowseSearch(BITS[4]);
         waitForTextToDisappear(BITS[2]);
-//        assertTextPresent("Category: ", 2); // Two categories contain text.
+        assertTextNotPresent(CATEGORIES[0]);
+        assertTextNotPresent(CATEGORIES[1]);
+        assertTextNotPresent(CATEGORIES[2]);
+        assertEquals("Incorrect number of dataset categories visible.", 2, getXpathCount(Locator.xpath("//div[contains(@class, 'x4-grid-group-title')]"))); // Two categories contain filter text.
         // 10 datasets(CATEGORIES[3]) + 7 datasets(CATEGORIES[4]) - 1 hidden dataset == 16?
         assertEquals("Incorrect number of datasets after filter", 16, getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
         collapseCategory(CATEGORIES[3]);
-        assertEquals("Incorrect number of datasets after filter", 6, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+        assertEquals("Incorrect number of datasets after collapsing category.", 6, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+        clickWebpartMenuItem("Data Views", false, "Customize");
+        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.uncheckCheckbox(this, "datasets");
+        setFormElement(Locator.name("webpart.title"), WEBPART_TITLE);
+        clickButton("Save", 0);
+        setDataBrowseSearch("");
+        waitForElement(Locator.linkWithText(REPORT_NAME), WAIT_FOR_JAVASCRIPT);
+        assertTextPresent(WEBPART_TITLE);
+        assertEquals("Incorrect number of datasets after filter", 1, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+
+        log("Verify cancel button");
+        clickWebpartMenuItem("Data Views", false, "Customize");
+        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.checkCheckbox(this, "datasets");
+        ExtHelper.uncheckCheckbox(this, "reports");
+        setFormElement(Locator.name("webpart.title"), "nothing");
+        clickButton("Cancel", 0);
+        sleep(500);               //TODO: \
+        refresh();                //TODO:  |remove: 13265: Data views webpart admin cancel button doesn't reset form
+        waitForText(REPORT_NAME); //TODO: /
+        assertTextNotPresent("nothing");
+        assertTextPresent(WEBPART_TITLE);
+        assertEquals("Incorrect number of datasets after filter", 1, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+
+        log("Verify category management");
+        clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
+        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.checkCheckbox(this, "datasets");
+        clickNavButton("Manage Categories", 0);
+        ExtHelper.waitForExtDialog(this, "Manage Categories");
+        click(Locator.xpath("//img[@data-qtip='Delete']"));
+        ExtHelper.waitForExtDialog(this, "Delete Category");
+        clickNavButton("OK", 0);
+        clickNavButton("Create New Category", 0);
+        setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[5]"), "testcategory"); // TODO: need a better xpath
+        clickNavButton("Done", 0);
+        clickNavButton("Save", 0);
+        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
+        refresh(); // Deleted category is still present, but hidden.  Refresh to clear page.
+        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent(CATEGORIES[0]);
+        assertTextPresentInThisOrder(CATEGORIES[2], CATEGORIES[3], "Uncategorized", "APX-1", REPORT_NAME);
+
+        log("Verify modify dataset");
+        click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
+        setFormElement(Locator.name("category"), NEW_CATEGORY);
+        setFormElement(Locator.name("description"), NEW_DESCRIPTION);
+        ExtHelper.clickExtButton(this, EDITED_DATASET, "Save", 0);
+        waitForText(NEW_CATEGORY);
+        clickLinkWithText(EDITED_DATASET);
+        assertTextPresent(NEW_DESCRIPTION);
     }
 
     private void clickExt4HeaderMenu(String title, String selection)
