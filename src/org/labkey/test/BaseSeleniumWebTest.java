@@ -1872,15 +1872,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setText("name", child);
 
         if (null != folderType && !folderType.equals("None"))
-            click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input"));
+            click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input[@role='radio']"));
         else {
-            click(Locator.xpath("//div[./label[text()='Custom']]/input"));
+            click(Locator.xpath("//div[./label[text()='Custom']]/input[@role='radio']"));
 
 
             if (tabsToAdd != null)
             {
                 for (String tabname : tabsToAdd)
-                    waitAndClick(Locator.xpath("//div[./label[text()='"+tabname+"']]/input"));
+                    waitAndClick(Locator.xpath("//div[./label[text()='"+tabname+"']]/input[@role='checkbox']"));
             }
 
         }
