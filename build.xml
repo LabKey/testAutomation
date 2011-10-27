@@ -1163,6 +1163,7 @@
     </target>
 
     <target name="install-rlabkey-init">
+        <delete failonerror="false" dir="${project.root}/sampledata/rlabkey"/>
         <mkdir dir="${project.root}/sampledata/rlabkey"/>
         <copy todir="${project.root}/sampledata/rlabkey">
             <fileset dir="${project.root}/remoteapi/r/test">
@@ -1176,7 +1177,7 @@
     <target name="install-rlabkey" depends="install-rlabkey-init, install-rlabkey-binary, install-rlabkey-source">
     </target>
 
-    <target name="install-rlabkey-dependencies" if="Rlabkey.uninstalled" depends="check-rlabkey-installed">
+    <target name="install-rlabkey-dependencies" depends="check-rlabkey-installed">
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
               input="${project.root}/tools/Rpackages/install-rlabkey-dependencies.R">
             <arg line="--vanilla --quiet"/>
