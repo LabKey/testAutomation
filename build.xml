@@ -134,7 +134,7 @@
         <echo message="    -DshuffleTests=true"/>
     </target>
 
-    <target name="clean">
+    <target name="clean" depends="clean-rpackages">
         <delete dir="${test.build.home}" />
     </target>
 
@@ -268,7 +268,7 @@
       <ant antfile="${project.root}/server/customModules/idriParticleSize/build.xml" inheritall="false" target="deploy"/>
     </target>
 
-    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-rpackages">
+    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, install-rpackages">
     </target>
 
     <target name="stage-simpletest-module">
@@ -1124,7 +1124,11 @@
         </jar>
     </target>
 
-    <target name="stage-rpackages" depends="install-rlabkey, install-ruminex"> <!--, install-flowWorkspace" -->
+    <target name="clean-rpackages">
+        <delete failonerror="false" dir="${project.root}/sampledata/rlabkey"/>
+    </target>
+
+    <target name="install-rpackages" depends="install-rlabkey, install-ruminex, install-flowWorkspace">
     </target>
 
     <macrodef name="check-R-package-installed">
@@ -1163,7 +1167,6 @@
     </target>
 
     <target name="install-rlabkey-init">
-        <delete failonerror="false" dir="${project.root}/sampledata/rlabkey"/>
         <mkdir dir="${project.root}/sampledata/rlabkey"/>
         <copy todir="${project.root}/sampledata/rlabkey">
             <fileset dir="${project.root}/remoteapi/r/test">
