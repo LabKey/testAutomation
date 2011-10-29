@@ -65,7 +65,7 @@ public class BasicTest extends BaseSeleniumWebTest
         addWebPart("Wiki");
         assertTextPresent("Wiki");
         assertLinkPresentWithText("Create a new wiki page");
-        addWebPart("Wiki TOC");
+        addWebPart("Wiki Table of Contents");
         // move messages below wiki:
         clickLinkWithImage("/_images/partdown.png", 0);
         waitForExtMaskToDisappear(30000);

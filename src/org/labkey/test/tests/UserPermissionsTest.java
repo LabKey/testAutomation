@@ -97,7 +97,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         addWebPart("Wiki");
         assertTextPresent("Wiki");
         assertLinkPresentWithText("Create a new wiki page");
-        addWebPart("Wiki TOC");
+        addWebPart("Wiki Table of Contents");
 
         //Create Reader User
         clickLinkWithText(PERM_PROJECT_NAME);

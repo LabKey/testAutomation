@@ -463,7 +463,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithText("Welcome");
 
         log("test wiki TOC customize link");
-        addWebPart("Wiki TOC");
+        addWebPart("Wiki Table of Contents");
         clickWebpartMenuItem("Pages", "Customize");
         setFormElement("title", "Test Customize TOC");
         log("check that container is set to current project");

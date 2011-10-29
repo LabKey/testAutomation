@@ -208,7 +208,7 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
 
         // create a wiki page with links to the views included in the module
         clickLinkWithText(PROJECT_NAME);
-        addWebPart("Wiki TOC");
+        addWebPart("Wiki Table of Contents");
         clickWebpartMenuItem("Pages", "New");
 
         setFormElement("name", "formulations");
