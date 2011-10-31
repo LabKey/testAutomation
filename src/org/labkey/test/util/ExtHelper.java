@@ -280,9 +280,9 @@ public class ExtHelper
         }
     }
 
-    public static void      selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
+    public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
     {
-        selectComboBoxItem(test, Locator.xpath("//div[./label[text()='"+label+":']]/div/div"), selection);
+        selectComboBoxItem(test, Locator.xpath("//div[./label/span[text()='"+label+":']]/div/div"), selection);
     }
 
     public static void selectGWTComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
