@@ -78,15 +78,16 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/tomaras_luminex_transform.R";
     private static final String RTRANSFORM_SCRIPT_FILE2 = "/resources/transformscripts/blank_bead_subtraction.R";
-    private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"1.0", "1.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
-            "35.2", "35.2", "63.0", "71.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "26430.8", "26556.2", "1.0", "1.0", "1.0",
-            "1.0", "1.0", "1.0", "194.2", "198.8", "1.0", "1.0", "1.0", "1.0"};
+    private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
+            "35.2", "35.2", "63.0", "71.0", "-34.0", "-33.0", "-29.8", "-19.8", "-639.8", "-640.2", "26430.8", "26556.2", "-216.2", "-204.2", "-158.5",
+            "-208.0", "-4.0", "-4.0", "194.2", "198.8", "-261.2", "-265.2", "-211.5", "-213.0"};
     private static final String[] RTRANS_ESTLOGCONC_VALUES_5PL = {"-6.9", "-6.9", "4.3", "4.3", "0.4", "0.4", "-0.0", "-0.0", "-6.9", "-6.9",
-            "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "4.3", "4.3", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9",
+            "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "4.2", "4.2", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9",
             "-6.9", "-0.6", "-0.6", "-6.9", "-6.9", "-6.9", "-6.9"};
 
     private static final String[] RTRANS_ESTLOGCONC_VALUES_4PL = {"-6.9", "-6.9", "5.0", "5.0", "0.4", "0.4", "0.1", "0.1", "-6.9", "-6.9",
-            "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9"};
+            "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "5.5", "5.5", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9",
+            "-0.8", "-0.8", "-6.9", "-6.9", "-6.9", "-6.9"};
 
     public static final String ASSAY_ID_FIELD  = "name";
     public static final String ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD = "__primaryFile__";
@@ -1130,6 +1131,7 @@ public class LuminexTest extends AbstractQCAssayTest
             assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
         }
         clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
+        setFilter(TEST_ASSAY_LUM + " Data", "Type", "Does Not Start With", "S"); // filter out the standards
         setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl", "Is Not Blank");
         assertTextPresent("1 - 32 of 32");
         // check values in the est log conc 5pl column
@@ -1139,7 +1141,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         clearFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl");
         setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_4pl", "Is Not Blank");
-        assertTextPresent("1 - 16 of 16");
+        assertTextPresent("1 - 32 of 32");
         // check values in the est log conc 4pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_4PL.length; i++)
         {
