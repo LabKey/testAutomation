@@ -158,13 +158,13 @@ public class CreateVialsTest extends AbstractViabilityTest
         click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"));
         assertFormElementEquals("defaultLocationField", "Alice Lab");
 
-        setFormElement("maxCellPerVialField", "19e6");
+        setFormElement("maxCellPerVialField", "10e6");
         setFormElement("defaultUsedCellsField", "1e5");
         setFormElement("defaultLocationField", "Site A");
         //String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
         //click(Locator.id(btnId));
         clickButton("Create Vials");
-        assertTextPresent("Each vial will have no more than 1.90e+07 cells.");
+        assertTextPresent("Each vial will have no more than 1.00e+07 cells.");
         assertTextNotPresent("B01");
 
 
@@ -175,38 +175,42 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertEquals("2.050E7", table.getDataAsText(0, "Original Viable Cells"));
         assertEquals("100000", getFormElement(Locator.name("usedCells", 0)));
         assertEquals("20404212", getFormElement(Locator.name("viableCells", 0)));
-        assertEquals("2", table.getDataAsText(0, "Vial Count"));
+        assertEquals("3", table.getDataAsText(0, "Vial Count"));
         assertEquals("Site A", getFormElement(Locator.name("siteLabel", 0)));
         setFormElement(Locator.name("siteLabel", 0), "Bob's Lab");
 
         setFormElement(Locator.name("usedCells", 0), "1");
         fireEvent(Locator.name("usedCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
         assertEquals("20504211", getFormElement(Locator.name("viableCells", 0)));
-        assertEquals("2", table.getDataAsText(0, "Vial Count"));
+        assertEquals("3", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("viableCells", 0), "10000000");
         fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
         assertEquals("10504212", getFormElement(Locator.name("usedCells", 0)));
         assertEquals("1", table.getDataAsText(0, "Vial Count"));
 
-        setFormElement(Locator.name("viableCells", 0), "19000000");
+        setFormElement(Locator.name("viableCells", 0), "20000000");
         fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
-        assertEquals("1504212", getFormElement(Locator.name("usedCells", 0)));
-        assertEquals("1", table.getDataAsText(0, "Vial Count"));
-
-        setFormElement(Locator.name("viableCells", 0), "19000001");
-        fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
-        assertEquals("1504211", getFormElement(Locator.name("usedCells", 0)));
+        assertEquals("504212", getFormElement(Locator.name("usedCells", 0)));
         assertEquals("2", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("viableCells", 0), "50000000");
         fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
         assertEquals("-29495788", getFormElement(Locator.name("usedCells", 0)));
-        assertEquals("3", table.getDataAsText(0, "Vial Count"));
+        assertEquals("5", table.getDataAsText(0, "Vial Count"));
 
         pressTab(Locator.name("viableCells", 0).toString());
 
+        clickButton("Save", 0);
+        assertAlert("All used cell fields must be greater than or equal to zero.");
+
+        setFormElement(Locator.name("viableCells", 0), "20000001");
+        fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
+        assertEquals("504211", getFormElement(Locator.name("usedCells", 0)));
+        assertEquals("3", table.getDataAsText(0, "Vial Count"));
+
         clickButton("Save");
+
 
         log("** checking cell counts and specimen IDs");
         table = new DataRegionTable(getAssayName() + " Data", this);
@@ -214,14 +218,14 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertEquals("B02_1.0_0,B02_1.0_1,B02_1.0_2", table.getDataAsText(1, "Specimen IDs"));
         // Viable Cells value doesn't get updated, only Original Cells
         assertEquals("2.050E7", table.getDataAsText(1, "Viable Cells"));
-        assertEquals("5.000E7", table.getDataAsText(1, "Original Cells"));
+        assertEquals("2.000E7", table.getDataAsText(1, "Original Cells"));
         assertEquals("3", table.getDataAsText(1, "Specimen Count"));
 
         assertEquals("B03", table.getDataAsText(2, "Participant ID"));
-        assertEquals("B03_1.0_0,B03_1.0_1", table.getDataAsText(2, "Specimen IDs"));
+        assertEquals("B03_1.0_0,B03_1.0_1,B03_1.0_2", table.getDataAsText(2, "Specimen IDs"));
         assertEquals("2.270E7", table.getDataAsText(2, "Viable Cells"));
         assertEquals("2.260E7", table.getDataAsText(2, "Original Cells"));
-        assertEquals("2", table.getDataAsText(2, "Specimen Count"));
+        assertEquals("3", table.getDataAsText(2, "Specimen Count"));
 
         
         log("** checking new site 'Site A' was added and no duplicate 'Bob's Lab' exist (Issue 12074)");
@@ -245,25 +249,24 @@ public class CreateVialsTest extends AbstractViabilityTest
         beginAt("/study-samples/" + getProjectName() + "/" + getFolderName() + "/samples.view?showVials=true");
         table = new DataRegionTable("SpecimenDetail", this);
         assertEquals("B02_1.0_0", table.getDataAsText(0, "Global Unique Id"));
-        assertEquals("16,666,666.0", table.getDataAsText(0, "Volume"));
+        assertEquals("6,666,667.0", table.getDataAsText(0, "Volume"));
         assertEquals("Bob's Lab", table.getDataAsText(0, "Site Name"));
 
         assertEquals("B02_1.0_1", table.getDataAsText(1, "Global Unique Id"));
-        assertEquals("16,666,666.0", table.getDataAsText(1, "Volume"));
+        assertEquals("6,666,667.0", table.getDataAsText(1, "Volume"));
         assertEquals("Bob's Lab", table.getDataAsText(1, "Site Name"));
 
         assertEquals("B02_1.0_2", table.getDataAsText(2, "Global Unique Id"));
-        assertEquals("16,666,666.0", table.getDataAsText(2, "Volume"));
+        assertEquals("6,666,667.0", table.getDataAsText(2, "Volume"));
         assertEquals("Bob's Lab", table.getDataAsText(2, "Site Name"));
 
         assertEquals("B03_1.0_0", table.getDataAsText(3, "Global Unique Id"));
-        assertEquals("11,299,723.0", table.getDataAsText(3, "Volume"));
+        assertEquals("7,533,149.0", table.getDataAsText(3, "Volume"));
         assertEquals("Site A", table.getDataAsText(3, "Site Name"));
 
         assertEquals("B03_1.0_1", table.getDataAsText(4, "Global Unique Id"));
-        assertEquals("11,299,723.0", table.getDataAsText(4, "Volume"));
+        assertEquals("7,533,149.0", table.getDataAsText(4, "Volume"));
         assertEquals("Site A", table.getDataAsText(4, "Site Name"));
-
 
         log("** move two vials to 'Site C'");
         table.checkCheckbox(1);
