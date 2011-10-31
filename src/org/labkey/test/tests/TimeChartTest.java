@@ -551,7 +551,7 @@ public class TimeChartTest extends StudyBaseTest
 
         if(scale!=null)
         {
-            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Scale:']]/div/div"), scale);
+            ExtHelper.selectComboBoxItem(this, "Scale", scale);
         }
 
         if(label!=null)

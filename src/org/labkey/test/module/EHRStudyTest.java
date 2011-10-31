@@ -250,7 +250,7 @@ public class EHRStudyTest extends SimpleApiTest
         checkRadioButton("selector", "renderMultiSubject");
         waitAndClick(Locator.xpath("//table[text()='[Search By Project/Protocol]']"));
         ExtHelper.waitForExtDialog(this, "Search By Project/Protocol");
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Project:']]/div/div"), PROJECT_ID);
+        ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID);
         clickNavButton("Submit", 0);
         waitForElement(Locator.button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Refresh", 0);
@@ -260,7 +260,7 @@ public class EHRStudyTest extends SimpleApiTest
         checkRadioButton("selector", "renderMultiSubject");
         waitAndClick(Locator.xpath("//table[text()='[Search By Project/Protocol]']"));
         ExtHelper.waitForExtDialog(this, "Search By Project/Protocol");
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./label[text()='Protocol:']]/div/div"), PROTOCOL_ID);
+        ExtHelper.selectComboBoxItem(this, "Protocol", PROTOCOL_ID);
         clickNavButton("Submit", 0);
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
 

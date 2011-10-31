@@ -141,14 +141,14 @@ public class ExtHelper
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String label, String text)
     {
-        test.setFormElement(Locator.xpath("//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
-        test.fireEvent(Locator.xpath("//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+        test.setFormElement(Locator.xpath("//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
+        test.fireEvent(Locator.xpath("//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
     }
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label, String text)
     {
-        test.setFormElement(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
-        test.fireEvent(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+        test.setFormElement(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
+        test.fireEvent(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
     }
 
     @Deprecated
