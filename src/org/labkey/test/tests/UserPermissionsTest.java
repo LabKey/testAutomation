@@ -23,7 +23,6 @@ import org.labkey.test.Locator;
  * Created by IntelliJ IDEA.
  * User: Mark Griffith
  * Date: Jan 18, 2006
- * To change this template use File | Settings | File Templates.
  */
 public class UserPermissionsTest extends BaseSeleniumWebTest
 {
@@ -38,9 +37,9 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
     protected static final String GAMMA_ADMIN_GROUP_NAME = "GammaAdmin";
     //permissions
     //editor, author, reader, restricted_reader, submitter, Admin
-    protected static final String GAMMA_EDITOR_USER = "gammaeditor@security.text";
+    protected static final String GAMMA_EDITOR_USER = "gammaeditor@security.test";
     protected static final String GAMMA_EDITOR_PAGE_TITLE = "This is a Test Message from : " + GAMMA_EDITOR_USER;
-    protected static final String GAMMA_AUTHOR_USER = "gammauthor@security.test";
+    protected static final String GAMMA_AUTHOR_USER = "gammaauthor@security.test";
     protected static final String GAMMA_AUTHOR_PAGE_TITLE = "This is a Test Message from : " + GAMMA_AUTHOR_USER;
     protected static final String GAMMA_READER_USER = "gammareader@security.test";
     //I can't really find any docs on what this is exactly?
@@ -119,7 +118,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         createPermissionsGroup(GAMMA_SUBMITTER_GROUP_NAME);
         assertPermissionSetting(GAMMA_SUBMITTER_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_SUBMITTER_GROUP_NAME, "Submitter");
-        createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME);
+        // TODO: Add submitter to a group
         /*
          * I need a way to test submitter, I can't even view a folder where submitter has permissions when
          * impersonating on my local labkey, so may require special page?
