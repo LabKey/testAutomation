@@ -166,13 +166,12 @@ public class FileContentTest extends BaseSeleniumWebTest
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
             setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), f.toString());
-            setFormElement(Locator.xpath("//div[./label[text() = 'Description:']]/div/input[contains(@class, 'x-form-text')]"), FILE_DESCRIPTION);
-            fireEvent(Locator.xpath("//div[./label[text() = 'Description:']]/div/input[contains(@class, 'x-form-text')]"), SeleniumEvent.blur);
+            ExtHelper.setExtFormElementByLabel(this, "Description", FILE_DESCRIPTION);
             clickButton("Upload", 0);
             waitForExtMaskToDisappear();
             ExtHelper.waitForExtDialog(this, "Extended File Properties", WAIT_FOR_JAVASCRIPT);
             setFormElement(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE);
-            click(Locator.xpath("//img[../../../label[contains(text(),'"+COLUMN_NAME+":')] ]"));
+            click(Locator.xpath("//img[../../../label/span[contains(text(),'"+COLUMN_NAME+":')] ]"));
             waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"), WAIT_FOR_JAVASCRIPT);
             click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"));
             clickButton("Done", 0);
