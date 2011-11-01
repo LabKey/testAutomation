@@ -257,7 +257,7 @@ public class StudyExportTest extends StudyManualTest
         clickNavButton("View Specimens");
         assertLinkPresentWithText("999320016");
         assertLinkPresentWithText("999320518");
-        clickLinkWithText("Show Vial Info");
+        clickLinkWithText("Show individual vials");
         assertLinkPresentWithText("999320016");
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickMenuButton("Request Options", "Create New Request");
@@ -389,7 +389,7 @@ public class StudyExportTest extends StudyManualTest
         clickMenuButton("Page Size", "Show All");
         assertTextPresent("DRT000XX-01");
         clickLinkWithText("Search");
-        clickLinkWithText("Search by specimen");
+        clickLinkWithText("Search grouped vials");
 
 //        WARNING: Using getFormElementNameByTableCaption() is dangerous... if muliple values are returned their
 //        order is unpredictable, since they come back in keyset order.  The code below breaks under Java 6.
@@ -407,7 +407,7 @@ public class StudyExportTest extends StudyManualTest
 
         clickNavButton("Search");
         assertTextPresent("999320528");
-        clickLinkWithText("Show Vial Info");
+        clickLinkWithText("Show individual vials");
         // if our search worked, we'll only have six vials:
         assertTextPresent("[history]", 6);
         assertLinkPresentWithTextCount("999320528", 6);

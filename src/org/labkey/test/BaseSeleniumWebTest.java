@@ -55,8 +55,11 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -4839,6 +4842,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String actual = getAttribute(locator, attributeName);
         assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
     }
+
+    public void assertSetsEqual(String firstSet, String secondSet, String delimiterRegEx)
+    {
+        String[] firstArray = firstSet.split(delimiterRegEx);
+        String[] secondArray = secondSet.split(delimiterRegEx);
+        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
+        Set<String> firstHash= new HashSet<String>();
+        Collections.addAll(firstHash, firstArray);
+        Set<String> secondHash= new HashSet<String>();
+        Collections.addAll(secondHash, secondArray);
+        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
+    }
+
 
     public String getAttribute(Locator locator, String attributeName)
     {

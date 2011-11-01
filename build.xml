@@ -65,6 +65,7 @@
         <echo message="bvt                run build verification tests (long suite)" />
         <echo message="daily              run daily test suite" />
         <echo message="continue           continue running a suite after a failure, starting with the test that failed" />
+        <echo message="continue-debug     continue running a suite after a failure, starting with the test that failed, but suspend until debugger attaches" />
         <echo message="drt-debug          run drt, but suspend until debugger attaches" />
         <echo message="bvt-debug          run bvt, but suspend until debugger attaches" />
         <echo message="daily-debug        run daily, but suspend until debugger attaches" />
@@ -310,6 +311,13 @@
         <property name="suite" value="CONTINUE"/>
         <antcall inheritall="true" target="sub-selenium">
             <param name="debug.suspend.selenium" value="n" />
+        </antcall>
+    </target>
+
+    <target name="continue-debug" description="Continue running a stopped or failed test suite, suspend until debugger attaches">
+        <property name="suite" value="CONTINUE"/>
+        <antcall inheritall="true" target="sub-selenium">
+            <param name="debug.suspend.selenium" value="y" />
         </antcall>
     </target>
 

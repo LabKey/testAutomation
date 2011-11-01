@@ -290,7 +290,7 @@ public class StudyTest extends StudyBaseTest
 
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
         String newPids = getFormElement(ID_FIELD);
-        assertEquals(pIDs, newPids);
+        assertSetsEqual(pIDs, newPids, ", *");
         log("IDs present after opening list: " + newPids);
 
         //remove first element
@@ -461,13 +461,13 @@ public class StudyTest extends StudyBaseTest
         clickMenuButton("Page Size", "Show All");
         assertTextNotPresent("DRT000XX-01");
         assertTextPresent("GAA082NH-01");
-        clickLinkWithText("Hide Vial Info");
+        clickLinkWithText("Group vials");
         assertTextPresent("Total:");
         assertTextPresent("466");
 
         assertTextNotPresent("BAD");
 
-        clickLinkWithText("Show Vial Info");
+        clickLinkWithText("Show individual vials");
         clickLinkContainingText("history");
         // verify that we're correctly parsing frozen time, which is a date with a time portion only:
         assertTextPresent("15:30:00");
