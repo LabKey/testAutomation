@@ -74,6 +74,7 @@ public enum TestSet
         NabAssayTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
+        FlowNormalizationTest.class,
         DataRegionTest.class,
         UserPermissionsTest.class,
         SampleSetTest.class,

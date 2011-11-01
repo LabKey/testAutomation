@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseFlowTest;
+import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
 
@@ -26,6 +27,16 @@ import java.util.Arrays;
  */
 public class FlowNormalizationTest extends BaseFlowTest
 {
+    @Override
+    protected void init()
+    {
+        // fail fast if R is not configured
+        // R is needed for the positivity report
+        RReportHelper.ensureRConfig(this);
+
+        super.init();
+    }
+
     @Override
     protected void doTestSteps() throws Exception
     {
