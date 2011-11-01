@@ -135,7 +135,7 @@
         <echo message="    -DshuffleTests=true"/>
     </target>
 
-    <target name="clean" depends="clean-rpackages">
+    <target name="clean">
         <delete dir="${test.build.home}" />
     </target>
 
