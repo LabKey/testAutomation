@@ -1394,11 +1394,11 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("view data");
         clickLinkContainingText("view data");
         DataRegionTable table = new DataRegionTable("query", this);
-        table.setFilter("GuideSet", "Is Not Blank", "");
+        table.setFilter("GuideSet/Created", "Is Not Blank", "");
         // check that the table contains one row that reads "No data to show."
         assertEquals("Expected no guide set assignments", 1, table.getDataRowCount());
         assertTextPresent("No data to show.");
-        table.clearFilter("GuideSet");
+        table.clearFilter("GuideSet/Created");
     }
 
     private void verifyGuideSetsApplied(Map<String, Integer> guideSetIds, String[] analytes, int expectedRunCount)
@@ -1601,7 +1601,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("OK", 0);
         // reselect the current guide set and apply it
         clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1,4");
-        clickButton("Apply Thresholds", 0);
+        waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0); 
         waitForExtMaskToDisappear();
         // verify that the plot is reloaded
         waitForTextToDisappear("Loading");
