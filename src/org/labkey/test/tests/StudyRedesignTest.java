@@ -124,7 +124,7 @@ public class StudyRedesignTest extends StudyBaseTest
         ExtHelper.checkCheckbox(this, "datasets");
         clickNavButton("Manage Categories", 0);
         ExtHelper.waitForExtDialog(this, "Manage Categories");
-        click(Locator.xpath("//img[@data-qtip='Delete']"));
+        waitAndClick(Locator.xpath("//img[@data-qtip='Delete']"));
         ExtHelper.waitForExtDialog(this, "Delete Category");
         clickNavButton("OK", 0);
         clickNavButton("Create New Category", 0);
