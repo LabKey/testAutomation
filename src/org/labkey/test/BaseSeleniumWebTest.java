@@ -716,8 +716,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void gotoAdminConsole()
     {
-        ensureAdminMode();
-        clickLinkWithText("Admin Console");
+        clickAdminMenuItem("Manage Site", "Admin Console");
     }
 
     public void hideNavigationBar()
