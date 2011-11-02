@@ -399,6 +399,8 @@ public class SecurityTest extends BaseSeleniumWebTest
         // create admin templates, plus test bogus & duplicate email addresses
         createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
         assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address");
+        //nav trail check
+        assertTextPresent("Site Users >  ");
         assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user. Click here to see this user's profile and history.");
 
         // create the project and set permissions
@@ -425,6 +427,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators");
         checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers");
+        assertTextPresent("Site Users >  User Details >  Permissions >  ");
     }
 
     protected void checkGroupMembership(String userName, String groupName)

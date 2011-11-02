@@ -277,6 +277,9 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY);
 
+        //nav trail check
+        assertTextPresent("Assay List >  " + TEST_ASSAY + " Batches >  ");
+
         clickNavButton("Import Data");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + "3");
 

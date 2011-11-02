@@ -63,6 +63,7 @@ public class StudyTest extends StudyBaseTest
 
     //lists created in participant picker tests must be cleaned up afterwards
     LinkedList<String> persistingLists  = new LinkedList<String>();
+    private String Study001 = "Study 001";
 
     protected File[] getTestFiles()
     {
@@ -125,7 +126,8 @@ public class StudyTest extends StudyBaseTest
         //issue 12487
         assertTextPresent("Manage " + SUBJECT_NOUN + " Groups");
 
-
+        //nav trail check
+        assertTextPresent(Study001 + " >  Manage Study > ");
 
         String allList = "all list12345";
         String filteredList = "Filtered list";
@@ -157,6 +159,11 @@ public class StudyTest extends StudyBaseTest
         // test creating a participant group directly from a data grid
         clickLinkWithText(STUDY_NAME);
         clickLinkWithText("DEM-1: Demographics");
+
+        //nav trail check
+        clickLinkContainingText("999320016");
+        assertTextPresent(Study001 + " >  Study Overview >  Dataset: DEM-1: Demographics, All Visits >  ");
+        clickLinkContainingText("Dataset:");
 
         // verify warn on no selection
         ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);

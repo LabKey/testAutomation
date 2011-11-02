@@ -1225,6 +1225,9 @@ public class LuminexTest extends AbstractQCAssayTest
         Map<String, Integer> guideSetIds = getGuideSetIdMap();
         verifyGuideSetsApplied(guideSetIds, analytes, 2);
 
+        //navil trail check
+        assertTextPresent("assay Schema >  ");
+
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
         double[] ec50Averages = {177.15, 43426.10};
