@@ -131,7 +131,10 @@ public class RReportHelper
         try
         {
             if (test.isREngineConfigured())
-                return true;
+                if(System.getProperty("teamcity.buildType.id") == null)
+                    return true;
+                else // Reset R scripting engine on TeamCity
+                    deleteEngine(test);        
         }
         catch (SeleniumException e)
         {
@@ -204,6 +207,23 @@ public class RReportHelper
         }
         test.fail("R is not configured on this system. Failed R tests.");
         return false;
+    }
+
+    public static void deleteEngine(BaseSeleniumWebTest test)
+    {
+        if (test.isREngineConfigured())
+        {
+            Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
+            test.mouseDown(engine);
+
+            String id = ExtHelper.getExtElementId(test, "btn_deleteEngine");
+            test.click(Locator.id(id));
+
+            ExtHelper.waitForExtDialog(test, "Delete Engine Configuration", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
+            test.clickNavButton("Yes", 0);
+            test.waitForElementToDisappear(engine, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public static void saveReport(BaseSeleniumWebTest test, String name)
