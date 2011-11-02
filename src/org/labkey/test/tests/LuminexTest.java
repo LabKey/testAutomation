@@ -77,7 +77,6 @@ public class LuminexTest extends AbstractQCAssayTest
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
     private static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/tomaras_luminex_transform.R";
-    private static final String RTRANSFORM_SCRIPT_FILE2 = "/resources/transformscripts/blank_bead_subtraction.R";
     private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "-34.0", "-33.0", "-29.8", "-19.8", "-639.8", "-640.2", "26430.8", "26556.2", "-216.2", "-204.2", "-158.5",
             "-208.0", "-4.0", "-4.0", "194.2", "198.8", "-261.2", "-265.2", "-211.5", "-213.0"};
@@ -450,7 +449,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkContainingText("view data");
         assertTextPresent("Four Parameter");
 
-        waitForText("4.469697");
+        waitForText("5.434791");
         
         checkEC50data();
     }
@@ -1131,8 +1130,9 @@ public class LuminexTest extends AbstractQCAssayTest
             assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
         }
         clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
-        setFilter(TEST_ASSAY_LUM + " Data", "Type", "Does Not Start With", "S"); // filter out the standards
         setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl", "Is Not Blank");
+        assertTextPresent("1 - 92 of 92");
+        setFilter(TEST_ASSAY_LUM + " Data", "Type", "Starts With", "X"); // filter to just the unknowns
         assertTextPresent("1 - 32 of 32");
         // check values in the est log conc 5pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_5PL.length; i++)
@@ -1147,7 +1147,8 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             assertEquals(RTRANS_ESTLOGCONC_VALUES_4PL[i], table.getDataAsText(i, "Est Log Conc Rumi 4 PL"));
         }
-
+        clearFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_4pl");
+        clearFilter(TEST_ASSAY_LUM + " Data", "Type");
 
         R_TRANSFORM_SET = true;
     }
@@ -1226,8 +1227,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
-        double[] ec50Averages = {177.20, 43423.37};
-        double[] ec50StdDevs = {18.42, 798.51};
+        double[] ec50Averages = {177.15, 43426.10};
+        double[] ec50StdDevs = {18.49, 794.95};
         double[] aucAverages = {8662.50, 80851.83};
         double[] aucStdDevs = {521.79, 6523.08};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec50Averages, ec50StdDevs, aucAverages, aucStdDevs);
@@ -1280,8 +1281,8 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
         int[] rowCounts2 = {2, 3};
-        double[] ec50Averages2 = {177.20, 42157.90};
-        double[] ec50StdDevs2 = {18.42, 4834.06};
+        double[] ec50Averages2 = {177.15, 42158.22};
+        double[] ec50StdDevs2 = {18.49, 4833.76};
         double[] aucAverages2 = {8662.50, 85268.04};
         double[] aucStdDevs2 = {521.79, 738.55};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec50Averages2, ec50StdDevs2, aucAverages2, aucStdDevs2);
@@ -1308,7 +1309,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForExtMaskToDisappear();
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
-        assertTextPresent("28040.11");
+        assertTextPresent("28040.51");
 
 
     }
