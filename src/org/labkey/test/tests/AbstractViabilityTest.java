@@ -84,7 +84,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     {
         log("** Import specimens");
         clickLinkWithText(studyFolder);
-        clickLinkWithText("By Specimen");
+        clickLinkWithText("By Vial Group");
         clickNavButton("Import Specimens");
         setLongTextField("tsv", getFileContents(specimensPath));
         submit();
