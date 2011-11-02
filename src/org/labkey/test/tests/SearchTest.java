@@ -325,10 +325,10 @@ public class SearchTest extends StudyTest
         waitFor(new Checker() {
             public boolean check()
             {
-                return getFormElement(Locator.xpath("//label[text() = 'Choose a file:']//..//input[contains(@class, 'x-form-file-text')]")).equals("");
+                return getFormElement(Locator.xpath("//label[./span[text() = 'Choose a file:']]//..//input[contains(@class, 'x-form-file-text')]")).equals("");
             }
         }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//label[text() = 'Choose a file:']//..//input[@class = 'x-form-file']"), f.toString());
+        setFormElement(Locator.xpath("//label[./span[text() = 'Choose a file:']]//..//input[@class = 'x-form-file']"), f.toString());
         clickNavButton("Upload", 0);
         waitForText(f.getName(), 10000);
     }
