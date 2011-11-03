@@ -1371,24 +1371,18 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("EC50TrendPlotDiv"));
-        assertElementPresent( Locator.id("EC50TrendPdfDiv"));
-        waitForText("PDF output file (click to download)");
 
         // check auc trending R plot
         click(Locator.tagWithText("span", "AUC"));
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("AUCTrendPlotDiv"));
-        assertElementPresent( Locator.id("AUCTrendPdfDiv"));
-        waitForText("PDF output file (click to download)");
 
         // check high mfi trending R plot
         click(Locator.tagWithText("span", "High MFI"));
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("High MFITrendPlotDiv"));
-        assertElementPresent( Locator.id("High MFITrendPdfDiv"));
-        waitForText("PDF output file (click to download)");
     }
 
     private void verifyGuideSetsNotApplied()
@@ -1487,7 +1481,6 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("HIVIG Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        waitForText("PDF output file (click to download)");
     }
 
     private void addRemoveGuideSetRuns(String[] rows)
@@ -1559,7 +1552,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("view data");
         clickLinkContainingText("view data");
         clickLinkContainingText(titrationName);
-        waitForText(titrationName + " Levey-Jennings Plots");
+        waitForText(titrationName + " Levey-Jennings Report");
     }
 
     private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, double[] ec50Averages, double[] ec50StdDevs, double[] aucAverages, double[] aucStdDevs)
@@ -1610,7 +1603,6 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the plot is reloaded
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        waitForText("PDF output file (click to download)");
     }
 
     private void applyStartAndEndDateFilter()
@@ -1633,7 +1625,6 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Refresh Graph", 0);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        waitForText("PDF output file (click to download)");
         // check that only 3 runs are now present
         for (int i = 4; i > 1; i--)
         {
@@ -1649,7 +1640,6 @@ public class LuminexTest extends AbstractQCAssayTest
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@id='scale-combo-box']/.."), "Log");
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        waitForText("PDF output file (click to download)");
     }
 
     private boolean verifyRunFileAssociations(boolean displayingRowId, int index)
