@@ -22,6 +22,7 @@ import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -212,6 +213,23 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         importAnalysis_analysisFolder(options.getContainerPath(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
         importAnalysis_confirm(options.getContainerPath(), options.getWorkspacePath(), options.getFcsPath(), options.isExistingKeywordRun(), options.getAnalysisName(), options.isExistingAnalysisFolder());
+
+        if (options.getExpectedErrors() == null || options.getExpectedErrors().isEmpty())
+        {
+            checkErrors();
+        }
+        else
+        {
+            goToFlowDashboard();
+            clickLinkContainingText("Show Jobs");
+            clickLinkWithText("ERROR");
+
+            for (String errorText : options.getExpectedErrors())
+                assertTextPresent(errorText);
+
+            int errorCount = countText("ERROR");
+            checkExpectedErrors(errorCount);
+        }
     }
 
     protected void importAnalysis_viaPipeline(String workspacePath)
@@ -354,6 +372,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         private final String _analysisName;
         private final boolean _existingAnalysisFolder;
         private final boolean _viaPipeline;
+        private final List<String> _expectedErrors;
 
         public ImportAnalysisOptions(
                 String containerPath,
@@ -376,6 +395,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
+            _expectedErrors = new ArrayList<String>();
         }
 
         public ImportAnalysisOptions(
@@ -390,7 +410,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 String rEngineNormalizationParameters,
                 String analysisName,
                 boolean existingAnalysisFolder,
-                boolean viaPipeline)
+                boolean viaPipeline,
+                List<String> expectedErrors)
         {
             _containerPath = containerPath;
             _workspacePath = workspacePath;
@@ -404,6 +425,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
+            _expectedErrors = expectedErrors;
         }
 
         public String getContainerPath()
@@ -464,6 +486,11 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         public boolean isViaPipeline()
         {
             return _viaPipeline;
+        }
+
+        public List<String> getExpectedErrors()
+        {
+            return _expectedErrors;
         }
     }
 }

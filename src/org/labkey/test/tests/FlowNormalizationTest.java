@@ -20,6 +20,7 @@ import org.labkey.test.BaseFlowTest;
 import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * User: kevink
@@ -58,7 +59,8 @@ public class FlowNormalizationTest extends BaseFlowTest
                 null,
                 "RAnalysis",
                 false,
-                true
+                true,
+                Collections.<String>emptyList()
         );
         importAnalysis(options);
     }
