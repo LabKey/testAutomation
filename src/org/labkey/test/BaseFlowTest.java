@@ -214,22 +214,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
         importAnalysis_confirm(options.getContainerPath(), options.getWorkspacePath(), options.getFcsPath(), options.isExistingKeywordRun(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
-        if (options.getExpectedErrors() == null || options.getExpectedErrors().isEmpty())
-        {
-            checkErrors();
-        }
-        else
-        {
-            goToFlowDashboard();
-            clickLinkContainingText("Show Jobs");
-            clickLinkWithText("ERROR");
-
-            for (String errorText : options.getExpectedErrors())
-                assertTextPresent(errorText);
-
-            int errorCount = countText("ERROR");
-            checkExpectedErrors(errorCount);
-        }
+        importAnalysis_checkErrors(options.getExpectedErrors());
     }
 
     protected void importAnalysis_viaPipeline(String workspacePath)
@@ -311,17 +296,31 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
 
         // R normalization options only present if rEngine as selected
-        if (isFormElementPresent("rEngineNormalization"))
+        if (isElementPresent(Locator.id("rEngineNormalization")))
         {
+            log("Setting normalization options");
             if (rEngineNormalization)
             {
                 checkCheckbox("rEngineNormalization");
-                // UNDONE: set rEngineNormalizationReference, rEngineNormalizationParameters
+                if (rEngineNormalizationReference != null)
+                {
+                    selectOptionByText("rEngineNormalizationReference", rEngineNormalizationReference);
+                    assertEquals(rEngineNormalizationReference, getFormElement("rEngineNormalizationReference"));
+                }
+
+                if (rEngineNormalizationParameters != null)
+                    setFormElement("rEngineNormalizationParameters", rEngineNormalizationParameters);
             }
             else
             {
                 uncheckCheckbox("rEngineNormalization");
             }
+        }
+        else
+        {
+            if (rEngineNormalization)
+                fail("Expected to find R normalization options");
+            log("Not setting normalization options");
         }
         clickNavButton("Next");
     }
@@ -356,6 +355,29 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("Finish");
         waitForPipeline(containerPath);
         log("finished import analysis wizard");
+    }
+
+    protected void importAnalysis_checkErrors(List<String> expectedErrors)
+    {
+        log("Checking for errors after importing");
+        pushLocation();
+        if (expectedErrors == null || expectedErrors.isEmpty())
+        {
+            checkErrors();
+        }
+        else
+        {
+            goToFlowDashboard();
+            clickLinkContainingText("Show Jobs");
+            clickLinkWithText("ERROR");
+
+            for (String errorText : expectedErrors)
+                assertTextPresent(errorText);
+
+            int errorCount = countText("ERROR");
+            checkExpectedErrors(errorCount);
+        }
+        popLocation();
     }
 
     protected static class ImportAnalysisOptions

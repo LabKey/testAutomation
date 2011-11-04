@@ -74,6 +74,7 @@ public class FlowImportTest extends BaseFlowTest
         assertTextPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(containerPath, analysisFolder, true);
         importAnalysis_confirm(containerPath, workspacePath, fcsFilePath, false, analysisFolder, true);
+        importAnalysis_checkErrors(null);
         // assert one keyword run created, one additional analysis run created
         beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + getFolderName() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this, true);
@@ -95,6 +96,7 @@ public class FlowImportTest extends BaseFlowTest
         assertTextNotPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(containerPath, analysisFolder + "_1", false);
         importAnalysis_confirm(containerPath, workspacePath, fcsFilePath, true, analysisFolder + "_1", false);
+        importAnalysis_checkErrors(null);
 
         beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + getFolderName() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this, true);

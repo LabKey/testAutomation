@@ -55,7 +55,7 @@ public class FlowNormalizationTest extends BaseFlowTest
                 "rEngine",
                 Arrays.asList("Sample Order 5"),
                 true,
-                "118836.fcs",
+                "118795.fcs",
                 "APC-A",
                 "RAnalysis",
                 false,
