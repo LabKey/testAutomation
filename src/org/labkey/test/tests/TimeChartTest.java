@@ -740,8 +740,7 @@ public class TimeChartTest extends StudyBaseTest
         checkRadioButton("number_of_charts", "per_group");
         assertElementPresent(Locator.xpath("//div[contains(@class, 'series-selector-tabpanel-test') ]//li[contains(@class, 'active')]//span[text()='Groups']"));
         log("Verify one line per measure per participant. All groups.");
-        waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 3); // One chart per group.
+        waitForText(CHART_TITLE, 3, WAIT_FOR_JAVASCRIPT); // One chart per group.
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
         assertTextPresent(GROUP1_PTIDS[0]+" CD4", 11);
