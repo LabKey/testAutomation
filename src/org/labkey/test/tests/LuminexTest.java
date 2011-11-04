@@ -555,7 +555,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         String comment = "exclude all for single well";
         setText(EXCLUDE_COMMENT_FIELD, comment);
-        clickButton(SAVE_CHANGES_BUTTON);
+        clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 
         excludeForSingleWellVerify("Excluded for replicate group: " + comment, new HashSet<String>(Arrays.asList(getListOfAnalytesMultipleCurveData())));
 
@@ -564,7 +564,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickRadioButtonById("excludeselected");
         clickButton(SAVE_CHANGES_BUTTON, 0);
         ExtHelper.waitForExtDialog(this, "Warning");
-        clickButton("Yes");
+        clickButton("Yes", 2 * defaultWaitForPage);
     }
 
     /**
