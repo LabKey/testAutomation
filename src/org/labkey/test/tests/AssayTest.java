@@ -130,6 +130,7 @@ public class AssayTest extends AbstractAssayTest
         publishData();
         editAssay();
         viewCrossFolderData();
+        verifyStudyBrowser();
     }
 
     private void editResults()
@@ -636,6 +637,26 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Cancel", defaultWaitForPage);
 
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+    }
+
+    private void verifyStudyBrowser()
+    {
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDIES);
+        addWebPart("Study List");
+        assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY1 + " Study");
+        assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY2 + " Study");
+        assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY3 + " Study");
+        clickWebpartMenuItem("Studies", "Customize");
+        selectOptionByText(Locator.name("displayType"), "Grid");
+        clickNavButton("Submit");
+        // TODO: Blocked: 13317: Exception when editing study properties via 'Study List' webpart
+        /*clickLinkWithText("edit");
+        setFormElement("quf_studyGrant", "Labkey");
+        setFormElement("quf_Investigator", "Britt");
+        setFormElement("quf_Description", "SCIENCE!!!");
+        clickNavButton("Submit");*/
+        // TODO: Test filter on details mode
+        // TODO: Blocked: 13318: Study List webpart ignores view in details mode
     }
 
     private void verifySpecimensPresent(int aaa07Count, int controlCount, int baq00051Count)
