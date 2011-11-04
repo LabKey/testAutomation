@@ -794,7 +794,7 @@ public class LuminexTest extends AbstractQCAssayTest
 //        assertTextPresent("BioPlex FitProb for VRC A 5304 gp140 (62) in plate 3", "0.9667");
 //        assertTextPresent("BioPlex ResVar for VRC A 5304 gp140 (62) in plate 3", "0.1895");
 
-        compareColumnValuesAgainstExpected("Analyte", "Analyte Standard", analytesAndStandardsConfig);
+        compareColumnValuesAgainstExpected("Analyte", "Standard", analytesAndStandardsConfig);
 
     }
 
