@@ -747,7 +747,7 @@ public class MS2Test extends MS2TestBase
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Protein");
-        assertTextPresent("Protein Description");
+        assertTextPresent("Description");
         assertTextPresent("Group");
         assertTextPresent("APETALA3 homolog RbAP3-2 [Ranunculus bulbosus]");
         assertTextPresent("gi|4883902|APETALA3_homolog_R");
