@@ -1622,7 +1622,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("end-date-field", df.format(endDate.getTime()));
         // click a different element on the page to trigger the date change event
         clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set plate 5"), "1,1");
-        clickButton("Refresh Graph", 0);
+        clickButton("Apply", 0);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         // check that only 3 runs are now present
