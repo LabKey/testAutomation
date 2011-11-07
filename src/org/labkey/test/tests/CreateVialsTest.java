@@ -171,7 +171,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         log("** test changing cell counts updates used/remaining columns and vial count column");
         table = new DataRegionTable(getAssayName() + " Data", this, false);
         assertEquals("B02", table.getDataAsText(0, "Participant ID"));
-        assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Run Batch Target Study"));
+        assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
         assertEquals("2.050E7", table.getDataAsText(0, "Original Viable Cells"));
         assertEquals("100000", getFormElement(Locator.name("usedCells", 0)));
         assertEquals("20404212", getFormElement(Locator.name("viableCells", 0)));

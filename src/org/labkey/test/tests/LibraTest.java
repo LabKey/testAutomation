@@ -29,7 +29,7 @@ public class LibraTest extends MS2Test
 {
     private String standardView = "Standard View";
     protected String proteinProphetView = "Protein Prophet View";
-    private String iTRAQ_QUANTITATION_RATIO = "iTRAQ Quantitation Ratio ";
+    private String iTRAQ_QUANTITATION_RATIO = "Ratio ";
 
     @Override
     protected String getProjectName()
@@ -48,11 +48,16 @@ public class LibraTest extends MS2Test
         ExtHelper.clickFileBrowserFileCheckbox(this, "iTRAQ.search.xar.xml");
         selectImportDataAction("Import Experiment");
         waitForTextToDisappear("LOADING");
-        sleep(200); // Takes a moment for run to appear after import.
-        refresh();
-
-        //set xar
-
+        for (int i = 0; i < 10; i++)
+        {
+            refresh();
+            if (isLinkPresentContainingText(runName))
+            {
+                break;
+            }
+            // Takes a moment for run to appear after import.
+            sleep(1000);
+        }
 
         clickLinkContainingText(runName);
     }
@@ -111,7 +116,7 @@ public class LibraTest extends MS2Test
 
     private void checkForITRAQNormalization()
     {
-        checkForNormalizationCountofSomething("iTRAQ Quantitation Normalized ");
+        checkForNormalizationCountofSomething("Normalized ");
     }
 
     private void checkForITRAQQuantitation()
@@ -153,7 +158,7 @@ public class LibraTest extends MS2Test
         checkForITRAQQuantitation();
 
 
-        assertTableCellTextEquals("dataregion_MS2Peptides", 2, "iTRAQ Quantitation Ratio 1", "0.71");
+        assertTableCellTextEquals("dataregion_MS2Peptides", 2, "Ratio 1", "0.71");
 
         Locator img = Locator.xpath("//img[contains(@id,'MS2Peptides-Handle')]");
         click(img);
