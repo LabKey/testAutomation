@@ -65,6 +65,7 @@ public class StudyManualTest extends StudyTest
 
         // change study label
         clickLinkWithText("Change Label or Description");
+        waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", getStudyLabel());
         clickNavButton("Update");
         assertTextPresent(getStudyLabel());
