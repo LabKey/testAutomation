@@ -67,7 +67,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText("Change Label or Description");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", getStudyLabel());
-        clickNavButton("Update");
+        clickNavButton("Submit");
         assertTextPresent(getStudyLabel());
 
         // import visit map
