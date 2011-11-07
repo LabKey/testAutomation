@@ -116,15 +116,18 @@ public class TargetStudyTest extends AbstractAssayTest
 
         log("** Set some awesome study labels");
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/manageStudyProperties.view");
-        setFormElement("label", _study1Label);
+        waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("Label", _study1Label);
         clickNavButton("Update");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/manageStudyProperties.view");
-        setFormElement("label", _study2Label);
+        waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("Label", _study2Label);
         clickNavButton("Update");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + "/manageStudyProperties.view");
-        setFormElement("label", _study3Label);
+        waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("Label", _study3Label);
         clickNavButton("Update");
     }
     protected void setupAssay()
