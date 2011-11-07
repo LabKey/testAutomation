@@ -65,7 +65,7 @@ public class StudyManualTest extends StudyTest
 
         // change study label
         clickLinkWithText("Change Label or Description");
-        setFormElement("label", getStudyLabel());
+        setFormElement("Label", getStudyLabel());
         clickNavButton("Update");
         assertTextPresent(getStudyLabel());
 
