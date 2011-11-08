@@ -291,7 +291,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", "Extra " + STUDY_NAME);
-        setFormElement("description", "Extra " + STUDY_DESCRIPTION);
+        setFormElement("Description", "Extra " + STUDY_DESCRIPTION);
         clickLinkWithText("Attach a file", false);
         waitForElement(Locator.id("formFile0"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("formFile0"), PROTOCOL_DOC2.toString());
