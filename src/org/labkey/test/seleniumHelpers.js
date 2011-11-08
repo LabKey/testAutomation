@@ -187,6 +187,7 @@ if (browserVersion.isChrome) {
                     msg.message.indexOf("[JavaScript Error:") == 0 &&
                     msg.message.indexOf("setting a property that has only a getter") == -1 &&
                     msg.message.indexOf("{file: \"chrome://") == -1 &&
+                    msg.message.indexOf("ext-all-sandbox-debug.js") == -1 && // Ignore error caused by project webpart
                     msg.message.indexOf("XULElement.selectedIndex") == -1 && // Ignore known Firefox Issue
                     msg.message.indexOf("xulrunner-1.9.0.14/components/FeedProcessor.js") == -1) // Firefox problem
                 {
