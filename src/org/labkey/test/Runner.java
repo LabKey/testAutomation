@@ -233,13 +233,7 @@ public class Runner extends TestSuite
             boolean errored = false;
             
             int _maxTestFailures;
-            try{
-                _maxTestFailures = Integer.parseInt(System.getProperty("maxTestFailures", String.valueOf(DEFAULT_MAX_TEST_FAILURES))); // 0 is unlimited
-            }
-            catch (NumberFormatException e)
-            {
-                _maxTestFailures = DEFAULT_MAX_TEST_FAILURES;
-            }
+            _maxTestFailures = Integer.getInteger("maxTestFailures", DEFAULT_MAX_TEST_FAILURES); // 0 is unlimited
 
             if (_failedTests.size() + _erroredTests.size() < _maxTestFailures || _maxTestFailures <= 0)
             {
@@ -272,6 +266,20 @@ public class Runner extends TestSuite
             if (_failedTests.isEmpty() && _erroredTests.isEmpty())
             {
                 getRemainingTestsFile().delete();
+            }
+        }
+
+        // Pause between tests for long test suites.  Will hopefully increase stability.
+        int ms = Integer.getInteger("pauseBetweenTests.ms", 0);
+        if(ms > 0)
+        {
+            try
+            {
+                Thread.sleep(ms);
+            }
+            catch (InterruptedException e)
+            {
+                /* ignore */
             }
         }
     }
