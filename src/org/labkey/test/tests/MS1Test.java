@@ -387,15 +387,15 @@ public class MS1Test extends BaseSeleniumWebTest
         CustomizeViewsHelper.moveCustomizeViewSort(this, "RelatedPeptide/PeptideProphet", true);
         CustomizeViewsHelper.saveCustomView(this, "My View");
 
-        assertTextPresent("Related Peptide PepProphet");
-        assertTextPresent("Related Peptide Protein");
+        assertTextPresent("PepProphet");
+        assertTextPresent("Protein");
         assertTextPresent("18protmix|P46406|G3P_RABIT");
         assertTextBefore("0.9956", "0.9862");
 
         //switch back to default view
         clickMenuButton("Views", "default");
-        assertTextNotPresent("Related Peptide PepProphet");
-        assertTextNotPresent("Related Peptide Protein");
+        assertTextNotPresent("PepProphet");
+        assertTextNotPresent("Protein");
         assertTextNotPresent("18protmix|P46406|G3P_RABIT");
 
         //test export
