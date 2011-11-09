@@ -53,7 +53,7 @@ public enum TestSet
         ButtonCustomizationTest.class,
         ReagentTest.class,
         FilterTest.class,
-            GenotypingTest.class,
+//            GenotypingTest.class,
             GroupTest.class
     }),
 
