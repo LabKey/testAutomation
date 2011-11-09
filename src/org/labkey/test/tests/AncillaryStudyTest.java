@@ -90,6 +90,8 @@ public class AncillaryStudyTest extends StudyBaseTest
         
         //Wizard page 1 - location
         ExtHelper.waitForExtDialog(this, "Create Ancillary Study");
+        clickAt(Locator.xpath("//label/span[text()='Protocol']"), "1,1");
+        waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Protocol Document']"), WAIT_FOR_JAVASCRIPT);
         setFormElement("studyName", getFolderName());
         setFormElement("studyDescription", STUDY_DESCRIPTION);
         assertTrue(PROTOCOL_DOC.exists());
@@ -134,6 +136,8 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         //Wizard page 3 - select datasets
         waitForElement(Locator.xpath("//div[contains(@class, 'studyWizardDatasetList')]"), WAIT_FOR_JAVASCRIPT);
+        clickAt(Locator.xpath("//label/span[text()='Data Refresh']"), "1,1");
+        waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Data Refresh']"), WAIT_FOR_JAVASCRIPT);
         assertWizardError("Finish", "You must select at least one dataset to create the new study from.");
         for(int i = 0; i < DATASETS.length; i++)
         {
@@ -293,8 +297,8 @@ public class AncillaryStudyTest extends StudyBaseTest
         setFormElement("Label", "Extra " + STUDY_NAME);
         setFormElement("Description", "Extra " + STUDY_DESCRIPTION);
         clickLinkWithText("Attach a file", false);
-        waitForElement(Locator.id("formFile0"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("formFile0"), PROTOCOL_DOC2.toString());
+        waitForElement(Locator.xpath("//div[@id='filePickers']//input[@type='text']"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.id("//div[@id='filePickers']//input[@type='text']"), PROTOCOL_DOC2.toString());
         clickNavButton("Update");
         assertLinkPresentWithText(PROTOCOL_DOC.getName());
         assertLinkPresentWithText(PROTOCOL_DOC2.getName());
