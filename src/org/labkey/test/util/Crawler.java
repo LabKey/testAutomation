@@ -465,6 +465,7 @@ public class Crawler
                 fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
 
 			testInjection(urlToCheck, currentPageUrl);
+            testNavTrail(urlToCheck);
         }
         catch (RuntimeException re)
         {
@@ -472,6 +473,34 @@ public class Crawler
             if (re.getMessage().indexOf("ScriptException") < 0 && !re.getClass().getSimpleName().equals("NotHTMLException"))
                 throw re;
         }
+    }
+
+    private void testNavTrail(UrlToCheck relativeURL)
+    {
+        System.out.println("Testing the nav trail");
+        Collection<String> navTrailEntries = _test.getNavTrailEntries();
+        if(navTrailEntries.size()==0)
+            return;
+        String folderUrl = _test.getFolderUrl();
+        if(folderUrl!=null && navTrailEntries.contains(folderUrl))
+            fail("Header url contained in nav trail");
+
+        Collection<String> tabUrls = null;
+        try
+        {
+            tabUrls = _test.getTabEntries();
+        }
+        catch (Exception e)
+        {
+            fail("Unable to combine tab urls");
+        }
+        Collection intersect = BaseSeleniumWebTest.collectionIntersection(navTrailEntries,tabUrls);
+        if(intersect.size()>0)
+        {
+            fail("Overlap between tabs and nav trail.  Intersect at following urls: " + intersect.toString());
+
+        }
+
     }
 
 
@@ -484,7 +513,7 @@ public class Crawler
             for (Map.Entry<String, String> entry : _sourceReplacements.entrySet())
                 responseText = responseText.replaceAll(entry.getKey(), entry.getValue());
 
-            //loop through forbidden words
+            //loop through forbidden words#BLOCKED
             for (String word : _forbiddenWords)
             {
                 if (responseText.indexOf(word.toLowerCase()) > 0)
