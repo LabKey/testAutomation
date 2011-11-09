@@ -54,7 +54,7 @@ public class FlowImportTest extends BaseFlowTest
         // don't select file path
         // place in FlowJoAnalysis_1 folder
         // assert only one analysis run created
-        importAnalysis(containerPath, workspacePath, null, analysisFolder, true);
+        importAnalysis(containerPath, workspacePath, null, false, analysisFolder, false, true);
         beginAt(WebTestHelper.getContextPath() + "/query/" + PROJECT_NAME + "/" + getFolderName() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         DataRegionTable table = new DataRegionTable("query", this, true);
         assertEquals("Expected a single run", table.getDataRowCount(), 1);

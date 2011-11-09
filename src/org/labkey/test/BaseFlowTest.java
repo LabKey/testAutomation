@@ -172,9 +172,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         beginAt(queryURL);
     }
 
-    protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, String analysisName, boolean viaPipeline)
+    protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, boolean existingKeywordRun, String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)
     {
-        ImportAnalysisOptions options = new ImportAnalysisOptions(containerPath, workspacePath, fcsPath, false, analysisName, false, viaPipeline);
+        ImportAnalysisOptions options = new ImportAnalysisOptions(containerPath, workspacePath, fcsPath, existingKeywordRun, analysisName, existingAnalysisFolder, viaPipeline);
         importAnalysis(options);
     }
 
