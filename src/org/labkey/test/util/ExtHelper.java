@@ -67,6 +67,24 @@ public class ExtHelper
         test.click(element);
     }
 
+
+    public static void clickExtDropDownMenu(BaseSeleniumWebTest test, Locator menuLocator, String value)
+    {
+        test.click(menuLocator);
+        Locator element = Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='" + value + "']");
+        test.waitForElement(element,  test.WAIT_FOR_PAGE);
+        test.click(element);
+    }
+
+    //for the second type of drop down menu
+    public static void clickExt4DropDownMenu(BaseSeleniumWebTest test, Locator menuLocator, String value)
+    {
+        test.click(menuLocator);
+        Locator element = Locator.xpath("//li[@class='x4-boundlist-item' and text()='" + value + "']");
+        test.waitForElement(element,  test.WAIT_FOR_PAGE);
+        test.click(element);
+    }
+
     public static void selectFolderManagementTreeItem(BaseSeleniumWebTest test, String path, boolean keepExisting)
     {
         test.getWrapper().getEval("selenium.selectFolderManagementItem('" + path + "', " + keepExisting +");");

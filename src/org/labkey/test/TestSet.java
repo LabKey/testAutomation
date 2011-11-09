@@ -23,6 +23,7 @@ import org.labkey.test.ms2.QuantitationTest;
 import org.labkey.test.ms2.SequestTest;
 import org.labkey.test.tests.*;
 
+import java.security.acl.Group;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +52,9 @@ public enum TestSet
         ViabilityTest.class,
         ButtonCustomizationTest.class,
         ReagentTest.class,
-        FilterTest.class
+        FilterTest.class,
+            GenotypingTest.class,
+            GroupTest.class
     }),
 
     MS2(new Class[]

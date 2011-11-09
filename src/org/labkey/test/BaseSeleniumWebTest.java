@@ -55,12 +55,14 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -499,8 +501,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         assertElementPresent(Locator.id("userMenuPopupLink"));
         click(Locator.id("userMenuPopupLink"));
-        assertTextPresent("Sign Out");
-        assertTextPresent("My Account");
+        assertTextNotPresent("Sign In");
+//        assertTextPresent("My Account");
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -617,6 +619,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Submit");
     }
 
+
     protected enum PasswordRule {Weak, Strong}
     protected enum PasswordExpiration {Never, FiveSeconds, ThreeMonths, SixMonths, OneYear}
 
@@ -713,7 +716,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void ensureAdminMode()
     {
         //Now switch to admin mode if available
-        if (!isElementPresent(Locator.id("leftmenupanel")))
+        //TODO:  this is causing all kinds of problems
+        if (!isElementPresent(Locator.id("leftmenupanel")) && !(isElementPresent(Locator.id("Admin ConsoleTab"))))
             clickAdminMenuItem("Show Navigation Bar");
     }
 
@@ -1342,10 +1346,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             return;
         beginAt("/admin/showErrorsSinceMark.view");
 
-        assertTrue("There were errors during the test run", isPageEmpty());
-        log("No new errors found.");
-        goToHome();         // Don't leave on an empty page
-    }
+       assertTrue("There were errors during the test run", isPageEmpty());
+       log("No new errors found.");
+       goToHome();         // Don't leave on an empty page
+   }
 
     public void checkExpectedErrors(int count)
     {
@@ -1762,7 +1766,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         clickLinkWithText("Create Project");
-        waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("name"), 1*WAIT_FOR_JAVASCRIPT);
         setText("name", projectName);
 
         if (null != folderType && !folderType.equals("None"))
@@ -1784,6 +1788,34 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         _createdProjects.add(projectName);
     }
 
+    public void startcreateGlobalPermissionsGroup(String groupName)
+    {
+
+        goToHome();
+        clickLinkWithText("Site Groups");
+        waitForPageToLoad();
+
+        setFormElement("newGroupFormSite$input",groupName);
+        clickButton("Create New Group", 0);
+        sleep(500);
+
+    }
+    public void createGlobalPermissionsGroup(String groupName, String... users)
+    {
+        startcreateGlobalPermissionsGroup(groupName);
+        StringBuilder namesList = new StringBuilder();
+        for(String member : users)
+        {
+            namesList.append(member).append("\n");
+        }
+
+        log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
+        waitAndClick(Locator.tagContainingText("a","manage group"));
+        waitForPageToLoad();
+        setFormElement("names", namesList.toString());
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership");
+    }
     public void createPermissionsGroup(String groupName)
     {
         log("Creating permissions group " + groupName);
@@ -1805,6 +1837,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         ExtHelper.clickExtTabContainingText(this, "Groups for project");
+        createPermissionGroupFromGroupScreen(groupName, memberNames);
+        enterPermissionsUI();
+    }
+
+
+    public void createPermissionGroupFromGroupScreen(String groupName, String... memberNames)
+    {
+
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create New Group", 0);
         sleep(500);
@@ -1821,7 +1861,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement("names", namesList.toString());
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
-        enterPermissionsUI();
     }
 
 
@@ -2014,6 +2053,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void deleteProject(String project, int wait)
     {
         log("Deleting project " + project);
+        if(!isTextPresent(project))
+            goToHome();
         clickLinkWithText(project);
         //Delete even if terms of use is required
         if (isElementPresent(Locator.name("approvedTermsOfUse")))
@@ -4358,6 +4399,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void createUser(String userName, String cloneUserName, boolean verifySuccess)
     {
+        goToHome();
         ensureAdminMode();
         clickLinkWithText("Site Users");
         clickNavButton("Add Users");
@@ -4414,6 +4456,55 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void deleteUser(String userEmail)
     {
         deleteUser(userEmail, false);
+    }
+
+    public void deleteGroup(String groupName, boolean failIfNotFound)
+    {
+        goToHome();
+        clickLinkWithText("Site Groups");
+        if(!selectGroup(groupName))
+            if(failIfNotFound)
+                fail("Group not found");
+            else
+                return;
+        deleteAllUsersFromGroup();
+
+        Locator l = Locator.xpath("//td/a/span[text()='Delete Empty Group']");
+        click(l);
+    }
+
+    private void deleteAllUsersFromGroup()
+    {
+        Locator l = Locator.xpath("//td/a/span[text()='remove']");
+
+        while(isElementPresent(l))
+            click(l);
+    }
+
+
+    public void removeUserFromGroup(String groupName, String userName)
+    {
+         if(!isTextPresent("Group " + groupName))
+             selectGroup(groupName);
+
+        Locator l = Locator.xpath("//td[text()='" + userName +  "']/..//td/a/span[text()='remove']");
+        click(l);
+    }
+
+    public boolean selectGroup(String groupName)
+    {
+//        ensureAdminMode();
+        //if(not at site groups page)
+//        if(!getURL().toString().contains("groups.view"))
+        goToHome();
+            clickLinkWithText("Site Groups");
+
+        Locator l = Locator.xpath("//div[text()='" + groupName + "']");
+        if(!isElementPresent(l))
+            return false;
+        click(l);
+        return true;
+
     }
 
     public void deleteUser(String userEmail, boolean failIfNotFound)
@@ -5580,5 +5671,77 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if(isElementPresent(Locator.id("userMenuPopupLink")))
             signOut();
+    }
+
+    public Collection<String> getNavTrailEntries()
+    {
+        return getAsUnderXpath("//span[@id='navTrailAncestors']/a");
+//        String navTrailXpath =   "//span[@id='navTrailAncestors']/a";
+//        int count = getXpathCount(Locator.xpath(navTrailXpath));
+//        ArrayList<String> al = new ArrayList<String>(count);
+//        for(int i=1; i<=count; i++)
+//        {
+//            al.add(getAttribute(Locator.xpath(navTrailXpath + "[" + i + "]"), "href"));
+//        }
+//        return al;
+    }
+
+    protected Collection<String> getAsUnderXpath(String xpath)
+    {
+//        String navTrailXpath =   "//span[@id='navTrailAncestors']/a";
+        int count = getXpathCount(Locator.xpath(xpath));
+        ArrayList<String> al = new ArrayList<String>(count);
+        for(int i=1; i<=count; i++)
+        {
+            al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]"), "href"));
+        }
+        return al;
+    }
+
+
+    public  String getFolderUrl()
+    {
+        Locator l = Locator.xpath("//td[@class='folder-title']/a");
+        return getAttribute(l,  "href");
+    }
+
+    public Collection<String> getTabEntries() throws Exception
+    {
+        Collection<String> tabs = getTabUrls(false);
+        Collection<String> activeTabs = getTabUrls(true);
+        if(activeTabs.size()>0 && !tabs.addAll(activeTabs))
+            throw new Exception("unable to combine tab groups");
+        return tabs;
+//        int count = getXpathCount(Locator.xpath(tabPath));
+//        ArrayList<String> al = new ArrayList<String>(count);
+//        for(int i=1; i<=count; i++)
+//        {
+//            al.add(getAttribute(Locator.xpath(tabPath + "[" + i + "]"), "href"));
+//        }
+//        return al;
+    }
+
+    public Collection<String> getTabUrls(boolean active)
+    {
+        String xpath = "(//li[@class = 'labkey-tab-inactive'])";
+        if(active)
+            xpath.replace("inactive", "active");
+
+        int count = getXpathCount(Locator.xpath(xpath));
+        ArrayList<String> al = new ArrayList<String>(count);
+        for(int i=1; i<=count; i++)
+        {
+            al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]/a"), "href"));
+        }
+        return al;
+
+    }
+
+    public static Collection collectionIntersection(Collection s1, Collection s2)
+    {
+        Set intersect = new TreeSet(s1);
+        intersect.retainAll(s2);
+
+        return intersect;
     }
 }

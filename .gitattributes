@@ -151,6 +151,7 @@ src/org/labkey/test/tests/FolderTest.java -text
 src/org/labkey/test/tests/FormulationsTest.java -text
 src/org/labkey/test/tests/GenotypingTest.java -text
 src/org/labkey/test/tests/GpatAssayTest.java -text
+src/org/labkey/test/tests/GroupTest.java -text
 src/org/labkey/test/tests/HTTPApiTest.java -text
 src/org/labkey/test/tests/IDRIParticleSizeTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
