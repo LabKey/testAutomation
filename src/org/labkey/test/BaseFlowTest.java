@@ -212,7 +212,18 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
         importAnalysis_analysisFolder(options.getContainerPath(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
-        importAnalysis_confirm(options.getContainerPath(), options.getWorkspacePath(), options.getFcsPath(), options.isExistingKeywordRun(), options.getAnalysisName(), options.isExistingAnalysisFolder());
+        importAnalysis_confirm(
+                options.getContainerPath(),
+                options.getWorkspacePath(),
+                options.getFcsPath(),
+                options.isExistingKeywordRun(),
+                options.getAnalysisEngine(),
+                options.getImportGroupNames(),
+                options.isREngineNormalization(),
+                options.getREngineNormalizationReference(),
+                options.getREngineNormalizationParameters(),
+                options.getAnalysisName(),
+                options.isExistingAnalysisFolder());
 
         importAnalysis_checkErrors(options.getExpectedErrors());
     }
@@ -343,15 +354,53 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                                           String fcsPath, boolean existingKeywordRun,
                                           String analysisFolder, boolean existingAnalysisFolder)
     {
+        importAnalysis_confirm(containerPath, workspacePath, fcsPath, existingKeywordRun, fcsPath,
+                Arrays.asList("All Samples"), false, null, null,
+                analysisFolder, existingAnalysisFolder);
+    }
+
+    protected void importAnalysis_confirm(String containerPath, String workspacePath,
+                                          String fcsPath, boolean existingKeywordRun,
+                                          String analysisEngine,
+                                          List<String> importGroupNames,
+                                          boolean rEngineNormalization,
+                                          String rEngineNormalizationReference,
+                                          String rEngineNormalizationParameters,
+                                          String analysisFolder,
+                                          boolean existingAnalysisFolder)
+    {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
-        assertTextPresent("Analysis Folder: " + analysisFolder);
+
+        if (analysisEngine.equals("noEngine"))
+            assertTextPresent("Analysis Engine: No analysis engine selected");
+        else if (analysisEngine.equals("rEngine"))
+            assertTextPresent("Analysis Engine: External R analysis engine");
+
+        if (importGroupNames == null)
+            assertTextPresent("Import Groups: All Samples");
+        else
+            assertTextPresent("Import Groups: " + StringUtils.join(importGroupNames, ","));
+
+        if (rEngineNormalization)
+        {
+            assertTextPresent("Reference Sample: " + rEngineNormalizationReference);
+            assertTextPresent("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : rEngineNormalizationParameters));
+        }
+
+        if (existingAnalysisFolder)
+            assertTextPresent("Existing Analysis Folder: " + analysisFolder);
+        else
+            assertTextPresent("New Analysis Folder: " + analysisFolder);
+
         if (existingKeywordRun)
             assertTextNotPresent("Existing FCS File run: none set");
+
         // XXX: assert fcsPath is present: need to normalize windows path backslashes
         if (fcsPath == null)
             assertTextPresent("FCS File Path: none set");
+
         assertTextPresent("Workspace: " + workspacePath);
-        
+
         clickNavButton("Finish");
         waitForPipeline(containerPath);
         log("finished import analysis wizard");

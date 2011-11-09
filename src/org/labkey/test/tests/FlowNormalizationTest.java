@@ -45,7 +45,7 @@ public class FlowNormalizationTest extends BaseFlowTest
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
-        clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
 
         ImportAnalysisOptions options = new ImportAnalysisOptions(
                 containerPath,
@@ -63,5 +63,14 @@ public class FlowNormalizationTest extends BaseFlowTest
                 Collections.<String>emptyList()
         );
         importAnalysis(options);
+
+        goToFlowDashboard();
+        clickLinkWithText("Show Jobs");
+        clickLinkWithText("COMPLETE");
+        assertTextPresent("/flowjoquery/miniFCS/mini-fcs.xml and loading group Sample Order 5: Gag1&2");
+        assertTextPresent("finished parsing 2 samples");
+        assertTextPresent("finished normalizing 2 samples");
+        assertTextPresent("Transaction completed successfully for mini-fcs.xml");
+        assertTextPresent("Transaction completed successfully for Normalized mini-fcs.xml");
     }
 }
