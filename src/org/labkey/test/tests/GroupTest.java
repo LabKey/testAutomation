@@ -76,7 +76,7 @@ public class GroupTest extends BaseSeleniumWebTest
         //add read permissions to group2
         goToHome();
         clickLinkWithText(getProjectName());
-        clickLinkContainingText("Permissions");
+        clickLinkWithText("Permissions");
         waitForPageToLoad();
 
         ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.EditorRole", COMPOUND_GROUP);
@@ -86,7 +86,7 @@ public class GroupTest extends BaseSeleniumWebTest
         log("Verify you can copy perms even with a default");
 
         clickLinkWithText(getProjectName());
-        clickLinkContainingText("Permissions");
+        clickLinkWithText("Permissions");
         waitForPageToLoad();
         ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "All Site Users");
         clickButton("Save and Finish");
