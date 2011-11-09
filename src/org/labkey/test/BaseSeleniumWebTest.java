@@ -1995,6 +1995,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText("Folders");
         waitForExtFolderTreeNode(folderName, 10000);
         clickNavButton("Delete");
+        // confirm delete subfolders if present
+        if(isTextPresent("This folder has subfolders."))
+            clickNavButton("Delete All Folders");
         // confirm delete:
         clickNavButton("Delete");
         // verify that we're not on an error page with a check for a project link:

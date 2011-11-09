@@ -52,6 +52,7 @@ public class JUnitHeader extends BaseSeleniumWebTest
         signIn();
         resetErrors();
         enableEmailRecorder();
+        try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
 
         log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
     }

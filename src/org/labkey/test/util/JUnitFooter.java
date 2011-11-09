@@ -56,6 +56,7 @@ public class JUnitFooter extends BaseSeleniumWebTest
         log("** It will check for any errors or memory leaks caused by the tests therein");
 
         signIn();
+        try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
         checkLeaksAndErrors();
         resetErrors();
 
