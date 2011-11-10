@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
@@ -83,6 +84,10 @@ public class AssayTest extends AbstractAssayTest
             "BAQ00051-08\th\t8\ttrue\t19\t2000-02-02\n" +
             "BAQ00051-11\ti\t9\ttrue\t18\t2000-03-03\n";
 
+    private static final String INVESTIGATOR = "Dr. No";
+    private static final String GRANT = "SPECTRE";
+    private static final String DESCRIPTION = "World Domination.";
+
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";
@@ -130,7 +135,7 @@ public class AssayTest extends AbstractAssayTest
         publishData();
         editAssay();
         viewCrossFolderData();
-        verifyStudyBrowser();
+        verifyStudyList();
     }
 
     private void editResults()
@@ -639,7 +644,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
     }
 
-    private void verifyStudyBrowser()
+    private void verifyStudyList()
     {
         clickLinkWithText(TEST_ASSAY_FLDR_STUDIES);
         addWebPart("Study List");
@@ -647,16 +652,35 @@ public class AssayTest extends AbstractAssayTest
         assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY2 + " Study");
         assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY3 + " Study");
         clickWebpartMenuItem("Studies", "Customize");
+
+        //verify grid view
         selectOptionByText(Locator.name("displayType"), "Grid");
         clickNavButton("Submit");
-        // TODO: Blocked: 13317: Exception when editing study properties via 'Study List' webpart
-        /*clickLinkWithText("edit");
-        setFormElement("quf_studyGrant", "Labkey");
-        setFormElement("quf_Investigator", "Britt");
-        setFormElement("quf_Description", "SCIENCE!!!");
-        clickNavButton("Submit");*/
-        // TODO: Test filter on details mode
-        // TODO: Blocked: 13318: Study List webpart ignores view in details mode
+        assertLinkNotPresentWithText("edit");
+
+        //edit study properties
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDY1 + " Study");
+        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        waitForElement(Locator.name("Investigator"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("Investigator", INVESTIGATOR);
+        setFormElement("studyGrant", GRANT);
+        setFormElement("Description", DESCRIPTION);
+        clickNavButton("Submit");
+
+        //verify study properties (grid view)
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDIES);
+        DataRegionTable table = new DataRegionTable("qwpStudies", this, false);
+        assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
+        assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));
+        assertEquals("Failed to set study grant.", GRANT, table.getDataAsText(0, "Study Grant"));
+        assertEquals("Failed to set study description.", DESCRIPTION, table.getDataAsText(0, "Description"));
+
+        //verify study properties (details view)
+        clickWebpartMenuItem("Studies", "Customize");
+        selectOptionByText(Locator.name("displayType"), "Details");
+        clickNavButton("Submit");
+        assertTextPresent(INVESTIGATOR, DESCRIPTION);
+        assertTextNotPresent(GRANT, TEST_ASSAY_FLDR_STUDY1 + " Study tracks data"); //Old description
     }
 
     private void verifySpecimensPresent(int aaa07Count, int controlCount, int baq00051Count)
