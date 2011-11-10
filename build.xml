@@ -512,10 +512,10 @@
             <arg value="-Dcaching=true"/>
             <arg value="-debug"/>
             <arg value="-log"/>
-            <arg value="selenium.log"/>
+            <arg value="${test.log.output.dir}/selenium.log"/>
         </java>
         <echo message="Checking for Selenium Server on port ${sysprop.selenium.server.port}" />
-        <waitfor maxwait="20" maxwaitunit="second" checkevery="2" checkeveryunit="second" timeoutproperty="noSeleniumServer">
+        <waitfor maxwait="60" maxwaitunit="second" checkevery="2" checkeveryunit="second" timeoutproperty="noSeleniumServer">
             <socket server="localhost" port="${sysprop.selenium.server.port}"/>
         </waitfor>
 

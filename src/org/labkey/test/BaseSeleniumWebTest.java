@@ -5123,7 +5123,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         DefaultSeleniumWrapper()
         {
-            super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL());
+            super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL() + "/");
         }
 
         private void log(String s)
