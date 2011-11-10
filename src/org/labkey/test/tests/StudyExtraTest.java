@@ -214,6 +214,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Copy to Study");
         clickLinkContainingText(STUDY_FOLDER + " Study");
 
+        addWebPart("Datasets");
         clickLinkWithText("TestAssay1");
         assertTextPresent("P1");
         assertTextPresent("V3");
@@ -245,7 +246,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         assertTextPresent("Day 12");
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "Simple");
@@ -266,7 +267,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         assertTextPresent("Day 320");
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Timepoints");
         setFormElement("startDate", "2007-11-01");
         submit();

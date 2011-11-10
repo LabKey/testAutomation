@@ -51,6 +51,7 @@ public class StudyRedesignTest extends StudyBaseTest
         setupDatasetCategories();
         log("Create report for data view webpart test.");
         goToModule("Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "R View");
         clickNavButton("Save", 0);

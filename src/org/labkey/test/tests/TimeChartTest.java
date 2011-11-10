@@ -367,6 +367,9 @@ public class TimeChartTest extends StudyBaseTest
     private void createChartTest()
     {
         clickLinkWithText(FOLDER_NAME);
+        addWebPart("Views");
+        addWebPart("Datasets");
+        addWebPart("Specimens");
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
@@ -391,6 +394,7 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Create multi-measure time chart.");
         clickLinkWithText(VISIT_FOLDER_NAME);
+        clickTab("Manage");
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
@@ -466,7 +470,7 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
 
         log("Verify saved report");
-        clickLinkWithText("Study Overview");
+        clickTab("Manage");
         waitForText("Manage Views", WAIT_FOR_JAVASCRIPT);
         clickLinkWithText("Manage Views");
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
@@ -785,7 +789,7 @@ public class TimeChartTest extends StudyBaseTest
         ExtHelper.waitForExtDialog(this, "Success");
         ExtHelper.clickExtButton(this, "Success", "OK", 0);
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Participant Groups");
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 

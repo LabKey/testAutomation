@@ -127,7 +127,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Manage " + SUBJECT_NOUN + " Groups");
 
         //nav trail check
-        assertTextPresent(Study001 + " >  Manage Study > ");
+        assertTextNotPresent("Manage Study > ");
 
         String allList = "all list12345";
         String filteredList = "Filtered list";
@@ -158,11 +158,12 @@ public class StudyTest extends StudyBaseTest
 
         // test creating a participant group directly from a data grid
         clickLinkWithText(STUDY_NAME);
+        clickLinkWithText("47 datasets");
         clickLinkWithText("DEM-1: Demographics");
 
         //nav trail check
         clickLinkContainingText("999320016");
-        assertTextPresent(Study001 + " >  Study Overview >  Dataset: DEM-1: Demographics, All Visits >  ");
+        assertTextPresent("Study Overview >  Dataset: DEM-1: Demographics, All Visits >  ");
         clickLinkContainingText("Dataset:");
 
         // verify warn on no selection
@@ -435,6 +436,7 @@ public class StudyTest extends StudyBaseTest
 
         // return to dataset import page
         clickLinkWithText(getStudyLabel());
+        clickLinkWithText("47 datasets");
         clickLinkWithText("verifyAssay");
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
@@ -464,6 +466,7 @@ public class StudyTest extends StudyBaseTest
     protected void verifySpecimens()
     {
         clickLinkWithText(getStudyLabel());
+        addWebPart("Specimens");
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Show All");
         assertTextNotPresent("DRT000XX-01");
@@ -552,12 +555,12 @@ public class StudyTest extends StudyBaseTest
         clickNavButton("Save");
 
         log("configure comments");
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Comments");
         if (isTextPresent("Comments can only be configured for studies with editable datasets"))
         {
             log("configure editable datasets");
-            clickLinkWithText("Manage Study");
+            clickTab("Manage");
             clickLinkWithText("Manage Security");
             selectOptionByText("securityString", "Basic security with editable datasets");
             waitForPageToLoad();
@@ -565,7 +568,7 @@ public class StudyTest extends StudyBaseTest
 
             log("configure comments");
             clickLinkWithText(getStudyLabel());
-            clickLinkWithText("Manage Study");
+            clickTab("Manage");
             clickLinkWithText("Manage Comments");
         }
         selectOptionByText("participantCommentDataSetId", PARTICIPANT_CMT_DATASET);
@@ -678,6 +681,7 @@ public class StudyTest extends StudyBaseTest
     protected void verifyManageDatasetsPage()
     {
         clickLinkWithText(getFolderName());
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
 
         clickLinkWithText("489");
@@ -741,6 +745,7 @@ public class StudyTest extends StudyBaseTest
         assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         clickLinkWithText(getFolderName());
+        clickLinkWithText("47 datasets");
         clickLinkWithText("Types");
         log("Verifying sequence numbers and visit names imported correctly");
 

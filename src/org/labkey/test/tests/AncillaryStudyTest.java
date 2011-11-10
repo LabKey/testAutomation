@@ -83,7 +83,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
 
         log("Create Special Emphasis Study.");
         clickNavButton("Create New Study", 0);
@@ -158,7 +158,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     public void doVerifySteps()
     {
         assertTextPresent("Ancillary study created by AncillaryStudyTest");
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         assertTextPresent((DATASETS.length + DEPENDENT_DATASETS.length) + " Datasets");
         clickLinkWithText("Manage Datasets");
         for( String str : DATASETS )
@@ -188,7 +188,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         clickLinkWithText(study);
         log("Modify " + study + " participant group.");
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Mouse Groups");
         waitForText(PARTICIPANT_GROUP);
         selenium.getEval("selenium.selectExtGridItem('label', '"+PARTICIPANT_GROUP+"', null, 'participantCategoriesGrid', null, false)");
@@ -227,7 +227,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (insert)");
         clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
         clickNavButton("View Data");
@@ -250,7 +250,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (modify)");
         clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
         clickNavButton("View Data");
@@ -273,7 +273,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (delete)");
         clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
         clickNavButton("View Data");
@@ -291,15 +291,15 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText(STUDY_NAME);
         assertTextPresent(STUDY_DESCRIPTION);
         assertElementPresent(Locator.xpath("//a[contains(@href, 'name="+PROTOCOL_DOC.getName()+"')]"));
-        clickAndWait(Locator.xpath("//a[./span[@title='Click to Edit']]"));
+        clickAndWait(Locator.xpath("//a[./img[@title='Edit']]"));
 
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", "Extra " + STUDY_NAME);
         setFormElement("Description", "Extra " + STUDY_DESCRIPTION);
         clickLinkWithText("Attach a file", false);
         waitForElement(Locator.xpath("//div[@id='filePickers']//input[@type='text']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("//div[@id='filePickers']//input[@type='text']"), PROTOCOL_DOC2.toString());
-        clickNavButton("Update");
+        setFormElement(Locator.xpath("//div[@id='filePickers']//input[@type='text']"), PROTOCOL_DOC2.toString());
+        clickNavButton("Submit");
         assertLinkPresentWithText(PROTOCOL_DOC.getName());
         assertLinkPresentWithText(PROTOCOL_DOC2.getName());
         assertTextPresent("Protocol documents:");

@@ -222,7 +222,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         log("Setting QC states in study " + folder + ".");
         clickLinkWithText(project);
         clickLinkWithText(folder);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Dataset QC States");
         setFormElement("newLabel", "Approved");
         setFormElement("newDescription", "We all like approval.");

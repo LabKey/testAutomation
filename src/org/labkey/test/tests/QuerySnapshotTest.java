@@ -168,6 +168,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         // snapshot over a custom query
         log("create a snapshot over a custom query");
         clickLinkWithText(getStudyLabel());
+        clickTab("Manage");
         clickLinkWithText("Manage Views");
         createReport(GRID_VIEW);
 
@@ -205,6 +206,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickNavButton("Delete Snapshot", 0);
         getConfirmationAndWait();
 
+        clickTab("Manage");
         waitForText("Manage Datasets", 10000);
         assertLinkNotPresentWithText("Custom Query Snapshot");
 

@@ -38,7 +38,7 @@ public class StudyHelper
         {
             test.clickLinkWithText(projectName);
             test.clickLinkWithText(studyFolder);
-            test.clickLinkWithText("Manage Study");
+            test.clickTab("Manage");
             test.clickLinkWithText("Manage "+participantString+" Groups");
         }
         test.log("Create "+participantString+" Group: " + groupName);
@@ -65,7 +65,7 @@ public class StudyHelper
     public static void exportStudy(BaseSeleniumWebTest test, String folder, boolean useXmlFormat, boolean zipFile)
     {
         test.clickLinkWithText(folder);
-        test.clickLinkWithText("Manage Study");
+        test.clickTab("Manage");
         test.clickNavButton("Export Study");
 
         test.assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents", "Queries", "Custom Views", "Reports", "Lists");

@@ -150,6 +150,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
         toggleCheckboxByTitle("Pipeline");
         submit();
         addWebPart("Data Pipeline");
+        addWebPart("Datasets");
+        addWebPart("Specimens");
+        addWebPart("Views");
         // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
         // in IE testing
         selenium.runScript("LABKEY.disablePipelineRefresh = true;");
@@ -160,6 +163,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     // Must be on study home page or "manage study" page
     protected void setDemographicsBit(String datasetName, boolean demographics)
     {
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(datasetName);
         clickButtonContainingText("Edit Definition");
@@ -176,6 +180,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     // Must be on study home page or "manage study" page
     protected void setVisibleBit(String datasetName, boolean showByDefault)
     {
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(datasetName);
         clickButtonContainingText("Edit Definition");

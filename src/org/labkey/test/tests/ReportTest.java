@@ -150,6 +150,7 @@ public class ReportTest extends StudyBaseTest
 
     protected void clickReportGridLink(String reportName, String linkText)
     {
+        clickTab("Manage");
         clickLinkWithText("Manage Views");
         final Locator report = Locator.tagContainingText("div", reportName);
 
@@ -199,7 +200,7 @@ public class ReportTest extends StudyBaseTest
 
         //Delete the report
         clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         deleteReport("TestReport");
 
         // create new grid view report:
@@ -213,7 +214,7 @@ public class ReportTest extends StudyBaseTest
         //assertTextPresent("urn:lsid");
         assertNavButtonNotPresent("go");
         clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         deleteReport(viewName);
 
         // create new external report
@@ -462,6 +463,7 @@ public class ReportTest extends StudyBaseTest
         log("Clean up R Reports");
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
+        clickTab("Manage");
         clickLinkWithText("Manage Views");
         for (String script : R_SCRIPTS)
         {
@@ -566,6 +568,7 @@ public class ReportTest extends StudyBaseTest
 
         // create grid view
         clickLinkWithText(getFolderName());
+        clickTab("Manage");
         waitForElement(Locator.linkWithText("Manage Views"), WAIT_FOR_JAVASCRIPT);
         clickLinkWithText("Manage Views");
 

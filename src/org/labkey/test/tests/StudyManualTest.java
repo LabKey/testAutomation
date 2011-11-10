@@ -71,6 +71,7 @@ public class StudyManualTest extends StudyTest
         assertTextPresent(getStudyLabel());
 
         // import visit map
+        clickTab("Manage");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Import Visit Map");
         String visitMapData = getFileContents(VISIT_MAP);
@@ -81,7 +82,7 @@ public class StudyManualTest extends StudyTest
         importCustomVisitMappingAndVerify();
 
         // define forms
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Define Dataset Schemas");
         clickLinkWithText("Bulk Import Schemas");
@@ -92,7 +93,7 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Submit", 180000);
 
         // setup cohorts:
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         selectOptionByText("participantCohortDataSetId", "EVC-1: Enrollment Vaccination");
         waitForPageToLoad();
@@ -101,7 +102,7 @@ public class StudyManualTest extends StudyTest
 
         // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
         clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Dataset QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickNavButton("Save");
@@ -166,7 +167,7 @@ public class StudyManualTest extends StudyTest
     {
         if (!isLinkPresentContainingText("Visit Import Mapping"))
         {
-            clickLinkWithText("Manage Study");
+            clickTab("Manage");
             clickLinkWithText("Manage Visits");
         }
 
@@ -182,6 +183,7 @@ public class StudyManualTest extends StudyTest
     protected void setDemographicsDescription()
     {
         clickLinkWithText(getFolderName());
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("DEM-1: Demographics");
         clickButtonContainingText("Edit Definition");
@@ -201,7 +203,7 @@ public class StudyManualTest extends StudyTest
     // Hide visits based on label -- manual create vs. import will result in different indexes for these visits
     protected void hideVisits(String... visitLabel)
     {
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Visits");
 
         Set<String> labels = new HashSet<String>(Arrays.asList(visitLabel));
@@ -239,6 +241,7 @@ public class StudyManualTest extends StudyTest
     protected void createCustomAssays()
     {
         clickLinkWithText(getFolderName());
+        clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "verifyAssay");

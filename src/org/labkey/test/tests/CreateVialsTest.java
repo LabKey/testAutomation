@@ -85,6 +85,7 @@ public class CreateVialsTest extends AbstractViabilityTest
     {
         super.initializeStudyFolder(tabs);
 
+        clickTab("Manage");
         log("** Adding new Sites to check null ExternalId (Issue 12074)");
         clickLinkContainingText("Manage Labs/Sites");
         setFormElement("newId", "100");

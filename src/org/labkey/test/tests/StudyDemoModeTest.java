@@ -76,7 +76,7 @@ public class StudyDemoModeTest extends StudyBaseTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Demo Mode");
         verifyNotInDemoMode();
         clickNavButton("Enter Demo Mode");
@@ -87,7 +87,7 @@ public class StudyDemoModeTest extends StudyBaseTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Demo Mode");
         verifyInDemoMode();
         clickNavButton("Leave Demo Mode");

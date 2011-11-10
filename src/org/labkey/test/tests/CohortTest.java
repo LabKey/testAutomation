@@ -55,8 +55,9 @@ public class CohortTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME, "Study");
         importStudyFromZip(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
         clickLinkWithText(PROJECT_NAME);
-
+        addWebPart("Specimens");
         // Check all cohorts after initial import.
+
         clickLinkWithText("Blood");
         assertTextPresent("Count: 25"); // 5 participants x 5 visits
         assertTextPresent("Positive", 10);
@@ -170,7 +171,7 @@ public class CohortTest extends BaseSeleniumWebTest
 
         // Check that switching visit order changes cohort.
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Change Visit Order");
         checkCheckbox("explicitChronologicalOrder");
@@ -200,12 +201,12 @@ public class CohortTest extends BaseSeleniumWebTest
 
         // Check that deleting a vistit changes the cohort.
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("edit", 4); // Visit 4
         clickNavButton("Delete visit");
         clickNavButton("Delete");
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         selenium.assignId(Locator.xpath(XPATH_COHORT_ASSIGNMENT_TABLE).toString(), COHORT_TABLE);
         assertTableCellTextEquals(COHORT_TABLE, 4, 1, "Negative"); // Infected4
@@ -230,6 +231,7 @@ public class CohortTest extends BaseSeleniumWebTest
 
         // Check that participant view respects filter.
         clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("2 datasets");
         clickLinkWithText("Test Results");
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
         clickLinkWithText("Infected1");
@@ -245,7 +247,7 @@ public class CohortTest extends BaseSeleniumWebTest
         // Check basic cohorts
         log("Check basic cohort features.");
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Manage Study");
+        clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         clickRadioButtonById("simpleCohorts");
         selenium.getConfirmation();
