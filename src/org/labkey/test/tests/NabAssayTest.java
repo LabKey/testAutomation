@@ -106,7 +106,6 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         log("Testing NAb Assay Designer");
 
-
         if (!CONTINUE)
         {
             // set up a scripting engine to run a java transform script
@@ -370,6 +369,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             // create user with read permissions to study and dataset, but no permissions to source assay
             clickLinkWithText(TEST_ASSAY_PRJ_NAB);
             clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
+            pushLocation();  // Save our location because impersonatied user won't have permission to project
             enterPermissionsUI();
             createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER);
             addUserToProjGroup(TEST_ASSAY_USR_NAB_READER, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER);
@@ -378,7 +378,8 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // view dataset, click [assay] link, see assay details in nabassay container
             impersonate(TEST_ASSAY_USR_NAB_READER);
-            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            popLocation();
+            assertTextPresent(TEST_ASSAY_PRJ_NAB);
             assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to nabassay container
             clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
             clickLinkWithText("Study Navigator");
