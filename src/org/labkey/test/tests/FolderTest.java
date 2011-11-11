@@ -25,7 +25,7 @@ import org.labkey.test.util.ExtHelper;
  */
 public class FolderTest extends BaseSeleniumWebTest
 {
-    private static final String PROJECT_NAME = "FolderTestProject";
+    private static final String PROJECT_NAME = "FolderTest#Project";
     private static final String WIKITEST_NAME = "WikiTestFolderCreate";
     private static final String FOLDER_CREATION_FILE = "folderTest.html";
     private static final String PROJECT_FOLDER_XPATH = "//li[@class='x-tree-node' and ./div/a/span[text()='"+PROJECT_NAME+"']]";
@@ -152,9 +152,9 @@ public class FolderTest extends BaseSeleniumWebTest
         log("Illegal multiple folder move: non-siblings");
         expandFolderNode("A");
         expandFolderNode("B");
-        selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[A]/[AA]', false)");
+        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[A]/[AA]', false)");
         sleep(100);
-        selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[B]/[BA]', true)");
+        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[B]/[BA]', true)");
         sleep(500);
         moveFolder("[AA]", "[C]", false, true);
         waitForExtMaskToDisappear(); // shouldn't be a confirmation dialog.
@@ -162,11 +162,11 @@ public class FolderTest extends BaseSeleniumWebTest
         log("Move multiple folders");
         sleep(500); // wait for failed move ghost to disappear.
         expandFolderNode("AB");
-        selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[D]', false)");
+        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[D]', false)");
         sleep(100);
-        selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[E]', true)");
+        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[E]', true)");
         sleep(100);
-        selenium.getEval("selenium.selectFolderManagementItem('FolderTestProject/[F]', true)");
+        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[F]', true)");
         sleep(500);
         moveFolder("[D]", "[AB]", true, true);
         sleep(500);
