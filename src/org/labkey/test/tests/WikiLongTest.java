@@ -383,6 +383,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickNavButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
+        pushLocation();
         assertTextPresent(WIKI_PAGE2_TITLE);
         clickTab("Wiki");
         assertTextNotPresent("copy pages");
@@ -393,8 +394,10 @@ public class WikiLongTest extends BaseSeleniumWebTest
         removePermission("User", "Reader");
         clickNavButton("Save and Finish");
         impersonate(USER1);
-        clickLinkWithText(PROJECT2_NAME);
-        assertTextNotPresent(WIKI_PAGE2_TITLE);
+        assertTextNotPresent(PROJECT2_NAME);     // Project should not be visible
+        popLocation();
+        assertTextPresent("User does not have permission to perform this operation");  // Not authorized
+        goToHome();
         stopImpersonating();
 
         log("Check if readers can read from other projects");
@@ -664,8 +667,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
     protected void doCleanup()
     {
         deleteUser(USER1);
+        try {deleteProject(PROJECT2_NAME); } catch (Throwable t) {}  // References TOC in PROJECT_NAME, so delete first
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT2_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT3_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT4_NAME); } catch (Throwable t) {}
     }

@@ -1177,7 +1177,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
                 catch (Exception t)
                 {
-
                     System.out.println("Unable to dump failure information");
                     t.printStackTrace();
                 }
