@@ -99,7 +99,6 @@ public enum TestSet
         UserTest.class,
         IssuesTest.class,
         NabOldTest.class,
-        CaBigTest.class,
         TimelineTest.class,
         ExternalSchemaTest.class,
         MenuBarTest.class,

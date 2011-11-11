@@ -23,6 +23,7 @@ import org.labkey.test.util.ExtHelper;
  * User: tamram
  * Date: May 15, 2006
  */
+// caBIG module is not installed by default any more, so this test isn't run
 public class CaBigTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "CaBigVerifyProject";
