@@ -94,6 +94,7 @@ public class GroupTest extends BaseSeleniumWebTest
         clickLinkWithText("Permissions");
         waitForPageToLoad();
 
+        waitForElement(Locator.id("$add$org.labkey.api.security.roles.EditorRole"), defaultWaitForPage);
         ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.EditorRole", COMPOUND_GROUP);
         clickButton("Save and Finish");
         assertUserCanSeeFolder(TEST_USERS_FOR_GROUP[0], getProjectName());
@@ -146,7 +147,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
         //second page of the wizard
         click(Locator.xpath("//label[contains(text(), 'Copy From Existing Project')]/../input"));
-        ExtHelper.clickExt4DropDownMenu(this, Locator.name("targetProject"), getProjectName());
+        ExtHelper.clickExt4DropDownMenu(this, Locator.xpath("//div[@id='targetProject-bodyEl']/input"), getProjectName());
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
         waitForPageToLoad();
 
