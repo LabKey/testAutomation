@@ -564,7 +564,6 @@ public class StudyTest extends StudyBaseTest
             clickLinkWithText("Manage Security");
             selectOptionByText("securityString", "Basic security with editable datasets");
             waitForPageToLoad();
-            clickNavButton("Update");
 
             log("configure comments");
             clickLinkWithText(getStudyLabel());

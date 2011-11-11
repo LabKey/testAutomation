@@ -151,7 +151,7 @@ public class StudySecurityTest extends StudyBaseTest
         waitAndClickNavButton("Study Security");
 
         click(getRadioButtonLocator(groupName, setting));
-        clickNavButtonByIndex("Update", 1);
+        clickNavButton("Update");
 
         if (null != datasets && null != perm)
         {
@@ -237,7 +237,7 @@ public class StudySecurityTest extends StudyBaseTest
         click(getRadioButtonLocator(GROUP_EDITORS, GroupSetting.editAll));
         click(getRadioButtonLocator(GROUP_LIMITED, GroupSetting.perDataset));
         click(getRadioButtonLocator(GROUP_NONE, GroupSetting.none));
-        clickNavButtonByIndex("Update", 1);
+        clickNavButton("Update");
 
         //grant limited rights to read a couple of datasets
         selectOptionByText("dataset.1", "Read");
