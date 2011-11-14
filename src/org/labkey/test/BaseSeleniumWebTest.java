@@ -277,6 +277,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return contents.toString();
     }
 
+    public void copyFile(String original, String copy)
+    {
+        copyFile(new File(original), new File(copy));
+    }
+
     public void copyFile(File original, File copy)
     {
         InputStream fis = null;
