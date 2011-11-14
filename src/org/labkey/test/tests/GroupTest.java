@@ -29,7 +29,7 @@ import org.labkey.test.util.ExtHelper;
 public class GroupTest extends BaseSeleniumWebTest
 {
 
-    protected static final String[] TEST_USERS_FOR_GROUP = {"user1@group1.com", "user2@group1.com", "user3@group2.com"};
+    protected static final String[] TEST_USERS_FOR_GROUP = {"user1@group1.group.test", "user2@group1.group.test", "user3@group2.group.test"};
     protected static final String SIMPLE_GROUP = "group1";
     protected static final String COMPOUND_GROUP = "group2";
     protected static final String BAD_GROUP = "group3";
