@@ -140,7 +140,8 @@ public class StudyRedesignTest extends StudyBaseTest
 
         log("Verify modify dataset");
         click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
-        setFormElement(Locator.name("category"), NEW_CATEGORY);
+        ExtHelper.waitForExtDialog(this, EDITED_DATASET);
+        setFormElement(Locator.xpath("//label[text() = 'Category']/..//input"), NEW_CATEGORY);
         setFormElement(Locator.name("description"), NEW_DESCRIPTION);
         ExtHelper.clickExtButton(this, EDITED_DATASET, "Save", 0);
         waitForText(NEW_CATEGORY);
