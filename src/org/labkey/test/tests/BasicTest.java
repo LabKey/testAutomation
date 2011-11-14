@@ -117,7 +117,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         log("Test browser version");
         String source = getHtmlSource();
-        assertTrue("The LabKey test suite requires Firefox 2.0 - 7.0", source.contains("Firefox/7.") || source.contains("Firefox/6.") || source.contains("Firefox/5.") || source.contains("Firefox/4.") || source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0") || source.contains("MSIE 8") || source.contains("MSIE 7"));
+        assertTrue("The LabKey test suite requires Firefox 2.0 - 8.0", source.contains("Firefox/8.") || source.contains("Firefox/7.") || source.contains("Firefox/6.") || source.contains("Firefox/5.") || source.contains("Firefox/4.") || source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0") || source.contains("MSIE 8") || source.contains("MSIE 7"));
         String version = "unknown";
         if(source.indexOf("Firefox") != -1 )
         {
