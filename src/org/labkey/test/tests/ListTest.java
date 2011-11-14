@@ -39,8 +39,8 @@ import java.util.Arrays;
  */
 public class ListTest extends BaseSeleniumWebTest
 {
-    protected final static String PROJECT_NAME = "ListVerifyProject";
-    private final static String PROJECT_NAME2 = "OtherListVerifyProject";
+    protected final static String PROJECT_NAME = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private final static String PROJECT_NAME2 = "OtherListVerifyProject" + INJECT_CHARS_2;
     protected final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     private final static String LIST_KEY_NAME = "Key";
@@ -918,7 +918,7 @@ public class ListTest extends BaseSeleniumWebTest
             createList("B", Bcolumns, Bdata);
             createList("A", Acolumns, Adata);
 
-            beginAt("/query/" + PROJECT_NAME + "/executeQuery.view?schemaName=lists&query.queryName=A");
+            beginAt("/query/" + EscapeUtil.encode(PROJECT_NAME) + "/executeQuery.view?schemaName=lists&query.queryName=A");
 
             pushLocation();
             {
@@ -950,7 +950,7 @@ public class ListTest extends BaseSeleniumWebTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL().contains("/junit/" + PROJECT_NAME + "/echoForm.view"));
+            assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_NAME) + "/echoForm.view"));
         }        
         popLocation();
     }
