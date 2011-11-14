@@ -4469,11 +4469,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         goToHome();
         clickLinkWithText("Site Groups");
+        waitForPageToLoad();
         if(!selectGroup(groupName))
+        {
+            log("failed to select group");
             if(failIfNotFound)
                 fail("Group not found");
             else
                 return;
+        }
         deleteAllUsersFromGroup();
 
         Locator l = Locator.xpath("//td/a/span[text()='Delete Empty Group']");
