@@ -4460,7 +4460,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         goToHome();
         clickLinkWithText("Site Groups");
-        waitForPageToLoad();
         if(!selectGroup(groupName))
         {
             log("failed to select group");
