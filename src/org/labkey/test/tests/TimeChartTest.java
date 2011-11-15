@@ -358,7 +358,7 @@ public class TimeChartTest extends StudyBaseTest
         checkRadioButton("number_of_charts", "per_subject");
         setFormElement("chart-title-textfield", CHART_TITLE);
         fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur);
-        assertTextPresent(CHART_TITLE, 5);
+        waitForText(CHART_TITLE, 5, WAIT_FOR_JAVASCRIPT);
         ExtHelper.prevClickFileBrowserFileCheckbox(this, "249320127"); // re-select participant
         waitForText(CHART_TITLE+": 249320127", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(CHART_TITLE, 6);
