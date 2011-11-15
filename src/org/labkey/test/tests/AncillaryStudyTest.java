@@ -297,10 +297,10 @@ public class AncillaryStudyTest extends StudyBaseTest
         setFormElement("Label", "Extra " + STUDY_NAME);
         setFormElement("Description", "Extra " + STUDY_DESCRIPTION);
         clickLinkWithText("Attach a file", false);
-        waitForElement(Locator.xpath("//div[@id='filePickers']//input[@type='text']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//div[@id='filePickers']//input[@type='text']"), PROTOCOL_DOC2.toString());
+        waitForElement(Locator.xpath("//div[@id='filePickers']//input[@type='file']"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.xpath("//div[@id='filePickers']//input[@type='file']"), PROTOCOL_DOC2.toString());
         clickNavButton("Submit");
-        assertElementPresent(Locator.xpath("//a[contains(@href, " + Locator.xq(PROTOCOL_DOC.getName()) + ") and contains(string(), 'Study Protocol Document')]"));
+        assertLinkPresentWithText(PROTOCOL_DOC.getName());
         assertLinkPresentWithText(PROTOCOL_DOC2.getName());
         assertTextPresent("Protocol documents:");
         assertTextPresent("Extra " + STUDY_NAME);
