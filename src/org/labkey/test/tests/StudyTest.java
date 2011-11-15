@@ -190,7 +190,7 @@ public class StudyTest extends StudyBaseTest
         Locator menuItem = Locator.menuItem("Participant Group from Grid");
         for (int i = 0; i < 10; i++)
         {
-            click(menu);
+            waitAndClick(menu);
             if (isElementPresent(menuItem))
                 break;
             else
