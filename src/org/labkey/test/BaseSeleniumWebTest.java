@@ -3680,15 +3680,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFormElement(Locator element, String text, boolean suppressValueLogging)
     {
-        try
-        {
-            selenium.type(element.toString(), text, suppressValueLogging);
-            fireEvent(element, SeleniumEvent.blur);
-        }
-        catch (SeleniumException e)
-        {
-             fail(e.getMessage() + "\nWarning: 'setFormElement()' is not supported for Combo Boxes in IE");
-        }
+        selenium.type(element.toString(), text, suppressValueLogging);
+        fireEvent(element, SeleniumEvent.blur);
     }
 
     public void setFormElement(String element, File file)
