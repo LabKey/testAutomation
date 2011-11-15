@@ -931,7 +931,6 @@ public class EHRStudyTest extends SimpleApiTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         goToModule("Study");
-        clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Dataset QC States");
 
         for(EHRQCState qcState : EHRQCState.values())
