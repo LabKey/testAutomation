@@ -163,7 +163,7 @@ public class StudyTest extends StudyBaseTest
 
         //nav trail check
         clickLinkContainingText("999320016");
-        assertTextPresent("Study Overview >  Dataset: DEM-1: Demographics, All Visits >  ");
+        assertTextPresent("Dataset: DEM-1: Demographics, All Visits >  ");
         clickLinkContainingText("Dataset:");
 
         // verify warn on no selection

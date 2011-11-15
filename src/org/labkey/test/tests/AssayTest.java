@@ -493,7 +493,8 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("a");
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent("2000-01-01");
-        clickLinkWithText("Study Overview");
+        clickTab("Overview");
+        clickLinkWithText("Study Navigator");
 
         log("Test participant counts and row counts in study overview");
         String[] row2 = new String[]{TEST_ASSAY, "7", "1", "1", "1", "1", "1", "2"};
