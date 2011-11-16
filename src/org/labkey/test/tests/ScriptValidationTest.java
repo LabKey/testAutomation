@@ -95,17 +95,23 @@ public class ScriptValidationTest extends SimpleModuleTest
     {
         JSONHelper json = new JSONHelper(this);
 
+        /* The following catch CommandExceptions in order to be able to access specific properties. */
+
         try
         {
+            /* The following exception is logged to the server as it is meant to simulate an unexpected error in
+             * script validation */
             log("** Test errors: throw Error()'");
+            checkErrors();
             insertColors(Arrays.asList(new ColorRecord("ShouldError", "not a hex value")));
             fail("Should throw an exception");
         }
-        catch (Exception e)
+        catch (CommandException e)
         {
             assertTrue("Expected \"color value must start with '#'\", got: \"" + e.getMessage() + "\"",
                     e.getMessage().contains("color value must start with '#'"));
         }
+        checkExpectedErrors(1);
 
         try
         {
