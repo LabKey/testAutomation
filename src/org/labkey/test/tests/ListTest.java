@@ -40,7 +40,7 @@ import java.util.Arrays;
 public class ListTest extends BaseSeleniumWebTest
 {
     protected final static String PROJECT_NAME = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    private final static String PROJECT_NAME2 = "OtherListVerifyProject" + INJECT_CHARS_2;
+    private final static String PROJECT_NAME2 = "OtherListVerifyProject";
     protected final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     private final static String LIST_KEY_NAME = "Key";

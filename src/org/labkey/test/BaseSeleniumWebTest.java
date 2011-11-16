@@ -107,13 +107,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "><&/% 1";
-    //#,? or %
-    //Issue 12774: Need to filter folder names .  Add the +,=,<>,[] back in when this is fixed (or remove it entirely, if that's what we decide)
-    //and also =,[,],"
-    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$^&()_{}|:',<.>-="; // "~!@$^&*()_+{}|:\"<>-=[]\',.'";
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
-    public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>;P";
+    public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
@@ -4502,7 +4499,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         //if(not at site groups page)
 //        if(!getURL().toString().contains("groups.view"))
         goToHome();
-        clickLinkWithText("Site Groups");
+            clickLinkWithText("Site Groups");
 
         Locator l = Locator.xpath("//div[text()='" + groupName + "']");
         if(!isElementPresent(l))
