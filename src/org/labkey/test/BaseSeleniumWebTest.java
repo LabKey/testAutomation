@@ -4463,6 +4463,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Attempting to delete group: " + groupName);
         goToHome();
         clickLinkWithText("Site Groups");
+        waitForText("Site Administrators");
         if(!selectGroup(groupName))
         {
             log("failed to select group");
