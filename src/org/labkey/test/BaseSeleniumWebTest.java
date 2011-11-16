@@ -2881,7 +2881,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public int countLinksWithText(String text)
     {
-        return selenium.getXpathCount("//a[text() = '"+text+"']").intValue();
+        return selenium.getXpathCount("//a[text() = "+Locator.xq(text)+"]").intValue();
     }
 
     public void assertLinkPresentWithTextCount(String text, int count)
@@ -3628,7 +3628,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
         waitForElement(l, waitFor);
-        sleep(500);
         clickAndWait(l, waitForPageToLoad);
     }
 
