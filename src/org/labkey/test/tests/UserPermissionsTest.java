@@ -204,6 +204,8 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         projectImpersonate(GAMMA_READER_USER);
         clickLinkWithText(PERM_PROJECT_NAME);
         assertLinkNotPresentWithText(DENIED_SUB_FOLDER_NAME);
+        // Ensure only one project visible during project impersonation. Regression test 13346
+        assertElementPresent(Locator.xpath("//table[@class='labkey-expandable-nav' and .//a[text()='Projects']]//td[@class='labkey-nav-tree-text']"), 1);
         assertLinkPresentWithText(GAMMA_SUB_FOLDER_NAME);
 
         //Reset ourselves to the global user so we can do cleanup
