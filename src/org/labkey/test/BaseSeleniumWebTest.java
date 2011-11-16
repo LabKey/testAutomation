@@ -107,11 +107,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "><&/% 1";
-    //public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$^&*()_+{}|:\"<>-=[]\',.#?%"; // % no worky
-    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$^&*()_+{}|:\"<>-=[]\',.#?";
+    //#,? or %
+    //Issue 12774: Need to filter folder names .  Add the +,=,<>,[] back in when this is fixed (or remove it entirely, if that's what we decide)
+    //and also =,[,],"
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$^&()_{}|:',<.>-="; // "~!@$^&*()_+{}|:\"<>-=[]\',.'";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
-    public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
+    public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>;P";
 
     public final static String FIREFOX_BROWSER = "*firefox";
     private final static String FIREFOX_UPLOAD_BROWSER = "*chrome";
@@ -1790,21 +1792,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         _createdProjects.add(projectName);
     }
 
-    public void startcreateGlobalPermissionsGroup(String groupName)
+    public void startCreateGlobalPermissionsGroup(String groupName)
     {
 
         goToHome();
         clickLinkWithText("Site Groups");
-        waitForPageToLoad();
+        Locator l = Locator.id("newGroupFormSite$input");
+        waitForElement(l, defaultWaitForPage);
 
-        setFormElement("newGroupFormSite$input",groupName);
+        setFormElement(l,groupName);
         clickButton("Create New Group", 0);
         sleep(500);
 
     }
     public void createGlobalPermissionsGroup(String groupName, String... users)
     {
-        startcreateGlobalPermissionsGroup(groupName);
+        startCreateGlobalPermissionsGroup(groupName);
         StringBuilder namesList = new StringBuilder();
         for(String member : users)
         {
@@ -2878,7 +2881,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public int countLinksWithText(String text)
     {
-        return selenium.getXpathCount("//a[text() = "+Locator.xq(text)+"]").intValue();
+        return selenium.getXpathCount("//a[text() = '"+text+"']").intValue();
     }
 
     public void assertLinkPresentWithTextCount(String text, int count)
@@ -3501,7 +3504,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return null;
     }
 
-    private Locator.XPathLocator getButtonLocatorContainingText(String text)
+    protected Locator.XPathLocator getButtonLocatorContainingText(String text)
     {
         // check for normal button:
         Locator.XPathLocator locator = Locator.buttonContainingText(text);
@@ -4458,6 +4461,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void deleteGroup(String groupName, boolean failIfNotFound)
     {
+        log("Attempting to delete group: " + groupName);
         goToHome();
         clickLinkWithText("Site Groups");
         if(!selectGroup(groupName))
@@ -4498,12 +4502,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         //if(not at site groups page)
 //        if(!getURL().toString().contains("groups.view"))
         goToHome();
-            clickLinkWithText("Site Groups");
+        clickLinkWithText("Site Groups");
 
         Locator l = Locator.xpath("//div[text()='" + groupName + "']");
         if(!isElementPresent(l))
             return false;
         click(l);
+        waitForExtMask();
         return true;
 
     }

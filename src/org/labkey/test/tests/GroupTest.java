@@ -86,7 +86,10 @@ public class GroupTest extends BaseSeleniumWebTest
         createGlobalPermissionsGroup(SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
         createGlobalPermissionsGroup(COMPOUND_GROUP, SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[2]);
 
-        log("TODO");
+
+        verifyExportFunction();
+
+        verifyRedundantUserWarnings();
 
         //add read permissions to group2
         goToHome();
@@ -112,9 +115,28 @@ public class GroupTest extends BaseSeleniumWebTest
 
     }
 
+    //should be at manage group page of COMPOUND_GROUP already
+    //verify attempting add a user and a group containing that user to another group results in a warning
+    private void verifyRedundantUserWarnings()
+    {
+        setFormElement("names", TEST_USERS_FOR_GROUP[0]); //this user is in group1 and so is already in group 2
+        clickButton("Update Group Membership");
+        assertTextPresent(TEST_USERS_FOR_GROUP[0] + "*", "* These group members already appear in other included member groups and can be safely removed.");
+//        expect warning
+    }
+
+    private void verifyExportFunction()
+    {
+        selectGroup(COMPOUND_GROUP);
+        clickLinkWithText("manage group");
+        //Selenium can't handle file exports, so there's nothing to be done here.
+        assertElementPresent(getButtonLocatorContainingText("Export All to Excel"));
+
+    }
+
     private void verifyCantAddSystemGroupToUserGroup()
     {
-        startcreateGlobalPermissionsGroup(BAD_GROUP);
+        startCreateGlobalPermissionsGroup(BAD_GROUP);
         setFormElement("Users_dropdownMenu", "All Site Users");
 
         ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//input[@id='Users_dropdownMenu']/../img"), "All Site Users");
