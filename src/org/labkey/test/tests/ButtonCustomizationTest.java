@@ -172,12 +172,12 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         ExtHelper.clickExtTab(this, "XML Metadata");
         setQueryEditorValue("metadataText", getMetadataXML(true));
         ExtHelper.clickExtTab(this, "Source");
-        clickNavButton("Save", 0);
+        clickNavButtonByIndex("Save", 1, 0);        // 0: source/save 1: metadata/save
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         clickNavButton("Execute Query", 0);
         waitForText("Seattle", WAIT_FOR_JAVASCRIPT);
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
-        ExtHelper.clickExtTab(this, "Source");
+//        ExtHelper.clickExtTab(this, "Source");
         clickNavButton("Save & Finish");
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonPresent("Insert New");
