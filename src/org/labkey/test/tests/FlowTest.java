@@ -252,7 +252,6 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for more FCS files to be imported");
 
-        waitForPageToLoad();
         waitAndClick(Locator.fileTreeByName("6color")); // try to avoid intermittent bug in file browser
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.waitForImportDataEnabled(this);
