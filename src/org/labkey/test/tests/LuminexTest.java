@@ -240,7 +240,7 @@ public class LuminexTest extends AbstractQCAssayTest
             runUploadAndCopyTest();
             runJavaTransformTest();
             runRTransformTest();
-            runMultipleCurveTest();
+            runMultipleCurveTest();  //TODO  remove when not failing
             runWellExclusionTest();
             runEC50Test();
             runGuideSetTest();
@@ -1267,6 +1267,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //verify Levey-Jennings report R plots are displayed without errors
         verifyLeveyJenningsRplots();
+        verifyQCAnalysis();
 
         // remove a run from the current guide set
         setUpGuideSet("GS Analyte (2)");
@@ -1298,6 +1299,49 @@ public class LuminexTest extends AbstractQCAssayTest
         // test the y-axis scale
         applyLogYAxisScale();
         guideSetApiTest();
+    }
+
+    private void verifyQCAnalysis()
+    {
+        goToQCAnalysisPage();
+        verifyQCReport();
+    }
+
+    private void goToQCAnalysisPage()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(TEST_ASSAY_LUM);
+
+        String qcUrlInRuns = getQCLink();
+        clickLinkWithText("view results");
+        String qcUrlInResults = getQCLink();
+        //compare qc links to make sure they go to the same spot
+//        assertEquals(qcUrlInResults, qcUrlInRuns);  TODO:  should this be true?
+
+        clickLinkContainingText("view qc report");
+
+    }
+
+    private void verifyQCReport()
+    {
+        assertTextPresent(TEST_ASSAY_LUM + " QC Report");
+        DataRegionTable drt = new DataRegionTable("TestAssayLuminex AnalyteTitration", this);
+        String isotype = drt.getDataAsText(0, "Isotype");
+        if(isotype.length()==0)
+            isotype = "[None]";
+        String conjugate = drt.getDataAsText(0, "Conjugate");
+        if(conjugate.length()==0)
+            conjugate =  "[None]";
+        clickLinkWithText("graph",0);
+        waitForText(" - " + isotype + " " + conjugate);
+        assertTextPresent( "HIVIG Levey-Jennings Report");
+    }
+
+    private String getQCLink()
+    {
+        Locator l = Locator.tagContainingText("a", "view qc report");
+        assertElementPresent(l);
+        return getAttribute(l,  "href");
     }
 
     private void excludableWellsWithTransformTest()
