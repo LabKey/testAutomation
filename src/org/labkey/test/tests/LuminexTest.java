@@ -240,7 +240,7 @@ public class LuminexTest extends AbstractQCAssayTest
             runUploadAndCopyTest();
             runJavaTransformTest();
             runRTransformTest();
-            runMultipleCurveTest();  //TODO  remove when not failing
+            runMultipleCurveTest();
             runWellExclusionTest();
             runEC50Test();
             runGuideSetTest();
@@ -1315,9 +1315,6 @@ public class LuminexTest extends AbstractQCAssayTest
         String qcUrlInRuns = getQCLink();
         clickLinkWithText("view results");
         String qcUrlInResults = getQCLink();
-        //compare qc links to make sure they go to the same spot
-//        assertEquals(qcUrlInResults, qcUrlInRuns);  TODO:  should this be true?
-
         clickLinkContainingText("view qc report");
 
     }
