@@ -375,7 +375,7 @@ public class ListHelper
             // click the combobox trigger image
             test.click(Locator.xpath("//input[@name='ff_type" + i + "']/../img"));
             // click lookup checkbox
-            ExtHelper.waitForExtDialog(test, "Choose field type:", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            ExtHelper.waitForExtDialog(test, "Choose Field Type", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : col.getType().toString()) + "']/../input[@name = 'rangeURI']"));
 
             if (lookup != null)
