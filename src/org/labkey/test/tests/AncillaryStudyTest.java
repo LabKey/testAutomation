@@ -86,7 +86,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickTab("Manage");
 
         log("Create Special Emphasis Study.");
-        clickNavButton("Create New Study", 0);
+        clickNavButton("Create Ancillary Study", 0);
         
         //Wizard page 1 - location
         ExtHelper.waitForExtDialog(this, "Create Ancillary Study");

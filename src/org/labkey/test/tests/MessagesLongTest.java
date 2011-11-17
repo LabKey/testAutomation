@@ -287,8 +287,9 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "New");
         setFormElement("emailList", USER2);
-        clickNavButton("Submit");
-        assertTextPresent("Title must not be blank");
+        clickButtonContainingText("Submit", "Title must not be blank");
+        clickButtonContainingText("OK", 0);
+        waitForExtMaskToDisappear();
         setFormElement("title", MSG3_TITLE);
         submit();
         assertTextPresent("This user doesn't have permission");
