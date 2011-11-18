@@ -1824,7 +1824,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickExtTabContainingText(this, "Groups for project");
+        ExtHelper.clickExtTabContainingText(this, "Project Groups");
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create New Group", 0);
         sleep(500);
@@ -1838,7 +1838,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickExtTabContainingText(this, "Groups for project");
+        ExtHelper.clickExtTabContainingText(this, "Project Groups");
         createPermissionGroupFromGroupScreen(groupName, memberNames);
         enterPermissionsUI();
     }
@@ -4554,7 +4554,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Groups for project " + projectName);
+        ExtHelper.clickExtTab(this, "Project Groups");
         boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         exitPermissionsUI();
         return ret;
@@ -4579,7 +4579,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Groups for project " + projectName);
+        ExtHelper.clickExtTab(this, "Project Groups");
         click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
         click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
