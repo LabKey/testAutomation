@@ -33,7 +33,9 @@ public class FlowTest extends BaseFlowTest
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
     private static final String JOIN_FIELD_LINK_TEXT = "Define sample description join fields";
-        String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
+    String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
+    private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
+    private static final String FCS_FILE_2 = "L04-060120-QUV-JS";
 
     private void clickButtonWithText(String text)
     {
@@ -98,22 +100,22 @@ public class FlowTest extends BaseFlowTest
         waitForPageToLoad();
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.waitForImportDataEnabled(this);
-        waitForElement(ExtHelper.locateBrowserFileCheckbox("L04-060120-QUV-JS"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(ExtHelper.locateBrowserFileCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
         assertTextPresent("The following directories within '8color'");
-        assertTextPresent("L02-060120-QUV-JS (25 fcs files)");
-        assertTextPresent("L04-060120-QUV-JS (14 fcs files)");
+        assertTextPresent(FCS_FILE_1 + " (25 fcs files)");
+        assertTextPresent(FCS_FILE_2 + " (14 fcs files)");
         clickNavButton("Cancel"); // go back to file-browser
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
         waitForPageToLoad();
         waitAndClick(Locator.fileTreeByName("8color"));
-        waitAndClick(Locator.fileTreeByName("L02-060120-QUV-JS"));
+        waitAndClick(Locator.fileTreeByName(FCS_FILE_1));
         waitForElement(ExtHelper.locateBrowserFileCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Current directory of 25 FCS Files");
-        assertTextPresent("The following directories within '8color" + File.separator + "L02-060120-QUV-JS'");
+        assertTextPresent("The following directories within '8color" + File.separator + FCS_FILE_1 + "'");
         assertTextPresent("Current Directory (25 fcs files)");
-        assertTextNotPresent("L04-060120-QUV-JS");
+        assertTextNotPresent(FCS_FILE_2);
         clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
         clickLinkWithText("Flow Dashboard");
@@ -128,7 +130,7 @@ public class FlowTest extends BaseFlowTest
         assertLinkNotPresentWithImage("/flagFCSFile.gif");
         pushLocation();
         clickLinkWithText("91761.fcs");
-        //assertTextPresent("L02-060120-QUV-JS"); // "experiment name" keyword
+        //assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickNavButton("edit");
         setFormElement("ff_name", "FlowTest New Name");
@@ -153,7 +155,7 @@ public class FlowTest extends BaseFlowTest
         submit();
 
         clickLinkWithText("Define compensation calculation from scratch");
-        selectOptionByText("selectedRunId", "L02-060120-QUV-JS");
+        selectOptionByText("selectedRunId", FCS_FILE_1);
         submit();
 
         selectOptionByText("identifier=positiveKeywordName[3]", "Comp");
@@ -244,8 +246,8 @@ public class FlowTest extends BaseFlowTest
 
         beginAt(urlAnalysis.getFile());
         clickLinkWithText("details");
-        clickLinkWithText("91918.fcs-L02-060120-QUV-JS");
-        assertTextPresent("91918.fcs-L02-060120-QUV-JS");
+        clickLinkWithText("91918.fcs-" + FCS_FILE_1);
+        assertTextPresent("91918.fcs-" + FCS_FILE_1);
 
 
         // Now, let's add another run:
@@ -255,10 +257,10 @@ public class FlowTest extends BaseFlowTest
         waitAndClick(Locator.fileTreeByName("6color")); // try to avoid intermittent bug in file browser
         waitAndClick(Locator.fileTreeByName("8color"));
         ExtHelper.waitForImportDataEnabled(this);
-        waitForElement(ExtHelper.locateBrowserFileCheckbox("L04-060120-QUV-JS"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(ExtHelper.locateBrowserFileCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
-        assertTextNotPresent("L02-060120-QUV-JS");
-        assertTextPresent("L04-060120-QUV-JS");
+        assertTextNotPresent(FCS_FILE_1);
+        assertTextPresent(FCS_FILE_2);
         clickNavButton("Import Selected Runs");
         waitForPipeline(containerPath);
 
@@ -272,7 +274,7 @@ public class FlowTest extends BaseFlowTest
         waitForPageToLoad();
 
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
-        selectOptionByText("ff_compensationMatrixOption", "Matrix: L02-060120-QUV-JS comp matrix");
+        selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
         waitForPageToLoad();
 
         checkCheckbox(".toggle");
@@ -367,9 +369,9 @@ public class FlowTest extends BaseFlowTest
         // UNDONE: assert background values are correctly calculated
 
         // check well details page for FCSFile has link to the sample
-        clickLinkWithText("91779.fcs-L02-060120-QUV-JS");
+        clickLinkWithText("91779.fcs-" + FCS_FILE_1);
         clickLinkWithText("91779.fcs");
-        assertLinkPresentWithText("L02-060120-QUV-JS-C01");
+        assertLinkPresentWithText(FCS_FILE_1 + "-C01");
     }
 
     public void copyAnalysisScriptTest()
@@ -501,7 +503,7 @@ public class FlowTest extends BaseFlowTest
 
         DataRegionTable table = new DataRegionTable("query", this, false);
         assertEquals(4, table.getDataRowCount());
-        assertEquals("91926.fcs-L02-060120-QUV-JS", table.getDataAsText(0, "Name"));
+        assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
     }
 
     private void deleteReport(String reportName)
