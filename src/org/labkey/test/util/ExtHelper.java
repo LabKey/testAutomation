@@ -241,9 +241,10 @@ public class ExtHelper
         if (path.startsWith("/"))
             path = path.substring(1);
         String[] parts = path.split("/");
+        test.sleep(500);
         for (int i = 0; i < parts.length; i++)
         {
-            if (i == parts.length - 1)
+            if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory 
             {
                 // select last item: click on tree node name
                 ExtHelper.clickFileBrowserFileCheckbox(test, parts[i]);

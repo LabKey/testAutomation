@@ -21,6 +21,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.ExperimentRunTable;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
 
@@ -241,10 +242,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     {
         _test.log("Start analysis of " + getDataPath());
         _test.clickNavButton("Process and Import Data");
-        String[] dirs = getDataPath().split("/");
-        _test.sleep(100);  // Workaround for lkwin03 // TODO: find a better solution
-        for (String dir : dirs)
-            _test.waitAndClick(Locator.fileTreeByName(dir));
+        ExtHelper.selectTreeItem(_test, getDataPath()+"/");
 
         clickActionButton();
 
