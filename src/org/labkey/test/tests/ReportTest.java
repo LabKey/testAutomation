@@ -394,6 +394,7 @@ public class ReportTest extends StudyBaseTest
                 fail("There was an error running the script");
         assertTextPresent(R_SCRIPT2_TEXT1);
         resaveReport();
+        ExtHelper.waitForExtDialog(this, "Save View");
 
         log("Test editing R scripts");
         signOut();
@@ -405,6 +406,7 @@ public class ReportTest extends StudyBaseTest
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 fail("There was an error running the script");
         resaveReport();
+        waitForPageToLoad();
 
         log("Check that edit worked");
         clickLinkWithText(getProjectName());
@@ -418,6 +420,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
         resaveReport();
+        waitForPageToLoad();
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
@@ -433,8 +436,6 @@ public class ReportTest extends StudyBaseTest
             setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
             ExtHelper.clickExtButton(this, "Save");
         }
-
-        sleep(2000);
     }
 
     private void resaveReport()
