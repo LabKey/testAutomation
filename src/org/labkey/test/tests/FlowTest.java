@@ -61,13 +61,13 @@ public class FlowTest extends BaseFlowTest
     }
 
     @Override
-    protected void init()
+    protected void init(boolean normalizationEnabled)
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
         RReportHelper.ensureRConfig(this);
 
-        super.init();
+        super.init(normalizationEnabled);
     }
 
     protected void setupQuery()
@@ -386,7 +386,7 @@ public class FlowTest extends BaseFlowTest
 
     protected void doTestSteps()
     {
-        init();
+        init(false);
         containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
         setupQuery();
 

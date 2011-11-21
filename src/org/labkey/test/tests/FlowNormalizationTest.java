@@ -29,19 +29,19 @@ import java.util.Collections;
 public class FlowNormalizationTest extends BaseFlowTest
 {
     @Override
-    protected void init()
+    protected void init(boolean normalizationEnabled)
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
         RReportHelper.ensureRConfig(this);
 
-        super.init();
+        super.init(normalizationEnabled);
     }
 
     @Override
     protected void doTestSteps() throws Exception
     {
-        init();
+        init(true);
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);

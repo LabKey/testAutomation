@@ -37,7 +37,7 @@ public class FlowImportTest extends BaseFlowTest
 
     protected void doTestSteps() throws Exception
     {
-        init();
+        init(false);
 
         // set pipeline root
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);

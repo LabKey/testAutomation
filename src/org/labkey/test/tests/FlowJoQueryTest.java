@@ -36,7 +36,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 {
     protected void doTestSteps() throws Exception
     {
-        init();
+        init(false);
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);

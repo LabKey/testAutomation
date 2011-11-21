@@ -97,7 +97,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         catch (Throwable t) {}
     }
 
-    protected void init()
+    protected void init(boolean normalizationEnabled)
     {
         beginAt("/admin/begin.view");
         clickLinkWithText("flow cytometry");
@@ -107,8 +107,20 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         assertTextPresent("Path does not exist");
         getPipelineWorkDirectory().mkdir();
         setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
+
+        if (normalizationEnabled)
+            checkCheckbox(Locator.id("normalizationEnabled"));
+        else
+            uncheckCheckbox(Locator.id("normalizationEnabled"));
+
         clickNavButton("update");
         assertTextNotPresent("Path does not exist");
+        if (normalizationEnabled)
+        {
+            assertTextNotPresent("The R script engine is not available.");
+            assertTextNotPresent("Please install the flowWorkspace R library");
+        }
+
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, getFolderName(), "Flow", null);
 
@@ -310,6 +322,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         if (isElementPresent(Locator.id("rEngineNormalization")))
         {
             log("Setting normalization options");
+            assertTextNotPresent("Normalization is current disabled");
             if (rEngineNormalization)
             {
                 checkCheckbox("rEngineNormalization");
