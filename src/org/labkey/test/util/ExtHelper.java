@@ -241,7 +241,7 @@ public class ExtHelper
         if (path.startsWith("/"))
             path = path.substring(1);
         String[] parts = path.split("/");
-        test.sleep(500);
+        test.sleep(1000);
         for (int i = 0; i < parts.length; i++)
         {
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory 
@@ -253,13 +253,14 @@ public class ExtHelper
             {
                 // expand tree node: click on expand/collapse icon
                 test.waitAndClick(Locator.fileTreeByName(parts[i]));
+                test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/"+path.substring(0, path.indexOf("/", i) + 1)+"']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             }
         }
     }
 
     public static void waitForImportDataEnabled(BaseSeleniumWebTest test)
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * test.WAIT_FOR_JAVASCRIPT);
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     /**
