@@ -17,6 +17,8 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 
 /**
  * User: jeckels
@@ -55,6 +57,11 @@ public class SampleSetTest extends BaseSeleniumWebTest
     protected void doCleanup()
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+    }
+
+    protected boolean isFileUploadTest()
+    {
+        return true;
     }
 
     @Override
@@ -207,6 +214,9 @@ public class SampleSetTest extends BaseSeleniumWebTest
         selectOptionByText("parentCol", "Parent");
         clickNavButton("Submit");
         assertTextPresent("SampleSetBVTChildA");
+
+        fileAttachmentTest();
+        clickLinkWithText("FolderChildrenSampleSet");
         clickLinkWithText("SampleSetBVTChildB");
 
         // Make sure that the parent got wired up
@@ -280,5 +290,57 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clearFilter("childMaterials", "Name");
         assertLinkNotPresentWithText("SampleSetBVT14");
         assertLinkPresentWithText("SampleSetBVTGrandchildA");
+    }
+
+    String experimentFilePath =  getLabKeyRoot() + PIPELINE_PATH + "/experiment.xar.xml";
+    private void fileAttachmentTest()
+    {
+        enableFileInput();
+
+        setFileAttachment(0, experimentFilePath);
+        setFileAttachment(1, getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx");
+        inserNewWithFileAttachmentTest();
+    }
+
+    private void inserNewWithFileAttachmentTest()
+    {
+        clickButton("Insert New");
+        setFormElement("quf_Name", "SampleSetInsertedManually");
+        setFileValue("quf_FileAttachment", experimentFilePath);
+        clickButton("Submit");
+        //a double upload causes the file to be appended with a count
+        assertTextPresent("experiment-1.xar.xml");
+    }
+
+    private void enableFileInput()
+    {
+        String inputFormID =   "name2-input";
+        String fileField = "FileAttachment";
+        clickButton("Edit Fields");
+        waitForText("Edit Fields ");
+        clickButton("Add Field", 0);
+        waitForElement(Locator.id(inputFormID), defaultWaitForPage);
+        setFormElement(inputFormID, fileField);
+        Locator l = Locator.xpath("//input[@id='" + inputFormID + "']/../../../td[8]/div/input");
+        setFormElement(l,  "File");
+        clickButton("Save");
+    }
+
+    private void setFileAttachment(int index, String fileName)
+    {
+        clickLinkWithText("edit", index);
+//        fileName = fileName.replace("\\", "/");
+        setFileValue("quf_FileAttachment",  fileName);
+        clickButton("Submit");
+
+        DataRegionTable drt = new DataRegionTable("Material", this);
+        String fileNameNoPath = null;
+
+        if(fileName.contains("/"))
+            fileNameNoPath = fileName.substring(fileName.lastIndexOf("/")+1);
+        else
+            fileNameNoPath = fileName;
+        assertEquals(fileNameNoPath, drt.getDataAsText(index, "File Attachment"));
+
     }
 }
