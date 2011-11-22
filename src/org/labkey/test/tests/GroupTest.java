@@ -51,11 +51,11 @@ public class GroupTest extends BaseSeleniumWebTest
         {
             deleteUser(user);
         }
-        deleteGroup(SIMPLE_GROUP, false);
-        deleteGroup(COMPOUND_GROUP, false);
-        deleteGroup(BAD_GROUP, false);
-        deleteProject(getProjectName());
-        deleteProject(getProject2Name());
+        try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}
+        try{deleteGroup(COMPOUND_GROUP);}catch(Throwable t){/*ignore*/}
+        try{deleteGroup(BAD_GROUP);}catch(Throwable t){/*ignore*/}
+        try{deleteProject(getProjectName());}catch(Throwable t){/*ignore*/}
+        try{deleteProject(getProject2Name());}catch(Throwable t){/*ignore*/}
     }
 
     protected void init()

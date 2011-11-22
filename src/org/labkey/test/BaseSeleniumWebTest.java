@@ -4455,24 +4455,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         deleteUser(userEmail, false);
     }
 
-    public void deleteGroup(String groupName, boolean failIfNotFound)
+    public void deleteGroup(String groupName)
     {
         log("Attempting to delete group: " + groupName);
-        goToHome();
-        clickLinkWithText("Site Groups");
-        waitForText("Site Administrators");
-        if(!selectGroup(groupName))
-        {
-            log("failed to select group");
-            if(failIfNotFound)
-                fail("Group not found");
-            else
-                return;
-        }
+        selectGroup(groupName);
         deleteAllUsersFromGroup();
 
-        Locator l = Locator.xpath("//td/a/span[text()='Delete Empty Group']");
-        click(l);
+        click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
+        waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()="+Locator.xq(groupName)+"]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void deleteAllUsersFromGroup()
@@ -4493,21 +4483,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         click(l);
     }
 
-    public boolean selectGroup(String groupName)
+    public void selectGroup(String groupName)
     {
-//        ensureAdminMode();
-        //if(not at site groups page)
-//        if(!getURL().toString().contains("groups.view"))
-        goToHome();
-            clickLinkWithText("Site Groups");
+        if(!isElementPresent(Locator.xpath("//li[contains(@class,'tab-strip-active')]//span[text()='Site Groups']")))
+            clickAdminMenuItem("Manage Site", "Site Groups");
 
-        Locator l = Locator.xpath("//div[text()='" + groupName + "']");
-        if(!isElementPresent(l))
-            return false;
-        click(l);
-        waitForExtMask();
-        return true;
-
+        waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
+        ExtHelper.waitForExtDialog(this, groupName + " Information");
     }
 
     public void deleteUser(String userEmail, boolean failIfNotFound)
