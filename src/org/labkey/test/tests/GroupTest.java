@@ -111,7 +111,9 @@ public class GroupTest extends BaseSeleniumWebTest
         clickButton("Save and Finish");
 
         createProjectCopyPerms();
-        verifyCantAddSystemGroupToUserGroup();
+
+        //TODO: Blocked: 13299: Various IllegalStateExceptions related to users/groups written to log file
+        //verifyCantAddSystemGroupToUserGroup();
 
     }
 
