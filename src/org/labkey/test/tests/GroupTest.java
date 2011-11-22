@@ -33,6 +33,9 @@ public class GroupTest extends BaseSeleniumWebTest
     protected static final String SIMPLE_GROUP = "group1";
     protected static final String COMPOUND_GROUP = "group2";
     protected static final String BAD_GROUP = "group3";
+    protected static final String WIKITEST_NAME = "GroupSecurityApiTest";
+    protected static final String GROUP_SECURITY_API_FILE = "groupSecurityTest.html";
+    protected static final String API_SITE_GROUP = "API Site Group";
 
     @Override
     protected String getProjectName()
@@ -54,6 +57,7 @@ public class GroupTest extends BaseSeleniumWebTest
         try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(COMPOUND_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(BAD_GROUP);}catch(Throwable t){/*ignore*/}
+        try{deleteGroup(API_SITE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteProject(getProjectName());}catch(Throwable t){/*ignore*/}
         try{deleteProject(getProject2Name());}catch(Throwable t){/*ignore*/}
     }
@@ -115,6 +119,8 @@ public class GroupTest extends BaseSeleniumWebTest
         //TODO: Blocked: 13299: Various IllegalStateExceptions related to users/groups written to log file
         //verifyCantAddSystemGroupToUserGroup();
 
+        //TODO: Blocked: 13299: Various IllegalStateExceptions related to users/groups written to log file
+        //groupSecurityApiTest(); // todo: talk to Li about where to put this call in the test
     }
 
     //should be at manage group page of COMPOUND_GROUP already
@@ -197,5 +203,25 @@ public class GroupTest extends BaseSeleniumWebTest
         impersonate(user);
         assertLinkPresentWithText(folder);
         stopImpersonating();
+    }
+
+    protected void groupSecurityApiTest()
+    {
+        // Initialize the Wiki
+        clickLinkWithText(getProjectName());
+        addWebPart("Wiki");
+
+        createNewWikiPage();
+        setFormElement("name", WIKITEST_NAME);
+        setFormElement("title", WIKITEST_NAME);
+        setWikiBody("Placeholder text.");
+        saveWikiPage();
+
+        setSourceFromFile(GROUP_SECURITY_API_FILE, WIKITEST_NAME);
+
+        // Run the Test Script
+        clickButton("Start Test", 0);
+        waitForText("Done!", defaultWaitForPage);
+        assertTextNotPresent("Error");
     }
 }

@@ -1,0 +1,222 @@
+<div id="start-test"></div>
+<div id="log-info"></div>
+<script type="text/javascript">
+
+    var logHtml = "";
+    var groups = [{name: "API Group 1"}, {name: "API Group 2"}, {name: "API Site Group"}];
+
+    function step(stepIndex){
+        switch(stepIndex)
+        {
+            case 1:
+                // create first project group
+                createGroup(0, LABKEY.container.path, stepIndex+1);
+                break;
+            case 2:
+                // create second project group
+                createGroup(1, LABKEY.container.path, stepIndex+1);
+                break;
+            case 3:
+                // create site group
+                createGroup(2, "/", stepIndex+1);
+                break;
+            case 4:
+                // add members to project group : other project group, site group, and user
+                addGroupMembers(groups[0], [groups[1].id, groups[2].id, LABKEY.Security.currentUser.id], LABKEY.container.path, false, stepIndex+1);
+                break;
+            case 5:
+                // test adding project group to site group (expect to fail)
+                addGroupMembers(groups[2], [groups[1].id], "/", true, stepIndex+1);
+                break;
+            case 6:
+                // test adding group to self (expect to fail)
+                addGroupMembers(groups[0], [groups[0].id], LABKEY.container.path, true, stepIndex+1);
+                break;
+            case 7:
+                // test adding recursive/circular group membership (expect to fail)
+                addGroupMembers(groups[1], [groups[0].id], LABKEY.container.path, true, stepIndex+1);
+                break;
+            case 8:
+                // test adding sytem group to project group (expect to fail)
+                addGroupMembers(groups[0], [LABKEY.Security.systemGroups.developers], LABKEY.container.path, true, stepIndex+1);
+                break;
+            case 9:
+                // test adding members to Users system group (expect to fail)
+                addGroupMembers({name: "Users", id: LABKEY.Security.systemGroups.users}, [groups[2].id], "/", true, stepIndex+1);
+                break;
+            case 10:
+                // test adding members to Guests system group (expect to fail)
+                addGroupMembers({name: "Guests", id: LABKEY.Security.systemGroups.guests}, [LABKEY.Security.currentUser.id], "/", true, stepIndex+1);
+                break;
+            case 11:
+                // test adding site group to Site Admin system group (expect to fail)
+                addGroupMembers({name: "Administrators", id: LABKEY.Security.systemGroups.administrators}, [groups[2].id], "/", true, stepIndex+1);
+                break;
+            case 12:
+                renameGroup(groups[1], stepIndex+1);
+                break;
+            case 13:
+                removeGroupMembers(groups[0], [groups[1].id, groups[2].id, LABKEY.Security.currentUser.id], stepIndex+1);
+                break;
+            case 14:
+                deleteGroup(groups[0], LABKEY.container.path, stepIndex+1);
+                break;
+            case 15:
+                deleteGroup(groups[1], LABKEY.container.path, stepIndex+1);
+                break;
+            case 16:
+                deleteGroup(groups[2], "/", stepIndex+1);
+                break;
+            case 17:
+                updateLog("Done!", true);
+                break;
+            default:
+                updateLog("Error : unknown step number", true);
+        }
+    }
+
+    function createGroup(groupIndex, containerPath, nextStepIndex){
+        updateLog("Creating new group : " + groups[groupIndex].name + "...", true);
+        LABKEY.Security.createGroup({
+            groupName: groups[groupIndex].name,
+            containerPath: containerPath,
+            success: function(data){
+                if (groups[groupIndex].name != data.name)
+                {
+                    updateLog("...Error : expected group name of " + groups[groupIndex].name, false);
+                }
+                else
+                {
+                    groups[groupIndex].id = data.id;
+                    updateLog("...Group successfully created : " + groups[groupIndex].name, false);
+                    step(nextStepIndex);
+                }
+            }
+        });
+    }
+
+    function renameGroup(group, nextStepIndex){
+        updateLog("Renaming group : " + group.name + "...", true);
+        LABKEY.Security.renameGroup({
+            groupId: group.id,
+            newName: group.name + " Renamed",
+            success: function(data){
+                if (group.id != data.renamed || group.name != data.oldName || group.name + " Renamed" != data.newName)
+                {
+                    updateLog("...Error : unexpected group rename property", false);
+                }
+                else
+                {
+                    group.name = data.newName;
+                    updateLog("...Group successfully renamed to " + group.name, false);
+                    step(nextStepIndex);
+                }
+            }
+        });
+    }
+
+    function deleteGroup(group, containerPath, nextStepIndex){
+        updateLog("Deleting group : " + group.name + "...", true);
+        LABKEY.Security.deleteGroup({
+            groupId: group.id,
+            containerPath: containerPath,
+            success: function(data){
+                if (group.id != data.deleted)
+                {
+                    updateLog("...Error : expected group id of " + group.id, false);
+                }
+                else
+                {
+                    updateLog("...Group successfully deleted : " + group.name, false);
+                    step(nextStepIndex);
+                }
+            }
+        });
+    }
+
+    function addGroupMembers(group, membersArr, containerPath, failureExpected, nextStepIndex){
+        updateLog("Adding " + membersArr.length + " group members to " + group.name + (failureExpected ? " (failure expected)..." : "..."), true);
+        LABKEY.Security.addGroupMembers({
+            groupId: group.id,
+            principalIds: membersArr,
+            containerPath: containerPath,
+            success: function(data){
+                // check that all of the ids were added
+                var success = true;
+                for (var i = 0; i < membersArr.length; i++)
+                {
+                    if (data.added.indexOf(membersArr[i]) == -1)
+                    {
+                        updateLog("...Error : principal not added to group " + group.name, false);
+                        success = false;
+                        break;
+                    }
+                }
+
+                if (success)
+                {
+                    updateLog("...Members successfully added to " + group.name, false);
+                    step(nextStepIndex);
+                }
+            },
+            failure: function(response){
+                if (failureExpected)
+                {
+                    updateLog("...Expected failure : " + response.exception, false);
+                    step(nextStepIndex);
+                }
+                else
+                {
+                    updateLog("...Error : " + response.exception, false);
+                }
+            }
+        });
+    }
+
+    function removeGroupMembers(group, membersArr, nextStepIndex){
+        updateLog("Removing " + membersArr.length + " group members from " + group.name + "...", true);
+        LABKEY.Security.removeGroupMembers({
+            groupId: group.id,
+            principalIds: membersArr,
+            success: function(data){
+                // check that all of the ids were removed
+                var success = true;
+                for (var i = 0; i < membersArr.length; i++)
+                {
+                    if (data.removed.indexOf(membersArr[i]) == -1)
+                    {
+                        updateLog("...Error : principal not removed from group " + group.name, false);
+                        success = false;
+                        break;
+                    }
+                }
+
+                if (success)
+                {
+                    updateLog("...Members successfully removed from " + group.name, false);
+                    step(nextStepIndex);
+                }
+            }
+        });
+    }
+
+    function updateLog(newHtml, newLine){
+        logHtml += (newLine ? "<br/>" : "") + newHtml;
+        Ext.get('log-info').update(logHtml);
+    }
+
+    function init(){
+        var btn = new Ext.Button({
+            id: 'test-button',
+            renderTo: 'start-test',
+            text: 'Start Test',
+            handler: function(){
+                updateLog("Starting Group Security API Test", true);
+                step(1);
+            }
+        });
+    }
+
+    Ext.onReady(init);
+
+</script>

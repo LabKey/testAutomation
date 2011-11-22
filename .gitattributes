@@ -13,6 +13,7 @@ data/api/getDataAggregateTest.html -text
 data/api/getDataDateTest.html -text
 data/api/getDataVisitTest.html -text
 data/api/gridTest.js -text
+data/api/groupSecurityTest.html -text
 data/api/http-api.xml -text
 data/api/lineChartTest.js -text
 data/api/queryTest.js -text
