@@ -57,20 +57,20 @@ public class LuminexTest extends AbstractQCAssayTest
     protected static final String TEST_ASSAY_LUM_RUN_NAME2 = "testRunName2";
     protected static final String TEST_ASSAY_LUM_RUN_NAME3 = "WithIndices.xls";
     protected static final String TEST_ANALYTE_LOT_NUMBER = "ABC 123";
-    protected final String TEST_ASSAY_LUM_FILE1 = getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls";
-    protected final String TEST_ASSAY_LUM_FILE2 = getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx";
-    protected final String TEST_ASSAY_LUM_FILE3 = getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls";
-    protected final String TEST_ASSAY_LUM_FILE4 = getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls";
-    protected final String TEST_ASSAY_LUM_FILE5 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 1.xls";
-    protected final String TEST_ASSAY_LUM_FILE6 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 2.xls";
-    protected final String TEST_ASSAY_LUM_FILE7 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls";
-    protected final String TEST_ASSAY_LUM_FILE8 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls";
-    protected final String TEST_ASSAY_LUM_FILE9 = getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls";
-    protected final String TEST_ASSAY_LUM_FILE10 = getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx";
+    protected final File TEST_ASSAY_LUM_FILE1 = new File(getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls");
+    protected final File TEST_ASSAY_LUM_FILE2 = new File(getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx");
+    protected final File TEST_ASSAY_LUM_FILE3 = new File(getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls");
+    protected final File TEST_ASSAY_LUM_FILE4 = new File(getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls");
+    protected final File TEST_ASSAY_LUM_FILE5 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 1.xls");
+    protected final File TEST_ASSAY_LUM_FILE6 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 2.xls");
+    protected final File TEST_ASSAY_LUM_FILE7 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls");
+    protected final File TEST_ASSAY_LUM_FILE8 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls");
+    protected final File TEST_ASSAY_LUM_FILE9 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls");
+    protected final File TEST_ASSAY_LUM_FILE10 = new File(getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx");
 
-    protected final String TEST_ASSAY_MULTIPLE_STANDARDS_1 = getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (b12 IgA std).xls";
-    protected final String TEST_ASSAY_MULTIPLE_STANDARDS_2 = getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls";
-    protected final String TEST_ASSAY_MULTIPLE_STANDARDS_3 = getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgG-Biot (HIVIG std).xls";
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (b12 IgA std).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgG-Biot (HIVIG std).xls");
 
     protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
     private static final String THAW_LIST_NAME = "LuminexThawList";
@@ -266,8 +266,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
         clickNavButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
-        File file1 = new File(TEST_ASSAY_LUM_FILE1);
-        setFormElement("__primaryFile__", file1);
+        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
         clickNavButton("Next", 60000);
         clickNavButton("Save and Import Another Run");
         clickLinkWithText(TEST_ASSAY_LUM);
@@ -277,7 +276,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
         clickNavButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
-        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE2));
+        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE2);
         clickNavButton("Next", 60000);
         selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]", "StandardName1b");
         selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']", "StandardName2");
@@ -297,7 +296,7 @@ public class LuminexTest extends AbstractQCAssayTest
                 "3\tSpecimenID3\tParticipantID3\t1.3\n" +
                 "4\tSpecimenID4\tParticipantID4\t1.4");
         clickNavButton("Next");
-        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE3));
+        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
         clickNavButton("Next", 60000);
         assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
         assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
@@ -320,7 +319,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickNavButton("Close", 0);
         clickNavButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
-        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE3));
+        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
         clickNavButton("Next", 60000);
         assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
         assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
@@ -381,7 +380,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickNavButton("Import Data");
         clickNavButton("Next");
         setFormElement("name", "raw and summary");
-        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE10));
+        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE10);
         clickNavButton("Next", 60000);
         clickNavButton("Save and Finish");
 
@@ -956,7 +955,7 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void uploadMultipleCurveData()
     {
-        String[] files = {TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3};
+        File[] files = {TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3};
         addFilesToAssayRun(files);
     }
 
@@ -965,13 +964,13 @@ public class LuminexTest extends AbstractQCAssayTest
         uploadMultipleCurveData();
     }
 
-    private void addFilesToAssayRun(String[] files)
+    private void addFilesToAssayRun(File[] files)
     {
         for(int i=0; i<files.length; i++)
         {
             String formName = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
 
-            setFileValue(formName, files[i]);
+            setFormElement(formName, files[i]);
 
             sleep(500);
 
@@ -1040,7 +1039,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
         clickNavButton("Next");
         setFormElement("name", "transformed assayId");
-        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE1));
+        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
         clickNavButton("Next", 60000);
         clickNavButton("Save and Finish");
 
@@ -1091,7 +1090,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("name", "r script transformed assayId");
         setFormElement("stndCurveFitInput", "FI");
         setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
-        setFormElement("__primaryFile__", new File(TEST_ASSAY_LUM_FILE4));
+        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE4);
         clickNavButton("Next", 60000);
         // make sure the Standard checkboxes are checked
         checkCheckbox("_titrationRole_standard_HIVIG");
@@ -1171,7 +1170,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         log("Uploading Luminex run with a R transform script for Guide Set test");
 
-        String[] files = {TEST_ASSAY_LUM_FILE5, TEST_ASSAY_LUM_FILE6, TEST_ASSAY_LUM_FILE7, TEST_ASSAY_LUM_FILE8, TEST_ASSAY_LUM_FILE9};
+        File[] files = {TEST_ASSAY_LUM_FILE5, TEST_ASSAY_LUM_FILE6, TEST_ASSAY_LUM_FILE7, TEST_ASSAY_LUM_FILE8, TEST_ASSAY_LUM_FILE9};
         String[] analytes = {"GS Analyte (1)", "GS Analyte (2)"};
 
         // add the R transform script to the assay
@@ -1205,7 +1204,7 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement("expPerformer", "TECH" + (i+1));
             testDate.add(Calendar.DATE, 1);
             setFormElement("testDate", df.format(testDate.getTime()));
-            setFormElement("__primaryFile__", new File(files[i]));
+            setFormElement("__primaryFile__", files[i]);
             clickNavButton("Next", 60000);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
             checkCheckbox("_titrationRole_qccontrol_HIVIG");
@@ -1253,7 +1252,7 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement("expPerformer", "TECH" + (i+1));
             testDate.add(Calendar.DATE, 1);
             setFormElement("testDate", df.format(testDate.getTime()));
-            setFormElement("__primaryFile__", new File(files[i]));
+            setFormElement("__primaryFile__", files[i]);
             clickNavButton("Next", 60000);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
             checkCheckbox("_titrationRole_qccontrol_HIVIG");

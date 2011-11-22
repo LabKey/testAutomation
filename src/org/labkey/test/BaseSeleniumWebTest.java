@@ -197,16 +197,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return _fileUploadAvailable;
     }
 
-    //file upload helpers
-
-    protected void setFileValue(String webPartName, String fileName)
-    {
-        //iff IE or Firefox- can do the easy thing
-        setFormElement(webPartName,  new File (fileName));
-
-        //if chrome: harder, probably unsupported thing.
-    }
-
     public String getBrowserType()
     {
         return System.getProperty("selenium.browser", FIREFOX_BROWSER);

@@ -59,13 +59,13 @@ public class GenotypingTest extends BaseSeleniumWebTest
         clickLinkContainingText(getProjectName());
         clickLinkContainingText("manage lists");
         clickButton("Import List Archive");
-        setFileValue("listZip", pipelineLoc + "/sequences.lists.zip"  );
+        setFormElement("listZip", new File(pipelineLoc, "sequences.lists.zip"));
         clickButton("Import List Archive");
 
         //get the second list set
         //TODO:  integrate these, or at least label the second one better
         clickButton("Import List Archive");
-        setFileValue("listZip", pipelineLoc + "/genotyping_2011-10-21_11-45-58.lists.zip"  );
+        setFormElement("listZip", new File(pipelineLoc, "genotyping_2011-10-21_11-45-58.lists.zip"));
         clickButton("Import List Archive");
 
         assertTextPresent("cohortList","emPCR",

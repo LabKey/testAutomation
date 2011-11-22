@@ -20,6 +20,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 
+import java.io.File;
+
 /**
  * User: jeckels
  * Date: Nov 19, 2007
@@ -292,13 +294,13 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("SampleSetBVTGrandchildA");
     }
 
-    String experimentFilePath =  getLabKeyRoot() + PIPELINE_PATH + "/experiment.xar.xml";
+    final File experimentFilePath =  new File(getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
     private void fileAttachmentTest()
     {
         enableFileInput();
 
         setFileAttachment(0, experimentFilePath);
-        setFileAttachment(1, getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx");
+        setFileAttachment(1, new File(getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
         inserNewWithFileAttachmentTest();
     }
 
@@ -306,7 +308,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
     {
         clickButton("Insert New");
         setFormElement("quf_Name", "SampleSetInsertedManually");
-        setFileValue("quf_FileAttachment", experimentFilePath);
+        setFormElement("quf_FileAttachment", experimentFilePath);
         clickButton("Submit");
         //a double upload causes the file to be appended with a count
         assertTextPresent("experiment-1.xar.xml");
@@ -326,21 +328,14 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickButton("Save");
     }
 
-    private void setFileAttachment(int index, String fileName)
+    private void setFileAttachment(int index, File attachment)
     {
         clickLinkWithText("edit", index);
-//        fileName = fileName.replace("\\", "/");
-        setFileValue("quf_FileAttachment",  fileName);
+        setFormElement("quf_FileAttachment",  attachment);
         clickButton("Submit");
 
         DataRegionTable drt = new DataRegionTable("Material", this);
-        String fileNameNoPath = null;
 
-        if(fileName.contains("/"))
-            fileNameNoPath = fileName.substring(fileName.lastIndexOf("/")+1);
-        else
-            fileNameNoPath = fileName;
-        assertEquals(fileNameNoPath, drt.getDataAsText(index, "File Attachment"));
-
+        assertEquals(attachment.getName(), drt.getDataAsText(index, "File Attachment"));
     }
 }
