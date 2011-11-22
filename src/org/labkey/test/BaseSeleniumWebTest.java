@@ -895,9 +895,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                         clickNavButton("Next");
                 }
 
-                if (isLinkPresentContainingText("Skip these steps and go to the Home page"))
+                if (isLinkPresentContainingText("Go directly to the server's Home page"))
                 {
-                    clickLinkContainingText("Skip these steps and go to the Home page");
+                    clickLinkContainingText("Go directly to the server's Home page");
                 }
             }
 
