@@ -71,7 +71,7 @@ public class GroupTest extends BaseSeleniumWebTest
             createUser(TEST_USERS_FOR_GROUP[i], null);
         }
 
-        createProject(getProjectName());
+        createProject(getProjectName(), "Collaboration");
     }
 
     @Override
@@ -95,32 +95,92 @@ public class GroupTest extends BaseSeleniumWebTest
 
         verifyRedundantUserWarnings();
 
+
         //add read permissions to group2
         goToHome();
         clickLinkWithText(getProjectName());
-        clickLinkWithText("Permissions");
-        waitForPageToLoad();
-
-        waitForElement(Locator.id("$add$org.labkey.api.security.roles.EditorRole"), defaultWaitForPage);
-        ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.EditorRole", COMPOUND_GROUP);
+        clickLinkWithText("Permissions", 0);
+        waitForText("Author");
+        setPermissions(COMPOUND_GROUP, "Author");
         clickButton("Save and Finish");
         assertUserCanSeeFolder(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
         log("Verify you can copy perms even with a default");
 
+        //give a system group permissions, so that we can verify copying them doesn't cause a problem
         clickLinkWithText(getProjectName());
         clickLinkWithText("Permissions");
         waitForPageToLoad();
+        waitForText("Author");
         ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "All Site Users");
         clickButton("Save and Finish");
 
         createProjectCopyPerms();
 
+        verifyImpersonateGroup();
         //TODO: Blocked: 13299: Various IllegalStateExceptions related to users/groups written to log file
         //verifyCantAddSystemGroupToUserGroup();
 
         //TODO: Blocked: 13299: Various IllegalStateExceptions related to users/groups written to log file
         //groupSecurityApiTest(); // todo: talk to Li about where to put this call in the test
+    }
+
+    private void verifyImpersonateGroup()
+    {
+        //set simple group as editor
+        setPermissions(SIMPLE_GROUP, "FolderAdmin");
+
+        //impersonate user 1, make several wiki edits
+        impersonate(TEST_USERS_FOR_GROUP[0]);
+        clickLinkWithText(getProjectName());
+        String[][] nameTitleBody = {{"Name1", "Title1", "Body1"}, {"Name2", "Title2", "Body2"}};
+
+        for(int i=0; i<nameTitleBody.length; i++)
+        {
+            createNewWikiPage();
+            setWikiValuesAndSave(nameTitleBody[i][0], nameTitleBody[i][1], nameTitleBody[i][2]);
+        }
+        stopImpersonating();
+
+        //impersonate simple group, they should have full editor permissions
+        impersonateGroup(SIMPLE_GROUP);
+        clickLinkContainingText(getProjectName());
+        assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
+        assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
+        sleep(500);
+        stopImpersonatingGroup();
+
+        //impersonate compound group, should only have author permissions
+        impersonateGroup(COMPOUND_GROUP);
+        clickLinkContainingText(getProjectName());
+        assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP,canSeePages(nameTitleBody));
+//        assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
+        sleep(500);
+        stopImpersonatingGroup();
+    }
+
+    private boolean canEditPages(String[][] nameTitleBody)
+    {
+        for(int i=0; i<nameTitleBody.length; i++)
+        {
+            waitForElement(Locator.linkContainingText(nameTitleBody[i][1]), defaultWaitForPage);
+            sleep(1000);
+            clickLinkWithText(nameTitleBody[i][1]);
+            if(!isTextPresent(nameTitleBody[i][2]))
+                return false;
+            selenium.goBack();
+        }
+        return true;
+    }
+
+    private boolean canSeePages(String[][] nameTitleBody)
+    {
+        for(int i=0; i<nameTitleBody.length; i++)
+        {
+            if(!isTextPresent(nameTitleBody[i][1]))
+                return false;
+        }
+        return true;
     }
 
     //should be at manage group page of COMPOUND_GROUP already

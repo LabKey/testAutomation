@@ -4265,7 +4265,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             String combo = "$combo$";
             //selenium.type(name, groupName + "\n");
             click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and contains(text(),'" + groupName + "')]"));
+            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(text(),'" + groupName + "')]"));
             //selenium.type(name, "\n");
             //selenium.focus("//body");
             sleep(100);
@@ -4333,6 +4333,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void exitPermissionsUI()
     {
         clickNavButton("Save and Finish");
+    }
+
+    public void impersonateGroup(String group)
+    {
+        log("Impersonating group: " + group);
+        goToHome();
+        clickAdminMenuItem("Impersonate", "Group", group);
+
+    }
+
+    public void stopImpersonatingGroup()
+    {
+        log("Ending impersonation");
+        Locator menuLink =  Locator.id("userMenuPopupLink");
+        click(menuLink);
+        waitForText("Stop Impersonating");
+        clickLinkWithText("Stop Impersonating");
+        assertSignOutAndMyAccountPresent();
+        goToHome();
     }
 
 
@@ -4448,6 +4467,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void deleteGroup(String groupName)
     {
         log("Attempting to delete group: " + groupName);
+//        if(!selectGroup(groupName))
+//        {
+//            log("failed to select group");
+//            if(failIfNotFound)
+//                fail("Group not found");
+//            else
+//                return;
+//        }
         selectGroup(groupName);
         deleteAllUsersFromGroup();
 
@@ -4674,6 +4701,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                     " before calling this method.");
 
         convertWikiFormat(format);
+    }
+
+    //must already be on wiki page
+    public void setWikiValuesAndSave(String name, String title, String body)
+    {
+
+        setFormElement("name", name);
+        setFormElement("title", title);
+        setWikiBody(body);
+        clickButtonContainingText("Save & Close");
     }
 
     /**

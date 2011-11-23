@@ -81,7 +81,7 @@ public class ExtHelper
     {
         test.click(menuLocator);
         Locator element = Locator.xpath("//li[@class='x4-boundlist-item' and text()='" + value + "']");
-        test.waitForElement(element,  test.WAIT_FOR_PAGE);
+        test.waitForElement(element,  3*test.WAIT_FOR_PAGE);
         test.click(element);
     }
 
