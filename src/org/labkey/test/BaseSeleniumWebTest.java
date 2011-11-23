@@ -4263,11 +4263,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             String input = "$add$" + role;
             String combo = "$combo$";
-            //selenium.type(name, groupName + "\n");
             click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(text(),'" + groupName + "')]"));
-            //selenium.type(name, "\n");
-            //selenium.focus("//body");
+            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + groupName + "']"));
             sleep(100);
             savePermissions();
             assertPermissionSetting(groupName, permissionString);
