@@ -241,9 +241,14 @@ public class ExtHelper
         if (path.startsWith("/"))
             path = path.substring(1);
         String[] parts = path.split("/");
+        StringBuilder nodeId = new StringBuilder();
+        nodeId.append('/');
+        
         waitForFileGridReady(test);
         for (int i = 0; i < parts.length; i++)
         {
+            nodeId.append(parts[i]).append('/');
+
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory 
             {
                 // select last item: click on tree node name
@@ -253,7 +258,7 @@ public class ExtHelper
             {
                 // expand tree node: click on expand/collapse icon
                 test.waitAndClick(Locator.fileTreeByName(parts[i]));
-                test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/"+path.substring(0, path.indexOf("/", i) + 1)+"']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+                test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             }
         }
     }
