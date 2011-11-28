@@ -48,6 +48,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private static final String RESP1_BODY = "I disagree";
     private static final String USER1 = "user1@wikilong.test";
     private static final String USER2 = "user2@wikilong.test";
+    private static final String USERS_GROUP = "Users";
     private static final String WIKI_PAGE3_WEBPART_TEST = "Best Gene Name";
     private static final String WIKI_NAVTREE_TITLE = "NavTree";
     private static final String WIKI_TERMS_TITLE = "Terms of Use";
@@ -115,12 +116,12 @@ public class WikiLongTest extends BaseSeleniumWebTest
     {
         enableEmailRecorder();
         createProject(PROJECT2_NAME);
-        setPermissions("Users", "Editor");
+        setPermissions(USERS_GROUP, "Editor");
         clickNavButton("Save and Finish");
         createProject(PROJECT_NAME);
         createPermissionsGroup("testers");
         setPermissions("testers", "Editor");
-        setPermissions("Users", "Editor");
+        setPermissions(USERS_GROUP, "Editor");
         clickNavButton("Save and Finish");
         clickLinkWithText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
@@ -372,14 +373,14 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("Check Permissions");
         log("Create fake user for permissions check");
         enterPermissionsUI();
-        clickManageGroup("Users");
+        clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
 
         log("Check if permissions work");
         enterPermissionsUI();
-        setPermissions("User", "Reader");
+        setPermissions(USERS_GROUP, "Reader");
         clickNavButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
@@ -390,8 +391,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT2_NAME);
         enterPermissionsUI();
-        removePermission("User", "Editor");
-        removePermission("User", "Reader");
+        removePermission(USERS_GROUP, "Editor");
+        removePermission(USERS_GROUP, "Reader");
         clickNavButton("Save and Finish");
         impersonate(USER1);
         assertTextNotPresent(PROJECT2_NAME);     // Project should not be visible
@@ -420,7 +421,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent(WIKI_PAGE2_TITLE);
         enterPermissionsUI();
-        setPermissions("User", "Project Administrator");
+        setPermissions(USERS_GROUP, "Project Administrator");
         clickNavButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
@@ -432,7 +433,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         enterPermissionsUI();
-        clickManageGroup("Users");
+        clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
@@ -447,7 +448,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         stopImpersonating();
         clickLinkWithText(PROJECT_NAME);
         enterPermissionsUI();
-        setPermissions("User", "Project Administrator");
+        setPermissions(USERS_GROUP, "Project Administrator");
         clickNavButton("Save and Finish");
 
         log("make sure the changes went through");
@@ -538,7 +539,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("Create user for terms of use checks");
         clickLinkWithText(PROJECT_NAME);
         enterPermissionsUI();
-        clickManageGroup("Users");
+        clickManageGroup(USERS_GROUP);
         setFormElement("names", USER2);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
