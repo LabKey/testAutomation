@@ -84,7 +84,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.click("//div[contains(text(), '(none)')]");
         selenium.click("//label[text()='Immunogen3']/../input");
         click(Locator.tagWithText("button", "Done"));
-        selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Click to Add Timepoint')]");
+        selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Add Timepoint')]");
         selenium.type("timepointName", "Pre-immunization");
         click(Locator.tagWithText("button", "OK"));
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/../..//input");
@@ -106,7 +106,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         while (!isTextPresent("This is a very important protocol") && n++ < 10)
             sleep(1000);
 
-		selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Click to Add Timepoint')]");
+		selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Add Timepoint')]");
 		selenium.type("timepointCount", "8");
         click(Locator.tagWithText("button", "OK"));
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/ancestor::tr/td[5]//input");
