@@ -101,7 +101,7 @@ public class GroupTest extends BaseSeleniumWebTest
         clickLinkWithText(getProjectName());
         clickLinkWithText("Permissions", 0);
         waitForText("Author");
-        setPermissions(COMPOUND_GROUP, "Author");
+        setSiteGroupPermissions(COMPOUND_GROUP, "Author");
         clickButton("Save and Finish");
         assertUserCanSeeFolder(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
@@ -128,7 +128,7 @@ public class GroupTest extends BaseSeleniumWebTest
     private void verifyImpersonateGroup()
     {
         //set simple group as editor
-        setPermissions(SIMPLE_GROUP, "FolderAdmin");
+        setSiteGroupPermissions(SIMPLE_GROUP, "FolderAdmin");
 
         //impersonate user 1, make several wiki edits
         impersonate(TEST_USERS_FOR_GROUP[0]);
