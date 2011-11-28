@@ -848,6 +848,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
                 for(String s: splitCol2Val)
                 {
+                    s = s.trim();
                     assertTrue("Expected " + expectedCol2Vals + " to contain" + s, expectedCol2Vals.contains(s));
                 }
             }
