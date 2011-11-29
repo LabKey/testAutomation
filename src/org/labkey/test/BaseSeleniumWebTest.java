@@ -2478,7 +2478,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitForExtFolderTreeNode(String nodeText, int wait)
     {
         final Locator locator = new Locator("//a[contains(@class, 'x-tree-node-anchor')]/span[text() = " + Locator.xq(nodeText) + "]");
-        String failMessage = "Ext NodeTree with locator " + locator + " did not appear in [" + wait + "ms]";
+        String failMessage = "Ext NodeTree with locator " + locator + " did not appear.";
         waitFor(new Checker()
         {
             public boolean check()
@@ -2490,7 +2490,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitForElement(final Locator locator, int wait)
     {
-        String failMessage = "Element with locator " + locator + " did not appear [" + wait + "ms]";
+        String failMessage = "Element with locator " + locator + " did not appear.";
         waitFor(new Checker()
         {
             public boolean check()
