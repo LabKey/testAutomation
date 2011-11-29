@@ -60,28 +60,15 @@ public class ExtHelper
 
     public static void clickExtDropDownMenu(BaseSeleniumWebTest test, String menuId, String value)
     {
-        Locator menu = Locator.id(menuId);
-        test.click(menu);
-        Locator element = Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='" + value + "']");
-        test.waitForElement(element,  test.WAIT_FOR_PAGE);
-        test.click(element);
+        clickExtDropDownMenu(test, Locator.id(menuId), value);
     }
 
 
     public static void clickExtDropDownMenu(BaseSeleniumWebTest test, Locator menuLocator, String value)
     {
         test.click(menuLocator);
-        Locator element = Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='" + value + "']");
-        test.waitForElement(element,  test.WAIT_FOR_PAGE);
-        test.click(element);
-    }
-
-    //for the second type of drop down menu
-    public static void clickExt4DropDownMenu(BaseSeleniumWebTest test, Locator menuLocator, String value)
-    {
-        test.click(menuLocator);
-        Locator element = Locator.xpath("//li[@class='x4-boundlist-item' and text()='" + value + "']");
-        test.waitForElement(element,  3*test.WAIT_FOR_PAGE);
+        Locator element = Locator.xpath("//*[(self::li[contains(@class, 'x4-boundlist-item')] or self::div[contains(@class, 'x-combo-list-item')]) and text()='" + value + "']");
+        test.waitForElement(element, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.click(element);
     }
 

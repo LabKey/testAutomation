@@ -237,7 +237,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
         //second page of the wizard
         click(Locator.xpath("//label[contains(text(), 'Copy From Existing Project')]/../input"));
-        ExtHelper.clickExt4DropDownMenu(this, Locator.xpath("//div[@id='targetProject-bodyEl']/input"), getProjectName());
+        ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//div[@id='targetProject-bodyEl']/input"), getProjectName());
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
         waitForPageToLoad();
 
