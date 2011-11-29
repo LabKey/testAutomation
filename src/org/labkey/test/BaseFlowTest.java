@@ -277,9 +277,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
-        sleep(500);
         ExtHelper.selectTreeItem(this, workspacePath);
-//        assertFormElementEquals("workspace.path", workspacePath);
         clickNavButton("Next");
     }
 
