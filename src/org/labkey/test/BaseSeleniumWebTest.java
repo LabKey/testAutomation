@@ -4464,14 +4464,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void deleteGroup(String groupName)
     {
         log("Attempting to delete group: " + groupName);
-//        if(!selectGroup(groupName))
-//        {
-//            log("failed to select group");
-//            if(failIfNotFound)
-//                fail("Group not found");
-//            else
-//                return;
-//        }
         selectGroup(groupName);
         deleteAllUsersFromGroup();
 
