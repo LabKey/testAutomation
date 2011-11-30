@@ -170,6 +170,8 @@ public class PipelineTestsBase
                     if (completeName == null || getStatusTable().hasJob(names[i]))
                         return false;
                     completeNames[i] = completeName;
+                    if (getStatusTable().getJobStatus(names[i]) != null)
+                        return true;
                 }
             }
             if (!tp.isExpectError())
