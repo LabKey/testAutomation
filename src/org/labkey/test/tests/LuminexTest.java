@@ -1161,8 +1161,8 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("propertyFormat", formatStr);
     }
 
-    protected String isotype = "IgG";
-    protected String conjugate = "PE";
+    protected String isotype = "IgG " + TRICKY_CHARACTERS_NO_QUOTES;
+    protected String conjugate = "PE " + TRICKY_CHARACTERS_NO_QUOTES;
 
     protected DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 

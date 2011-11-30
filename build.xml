@@ -1151,7 +1151,10 @@
             </exec>
 
             <uptodate targetfile="${project.root}/sampledata/rlabkey/@{package}" property="@{property}.uptodate">
-                <srcfiles dir="${project.root}/tools/Rpackages" includes="@{package}*.tar.gz" />
+                <srcfiles dir="${project.root}/tools/Rpackages">
+                    <include name="@{package}*.tar.gz" />
+                    <include name="install-@{package}-depdendencies.R" />
+                </srcfiles>
             </uptodate>
 
             <condition property="@{property}.installed" value="true">
