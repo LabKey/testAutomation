@@ -191,6 +191,36 @@
             ]]>
         </response>
     </test>
+    <test name="insert and select with plus sign" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                ## insert row with text containing plus sign
+                newrow <- data.frame(
+                    DisplayFld="Inserted with plus (+) sign"
+                    , RequiredText = "Required"
+                    , RequiredInt = 0)
+
+                insertedRow <- labkey.insertRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toInsert=newrow)
+
+                ## reselect inserted row
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                    , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Inserted with plus (+) sign")))
+                selectedRow
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                DisplayName Text Field Integer Field Double Field
+                Inserted with plus (+) sign <NA> NA NA
+                DateTime Field Boolean Field Long Text Field Attachment Required Text
+                <NA> NA <NA> <NA> Required
+                Required Integer Category Lookup
+                0 <NA>
+            ]]>            
+        </response>
+    </test>
     <test name="ContainerFilter1" type="post">
             <url>
                 <![CDATA[
