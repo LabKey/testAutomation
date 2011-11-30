@@ -274,7 +274,7 @@ public class SearchTest extends StudyTest
         {
             clickLinkWithText("Attach a file", false);
             File file = new File(getLabKeyRoot() + "/common.properties");
-            setFormElement("formFiles[0]", file);
+            setFormElement("formFiles[00]", file);
         }
         clickNavButton("Save");
 

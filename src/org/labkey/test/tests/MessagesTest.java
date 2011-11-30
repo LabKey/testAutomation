@@ -86,7 +86,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         {
             clickLinkWithText("Attach a file", false);
             File file = new File(getLabKeyRoot() + "/common.properties");
-            setFormElement("formFiles[0]", file);
+            setFormElement("formFiles[00]", file);
         }
         else
             log("File upload skipped.");

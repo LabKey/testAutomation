@@ -567,18 +567,21 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(label, WAIT_FOR_JAVASCRIPT);
         checkRadioButton(axis + "axis_range", "manual");
         setFormElement(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[1]"), lowerBound);
-        fireEvent(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[1]"), SeleniumEvent.blur);
+        pressEnter(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[1]").toString());
+        sleep(1000); //let the chart refresh.
         setFormElement(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[2]"), upperBound);
-        fireEvent(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[2]"), SeleniumEvent.blur);
+        pressEnter(Locator.xpath("//input[@name='" + axis + "axis_range']/../../input[2]").toString());
+        sleep(1000); //let the chart refresh
         mouseDown(Locator.xpath("/html/body"));
-
         if(textPresent!=null)
             waitForText((textPresent[0]), WAIT_FOR_JAVASCRIPT);
 
         assertTextPresent(textPresent);
+
+        if(textNotPresent!=null)
+            waitForTextToDisappear(textNotPresent[0], WAIT_FOR_JAVASCRIPT);
+        
         assertTextNotPresent(textNotPresent);
-
-
     }
 
     private void multiMeasureTimeChartTest()
@@ -881,8 +884,11 @@ public class TimeChartTest extends StudyBaseTest
 
         checkRadioButton("rightaxis_range", "manual");
         setFormElement(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[1]"), "12"); //Min
+        pressEnter(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[1]").toString()); // Need to trigger keyup event to make changes appear.
+        sleep(1000); //let the chart refresh after changing axis.
         setFormElement(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[2]"), "16"); //Max
-        fireEvent(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[2]"), SeleniumEvent.blur);
+        pressEnter(Locator.xpath("//div[./div/label[text() = 'Manual']]/input[2]").toString()); // Need to trigger keyup event to make changes appear.
+        sleep(1000); //let the chart refresh after changing axis.
         waitForText("Hemogoblins");
         assertTextNotPresent("17.0");
         assertTextPresent("16.0");
