@@ -539,10 +539,10 @@ public class MS2Test extends MS2TestBase
         assertTextNotPresent("SeqHits");
         assertTextPresent("gi|27805893|guanine_nucleotid");
 
-
         log("Test changing order of sorts and columns");
-        selenium.windowMaximize();
         CustomizeViewsHelper.openCustomizeViewPanel(this);
+        selenium.windowMaximize();
+        sleep(500);
         CustomizeViewsHelper.moveCustomizeViewSort(this, "Charge", false);
         // XXX: selenium test can't move columns that require scrolling the column list
         //CustomizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", false);

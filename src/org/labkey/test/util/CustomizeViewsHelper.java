@@ -410,13 +410,21 @@ public class CustomizeViewsHelper
         moveCustomizeViewItem(test, fieldKey, moveUp, ViewItemType.Sort);
     }
 
-    private static void moveCustomizeViewItem(BaseSeleniumWebTest test, String fieldKey, boolean moveUp, ViewItemType type)
+    private static void moveCustomizeViewItem(final BaseSeleniumWebTest test, String fieldKey, boolean moveUp, ViewItemType type)
     {
-        String itemXPath = itemXPath(type, fieldKey);
+        final String itemXPath = itemXPath(type, fieldKey);
         changeTab(test, type);
-        int itemIndex = test.getElementIndex(Locator.xpath(itemXPath));
+        final int itemIndex = test.getElementIndex(Locator.xpath(itemXPath));
 
         moveCustomizeViewItem(test, itemIndex, moveUp, type);
+
+        test.waitFor(new BaseSeleniumWebTest.Checker()
+        {
+            public boolean check()
+            {
+                return itemIndex != test.getElementIndex(Locator.xpath(itemXPath));
+            }
+        }, "Item was not reordered.", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     private static void moveCustomizeViewItem(BaseSeleniumWebTest test, int field_index, boolean moveUp, ViewItemType type)
