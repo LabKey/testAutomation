@@ -467,7 +467,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME, 3);
 
         log("Test single list web part");
-        addWebPart("Single List");
+        addWebPart("List - Single");
         setText("title", "This is my single list web part title");
         submit();
         assertTextPresent("Import Data");
