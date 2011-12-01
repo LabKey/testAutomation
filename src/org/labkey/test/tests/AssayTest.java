@@ -664,7 +664,7 @@ public class AssayTest extends AbstractAssayTest
         click(Locator.tagWithAttribute("img", "title", "Edit"));
         waitForElement(Locator.name("Investigator"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Investigator", INVESTIGATOR);
-        setFormElement("studyGrant", GRANT);
+        setFormElement("Grant", GRANT);
         setFormElement("Description", DESCRIPTION);
         clickNavButton("Submit");
 
@@ -673,7 +673,7 @@ public class AssayTest extends AbstractAssayTest
         DataRegionTable table = new DataRegionTable("qwpStudies", this, false);
         assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
         assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));
-        assertEquals("Failed to set study grant.", GRANT, table.getDataAsText(0, "Study Grant"));
+        assertEquals("Failed to set study grant.", GRANT, table.getDataAsText(0, "Grant"));
         assertEquals("Failed to set study description.", DESCRIPTION, table.getDataAsText(0, "Description"));
 
         //verify study properties (details view)
