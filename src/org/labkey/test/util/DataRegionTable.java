@@ -63,6 +63,7 @@ public class DataRegionTable
         reload(test);
         _columnCount = _test.getTableColumnCount(getHtmlName());
         _headerRows = 2 + (floatingHeaders?2:0);
+        _test.assertElementPresent(Locator.xpath("//table[@id='" + getHtmlName() + "']"));
     }
 
     public String getTableName()
