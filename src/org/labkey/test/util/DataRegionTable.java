@@ -63,7 +63,7 @@ public class DataRegionTable
         reload(test);
         _columnCount = _test.getTableColumnCount(getHtmlName());
         _headerRows = 2 + (floatingHeaders?2:0);
-        _test.assertElementPresent(Locator.xpath("//table[@id='" + getHtmlName() + "']"));
+        _test.assertElementPresent(Locator.xpath("//table[@id='" + Locator.xq(getHtmlName()) + "']"));
     }
 
     public String getTableName()
@@ -137,7 +137,7 @@ public class DataRegionTable
 
     public Locator.XPathLocator xpath(int row, int col)
     {
-        return Locator.xpath("//table[@id='" + getHtmlName() + "']/tbody/tr[" + (row+_headerRows+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
+        return Locator.xpath("//table[@id='" + Locator.xq(getHtmlName()) + "']/tbody/tr[" + (row+_headerRows+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
     }
 
     public void clickLink(int row, int col)
@@ -211,7 +211,7 @@ public class DataRegionTable
         {
             while (true)
             {
-                String value = _test.getAttribute(Locator.xpath("//table[@id='" + getHtmlName() +"']//tr[" + (row+5) + "]//input[@name='.select']/"), "value");
+                String value = _test.getAttribute(Locator.xpath("//table[@id='" + Locator.xq(getHtmlName()) +"']//tr[" + (row+5) + "]//input[@name='.select']/"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;
