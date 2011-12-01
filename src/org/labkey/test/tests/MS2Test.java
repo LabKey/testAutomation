@@ -71,10 +71,6 @@ public class MS2Test extends MS2TestBase
 
         super.doTestSteps();
 
-        DataRegionTable peptidesTable = new DataRegionTable("MS2Peptides", this);
-        DataRegionTable proteinGroupsTable = new DataRegionTable("ProteinGroups", this);
-        DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
-
         log("Upload existing MS2 data.");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
@@ -159,6 +155,7 @@ public class MS2Test extends MS2TestBase
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
         log("Test export selected");
+        DataRegionTable peptidesTable = new DataRegionTable("MS2Peptides", this);
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
         peptidesTable.checkCheckbox(0);
@@ -781,6 +778,7 @@ public class MS2Test extends MS2TestBase
         popLocation();
 
         log("Test exporting selected and non-expanded view");
+        DataRegionTable proteinGroupsTable = new DataRegionTable("ProteinGroups", this);
         uncheckCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         pushLocation();
@@ -820,6 +818,7 @@ public class MS2Test extends MS2TestBase
 
         log("Test export 2 runs together");
         pushLocation();
+        DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         searchRunsTable.checkAllOnPage();
         clickNavButton("MS2 Export");
         checkRadioButton("exportFormat", "TSV");
