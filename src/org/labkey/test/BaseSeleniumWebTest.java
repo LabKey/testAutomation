@@ -5486,7 +5486,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             clickLinkWithText("Manage Files");
             waitAndClickNavButton("Process and Import Data");
-            sleep(1000);
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;
@@ -5498,23 +5497,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 testDir = testDir.getParentFile();
             }
 
-            // Now navigate to the temp dir
-            for (String dirName : dirNames)
-                waitAndClick(Locator.fileTreeByName(dirName));
+            //Build folder path.
+            String path = "/";
+            for (String dir : dirNames)
+                path += dir + "/";
 
-            String tempDirShortName = dirNames.get(dirNames.size() - 1);
-
-            int seconds = 0;
-            sleep(1000);
-
-/*
-            while (!isNavButtonPresent("Import specimen data") && seconds < 20)
-            {
-                seconds++;
-                click(Locator.fileTreeByName(tempDirShortName));
-                sleep(1000);
-            }
-*/
+            ExtHelper.selectTreeItem(BaseSeleniumWebTest.this, path);
 
             for (File copiedArchive : _copiedArchives)
                 ExtHelper.clickFileBrowserFileCheckbox(BaseSeleniumWebTest.this, copiedArchive.getName());
