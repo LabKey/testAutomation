@@ -242,7 +242,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     {
         _test.log("Start analysis of " + getDataPath());
         _test.clickNavButton("Process and Import Data");
-        ExtHelper.selectTreeItem(_test, getDataPath()+"/");
+        ExtHelper.selectFileBrowserItem(_test, getDataPath()+"/");
 
         clickActionButton();
 

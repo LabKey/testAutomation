@@ -277,7 +277,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
-        ExtHelper.selectTreeItem(this, workspacePath);
+        ExtHelper.selectFileBrowserItem(this, workspacePath);
         clickNavButton("Next");
     }
 
@@ -290,7 +290,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
         else if (fcsPath != null)
         {
-            ExtHelper.selectTreeItem(this, fcsPath);
+            ExtHelper.selectFileBrowserItem(this, fcsPath);
         }
         else
         {

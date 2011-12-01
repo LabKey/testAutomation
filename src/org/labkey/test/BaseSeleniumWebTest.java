@@ -5502,7 +5502,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             for (String dir : dirNames)
                 path += dir + "/";
 
-            ExtHelper.selectTreeItem(BaseSeleniumWebTest.this, path);
+            ExtHelper.selectFileBrowserItem(BaseSeleniumWebTest.this, path);
 
             for (File copiedArchive : _copiedArchives)
                 ExtHelper.clickFileBrowserFileCheckbox(BaseSeleniumWebTest.this, copiedArchive.getName());

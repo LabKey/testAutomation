@@ -222,9 +222,9 @@ public class ExtHelper
         test.mouseDown(file);
     }
 
-    public static void selectTreeItem(BaseSeleniumWebTest test, String path)
+    public static void selectFileBrowserItem(BaseSeleniumWebTest test, String path)
     {
-        test.log("selectTreeItem path: " + path);
+        test.log("selectFileBrowserItem path: " + path);
         if (path.startsWith("/"))
             path = path.substring(1);
         String[] parts = path.split("/");
