@@ -209,16 +209,16 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         // verify customization of the run details view is possible
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Mean");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Median");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 8_Mean");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 8_Median");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Mean");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Median");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 8_Mean");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 8_Median");
         CustomizeViewsHelper.saveCustomView(this, "Without Antigen7&8");
 
         clickMenuButton("Views", "default");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Mean");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Properties/Antigen 7_Median");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Mean");
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Median");
         CustomizeViewsHelper.saveDefaultView(this);
 
         clickMenuButton("Views", "Without Antigen7&8");
