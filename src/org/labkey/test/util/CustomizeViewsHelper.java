@@ -136,7 +136,7 @@ public class CustomizeViewsHelper
             nodePath += fieldKeyParts[i];
             try
             {
-                test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
+                test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
             }
             catch(AssertionFailedError se)
             {

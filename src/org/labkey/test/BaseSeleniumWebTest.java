@@ -2930,7 +2930,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickAndWait(Locator l, int millis)
     {
-        assertElementPresent(l);
         selenium.click(l.toString());
         if (millis > 0)
             waitForPageToLoad(millis);
@@ -2938,7 +2937,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickAtAndWait(Locator l, int millis, String coord)
     {
-        assertElementPresent(l);
         selenium.clickAt(l.toString(), coord);
         if (millis > 0)
             waitForPageToLoad(millis);
@@ -2947,7 +2945,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickAtAndWait(Locator l, String coord, int millis)
     {
-        assertElementPresent(l);
         selenium.clickAt(l.toString(), coord);
         if (millis > 0)
             waitForPageToLoad(millis);
@@ -3605,7 +3602,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void waitAndClick(Locator l)
     {
-        waitAndClick(10000, l, 0);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, l, 0);
     }
 
 
