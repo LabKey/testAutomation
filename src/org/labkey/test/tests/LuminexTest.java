@@ -191,7 +191,7 @@ public class LuminexTest extends AbstractQCAssayTest
         addField("Run Fields", 13, "ExpPerformer", "Experiment Performer", ListColumnType.String);
 
         // add analyte property for tracking lot number
-        addField("Analyte Properties", 7, "LotNumber", "Lot Number", ListColumnType.String);
+        addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
 
         // add the data properties for the calculated columns
         addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
@@ -1280,7 +1280,7 @@ public class LuminexTest extends AbstractQCAssayTest
         editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs", true);
 
         // apply the new guide set to a run
-        applyGuideSetToRun("Guide Set plate 5", "create new analyte 2 guide set with 3 runs");
+        applyGuideSetToRun("NETWORK5", 2, "create new analyte 2 guide set with 3 runs", 4);
 
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
@@ -1626,19 +1626,19 @@ public class LuminexTest extends AbstractQCAssayTest
         }
     }
 
-    private void applyGuideSetToRun(String runAssayId, String comment)
+    private void applyGuideSetToRun(String network, int networkColIndex, String comment, int commentColIndex)
     {
-        clickAt(ExtHelper.locateBrowserFileCheckbox(runAssayId), "1,1");
+        clickAt(ExtHelper.locateBrowserFileCheckbox(network), "1," + networkColIndex);
         clickButton("Apply Guide Set", 0);
-        waitForElement(ExtHelper.locateBrowserFileCheckbox(runAssayId), defaultWaitForPage);
+        waitForElement(ExtHelper.locateBrowserFileCheckbox(network), defaultWaitForPage);
         waitForElement(ExtHelper.locateBrowserFileCheckbox(comment), defaultWaitForPage);
         // deselect the current guide set to test error message
-        clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1,4");
+        clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1," + commentColIndex);
         clickButton("Apply Thresholds", 0);
         waitForText("Please select a guide set to be applied to the selected records.");
         clickButton("OK", 0);
         // reselect the current guide set and apply it
-        clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1,4");
+        clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1," + commentColIndex);
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0); 
         waitForExtMaskToDisappear();
         // verify that the plot is reloaded
@@ -1648,27 +1648,30 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void applyStartAndEndDateFilter()
     {
+        String colValuePrefix = "NETWORK";
+        int columnIndex = 2;
+
         setUpGuideSet("GS Analyte (2)");
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 5; i > 0; i--)
         {
-            clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set plate " + i), i+",1");
+            clickAt(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + i), i+","+columnIndex);
         }
         // set start and end date filter
         setFormElement("start-date-field", "2011-03-26");
         setFormElement("end-date-field", "2011-03-28");
         // click a different element on the page to trigger the date change event
-        clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set plate 5"), "1,1");
+        clickAt(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
         clickButton("Apply", 0);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         // check that only 3 runs are now present
         for (int i = 4; i > 1; i--)
         {
-            clickAt(ExtHelper.locateBrowserFileCheckbox("Guide Set plate " + i), (i-3)+",1");
+            clickAt(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
         }
-        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set plate 5"));
-        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox("Guide Set plate 1"));
+        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + "5"));
+        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + "1"));
     }
 
     private void applyLogYAxisScale()
