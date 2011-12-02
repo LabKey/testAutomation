@@ -118,9 +118,7 @@ public class StudyTest extends StudyBaseTest
      */
     protected void manageSubjectClassificationTest()
     {
-
         //verify/create the right data
-
         goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
 
         //issue 12487
@@ -139,8 +137,6 @@ public class StudyTest extends StudyBaseTest
 
         refresh();
         editClassificationList(allList, pIDs);
-
-
 
         //Issue 12485
         createListWithAddAll(filteredList, true);
@@ -168,8 +164,10 @@ public class StudyTest extends StudyBaseTest
 
         // verify warn on no selection
         ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
-        waitForText("At least one " + SUBJECT_NOUN + " must be selected");
+        ExtHelper.waitForExtDialog(this, "Selection Error");
+        assertTextPresent("At least one " + SUBJECT_NOUN + " must be selected");
         clickButtonContainingText("OK", 0);
+        waitForExtMaskToDisappear();
 
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
         for (int i=0; i < 5; i++)
@@ -178,11 +176,13 @@ public class StudyTest extends StudyBaseTest
         // verify the selected list of identifiers is passed to the participant group wizard
         String[] selectedIDs = new String[]{"999320016","999320518","999320529","999320541","999320533"};
         ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
+        ExtHelper.waitForExtDialog(this, "Define " + SUBJECT_NOUN + " Group");
         verifySubjectIDsInWizard(selectedIDs);
 
         // save the new group and use it
         setFormElement(LABEL_FIELD, "Participant Group from Grid");
         clickButtonContainingText("Save", 0);
+        waitForExtMaskToDisappear();
 
         // the dataregion get's ajaxed into place, wait until the new group appears in the menu
         Locator menu = Locator.navButton(SUBJECT_NOUN + " Groups");
@@ -190,13 +190,13 @@ public class StudyTest extends StudyBaseTest
         Locator menuItem = Locator.menuItem("Participant Group from Grid");
         for (int i = 0; i < 10; i++)
         {
-            waitAndClick(menu);
+            click(menu);
             if (isElementPresent(menuItem))
                 break;
             else
                 sleep(1000);
         }
-        clickMenuButton(SUBJECT_NOUN + " Groups", "Participant Group from Grid");
+        clickAndWait(menuItem);
         for (String identifier : selectedIDs)
             assertTextPresent(identifier);
     }
