@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -190,7 +191,12 @@ public class StudyTest extends StudyBaseTest
         Locator menuItem = Locator.menuItem("Participant Group from Grid");
         for (int i = 0; i < 10; i++)
         {
-            click(menu);
+            try{
+                click(menu);
+            }
+            catch(SeleniumException e){
+                /* Ignore. This button is unpredictable. */
+            }
             if (isElementPresent(menuItem))
                 break;
             else
