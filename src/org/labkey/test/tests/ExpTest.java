@@ -96,7 +96,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickTab("Query");
         createNewQuery("exp");
         setFormElement("ff_newQueryName", "dataCustomQuery");
-        selectOptionByText("ff_baseTableName", "Datas");
+        selectOptionByText("ff_baseTableName", "Data");
         clickNavButton("Create and Edit Source");
         setQueryEditorValue("queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
@@ -140,7 +140,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Add a new wrapped column to the exp.Datas table
         clickTab("Query");
-        selectQuery("exp", "Datas"); // Select the one we want to edit
+        selectQuery("exp", "Data"); // Select the one we want to edit
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickLinkWithText("edit metadata");
         waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
