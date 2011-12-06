@@ -72,6 +72,7 @@ public class NabOldTest extends BaseSeleniumWebTest
         clickNavButton("Create Study");
         clickNavButton("Create Study");
         clickTab("Nab");
+        clickLinkWithText("Deprecated NAb Run");
         File testFile = new File(getLabKeyRoot() + TEST_FILE_PATH);
         setFormElement("dataFile", testFile);
         setFormElement("metadata.virusName", "First run");
@@ -82,14 +83,16 @@ public class NabOldTest extends BaseSeleniumWebTest
         assertTextPresent("109935");
 
         clickTab("Nab");
+        clickLinkWithText("Deprecated NAb Run");
         setFormElement("dataFile", testFile);
         setFormElement("metadata.virusName", "Second run");
         clickNavButton("Calculate");
         assertTextPresent(TEST_FILE_NAME);
         assertTextPresent("1353");
-        clickTab("Nab");
 
         log("Verify saved run");
+        clickTab("Nab");
+        clickLinkWithText("Deprecated NAb Run");
         clickLinkWithText("Previous Runs");
         assertTextPresent("First run");
         assertTextPresent("Second run");
@@ -123,6 +126,7 @@ public class NabOldTest extends BaseSeleniumWebTest
         assertTextPresent("100.1");
 
         clickTab("Nab");
+        clickLinkWithText("Deprecated NAb Run");
         clickLinkWithText("Previous Runs");
         log("Delete run");
         clickImgButtonNoNav("Select All");
