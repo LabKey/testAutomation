@@ -782,13 +782,26 @@ public class LuminexTest extends AbstractQCAssayTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/ResVar");
         CustomizeViewsHelper.applyCustomView(this);
 
-        //Issue 12943
-//        assertTextPresent("BioPlex curve fit for VRC A 5304 gp140 (62) in plate 3", "FI = 0.465914 + (1.5417E+006 - 0.465914) / ((1 + (Conc / 122.733)^-0.173373))^7.64039");
-//        assertTextPresent("BioPlex FitProb for VRC A 5304 gp140 (62) in plate 3", "0.9667");
-//        assertTextPresent("BioPlex ResVar for VRC A 5304 gp140 (62) in plate 3", "0.1895");
+        // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
+        // the same curve fits
+        assertTrue("BioPlex curve fit for VRC A 5304 gp140 (62) in plate 1, 2, or 3",
+                isTextPresent("FI = 0.465914 + (1.5417E+006 - 0.465914) / ((1 + (Conc / 122.733)^-0.173373))^7.64039") ||
+                isTextPresent("FI = 0.582906 + (167.081 - 0.582906) / ((1 + (Conc / 0.531813)^-5.30023))^0.1"));
+        assertTrue("BioPlex FitProb for VRC A 5304 gp140 (62) in plate 1, 2, or 3", isTextPresent("0.9667") || isTextPresent("0.4790"));
+        assertTrue("BioPlex ResVar for VRC A 5304 gp140 (62) in plate 1, 2, 3", isTextPresent("0.1895") || isTextPresent("0.8266"));
 
         compareColumnValuesAgainstExpected("Analyte", "Standard", analytesAndStandardsConfig);
 
+        // Go to the schema browser to check out the parsed curve fits
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " CurveFit");
+        waitForText("view data");
+        clickLinkContainingText("view data");
+
+        // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
+        // the same curve fits
+        assertTrue("BioPlex curve fit parameter for VRC A 5304 gp140 (62) in plate 1, 2, or 3", isTextPresent("0.465914") || isTextPresent("0.582906"));
+        assertTrue("BioPlex curve fit parameter for VRC A 5304 gp140 (62) in plate 1, 2, or 3", isTextPresent("7.64039") || isTextPresent("0.1"));
     }
 
     private void compareColumnValuesAgainstExpected(String column1, String column2, Map<String, Set<String>> column1toColumn2)
