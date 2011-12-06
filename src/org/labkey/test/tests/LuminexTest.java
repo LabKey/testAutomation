@@ -1520,7 +1520,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         setIsoAndConjugate();
 
-        l = Locator.buttonContainingText("Reset Graph");
+        l = Locator.extButton("Apply", 0);
         clickAt(l,  "1,1");
 
         // wait for the test headers in the guide set and tracking data regions
@@ -1668,7 +1668,8 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("end-date-field", "2011-03-28");
         // click a different element on the page to trigger the date change event
         clickAt(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
-        clickButton("Apply", 0);
+        Locator l = Locator.extButton("Apply", 1);
+        clickAt(l,  "1,1");
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         // check that only 3 runs are now present
