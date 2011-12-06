@@ -113,10 +113,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Files");
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("datasets"));
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "Study001.dataset");
-        //waitForElement(Locator.navButton("Import datasets"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.selectFileBrowserItem(this, "datasets/Study001.dataset");
         if (isNavButtonPresent("Delete log"))
             clickNavButton("Delete log");
         selectImportDataAction("Import Datasets");

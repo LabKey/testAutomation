@@ -299,7 +299,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         log("browse pipeline to begin import analysis wizard");
         goToFlowDashboard();
         clickLinkContainingText("FCS files to be imported");
-
+        ExtHelper.selectFileBrowserItem(this, workspacePath + "/");
         if (workspacePath.startsWith("/"))
             workspacePath = workspacePath.substring(1);
         String[] parts = workspacePath.split("/");

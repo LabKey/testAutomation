@@ -44,8 +44,7 @@ public class LibraTest extends MS2Test
         clickLinkContainingText(getProjectName());
 
         clickButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("Libra"));
-        ExtHelper.clickFileBrowserFileCheckbox(this, "iTRAQ.search.xar.xml");
+        ExtHelper.selectFileBrowserItem(this, "xtandem/Libra/iTRAQ.search.xar.xml");
         selectImportDataAction("Import Experiment");
         waitForTextToDisappear("LOADING");
         for (int i = 0; i < 10; i++)

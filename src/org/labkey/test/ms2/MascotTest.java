@@ -18,6 +18,7 @@ package org.labkey.test.ms2;
 
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.IOException;
 import java.io.File;
@@ -211,9 +212,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Upload existing Mascot .dat result file.");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
-        waitAndClick(Locator.fileTreeByName("test3"));
+        ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SEARCH_TYPE + "/test3/");
         selectImportDataAction("Import Results");
 
         log("Verify upload started.");

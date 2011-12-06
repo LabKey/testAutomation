@@ -47,9 +47,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
 
-        waitAndClick(Locator.fileTreeByName("bov_sample"));
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "CAexample_mini.mzXML");
+        ExtHelper.selectFileBrowserItem(this, "bov_sample/CAexample_mini.mzXML");
         selectImportDataAction("Create New Mass Spec Metadata Assay Design");
 
         log("Create a new MS2 sample prep assay definition.");
@@ -66,9 +64,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("bov_sample"));
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "CAexample_mini.mzXML");
+        ExtHelper.selectFileBrowserItem(this, "bov_sample/CAexample_mini.mzXML");
         selectImportDataAction("Use " + TEST_ASSAY_NAME);
 
         log("Describe MS2 run.");
@@ -95,7 +91,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertLinkPresentWithText(ANNOTATION_RUN_NAME);
 
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("bov_sample"));
+        ExtHelper.selectFileBrowserItem(this, "bov_sample/");
         setupEngine();
 
         waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_JAVASCRIPT);
@@ -128,7 +124,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         log("Analyze again.");
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("bov_sample"));
+        ExtHelper.selectFileBrowserItem(this, "bov_sample/");
 
         setupEngine();
 

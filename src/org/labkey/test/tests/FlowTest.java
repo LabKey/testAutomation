@@ -115,8 +115,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for FCS files to be imported");
 
         // Should allow for import all directories containing FCS Files
-        waitForPageToLoad();
-        waitAndClick(Locator.fileTreeByName("8color"));
+        ExtHelper.selectFileBrowserItem(this, "8color/");
         ExtHelper.waitForImportDataEnabled(this);
         waitForElement(ExtHelper.locateBrowserFileCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
@@ -127,8 +126,7 @@ public class FlowTest extends BaseFlowTest
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
         waitForPageToLoad();
-        waitAndClick(Locator.fileTreeByName("8color"));
-        waitAndClick(Locator.fileTreeByName(FCS_FILE_1));
+        ExtHelper.selectFileBrowserItem(this, "8color/" + FCS_FILE_1 + "/");
         waitForElement(ExtHelper.locateBrowserFileCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Current directory of 25 FCS Files");
         assertTextPresent("The following directories within '8color" + File.separator + FCS_FILE_1 + "'");

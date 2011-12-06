@@ -74,11 +74,7 @@ public class MS2Test extends MS2TestBase
         log("Upload existing MS2 data.");
         clickLinkWithText(FOLDER_NAME);
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
-        waitAndClick(Locator.fileTreeByName(testFile1));
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, SAMPLE_BASE_NAME + ".search.xar.xml");
+        ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SEARCH_TYPE + "/" + testFile1 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
 
         selectImportDataAction("Import Experiment");
 
@@ -793,11 +789,7 @@ public class MS2Test extends MS2TestBase
 
         log("Upload second MS2 Run");
         clickNavButton("Process and Import Data");
-        waitAndClick(Locator.fileTreeByName("bov_sample"));
-        waitAndClick(Locator.fileTreeByName(SEARCH_TYPE));
-        waitAndClick(Locator.fileTreeByName(testFile2));
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, SAMPLE_BASE_NAME + ".search.xar.xml");
+        ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SEARCH_TYPE + "/" + testFile2 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
 
         selectImportDataAction("Import Experiment");
 

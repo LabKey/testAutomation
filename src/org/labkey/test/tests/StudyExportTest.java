@@ -71,9 +71,7 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (legacy formats)");
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
-        waitAndClick(Locator.fileTreeByName("export"));
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
+        ExtHelper.selectFileBrowserItem(this, "export/study.xml");
 
         selectImportDataAction("Import Study");
 
@@ -105,12 +103,12 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickNavButton("Delete Study");
         checkCheckbox("confirm");
-        clickNavButton("Delete", WAIT_FOR_PAGE *2); // TODO: Shorten wait (Issue 12731)
+        clickNavButton("Delete", WAIT_FOR_PAGE);
 
         log("Importing exported study (xml formats)");
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
-        waitAndClick(Locator.fileTreeByName("export"));
+        ExtHelper.selectFileBrowserItem(this, "export/");
         ExtHelper.selectAllFileBrowserFiles(this);
 
         selectImportDataAction("Import Study");

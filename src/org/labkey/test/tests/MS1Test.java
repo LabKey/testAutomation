@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * MS1 BVT
@@ -142,12 +143,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         clickNavButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        if(!isTextPresent(BASE_FILE_NAME_1 + SEARCH_XAR_XML_EXTENSION))
-        {
-            //go down to the xtandem protocol directory under xtandem
-            waitAndClick(Locator.fileTreeByName(PIPELINE_XTANDEM_DIR));
-            waitAndClick(Locator.fileTreeByName(xProtocol));
-        }
+        ExtHelper.selectFileBrowserItem(this, PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/");
 
         selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
@@ -159,19 +155,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         clickNavButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        if(!isTextPresent(BASE_FILE_NAME_1 + PIPE_XAR_XML_EXTENSION))
-        {
-            //go down to the xtandem protocol directory under xtandem
-            sleep(3000);
-            waitAndClick(Locator.fileTreeByName(PIPELINE_XTANDEM_DIR));
-            sleep(3000);
-            waitAndClick(Locator.fileTreeByName(xProtocol));
-            //go down to the features protocol directory
-            sleep(3000);
-            waitAndClick(Locator.fileTreeByName(PIPELINE_MS1PEP_DIR));
-            sleep(3000);
-            waitAndClick(Locator.fileTreeByName(featuresProtocol));
-        }
+        ExtHelper.selectFileBrowserItem(this, PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/" + PIPELINE_MS1PEP_DIR + "/" + featuresProtocol + "/");
 
         selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
@@ -183,14 +167,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         clickNavButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        if (!isTextPresent(BASE_FILE_NAME_3 + PIPE_XAR_XML_EXTENSION))
-        {
-            //go down to the protocol directory under the inspect directory
-            sleep(1000);
-            waitAndClick(Locator.fileTreeByName(PIPELINE_INSPECT_DIR));
-            sleep(1000);
-            waitAndClick(Locator.fileTreeByName(protocol));
-        }
+        ExtHelper.selectFileBrowserItem(this, PIPELINE_INSPECT_DIR + "/" + protocol + "/");
 
         selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
