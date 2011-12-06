@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
@@ -97,7 +98,22 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         catch (Throwable t) {}
     }
 
-    protected void init(boolean normalizationEnabled)
+    @Override
+    protected void doTestSteps() throws Exception
+    {
+        init();
+        _doTestSteps();
+        after();
+    }
+
+    protected abstract void _doTestSteps() throws Exception;
+
+    protected boolean requiresNormalization()
+    {
+        return false;
+    }
+
+    protected void init()
     {
         beginAt("/admin/begin.view");
         clickLinkWithText("flow cytometry");
@@ -108,6 +124,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         getPipelineWorkDirectory().mkdir();
         setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
 
+        boolean normalizationEnabled = requiresNormalization();
         if (normalizationEnabled)
             checkCheckbox(Locator.id("normalizationEnabled"));
         else
@@ -125,6 +142,43 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         createSubfolder(PROJECT_NAME, PROJECT_NAME, getFolderName(), "Flow", null);
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
+    }
+
+    protected void after() throws Exception
+    {
+        deleteAllRuns();
+    }
+
+    protected void deleteAllRuns() throws Exception
+    {
+        if (!isLinkPresentWithText(getProjectName()))
+            goToHome();
+        if (!isLinkPresentWithText(getProjectName()))
+            return;
+
+        clickLinkWithText(getProjectName());
+        if (!isLinkPresentWithText(getFolderName()))
+            return;
+
+        clickLinkWithText(getFolderName());
+
+        beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
+        DataRegionTable table = new DataRegionTable("query", this);
+        if (table.getDataRowCount() > 0)
+        {
+            table.checkAllOnPage();
+            selenium.chooseOkOnNextConfirmation();
+            clickButton("Delete", 0);
+            assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+            waitForPageToLoad();
+            assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
+
+            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=DataInputs");
+            assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
+
+            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Datas");
+            assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
+        }
     }
 
     protected String getFolderName()

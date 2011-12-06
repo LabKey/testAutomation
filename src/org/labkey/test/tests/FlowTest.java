@@ -61,13 +61,31 @@ public class FlowTest extends BaseFlowTest
     }
 
     @Override
-    protected void init(boolean normalizationEnabled)
+    protected void init()
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
         RReportHelper.ensureRConfig(this);
 
-        super.init(normalizationEnabled);
+        super.init();
+    }
+
+    protected void _doTestSteps()
+    {
+        containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
+        setupQuery();
+
+        importFiles();
+
+        analysisFilterTest();
+
+        configureSampleSetAndMetadata();
+
+        sampleSetAndMetadataTest();
+
+        positivityReportTest();
+
+        copyAnalysisScriptTest();
     }
 
     protected void setupQuery()
@@ -382,25 +400,6 @@ public class FlowTest extends BaseFlowTest
         setFormElement("name", "QUV analysis");
         submit();
         assertTextPresent("There is already a protocol named 'QUV analysis'");
-    }
-
-    protected void doTestSteps()
-    {
-        init(false);
-        containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
-        setupQuery();
-
-        importFiles();
-
-        analysisFilterTest();
-
-        configureSampleSetAndMetadata();
-
-        sampleSetAndMetadataTest();
-
-        positivityReportTest();
-
-        copyAnalysisScriptTest();
     }
 
 

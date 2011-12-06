@@ -2039,9 +2039,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkPresentWithText(folderName);
         assertLinkPresentWithText(newParent);
     }
+
     public void deleteProject(String project)
     {
-        
         deleteProject(project, 90000); // Wait for 90 seconds for project deletion
     }
 

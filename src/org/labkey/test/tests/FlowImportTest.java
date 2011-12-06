@@ -29,16 +29,8 @@ import java.util.Arrays;
  */
 public class FlowImportTest extends BaseFlowTest
 {
-    @Override
-    protected void doCleanup() throws Exception
+    protected void _doTestSteps() throws Exception
     {
-        super.doCleanup();
-    }
-
-    protected void doTestSteps() throws Exception
-    {
-        init(false);
-
         // set pipeline root
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");

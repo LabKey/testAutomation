@@ -1429,8 +1429,7 @@ public class LuminexTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable("query", this);
         table.setFilter("GuideSet/Created", "Is Not Blank", "");
         // check that the table contains one row that reads "No data to show."
-        assertEquals("Expected no guide set assignments", 1, table.getDataRowCount());
-        assertTextPresent("No data to show.");
+        assertEquals("Expected no guide set assignments", 0, table.getDataRowCount());
         table.clearFilter("GuideSet/Created");
     }
 

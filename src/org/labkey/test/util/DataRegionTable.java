@@ -110,7 +110,7 @@ public class DataRegionTable
         int rows = 0;
         rows = _test.getTableRowCount(getHtmlName()) - (_headerRows + (bottomBarPresent()?1:0));
 
-        if (rows == 1 && "No data to show.".equals(getDataAsText(0, 0)))
+        if (rows == 1 && hasNoDataToShow())
             rows = 0;
 
         return rows;
@@ -226,13 +226,24 @@ public class DataRegionTable
         return -1;
     }
 
+    private boolean hasNoDataToShow()
+    {
+        return "No data to show.".equals(_getDataAsText(_headerRows, 0));
+    }
+
     public String getDataAsText(int row, int column)
+    {
+        return _getDataAsText(row + _headerRows, column + (_selectors ? 1 : 0));
+    }
+
+    // Doesn't adjust for header rows or selector columns.
+    private String _getDataAsText(int row, int column)
     {
         String ret = null;
 
         try
         {
-            ret = _test.getTableCellText(getHtmlName(), row + _headerRows, column + (_selectors ? 1 : 0));
+            ret = _test.getTableCellText(getHtmlName(), row, column);
         }
         catch(Exception ignore) {}
 

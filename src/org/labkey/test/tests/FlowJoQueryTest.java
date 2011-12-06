@@ -34,9 +34,8 @@ import java.util.regex.Matcher;
  */
 public class FlowJoQueryTest extends BaseFlowTest
 {
-    protected void doTestSteps() throws Exception
+    protected void _doTestSteps() throws Exception
     {
-        init(false);
         String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
