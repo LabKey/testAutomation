@@ -174,14 +174,14 @@ public class AncillaryStudyTest extends StudyBaseTest
         }
         assertTextPresent("10 mice");
 
-        verifySpecimens();
+        verifySpecimens(5, 44);
         verifyModifyParticipantGroup(STUDY_NAME);
         verifyModifyParticipantGroup(getFolderName());
         verifyModifyDataset();
         verifyProtocolDocument();
         verifyDatasets();
-//        verifySpecimens(); // TODO: check specimens after modifying participant lists.  Blocked by #13199
-//        verifyExportImport(); // TODO: blocked, #13207 Import with protocol doc broken.
+        verifySpecimens(4, 38); // Lose one specimen and associated vials due to mouse group modification
+        verifyExportImport();
     }
 
     private void verifyModifyParticipantGroup(String study)
@@ -334,19 +334,19 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertTextPresent(UPDATED_DATASET_VAL);
     }
 
-    private void verifySpecimens()
+    private void verifySpecimens(int specimenCount, int vialCount)
     {
         log("Verify copied specimens");
         clickLinkWithText(STUDY_NAME);
         clickLinkWithText("Specimen Data");
         clickLinkWithText("By Vial Group");
         DataRegionTable table = new DataRegionTable("SpecimenSummary", this, false, true);
-        assertEquals("Did not find expected number of specimens.", 5, table.getDataRowCount() - 1); // 5 specimens + 1 total row
-        assertEquals("Incorrect total vial count.", "44", table.getDataAsText(5, "Vial Count"));
+        assertEquals("Did not find expected number of specimens.", specimenCount, table.getDataRowCount() - 1); // n specimens + 1 total row
+        assertEquals("Incorrect total vial count.", String.valueOf(vialCount), table.getDataAsText(specimenCount, "Vial Count"));
         clickLinkWithText("Specimen Data");
         clickLinkWithText("By Individual Vial");
         table = new DataRegionTable("SpecimenDetail", this, false, true);
-        assertEquals("Did not find expected number of vials.", 44, table.getDataRowCount() - 1); // 44 vials + 1 total row
+        assertEquals("Did not find expected number of vials.", vialCount, table.getDataRowCount() - 1); // m vials + 1 total row
 
         log("Verify that Ancillary study doesn't support requests.");
         clickLinkWithText("Manage");
@@ -369,24 +369,19 @@ public class AncillaryStudyTest extends StudyBaseTest
         goToModule("Pipeline");
         clickNavButton("Process and Import Data");
 
-        waitAndClick(Locator.fileTreeByName("export"));
-        waitForText("participant_groups.xml");
+        ExtHelper.selectFileBrowserItem(this, "export/participant_groups.xml");
         log("Verify protocol document in export");
-        waitAndClick(Locator.fileTreeByName("protocolDocs"));
-        waitForText(PROTOCOL_DOC.getName());
+        ExtHelper.selectFileBrowserItem(this, "export/protocolDocs/" + PROTOCOL_DOC.getName());
+        assertTextPresent(PROTOCOL_DOC2.getName());
 
-        waitAndClick(Locator.fileTreeByName("datasets"));
-        waitForText("datasets_metadata.xml");
+        ExtHelper.selectFileBrowserItem(this, "export/datasets/datasets_metadata.xml");
         assertTextPresent(".tsv", (DATASETS.length + DEPENDENT_DATASETS.length) * 3);
         assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset125.tsv",
                 "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset200.tsv",
                 "dataset300.tsv", "dataset350.tsv", "dataset420.tsv", "dataset423.tsv", "dataset490.tsv");
 
         log("Verify reloading study");
-        waitAndClick(Locator.fileTreeByName("export"));
-        waitForText("study.xml");
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
+        ExtHelper.selectFileBrowserItem(this, "export/study.xml");
         selectImportDataAction("Reload Study");
         waitForPipelineJobsToComplete(1, "study import", false);
     }

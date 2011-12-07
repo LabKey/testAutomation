@@ -244,7 +244,7 @@ public class ExtHelper
             else
             {
                 // expand tree node: click on expand/collapse icon
-                test.waitAndClick(Locator.fileTreeByName(parts[i]));
+                test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodeId + "']"));
                 test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             }
         }
