@@ -405,8 +405,9 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
     public void insertViaFormNoPerms(String containerPath, String text, int intNotNull)
     {
-        _insertViaForm(containerPath, text, intNotNull);
-        assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
+        log("** Inserting via form: text='" + text + "', intNotNull=" + intNotNull + "...");
+        beginAt("/query/" + containerPath + "/insertQueryRow.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        assertTextPresent("You do not have permission");
     }
 
     public int insertViaForm(String containerPath, String text, int intNotNull)
