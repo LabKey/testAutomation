@@ -577,8 +577,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
         popLocation();
         clickLinkWithText(PROJECT_NAME);
-        assertTextPresent("Query '" + LIST_NAME + "' has errors");
-        assertTextPresent("List does not exist");
+        assertTextPresent("query not found");
 
         log("Test exporting a nonexistent list returns a 404");
         selenium.open(WebTestHelper.getBaseURL() + exportUrl.substring(WebTestHelper.getContextPath().length()));
