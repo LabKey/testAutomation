@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
@@ -166,6 +167,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         DataRegionTable table = new DataRegionTable("query", this);
         if (table.getDataRowCount() > 0)
         {
+            // Delete all runs
             table.checkAllOnPage();
             selenium.chooseOkOnNextConfirmation();
             clickButton("Delete", 0);
@@ -173,10 +175,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             waitForPageToLoad();
             assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
+            // Check all DataInputs were deleted
             beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=DataInputs");
             assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
 
-            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Datas");
+            // Check all Datas were deleted except for flow analysis scripts (FlowDataType.Script)
+            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Datas&query.LSID~doesnotcontain=Flow-AnalysisScript");
             assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
         }
     }
