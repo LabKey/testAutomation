@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.tests.StudyBaseTest;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
