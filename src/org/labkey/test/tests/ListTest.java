@@ -767,15 +767,15 @@ public class ListTest extends BaseSeleniumWebTest
         sleep(2000);
         assertTextNotPresent("Formatting applied because column > 5.");
 
-        assertTextNotPresent("Formatting applied because column STARTS WITH true.");
+        assertTextNotPresent("Formatting applied because column = true.");
         mouseOver(Locator.xpath("//td[text()='true']"));
         // Tooltip doesn't show instantly, so wait for a bit
         sleep(2000);
-        assertTextPresent("Formatting applied because column STARTS WITH true.");
+        assertTextPresent("Formatting applied because column = true.");
         mouseOut(Locator.xpath("//td[text()='true']"));
         // Tooltip doesn't hide instantly, so wait for a bit
         sleep(2000);
-        assertTextNotPresent("Formatting applied because column STARTS WITH true.");
+        assertTextNotPresent("Formatting applied because column = true.");
     }
 
     private void doRenameFieldsTest()
