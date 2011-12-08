@@ -4341,7 +4341,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Ending impersonation");
         Locator menuLink =  Locator.id("userMenuPopupLink");
-        click(menuLink);
+        waitAndClick(menuLink);
         waitForText("Stop Impersonating");
         clickLinkWithText("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
