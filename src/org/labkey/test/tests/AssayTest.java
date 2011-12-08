@@ -444,6 +444,14 @@ public class AssayTest extends AbstractAssayTest
      */
     private void publishData()
     {
+        log("Prepare visit map to check PTID counts in study navigator.");
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Visits");
+        clickLinkWithText("Import Visit Map");
+        setFormElement("content", "301-302|X|Test Visit");
+        clickNavButton("Import");
+
         log("Publishing the data as the PI");
 
         //impersonate the PI
@@ -483,6 +491,7 @@ public class AssayTest extends AbstractAssayTest
         clickNavButton("Next");
         assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY1 + " Study: Verify Results");
 
+        setFormElement("visitId", "301.5");
         clickNavButton("Copy to Study");
 
         log("Verifying that the data was published");
