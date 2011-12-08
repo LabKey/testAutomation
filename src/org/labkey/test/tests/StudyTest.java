@@ -467,6 +467,27 @@ public class StudyTest extends StudyBaseTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "QCState", "QC State");
         CustomizeViewsHelper.applyCustomView(this);
         assertTextPresent("unknown QC");
+
+        // Test Bad Field Names -- #13607
+        clickNavButton("Manage Dataset");
+        clickNavButton("Edit Definition");
+        clickNavButton("Add Field", 0);
+        ListHelper.setColumnName(this, getPropertyXPath("Dataset Fields"), 4, "Bad Name");
+        clickNavButton("Save");
+        clickNavButton("View Data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Bad Name", "Bad Name");
+        CustomizeViewsHelper.applyCustomView(this);
+        clickMenuButton("QC State", "All data");
+        clickLinkWithText("edit", 0);
+        setFormElement(Locator.input("quf_Bad Name"), "Updatable Value");
+        clickButton("Submit");
+        assertTextPresent("Updatable Value");
+        clickLinkWithText("edit", 0);
+        assertFormElementEquals(Locator.input("quf_Bad Name"), "Updatable Value");
+        setFormElement(Locator.input("quf_Bad Name"), "Updatable Value11");
+        clickButton("Submit");
+        assertTextPresent("Updatable Value11");
     }
 
     protected void verifySpecimens()
