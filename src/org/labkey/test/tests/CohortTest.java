@@ -58,7 +58,7 @@ public class CohortTest extends BaseSeleniumWebTest
         addWebPart("Specimens");
         // Check all cohorts after initial import.
 
-        clickLinkWithText("Blood");
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Blood"), WAIT_FOR_PAGE);
         assertTextPresent("Count: 25"); // 5 participants x 5 visits
         assertTextPresent("Positive", 10);
         assertTextPresent("Negative", 10);
