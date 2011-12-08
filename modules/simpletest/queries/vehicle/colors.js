@@ -24,8 +24,10 @@ function beforeInsert(row, errors) {
         throw new Error("row properties must be case-insensitive.");
 
     // Throwing a script exception will bubble all the way up and cancel the insert immediately.
-    if (row.Hex && row.Hex[0] != "#")
-        throw new Error("color value must start with '#'");
+    if (row.Hex && row.Hex[0] != "#") {
+        errors[null] = "color value must start with '#'";
+        return;
+    }
 
     // Any errors added to the error map will cancel the insert
     // and appear in the html or Ext form next to the field with the error.
@@ -109,7 +111,7 @@ function afterUpdate(row, oldRow, errors) {
         throw new Error("afterUpdate oldRow properties must be case-insensitive.");
 
     if (row.Name[row.Name.length - 1] != "?")
-        throw new Error("Expected color name to end in '?'");
+        errors[null] = "Expected color name to end in '?'";
 }
 
 function beforeDelete(row, errors) {

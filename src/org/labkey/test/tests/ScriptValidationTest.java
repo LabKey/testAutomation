@@ -102,7 +102,6 @@ public class ScriptValidationTest extends SimpleModuleTest
             /* The following exception is logged to the server as it is meant to simulate an unexpected error in
              * script validation */
             log("** Test errors: throw Error()'");
-            checkErrors();
             insertColors(Arrays.asList(new ColorRecord("ShouldError", "not a hex value")));
             fail("Should throw an exception");
         }
@@ -111,7 +110,6 @@ public class ScriptValidationTest extends SimpleModuleTest
             assertTrue("Expected \"color value must start with '#'\", got: \"" + e.getMessage() + "\"",
                     e.getMessage().contains("color value must start with '#'"));
         }
-        checkExpectedErrors(1);
 
         try
         {
