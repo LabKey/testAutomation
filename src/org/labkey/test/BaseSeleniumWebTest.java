@@ -5324,7 +5324,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             setTimeout("" + millis);
             _testTimeout = true;
-            super.open(url);
+            try
+            {
+                super.open(url);
+            }
+            catch (SeleniumException e)
+            {
+                // fall through if we get a 'livemark' exception, which occurs when running offline
+                if (e.getMessage() == null || !e.getMessage().contains("Livemark Service"))
+                    throw e;
+            }
             // commandProcessor.doCommand("open", new String[] {url,"true"}); // Workaround for XHR errors. http://code.google.com/p/selenium/issues/detail?id=408
             _testTimeout = false;
         }

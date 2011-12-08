@@ -199,11 +199,6 @@ public class StudyExportTest extends StudyManualTest
     {
         super.verifySpecimens();
 
-        // verify that we correctly warn when specimen tracking hasn't been configured
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Create New Request");
-        assertTextPresent("Specimen management is not configured for this study");
-
         // configure specimen tracking
         clickLinkWithText(getStudyLabel());
         clickTab("Manage");
@@ -359,6 +354,8 @@ public class StudyExportTest extends StudyManualTest
 
         // test specimen comments
         clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Vials by Derivative", false);
+        waitForText("Plasma, Unknown Processing");
         clickLinkWithText("Plasma, Unknown Processing");
         clickNavButton("Enable Comments/QC");
         checkAllOnPage("SpecimenDetail");
@@ -381,12 +378,14 @@ public class StudyExportTest extends StudyManualTest
 
         // verify that comments remain after second specimen load
         clickLinkWithText(getStudyLabel());
+        clickLinkWithText("Vials by Derivative", false);
+        waitForText("Plasma, Unknown Processing");
         clickLinkWithText("Plasma, Unknown Processing");
         assertTextPresent("These vials are very important.", 2);
 
         // check to see that data in the specimen archive was merged correctly:
         clickLinkWithText(getStudyLabel());
-        clickLinkWithText("By Vial");
+        clickLinkWithText("By Individual Vial");
         clickMenuButton("Page Size", "Show All");
         assertTextPresent("DRT000XX-01");
         clickLinkWithText("Search");
@@ -421,7 +420,8 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Johannesburg, South Africa");
 
         clickLinkWithText(getStudyLabel());
-        clickLinkWithText("View Existing Requests");
+        clickLinkWithText("Specimen Requests", false);
+        clickLinkWithText("View Current Requests");
         clickNavButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
         clickNavButton("Delete missing specimens", 0);

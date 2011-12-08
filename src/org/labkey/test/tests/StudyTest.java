@@ -473,6 +473,7 @@ public class StudyTest extends StudyBaseTest
     {
         clickLinkWithText(getStudyLabel());
         addWebPart("Specimens");
+        waitForText("Blood (Whole)");
         clickLinkWithText("Blood (Whole)");
         clickMenuButton("Page Size", "Show All");
         assertTextNotPresent("DRT000XX-01");
@@ -496,7 +497,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
 
         clickLinkWithText("Specimen Overview");
-        clickLinkWithText("By Vial");
+        clickLinkWithText("By Individual Vial");
         DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
         table.setFilter("QualityControlFlag", "Equals", "true");
         table.setSort("GlobalUniqueId", SortDirection.ASC);
@@ -586,6 +587,7 @@ public class StudyTest extends StudyBaseTest
         clickNavButton("Save");
 
         clickLinkWithText(getStudyLabel());
+        waitForText("Blood (Whole)");
         clickLinkWithText("Blood (Whole)");
         clickNavButton("Enable Comments/QC");
         log("manage participant comments directly");
@@ -597,6 +599,7 @@ public class StudyTest extends StudyBaseTest
         clickNavButton("Submit");
 
         clickLinkWithText(getStudyLabel());
+        waitForText("Blood (Whole)");
         clickLinkWithText("Blood (Whole)");
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320812");
 
