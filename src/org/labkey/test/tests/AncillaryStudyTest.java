@@ -166,7 +166,7 @@ public class AncillaryStudyTest extends StudyBaseTest
             assertLinkPresentWithText(str);
         }
 
-        clickLinkWithText("Shortcuts");
+        clickLinkWithText("Mice");
         waitForText(PTIDS[0]);
         for( String str : PTIDS )
         {
@@ -205,7 +205,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify that modified participant group has no effect on ancillary study.");
         clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Shortcuts");
+        clickLinkWithText("Mice");
         waitForText("Filter:"); // Wait for participant list to appear.
 
         for( String str : PTIDS )
