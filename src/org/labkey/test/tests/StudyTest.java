@@ -471,7 +471,7 @@ public class StudyTest extends StudyBaseTest
         // Test Bad Field Names -- #13607
         clickNavButton("Manage Dataset");
         clickNavButton("Edit Definition");
-        clickNavButton("Add Field", 0);
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
         ListHelper.setColumnName(this, getPropertyXPath("Dataset Fields"), 4, "Bad Name");
         clickNavButton("Save");
         clickNavButton("View Data");
