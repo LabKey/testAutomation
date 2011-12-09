@@ -254,7 +254,7 @@ public class CohortTest extends BaseSeleniumWebTest
         waitForPageToLoad();
 
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Blood");
+        waitAndClick(Locator.linkWithText("Blood"));
 
         assertTextPresent("Positive", 12);
         assertTextPresent("Negative", 4);
