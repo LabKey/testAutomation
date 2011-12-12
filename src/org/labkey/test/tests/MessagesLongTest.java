@@ -117,7 +117,9 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         log("Check email admin works");
         clickWebpartMenuItem("Messages", "Email", "Administration");
 
+        assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
         click(Locator.navButton("Update Settings"));
+        waitForElement(Locator.xpath("//li/a[text()='messages']"), WAIT_FOR_JAVASCRIPT);
         selenium.mouseDown("//li/a[text()='messages']");
         Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@name='defaultEmailOption']/../../div");
 
