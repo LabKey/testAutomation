@@ -213,7 +213,7 @@ public class CohortTest extends BaseSeleniumWebTest
 
         // Check all cohorts after manipulation.
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Blood");
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Blood"), WAIT_FOR_PAGE);
         assertTextPresent("Count: 20"); // 5 participants x 4 visits (was five visits, but one was just deleted)
 
         clickMenuButton("Participant Groups", "Cohorts", "Negative", "Initial cohort");
