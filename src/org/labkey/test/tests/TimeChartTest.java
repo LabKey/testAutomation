@@ -857,6 +857,13 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" CD4", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 0);
+
+        ExtHelper.prevClickFileBrowserFileCheckbox(this, GROUP2_NAME); // de-select.
+        waitForText(CHART_TITLE, 1, WAIT_FOR_JAVASCRIPT); // One chart per group.
+
+        clickNavButton("Save", 0);
+        ExtHelper.waitForExtDialog(this, "Success");
+        ExtHelper.clickExtButton(this, "Success", "OK", 0);
     }
 
     private void multiAxisTimeChartTest()
