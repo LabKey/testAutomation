@@ -448,7 +448,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         if (isPresent)
         {
             clickLink(userAccessLink);
-            Locator groupMembershipLink = Locator.xpath("//td[@id='bodypanel']//td/a[text()='SecurityVerifyProject']/../../td[3]/a");
+            Locator groupMembershipLink = Locator.xpath("//td[@id='bodypanel']//td/a[text()='SecurityVerifyProject']/../../td[4]/a");
             if (isElementPresent(groupMembershipLink))
             {
                 String text = getText(groupMembershipLink);
