@@ -2918,6 +2918,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, 0);
     }
 
+
+
     public void clickAt(Locator l, String coord)
     {
         selenium.clickAt(l.toString(), coord);
@@ -4796,7 +4798,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         beginAt("/admin/showAdmin.view");
     }
 
-
     public void goToPipelineItem(String item)
     {
         int time = 0;
@@ -5074,6 +5075,32 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (null == url || url.length() == 0)
             fail("Could not get the URL for creating a new query in schema " + schemaName);
         beginAt(url);
+    }
+
+
+    protected void createQuery(String container, String name, String queryType, String sql, String xml, boolean inheritable)
+    {
+        String queryURL = "query/" + container + "/begin.view?schemaName=flow";
+        beginAt(queryURL);
+        createNewQuery(queryType);
+        setFormElement("ff_newQueryName", name);
+        clickNavButton("Create and Edit Source");
+//        toggleSQLQueryEditor();
+        setQueryEditorValue("queryText", sql);
+//        setFormElement("queryText", sql);
+        ExtHelper.clickExtTab(this, "XML Metadata");
+        setQueryEditorValue("metadataText", xml);
+//        toggleMetadataQueryEditor();
+//        setFormElement("metadataText", xml);
+        clickButton("Save", 0);
+        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        if (inheritable)
+        {
+            beginAt(queryURL);
+            editQueryProperties("flow", name);
+            selectOptionByValue("inheritable", "true");
+            submit();
+        }
     }
 
     public void validateQueries()

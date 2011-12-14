@@ -218,28 +218,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void createQuery(String container, String name, String sql, String xml, boolean inheritable)
     {
-        String queryURL = "query/" + container + "/begin.view?schemaName=flow";
-        beginAt(queryURL);
-        createNewQuery("flow");
-        setFormElement("ff_newQueryName", name);
-        clickNavButton("Create and Edit Source");
-//        toggleSQLQueryEditor();
-        setQueryEditorValue("queryText", sql);
-//        setFormElement("queryText", sql);
-        ExtHelper.clickExtTab(this, "XML Metadata");
-        setQueryEditorValue("metadataText", xml);
-//        toggleMetadataQueryEditor();
-//        setFormElement("metadataText", xml);
-        clickButton("Save", 0);
-        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
-        if (inheritable)
-        {
-            beginAt(queryURL);
-            editQueryProperties("flow", name);
-            selectOptionByValue("inheritable", "true");
-            submit();
-        }
-        beginAt(queryURL);
+        super.createQuery(container, name, "flow", sql, xml, inheritable);
+        goToSchemaBrowser();
     }
 
     protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, boolean existingKeywordRun, String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)

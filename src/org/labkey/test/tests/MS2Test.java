@@ -1212,7 +1212,46 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("29%");
         popLocation();
 */
+
+        queryValidationTest();
+
     }
 
+    //issue 12342
+    private void queryValidationTest()
+    {
+        log("Validate previously failing queiries");
 
+
+        String  sqlGroupNumberDisplay =    "SELECT ProteinGroups.\"Group\", \n" +
+                "ProteinGroups.GroupProbability, \n" +
+                "ProteinGroups.ErrorRate, \n" +
+                "ProteinGroups.UniquePeptidesCount, \n" +
+                "ProteinGroups.TotalNumberPeptides \n" +
+                "FROM ProteinGroups ";
+
+        String expectedError = "Could not resolve IndistinguishableCollectionId column";
+
+        createQuery(getProjectName() + "/ms2folder", "GroupNumberTest", "ms2", sqlGroupNumberDisplay, "", false);
+        ExtHelper.clickExtTab(this, "Source");
+        clickButtonContainingText("Execute Query", 0);
+        waitForText(expectedError);
+        assertTextPresent(expectedError, 13);
+
+        //add correct text
+        String  sqlGroupNumberDisplay2 =    "SELECT ProteinGroups.\"Group\", \n" +
+                "ProteinGroups.GroupProbability, \n" +
+                "ProteinGroups.ErrorRate, \n" +
+                "ProteinGroups.UniquePeptidesCount, \n" +
+                "ProteinGroups.TotalNumberPeptides, \n" +
+                "ProteinGroups.IndistinguishableCollectionId \n" +
+                "FROM ProteinGroups ";
+
+        createQuery(getProjectName() + "/ms2folder", "GroupNumberTestCorrect", "ms2", sqlGroupNumberDisplay2 + "\n", "", false);
+        ExtHelper.clickExtTab(this, "Source");
+        clickButtonContainingText("Execute Query", 0);
+        assertTextNotPresent(expectedError);
+        goToHome();
+
+    }
 }
