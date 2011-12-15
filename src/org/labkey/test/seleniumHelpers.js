@@ -176,7 +176,7 @@ selenium.getContainerId = function () {
 // firefox error console listener
 // http://sejq.blogspot.com/2008/12/can-selenium-detect-if-page-has.html
 // https://developer.mozilla.org/en/Console_service
-if (browserVersion.isChrome) {
+if (browserVersion.isFirefox) {
     var consoleListener = {
         installed: false,
         observe: function( msg ) {
@@ -203,20 +203,13 @@ if (browserVersion.isChrome) {
             catch (e) {
                 LOG.error("JsErrorChecker observe error: " + e.message);
             }
-        },
-        QueryInterface: function (iid) {
-             if (!iid.equals(Components.interfaces.nsIConsoleListener) &&
-                   !iid.equals(Components.interfaces.nsISupports)) {
-                 throw Components.results.NS_ERROR_NO_INTERFACE;
-             }
-             return this;
         }
    };
  }
 
 selenium.doBeginJsErrorChecker = function() {
     try {
-        if (browserVersion.isChrome) {// firefox
+        if (browserVersion.isFirefox) {// firefox
             if (!consoleListener.installed)
             {
                 var consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
@@ -229,16 +222,16 @@ selenium.doBeginJsErrorChecker = function() {
                 LOG.warn("console listener already registered");
             }
         } else {
-            throw new Error("TODO: Non-FF browser...");
+            throw new SeleniumError("TODO: Non-FF browser...");
         }
     } catch (e) {
-        throw new Error("doBeginJsErrorChecker() threw an exception: " + e.message);
+        throw new SeleniumError("doBeginJsErrorChecker() threw an exception: " + e.message);
     }
 };
 
 selenium.doEndJsErrorChecker = function() {
     try {
-        if (browserVersion.isChrome) {// firefox
+        if (browserVersion.isFirefox) {// firefox
             if (consoleListener.installed) {
                 var consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
                 consoleService.unregisterListener(consoleListener);
