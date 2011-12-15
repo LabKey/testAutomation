@@ -425,12 +425,12 @@ public class SecurityTest extends BaseSeleniumWebTest
         createUserAndNotify(TO_BE_DELETED_USER, NORMAL_USER_TEMPLATE);
 
         // verify permissions
-        checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators");
-        checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers");
+        checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
+        checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers", 1);
         assertTextPresent("Site Users >  User Details >  Permissions >  ");
     }
 
-    protected void checkGroupMembership(String userName, String groupName)
+    protected void checkGroupMembership(String userName, String groupName, int expectedCount)
     {
         clickLinkWithText("Site Users");
 
@@ -448,14 +448,10 @@ public class SecurityTest extends BaseSeleniumWebTest
         if (isPresent)
         {
             clickLink(userAccessLink);
-            Locator groupMembershipLink = Locator.xpath("//td[@id='bodypanel']//td/a[text()='SecurityVerifyProject']/../../td[4]/a");
-            if (isElementPresent(groupMembershipLink))
-            {
-                String text = getText(groupMembershipLink);
-                assertEquals("The group membership does not match what is expected", groupName, text);
-                return;
-            }
             
+            // check for the expected number of group membership links (note: they may be hidden by expandos)
+            assertLinkPresentWithTextCount(groupName, expectedCount);
+            return;
         }
         fail("Unable to verify group membership of cloned user privileges");
     }
