@@ -151,12 +151,10 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         waitForElement(Locator.xpath( getPropertyXPath(ASSAY_NAME_TSV + " Data Fields")), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnLabel(this, getPropertyXPath(ASSAY_NAME_TSV + " Data Fields"), 4, "Blank");
-        //TODO: blocked. Aliased columns can't be required
-        // 12168: Assay required fields do not acknowledge aliased columns
-        //ListHelper.setColumnLabel(this, 7, "Result");
-        //ListHelper.setColumnName(this, 7, "Result");
-        //click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='" + "Advanced" + "']"));
-        //setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']") , "Score");                   
+        ListHelper.setColumnLabel(this, 7, "Result");
+        ListHelper.setColumnName(this, 7, "Result");
+        click(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='" + "Advanced" + "']"));
+        setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']") , "Score");                   
         
         clickNavButton("Save & Close");
         clickNavButton("Next");        
@@ -167,7 +165,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Verify standard column aliases");
         clickLinkWithText(PROJECT_NAME);
-        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_1);
+        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_1);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "specId");
@@ -176,7 +174,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("Date", "draw_date");
         clickNavButton("Cancel");
         refresh(); // avoid file selection timeout
-        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_2);
+        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_2);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId1");
@@ -185,7 +183,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("Date", "drawDate");
         clickNavButton("Cancel");
         refresh(); // avoid file selection timeout
-        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_3);
+        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_3);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId");
@@ -194,7 +192,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("Date", "date");
         clickNavButton("Cancel");
         refresh(); // avoid file selection timeout
-        ExtHelper.clickFileBrowserFileCheckbox(this, ALIASED_ASSAY_4);
+        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_4);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "guspec");
