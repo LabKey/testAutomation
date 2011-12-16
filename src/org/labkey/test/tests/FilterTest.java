@@ -24,6 +24,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.RReportHelper;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
@@ -35,6 +36,7 @@ public class FilterTest extends ListTest
 
     public void doTestSteps()
     {
+        RReportHelper.ensureRConfig(this);
         setUpList(PROJECT_NAME);
         CustomizeViewsHelper.createRView(this, null, rViewName);
         filterTest();
