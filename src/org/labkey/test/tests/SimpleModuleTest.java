@@ -27,6 +27,7 @@ import org.labkey.test.util.RReportHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -342,20 +343,23 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
             if (selectResp.getRowCount().intValue() > 0)
             {
                 Map<String, List<Map<String, Object>>> rowsByContainer = new LinkedHashMap<String, List<Map<String, Object>>>();
-                if (selectResp.getColumnModel("Container") != null)
+                for (Map<String, Object> row : selectResp.getRows())
                 {
-                    for (Map<String, Object> row : selectResp.getRows())
-                    {
-                        String container = (String)row.get("Container");
-                        List<Map<String, Object>> rows = rowsByContainer.get(container);
-                        if (rows == null)
-                            rowsByContainer.put(container, rows = new ArrayList<Map<String, Object>>());
-                        rows.add(row);
-                    }
-                }
-                else
-                {
-                    rowsByContainer.put(null, selectResp.getRows());
+                    Row convertedRow = new RowMap(row);
+
+                    String container = null;
+                    if(convertedRow.getValue("Container") != null)
+                        container = convertedRow.getValue("Container").toString();
+
+                    String keyField = selectResp.getMetaData().get("id").toString();
+                    Map<String, Object> newRow = new HashMap<String, Object>();
+                    Object value = convertedRow.getValue(keyField);
+                    newRow.put(keyField, value);
+
+                    List<Map<String, Object>> rows = rowsByContainer.get(container);
+                    if (rows == null)
+                        rowsByContainer.put(container, rows = new ArrayList<Map<String, Object>>());
+                    rows.add(newRow);
                 }
 
                 for (String container : rowsByContainer.keySet())

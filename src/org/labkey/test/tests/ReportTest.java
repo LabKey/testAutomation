@@ -237,6 +237,12 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("Female");
     }
 
+    @Override
+    protected String getProjectName()
+    {
+        return "ReportVerifyProject";  // don't want this test to stomp on StudyVerifyProject
+    }
+
     protected void doCreateRReports()
     {
         log("Create an R Report");
@@ -494,7 +500,7 @@ public class ReportTest extends StudyBaseTest
     {
         click(Locator.linkWithText("Projects"));
         sleep(3000);
-        clickLinkWithText("StudyVerifyProject");
+        clickLinkWithText(getProjectName());
         clickLinkWithText("My Study");
 
         // create a test group and give it container read perms
@@ -580,16 +586,16 @@ public class ReportTest extends StudyBaseTest
         // test security
         click(Locator.linkWithText("Projects"));
         sleep(3000);
-        clickLinkWithText("StudyVerifyProject");
+        clickLinkWithText(getProjectName());
         clickLinkWithText("My Study");
 
         clickReportGridLink("participant chart", "permissions");
-        selenium.click("useExplicit");
+        selenium.click("useCustom");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickNavButton("Save");
 
         clickReportGridLink(TEST_GRID_VIEW, "permissions");
-        selenium.click("useExplicit");
+        selenium.click("useCustom");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickNavButton("Save");
 
@@ -597,7 +603,7 @@ public class ReportTest extends StudyBaseTest
         sleep(3000);
         clickLinkWithText("Admin Console");
         impersonate(TEST_USER);
-        clickLinkWithText("StudyVerifyProject");
+        clickLinkWithText(getProjectName());
         clickLinkWithText("My Study");
 
         assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");

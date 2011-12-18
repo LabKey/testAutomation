@@ -472,7 +472,8 @@ public class StudyTest extends StudyBaseTest
         clickNavButton("Manage Dataset");
         clickNavButton("Edit Definition");
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
-        ListHelper.setColumnName(this, getPropertyXPath("Dataset Fields"), 4, "Bad Name");
+        int newFieldIndex = getXpathCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
+        ListHelper.setColumnName(this, getPropertyXPath("Dataset Fields"), newFieldIndex, "Bad Name");
         clickNavButton("Save");
         clickNavButton("View Data");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
