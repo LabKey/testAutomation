@@ -1368,11 +1368,6 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void guideSetApiTest()
     {
-        javascriptReadTest();
-    }
-
-    private void javascriptReadTest()
-    {
         clickLinkContainingText(getProjectName());
         assertTextNotPresent("GS Analyte");
         addWebPart("Wiki");
@@ -1380,33 +1375,26 @@ public class LuminexTest extends AbstractQCAssayTest
         setWikiBody(getFileContents("server/test/data/api/LuminexGuideSet.html"));
         saveWikiPage();
 
-        // QueryWebParts are being loaded via AJAX, so wait for them to show up
-        String[] titles = {"TestAssayLuminex Analyte", "TestAssayLuminex AnalyteTitration", "TestAssayLuminex CurveFit", "TestAssayLuminex GuideSet", "TestAssayLuminex GuideSetCurveFit"};
-        for (String title : titles)
-        {
-            waitForText(title);
-        }
-        assertTextPresentInThisOrder(titles);
+        click(Locator.id("button_loadqwps"));
+        waitForText("Done loading QWPs");
+        assertTextNotPresent("Error:");
 
-        DataRegionTable drt = new DataRegionTable("GuideSetQWP", this);
+        click(Locator.id("button_testiud"));
+        waitForText("Done testing inserts, updates, and deletes");
+        assertTextNotPresent("Error:");
 
-        click(Locator.id("button_commitLegal"));
-        waitForText("inserted via javascript");
-        assertEquals("inserted via javascript",  new DataRegionTable("GuideSetQWP", this).getDataAsText(3, "Comment"));
-        waitForText("Updated GuideSet via javascript");
-        assertEquals("Updated GuideSet via javascript",  new DataRegionTable("GuideSetQWP", this).getDataAsText(0, "Comment"));
-        waitForText("Updated name");
-        assertEquals("Updated name",  new DataRegionTable("AnalyteQWP", this).getDataAsText(0, "Name"));
+        click(Locator.id("button_updateCurveFit"));
+        waitForText("Done with CurveFit update");
+        assertTextNotPresent("Error:");
 
-        String[] buttonsForUnauthorized = {"button_updateCurveFit", "button_updateGuideSetCurveFit"};
+        click(Locator.id("button_updateGuideSetCurveFit"));
+        waitForText("Done with GuideSetCurveFit update");
+        assertTextNotPresent("Error:");
 
-        for(String buttonId:  buttonsForUnauthorized)
-        {
-            click(Locator.id(buttonId));
-            waitForText("Unauthorized");
-            clickButtonContainingText("OK", 0);
-            waitForExtMaskToDisappear();
-        }
+        // check the QWPs again to make the inserts/updates/deletes didn't affected the expected row counts
+        click(Locator.id("button_loadqwps"));
+        waitForText("Done loading QWPs again");
+        assertTextNotPresent("Error:");        
     }
 
     private void verifyLeveyJenningsRplots()

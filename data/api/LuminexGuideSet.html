@@ -1,260 +1,202 @@
 
-<input type="button" value="Commit legal actions" onClick="updateAndInsert();" id="button_commitLegal"/>
-<input type="button" value="Attempt update CurveFit"  onClick="updateCurveFit();" id="button_updateCurveFit"/>
-<input type="button" value="Attempt update GuideSetCurveFit"  onClick="updateGuideSetCurveFit();" id="button_updateGuideSetCurveFit"/>
-<div id='myDivAnalyte'></div>
-<div id='myDivAnalyteTitration'></div>
-<div id='myDivCurveFit'></div>
-<div id='myDivGuideSet'></div>
-<div id='myDivGuideSetCurveFit'></div>
+<input type="button" value="Load QWPs" onClick="loadQWP(0);" id="button_loadqwps"/>
+<input type="button" value="Test Insert,Update,Delete" onClick="testInsertUpdateDelete(0);" id="button_testiud"/>
+<input type="button" value="Attempt update CurveFit"  onClick="updateCurveFit('CurveFit', 'RowId');" id="button_updateCurveFit"/>
+<input type="button" value="Attempt update GuideSetCurveFit"  onClick="updateCurveFit('GuideSetCurveFit', 'GuideSetId');" id="button_updateGuideSetCurveFit"/>
+<div id='qwp-div'></div>
+<div id="log-info"></div>
 
 <script type="text/javascript">
+        var tablePrefix = "TestAssayLuminex";
+        var loadedQWPsOnce = false;
+        var currentStep = 0;
+        var logHtml = "";
 
-        var myGrid = null;
+        var qwpArray = [
+            {table: "Analyte", cols: ["RowId", "Name"], sort: "RowId", expectedRows: 10},
+            {table: "AnalyteTitration", cols: ["Analyte", "Titration"], sort: "Analyte, Titration", expectedRows: 10},
+            {table: "CurveFit", cols: ["RowId", "EC50", "AUC"], sort: "RowId", expectedRows: 20},
+            {table: "GuideSet", cols: ["RowId", "AnalyteName", "Conjugate", "Isotype", "Comment"], sort: "RowId"},
+            {table: "GuideSetCurveFit", cols: ["GuideSetId", "AUCAverage", "EC50Average"], sort: "GuideSetId"}, // TODO: add expectedRows: 6 back when Issue 13724 fixed
+            {table: "QCFlags", cols: ["RowId", "FlagType", "Description", "Enabled"], sort: "RowId", expectedRows: 7},
+            {table: "Titration", cols: ["RowId", "Name"], sort: "RowId", expectedRows: 5},
+            {table: "RunExclusion", cols: ["RunId", "Comment"], sort: "RunId", expectedRows: 0},
+            {table: "WellExclusion", cols: ["RowId", "Description", "Comment"], sort: "RowId", expectedRows: 1}
+        ];
 
-        function loadAnalyteTitration()
+        function loadQWP(index)
         {
+            var record = qwpArray[index];
+            var sql = 'SELECT ';
+            for (var i = 0; i < record.cols.length; i++)
+            {
+                sql += (i > 0 ? ',' : '') + ' x.' + record.cols[i];
+            }
+            sql += ' FROM "' + tablePrefix + ' ' + record.table + '"' + ' AS x';
+
             new LABKEY.QueryWebPart({
-               dataRegionName: 'AnalyteTitrationQWP',
-               title: 'TestAssayLuminex AnalyteTitration',
+               title: tablePrefix + ' ' + record.table,
                schemaName: 'assay',
-               sql: 'SELECT x.Analyte, x.Titration FROM "TestAssayLuminex AnalyteTitration" AS x',
-               sort: 'Analyte, Titration',
-               renderTo: 'myDivAnalyteTitration'
+               sql: sql,
+               sort: record.sort,
+               renderTo: 'qwp-div',
+               success: function(dataRegion, request) {
+                   updateLog("Success: loaded " + record.table + " QWP with " + dataRegion.rowCount + ".", true);
+                   if (record.expectedRows != undefined && record.expectedRows != dataRegion.rowCount)
+                   {
+                       updateLog("<span class='labkey-error'>Error: unexpcted number of records in " + record.table + " QWP (expected " + record.expectedRows + ")</span>", true);
+                   }
+
+                   if (qwpArray.length > index+1)
+                   {
+                       loadQWP(index+1);
+                   }
+                   else
+                   {
+                       updateLog("Done loading QWPs" + (loadedQWPsOnce ? " again" : ""), true);
+                       updateLog("", true); // add a blank line
+                       Ext.get('qwp-div').update(""); // clear the QWP div
+                       loadedQWPsOnce = true;
+                   }
+               }
             });
-
-
-
-           new LABKEY.ext.Store({
-              autoLoad: true,
-              schemaName: 'assay',
-              queryName: 'TestAssayLuminex AnalyteTitration',
-              columns: 'RowId',
-              listeners: {
-                  scope: this,
-                  'load': function(store, records, options) {
-                      // you can check things like the number of records in the store
-                      idAnalyteTitration =  records[0].get("AnalyteId");
-
-                  }
-              }
-           });
         }
 
-        var idGuideSetCurveFit;
-        var idAnalyteTitration;
-        var idAnalyte;
-        var idGuideSet;
-        var idCurveFit;
+        var insertArray = [
+            {table: "Analyte", insertRow: {}, insertFailureExpected: true},
+            {table: "AnalyteTitration", insertRow: {}, insertFailureExpected: true},
+            {table: "CurveFit", insertRow: {}, insertFailureExpected: true},
+            {table: "GuideSet", keyVar: "rowId", updateVar: "comment", insertRow: {analyteName: "Test Analyte", titrationName: "Test Titration", currentGuideSet: false}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: true},
+            {table: "GuideSetCurveFit", insertRow: {}, insertFailureExpected: true},
+            {table: "QCFlags", keyVar: "rowid", updateVar: "comment", insertRow: {runId: 1, flagType: "TEST", description: "Test Description", enabled: true}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false},
+            {table: "Titration", insertRow: {}, insertFailureExpected: true},
+            {table: "RunExclusion", keyVar: "runid", updateVar: "comment", insertRow: {runid: 1}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false},
+            {table: "WellExclusion", keyVar: "rowid", updateVar: "comment", insertRow: {dataId: 1}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false}
+        ];
 
-        function loadGuideSetCurveFit()
+        function testInsertUpdateDelete(index)
         {
-            new LABKEY.QueryWebPart({
-               dataRegionName: 'GuideSetCurveFitQWP',
-               title: 'TestAssayLuminex GuideSetCurveFit',
-               schemaName: 'assay',
-               sql: 'SELECT x.GuideSetId, x.AUCAverage, x.EC50Average FROM "TestAssayLuminex GuideSetCurveFit" AS x',
-               sort: 'GuideSetId',
-               renderTo: 'myDivGuideSetCurveFit',
-              success: function(dataRegion, result) {
-                   console.log(dataRegion);
-                   console.log(result);
-              }
-            });
+            var record = insertArray[index];
 
-
-
-           new LABKEY.ext.Store({
-              autoLoad: true,
-              schemaName: 'assay',
-              queryName: 'TestAssayLuminex GuideSetCurveFit',
-              columns: 'RowId',
-              listeners: {
-                  scope: this,
-                  'load': function(store, records, options) {
-                      // you can check things like the number of records in the store
-                      idGuideSetCurveFit =  records[0].get("GuideSetId");
-
-                  }
-              }
-           });
-        }
-
-
-       function loadGuideSet()
-       {
-           new LABKEY.QueryWebPart({
-              dataRegionName: 'GuideSetQWP',
-              title: 'TestAssayLuminex GuideSet',
-              schemaName: 'assay',
-              sql: 'SELECT x.RowId, x.AnalyteName, x.Conjugate, x.Isotype, x.Comment FROM "TestAssayLuminex GuideSet" AS x',
-              sort: 'RowId',
-              renderTo: 'myDivGuideSet',
-              success: function(dataRegion, result) {
-                   console.log(dataRegion);
-                   console.log(result);
-              }
-           });
-
-           new LABKEY.ext.Store({
-              autoLoad: true,
-              schemaName: 'assay',
-              queryName: 'TestAssayLuminex GuideSet',
-              columns: 'RowId, AnalyteName, Conjugate, Isotype, Comment',
-              listeners: {
-                  scope: this,
-                  'load': function(store, records, options) {
-                      // you can check things like the number of records in the store
-                      idGuideSet =  records[0].get("RowId");
-
-                  }
-              }
-           });
-       }
-
-        function loadAnalyte()
-        {
-            new LABKEY.QueryWebPart({
-               dataRegionName: 'AnalyteQWP',
-               title: 'TestAssayLuminex Analyte',
-               schemaName: 'assay',
-               sql: 'SELECT x.RowId, x.Name FROM "TestAssayLuminex Analyte" AS x',
-               sort: 'RowId',
-               renderTo: 'myDivAnalyte'
-            });
-
-
-
-           new LABKEY.ext.Store({
-              autoLoad: true,
-              schemaName: 'assay',
-              queryName: 'TestAssayLuminex Analyte',
-              columns: 'RowId',
-              listeners: {
-                  scope: this,
-                  'load': function(store, records, options) {
-                      // you can check things like the number of records in the store
-                      idAnalyte=  records[0].get("RowId");
-
-                  }
-              }
-           });
-        }
-
-
-
-        function loadCurveFit()
-        {
-            new LABKEY.QueryWebPart({
-               dataRegionName: 'CurveFitQWP',
-               title: 'TestAssayLuminex CurveFit',
-               schemaName: 'assay',
-               sql: 'SELECT x.RowId, x.EC50, x.AUC FROM "TestAssayLuminex CurveFit" AS x',
-               sort: 'RowId',
-               renderTo: 'myDivCurveFit'
-            });
-
-
-           new LABKEY.ext.Store({
-              autoLoad: true,
-              schemaName: 'assay',
-              queryName: 'TestAssayLuminex CurveFit',
-              columns: 'RowId',
-              listeners: {
-                  scope: this,
-                  'load': function(store, records, options) {
-                      // you can check things like the number of records in the store
-                      idCurveFit =  records[0].get("RowId");
-
-                  }
-              }
-           });
-        }
-
-        function updateUpdatables()
-        {
-            LABKEY.Query.updateRows({
+            LABKEY.Query.insertRows({
                 schemaName: 'assay',
-                queryName: 'TestAssayLuminex GuideSet',
-                rows: [{rowId:idGuideSet, "Comment":"Updated GuideSet via javascript"}],
-                success: function(data) {
-                    loadGuideSet();
-                }
+                queryName: tablePrefix + ' ' + record.table,
+                rows: [record.insertRow],
+                success: insertSuccess(record, index),
+                failure: insertFailure("insert", record, index, record.insertFailureExpected)
             });
+        }
 
-            LABKEY.Query.updateRows({
+        function insertSuccess(record, index)
+        {
+            return function(data) {
+                updateLog("Success: inserted record into " + record.table, true);
+                if (data.rowsAffected != 1)
+                    updateLog("<span class='labkey-error'>Error: unexpected number of rows affected by insert into " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
+
+                var keyVal = data.rows[0][record.keyVar];
+                var updateRow = record.insertRow;
+                updateRow[record.keyVar] = keyVal;
+                updateRow[record.updateVar] = "updated via javascript";
+                console.log(updateRow);
+
+                LABKEY.Query.updateRows({
+                    schemaName: 'assay',
+                    queryName: tablePrefix + ' ' + record.table,
+                    rows: [updateRow],
+                    success: updateSuccess(record, index),
+                    failure: insertFailure("update", record, index, record.updateFailureExpected)
+                });
+            }
+        }
+
+        function updateSuccess(record, index)
+        {
+            return function(data) {
+                updateLog("Success: updated record in " + record.table, true);
+                if (data.rowsAffected != 1)
+                    updateLog("<span class='labkey-error'>Error: unexpected number of rows affected by update in " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
+
+                var deleteRow = {};
+                deleteRow[record.keyVar] = data.rows[0][record.keyVar];
+
+                if (record.deleteFailureExpected)
+                {
+                    checkForNextInsert(index);
+                }
+                else
+                {
+                    LABKEY.Query.deleteRows({
+                        schemaName: 'assay',
+                        queryName: tablePrefix + ' ' + record.table,
+                        rows: [deleteRow],
+                        success: function(data){
+                            updateLog("Success: deleted record from " + record.table, true);
+                            checkForNextInsert(index);
+                        },
+                        failure: insertFailure("delete", record, index, record.deleteFailureExpected)
+                    });
+                }
+            }
+        }
+
+        function insertFailure(type, record, index, failureExpected)
+        {
+            return function(response){
+                if (failureExpected)
+                    updateLog("Expected " + type + " failure for " + record.table + ": " + response.exception, true);
+                else
+                    updateLog("<span class='labkey-error'>Error: " + type + " failured for " + record.table + ": " + response.exception + "</span>", true);
+
+                checkForNextInsert(index);
+            }
+        }
+
+        function checkForNextInsert(index)
+        {
+            if (insertArray.length > index+1)
+            {
+               testInsertUpdateDelete(index+1);
+            }
+            else
+            {
+               updateLog("Done testing inserts, updates, and deletes", true);
+               updateLog("", true); // add a blank line
+            }
+        }
+
+
+        function updateCurveFit(table, keyVar)
+        {
+            LABKEY.Query.selectRows({
                 schemaName: 'assay',
-                queryName: 'TestAssayLuminex Analyte',
-                rows: [{rowId:idAnalyte, "Name":"Updated name"}],
+                queryName: tablePrefix + ' ' + table,
                 success: function(data) {
-                    loadAnalyte();
+                    var updateRow = {};
+                    updateRow[keyVar] = data.rows[0][keyVar];
+
+                    // expect the update for teh CurveFit table to fail
+                    LABKEY.Query.updateRows({
+                        schemaName: 'assay',
+                        queryName: tablePrefix + ' ' + table,
+                        rows: [updateRow],
+                        success: function(){
+                            updateLog("Error: unexpected successful update of " + table, true);
+                            updateLog("Done with " + table + " update", true);
+                            updateLog("", true);
+                        },
+                        failure: function(response){
+                            updateLog("Expected update failure for " + table + ": " + response.exception, true);
+                            updateLog("Done with " + table + " update", true);
+                            updateLog("", true);                            
+                        }
+                     });
                 }
-            });
-
-//            LABKEY.Query.updateRows({
-//                schemaName: 'assay',
-//                queryName: 'TestAssayLuminex AnalyteTitration',
-//                rows: [{rowId:idAnalyteTitration, "MaxFI":"99999"}],
-//                success: function(data) {
-//                    loadAnalyteTitration();
-//                }
-//            });
-
-//            LABKEY.Query.updateRows({
-//                schemaName: 'assay',
-//                queryName: 'TestAssayLuminex GuideSetCurveFit',
-//                rows: [{rowId:idGuideSetCurveFit, "Comment":"Updated GuideSetCurveFit via javascript"}],
-//                success: function(data) {
-//                    loadGuideSetCurveFit();
-//                }
-//             });
-
-
-        }
-
-        function insertInsertables()
-        {
-
-            var results = LABKEY.Query.insertRows({
-                schemaName: "assay",
-                queryName: "TestAssayLuminex GuideSet",
-                rows: [{'analytename':'GS Analyte (1)', 'comment':'inserted via javascript'}],
-                success: function(data) {
-                    loadGuideSet();
-                }
-            });
-        }
-
-        function updateAndInsert()
-        {
-            insertInsertables();
-            updateUpdatables();
-        }
-
-        function updateCurveFit()
-        {
-            LABKEY.Query.updateRows({
-                schemaName: 'assay',
-                queryName: 'TestAssayLuminex CurveFit',
-                rows: [{rowId:idCurveFit, "RowId":"Updated name"}]
-
              });
         }
 
-        function updateGuideSetCurveFit()
-        {
-            LABKEY.Query.updateRows({
-                schemaName: 'assay',
-                queryName: 'TestAssayLuminex GuideSetCurveFit',
-                rows: [{GuideSetId:idGuideSetCurveFit, "RunCount":"5"}]
-
-             });
+        function updateLog(newHtml, newLine){
+            logHtml += (newLine ? "<br/>" : "") + newHtml;
+            Ext.get('log-info').update(logHtml);
         }
-
-
-    loadAnalyte();
-    loadAnalyteTitration();
-    loadCurveFit();
-    loadGuideSet();
-    loadGuideSetCurveFit();
 </script>
