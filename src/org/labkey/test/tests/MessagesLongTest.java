@@ -285,7 +285,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("names", USER3);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
-        
+
         clickLinkWithText(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "New");
         setFormElement("emailList", USER2);

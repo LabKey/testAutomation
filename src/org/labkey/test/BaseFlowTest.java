@@ -77,11 +77,14 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         beginAt("/Flow" + containerPath + "/showJobs.view");
 
         long startTime = System.currentTimeMillis();
-        while(!isTextPresent("There are no running or pending flow jobs") && System.currentTimeMillis() - startTime < 300000)
+        do
         {
-            sleep(2000);
+            log("Waiting for flow pipeline jobs to complete...");
+            sleep(1500);
             refresh();
         }
+        while (!isTextPresent("There are no running or pending flow jobs") && System.currentTimeMillis() - startTime < 300000);
+
         popLocation(longWaitForPage);
     }
 

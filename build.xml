@@ -1136,7 +1136,7 @@
         <delete failonerror="false" dir="${project.root}/sampledata/rlabkey"/>
     </target>
 
-    <target name="install-rpackages" depends="install-rlabkey, install-ruminex, install-flowStats, install-flowWorkspace">
+    <target name="install-rpackages" depends="install-rlabkey, install-ruminex, install-flowWorkspace, install-flowStats">
     </target>
 
     <macrodef name="check-R-package-installed">
@@ -1266,7 +1266,7 @@
         </exec>
     </target>
 
-    <target name="install-flowStats" depends="install-flowStats-binary, install-flowStats-source">
+    <target name="install-flowStats" depends="install-flowWorkspace, install-flowStats-binary, install-flowStats-source">
     </target>
 
     <target name="check-flowWorkspace-installed" if="R.present" depends="locate-R">
@@ -1299,7 +1299,7 @@
         </exec>
     </target>
 
-    <target name="install-flowWorkspace" depends="install-flowStats, install-flowWorkspace-binary, install-flowWorkspace-source">
+    <target name="install-flowWorkspace" depends="install-flowWorkspace-binary, install-flowWorkspace-source">
     </target>
 
     <target name="locate-R">

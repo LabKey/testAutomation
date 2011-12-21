@@ -312,7 +312,7 @@ public class FlowTest extends BaseFlowTest
     // Test sample set and ICS metadata
     protected void configureSampleSetAndMetadata()
     {
-        // upload sample set
+        log("** Uploading sample set");
         goToFlowDashboard();
         clickLinkWithText("Upload Sample Descriptions");
         setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
@@ -320,7 +320,7 @@ public class FlowTest extends BaseFlowTest
         selectOptionByText("idColumn2", "Well Id");
         submit();
 
-        // join with FCSFile keywords
+        log("** Join sample set with FCSFile keywords");
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Define sample description join fields");
         selectOptionByText(Locator.name("ff_samplePropertyURI", 0), "Exp Name");
@@ -330,7 +330,7 @@ public class FlowTest extends BaseFlowTest
         submit();
         assertTextPresent("39 FCS files were linked to samples in this sample set.");
 
-        // add ICS metadata
+        log("** Specify ICS metadata");
         clickLinkWithText("Protocol 'Flow'");
         clickLinkWithText("Edit ICS Metadata");
 
@@ -392,6 +392,7 @@ public class FlowTest extends BaseFlowTest
     public void copyAnalysisScriptTest()
     {
         // bug 4625
+        log("** Check analysis script copy must have unique name");
         goToFlowDashboard();
         clickLinkWithText("QUV analysis");
         clickLinkWithText("Make a copy of this analysis script");
@@ -421,6 +422,7 @@ public class FlowTest extends BaseFlowTest
 
     private void createPositivityReport(String reportName, String description)
     {
+        log("** Creating positivity report '" + reportName + "'");
         goToFlowDashboard();
         addWebPart("Flow Reports");
 
@@ -454,6 +456,7 @@ public class FlowTest extends BaseFlowTest
 
     private void updatePositivityReportFilter(String reportName)
     {
+        log("** Updating positivity report filter '" + reportName + "'");
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
@@ -464,6 +467,7 @@ public class FlowTest extends BaseFlowTest
 
     private void executeReport(String reportName)
     {
+        log("** Executing positivity report '" + reportName + "'");
         goToFlowDashboard();
 
         clickLinkWithText(reportName);
@@ -473,6 +477,7 @@ public class FlowTest extends BaseFlowTest
 
     private void verifyReportError(String reportName, String errorText)
     {
+        log("** Checking for expected error in report '" + reportName + "'");
         goToFlowDashboard();
         clickLinkContainingText("Show Jobs");
         clickLinkWithText("ERROR");
@@ -484,6 +489,7 @@ public class FlowTest extends BaseFlowTest
 
     private void verifyReport(String reportName)
     {
+        log("** Verifying positivity report '" + reportName + "'");
         beginAt("/flow" + containerPath + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
 
         // HACK: need FieldKey.encodePart() in the test module
@@ -504,6 +510,7 @@ public class FlowTest extends BaseFlowTest
 
     private void deleteReport(String reportName)
     {
+        log("** Deleting positivity report '" + reportName + "'");
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
@@ -513,6 +520,7 @@ public class FlowTest extends BaseFlowTest
 
     private void verifyDeleted(String reportName)
     {
+        log("** Verifying positivity report was deleted '" + reportName + "'");
         beginAt("/flow" + containerPath + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         assertTextPresent("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.");
     }
