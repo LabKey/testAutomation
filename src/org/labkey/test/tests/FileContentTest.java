@@ -62,6 +62,7 @@ public class FileContentTest extends BaseSeleniumWebTest
     protected void doCleanup() throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteUser(TEST_USER);
         deleteDir(getTestTempDir());
     }
 
@@ -121,6 +122,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             ListHelper.uploadData(this, PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
             clickLinkWithText(PROJECT_NAME);
             // Setup custom file properties
+            ExtHelper.waitForFileGridReady(this);
             clickButton("Admin", 0);
             ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
             clickConfigTab(FileTab.file);
@@ -132,7 +134,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickNavButton("Save & Close");
 
             waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
-            sleep(1000); // Config button bar is broken without this wait.
+            ExtHelper.waitForFileGridReady(this);
             clickButton("Admin", 0);
             ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
 
@@ -143,25 +145,32 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickConfigTab(FileTab.file);
             checkRadioButton("fileOption", "useCustom");
 
+            // Modify toolbar.
             clickConfigTab(FileTab.toolbar);
-
-            // TODO: Add new button once 11342 is resolved.
-            // dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Show History']"),
-            //             Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
-            click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconDownload')]"));
-            click(Locator.xpath("//a[./span[text()='remove']]"));
+            click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconUpload')]"));
+            click(Locator.xpath("//a[./span[text()='remove']]")); // Remove upload button
+            click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconUp')]"));
+            click(Locator.xpath("//a[./span[text()='show/hide text']]")); // Add text to 'Parent Folder' button
 
             // Save settings.
             clickButton("Submit", 0);
             waitForExtMaskToDisappear();
 
             // Verify custom action buttons
-            waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconDownload')]"), WAIT_FOR_JAVASCRIPT);
-            // TODO: Check added button once 11342 is resolved. 
-            // assertElementPresent(Locator.xpath("//button[text()='Show History']"));
+            waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconUpload')]"), WAIT_FOR_JAVASCRIPT);
+            assertElementPresent(Locator.xpath("//button[text()='Parent Folder']"));
 
-            clickButton("Upload Files",0);
-
+            // Re-add upload button
+            clickButton("Admin", 0);
+            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
+            clickConfigTab(FileTab.toolbar);
+            dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Upload Files']"),
+                         Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
+            clickButton("Submit", 0);
+            waitForExtMaskToDisappear();
+            waitForElement(Locator.xpath("//button[contains(@class, 'iconUpload')]"), WAIT_FOR_JAVASCRIPT);
+            
+            clickButton("Upload Files", 0);
             String filename = "InlineFile.html";
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
@@ -179,8 +188,8 @@ public class FileContentTest extends BaseSeleniumWebTest
             
             waitForText(filename, WAIT_FOR_JAVASCRIPT);
             waitForText(FILE_DESCRIPTION, WAIT_FOR_JAVASCRIPT);
-            // waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT); // TODO: 11373: Custom file properties don't work on sqlserver
-            // waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
+            waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT);
+            waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
 
             // Check custom actions as non-administrator.
             impersonate(TEST_USER);
@@ -204,17 +213,14 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickLinkWithText(PROJECT_NAME);
 
             SearchHelper.enqueueSearchItem(filename, true, Locator.linkContainingText(filename));
-            //SearchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename)); // TODO: Blocked by Issue #11393
+            SearchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename));
             SearchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(filename));
 
             SearchHelper.verifySearchResults(this, "/" + PROJECT_NAME, false);
 
             // Delete file.
             clickLinkWithText(PROJECT_NAME);
-            waitForText(filename, WAIT_FOR_JAVASCRIPT);
-            // Wait a bit before trying to select the file
-            sleep(2000);
-            ExtHelper.clickFileBrowserFileCheckbox(this, filename);
+            ExtHelper.selectFileBrowserItem(this, filename);
             click(Locator.xpath("//button[contains(@class, 'iconDelete')]"));
             clickButton("Yes", 0);
             waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);
