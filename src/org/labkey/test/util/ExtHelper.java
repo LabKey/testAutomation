@@ -200,6 +200,12 @@ public class ExtHelper
         test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
     }
 
+    public static void clickXGridPanelCheckbox(BaseSeleniumWebTest test, int index, boolean keepExisting)
+    {
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'x-grid-panel')]"), 60000);
+        test.getWrapper().getEval("selenium.selectExtGridItem('null', 'null', " + index + ", 'x-grid-panel', " + keepExisting + ")");
+    }
+
     @Deprecated
     public static void prevClickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
     {
@@ -311,13 +317,22 @@ public class ExtHelper
     public static void closeExtTab(BaseSeleniumWebTest test, String tabName)
     {
         test.log("Closing Ext tab " + tabName);
-        test.mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 0, 0);
+        test.mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 1, 1);
     }
 
     public static void clickExtTab(BaseSeleniumWebTest test, String tabname)
     {
         test.log("Selecting Ext tab " + tabname);
-        test.click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']"));
+        Locator l = Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']");
+        if(test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
+        {
+            test.mouseDownAt(l,  1,1);
+            test.clickAt(l, "1,1");
+        }
+        else
+        {
+            test.click(l);
+        }
     }
 
     public static void clickExtTabContainingText(BaseSeleniumWebTest test, String tabText)

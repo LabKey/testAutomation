@@ -106,7 +106,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
-    public static final String TRICKY_CHARACTERS_NO_QUOTES = "><&/% 1";
+    public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1";
     public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
@@ -425,6 +425,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForPageToLoad(millis);
     }
 
+    public void goBack(int millis)
+    {
+        selenium.goBack();
+        waitForPageToLoad(millis);
+    }
+
+    public void goBack()
+    {
+        goBack(defaultWaitForPage);
+    }
+
 
     public void sleep(long ms)
     {
@@ -515,6 +526,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             assertSignOutAndMyAccountPresent();
         }
     }
+
 
     public void attemptSignIn(String email, String password)
     {
@@ -1150,7 +1162,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             try
             {
-                populateLastPageInfo();
+                 populateLastPageInfo();
             }
             catch (Throwable t)
             {
@@ -2546,6 +2558,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
          waitForText(text, defaultWaitForPage);
     }
 
+    public void waitForTextWithRefresh(String text, int wait)
+    {
+        for(int i=0; i<wait; i+=1000)
+        {
+            if(isTextPresent(text))
+                return;
+            else
+                sleep(1000);
+            refresh();
+        }
+        fail(text + " did not appear");
+    }
     public void waitForText(final String text, int wait)
     {
         String failMessage = text + " did not appear";
@@ -2930,11 +2954,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAndWait(l, defaultWaitForPage);
     }
 
+    public static final int WAIT_FOR_EXT_MASK_TO_DISSAPEAR = -1;
+    public static final int WAIT_FOR_EXT_MASK_TO_APPEAR = -2;
     public void clickAndWait(Locator l, int millis)
     {
         selenium.click(l.toString());
         if (millis > 0)
             waitForPageToLoad(millis);
+        else if(millis==WAIT_FOR_EXT_MASK_TO_APPEAR)
+            waitForExtMask();
+        else if(millis==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
+            waitForExtMaskToDisappear();
     }
 
     public void clickAtAndWait(Locator l, int millis, String coord)
@@ -4787,6 +4817,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Update Folder");
     }
 
+
+    public void goToProjectHome()
+    {
+        clickLinkWithText(getProjectName());
+    }
 
     public void goToHome()
     {
