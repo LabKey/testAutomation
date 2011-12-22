@@ -13,15 +13,15 @@
         var logHtml = "";
 
         var qwpArray = [
-            {table: "Analyte", cols: ["RowId", "Name"], sort: "RowId", expectedRows: 10},
-            {table: "AnalyteTitration", cols: ["Analyte", "Titration"], sort: "Analyte, Titration", expectedRows: 10},
-            {table: "CurveFit", cols: ["RowId", "EC50", "AUC"], sort: "RowId", expectedRows: 20},
+            {table: "Analyte", cols: ["RowId", "Name"], sort: "RowId"},
+            {table: "AnalyteTitration", cols: ["Analyte", "Titration"], sort: "Analyte, Titration"},
+            {table: "CurveFit", cols: ["RowId", "EC50", "AUC"], sort: "RowId"},
             {table: "GuideSet", cols: ["RowId", "AnalyteName", "Conjugate", "Isotype", "Comment"], sort: "RowId"},
-            {table: "GuideSetCurveFit", cols: ["GuideSetId", "AUCAverage", "EC50Average"], sort: "GuideSetId"}, // TODO: add expectedRows: 6 back when Issue 13724 fixed
-            {table: "QCFlags", cols: ["RowId", "FlagType", "Description", "Enabled"], sort: "RowId", expectedRows: 7},
-            {table: "Titration", cols: ["RowId", "Name"], sort: "RowId", expectedRows: 5},
-            {table: "RunExclusion", cols: ["RunId", "Comment"], sort: "RunId", expectedRows: 0},
-            {table: "WellExclusion", cols: ["RowId", "Description", "Comment"], sort: "RowId", expectedRows: 1}
+            {table: "GuideSetCurveFit", cols: ["GuideSetId", "AUCAverage", "EC50Average"], sort: "GuideSetId"},
+            {table: "QCFlags", cols: ["RowId", "FlagType", "Description", "Enabled"], sort: "RowId"},
+            {table: "Titration", cols: ["RowId", "Name"], sort: "RowId"},
+            {table: "RunExclusion", cols: ["RunId", "Comment"], sort: "RunId"},
+            {table: "WellExclusion", cols: ["RowId", "Description", "Comment"], sort: "RowId"}
         ];
 
         function loadQWP(index)
@@ -46,6 +46,9 @@
                    {
                        updateLog("<span class='labkey-error'>Error: unexpcted number of records in " + record.table + " QWP (expected " + record.expectedRows + ")</span>", true);
                    }
+
+                   // store the rowCount for checking if the loadQWP is called again
+                   qwpArray[index].expectedRows = dataRegion.rowCount;
 
                    if (qwpArray.length > index+1)
                    {
@@ -122,6 +125,9 @@
 
                 if (record.deleteFailureExpected)
                 {
+                    if (qwpArray[index].expectedRows != undefined)
+                        qwpArray[index].expectedRows++;
+                    
                     checkForNextInsert(index);
                 }
                 else
