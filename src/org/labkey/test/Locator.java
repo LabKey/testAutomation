@@ -39,6 +39,13 @@ public class Locator
         return loc;
     }
 
+    public String toXpath()
+    {
+        String xpath = loc.substring(loc.indexOf("=")+1);
+        return xpath;
+
+    }
+
     protected void setRawLocator(String locator)
     {
         loc = locator;
