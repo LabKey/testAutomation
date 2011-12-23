@@ -1,6 +1,6 @@
 
 <input type="button" value="Load QWPs" onClick="loadQWP(0);" id="button_loadqwps"/>
-<input type="button" value="Test Insert,Update,Delete" onClick="testInsertUpdateDelete(0);" id="button_testiud"/>
+<input type="button" value="Test Insert,Update,Delete" onClick="getValidDataAndRunId();" id="button_testiud"/>
 <input type="button" value="Attempt update CurveFit"  onClick="updateCurveFit('CurveFit', 'RowId');" id="button_updateCurveFit"/>
 <input type="button" value="Attempt update GuideSetCurveFit"  onClick="updateCurveFit('GuideSetCurveFit', 'GuideSetId');" id="button_updateGuideSetCurveFit"/>
 <div id='qwp-div'></div>
@@ -11,6 +11,8 @@
         var loadedQWPsOnce = false;
         var currentStep = 0;
         var logHtml = "";
+        var validDataId = null;
+        var validRunId = null;
 
         var qwpArray = [
             {table: "Analyte", cols: ["RowId", "Name"], sort: "RowId"},
@@ -77,9 +79,37 @@
             {table: "WellExclusion", keyVar: "rowid", updateVar: "comment", insertRow: {dataId: 1}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false}
         ];
 
+        function getValidDataAndRunId()
+        {
+            // before we can call the insert, update, and delete testing function, we will need a valid dataId and runId
+            // we can use the ones that are used by the existing WellExclusion
+            LABKEY.Query.selectRows({
+                schemaName: "assay",
+                queryName: tablePrefix + " WellExclusion",
+                columns: "DataId, DataId/Run/RowId",
+                success: function(data){
+                    if (data.rows.length > 0)
+                    {
+                        validDataId = data.rows[0]["DataId"];
+                        validRunId = data.rows[0]["DataId/Run/RowId"];
+                    }
+
+                    testInsertUpdateDelete(0);
+                }
+            });
+        }
+
         function testInsertUpdateDelete(index)
         {
             var record = insertArray[index];
+
+            // replace the temp runId and dataId values with valid ones
+            if (record.insertRow.runId)
+                record.insertRow.runId = validRunId;
+            if (record.insertRow.runid)
+                record.insertRow.runid = validRunId;
+            if (record.insertRow.dataId)
+                record.insertRow.dataId = validDataId;            
 
             LABKEY.Query.insertRows({
                 schemaName: 'assay',
@@ -152,7 +182,7 @@
                 if (failureExpected)
                     updateLog("Expected " + type + " failure for " + record.table + ": " + response.exception, true);
                 else
-                    updateLog("<span class='labkey-error'>Error: " + type + " failured for " + record.table + ": " + response.exception + "</span>", true);
+                    updateLog("<span class='labkey-error'>Error: " + type + " failed for " + record.table + ": " + response.exception + "</span>", true);
 
                 checkForNextInsert(index);
             }
