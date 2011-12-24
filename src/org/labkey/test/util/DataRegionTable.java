@@ -116,6 +116,18 @@ public class DataRegionTable
         return rows;
     }
 
+    public int getIndexOfColumnCellWithData(String cellContents, int columnIndex)
+    {
+//          getColumn(columnName);
+        int rowCount = getDataRowCount();
+        for(int i=0; i<rowCount; i++)
+        {
+            if(cellContents.equals(getDataAsText(i, columnIndex)))
+                return i;
+        }
+          return -1;
+    }
+
     public int getDataRowCount(int div)
     {
         int rows = 0;
@@ -180,9 +192,8 @@ public class DataRegionTable
         return -1;
     }
 
-    public List<String> getColumnDataAsText(String name)
+    public List<String> getColumnDataAsText(int col)
     {
-        int col = getColumn(name);
         int rowCount = getDataRowCount();
         List<String> columnText = new ArrayList<String>();
 
@@ -195,6 +206,12 @@ public class DataRegionTable
         }
 
         return columnText;
+
+    }
+    public List<String> getColumnDataAsText(String name)
+    {
+        int col = getColumn(name);
+        return  getColumnDataAsText(col);
     }
 
     /** Find the row number for the given primary key. */

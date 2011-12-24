@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
 /**
@@ -102,6 +103,7 @@ public class GroupTest extends BaseSeleniumWebTest
         clickLinkWithText("Permissions", 0);
         waitForText("Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Author");
+        setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
         clickButton("Save and Finish");
         assertUserCanSeeFolder(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
@@ -113,7 +115,13 @@ public class GroupTest extends BaseSeleniumWebTest
         waitForPageToLoad();
         waitForText("Author");
         ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "All Site Users");
-        clickButton("Save and Finish");
+
+        clickButton("Save", 0);
+        sleep(500);
+
+        permissionsReportTest();
+
+        goToProjectHome();
 
         createProjectCopyPerms();
 
@@ -122,6 +130,55 @@ public class GroupTest extends BaseSeleniumWebTest
         verifyCantAddSystemGroupToUserGroup();
 
         groupSecurityApiTest();
+    }
+
+    private void permissionsReportTest()
+    {
+        clickLinkWithText("view permissions report");
+        DataRegionTable drt = new DataRegionTable("access", this, false, false);
+
+        waitForText("Access Modification History For This Folder");
+        assertTextPresent( "Folder Access Details");
+
+        //this table isn't quite a real Labkey Table Region, so we can't use column names
+        int detailsColumn = 0;
+        int userColumn = 1;
+        int accessColumn = 2;
+
+        int rowIndex = drt.getIndexOfColumnCellWithData(TEST_USERS_FOR_GROUP[0], 1);
+
+        if(getBrowser().startsWith(FIREFOX_BROWSER))
+        //IE displays correctly but selenium retrieves the data differently
+        {
+            //confirm correct perms
+            assertEquals("Reader, Author", drt.getDataAsText(rowIndex, 2));
+
+            //exapnd plus thingy to check specific groups
+            clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+3), "1,1");
+            assertEquals("Reader, Author RoleGroup(s) ReaderSite group2AuthorSite group2, Site Users", drt.getDataAsText(rowIndex, 2));
+        }
+        else
+        {
+
+            assertEquals("Reader, Author \n" +
+                    "RoleGroup(s)\n" +
+                    "ReaderSite group2\n" +
+                    "AuthorSite group2, Site Users", drt.getDataAsText(rowIndex, 2));
+        }
+
+
+
+        //confirm details link leads to right user, page
+        clickLinkContainingText("details", rowIndex);
+        assertTextPresent(TEST_USERS_FOR_GROUP[0]);
+        assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
+        goBack();
+
+        //confirm username link leads to right user, page
+        clickLinkContainingText(TEST_USERS_FOR_GROUP[0]);
+        assertTextPresent("User Access Details: "  + TEST_USERS_FOR_GROUP[0]);
+        goBack();
+
     }
 
     private void verifyImpersonateGroup()
