@@ -151,19 +151,19 @@ public class GroupTest extends BaseSeleniumWebTest
         //IE displays correctly but selenium retrieves the data differently
         {
             //confirm correct perms
-            assertEquals("Reader, Author", drt.getDataAsText(rowIndex, 2));
+            assertEquals("Author, Reader", drt.getDataAsText(rowIndex, 2));
 
             //exapnd plus thingy to check specific groups
             clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+3), "1,1");
-            assertEquals("Reader, Author RoleGroup(s) ReaderSite group2AuthorSite group2, Site Users", drt.getDataAsText(rowIndex, 2));
+            assertEquals("Author, Reader RoleGroup(s) AuthorSite group2, Site UsersReaderSite group2", drt.getDataAsText(rowIndex, 2));
         }
         else
         {
 
-            assertEquals("Reader, Author \n" +
+            assertEquals("Author, Reader \n" +
                     "RoleGroup(s)\n" +
-                    "ReaderSite group2\n" +
-                    "AuthorSite group2, Site Users", drt.getDataAsText(rowIndex, 2));
+                    "AuthorSite group2, Site Users\n" +
+                    "ReaderSite group2", drt.getDataAsText(rowIndex, 2));
         }
 
 

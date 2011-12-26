@@ -73,10 +73,10 @@
             {table: "CurveFit", insertRow: {}, insertFailureExpected: true},
             {table: "GuideSet", keyVar: "rowId", updateVar: "comment", insertRow: {analyteName: "Test Analyte", titrationName: "Test Titration", currentGuideSet: false}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: true},
             {table: "GuideSetCurveFit", insertRow: {}, insertFailureExpected: true},
-            {table: "QCFlags", keyVar: "rowid", updateVar: "comment", insertRow: {runId: 1, flagType: "TEST", description: "Test Description", enabled: true}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false},
+            {table: "QCFlags", keyVar: "rowId", updateVar: "comment", insertRow: {runId: 1, flagType: "TEST", description: "Test Description", enabled: true}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false},
             {table: "Titration", insertRow: {}, insertFailureExpected: true},
-            {table: "RunExclusion", keyVar: "runid", updateVar: "comment", insertRow: {runid: 1}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false},
-            {table: "WellExclusion", keyVar: "rowid", updateVar: "comment", insertRow: {dataId: 1}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false}
+            {table: "RunExclusion", keyVar: "runId", updateVar: "comment", insertRow: {runId: 1}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false},
+            {table: "WellExclusion", keyVar: "rowId", updateVar: "comment", insertRow: {dataId: 1, type: "T1", description: "TEST"}, insertFailureExpected: false, updateFailureExpected: false, deleteFailureExpected: false}
         ];
 
         function getValidDataAndRunId()
@@ -105,9 +105,7 @@
 
             // replace the temp runId and dataId values with valid ones
             if (record.insertRow.runId)
-                record.insertRow.runId = validRunId;
-            if (record.insertRow.runid)
-                record.insertRow.runid = validRunId;
+                record.insertRow.runId = parseInt(validRunId) - 1;
             if (record.insertRow.dataId)
                 record.insertRow.dataId = validDataId;            
 
@@ -127,11 +125,10 @@
                 if (data.rowsAffected != 1)
                     updateLog("<span class='labkey-error'>Error: unexpected number of rows affected by insert into " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
 
-                var keyVal = data.rows[0][record.keyVar];
+                var keyVal = (data.rows[0][record.keyVar] ? data.rows[0][record.keyVar] : data.rows[0][record.keyVar.toLowerCase()]);
                 var updateRow = record.insertRow;
                 updateRow[record.keyVar] = keyVal;
                 updateRow[record.updateVar] = "updated via javascript";
-                console.log(updateRow);
 
                 LABKEY.Query.updateRows({
                     schemaName: 'assay',
@@ -151,7 +148,8 @@
                     updateLog("<span class='labkey-error'>Error: unexpected number of rows affected by update in " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
 
                 var deleteRow = {};
-                deleteRow[record.keyVar] = data.rows[0][record.keyVar];
+                var keyVal = (data.rows[0][record.keyVar] ? data.rows[0][record.keyVar] : data.rows[0][record.keyVar.toLowerCase()]);
+                deleteRow[record.keyVar] = keyVal;
 
                 if (record.deleteFailureExpected)
                 {
