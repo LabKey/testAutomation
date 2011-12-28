@@ -19,6 +19,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.StringHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -151,21 +152,20 @@ public class GroupTest extends BaseSeleniumWebTest
         //IE displays correctly but selenium retrieves the data differently
         {
             //confirm correct perms
-            assertEquals("Author, Reader", drt.getDataAsText(rowIndex, 2));
-
-            //exapnd plus thingy to check specific groups
-            clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+3), "1,1");
-            assertEquals("Author, Reader RoleGroup(s) AuthorSite group2, Site UsersReaderSite group2", drt.getDataAsText(rowIndex, 2));
+            assertTrue(StringHelper.stringArraysAreEquivalent(new String[] {"Reader", "Author"},
+                    drt.getDataAsText(rowIndex, 2).split(",")));
         }
         else
         {
-
-            assertEquals("Author, Reader \n" +
-                    "RoleGroup(s)\n" +
-                    "AuthorSite group2, Site Users\n" +
-                    "ReaderSite group2", drt.getDataAsText(rowIndex, 2));
+            assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite group2AuthorSite group2, Site Users".split(" "),
+                    drt.getDataAsText(rowIndex, 2).split(" ")));
         }
 
+
+        //exapnd plus thingy to check specific groups
+        clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+3), "1,1");
+        assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite group2AuthorSite group2, Site Users".split(" "),
+                drt.getDataAsText(rowIndex, 2).split(" ")));
 
 
         //confirm details link leads to right user, page
