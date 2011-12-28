@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -109,11 +110,11 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Change user setting TEST_USER -> No Email
             checkDataRegionCheckbox("Users", 1);
             ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
-            clickButtonByIndex("Update Settings", 1, 0);
-            ExtHelper.waitForExtDialog(this, "Update selected users", WAIT_FOR_JAVASCRIPT);
-            clickNavButton("Yes", 0);
-            waitForExtMaskToDisappear(); // Can't tell when ext mask is active (not style=display:block...
-            sleep(200); // ...so we sleep
+            click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Settings']"));
+            waitAndClickNavButton("Yes");
+            waitForPageToLoad();
+            DataRegionTable table = new DataRegionTable("Users", this);
+            assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(1, "File Settings"));
 
             waitForElement(Locator.xpath("//a/span[text() = 'Admin']"), WAIT_FOR_JAVASCRIPT);
             enableEmailRecorder();
@@ -166,6 +167,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickConfigTab(FileTab.toolbar);
             dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Upload Files']"),
                          Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
+            waitForElement(Locator.xpath("//button[contains(@class, 'iconUpload')]"), WAIT_FOR_JAVASCRIPT);
             clickButton("Submit", 0);
             waitForExtMaskToDisappear();
             waitForElement(Locator.xpath("//button[contains(@class, 'iconUpload')]"), WAIT_FOR_JAVASCRIPT);
