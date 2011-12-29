@@ -17,8 +17,7 @@
 package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.labkey.test.util.CustomizeViewsHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 

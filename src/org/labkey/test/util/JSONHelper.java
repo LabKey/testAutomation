@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.labkey.test.BaseSeleniumWebTest;

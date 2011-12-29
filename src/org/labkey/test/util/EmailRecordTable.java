@@ -15,11 +15,10 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.pipeline.PipelineWebTestBase;
-import org.labkey.test.Locator;
-import org.apache.commons.lang.StringUtils;
 import junit.framework.Assert;
+import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 /**
  * <code>EmailRecordTable</code>

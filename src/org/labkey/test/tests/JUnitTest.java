@@ -22,7 +22,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONValue;
 import junit.framework.TestSuite;
 import junit.framework.TestResult;
