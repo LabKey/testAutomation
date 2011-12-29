@@ -218,7 +218,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 log("Warning: Internet Explorer cannot do file uploads!");
                 //browser = IE_UPLOAD_BROWSER;
-                _fileUploadAvailable = true;
+                _fileUploadAvailable = false;
             }
             else if (browser.startsWith(FIREFOX_BROWSER))
             {
