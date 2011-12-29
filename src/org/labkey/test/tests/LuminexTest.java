@@ -107,6 +107,7 @@ public class LuminexTest extends AbstractQCAssayTest
         return "server/modules/luminex";
     }
 
+
     @Override
     protected String getProjectName()
     {
@@ -133,7 +134,6 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected void configure()
     {
-
         if(!isFileUploadAvailable())
             Assert.fail("Test depends on file upload ability");
 
@@ -1274,6 +1274,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //verify Levey-Jennings report R plots are displayed without errors
         verifyLeveyJenningsRplots();
+        verifyQCFlags();
         verifyQCAnalysis();
 
         // remove a run from the current guide set
@@ -1306,6 +1307,71 @@ public class LuminexTest extends AbstractQCAssayTest
         // test the y-axis scale
         applyLogYAxisScale();
         guideSetApiTest();
+    }
+
+    private void verifyQCFlags()
+    {
+        goToProjectHome();
+        clickLinkWithText(TEST_ASSAY_LUM);
+        verifyQCFlagsInRunGrid();
+        verifyQCFlagsSchema();
+    }
+
+    private void verifyQCFlagsSchema()
+    {
+        goToSchemaBrowser();
+        selectQuery("assay", TEST_ASSAY_LUM + " QCFlags");
+        waitForText("assay." + TEST_ASSAY_LUM + " QCFlags");
+    }
+
+    String[] expectedFlags = {"AUC, EC50, HMFI","AUC, EC50, HMFI", "HMFI", "", "", "" };
+
+    private void verifyQCFlagsInRunGrid()
+    {
+        //add QC flag colum
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCFlags");
+        CustomizeViewsHelper.saveCustomView(this);
+
+        //verify expected values in column
+        String[] flags = getColumnValues(TEST_ASSAY_LUM + " Runs", "QC Flags").get(0).toArray(new String[] {});
+        for(int i=0; i<flags.length; i++)
+        {
+            assertEquals(expectedFlags[i], flags[i]);
+        }
+        verifyQCFlagLink();
+    }
+
+    private void verifyQCFlagLink()
+    {
+        clickLinkContainingText(expectedFlags[0], 0, false);
+        waitForExtMask();
+
+        //verify text is in expected form
+        waitForText("HIVIG GS Analyte (1) - " + isotype + " " + conjugate + " under threshold for AUC");
+
+        //verify unchecking a box  removes the flag
+        Locator aucCheckBox = Locator.xpath("//div[text()='AUC']/../../td/div/div[contains(@class, 'check')]");
+        clickAt(aucCheckBox,  "1,1");
+        clickButton("Save", 0);
+        waitForExtMaskToDisappear();
+        waitForPageToLoad();
+
+        Locator strikeoutAUC = Locator.xpath("//span[contains(@style, 'line-through') and  text()='AUC']");
+        isElementPresent(strikeoutAUC);
+
+        //verify rechecking a box adds the flag back
+        waitForText(expectedFlags[0]);
+        clickAtAndWait(strikeoutAUC, 0, "1,1");
+        waitForExtMask();
+//        waitForPageToLoad();
+        waitForElement(aucCheckBox, defaultWaitForPage);
+        clickAt(aucCheckBox,  "1,1");
+
+        clickButton("Save", 0);
+        waitForExtMaskToDisappear();
+        waitForPageToLoad();
+        assertElementNotPresent(Locator.xpath("//span[contains(@style, 'line-through') and  text()='AUC']"));
     }
 
     private void verifyQCAnalysis()
@@ -1419,6 +1485,12 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("High MFITrendPlotDiv"));
+
+        //verify QC flags
+        //this locator finds an EC50 flag, then makes sure there's red text outlining
+        Locator.XPathLocator l = Locator.xpath("//td/div[contains(@style,'red')]/../../td/div/a[contains(text(),'EC50')]");
+        assertElementPresent(l,2);
+        assertTextPresent("Flags"); //should update to qc flags
     }
 
     private void verifyGuideSetsNotApplied()
