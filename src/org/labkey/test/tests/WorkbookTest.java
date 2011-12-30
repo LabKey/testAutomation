@@ -94,7 +94,6 @@ public class WorkbookTest extends BaseSeleniumWebTest
         waitForText("No description provided. Click to add one.", WAIT_FOR_JAVASCRIPT); // Takes a moment to appear.
 
         clickLinkWithText(PROJECT_NAME);
-        clickNavButton("Manage Workbooks");
 
         // Check for all workbooks in list.
         assertLinkPresentWithText("Renamed"+DEFAULT_WORKBOOK_NAME);
