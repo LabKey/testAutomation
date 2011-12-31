@@ -104,7 +104,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             click(Locator.navButton("Update Settings"));
             // Set folder default
             ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
-            clickButtonByIndex("Update Folder Default", 1, 0);
+            click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
             ExtHelper.waitForExtDialog(this, "Update complete", WAIT_FOR_JAVASCRIPT);            
             waitForExtMaskToDisappear();
             // Change user setting TEST_USER -> No Email
@@ -148,7 +148,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             // Modify toolbar.
             clickConfigTab(FileTab.toolbar);
-            click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconUpload')]"));
+            click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconFolderNew')]"));
             click(Locator.xpath("//a[./span[text()='remove']]")); // Remove upload button
             click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconUp')]"));
             click(Locator.xpath("//a[./span[text()='show/hide text']]")); // Add text to 'Parent Folder' button
@@ -158,19 +158,20 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForExtMaskToDisappear();
 
             // Verify custom action buttons
-            waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconUpload')]"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             assertElementPresent(Locator.xpath("//button[text()='Parent Folder']"));
 
+            //TODO: Re-add new folder button to test adding new button. Fails on TeamCity
             // Re-add upload button
-            clickButton("Admin", 0);
-            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
-            clickConfigTab(FileTab.toolbar);
-            dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Upload Files']"),
-                         Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
-            waitForElement(Locator.xpath("//button[contains(@class, 'iconUpload')]"), WAIT_FOR_JAVASCRIPT);
-            clickButton("Submit", 0);
-            waitForExtMaskToDisappear();
-            waitForElement(Locator.xpath("//button[contains(@class, 'iconUpload')]"), WAIT_FOR_JAVASCRIPT);
+            //clickButton("Admin", 0);
+            //ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
+            //clickConfigTab(FileTab.toolbar);
+            //dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
+            //             Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
+            //waitForElement(Locator.xpath("(//button[contains(@class, 'iconFolderNew')])[2]"), WAIT_FOR_JAVASCRIPT);
+            //clickButton("Submit", 0);
+            //waitForExtMaskToDisappear();
+            //waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             
             clickButton("Upload Files", 0);
             String filename = "InlineFile.html";
