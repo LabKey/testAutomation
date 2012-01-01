@@ -49,23 +49,14 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang-2.6.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang-2.6-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang-2.6-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.1.jar!/" />
         </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.1-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.1-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
