@@ -23,7 +23,6 @@ import org.labkey.test.ms2.QuantitationTest;
 import org.labkey.test.ms2.SequestTest;
 import org.labkey.test.tests.*;
 
-import java.security.acl.Group;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,7 +52,7 @@ public enum TestSet
         ButtonCustomizationTest.class,
         ReagentTest.class,
         FilterTest.class,
-//            GenotypingTest.class,
+//            GenotypingTest.class,            //TODO:  comment this out, genotyping shouldn't be run on TC yet
             GroupTest.class
     }),
 
@@ -102,7 +101,13 @@ public enum TestSet
         TimelineTest.class,
         ExternalSchemaTest.class,
         MenuBarTest.class,
-        LuminexTest.class,
+        LuminexUploadAndCopyTest.class,
+        LuminexExcludableWellsTest.class,
+        LuminexMultipleCurvesTest.class,
+        LuminexJavaTransformTest.class,
+        LuminexRTransformTest.class,
+        LuminexEC50Test.class,
+        LuminexGuideSetTest.class,
         SimpleModuleTest.class,
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
@@ -217,7 +222,13 @@ public enum TestSet
         TargetStudyTest.class,
         NabOldTest.class,
         NabAssayTest.class,
-        LuminexTest.class,
+        LuminexUploadAndCopyTest.class,
+        LuminexExcludableWellsTest.class,
+        LuminexMultipleCurvesTest.class,
+        LuminexJavaTransformTest.class,
+        LuminexRTransformTest.class,
+        LuminexEC50Test.class,
+        LuminexGuideSetTest.class,
         ViabilityTest.class,
         ModuleAssayTest.class,
         IDRIParticleSizeTest.class,
@@ -246,7 +257,7 @@ public enum TestSet
 
     Weekly(600000, BVTnDaily, new Class[] {
             // Add special test classes, not in daily or BVT.
-            SecurityTestExtended.class
+            SecurityTestExtended.class,
     }),
 
     Adaptive(new Class[]{
