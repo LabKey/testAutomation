@@ -90,6 +90,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private URL _lastPageURL = null;
     private String _lastPageText = null;
     private Stack<String> _locationStack = new Stack<String>();
+    private String _savedLocation = null;
     private Stack<String> _impersonationStack = new Stack<String>();
     private List<String> _createdProjects = new ArrayList<String>();
     private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
@@ -412,6 +413,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String location = _locationStack.pop();
         assertNotNull("Cannot pop without a push.", location);
         beginAt(location, millis);
+    }
+
+    public void saveLocation()
+    {
+        _savedLocation = getCurrentRelativeURL();
+    }
+
+    public void recallLocation()
+    {
+        recallLocation(defaultWaitForPage);
+    }
+
+    public void recallLocation(int wait)
+    {
+        assertNotNull("Cannot recall without saving first.", _savedLocation);
+        beginAt(_savedLocation, wait);
     }
 
     public void refresh()

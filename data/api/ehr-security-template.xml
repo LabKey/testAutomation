@@ -13,7 +13,7 @@
                     "values":
                     {
                         "Id":"${AnimalId}",
-                        "date":"2011-05-12T13:01:00",
+                        "date":"${Date}",
                         "enddate":null,
                         "project":null,
                         "account":null,
@@ -45,12 +45,12 @@
             {
                 "silent":true,
                 "targetQCState":null,
-                "errorThreshold":"WARN",
+                "errorThreshold":"ERROR",
                 "skipIdFormatCheck":true
             }}
         </formData>
         <successresponse>
-           {"result": [{
+            {"result": [{
                 "containerPath": "/WNPRC/EHR",
                 "rowsAffected": 1,
                 "schemaName": "study",
@@ -58,32 +58,24 @@
                 "command": "insertWithKeys",
                 "rows": [{
                     "values": {
+                        "Description": "Weight: 22",
                         "weight": 22,
                         "ts": null,
-                        "Dataset": null,
                         "remark": null,
                         "taskid": "237539ae-5e39-102e-a19e-7a684b53aa87",
-                        "SequenceNum": null,
-                        "date": "12 May 2011 13:01:00",
-                        "ParticipantSequenceKey": null,
-                        "parentId": null,
-                        "Created": null,
-                        "weightRawValue": null,
-                        "Modified": null,
-                        "performedby": null,
-                        "QCState": 22,
-                        "sourcelsid": null,
-                        "lsid": "urn:lsid:labkey.com:Study.Data-33:1045.2.0110512E7.1052976.26e8080a-5fb5-102e-b27b-fe05e4821f99",
-                        "Description": "Weight: 22",
-                        "weightMVIndicator": null,
-                        "ModifiedBy": null,
+                        "date": "${Date}",
                         "project": null,
-                        "CreatedBy": null,
+                        "parentId": null,
+                        "performedby": null,
+                        "QCState": 160,
                         "account": null,
                         "Id": "${AnimalId}",
-                        "requestid": null,
+                        "sourcelsid": null,
                         "objectid": "26e8080a-5fb5-102e-b27b-fe05e4821f99",
-                        "_row": null
+                        "requestid": null,
+                        "enddate": null,
+                        "_row": null,
+                        "lsid": "urn:lsid:labkey.com:Study.Data-33:1045.2.0110512E7.1052976.26e8080a-5fb5-102e-b27b-fe05e4821f99"
                     },
                     "oldKeys": {"lsid": "ext-record-195"}
                 }]
