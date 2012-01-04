@@ -1395,7 +1395,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyQCReport()
     {
         assertTextPresent(TEST_ASSAY_LUM + " QC Report");
-        DataRegionTable drt = new DataRegionTable("TestAssayLuminex AnalyteTitration", this);
+        DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " AnalyteTitration", this);
         String isotype = drt.getDataAsText(0, "Isotype");
         if(isotype.length()==0)
             isotype = "[None]";
