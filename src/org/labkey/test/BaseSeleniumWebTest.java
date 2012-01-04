@@ -3615,7 +3615,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickNavButtonAt(String buttonText, int waitMillis, String coord)
     {
-        clickButtonAt(buttonText, waitMillis, "1,1");
+        clickButtonAt(buttonText, waitMillis, coord);
     }
 
     public void clickNavButtonByIndex(String buttonText, int index, int wait)
@@ -4099,6 +4099,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         checkCheckbox(Locator.raw("//a[contains(text(), '" + name + "')]/../..//td/input"));
     }
 
+    public void checkButtonByText(String text)
+    {
+        Locator l = Locator.xpath("//*[text()='" + text + "']/../input[contains(@type,'button')]");
+        click(l);
+    }
+
     public void checkRadioButton(Locator radioButtonLocator)
     {
         checkCheckbox(radioButtonLocator);
@@ -4572,6 +4578,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             assertTextPresent("permanently delete");
             clickNavButton("Permanently Delete");
         }
+    }
+
+    public void customizeWebPart(String webPartId)
+    {
+        clickAt(Locator.id("more-" + webPartId), "1,1");
+        clickAt(Locator.tagContainingText("span", "Customize"), "1,1");
     }
 
     public void assertUserExists(String email)
