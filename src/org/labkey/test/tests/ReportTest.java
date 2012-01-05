@@ -21,6 +21,8 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 
+import java.io.File;
+
 /**
  * User: klum
  * Date: Jul 31, 2009
@@ -115,6 +117,7 @@ public class ReportTest extends StudyBaseTest
     {
         doCreateCharts();
         doCreateRReports();
+        doAttachmentReportTest();
 
         // additional report and security tests
         setupDatasetSecurity();
@@ -429,6 +432,45 @@ public class ReportTest extends StudyBaseTest
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
+    }
+
+    private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
+    private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
+    private static final File ATTACHMENT_REPORT_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test1.jpg"); // arbitrary image file
+    private static final String ATTACHMENT_REPORT2_NAME = "Attachment Report2";
+    private static final String ATTACHMENT_REPORT2_DESCRIPTION= "This attachment report points at a file on the server.";
+    private static final File ATTACHMENT_REPORT2_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
+    private void doAttachmentReportTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Attachment Report");
+        clickButton("Cancel");
+
+        //TODO: Test uploaded attachment report. Unable to set form element to do so.
+        if(false)//isFileUploadAvailable())
+        {
+            clickMenuButton("Create", "Attachment Report");
+            setFormElement("label", ATTACHMENT_REPORT_NAME);
+            setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
+            setFormElement("uploadFile", ATTACHMENT_REPORT_FILE.toString());
+            setFormElement(Locator.xpath("id('uploadFile')/div/input"), ATTACHMENT_REPORT_FILE.toString());
+        }
+
+        clickMenuButton("Create", "Attachment Report");
+        setFormElement("label", ATTACHMENT_REPORT2_NAME);
+        setFormElement("description", ATTACHMENT_REPORT2_DESCRIPTION);
+        click(Locator.xpath("//input[../label[string()='Use a file on server localhost']]"));
+        setFormElement("filePath", ATTACHMENT_REPORT2_FILE.toString());
+        clickNavButton("Submit");
+
+        clickLinkWithText("Clinical and Assay Data");
+        //waitForText(ATTACHMENT_REPORT_NAME);
+        waitForText(ATTACHMENT_REPORT2_NAME);
+
+        //TODO: Verify report. Blocked: 13761: Attachment report on server localhost doesn't know what kind of file it is.
     }
 
     private void saveReport(String name)

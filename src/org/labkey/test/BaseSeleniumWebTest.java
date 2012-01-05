@@ -144,12 +144,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return selenium;
     }
 
-    public String getLabKeyRoot()
+    public static String getLabKeyRoot()
     {
         return WebTestHelper.getLabKeyRoot();
     }
 
-    public String getContextPath()
+    public static String getContextPath()
     {
         return WebTestHelper.getContextPath();
     }
