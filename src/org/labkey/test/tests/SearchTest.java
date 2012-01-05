@@ -230,7 +230,7 @@ public class SearchTest extends StudyTest
         setFormElement("body", WIKI_CONTENT);
         if (isFileUploadAvailable())
         {
-            File file = new File(getLabKeyRoot() + "/server/version.properties");
+            File file = new File(getLabKeyRoot() + "/server/module.template.properties");
             setFormElement("formFiles[0]", file);
         }
         saveWikiPage();
@@ -239,7 +239,7 @@ public class SearchTest extends StudyTest
         SearchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem(WIKI_TITLE, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem(WIKI_CONTENT, Locator.linkWithText(WIKI_TITLE));
-        SearchHelper.enqueueSearchItem("Master version", Locator.linkWithText("\"version.properties\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file
+        SearchHelper.enqueueSearchItem("moduleDependencies", Locator.linkWithText("\"module.template.properties\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file
     }
 
     private void addSearchableIssues()
