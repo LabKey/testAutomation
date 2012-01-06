@@ -45,7 +45,7 @@ public class LuminexTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
-    protected static final String TEST_ASSAY_LUM =  "TestAssayLuminex";
+    protected static final String TEST_ASSAY_LUM =  "&TestAssayLuminex" + TRICKY_CHARACTERS_NO_QUOTES;
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
 
     protected static final String TEST_ASSAY_LUM_ANALYTE_PROP_NAME = "testAssayAnalyteProp";
