@@ -82,7 +82,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         ExtHelper.waitForExtDialog(this, "Primary Column Properties");
         ExtHelper.clickExtTab(this, "Advanced");
         checkCheckbox("mvEnabled");
-        clickNavButton("Ok", 0);
+        clickNavButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
@@ -100,6 +100,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Import XLSX GPAT assay");
         clickLinkWithText(PROJECT_NAME);
+        ExtHelper.waitForFileGridReady(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_XLSX);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
@@ -113,7 +114,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         ExtHelper.waitForExtDialog(this, "Primary Column Properties");
         ExtHelper.clickExtTab(this, "Advanced");
         checkCheckbox("mvEnabled");
-        clickNavButton("Ok", 0);
+        clickNavButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
@@ -141,7 +142,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         ExtHelper.waitForExtDialog(this, "Primary Column Properties");
         ExtHelper.clickExtTab(this, "Advanced");
         checkCheckbox("mvEnabled");
-        clickNavButton("Ok", 0);
+        clickNavButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
