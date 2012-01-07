@@ -146,7 +146,7 @@ public class GroupTest extends BaseSeleniumWebTest
         int userColumn = 1;
         int accessColumn = 2;
 
-        int rowIndex = drt.getIndexOfColumnCellWithData(TEST_USERS_FOR_GROUP[0], 1);
+        int rowIndex = drt.getIndexOfColumnCellWithData(TEST_USERS_FOR_GROUP[0], userColumn);
 
         if(getBrowser().startsWith(FIREFOX_BROWSER))
         //IE displays correctly but selenium retrieves the data differently
@@ -162,11 +162,24 @@ public class GroupTest extends BaseSeleniumWebTest
         }
 
 
-        //exapnd plus thingy to check specific groups
+        //exapnd plus  to check specific groups
         clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+3), "1,1");
         assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite group2AuthorSite group2, Site Users".split(" "),
                 drt.getDataAsText(rowIndex, 2).split(" ")));
 
+        //confirm hover over produces list of broups
+        Locator groupSpecification = Locator.tagContainingText("span","Site group2");
+        String groupHierarchy = getAttribute(groupSpecification, "ext:qtip");
+        String[] expectedMessagesInHierarchy = new String[] {"user1@group1.group.test is a member of <strong>group1</strong>",
+                "Which is a member of <strong>group2</strong><BR/>",
+                "Which is assigned the Author role",
+                "user1@group1.group.test is a member of <strong>group2</strong>",
+                "Which is assigned the Author role"};
+        for(String msg : expectedMessagesInHierarchy)
+        {
+                assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
+        }
+//        assertTrue(groupHierarchy.contains());
 
         //confirm details link leads to right user, page
         clickLinkContainingText("details", rowIndex);
