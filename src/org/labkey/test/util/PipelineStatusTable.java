@@ -32,7 +32,8 @@ public class PipelineStatusTable extends DataRegionTable
 
     public PipelineStatusTable(BaseSeleniumWebTest test, boolean selectors, boolean cache)
     {
-        super("StatusFiles", test, selectors);
+        // 13760: PipelineTest fails because status table no longer has floating headers
+        super("StatusFiles", test, selectors, false);
 
         _cache = cache;
     }
