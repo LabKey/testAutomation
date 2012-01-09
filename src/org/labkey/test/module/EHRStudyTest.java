@@ -862,7 +862,7 @@ public class EHRStudyTest extends SimpleApiTest
 
         String line;
         boolean permitted = successExpected(user.getRole(), qcState);
-        DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
 
         while ( (line = reader.readLine()) != null)
         {
