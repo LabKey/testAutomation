@@ -319,7 +319,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         String inputFormID =   "name2-input";
         String fileField = "FileAttachment";
         clickButton("Edit Fields");
-        waitForText("Edit Fields ");
+        waitForElement(Locator.navButton("Add Field"), defaultWaitForPage);
         clickButton("Add Field", 0);
         waitForElement(Locator.id(inputFormID), defaultWaitForPage);
         setFormElement(inputFormID, fileField);
