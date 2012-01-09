@@ -353,7 +353,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
         if (groupNames != null && groupNames.size() > 0)
         {
-            setFormElement("importGroupNames", StringUtils.join(groupNames, ","));
+            setFormElement(Locator.id("importGroupNames"), StringUtils.join(groupNames, ","));
         }
 
         // R normalization options only present if rEngine as selected
