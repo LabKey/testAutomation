@@ -1818,7 +1818,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         setFormElement(l,groupName);
         clickButton("Create New Group", 0);
-        sleep(500);
+        ExtHelper.waitForExtDialog(this, groupName + " Information");
 
     }
     public void createGlobalPermissionsGroup(String groupName, String... users)

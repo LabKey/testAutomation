@@ -478,6 +478,7 @@ public class FlowTest extends BaseFlowTest
     private void verifyReportError(String reportName, String errorText)
     {
         log("** Checking for expected error in report '" + reportName + "'");
+        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         goToFlowDashboard();
         clickLinkContainingText("Show Jobs");
         clickLinkWithText("ERROR");

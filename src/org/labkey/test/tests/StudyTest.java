@@ -392,6 +392,8 @@ public class StudyTest extends StudyBaseTest
 
         clickButtonContainingText("Save", 0);
 
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        assertTextPresent(listName);
         return idsInForm;
     }
 
