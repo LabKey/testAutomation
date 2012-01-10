@@ -88,20 +88,22 @@ public class FlowTest extends BaseFlowTest
         copyAnalysisScriptTest();
     }
 
+    String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";
+    String analysisName = "FCSAnalyses";
     protected void setupQuery()
     {
         beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
         createNewQuery("flow");
-        setFormElement(Locator.nameOrId("ff_newQueryName"), "DRTQuery1");
-        selectOptionByText("identifier=ff_baseTableName", "FCSAnalyses");
+        setFormElement(Locator.nameOrId("ff_newQueryName"), query1);
+        selectOptionByText("identifier=ff_baseTableName",  analysisName);
         clickButton("Create and Edit Source");
 
         // Start Query Editing
-        setQueryEditorValue("queryText", "SELECT FCSAnalyses.RowId, " +
-                "FCSAnalyses.Statistic.\"Count\", " +
-                "FCSAnalyses.Run.FilePathRoot, " +
-                "FCSAnalyses.FCSFile.Run.WellCount " +
-                "FROM FCSAnalyses AS FCSAnalyses");
+        setQueryEditorValue("queryText", "SELECT " + analysisName + ".RowId, " +
+                analysisName + ".Statistic.\"Count\", " +
+                analysisName + ".Run.FilePathRoot, " +
+                analysisName + ".FCSFile.Run.WellCount " +
+                "FROM " + analysisName + " AS " + analysisName);
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
 
@@ -298,11 +300,11 @@ public class FlowTest extends BaseFlowTest
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("FlowExperiment2");
-        clickMenuButton("Query", "DRTQuery1");
+        clickMenuButton("Query", query1);
         assertTextPresent("File Path Root");
 
-        setSelectedFields(containerPath, "flow", "DRTQuery1", "MostColumns", new String[] {"RowId", "Count","WellCount"});
-        setSelectedFields(containerPath, "flow", "DRTQuery1", "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
+        setSelectedFields(containerPath, "flow", query1, "MostColumns", new String[] {"RowId", "Count","WellCount"});
+        setSelectedFields(containerPath, "flow", query1, "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
         clickMenuButton("Views", "MostColumns");
         assertTextNotPresent("File Path Root");
         clickMenuButton("Views", "AllColumns");
@@ -478,7 +480,6 @@ public class FlowTest extends BaseFlowTest
     private void verifyReportError(String reportName, String errorText)
     {
         log("** Checking for expected error in report '" + reportName + "'");
-        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         goToFlowDashboard();
         clickLinkContainingText("Show Jobs");
         clickLinkWithText("ERROR");
