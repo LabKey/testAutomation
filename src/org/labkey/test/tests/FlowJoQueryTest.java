@@ -123,5 +123,14 @@ public class FlowJoQueryTest extends BaseFlowTest
         //setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "1", longWaitForPage);
         setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "2.5", longWaitForPage);
         assertTextPresent("No data to show");
+
+        //does this work here?
+        importAnalysis(containerPath, "/flowjoquery/Workspaces/boolean-sub-populations.xml", "miniFCS", true, "BooleanOfBooleanAnalysis", false, false);
+        clickLinkWithText("118795.fcs");
+        sleep(2000);
+        waitForElement(Locator.xpath("//table/tbody/tr/td/a/span[text()='A&B']"), defaultWaitForPage);
+        assertElementPresent(Locator.xpath("//tbody/tr/td/a/span[text()='C|D']"));
     }
+
+
 }
