@@ -35,6 +35,7 @@ import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -869,7 +870,9 @@ public class EHRStudyTest extends SimpleApiTest
             line = line.replace("${AnimalId}", MORE_ANIMAL_IDS[2]);
             line = line.replace("${QCState}", qcState.label);
             line = line.replace("${Role}", user.getRole().toString());
-            line = line.replace("${Date}", dateFormat.format(new Date()));
+            Calendar now = Calendar.getInstance();
+            now.add(Calendar.MINUTE, 1); // avoid creating records "in the past"
+            line = line.replace("${Date}", dateFormat.format(now.getTime()));
             line = line.replace(permitted ? "successresponse>" : "failresponse>", "response>");
 
             writer.write(line + "\n");
