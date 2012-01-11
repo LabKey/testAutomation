@@ -1324,7 +1324,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("assay." + TEST_ASSAY_LUM + " QCFlags");
     }
 
-    String[] expectedFlags = {"AUC, EC50, HMFI","AUC, EC50, HMFI", "HMFI", "", "", "" };
+    String[] expectedFlags = {"AUC, CV, EC50, HMFI","AUC, CV, EC50, HMFI", "HMFI", "CV", "CV"};
 
     private void verifyQCFlagsInRunGrid()
     {
@@ -1490,7 +1490,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //this locator finds an EC50 flag, then makes sure there's red text outlining
         Locator.XPathLocator l = Locator.xpath("//td/div[contains(@style,'red')]/../../td/div/a[contains(text(),'EC50')]");
         assertElementPresent(l,2);
-        assertTextPresent("Flags"); //should update to qc flags
+        assertTextPresent("QC Flags"); //should update to qc flags
     }
 
     private void verifyGuideSetsNotApplied()
