@@ -152,6 +152,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         deleteAllRuns();
     }
 
+    //Issue 12597: Need to delete exp.data objects when deleting a flow run
     protected void deleteAllRuns() throws Exception
     {
         if (!isLinkPresentWithText(getProjectName()))
