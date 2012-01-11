@@ -417,16 +417,7 @@
         <antcall target="stopSeleniumServer" />
     </target>
 
-    <target name="set-debug-props">
-        <condition property="teamcity.selenium.debug" value="-Xdebug" else="">
-            <isset property="debug.suspend.selenium"/>
-        </condition>
-        <condition property="teamcity.selenium.params" value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend.selenium},address=${sysprop.selenium.debug.port}" else="">
-            <isset property="debug.suspend.selenium"/>
-        </condition>
-    </target>
-
-    <target name="runsuite-selenium-tomcat" depends="stopSeleniumServer,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props">
+    <target name="runsuite-selenium-tomcat" depends="stopSeleniumServer,compile,ensurePassword,deploy-test-modules,set-user-props">
         <fail unless="tomcat.home" />
         <echo message="Deleting log files from ${tomcat.home}/logs"/>
         <delete failonerror="false" dir="${tomcat.home}/logs" />
@@ -454,8 +445,6 @@
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="false" haltonerror="false" showoutput="true">
             <jvmarg value="-Xmx512m"/>
-            <jvmarg value="${teamcity.selenium.debug}" />
-            <jvmarg value="${teamcity.selenium.params}" />
             <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suiteToUse}"/>
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
