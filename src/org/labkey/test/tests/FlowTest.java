@@ -481,6 +481,7 @@ public class FlowTest extends BaseFlowTest
     {
         log("** Checking for expected error in report '" + reportName + "'");
         goToFlowDashboard();
+        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         clickLinkContainingText("Show Jobs");
         clickLinkWithText("ERROR");
 
