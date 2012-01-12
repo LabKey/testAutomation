@@ -78,7 +78,6 @@ function doTest()
     result = LABKEY.Security.getGroupsForCurrentUser({
         containerPath: containerPath
     });
-    console.log("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
     if( !result.groups )
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = "+Ext.util.JSON.encode(result));
     else if( result.groups.length >= 3
