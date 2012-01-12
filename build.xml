@@ -1144,7 +1144,7 @@
         <sequential>
             <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey"
                   input="${project.root}/tools/Rpackages/check-installed.R"
-                  failifexecutionfails="false" searchpath="true"
+                  failifexecutionfails="true" searchpath="true"
                   resultproperty="@{property}.exitcode">
                 <arg line="--slave --vanilla --args @{package}"/>
             </exec>
