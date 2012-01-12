@@ -672,11 +672,7 @@ public class TimeChartTest extends StudyBaseTest
             waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
             DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
-            for (int i = 0; i < columnHeaders[testIndex].length; i++)
-            {
-                int colIndex = table.getColumn(columnHeaders[testIndex][i]);
-                assertEquals("Unexpected column index for '" + columnHeaders[testIndex][i] + "'", i, colIndex);
-            }
+
             // check values in interval column for the first participant
             if(numbercheck!=null)
             {
