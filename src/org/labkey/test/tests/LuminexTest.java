@@ -1575,7 +1575,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void setUpGuideSet(String analyte)
     {
         waitForText(analyte);
-        Locator l = Locator.tagContainingText("div", analyte);
+        Locator l = Locator.tagContainingText("span", analyte);
         clickAt(l, "1,1");
 
         setIsoAndConjugate();
