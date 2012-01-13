@@ -292,6 +292,15 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clearFilter("childMaterials", "Name");
         assertLinkNotPresentWithText("SampleSetBVT14");
         assertLinkPresentWithText("SampleSetBVTGrandchildA");
+
+        // Verify that the event was audited
+        goToModule("Query");
+        selectQuery("auditLog", "SampleSetAuditEvent");
+        waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
+        clickLinkWithText("view data");
+        assertTextPresent("Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
+            "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
+            "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
     }
 
     final File experimentFilePath =  new File(getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
