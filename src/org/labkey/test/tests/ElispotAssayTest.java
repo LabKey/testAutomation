@@ -16,11 +16,14 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
+import java.util.List;
 
 public class ElispotAssayTest extends AbstractQCAssayTest
 {
@@ -183,6 +186,29 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertTextPresent("atg_3B");
         assertTextPresent("atg_4B");
 
+        // show the normalized spot count column and verify it is calculated correctly
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "NormalizedSpotCount");
+        CustomizeViewsHelper.applyCustomView(this);
+
+        DataRegionTable dataTable = new DataRegionTable(TEST_ASSAY_ELISPOT + " Data", this);
+        List<String> cellWell = dataTable.getColumnDataAsText("CellWell");
+        List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
+        List<String> normalizedSpotCount = dataTable.getColumnDataAsText("NormalizedSpotCount");
+
+        for (int i=0; i < cellWell.size(); i++)
+        {
+            int cpw = NumberUtils.toInt(cellWell.get(i), 0);
+            Float sc = NumberUtils.toFloat(spotCount.get(i));
+            Float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
+            Float computed = sc;
+
+            if (cpw != 0)
+                computed = sc / cpw * 1000000;
+
+            assertEquals(computed.intValue(), nsc.intValue());
+        }
+        
         clickLinkWithText("view runs");
         clickLinkContainingText("details");
 
@@ -206,6 +232,19 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "765.0"));
         assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "591.0"));
         assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "257.0"));
+
+        // test the mean and median values
+        DataRegionTable table = new DataRegionTable(TEST_ASSAY_ELISPOT + " AntigenStats", this);
+        String[] expectedMeans = new String[]{"15555.6", "8888.9", "122222.2", "46666.7"};
+        String[] expectedMedians = new String[]{"13333.3", "13333.3", "126666.7", "40000.0"};
+
+        int row = 0;
+        for (String mean : expectedMeans)
+            assertEquals(mean, table.getDataAsText(row++, "Atg1CMean"));
+
+        row = 0;
+        for (String median : expectedMedians)
+            assertEquals(median, table.getDataAsText(row++, "Atg1CMedian"));
 
         // verify customization of the run details view is possible
         CustomizeViewsHelper.openCustomizeViewPanel(this);
