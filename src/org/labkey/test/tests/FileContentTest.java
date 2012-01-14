@@ -229,15 +229,15 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);
                   
             clickButton("Audit History");
-            assertTextPresent("file uploaded to folder: /" + PROJECT_NAME);
+            assertTextPresent("File uploaded to project: /" + PROJECT_NAME);
             assertTextPresent("annotations updated: "+CUSTOM_PROPERTY+"="+CUSTOM_PROPERTY_VALUE);
-            assertTextPresent("file deleted from folder: /" + PROJECT_NAME);
+            assertTextPresent("File deleted from project: /" + PROJECT_NAME);
 
             beginAt(getBaseURL()+"/filecontent/" + PROJECT_NAME + "/sendShortDigest.view");
             goToModule("Dumbster");
             assertTextNotPresent(TEST_USER);  // User opted out of notifications
             clickLinkWithText("File Management Notification", false);
-            assertTextBefore("file uploaded", "annotations updated");
+            assertTextBefore("File uploaded", "annotations updated");
             assertTextBefore("annotations updated", "file deleted");
         }
     }
