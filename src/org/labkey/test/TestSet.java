@@ -52,7 +52,7 @@ public enum TestSet
         ButtonCustomizationTest.class,
         ReagentTest.class,
         FilterTest.class,
-//            GenotypingTest.class,            //TODO:  comment this out, genotyping shouldn't be run on TC yet
+//            GenotypingTest.class,            //TODO:  comment this out, genotyping shouldn't be run on TC
             GroupTest.class
     }),
 
@@ -237,6 +237,10 @@ public enum TestSet
 
     UnitTests(new Class[] {
         JUnitTest.class
+    }),
+
+    Chrome(new Class[] {
+        ListExportTest.class
     }),
 
     Data(new Class[] {

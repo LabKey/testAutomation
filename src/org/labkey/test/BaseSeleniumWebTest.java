@@ -505,6 +505,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isTitleEqual("Sign In"))
         {
             assertTitleEquals("Sign In");
+            waitForElement(Locator.id("email"), defaultWaitForPage);
             assertFormPresent("login");
             setText("email", PasswordUtil.getUsername());
             setText("password", PasswordUtil.getPassword());
