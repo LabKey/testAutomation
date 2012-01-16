@@ -1347,6 +1347,8 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkContainingText(expectedFlags[0], 0, false);
         waitForExtMask();
 
+        assertTextPresent("CV", 4);
+
         //verify text is in expected form
         waitForText("HIVIG GS Analyte (1) - " + isotype + " " + conjugate + " under threshold for AUC");
 
