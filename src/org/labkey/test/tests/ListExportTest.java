@@ -34,10 +34,9 @@ public class ListExportTest extends ListTest
         sleep(1000);
         File[] fileAfterDownload =  getFilesWithNameInDlDir(downloadDirectory, filter);
         assertEquals(fileCount+1, fileAfterDownload.length);
-        fileAfterDownload[fileAfterDownload.length-1].deleteOnExit();
 
-        //read back the file and verify it has the number of rows expected
-        //TODO:  read and verify downloaded file
+        File exportedFile = fileAfterDownload[fileAfterDownload.length-1];
+        exportedFile.deleteOnExit();
     }
 
     private File[] getFilesWithNameInDlDir(String dir, String fileRegEx)
