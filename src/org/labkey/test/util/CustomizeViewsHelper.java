@@ -89,7 +89,12 @@ public class CustomizeViewsHelper
 
     public static void revertUnsavedView(BaseSeleniumWebTest test)
     {
-        test.clickNavButton("Revert");
+        Locator btnLocator = Locator.xpath("//span[contains(@class, 'unsavedview-revert')]");
+
+        if (test.isElementPresent(btnLocator))
+            test.clickAndWait(btnLocator);
+        else
+            test.fail("revert button not found");
     }
 
     public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String column_name)
