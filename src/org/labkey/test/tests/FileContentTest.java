@@ -238,7 +238,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertTextNotPresent(TEST_USER);  // User opted out of notifications
             clickLinkWithText("File Management Notification", false);
             assertTextBefore("File uploaded", "annotations updated");
-            assertTextBefore("annotations updated", "file deleted");
+            assertTextBefore("annotations updated", "File deleted");
         }
     }
 
