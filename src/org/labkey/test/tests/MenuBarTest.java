@@ -88,8 +88,14 @@ public class MenuBarTest extends BaseSeleniumWebTest
         assertNavButtonNotPresent("Manage Assays");
         assertTextNotPresent("No Studies Found");
 
-        mouseOver(Locator.menuBarItem("Wiki Menu"));
-        waitForText(WIKI_PAGE_CONTENT, 3000);
+//        mouseOver(Locator.menuBarItem("Wiki Menu"));
+//        waitForText(WIKI_PAGE_CONTENT, 3000);
+        //TODO:  clean up
+        Locator l = Locator.id("Wiki Menu6$Header");
+        //selenium.focus(l);
+        mouseOver(l);
+        sleep(3000);
+        assertTextPresent(WIKI_PAGE_CONTENT);
         mouseOver(Locator.menuBarItem("Assays"));
         waitForElement(Locator.navButton("Manage Assays"), 3000);
 

@@ -39,6 +39,12 @@ public class ListHelper
         _submitImportTsv(test, null);
     }
 
+    public static boolean uploadExcelFile(BaseSeleniumWebTest test, String folderName, String listName, String fileName)
+    {
+        //todo
+        return false;
+    }
+
     public static void submitTsvData(BaseSeleniumWebTest test, String listData)
     {
         test.setLongTextField("text", listData);
@@ -583,7 +589,8 @@ public class ListHelper
         if ( lookup.getFolder() != null ) test.setFormElement("lookupContainer", lookup.getFolder());
         if ( lookup.getSchema() != null ) test.setFormElement("schema", lookup.getSchema());
         if ( lookup.getTable() != null ) test.setFormElement("table", lookup.getTable());
-        test.clickNavButton("Apply", 0);
+
+        test.clickNavButtonAt("Apply", 0, "1,1");
     }
 
     public static void selectPropertyTab(BaseSeleniumWebTest test, String name)
