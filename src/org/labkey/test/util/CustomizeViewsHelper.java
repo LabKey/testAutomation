@@ -89,7 +89,7 @@ public class CustomizeViewsHelper
 
     public static void revertUnsavedView(BaseSeleniumWebTest test)
     {
-        Locator btnLocator = Locator.xpath("//span[contains(@class, 'unsavedview-revert')]");
+        Locator btnLocator = Locator.xpath("//button[@title='Revert your edited view']");
 
         if (test.isElementPresent(btnLocator))
             test.clickAndWait(btnLocator);
