@@ -208,6 +208,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
             assertEquals(computed.intValue(), nsc.intValue());
         }
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.revertUnsavedView(this);
 
         clickLinkWithText("view runs");
