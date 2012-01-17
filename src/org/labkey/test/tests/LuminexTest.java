@@ -57,6 +57,7 @@ public class LuminexTest extends AbstractQCAssayTest
     protected static final String TEST_ASSAY_LUM_RUN_NAME2 = "testRunName2";
     protected static final String TEST_ASSAY_LUM_RUN_NAME3 = "WithIndices.xls";
     protected static final String TEST_ANALYTE_LOT_NUMBER = "ABC 123";
+    public static final String GUIDE_SET_5_COMMENT = "analyte 2 guide set run removed";
     protected final File TEST_ASSAY_LUM_FILE1 = new File(getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls");
     protected final File TEST_ASSAY_LUM_FILE2 = new File(getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx");
     protected final File TEST_ASSAY_LUM_FILE3 = new File(getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls");
@@ -1173,6 +1174,27 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
+    protected void importLuminexRun()
+    {
+
+    }
+
+    protected void importLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
+                                           String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
+                                           String testDate, String file, int i)
+    {
+            setFormElement("name", name);
+            setFormElement("isotype", isotype);
+            setFormElement("conjugate", conjugate);
+            setFormElement("stndCurveFitInput", stndCurveFitInput);
+            setFormElement("unkCurveFitInput", unkCurveFitInput);
+            setFormElement("notebookNo", notebookNo);
+            setFormElement("assayType", assayType);
+            setFormElement("expPerformer", expPerformer);
+            setFormElement("testDate", testDate);
+            setFormElement("__primaryFile__", file);
+            clickNavButton("Next", 60000);
+    }
     //requires drc, Ruminex, rlabkey and xtable packages installed in R
     protected void runGuideSetTest()
     {
@@ -1202,18 +1224,10 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Import Data");
             setFormElement("network", "NETWORK" + (i + 1));
             clickNavButton("Next");
-            setFormElement("name", "Guide Set plate " + (i+1));
-            setFormElement("isotype", isotype);
-            setFormElement("conjugate", conjugate);
-            setFormElement("stndCurveFitInput", "");
-            setFormElement("unkCurveFitInput", "");
-            setFormElement("notebookNo", "Notebook" + (i+1));
-            setFormElement("assayType", "Experimental");
-            setFormElement("expPerformer", "TECH" + (i+1));
+
             testDate.add(Calendar.DATE, 1);
-            setFormElement("testDate", df.format(testDate.getTime()));
-            setFormElement("__primaryFile__", files[i]);
-            clickNavButton("Next", 60000);
+            importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
+                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
             checkCheckbox("_titrationRole_qccontrol_HIVIG");
             clickNavButton("Save and Finish");
@@ -1250,18 +1264,9 @@ public class LuminexTest extends AbstractQCAssayTest
             clickNavButton("Import Data");
             setFormElement("network", "NETWORK" + (i + 1));
             clickNavButton("Next");
-            setFormElement("name", "Guide Set plate " + (i+1));
-            setFormElement("isotype", isotype);
-            setFormElement("conjugate", conjugate);
-            setFormElement("stndCurveFitInput", "");
-            setFormElement("unkCurveFitInput", "");
-            setFormElement("notebookNo", "Notebook" + (i+1));
-            setFormElement("assayType", "Experimental");
-            setFormElement("expPerformer", "TECH" + (i+1));
-            testDate.add(Calendar.DATE, 1);
-            setFormElement("testDate", df.format(testDate.getTime()));
-            setFormElement("__primaryFile__", files[i]);
-            clickNavButton("Next", 60000);
+
+            importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
+                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
             uncheckCheckbox("_titrationRole_standard_HIVIG");
             checkCheckbox("_titrationRole_qccontrol_HIVIG");
             clickNavButton("Save and Finish");
@@ -1280,7 +1285,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // remove a run from the current guide set
         setUpGuideSet("GS Analyte (2)");
         clickButtonContainingText("Edit", 0);
-        editGuideSet(new String[] {"guideRunSetRow_0"}, "analyte 2 guide set run removed", false);
+        editGuideSet(new String[] {"guideRunSetRow_0"}, GUIDE_SET_5_COMMENT, false);
 
         // create a new guide set for the second analyte so that we can test the apply guide set
         setUpGuideSet("GS Analyte (2)");
@@ -1288,7 +1293,7 @@ public class LuminexTest extends AbstractQCAssayTest
         editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs", true);
 
         // apply the new guide set to a run
-        applyGuideSetToRun("NETWORK5", 2, "create new analyte 2 guide set with 3 runs", 4);
+        verifyGuideSetToRun("NETWORK5", 2, "create new analyte 2 guide set with 3 runs", 4);
 
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
@@ -1307,6 +1312,122 @@ public class LuminexTest extends AbstractQCAssayTest
         // test the y-axis scale
         applyLogYAxisScale();
         guideSetApiTest();
+        verifyQCFlagUpdates();
+    }
+
+    String newGuideSetPlate = "Reload guide set 5";
+    private void verifyQCFlagUpdates()
+    {
+        importPlateFiveAgain();
+         DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
+        //
+        //2. exclude wells A4, B4 from plate 5a for both analytes
+        //	- the EC50 for GS Analyte (2) is changed to be under the Guide Set range so new QC Flag inserted for that
+        //
+        excludeWellFromRun("Guide Set plate 5", "A4,B4");
+        goBack();
+        refresh();
+        assertEquals("AUC, CV, EC50, HMFI",  drt.getDataAsText(1, "QC Flags"));
+
+        //3. un-exclude wells A4, B4 from plate 5a for both analytes
+        //	- the EC50 QC Flag for GS Analyte (2) that was inserted in the previous step is removed
+
+        includeWellFromRun("Guide Set plate 5", "A4,B4");
+        goBack();
+        refresh();
+        assertEquals("AUC, CV, HMFI",  drt.getDataAsText(1, "QC Flags"));
+
+
+//4. For GS Analyte (2), apply the non-current guide set to plate 5a
+//	- QC Flags added for EC50 and HMFI
+        goToLeveyJenningsGraphPage("HIVIG");
+        setUpGuideSet("GS Analyte (2)");
+        String newQcFlags = "AUC, EC50, HMFI";
+        assertTextNotPresent(newQcFlags);
+      applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
+        //assert ec50 and HMFI red text present
+        assertElementPresent(Locator.xpath("//div[text()='28040.51' and contains(@style,'red')]"));
+        assertElementPresent(Locator.xpath("//div[text()='32145.80' and contains(@style,'red')]"));
+        assertTextPresent(newQcFlags);
+        //verify new flags present in run list
+        goToTestRunList();
+        assertTextPresent("AUC, CV, EC50, HMFI");
+
+//5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
+//	- the EC50 and HMFI QC Flags that were added in step 4 are removed
+        goToLeveyJenningsGraphPage("HIVIG");
+        setUpGuideSet("GS Analyte (2)");
+        applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT, -1);
+        assertTextNotPresent(newQcFlags);
+//
+//6. Create new Guide Set for GS Analyte (2) that includes plate 5 (but not plate 5a)
+//	- the AUC QC Flag for plate 5 is removed
+//
+        Locator.XPathLocator aucLink =  Locator.xpath("//a[contains(text(),'AUC')]");
+        int aucCount = getXpathCount(aucLink);
+        createGuideSet("GS Analyte (2)", false);
+        editGuideSet(new String[]{"allRunsRow_1"}, "Guide set includes plate 5", true);
+        assertEquals("Wrong count for AUC flag links", aucCount-1, (getXpathCount(aucLink)));
+
+
+//7. Switch to GS Analyte (1), and edit the current guide set to include plate 3
+//	- the QC Flag for plate 3 (the run included) and the other plates (4, 5, and 5a) are all removed as all values are within the guide set ranges
+        setUpGuideSet("GS Analyte (1)");
+        assertExpectedAnalyte1QCFlagsPresent();
+        clickButtonContainingText("Edit", 0);
+        editGuideSet(new String[]{"allRunsRow_3"}, "edited analyte 1", false);
+        assertNoQCFlagsPresent();
+
+//8. Edit the GS Analyte (1) guide set and remove plate 3
+//	- the QC Flags for plates 3, 4, 5, and 5a return (HMFI for all 4 and AUC for plates 4, 5, and 5a)
+        removePlate3FromGuideSet();
+        assertExpectedAnalyte1QCFlagsPresent();
+    }
+
+    private void removePlate3FromGuideSet()
+    {
+        clickButtonContainingText("Edit", 0);
+        waitForExtMask();
+        Locator l = Locator.id("guideRunSetRow_0");
+        waitForElement(l, defaultWaitForPage);
+        click(l);
+        clickButton("Save",0);
+        waitForGuideSetExtMaskToDisappear();
+    }
+
+    private void assertExpectedAnalyte1QCFlagsPresent()
+    {
+
+            assertElementPresent(Locator.xpath("//a[contains(text(),'HMFI')]"), 4);
+    }
+
+    private void assertNoQCFlagsPresent()
+    {
+        assertEquals("Unexpected QC Flag Highlight Present", 0,
+                    getXpathCount(Locator.xpath("//div[contains(@style,'red')]")));
+        for(String flag : new String[] {"AUC", "HMFI", "EC50", "CV"})
+        {
+            assertElementNotPresent(Locator.xpath("//a[contains(text(),'" + flag + "')]"));
+        }
+    }
+
+    private void importPlateFiveAgain()
+    {
+        //1. upload plate 5 again with the same isotype and conjugate (plate 5a)
+        //	- QC flags inserted for AUC for both analytes and HMFI for GS Analyte (1)
+
+        goToTestAssayHome();
+        clickNavButton("Import Data");
+        setFormElement("network", "NETWORK" + (10));
+        clickNavButton("Next");
+
+        importLuminexRunPageTwo(newGuideSetPlate, isotype, conjugate, "", "", "Notebook" + 11,
+                    "Experimental", "TECH" + (11), "",  TEST_ASSAY_LUM_FILE9.toString(), 6);
+        uncheckCheckbox("_titrationRole_standard_HIVIG");
+        checkCheckbox("_titrationRole_qccontrol_HIVIG");
+        clickNavButton("Save and Finish");
+
+
     }
 
     private void verifyQCFlags()
@@ -1346,8 +1467,8 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         clickLinkContainingText(expectedFlags[0], 0, false);
         waitForExtMask();
-
-        assertTextPresent("CV", 4);
+         sleep(500);
+        assertTextPresent("CV", 8);
 
         //verify text is in expected form
         waitForText("HIVIG GS Analyte (1) - " + isotype + " " + conjugate + " under threshold for AUC");
@@ -1416,16 +1537,36 @@ public class LuminexTest extends AbstractQCAssayTest
         return getAttribute(l,  "href");
     }
 
+    protected void excludeWellFromRun(String run, String well)
+    {
+        clickLinkContainingText(run);
+
+        log("Exclude well from from run");
+        clickExclusionMenuIconForWell(well);
+        clickButton("Save");
+        waitForExtMaskToDisappear();
+    }
+
+    //re-include an excluded well
+    protected void includeWellFromRun(String run, String well)
+    {
+        clickLinkContainingText(run);
+
+        log("Exclude well from from run");
+        clickExclusionMenuIconForWell(well);
+        clickRadioButtonById("excludeselected");
+        clickButton("Save", 0);
+//        sleep(1000);
+        ExtHelper.clickExtButton(this, "Yes");
+        waitForExtMaskToDisappear();
+    }
+
+
     private void excludableWellsWithTransformTest()
     {
         clickLinkContainingText(getProjectName());
         clickLinkContainingText(TEST_ASSAY_LUM);
-        clickLinkContainingText("Guide Set plate 5");
-
-        log("Exclude well from from run");
-        clickExclusionMenuIconForWell("A6,B6");
-        clickButton("Save");
-        waitForExtMaskToDisappear();
+        excludeWellFromRun("Guide Set plate 5", "A6,B6");
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
         assertTextPresent("28040.51");
@@ -1647,11 +1788,17 @@ public class LuminexTest extends AbstractQCAssayTest
             assertElementPresent(Locator.button("Save"));
             clickButton("Save",0);
         }
+        waitForGuideSetExtMaskToDisappear();
+
+        waitForText("Created: " + today + "; Comment: " + comment);
+    }
+
+    private void waitForGuideSetExtMaskToDisappear()
+    {
+
         waitForExtMaskToDisappear();
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-
-        waitForText("Created: " + today + "; Comment: " + comment);
     }
 
     private void goToLeveyJenningsGraphPage(String titrationName)
@@ -1694,7 +1841,23 @@ public class LuminexTest extends AbstractQCAssayTest
         }
     }
 
-    private void applyGuideSetToRun(String network, int networkColIndex, String comment, int commentColIndex)
+    private void applyGuideSetToRun(String network, int runRowIndex, String comment, int guideSetIndex)
+    {
+        clickAt(ExtHelper.locateBrowserFileCheckbox(network), "1," + runRowIndex);
+        clickButton("Apply Guide Set", 0);
+        sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
+
+        if(guideSetIndex!=-1) //not clicking anything will apply the current guide set
+            clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1," + guideSetIndex);
+
+        waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0);
+        waitForExtMaskToDisappear();
+        // verify that the plot is reloaded
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+
+    }
+    private void verifyGuideSetToRun(String network, int networkColIndex, String comment, int commentColIndex)
     {
         clickAt(ExtHelper.locateBrowserFileCheckbox(network), "1," + networkColIndex);
         clickButton("Apply Guide Set", 0);
