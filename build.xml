@@ -489,6 +489,7 @@
                 todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
         </junit>
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
+        <antcall target="waitfor-tomcat-shutdown"/>
         <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${serverType}/" />
         <mkdir dir="${test.log.output.dir}/${serverType}" />
         <copy todir="${test.log.output.dir}/${serverType}">
@@ -502,6 +503,18 @@
         <antcall target="fail_message"/>
     </target>
 
+    <target name="waitfor-tomcat-shutdown">
+      <property name="server.url" value="${sysprop.labkey.server}:${sysprop.labkey.port}"/>
+
+      <echo message="waiting for the server to shutdown: ${server.url}"/>
+      <waitfor maxwait="2" maxwaitunit="minute">
+          <or>
+            <not><http url="${server.url}" /></not>
+            <not><equals arg1="${sysprop.labkey.server}" arg2="localhost"/></not>
+          </or>
+      </waitfor>
+    </target>
+    
     <target name="fail_message" if="suite.failed">
         <echo message="${sysprop.suiteToUse} FAILED"/>
     </target>
