@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -34,9 +35,10 @@ import java.util.regex.Matcher;
  */
 public class FlowJoQueryTest extends BaseFlowTest
 {
+    String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
+
     protected void _doTestSteps() throws Exception
     {
-        String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         clickLinkWithText("Flow Dashboard");
@@ -70,61 +72,69 @@ public class FlowJoQueryTest extends BaseFlowTest
 //        setFormElement("query.queryName", "DeviationFromMean");
 //        waitForPageToLoad();
 
-        clickLinkWithText("Flow Dashboard");
+//        clickLinkWithText("Flow Dashboard");
         importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", false, "FlowJoAnalysis", true, false);
+//
+//        int runId = -1;
+//        String currentURL = getCurrentRelativeURL();
+//        Pattern p = Pattern.compile(".*runId=([0-9]+).*$");
+//        Matcher m = p.matcher(currentURL);
+//        if (m.matches())
+//        {
+//            String runIdStr = m.group(1);
+//            runId = Integer.parseInt(runIdStr);
+//            log("mini-fcs.xml runId = " + runId);
+//        }
+//        else
+//        {
+//            fail("Failed to match runId pattern for url: " + currentURL);
+//        }
+//        assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
+//
+//        // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
+//        setFilter("query", "Name", "Equals", "118795.fcs");
+//        clickLinkContainingText("workspaceScript");
+//        clickLinkWithText("Make a copy of this analysis script");
+//        setFormElement("name", "LabKeyScript");
+//        checkCheckbox("copyAnalysis");
+//        submit();
+//
+//        // Only run LabKeyScript on sample wells
+//        // NOTE: we use 'Contains' since it is case-insensitive. Some values are Non-comp and other are Non-Comp.
+//        clickLinkWithText("Edit Settings");
+//        selectOptionByText(Locator.name("ff_filter_field", 0), "Comp");
+//        selectOptionByText(Locator.name("ff_filter_op", 0), "Contains");
+//        setFormElement(Locator.name("ff_filter_value", 0), "non-comp"); clickNavButton("Update");
+//
+//        clickLinkWithText("Analyze some runs");
+//        selectOptionByValue("ff_targetExperimentId", "");
+//        waitForPageToLoad();
+//        // select mini-fcs.xml Analysis run
+//        checkCheckbox(".select", String.valueOf(runId));
+//        clickNavButton("Analyze selected runs");
+//        setFormElement("ff_analysisName", "LabKeyAnalysis");
+//        clickNavButton("Analyze runs");
+//        waitForPipeline(containerPath);
+//        clickLinkWithText("Flow Dashboard");
+//        clickLinkWithText("LabKeyAnalysis");
+//        clickMenuButton("Query", "Comparison");
+//        waitForPageToLoad(longWaitForPage);
+//        assertTextNotPresent("No data to show");
+//        setFilterAndWait("query", "AbsDifference", "Is Greater Than Or Equal To", "2", longWaitForPage);
+//        // UNDONE: sample '118902.fcs' differs by 2.46%
+//        //setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "1", longWaitForPage);
+//        setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "2.5", longWaitForPage);
+//        assertTextPresent("No data to show");
 
-        int runId = -1;
-        String currentURL = getCurrentRelativeURL();
-        Pattern p = Pattern.compile(".*runId=([0-9]+).*$");
-        Matcher m = p.matcher(currentURL);
-        if (m.matches())
-        {
-            String runIdStr = m.group(1);
-            runId = Integer.parseInt(runIdStr);
-            log("mini-fcs.xml runId = " + runId);
-        }
-        else
-        {
-            fail("Failed to match runId pattern for url: " + currentURL);
-        }
-        assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
+//        verifyNestedBooleans();
 
-        // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
-        setFilter("query", "Name", "Equals", "118795.fcs");
-        clickLinkContainingText("workspaceScript");
-        clickLinkWithText("Make a copy of this analysis script");
-        setFormElement("name", "LabKeyScript");
-        checkCheckbox("copyAnalysis");
-        submit();
+         verifyFilterOnImport();
 
-        // Only run LabKeyScript on sample wells
-        // NOTE: we use 'Contains' since it is case-insensitive. Some values are Non-comp and other are Non-Comp.
-        clickLinkWithText("Edit Settings");
-        selectOptionByText(Locator.name("ff_filter_field", 0), "Comp");
-        selectOptionByText(Locator.name("ff_filter_op", 0), "Contains");
-        setFormElement(Locator.name("ff_filter_value", 0), "non-comp"); clickNavButton("Update");
+    }
 
-        clickLinkWithText("Analyze some runs");
-        selectOptionByValue("ff_targetExperimentId", "");
-        waitForPageToLoad();
-        // select mini-fcs.xml Analysis run
-        checkCheckbox(".select", String.valueOf(runId));
-        clickNavButton("Analyze selected runs");
-        setFormElement("ff_analysisName", "LabKeyAnalysis");
-        clickNavButton("Analyze runs");
-        waitForPipeline(containerPath);
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("LabKeyAnalysis");
-        clickMenuButton("Query", "Comparison");
-        waitForPageToLoad(longWaitForPage);
-        assertTextNotPresent("No data to show");
-        setFilterAndWait("query", "AbsDifference", "Is Greater Than Or Equal To", "2", longWaitForPage);
-        // UNDONE: sample '118902.fcs' differs by 2.46%
-        //setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "1", longWaitForPage);
-        setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "2.5", longWaitForPage);
-        assertTextPresent("No data to show");
-
-        //does this work here?
+    private void verifyNestedBooleans()
+    {
+        //verify workspaces with booleans-within-booleans
         importAnalysis(containerPath, "/flowjoquery/Workspaces/boolean-sub-populations.xml", "miniFCS", true, "BooleanOfBooleanAnalysis", false, false);
         clickLinkWithText("118795.fcs");
         sleep(2000);
@@ -132,5 +142,13 @@ public class FlowJoQueryTest extends BaseFlowTest
         assertElementPresent(Locator.xpath("//tbody/tr/td/a/span[text()='C|D']"));
     }
 
+
+    private void verifyFilterOnImport()
+    {
+        setFlowFilter(new String[] {"Name", "Keyword/Comp"}, new String[] { "startswith","eq"}, new String[] {"118", "PE CD8"});
+        importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "miniFCS", true, "FilterAnalysis", false, false);
+        DataRegionTable queryTable = new DataRegionTable("query", this);
+        assertEquals(1, queryTable.getDataRowCount());
+    }
 
 }

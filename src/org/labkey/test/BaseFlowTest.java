@@ -37,6 +37,24 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         return "server/modules/flow";
     }
 
+
+    //need not fill all three, but must be the same length.  If you wish to skip a field, set it to an empty string,
+    // or the default in the case of op
+    public void setFlowFilter(String[] fields, String[] ops, String[] values)
+    {
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Other settings");
+        clickLinkWithText("Edit FCS Analysis Filter");
+
+        for(int i=0; i<fields.length; i++)
+        {
+            selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(i),  fields[i]);
+            selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(i), ops[i]);
+            setFormElement(Locator.xpath("//input[@name='ff_value']").index(i), values[i]);
+        }
+        submit();
+    }
+
     @Override
     protected String getProjectName()
     {
@@ -345,6 +363,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importAnalysis_analysisEngine(String containerPath, String engineId)
     {
         assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
+        waitForElement(Locator.id(engineId), defaultWaitForPage);
         clickRadioButtonById(engineId);
         clickNavButton("Next");
     }

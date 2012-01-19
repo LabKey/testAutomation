@@ -197,14 +197,7 @@ public class FlowTest extends BaseFlowTest
 
     protected void analysisFilterTest()
     {
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Other settings");
-        clickLinkWithText("Edit FCS Analysis Filter");
-        selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "Keyword/Stim");
-        selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(0),  "isnonblank");
-        selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(1),  "eq");
-        selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(2),  "eq");
-        submit();
+        setFlowFilter(new String[] {"Keyword/Stim"}, new String[] {"isnonblank"}, new String[] {""});
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("QUV analysis");
@@ -269,7 +262,7 @@ public class FlowTest extends BaseFlowTest
 
 
         // Now, let's add another run:
-        clickLinkWithText("Flow Dashboard");
+         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for more FCS files to be imported");
 
         ExtHelper.selectFileBrowserItem(this, "8color/");
@@ -480,6 +473,7 @@ public class FlowTest extends BaseFlowTest
     private void verifyReportError(String reportName, String errorText)
     {
         log("** Checking for expected error in report '" + reportName + "'");
+        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         goToFlowDashboard();
         waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         clickLinkContainingText("Show Jobs");
