@@ -660,8 +660,8 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("pomegranate");
 
         File tsvFile = new File(TSV_DATA_FILE);
-        //Cancel test disabled.  //TODO: re-enable
-        /* log("Infer from tsv file, but cancel before completion");
+        //Cancel test disabled because teamcity is too slow to run it successfully
+        /*log("Infer from tsv file, but cancel before completion");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("manage lists");
         clickNavButton("Create New List");
