@@ -247,13 +247,10 @@ public class GenotypingTest extends BaseSeleniumWebTest
         //click some checkboxes
         mouseDown(Locator.tagContainingText("div", alleles[1]));
         mouseDown(Locator.tagContainingText("div", alleles[2]));
-//        click
 
-        //TODO:  click combine
-        //TODO:  verify combination took
+        //combine some but not all of the matches
         ExtHelper.clickXGridPanelCheckbox(this, 0, true);
         ExtHelper.clickXGridPanelCheckbox(this, 2, true);
-
         clickButtonContainingText("Combine", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         refresh();
 
@@ -431,4 +428,5 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
 }
