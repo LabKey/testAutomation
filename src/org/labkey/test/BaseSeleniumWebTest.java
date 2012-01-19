@@ -1409,7 +1409,28 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if(!"Query Schema Browser".equals(selenium.getTitle()))
                 goToSchemaBrowser();
             validateQueries();
+            validateLabAuditTrail();
         }
+    }
+
+    private void validateLabAuditTrail()
+    {
+        int auditEventRowCount = 0;
+        DataRegionTable drt = null;
+        for(String query : new String[] {"ExperimentAuditEvent", "SampleSetAuditEvent", "FileSystem", "ContainerAuditEvent"})
+        {
+            viewQueryData("auditLog", query);
+            if(drt==null)
+                drt =  new DataRegionTable("query", this);
+            int rowCount =   drt.getDataRowCount();
+            log(query + " row count: " + rowCount);
+            auditEventRowCount += rowCount;
+            goBack();
+        }
+
+        viewQueryData("auditLog", "LabAuditEvents");
+        int labAuditRowCount = drt.getDataRowCount();
+        assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, labAuditRowCount);
     }
 
     private void checkActionCoverage()
@@ -1809,11 +1830,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         _createdProjects.add(projectName);
     }
 
-    public void startCreateGlobalPermissionsGroup(String groupName)
+    public void startCreateGlobalPermissionsGroup(String groupName, boolean failIfAlreadyExists)
     {
 
         goToHome();
         clickLinkWithText("Site Groups");
+        if(isElementPresent(Locator.tagWithText("div", groupName)))
+        {
+            if(failIfAlreadyExists)
+                fail("Group already exists");
+            else
+                return;
+        }
+
         Locator l = Locator.id("newGroupFormSite$input");
         waitForElement(l, defaultWaitForPage);
 
@@ -1822,9 +1851,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ExtHelper.waitForExtDialog(this, groupName + " Information");
 
     }
+
     public void createGlobalPermissionsGroup(String groupName, String... users)
     {
-        startCreateGlobalPermissionsGroup(groupName);
+        createGlobalPermissionsGroup(groupName, true, users);
+    }
+
+    public void createGlobalPermissionsGroup(String groupName, boolean failIfAlreadyExists, String... users )
+    {
+        startCreateGlobalPermissionsGroup(groupName, failIfAlreadyExists);
         StringBuilder namesList = new StringBuilder();
         for(String member : users)
         {
@@ -1838,6 +1873,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
     }
+
     public void createPermissionsGroup(String groupName)
     {
         log("Creating permissions group " + groupName);
@@ -1849,7 +1885,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickButton("Create New Group", 0);
         sleep(500);
         waitAndClick(Locator.xpath("//div[@id='userInfoPopup']//div[contains(@class,'x-tool-close')]"));
-        waitForElement(Locator.xpath("//div[@id='groupsFrame']//div[contains(@class,'pGroup') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[@id='groupsFrame']//div[contains(@class,'pGroup') and text()='" + groupName + "']"),
+                WAIT_FOR_JAVASCRIPT);
     }
 
     public void createPermissionsGroup(String groupName, String... memberNames)
@@ -2259,6 +2296,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if(type.contains("Equals One Of"))
         {
             desc = "IS ONE OF (" + value.replace(";", ", ") + "))";
+        }
+        else if(type.contains("Contains One Of"))
+        {
+            desc = "CONTAINS ONE OF (" + value.replace(";", ", ") + "))";
+        }
+        else if(type.contains("Does Not Contain Any Of"))
+        {
+            desc = "DOES NOT CONTAIN ANY OF (" + value.replace(";", ", ") + "))";
         }
         else if(type.equals("Equals"))
         {
@@ -4351,6 +4396,25 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    protected void addUserToSiteGroup(String userName, String groupName)
+    {
+        goToHome();
+        clickLinkWithText("Site Groups");
+        Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
+        waitForElement(groupLoc, defaultWaitForPage);
+        click(groupLoc);
+        clickLinkContainingText("manage group");
+        addUserToGroupFromGroupScreen(userName);
+    }
+
+    protected void addUserToGroupFromGroupScreen(String userName)
+    {
+        setFormElement("names", userName );
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership");
+
+    }
+
     /**
      * Adds a new or existing user to an existing group within an existing project
      *
@@ -4367,9 +4431,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
-        setFormElement("names", userName );
-        uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        addUserToGroupFromGroupScreen(userName);
     } //addUserToProjGroup()
 
     public void enterPermissionsUI()

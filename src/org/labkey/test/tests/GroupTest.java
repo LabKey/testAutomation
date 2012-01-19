@@ -35,6 +35,7 @@ public class GroupTest extends BaseSeleniumWebTest
     protected static final String SIMPLE_GROUP = "group1";
     protected static final String COMPOUND_GROUP = "group2";
     protected static final String BAD_GROUP = "group3";
+    protected static final String CHILD_GROUP = "group4";
     protected static final String WIKITEST_NAME = "GroupSecurityApiTest";
     protected static final String GROUP_SECURITY_API_FILE = "groupSecurityTest.html";
     protected static final String API_SITE_GROUP = "API Site Group";
@@ -59,6 +60,7 @@ public class GroupTest extends BaseSeleniumWebTest
         try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(COMPOUND_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(BAD_GROUP);}catch(Throwable t){/*ignore*/}
+        try{deleteGroup(CHILD_GROUP);}catch(Throwable t){}
         try{deleteGroup(API_SITE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteProject(getProjectName());}catch(Throwable t){/*ignore*/}
         try{deleteProject(getProject2Name());}catch(Throwable t){/*ignore*/}
@@ -226,6 +228,16 @@ public class GroupTest extends BaseSeleniumWebTest
 //        assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
         sleep(500);
         stopImpersonatingGroup();
+
+        //Issue 13802: add child group to SIMPLE_GROUP, child group should also have access to pages
+        createGlobalPermissionsGroup(CHILD_GROUP, "");
+        addUserToSiteGroup(CHILD_GROUP, SIMPLE_GROUP);
+        impersonateGroup(CHILD_GROUP);
+        clickLinkContainingText(getProjectName());
+        assertTrue("could not see wiki pages when impersonating " + CHILD_GROUP, canSeePages(nameTitleBody));
+        assertTrue("could not edit wiki pages when impersonating " + CHILD_GROUP, canEditPages(nameTitleBody));
+        sleep(500);
+        stopImpersonatingGroup();
     }
 
     private boolean canEditPages(String[][] nameTitleBody)
@@ -273,7 +285,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
     private void verifyCantAddSystemGroupToUserGroup()
     {
-        startCreateGlobalPermissionsGroup(BAD_GROUP);
+        startCreateGlobalPermissionsGroup(BAD_GROUP, true);
         setFormElement("Users_dropdownMenu", "All Site Users");
 
         ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//input[@id='Users_dropdownMenu']/../img"), "All Site Users");
