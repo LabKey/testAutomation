@@ -1251,10 +1251,10 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
-        double[] ec50Averages = {177.15, 43426.10};
-        double[] ec50StdDevs = {18.49, 794.95};
-        double[] aucAverages = {8662.50, 80851.83};
-        double[] aucStdDevs = {521.79, 6523.08};
+        double[] ec50Averages = {179.78, 43426.10};
+        double[] ec50StdDevs = {22.21, 794.95};
+        double[] aucAverages = {8701.38, 80851.83};
+        double[] aucStdDevs = {466.81, 6523.08};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec50Averages, ec50StdDevs, aucAverages, aucStdDevs);
 
         // upload the final set of runs (2 runs)
@@ -1298,10 +1298,10 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
         int[] rowCounts2 = {2, 3};
-        double[] ec50Averages2 = {177.15, 42158.22};
-        double[] ec50StdDevs2 = {18.49, 4833.76};
-        double[] aucAverages2 = {8662.50, 85268.04};
-        double[] aucStdDevs2 = {521.79, 738.55};
+        double[] ec50Averages2 = {179.78, 42158.22};
+        double[] ec50StdDevs2 = {22.21, 4833.76};
+        double[] aucAverages2 = {8701.38, 85268.04};
+        double[] aucStdDevs2 = {466.81, 738.55};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec50Averages2, ec50StdDevs2, aucAverages2, aucStdDevs2);
 
         // test the start and end date filter for the report
@@ -1327,7 +1327,7 @@ public class LuminexTest extends AbstractQCAssayTest
         excludeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
-        assertEquals("AUC, CV, EC50, HMFI",  drt.getDataAsText(1, "QC Flags"));
+        assertEquals("AUC, EC50, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 QC Flag for GS Analyte (2) that was inserted in the previous step is removed
@@ -1335,7 +1335,7 @@ public class LuminexTest extends AbstractQCAssayTest
         includeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
-        assertEquals("AUC, CV, HMFI",  drt.getDataAsText(1, "QC Flags"));
+        assertEquals("AUC, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
 
 //4. For GS Analyte (2), apply the non-current guide set to plate 5a
@@ -1351,7 +1351,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent(newQcFlags);
         //verify new flags present in run list
         goToTestRunList();
-        assertTextPresent("AUC, CV, EC50, HMFI");
+        assertTextPresent("AUC, EC50, HMFI, PCV");
 
 //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
 //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
@@ -1405,7 +1405,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         assertEquals("Unexpected QC Flag Highlight Present", 0,
                     getXpathCount(Locator.xpath("//div[contains(@style,'red')]")));
-        for(String flag : new String[] {"AUC", "HMFI", "EC50", "CV"})
+        for(String flag : new String[] {"AUC", "HMFI", "EC50", "PCV"})
         {
             assertElementNotPresent(Locator.xpath("//a[contains(text(),'" + flag + "')]"));
         }
@@ -1445,7 +1445,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("assay." + TEST_ASSAY_LUM + " QCFlags");
     }
 
-    String[] expectedFlags = {"AUC, CV, EC50, HMFI","AUC, CV, EC50, HMFI", "HMFI", "CV", "CV"};
+    String[] expectedFlags = {"AUC, EC50, HMFI, PCV","AUC, EC50, HMFI", "HMFI", "", "PCV"};
 
     private void verifyQCFlagsInRunGrid()
     {
@@ -1468,7 +1468,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkContainingText(expectedFlags[0], 0, false);
         waitForExtMask();
          sleep(500);
-        assertTextPresent("CV", 8);
+        assertTextPresent("CV", 4); // 3 occurances of PCV and 1 of %CV
 
         //verify text is in expected form
         waitForText("HIVIG GS Analyte (1) - " + isotype + " " + conjugate + " under threshold for AUC");
