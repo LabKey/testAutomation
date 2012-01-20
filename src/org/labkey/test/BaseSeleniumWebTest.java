@@ -1409,7 +1409,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if(!"Query Schema Browser".equals(selenium.getTitle()))
                 goToSchemaBrowser();
             validateQueries();
-            validateLabAuditTrail();
+//            validateLabAuditTrail();
         }
     }
 
