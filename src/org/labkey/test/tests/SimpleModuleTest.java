@@ -337,7 +337,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
             SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, tableName);
             selectCmd.setMaxRows(-1);
             selectCmd.setContainerFilter(ContainerFilter.AllFolders);
-            selectCmd.setColumns(Arrays.asList("*"));
+            selectCmd.setColumns(Arrays.asList("*", "Container/Path"));
             SelectRowsResponse selectResp = selectCmd.execute(cn, "Home");
 
             if (selectResp.getRowCount().intValue() > 0)
@@ -348,8 +348,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                     Row convertedRow = new RowMap(row);
 
                     String container = null;
-                    if(convertedRow.getValue("Container") != null)
-                        container = convertedRow.getValue("Container").toString();
+                    if(convertedRow.getValue("Container/Path") != null)
+                        container = convertedRow.getValue("Container/Path").toString();
 
                     String keyField = selectResp.getMetaData().get("id").toString();
                     Map<String, Object> newRow = new HashMap<String, Object>();
