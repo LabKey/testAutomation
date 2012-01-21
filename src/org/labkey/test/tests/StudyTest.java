@@ -555,6 +555,7 @@ public class StudyTest extends StudyBaseTest
         log("creating the participant/visit comment dataset");
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
 
@@ -673,6 +674,7 @@ public class StudyTest extends StudyBaseTest
     {
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Study");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
 
         // test optional/required/not associated
@@ -714,6 +716,7 @@ public class StudyTest extends StudyBaseTest
     {
         clickLinkWithText(getFolderName());
         clickTab("Manage");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Datasets");
 
         clickLinkWithText("489");
@@ -747,6 +750,7 @@ public class StudyTest extends StudyBaseTest
     private void verifyVisitImportMapping()
     {
         clickLinkWithText("Manage Study");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Visit Import Mapping");
         assertTableRowsEqual("customMapping", 2, VISIT_IMPORT_MAPPING.replace("SequenceNum", "Sequence Number Mapping"));
