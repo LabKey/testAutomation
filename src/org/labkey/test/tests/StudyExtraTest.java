@@ -269,6 +269,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Study Navigator");
         assertTextPresent("Day 320");
         clickTab("Manage");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Timepoints");
         setFormElement("startDate", "2007-11-01");
         submit();

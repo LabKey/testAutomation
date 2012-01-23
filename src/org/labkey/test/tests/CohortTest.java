@@ -172,6 +172,7 @@ public class CohortTest extends BaseSeleniumWebTest
         // Check that switching visit order changes cohort.
         clickLinkWithText(PROJECT_NAME);
         clickTab("Manage");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Change Visit Order");
         checkCheckbox("explicitChronologicalOrder");
@@ -202,6 +203,7 @@ public class CohortTest extends BaseSeleniumWebTest
         // Check that deleting a vistit changes the cohort.
         clickLinkWithText(PROJECT_NAME);
         clickTab("Manage");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("edit", 4); // Visit 4
         clickNavButton("Delete visit");

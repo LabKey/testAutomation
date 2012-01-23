@@ -716,7 +716,6 @@ public class StudyTest extends StudyBaseTest
     {
         clickLinkWithText(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Datasets");
 
         clickLinkWithText("489");

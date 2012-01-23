@@ -447,6 +447,7 @@ public class AssayTest extends AbstractAssayTest
         log("Prepare visit map to check PTID counts in study navigator.");
         clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
         clickLinkWithText("Manage");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Import Visit Map");
         setFormElement("content", "301-302|X|Test Visit");

@@ -165,7 +165,6 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void setDemographicsBit(String datasetName, boolean demographics)
     {
         clickTab("Manage");
-        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(datasetName);
         clickButtonContainingText("Edit Definition");
@@ -183,7 +182,6 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void setVisibleBit(String datasetName, boolean showByDefault)
     {
         clickTab("Manage");
-        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(datasetName);
         clickButtonContainingText("Edit Definition");
