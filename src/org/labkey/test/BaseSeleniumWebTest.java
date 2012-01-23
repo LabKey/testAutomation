@@ -23,6 +23,11 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -55,6 +60,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -1413,24 +1419,74 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
-    private void validateLabAuditTrail()
+    protected void validateLabAuditTrail()
     {
         int auditEventRowCount = 0;
-        DataRegionTable drt = null;
-        for(String query : new String[] {"ExperimentAuditEvent", "SampleSetAuditEvent", "FileSystem", "ContainerAuditEvent"})
+        SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "tobereplaced");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
+        selectCmd.setColumns(Arrays.asList("*"));
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        SelectRowsResponse selectResp = null;
+
+        for(String query : new String[] {"ExperimentAuditEvent", "SampleSetAuditEvent", "ContainerAuditEvent"})
         {
-            viewQueryData("auditLog", query);
-            if(drt==null)
-                drt =  new DataRegionTable("query", this);
-            int rowCount =   drt.getDataRowCount();
+            selectCmd.setQueryName(query);
+            int rowCount = 0;
+            try
+            {
+                selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
+                rowCount =   selectResp.getRowCount().intValue();
+            }
+            catch (IOException e)
+            {
+               fail("Unable to retrieve query: " + query);
+            }
+            catch (CommandException e)
+            {
+               fail("Unable to retrieve query: " + query);
+            }
             log(query + " row count: " + rowCount);
             auditEventRowCount += rowCount;
-            goBack();
         }
 
-        viewQueryData("auditLog", "LabAuditEvents");
-        int labAuditRowCount = drt.getDataRowCount();
-        assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, labAuditRowCount);
+        //file system events are batched
+        String query =  "FileSystem";
+        try
+        {
+            selectCmd.setQueryName(query);
+            int rowCount = 0;
+
+            selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
+            rowCount =   selectResp.getRowCount().intValue();
+
+            //if we ever have a test generating more than one batch of files, this will need to be updated, but it will
+            //do for now
+            if(rowCount > 0)
+                auditEventRowCount++;
+        }
+        catch (IOException e)
+        {
+           fail("Unable to retrieve query: " + query);
+        }
+        catch (CommandException e)
+        {
+           fail("Unable to retrieve query: " + query);
+        }
+        try
+        {
+            selectCmd.setQueryName("LabAuditEvents");
+            selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
+        }
+        catch (IOException e)
+        {
+               fail("Unable to retrieve query: LabAuditEvents");
+        }
+        catch (CommandException e)
+        {
+               fail("Unable to retrieve query: LabAuditEvents");
+        }
+        assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, selectResp.getRowCount().intValue());
     }
 
     private void checkActionCoverage()
@@ -1695,6 +1751,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public String getBaseURL()
     {
         return WebTestHelper.getBaseURL();
+    }
+
+    public String getProjectUrl()
+    {
+        return getBaseURL() + "/project/" + getProjectName() + "/begin.view?";
     }
 
     public static String stripContextPath(String url)

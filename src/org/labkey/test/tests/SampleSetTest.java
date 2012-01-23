@@ -301,6 +301,9 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
             "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
             "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
+
+
+        validateLabAuditTrail();
     }
 
     final File experimentFilePath =  new File(getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");

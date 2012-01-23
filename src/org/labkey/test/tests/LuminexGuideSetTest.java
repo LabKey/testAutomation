@@ -25,5 +25,6 @@ public class LuminexGuideSetTest  extends LuminexTest
     protected void runUITests()
     {
         runGuideSetTest();
+        validateLabAuditTrail();
     }
 }

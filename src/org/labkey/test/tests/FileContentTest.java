@@ -241,6 +241,9 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickLinkWithText("File Management Notification", false);
             assertTextBefore("File uploaded", "annotations updated");
             assertTextBefore("annotations updated", "File deleted");
+
+            //Issue 13844: FileSystem log events not included in LabAuditEvents
+//            validateLabAuditTrail();
         }
     }
 
