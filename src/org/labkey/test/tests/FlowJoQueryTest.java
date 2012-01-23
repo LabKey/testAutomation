@@ -55,7 +55,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         CustomizeViewsHelper.applyCustomView(this);
         clickLinkWithText(PROJECT_NAME);
         clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Manage Folder Settings");
+        clickLinkContainingText("Folder Settings");
         toggleCheckboxByTitle("Query");
         toggleCheckboxByTitle("Flow");
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);

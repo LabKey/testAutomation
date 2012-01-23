@@ -142,7 +142,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         log("Setting MV indicators");
         
         clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Manage Folder Settings");
+        clickLinkContainingText("Folder Settings");
         clickLinkWithText("Missing Value Indicators");
         clickCheckboxById("inherit");
 
@@ -249,12 +249,14 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         log("Create dataset");
         clickLinkWithText(PROJECT_NAME);
         clickTab("Manage");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Import Visit Map");
         // Dummy visit map data (probably non-sensical), but enough to get a placeholder created for dataset #1:
         setFormElement("content", "20|S|Only Visit|1|1|1|1|1|1|1");
         clickNavButton("Import");
         clickLinkWithText("Manage Study");
+        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Define Dataset Schemas");
         clickLinkWithText("Bulk Import Schemas");

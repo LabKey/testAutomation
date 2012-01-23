@@ -241,7 +241,7 @@ public class TimeChartTest extends StudyBaseTest
     private void initializePipeline()
     {
         clickAdminMenuItem("Folder", "Management");
-        clickLinkContainingText("Manage Folder Settings");
+        clickLinkContainingText("Folder Settings");
         toggleCheckboxByTitle("Pipeline");
         submit();
         addWebPart("Data Pipeline");

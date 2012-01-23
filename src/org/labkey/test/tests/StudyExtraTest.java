@@ -148,7 +148,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		clickNavButton("Next");
         clickNavButton("Finish");
         clickAdminMenuItem("Folder", "Management");
-        clickLinkContainingText("Manage Folder Settings");
+        clickLinkContainingText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle("Experiment"));
         checkCheckbox(Locator.checkboxByTitle("Query"));
         clickNavButton("Update Folder");

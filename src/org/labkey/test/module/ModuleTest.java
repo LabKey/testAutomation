@@ -39,7 +39,7 @@ public class ModuleTest extends BaseSeleniumWebTest
         log("Test module created from moduleTemplate");
         clickLinkWithText(PROJECT_NAME);
         clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Manage Folder Settings");
+        clickLinkContainingText("Folder Settings");
         checkCheckbox(Locator.raw("//input[@value='" + TEST_MODULE_TEMPLATE_FOLDER_NAME + "']"));
         clickNavButton("Update Folder");
         clickTab(TEST_MODULE_TEMPLATE_FOLDER_NAME);

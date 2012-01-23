@@ -85,7 +85,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             "in its Connector element: URIEncoding=\"UTF-8\"", isTextPresent("404: page not found"));
 
         clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Manage Project Settings");
+        clickLinkContainingText("Project Settings");
         clickLinkWithText("Files");
 
         File dir = getTestTempDir();
@@ -101,7 +101,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Setup notificaiton emails
             // as they are now digest based.
             clickAdminMenuItem("Project", "Management");
-            clickLinkContainingText("Manage Folder Settings");
+            clickLinkContainingText("Folder Settings");
             clickLinkWithText("Email Notifications");
             click(Locator.navButton("Update Settings"));
             // Set folder default

@@ -2004,7 +2004,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             return;
 
         clickAdminMenuItem("Folder", "Management");
-        clickLinkContainingText("Manage Folder Settings");
+        clickLinkContainingText("Folder Settings");
 
         // verify that we're on the customize tabs page, then submit:
         assertTextPresent("Folder Settings: /" + project);
@@ -4901,7 +4901,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void enableModule(String moduleName, boolean isProject)
     {
         clickAdminMenuItem(isProject ? "Project" : "Folder", "Management");
-        clickLinkContainingText("Manage Folder Settings");
+        clickLinkContainingText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle(moduleName));
         clickNavButton("Update Folder");
     }
