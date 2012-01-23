@@ -745,7 +745,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void gotoAdminConsole()
     {
-        clickAdminMenuItem("Manage Site", "Admin Console");
+        clickAdminMenuItem("Site", "Admin Console");
     }
 
     public void hideNavigationBar()
@@ -1964,10 +1964,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Creating subfolder " + child + " under project " + parent);
         String _active = (!parent.equals(project)? parent : project);
         clickLinkWithText(_active);
-        clickLinkWithText("Folders");
-        // click last index, since this text appears in the nav tree
-        waitForExtFolderTreeNode(_active, 10000);
-        clickNavButton("Create Subfolder");
+        clickAdminMenuItem(project.equals(parent) ? "Project" : "Folder", "Management");
+        clickLinkContainingText("Create Subfolder");
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setText("name", child);
 
@@ -2005,7 +2003,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (null == tabsToAdd || tabsToAdd.length == 0)
             return;
 
-        clickLinkWithText("Folder Settings");
+        clickAdminMenuItem("Folder", "Management");
+        clickLinkContainingText("Manage Folder Settings");
 
         // verify that we're on the customize tabs page, then submit:
         assertTextPresent("Folder Settings: /" + project);
@@ -2051,9 +2050,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(project);
         clickLinkWithText(folderName);
         ensureAdminMode();
-        clickLinkWithText("Folders");
-        waitForExtFolderTreeNode(folderName, 10000);
-        clickNavButton("Delete");
+        clickAdminMenuItem(project.equals(folderName) ? "Project" : "Folder", "Management");
+        clickLinkContainingText("Delete Folder");
         // confirm delete subfolders if present
         if(isTextPresent("This folder has subfolders."))
             clickNavButton("Delete All Folders");
@@ -2070,9 +2068,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(project);
         clickLinkWithText(folderName);
         ensureAdminMode();
-        clickLinkWithText("Folders");
-        waitForExtFolderTreeNode(folderName, 10000);
-        clickNavButton("Rename");
+        clickAdminMenuItem(project.equals(folderName) ? "Project" : "Folder", "Management");
+        clickLinkContainingText("Rename Folder");
         setText("name", newFolderName);
         if (createAlias)
             checkCheckbox("addAlias");
@@ -2091,7 +2088,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(projectName);
         clickLinkWithText(folderName);
         ensureAdminMode();
-        clickLinkWithText("Folders");
+        clickAdminMenuItem(projectName.equals(folderName) ? "Project" : "Folder", "Management");
+        clickLinkContainingText("Manage Subfolders");
         waitForExtFolderTreeNode(folderName, 10000);
         clickNavButton("Move");
         if (createAlias)
@@ -2125,10 +2123,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickNavButton("Agree");
         }
         ensureAdminMode();
-
-        clickLinkWithText("Folders");
-        waitForExtFolderTreeNode(project, 10000);
-        clickNavButton("Delete");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Delete Folder");
         // in case there are sub-folders
         if (isNavButtonPresent("Delete All Folders"))
         {
@@ -4607,7 +4603,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void selectGroup(String groupName)
     {
         if(!isElementPresent(Locator.xpath("//li[contains(@class,'tab-strip-active')]//span[text()='Site Groups']")))
-            clickAdminMenuItem("Manage Site", "Site Groups");
+            clickAdminMenuItem("Site", "Site Groups");
 
         waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
         ExtHelper.waitForExtDialog(this, groupName + " Information");
@@ -4899,12 +4895,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         ensureAdminMode();
         clickLinkWithText(projectName);
-        enableModule(moduleName);
+        enableModule(moduleName, true);
     }
 
-    public void enableModule(String moduleName)
+    public void enableModule(String moduleName, boolean isProject)
     {
-        clickLinkWithText("Folder Settings");
+        clickAdminMenuItem(isProject ? "Project" : "Folder", "Management");
+        clickLinkContainingText("Manage Folder Settings");
         checkCheckbox(Locator.checkboxByTitle(moduleName));
         clickNavButton("Update Folder");
     }

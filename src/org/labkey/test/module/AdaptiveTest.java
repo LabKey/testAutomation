@@ -881,7 +881,8 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     {
         ensureAdminMode();
 
-        clickAdminMenuItem("Manage Project", "Project Settings");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Manage Project Settings");
         clickLinkWithText("Resources");
 
         File file = new File(cssPath, cssFile);

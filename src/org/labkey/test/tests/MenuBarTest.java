@@ -47,7 +47,8 @@ public class MenuBarTest extends BaseSeleniumWebTest
 
         log("Open new project");
         createProject(PROJECT_NAME, "Collaboration");
-        clickAdminMenuItem("Manage Project", "Project Settings");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Manage Project Settings");
         checkRadioButton("folderDisplayMode", "IN_MENU");
         clickButtonContainingText("Save");
         clickLinkWithText("Menu Bar");
@@ -65,7 +66,8 @@ public class MenuBarTest extends BaseSeleniumWebTest
         setFormElement("title", WIKI_PAGE_TITLE);
         setWikiBody(WIKI_PAGE_CONTENT);
         saveWikiPage();
-        clickAdminMenuItem("Manage Project", "Project Settings");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Manage Project Settings");
         clickLinkWithText("Menu Bar");
 
         log("Test wiki customization");

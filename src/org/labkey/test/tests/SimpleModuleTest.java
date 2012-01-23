@@ -506,7 +506,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     protected void assertModuleEnabledByDefault(String moduleName)
     {
         log("Ensuring that that '" + moduleName + "' module is enabled");
-        clickLinkWithText("Folder Settings");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Manage Folder Settings");
         assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 

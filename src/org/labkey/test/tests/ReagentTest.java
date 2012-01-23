@@ -67,7 +67,7 @@ public class ReagentTest extends BaseSeleniumWebTest
         log("** Create Project");
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Query" });
-        enableModule("reagent");
+        enableModule("reagent", false);
 
         addWebPart("Query");
         setFormElement("schemaName", "reagent");

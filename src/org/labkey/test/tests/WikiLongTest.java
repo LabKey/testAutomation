@@ -123,7 +123,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
         setPermissions("testers", "Editor");
         setPermissions(USERS_GROUP, "Editor");
         clickNavButton("Save and Finish");
-        clickLinkWithText("Folder Settings");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Manage Folder Settings");
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
@@ -134,7 +135,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
         beginAt(selenium.getLocation().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
 
         clickLinkWithText(PROJECT2_NAME);
-        clickLinkWithText("Folder Settings");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Manage Folder Settings");
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 

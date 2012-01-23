@@ -49,7 +49,8 @@ public class IDRIParticleSizeTest extends AbstractAssayTest
         createProject(PROJECT_NAME);
 
         // module settings
-        clickLinkWithText("Folder Settings");
+        clickAdminMenuItem("Project", "Management");
+        clickLinkContainingText("Manage Folder Settings");
         toggleCheckboxByTitle("Experiment");
         toggleCheckboxByTitle("ParticleSize");
         clickNavButton("Update Folder");
