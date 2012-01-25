@@ -64,7 +64,7 @@ public class StudyManualTest extends StudyTest
         clickNavButton("Create Study");
 
         // change study label
-        clickLinkWithText("Change Label or Description");
+        clickLinkWithText("Change Study Properties");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", getStudyLabel());
         clickNavButton("Submit");
