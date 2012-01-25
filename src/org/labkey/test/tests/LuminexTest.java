@@ -1467,7 +1467,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         clickLinkContainingText(expectedFlags[0], 0, false);
         waitForExtMask();
-         sleep(500);
+        sleep(1500);
         assertTextPresent("CV", 4); // 3 occurances of PCV and 1 of %CV
 
         //verify text is in expected form
