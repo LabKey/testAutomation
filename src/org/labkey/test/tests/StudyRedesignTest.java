@@ -58,6 +58,7 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText("Please enter a view name:");
         setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
         clickNavButton("Save");
+
 //        log("Create query for data view webpart.");
 //        goToSchemaBrowser();
 //        createNewQuery("study");
@@ -70,6 +71,7 @@ public class StudyRedesignTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         dataViewsWebpartTest();
+        scheduleWebpartTest();
     }
 
     private void dataViewsWebpartTest()
@@ -147,6 +149,49 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText(NEW_CATEGORY);
         clickLinkWithText(EDITED_DATASET);
         assertTextPresent(NEW_DESCRIPTION);
+    }
+
+    private void scheduleWebpartTest()
+    {
+        log("Study Schedule Test");
+        String dataset = "PRE-1: Pre-Existing Conditions";
+        String visit = "Screening Cycle";
+
+        // check required timepoints
+        goToStudySchedule();
+        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
+        assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='checked']"));
+
+        // change a required visit to optional
+        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
+        selectOption("dataSetStatus", 2, "OPTIONAL");
+        clickNavButton("Save");
+
+        // verify that change is noted in schedule
+        goToStudySchedule();
+        assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='unchecked']"));
+
+        // revert change
+        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
+        selectOption("dataSetStatus", 2, "REQUIRED");
+        clickNavButton("Save");
+
+        // verify dataset 'data' link
+        goToStudySchedule();
+        click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[2]//a")); // go to dataset
+        waitForText(dataset);
+    }
+
+    private void goToStudySchedule()
+    {
+        clickAdminMenuItem("Manage Study");
+        clickLinkWithText("Study Schedule");
+
+        // wait for grid to load
+        waitForText("verifyAssay"); // verify dataset column
+        waitForText("Termination"); // verify timepoint
     }
 
     private void clickExt4HeaderMenu(String title, String selection)
