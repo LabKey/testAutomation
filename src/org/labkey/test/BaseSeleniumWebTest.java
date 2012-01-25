@@ -3895,6 +3895,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         runMenuItemHandler(id);
+        if(isTextPresent("Advanced"))
+        {
+            log("Switching to advanced filter UI");
+            checkRadioButton("filterType", "default");
+            waitForText("Filter Type");
+        }
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
     }
@@ -3904,6 +3910,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         runMenuItemHandler(id);
+        if(isTextPresent("Advanced"))
+        {
+            log("Switching to advanced filter UI");
+            checkRadioButton("filterType", "default");
+            waitForText("Filter Type");
+        }
+
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
         clickNavButton("OK", milliSeconds);
@@ -3919,6 +3932,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log( log );
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         runMenuItemHandler(id);
+        if(isTextPresent("Advanced"))
+        {
+            log("Switching to advanced filter UI");
+            checkRadioButton("filterType", "default");
+            waitForText("Filter Type");
+        }
         ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
         setFormElement("value_1", filter1);
         if(filter2Type!=null)
