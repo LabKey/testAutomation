@@ -103,7 +103,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         // Navigate to the credits page and verify that all external components are documented
         clickLinkWithText("credits");
-//        assertTextNotPresent("WARNING:");
+        assertTextNotPresent("WARNING:");
 
         ensureAdminMode();
         clickLinkWithText(PROJECT_NAME);
