@@ -1863,6 +1863,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Apply Guide Set", 0);
         waitForElement(ExtHelper.locateBrowserFileCheckbox(network), defaultWaitForPage);
         waitForElement(ExtHelper.locateBrowserFileCheckbox(comment), defaultWaitForPage);
+        sleep(1000);
         // deselect the current guide set to test error message
         clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1," + commentColIndex);
         clickButton("Apply Thresholds", 0);
