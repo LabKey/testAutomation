@@ -159,7 +159,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
         // check required timepoints
         goToStudySchedule();
-        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
+//        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
         assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='checked']"));
 
         // change a required visit to optional
