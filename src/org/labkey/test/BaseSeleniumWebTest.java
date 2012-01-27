@@ -5003,8 +5003,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void enableModule(String moduleName, boolean isProject)
     {
-        clickLinkContainingText("Folder Settings");
         goToContainerManagementPage(isProject);
+        clickLinkContainingText("Folder Settings");
         checkCheckbox(Locator.checkboxByTitle(moduleName));
         clickNavButton("Update Folder");
     }
