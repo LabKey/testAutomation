@@ -118,6 +118,7 @@ public class ReportTest extends StudyBaseTest
         doCreateCharts();
         doCreateRReports();
         doAttachmentReportTest();
+        doParticipantReportTest();
 
         // additional report and security tests
         setupDatasetSecurity();
@@ -664,5 +665,48 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("User does not have read permission on this dataset.");
 */
         stopImpersonating();
+    }
+
+    private static final String ADD_MEASURE_TITLE = "Add Measure";
+    private void doParticipantReportTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Mouse Report");
+
+        // select some measures from a dataset
+        clickNavButton("Add Field", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");
+        pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
+        assertEquals("", 6, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-list-body-inner')]/dl")));
+
+        selenium.controlKeyDown();
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='2a. Creatinine']]"));
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='1a.ALT AE Severity Grade']]"));
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='1a. ALT (SGPT)']]"));
+        selenium.controlKeyUp();
+
+        clickNavButton("Select", 0);
+
+        // select additional measures from another dataset
+        clickNavButton("Add Field", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cps-1");
+        pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
+        assertEquals("", 2, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-list-body-inner')]/dl")));
+
+        selenium.controlKeyDown();
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='2a. Creatinine']]"));
+        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='1a. ALT (SGPT)']]"));
+        selenium.controlKeyUp();
+
+        clickNavButton("Select", 0);
+
+        // at this point the report should render some content
     }
 }
