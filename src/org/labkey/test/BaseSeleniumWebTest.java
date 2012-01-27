@@ -155,6 +155,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return WebTestHelper.getLabKeyRoot();
     }
 
+    public static String getSampledataPath()
+    {
+        return getLabKeyRoot() + "\\sampledata";
+    }
     public static String getContextPath()
     {
         return WebTestHelper.getContextPath();
@@ -2602,6 +2606,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Export to Text");
     }
 
+    protected void exportFolderAsZip()
+    {
+        goToContainerManagementPage(false);
+        clickButton("Export Folder");
+        checkRadioButton("location", 1);
+
+    }
+
     public interface Checker
     {
         public boolean check();
@@ -4984,10 +4996,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         enableModule(moduleName, true);
     }
 
-    public void enableModule(String moduleName, boolean isProject)
+    public void goToContainerManagementPage(boolean isProject)
     {
         clickAdminMenuItem(isProject ? "Project" : "Folder", "Management");
+    }
+
+    public void enableModule(String moduleName, boolean isProject)
+    {
         clickLinkContainingText("Folder Settings");
+        goToContainerManagementPage(isProject);
         checkCheckbox(Locator.checkboxByTitle(moduleName));
         clickNavButton("Update Folder");
     }
@@ -5044,6 +5061,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
+    protected void importFolderFromZip(String folderFile)
+    {
+        goToContainerManagementPage(false);
+        clickButton("Import Folder");
+        setFormElement(Locator.name("folderZip"), folderFile);
+        clickButtonContainingText("Import Folder From Local Zip Archive");
+    }
+
+    protected void importFolderFromPipeline(String folderFile)
+    {
+        goToContainerManagementPage(false);
+        clickButton("Import Folder");
+        clickButtonContainingText("Import Folder Using Pipeline");
+        ExtHelper.selectFileBrowserItem(this, folderFile);
+        selectImportDataAction("Import Folder");
+        waitForPipelineJobsToComplete(1, "foo", false);
+    }
     public String getFileContents(String rootRelativePath)
     {
         if (rootRelativePath.charAt(0) != '/')
