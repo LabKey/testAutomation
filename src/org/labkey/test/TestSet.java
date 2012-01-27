@@ -220,6 +220,7 @@ public enum TestSet
     Assays(new Class[] {
         AssayTest.class,
         MissingValueIndicatorsTest.class,
+        ElispotAssayTest.class,
         TargetStudyTest.class,
         NabOldTest.class,
         NabAssayTest.class,
