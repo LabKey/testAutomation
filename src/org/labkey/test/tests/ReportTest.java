@@ -677,7 +677,7 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Create", "Mouse Report");
 
         // select some measures from a dataset
-        clickNavButton("Add Field", 0);
+        waitAndClickNavButton("Add Field", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");
@@ -691,6 +691,12 @@ public class ReportTest extends StudyBaseTest
         selenium.controlKeyUp();
 
         clickNavButton("Select", 0);
+
+        waitForText("MouseId:", 8, WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("2a. Creatinine", 11); // 8 mice + 1 Report Field list + 2 in hidden add field dialog
+        //TODO: 13905: Participant report: Column headers getting messed up.
+//        assertTextPresent("1a.ALT AE Severity Grade", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
+//        assertTextPresent("1a. ALT (SGPT)", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
 
         // select additional measures from another dataset
         clickNavButton("Add Field", 0);
@@ -708,5 +714,14 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Select", 0);
 
         // at this point the report should render some content
+        waitForText("Creatinine", 20, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns) + 1 Report Field list + 2 in hidden add field dialog
+        //TODO: 13905: Participant report: Column headers getting messed up.
+//        assertTextPresent("1a.ALT AE Severity Grade", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
+//        assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice (x2 columns) + 1 Report Field list + 1 in hidden add field dialog
+        assertTextPresent("MouseId:", 8);
+
+        clickNavButton("Save", 0);
+        ExtHelper.waitForExtDialog(this, "Save failed");
+        waitAndClickNavButton("OK", 0);
     }
 }

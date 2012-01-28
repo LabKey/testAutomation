@@ -3649,6 +3649,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isElementPresent(locator))
             return locator;
 
+        // check for Ext 4 button:
+        locator = Locator.ext4Button(text);
+        if (isElementPresent(locator))
+            return locator;
+
         return null;
     }
 
@@ -3749,6 +3754,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void waitAndClickNavButton(final String text)
     {
+        waitAndClickNavButton(text, defaultWaitForPage);
+    }
+
+    public void waitAndClickNavButton(final String text, final int wait)
+    {
         String failMessage = "Button with text '" + text + "' did not appear";
         waitFor(new Checker()
         {
@@ -3756,8 +3766,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 return null != getButtonLocator(text);
             }
-        }, failMessage, defaultWaitForPage);
-        clickNavButton(text);
+        }, failMessage, WAIT_FOR_JAVASCRIPT);
+        clickNavButton(text, wait);
     }
 
 
