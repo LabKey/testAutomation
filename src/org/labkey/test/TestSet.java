@@ -42,7 +42,7 @@ public enum TestSet
         ExpTest.class,
         AssayTest.class,
         StudyExportTest.class,
-        FolderExportTest.class,
+        //FolderExportTest.class,
         PipelineTest.class,
         FileContentTest.class,
         ClientAPITest.class,
