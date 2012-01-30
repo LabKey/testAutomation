@@ -22,6 +22,7 @@ package org.labkey.test.tests;
  * Time: 3:58 PM
  */
 
+import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.RReportHelper;
@@ -78,8 +79,13 @@ public class FilterTest extends ListTest
         else
             setUpFilter(regionName, columnName, filterType,
                 filterValue);
+        sleep(300);
+        pressEnter("//input[@id='value_1']");
         clickButton("OK",0);
+        assert(isElementPresent(Locator.extButton("OK")));
+        assert(!isElementPresent(Locator.extButtonEnabled("OK")));
         assertTextPresent(expectedError);
+
         clickButton("CANCEL", 0);
         waitForExtMaskToDisappear();
 
@@ -94,7 +100,7 @@ public class FilterTest extends ListTest
                 {TABLE_NAME, getBooleanColumnName(), "Equals", "foo", "foo is not a valid boolean"},
                 {TABLE_NAME, getStringColumnName(), "Equals", "", EMPTY_FILTER_VAL_ERROR_MSG},
                 {TABLE_NAME, getDateColumnName(), "Equals", TRICKY_CHARACTERS, TRICKY_CHARACTERS + " is not a valid date"},
-                {TABLE_NAME, getIntColumnName(), "Equals", "ab123", "ab123 is not a valid integer"},
+                {TABLE_NAME, getIntColumnName(), "Equals", "ab123", "Invalid value: ab123"},
                 {TABLE_NAME, getIntColumnName(), "Equals", "", EMPTY_FILTER_VAL_ERROR_MSG},
         };
 
