@@ -58,7 +58,7 @@ public class ListTest extends BaseSeleniumWebTest
     protected final ListColumn _listCol6 = new ListColumn("AliasedColumn", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
-            { "Zany", "Robust", "Mellow", "Light"},
+            { "Light", "Mellow", "Robust", "Zany" },
             { "true", "false", "true", "false"},
             { "1", "4", "3", "2" },
             { "10", "9", "8", "7"},
@@ -393,7 +393,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test Sort and Filter in Data View");
         setSort("query", _listCol1.getName(), SortDirection.ASC);
-        assertTextBefore(TEST_DATA[0][1], TEST_DATA[0][0]);
+        assertTextBefore(TEST_DATA[0][0], TEST_DATA[0][1]);
 
         clearSortTest();
 
@@ -637,7 +637,7 @@ public class ListTest extends BaseSeleniumWebTest
     private void clearSortTest()
     {
         //make sure elements are ordered the way they should be
-        assertTextPresentInThisOrder(TEST_DATA[5][2], TEST_DATA[5][1],TEST_DATA[5][0]);
+        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
 
         //sort  by element and verify it worked
         setSort("query", _listCol6.getName(), SortDirection.DESC);
@@ -645,7 +645,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         //remove sort and verify we return to initial state
         clearSort("query", _listCol6.getName());
-        assertTextPresentInThisOrder(TEST_DATA[5][2], TEST_DATA[5][1],TEST_DATA[5][0]);
+        assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
     }
 
     private void doUploadTest()
