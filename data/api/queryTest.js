@@ -145,6 +145,12 @@ var testFunctions = [
         LABKEY.Query.selectRows(schemaName, queryName, successHandler, failureHandler, [ LABKEY.Filter.create('Age', '-1;88', LABKEY.Filter.Types.EQUALS_ONE_OF) ]);
     },
 
+// Verify QUERY.selectRows handles QueryParseException
+    function() //testResults[15]
+    {
+        LABKEY.Query.executeSql({schemaName: 'lists', sql: 'Bad Query', successCallback: successHandler, errorCallback: failureHandler});
+    },
+
     // last function sets the contents of the results div.
     function()
     {
@@ -223,11 +229,21 @@ var testFunctions = [
             html += 'SUCCESS: Non-transacted bad saveRows modified rows.<br>';
         else
             html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[13].rowCount + ' rows, expected 3.  Error value = ' + testResults[13].exception + '<br>';
+
         if (testResults[14].rowCount == 0)
             html += 'SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';
         else
             html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';
-        document.getElementById('testDiv').innerHTML = html;        
+
+        if (testResults[15].exception)
+            if (testResults[15].exceptionClass == "org.labkey.api.query.QueryParseException")
+                html += 'SUCCESS: Bad query exception: ' + testResults[15].exceptionClass + '<br>';
+            else
+                html += 'FAILURE: Bad query generated wrong exception: ' + testResults[15].exceptionClass + '<br>';
+        else
+            html += 'FAILURE: Bad query did not generate an exception.<br>';
+
+        document.getElementById('testDiv').innerHTML = html;
     }
 ];
 
