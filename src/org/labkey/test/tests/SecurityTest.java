@@ -79,6 +79,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         tokenAuthenticationTest();
         impersonationTest();
         guestTest();
+        addRemoveSiteAdminTest();
 
         log("Check welcome emails [6 new users]");
         goToModule("Dumbster");
@@ -342,6 +343,21 @@ public class SecurityTest extends BaseSeleniumWebTest
         return newPassword;
     }
 
+    protected void addRemoveSiteAdminTest()
+    {
+        // test for issue 13921
+        clickLinkWithText("Site Admins");
+        setFormElement("names", NORMAL_USER);
+        uncheckCheckbox("sendEmail");
+        clickNavButton("Update Group Membership");
+        assertTextPresent(NORMAL_USER);
+        checkCheckbox("delete", NORMAL_USER);
+        selenium.chooseOkOnNextConfirmation();
+        clickNavButton("Update Group Membership");
+        assertEquals(selenium.getConfirmation(), "Permanently remove selected users from this group?");
+        assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
+        clickLinkWithText(PROJECT_NAME);
+    }
 
     protected void guestTest()
     {
