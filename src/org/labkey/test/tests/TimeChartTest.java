@@ -794,7 +794,7 @@ public class TimeChartTest extends StudyBaseTest
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
         log("Remove a participant from one group.");
-        selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP1_NAME+"', null, 'participantCategoriesGrid', null, false)");
+        selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP1_NAME+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+GROUP1_NAME+"']"));
         clickNavButton("Edit Selected", 0);
         ExtHelper.waitForExtDialog(this, "Define Participant Group");
@@ -804,7 +804,7 @@ public class TimeChartTest extends StudyBaseTest
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
         log("Delete one group.");
-        selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP3_NAME+"', null, 'participantCategoriesGrid', null, false)");
+        selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP3_NAME+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+GROUP3_NAME+"']"));
         clickNavButton("Delete Selected", 0);
         ExtHelper.waitForExtDialog(this, "Delete Group");

@@ -180,7 +180,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
             setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), f.toString());
-            ExtHelper.setExtFormElementByLabel(this, "Description", FILE_DESCRIPTION);
+            ExtHelper.setExtFormElementByLabel(this, "Description:", FILE_DESCRIPTION);
             clickButton("Upload", 0);
             waitForExtMaskToDisappear();
             ExtHelper.waitForExtDialog(this, "Extended File Properties", WAIT_FOR_JAVASCRIPT);

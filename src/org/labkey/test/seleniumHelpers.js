@@ -71,7 +71,7 @@ selenium.getExtElementId = function (id) {
 };
 
 selenium.selectFileBrowserCheckbox = function (filename) {
-    selenium.selectExtGridItem('name', filename, null, 'labkey-filecontent-grid', true);
+    selenium.selectExtGridItem('name', filename, -1, 'labkey-filecontent-grid', true);
 };
 
 selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {
@@ -85,7 +85,9 @@ selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, ke
         var grid = ext.getCmp(el.id);
         if (grid)
         {
-            if (idx == null) idx = grid.getStore().find(columnName, columnVal);
+            if (idx == -1)
+                idx = grid.getStore().find(columnName, columnVal);
+
             if (idx < grid.getStore().getCount())
             {
                 if (idx >= 0)

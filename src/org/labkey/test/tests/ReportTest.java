@@ -677,18 +677,16 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Create", "Mouse Report");
 
         // select some measures from a dataset
-        waitAndClickNavButton("Add Field", 0);
+        waitAndClickNavButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
-        assertEquals("", 6, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-list-body-inner')]/dl")));
+        assertEquals("", 18, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-grid3-body')]/div[contains(@class, 'x-grid3-row')]")));
 
-        selenium.controlKeyDown();
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='2a. Creatinine']]"));
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='1a.ALT AE Severity Grade']]"));
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='1a. ALT (SGPT)']]"));
-        selenium.controlKeyUp();
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "2a. Creatinine", true);
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "1a.ALT AE Severity Grade", true);
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "1a. ALT (SGPT)", true);
 
         clickNavButton("Select", 0);
 
@@ -699,29 +697,35 @@ public class ReportTest extends StudyBaseTest
 //        assertTextPresent("1a. ALT (SGPT)", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
 
         // select additional measures from another dataset
-        clickNavButton("Add Field", 0);
+        clickNavButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cps-1");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
-        assertEquals("", 2, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-list-body-inner')]/dl")));
+        assertEquals("", 12, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-grid3-body')]/div[contains(@class, 'x-grid3-row')]")));
 
-        selenium.controlKeyDown();
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='2a. Creatinine']]"));
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//dl[./dt/em[text()='1a. ALT (SGPT)']]"));
-        selenium.controlKeyUp();
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "2a. Creatinine", true);
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "1a. ALT (SGPT)", true);
 
         clickNavButton("Select", 0);
 
         // at this point the report should render some content
-        waitForText("Creatinine", 20, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns) + 1 Report Field list + 2 in hidden add field dialog
+        waitForText("Creatinine", 21, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns) + 1 Report Field list + 2 in hidden add field dialog
         //TODO: 13905: Participant report: Column headers getting messed up.
 //        assertTextPresent("1a.ALT AE Severity Grade", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
 //        assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice (x2 columns) + 1 Report Field list + 1 in hidden add field dialog
         assertTextPresent("MouseId:", 8);
 
+        // verify form validation
         clickNavButton("Save", 0);
-        ExtHelper.waitForExtDialog(this, "Save failed");
+        ExtHelper.waitForExtDialog(this, "Error");
+        waitAndClickNavButton("OK", 0);
+
+        // save the report for real
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", "Test Participant Report");
+        clickNavButton("Save", 0);
+
+        ExtHelper.waitForExtDialog(this, "Success");
         waitAndClickNavButton("OK", 0);
     }
 }

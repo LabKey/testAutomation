@@ -146,14 +146,26 @@ public class ExtHelper
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String label, String text)
     {
-        test.setFormElement(Locator.xpath("//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
-        test.fireEvent(Locator.xpath("//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+        Locator formElement = Locator.xpath("//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        if (!test.isElementPresent(formElement))
+        {
+            // try the ext4 version 
+            formElement = Locator.xpath("//div[./label[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        }
+        test.setFormElement(formElement, text);
+        test.fireEvent(formElement, BaseSeleniumWebTest.SeleniumEvent.blur);
     }
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label, String text)
     {
-        test.setFormElement(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), text);
-        test.fireEvent(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+":']]/div/*[self::input or self::textarea]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+        Locator formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        if (!test.isElementPresent(formElement))
+        {
+            // try the ext4 version
+            formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        }
+        test.setFormElement(formElement, text);
+        test.fireEvent(formElement, BaseSeleniumWebTest.SeleniumEvent.blur);
     }
 
     @Deprecated
@@ -202,8 +214,18 @@ public class ExtHelper
 
     public static void clickXGridPanelCheckbox(BaseSeleniumWebTest test, int index, boolean keepExisting)
     {
+        clickXGridPanelCheckbox(test, null, null, index, keepExisting);
+    }
+
+    public static void clickXGridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, boolean keepExisting)
+    {
+        clickXGridPanelCheckbox(test, colName, colValue, -1, keepExisting);
+    }
+
+    protected static void clickXGridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, int rowIndex, boolean keepExisting)
+    {
         test.waitForElement(Locator.xpath("//div[contains(@class, 'x-grid-panel')]"), 60000);
-        test.getWrapper().getEval("selenium.selectExtGridItem('null', 'null', " + index + ", 'x-grid-panel', " + keepExisting + ")");
+        test.getWrapper().getEval("selenium.selectExtGridItem('" + colName + "', '" + colValue + "', " + rowIndex + ", 'x-grid-panel', " + keepExisting + ")");
     }
 
     @Deprecated

@@ -141,7 +141,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertWizardError("Finish", "You must select at least one dataset to create the new study from.");
         for(int i = 0; i < DATASETS.length; i++)
         {
-            selenium.getEval("selenium.selectExtGridItem('Label', '"+DATASETS[i]+"', null, 'studyWizardDatasetList', true)");
+            selenium.getEval("selenium.selectExtGridItem('Label', '"+DATASETS[i]+"', -1, 'studyWizardDatasetList', true)");
         }
         assertWizardError("Finish", "An error occurred trying to create the study: A study already exists in the destination folder.");
 
@@ -191,7 +191,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Manage Mouse Groups");
         waitForText(PARTICIPANT_GROUP);
-        selenium.getEval("selenium.selectExtGridItem('label', '"+PARTICIPANT_GROUP+"', null, 'participantCategoriesGrid', null, false)");
+        selenium.getEval("selenium.selectExtGridItem('label', '"+PARTICIPANT_GROUP+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+PARTICIPANT_GROUP+"']"));
         clickNavButton("Edit Selected", 0);
         ExtHelper.waitForExtDialog(this, "Define Mouse Group");

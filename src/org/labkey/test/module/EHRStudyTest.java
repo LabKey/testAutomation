@@ -595,20 +595,20 @@ public class EHRStudyTest extends SimpleApiTest
         log("Add blank weight entries");
         clickButton("Add Record", 0);
         waitForElement(Locator.xpath("//input[@name='Id' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByLabel(this, "Id", "noSuchAnimal");
+        ExtHelper.setExtFormElementByLabel(this, "Id:", "noSuchAnimal");
         waitForText("Id not found", WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByLabel(this, "Id", DEAD_ANIMAL_ID);
+        ExtHelper.setExtFormElementByLabel(this, "Id:", DEAD_ANIMAL_ID);
         waitForText(DEAD_ANIMAL_ID, WAIT_FOR_JAVASCRIPT);
 
         waitForElement(Locator.button("Add Batch"), WAIT_FOR_JAVASCRIPT);
         clickButton("Add Batch", 0);
         ExtHelper.waitForExtDialog(this, "");
-        ExtHelper.setExtFormElementByLabel(this, "", "Room(s)", ROOM_ID);
+        ExtHelper.setExtFormElementByLabel(this, "", "Room(s):", ROOM_ID);
         ExtHelper.clickExtButton(this, "", "Submit", 0);
         waitForText(PROJECT_MEMBER_ID, WAIT_FOR_JAVASCRIPT);
         clickButton("Add Batch", 0);
         ExtHelper.waitForExtDialog(this, "");
-        ExtHelper.setExtFormElementByLabel(this, "", "Id(s)", MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
+        ExtHelper.setExtFormElementByLabel(this, "", "Id(s):", MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
         ExtHelper.clickExtButton(this, "", "Submit", 0);
         waitForText(MORE_ANIMAL_IDS[0], WAIT_FOR_JAVASCRIPT);
         waitForText(MORE_ANIMAL_IDS[1], WAIT_FOR_JAVASCRIPT);
@@ -666,11 +666,11 @@ public class EHRStudyTest extends SimpleApiTest
         ExtHelper.clickExtButton(this, "Yes", 0);
         waitForText("No Animal Selected", WAIT_FOR_JAVASCRIPT);
         selectRecord("weight", PROJECT_MEMBER_ID, false);
-        ExtHelper.setExtFormElementByLabel(this, "Weight (kg)", "3.333");
+        ExtHelper.setExtFormElementByLabel(this, "Weight (kg):", "3.333");
         selectRecord("weight", MORE_ANIMAL_IDS[3], false);
-        ExtHelper.setExtFormElementByLabel(this, "Weight (kg)", "4.444");
+        ExtHelper.setExtFormElementByLabel(this, "Weight (kg):", "4.444");
         selectRecord("weight", MORE_ANIMAL_IDS[4], false);
-        ExtHelper.setExtFormElementByLabel(this, "Weight (kg)", "5.555");
+        ExtHelper.setExtFormElementByLabel(this, "Weight (kg):", "5.555");
 
         clickButton("Submit for Review", 0);
         ExtHelper.waitForExtDialog(this, "Submit For Review");
@@ -733,7 +733,7 @@ public class EHRStudyTest extends SimpleApiTest
         waitForText("Treatments", WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.name("Id"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByLabel(this, "Id", PROJECT_MEMBER_ID);
+        ExtHelper.setExtFormElementByLabel(this, "Id:", PROJECT_MEMBER_ID);
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
         setFormElement("title", MPR_TASK_TITLE);
         ExtHelper.selectComboBoxItem(this, "Assigned To", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
@@ -1071,7 +1071,7 @@ public class EHRStudyTest extends SimpleApiTest
 
     private void selectRecord(String query, String Id, boolean keepExisting)
     {
-        getWrapper().getEval("selenium.selectExtGridItem('Id','" + Id + "', null, 'ehr-" + query + "-records-grid', "+keepExisting+");");
+        getWrapper().getEval("selenium.selectExtGridItem('Id','" + Id + "', -1, 'ehr-" + query + "-records-grid', "+keepExisting+");");
         if(!keepExisting)waitForElement(Locator.xpath("//div[@id='Id']/a[text()='"+Id+"']"), WAIT_FOR_JAVASCRIPT);
     }
 
