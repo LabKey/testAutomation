@@ -181,8 +181,10 @@ selenium.getContainerId = function () {
 if (browserVersion.isFirefox) {
     var consoleListener = {
         installed: false,
+        paused: false,
         observe: function( msg ) {
 //            LOG.info("JsErrorChecker: " + msg.message);
+            if (this.paused) return;
             try {
                 dump("Log : " + msg.message);
                 if (msg.message != null &&
@@ -190,7 +192,6 @@ if (browserVersion.isFirefox) {
                     msg.message.indexOf("setting a property that has only a getter") == -1 &&
                     msg.message.indexOf("{file: \"chrome://") == -1 &&
                     msg.message.indexOf("ext-all-sandbox-debug.js") == -1 && // Ignore error caused by project webpart
-                    msg.message.indexOf("ext-all-sandbox.js") == -1 && // Ignore error caused by navigating away from pages quickly during crawl.
                     msg.message.indexOf("XULElement.selectedIndex") == -1 && // Ignore known Firefox Issue
                     msg.message.indexOf("xulrunner-1.9.0.14/components/FeedProcessor.js") == -1) // Firefox problem
                 {
@@ -251,6 +252,14 @@ selenium.doEndJsErrorChecker = function() {
     } catch (e) {
         throw new SeleniumError("doEndJsErrorChecker() threw an exception: " + e.message);
     }
+};
+
+selenium.pauseJsErrorChecker = function() {
+    consoleListener.paused = true;
+};
+
+selenium.resumeJsErrorChecker = function() {
+    consoleListener.paused = false;
 };
 
 selenium.setEditAreaValue = function(id, value) {

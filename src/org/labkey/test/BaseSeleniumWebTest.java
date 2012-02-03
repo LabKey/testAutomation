@@ -192,6 +192,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.getEval("selenium.doEndJsErrorChecker();");
     }
 
+    public void pauseJsErrorChecker()
+    {
+        selenium.getEval("selenium.pauseJsErrorChecker();");
+    }
+
+    public void resumeJsErrorChecker()
+    {
+        selenium.getEval("selenium.resumeJsErrorChecker();");
+    }
+
     /**
      * Override if using file upload features in the test. Returning true will attempt to use
      * a version of the browser that allows file upload fields to be set. Defaults to false.
@@ -1102,6 +1112,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void testSteps() throws Exception
     {
+        try{ resumeJsErrorChecker(); }// Make sure js error checker didn't get stuck paused by a failure in the crawler.
+        catch (Throwable t){/*ignore*/}
         try
         {
             log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
@@ -1160,8 +1172,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             if (enableLinkCheck())
             {
+                pauseJsErrorChecker();
                 Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
                 crawler.crawlAllLinks(enableInjectCheck());
+                resumeJsErrorChecker();
             }
 
             _testFailed = false;
