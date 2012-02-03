@@ -181,7 +181,7 @@ public class AssayTest extends AbstractAssayTest
         selectQuery("auditLog", "ExperimentAuditEvent");
         waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
         clickLinkWithText("view data");
-        assertTextPresent("Data row, id ", ", edited.", 
+        assertTextPresent("Data row, id ", ", edited in " + TEST_ASSAY + ".",
                 "Specimen ID changed from 'AAA07XK5-05' to 'EditedSpecimenID'",
                 "Visit ID changed from '601.0' to '601.5",
                 "testAssayDataProp5 changed from blank to '514801'");
