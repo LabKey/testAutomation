@@ -3643,6 +3643,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isElementPresent(locator))
             return locator;
 
+        // check for Ext 4 button:
+        locator = Locator.ext4Button(text, index);
+        if (isElementPresent(locator))
+            return locator;
+
         return null;
     }
 
