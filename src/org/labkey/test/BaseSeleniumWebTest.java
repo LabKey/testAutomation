@@ -3946,7 +3946,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             log("Switching to advanced filter UI");
             checkRadioButton("filterType", "default");
-            waitForText("Filter Type");
+            waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
         }
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
         setFormElement("value_1", filter);
@@ -3961,7 +3961,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             log("Switching to advanced filter UI");
             checkRadioButton("filterType", "default");
-            waitForText("Filter Type");
+            waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
         }
 
         ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
