@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.RReportHelper;
 
 /**
  * User: elvan
@@ -40,7 +41,7 @@ public class StudyRedesignTest extends StudyBaseTest
     @Override
     protected void doCreateSteps()
     {
-
+        RReportHelper.ensureRConfig(this);
         importStudy();
         startSpecimenImport(2);
 
