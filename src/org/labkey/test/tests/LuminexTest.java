@@ -100,7 +100,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private String EC50_RUN_NAME = "EC50";
     private String rum4 = "Four Parameter";
-    private String rum5 = "Five FourParameter";
+    private String rum5 = "Five Parameter";
     private String trapezoidal = "Trapezoidal";
 
     public String getAssociatedModuleDirectory()
@@ -469,8 +469,7 @@ public class LuminexTest extends AbstractQCAssayTest
             }
             else if(formula.get(i).equals(rum5))
             {
-
-                assertEquals("", ec50.get(i));
+                assertTrue("EC50 was unpopulated for row " + i, ((String) ec50.get(i)).length()>0);
                 assertEquals("", auc.get(i));
             }
             else if(formula.get(i).equals(trapezoidal))
@@ -1251,11 +1250,15 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
-        double[] ec50Averages = {179.78, 43426.10};
-        double[] ec50StdDevs = {22.21, 794.95};
+        double[] ec504plAverages = {179.78, 43426.10};
+        double[] ec504plStdDevs = {22.21, 794.95};
+        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec504plAverages, ec504plStdDevs, "Four Parameter", "EC50Average", "EC50Std Dev");
+        double[] ec505plAverages = {12105.1, 2777412.81};
+        double[] ec505plStdDevs = {7337.32, 1999838.60};
+        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec505plAverages, ec505plStdDevs, "Five Parameter", "EC50Average", "EC50Std Dev");
         double[] aucAverages = {8701.38, 80851.83};
         double[] aucStdDevs = {466.81, 6523.08};
-        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec50Averages, ec50StdDevs, aucAverages, aucStdDevs);
+        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, aucAverages, aucStdDevs, "Trapezoidal", "AUCAverage", "AUCStd Dev");
 
         // upload the final set of runs (2 runs)
         for (int i = 2; i < files.length; i++)
@@ -1298,11 +1301,15 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
         int[] rowCounts2 = {2, 3};
-        double[] ec50Averages2 = {179.78, 42158.22};
-        double[] ec50StdDevs2 = {22.21, 4833.76};
+        double[] ec504plAverages2 = {179.78, 42158.22};
+        double[] ec504plStdDevs2 = {22.21, 4833.76};
+        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec504plAverages2, ec504plStdDevs2, "Four Parameter", "EC50Average", "EC50Std Dev");
+        double[] ec505plAverages2 = {12105.1, 5568230.67};
+        double[] ec505plStdDevs2 = {7337.32, 3820010.22};
+        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec505plAverages2, ec505plStdDevs2, "Five Parameter", "EC50Average", "EC50Std Dev");
         double[] aucAverages2 = {8701.38, 85268.04};
         double[] aucStdDevs2 = {466.81, 738.55};
-        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec50Averages2, ec50StdDevs2, aucAverages2, aucStdDevs2);
+        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, aucAverages2, aucStdDevs2, "Trapezoidal", "AUCAverage", "AUCStd Dev");
 
         // test the start and end date filter for the report
         goToLeveyJenningsGraphPage("HIVIG");
@@ -1310,7 +1317,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         excludableWellsWithTransformTest();
         // test the y-axis scale
-        applyLogYAxisScale();
+        // TODO: blocked by issue 13983
+//        applyLogYAxisScale();
         guideSetApiTest();
         verifyQCFlagUpdates();
     }
@@ -1342,7 +1350,7 @@ public class LuminexTest extends AbstractQCAssayTest
 //	- QC Flags added for EC50 and HMFI
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
-        String newQcFlags = "AUC, EC50, HMFI";
+        String newQcFlags = "AUC, EC50, EC50_5PL, HMFI";
         assertTextNotPresent(newQcFlags);
       applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
         //assert ec50 and HMFI red text present
@@ -1351,7 +1359,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent(newQcFlags);
         //verify new flags present in run list
         goToTestRunList();
-        assertTextPresent("AUC, EC50, HMFI, PCV");
+        assertTextPresent("AUC, EC50, EC50_5PL, HMFI, PCV");
 
 //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
 //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
@@ -1445,7 +1453,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("assay." + TEST_ASSAY_LUM + " QCFlags");
     }
 
-    String[] expectedFlags = {"AUC, EC50, HMFI, PCV","AUC, EC50, HMFI", "HMFI", "", "PCV"};
+    String[] expectedFlags = {"AUC, EC50, HMFI, PCV","AUC, EC50, HMFI", "EC50_5PL, HMFI", "", "PCV"};
 
     private void verifyQCFlagsInRunGrid()
     {
@@ -1611,11 +1619,17 @@ public class LuminexTest extends AbstractQCAssayTest
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
 
-        // check ec50 trending R plot
-        click(Locator.tagWithText("span", "EC50"));
+        // check 4PL ec50 trending R plot
+        click(Locator.tagWithText("span", "EC50 - 4PL"));
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        assertElementPresent( Locator.id("EC50TrendPlotDiv"));
+        assertElementPresent( Locator.id("EC50 4PLTrendPlotDiv"));
+
+        // check5PL  ec50 trending R plot
+        click(Locator.tagWithText("span", "EC50 - 5PL Rumi"));
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        assertElementPresent( Locator.id("EC50 5PLTrendPlotDiv"));        
 
         // check auc trending R plot
         click(Locator.tagWithText("span", "AUC"));
@@ -1632,7 +1646,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //verify QC flags
         //this locator finds an EC50 flag, then makes sure there's red text outlining
         Locator.XPathLocator l = Locator.xpath("//td/div[contains(@style,'red')]/../../td/div/a[contains(text(),'EC50')]");
-        assertElementPresent(l,2);
+        assertElementPresent(l,3);
         assertTextPresent("QC Flags"); //should update to qc flags
     }
 
@@ -1811,7 +1825,8 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText(titrationName + " Levey-Jennings Report");
     }
 
-    private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, double[] ec50Averages, double[] ec50StdDevs, double[] aucAverages, double[] aucStdDevs)
+    private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, double[] averages, double[] stdDevs,
+                                          String curveType, String averageColName, String stdDevColName)
     {
         // go to the GuideSetCurveFit table to verify the calculated threshold values for the EC50 and AUC
         goToSchemaBrowser();
@@ -1824,18 +1839,12 @@ public class LuminexTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable("query", this);
         for (int i = 0; i < analytes.length; i++)
         {
-            // verify the row count, average, and standard deviation for the EC50 values
+            // verify the row count, average, and standard deviation for the specified curve type's values
             table.setFilter("GuideSetId/RowId", "Equals", guideSetIds.get(analytes[i]).toString());
-            table.setFilter("CurveType", "Equals", "Four Parameter");
+            table.setFilter("CurveType", "Equals", curveType);
             assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[i]).toString(), rowCounts[i], Integer.parseInt(table.getDataAsText(0, "Run Count")));
-            assertEquals("Unexpected EC50 average for guide set " + guideSetIds.get(analytes[i]).toString(), ec50Averages[i], Double.parseDouble(table.getDataAsText(0, "EC50Average")));
-            assertEquals("Unexpected EC50 StdDev for guide set " + guideSetIds.get(analytes[i]).toString(), ec50StdDevs[i], Double.parseDouble(table.getDataAsText(0, "EC50Std Dev")));
-            table.clearFilter("CurveType");
-            // verify the row count, average, and standard deviation for the AUC values
-            table.setFilter("CurveType", "Equals", "Trapezoidal");
-            assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[i]).toString(), rowCounts[i], Integer.parseInt(table.getDataAsText(0, "Run Count")));
-            assertEquals("Unexpected AUC average for guide set " + guideSetIds.get(analytes[i]).toString(), aucAverages[i]	, Double.parseDouble(table.getDataAsText(0, "AUCAverage")));
-            assertEquals("Unexpected AUC StdDev for guide set " + guideSetIds.get(analytes[i]).toString(), aucStdDevs[i], Double.parseDouble(table.getDataAsText(0, "AUCStd Dev")));
+            assertEquals("Unexpected average for guide set " + guideSetIds.get(analytes[i]).toString(), averages[i], Double.parseDouble(table.getDataAsText(0, averageColName)));
+            assertEquals("Unexpected stddev for guide set " + guideSetIds.get(analytes[i]).toString(), stdDevs[i], Double.parseDouble(table.getDataAsText(0, stdDevColName)));
             table.clearFilter("CurveType");
             table.clearFilter("GuideSetId/RowId");
         }
