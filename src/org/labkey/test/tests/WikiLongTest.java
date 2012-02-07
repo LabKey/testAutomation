@@ -266,7 +266,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("Check that discussion board works");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         waitForExtReady();
-        clickLinkWithText("discuss this", false);
+        clickLinkWithText("discussion", false);
         waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
         clickLinkWithText("Start new discussion");
         setFormElement("title", DISC1_TITLE);
