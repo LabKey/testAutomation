@@ -3913,16 +3913,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFilter(String regionName, String columnName, String filterType)
     {
-        log("Setting filter in " + regionName + " for " + columnName+" to " + filterType.toLowerCase());
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        runMenuItemHandler(id);
-        if(isTextPresent("Advanced"))
-        {
-            log("Switching to advanced filter UI");
-            checkRadioButton("filterType", "default");
-            waitForText("Filter Type");
-        }
-        ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
+        setUpFilter(regionName, columnName, filterType, null);
         clickNavButton("OK");
     }
 
@@ -3939,59 +3930,45 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setUpFilter(String regionName, String columnName, String filterType, String filter)
     {
-        log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        runMenuItemHandler(id);
-        if(isTextPresent("Select All"))
-        {
-            log("Switching to advanced filter UI");
-            checkRadioButton("filterType", "default");
-            waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
-        }
-        ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
-        setFormElement("value_1", filter);
+        setUpFilter(regionName, columnName, filterType, filter, null, null);
     }
 
     public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
     {
-        log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
+        setUpFilter(regionName, columnName, filterType, filter);
+        clickNavButton("OK", milliSeconds);
+    }
+
+    public void setUpFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
+    {
+        String log =    "Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + (filter1!=null?" " + filter1:"");
+        if(filter2Type!=null)
+        {
+            log+= " and " + filter2Type.toLowerCase() + (filter2!=null?" " + filter2:"");
+        }
+        log( log );
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
+        String columnLabel = getText(Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header")));
         runMenuItemHandler(id);
+        ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
         if(isTextPresent("Advanced"))
         {
             log("Switching to advanced filter UI");
             checkRadioButton("filterType", "default");
             waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
         }
-
-        ExtHelper.selectComboBoxItem(this, "Filter Type", filterType); //Select combo box item.
-        setFormElement("value_1", filter);
-        clickNavButton("OK", milliSeconds);
+        ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
+        if(filter1 != null) setFormElement("value_1", filter1);
+        if(filter2Type!=null)
+        {
+            ExtHelper.selectComboBoxItem(this, "and", filter2Type); //Select combo box item.
+            if(filter2 != null) setFormElement("value_2", filter2);
+        }
     }
 
     public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
     {
-        String log =    "Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + " " + filter1;
-        if(filter2Type!=null)
-        {
-            log+=   " and " + filter2Type.toLowerCase() + " " + filter2;
-        }
-        log( log );
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        runMenuItemHandler(id);
-        if(isTextPresent("Advanced"))
-        {
-            log("Switching to advanced filter UI");
-            checkRadioButton("filterType", "default");
-            waitForText("Filter Type");
-        }
-        ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
-        setFormElement("value_1", filter1);
-        if(filter2Type!=null)
-        {
-            ExtHelper.selectComboBoxItem(this, "and", filter2Type); //Select combo box item.
-            setFormElement("value_2", filter2);
-        }
+        setUpFilter(regionName, columnName, filter1Type, filter1, filter2Type, filter2);
         clickNavButton("OK");
     }
 
