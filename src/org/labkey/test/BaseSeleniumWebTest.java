@@ -3942,7 +3942,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Setting filter in " + regionName + " for " + columnName + " to " + filterType.toLowerCase() + " " + filter);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         runMenuItemHandler(id);
-        if(isTextPresent("Advanced"))
+        if(isTextPresent("Select All"))
         {
             log("Switching to advanced filter UI");
             checkRadioButton("filterType", "default");
@@ -5094,6 +5094,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         goToContainerManagementPage(false);
         clickButton("Import Folder");
+        sleep(2000);
         setFormElement(Locator.name("folderZip"), folderFile);
         clickButtonContainingText("Import Folder From Local Zip Archive");
     }

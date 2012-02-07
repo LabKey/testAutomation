@@ -25,6 +25,8 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 
 /**conceptually filter and list are separate, but
@@ -35,12 +37,63 @@ public class FilterTest extends ListTest
     protected final static String PROJECT_NAME = "FilterVerifyProject";
     protected String rViewName = TRICKY_CHARACTERS + "R view";
 
+    protected void createList2()
+    {
+
+        ListHelper.createList(this, PROJECT_NAME, "list1", LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1);
+        clickNavButton("Import Data");
+        setFormElement(Locator.name("text"),"Car\tColor\n" +
+                "1\tBlue\n" +
+                   "2\tRed" );
+
+        clickButton("Submit", 0);
+        waitForElement(Locator.tagWithText("button", "OK"), defaultWaitForPage);
+        ExtHelper.clickExtButton(this, "OK");
+        waitForPageToLoad();
+    }
+
     public void doTestSteps()
     {
         RReportHelper.ensureRConfig(this);
         setUpList(PROJECT_NAME);
         CustomizeViewsHelper.createRView(this, null, rViewName);
         filterTest();
+        facetedFilterTest();
+    }
+
+    private void startFilter()
+    {
+        click(Locator.tagWithText("div", "Color"));
+        click(Locator.tagWithText("span", "Filter..."));
+        waitForExtMask();
+        waitForTextToDisappear("loading");
+        waitForText("Select All");
+
+    }
+
+    private void facetedFilterTest()
+    {
+
+        createList2();
+        assertTextPresent("Light", "Robust");
+        startFilter();
+
+        log("Verifying expected faceted filter elements present");
+        assertTextPresent("Choose Values To Display", "Advanced");
+        waitForTextToDisappear("loading");
+        assertTextPresent("Light", 4);
+        assertTextPresent("Robust", 4);
+
+        ExtHelper.clickExtButton(this, "OK");
+        assertTextPresent("Light", "Robust");
+
+
+        startFilter();
+        checkCheckbox("Light");
+        uncheckCheckbox("Robust");
+        ExtHelper.clickExtButton(this, "OK");
+        assertTextPresent("Light");
+        assertTextNotPresent("Robust");
     }
 
 

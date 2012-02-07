@@ -448,7 +448,7 @@ public class ListHelper
 
 
     // initial "create list" steps common to both manual and import from file scenarios
-    private static void beginCreateList(BaseSeleniumWebTest test, String folderName, String listName)
+    public static void beginCreateList(BaseSeleniumWebTest test, String folderName, String listName)
     {
         test.clickLinkWithText(folderName);
         if (!test.isLinkPresentWithText("Lists"))

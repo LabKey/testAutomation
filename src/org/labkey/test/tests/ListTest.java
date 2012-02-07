@@ -42,14 +42,14 @@ public class ListTest extends BaseSeleniumWebTest
     protected final static String PROJECT_NAME = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
     protected final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
-    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
-    private final static String LIST_KEY_NAME = "Key";
-    private final static String LIST_KEY_NAME2 = "Color";
-    private final static String LIST_DESCRIPTION = "A list of colors and what they are like";
-    private final static String FAKE_COL1_NAME = "FakeName";
-    private final static String ALIASED_KEY_NAME = "Material";
-    private final static String HIDDEN_TEXT = "Hidden";
-    private ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
+    protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
+    protected final static String LIST_KEY_NAME = "Key";
+    protected final static String LIST_KEY_NAME2 = "Color";
+    protected final static String LIST_DESCRIPTION = "A list of colors and what they are like";
+    protected final static String FAKE_COL1_NAME = "FakeName";
+    protected final static String ALIASED_KEY_NAME = "Material";
+    protected final static String HIDDEN_TEXT = "Hidden";
+    protected ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
     protected ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
     protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
     protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
@@ -79,10 +79,10 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String TEST_FAIL = "testfail";
     private final static String TEST_VIEW = "list_view";
     private final static String LIST2_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
-    private final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
-    private final static String LIST2_KEY_NAME = "Car";
+    protected final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
+    protected final static String LIST2_KEY_NAME = "Car";
 
-    private final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME));
+    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME));
     private final static String LIST2_KEY = "Car1";
     private final static String LIST2_FOREIGN_KEY = "Blue";
     private final static String LIST2_KEY2 = "Car2";
@@ -96,7 +96,7 @@ public class ListTest extends BaseSeleniumWebTest
     private final static ListHelper.ListColumnType LIST3_KEY_TYPE = ListHelper.ListColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
     private final ListColumn _list3Col2 = new ListColumn("Wealth", "Wealth", ListHelper.ListColumnType.String, "");
-    private final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_NAME2, "lists", LIST3_NAME));
+    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_NAME2, "lists", LIST3_NAME));
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA = LIST2_KEY_NAME + "\t" + _list2Col1.getName()  + "\t" + LIST3_KEY_NAME
             + "\n" + LIST2_KEY + "\t" + LIST2_FOREIGN_KEY + "\n" + LIST2_KEY2  + "\t" + LIST2_FOREIGN_KEY2 + "\t" +
