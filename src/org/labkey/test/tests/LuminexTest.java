@@ -487,7 +487,7 @@ public class LuminexTest extends AbstractQCAssayTest
             }
             else if(formula.get(i).equals(rum5))
             {
-                assertTrue("EC50 was unpopulated for row " + i, ((String) ec50.get(i)).length()>0);
+                assertTrue("EC50 was unpopulated for row " + i, ((String) ec50.get(i)).length() > 0);
                 assertEquals("", auc.get(i));
             }
             else if(formula.get(i).equals(trapezoidal))
@@ -1303,6 +1303,57 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyQCFlags();
         verifyQCAnalysis();
 
+        verifyExcludingRuns(guideSetIds, analytes);
+
+        // test the start and end date filter for the report
+        goToLeveyJenningsGraphPage("HIVIG");
+        applyStartAndEndDateFilter();
+
+        excludableWellsWithTransformTest();
+        // test the y-axis scale
+        // TODO: blocked by issue 13983
+//        applyLogYAxisScale();
+        guideSetApiTest();
+        verifyQCFlagUpdatesAfterWellChange();
+        verifyLeveyJenningsPermissions();
+        verifyHighlightUpdatesAfterQCFlagChange();
+    }
+
+    private void verifyHighlightUpdatesAfterQCFlagChange()
+    {
+        goToTestRunList();
+        clickLinkWithText("Guide Set plate 4");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        String expectedHMFI=  "9173.8";
+
+        String[] newColumns = {"AnalyteTitration/MaxFIQCFlagsEnabled", "AnalyteTitration/MaxFI",
+            "AnalyteTitration/Four ParameterCurveFit/EC50", "AnalyteTitration/Four ParameterCurveFit/AUC",
+            "AnalyteTitration/Four ParameterCurveFit/EC50QCFlagsEnabled",
+            "AnalyteTitration/Four ParameterCurveFit/AUCQCFlagsEnabled",
+            "AnalyteTitration/Five ParameterCurveFit/EC50", "AnalyteTitration/Five ParameterCurveFit/AUC",
+            "AnalyteTitration/Five ParameterCurveFit/EC50QCFlagsEnabled",
+            "AnalyteTitration/Five ParameterCurveFit/AUCQCFlagsEnabled"};
+        for(String column : newColumns)
+        {
+            CustomizeViewsHelper.addCustomizeViewColumn(this, column);
+        }
+        CustomizeViewsHelper.saveCustomView(this);
+
+        assertElementPresent(Locator.xpath("//span[contains(@style, 'red') and text()=" + expectedHMFI + "]"));
+        String expectedEC50 = "36676.656";
+//        assertElementPresent(Locator.xpath("//span[contains(@style, 'red') and text()=" + expectedEC50 + "]"));
+
+        clickLinkContainingText("view runs");
+        enableDisableQCFlags("Guide Set plate 4", "AUC", "HMFI");
+        clickLinkContainingText("view results");
+        //turn off flags
+        assertElementPresent(Locator.xpath("//td[contains(@style, 'white-space') and text()=" + expectedHMFI + "]"));
+        assertElementPresent(Locator.xpath("//td[contains(@style, 'white-space') and text()=" + expectedEC50 + "]"));
+    }
+
+    private void verifyExcludingRuns(Map<String, Integer> guideSetIds, String[] analytes)
+    {
+
         // remove a run from the current guide set
         setUpGuideSet("GS Analyte (2)");
         clickButtonContainingText("Edit", 0);
@@ -1328,21 +1379,43 @@ public class LuminexTest extends AbstractQCAssayTest
         double[] aucAverages2 = {8701.38, 85268.04};
         double[] aucStdDevs2 = {466.81, 738.55};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, aucAverages2, aucStdDevs2, "Trapezoidal", "AUCAverage", "AUCStd Dev");
+    }
 
-        // test the start and end date filter for the report
-        goToLeveyJenningsGraphPage("HIVIG");
-        applyStartAndEndDateFilter();
+    private void verifyLeveyJenningsPermissions()
+    {
+        String ljUrl = getCurrentRelativeURL();
+        String editor = "editor@jennings.com";
+        String reader = "reader@jennings.com";
 
-        excludableWellsWithTransformTest();
-        // test the y-axis scale
-        // TODO: blocked by issue 13983
-//        applyLogYAxisScale();
-        guideSetApiTest();
-        verifyQCFlagUpdates();
+        createAndImpersonateUser(editor, "Editor");
+
+        beginAt(ljUrl);
+        setUpGuideSet("GS Analyte (2)");
+        assertTextPresent("Apply Guide Set");
+        stopImpersonating();
+        deleteUser(editor);
+
+        createAndImpersonateUser(reader, "Reader");
+
+        beginAt(ljUrl);
+        setUpGuideSet("GS Analyte (2)");
+        assertTextPresent("HIVIG Levey-Jennings Report");
+        assertTextNotPresent("Apply Guide Set");
+        stopImpersonating();
+        deleteUser(reader);
+    }
+
+    private void createAndImpersonateUser(String user, String perms)
+    {
+        goToHome();
+        createUser(user, null, false);
+        goToProjectHome();
+        setUserPermissions(user, perms);
+        impersonate(user);
     }
 
     String newGuideSetPlate = "Reload guide set 5";
-    private void verifyQCFlagUpdates()
+    private void verifyQCFlagUpdatesAfterWellChange()
     {
         importPlateFiveAgain();
          DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
@@ -1487,6 +1560,30 @@ public class LuminexTest extends AbstractQCAssayTest
             assertEquals(expectedFlags[i], flags[i]);
         }
         verifyQCFlagLink();
+    }
+
+    private void enableDisableQCFlags(String runName, String... flags)
+    {
+
+//        clickLinkWithText(expectedFlags,index, false);
+
+        Locator l = Locator.xpath("//a[text()='" + runName + "']/../../td/a[contains(@onclick,'showQCFlag')]");
+        click(l);
+        waitForExtMask();
+
+        sleep(1500);
+        waitForText("Run QC Flags");
+
+        for(String flag : flags)
+        {
+            Locator aucCheckBox = Locator.xpath("//div[text()='" + flag + "']/../../td/div/div[contains(@class, 'check')]");
+            clickAt(aucCheckBox,  "1,1");
+        }
+
+        clickButton("Save", 0);
+        waitForExtMaskToDisappear();
+        waitForPageToLoad();
+
     }
 
     private void verifyQCFlagLink()
