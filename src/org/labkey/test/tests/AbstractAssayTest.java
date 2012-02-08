@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 
@@ -207,7 +208,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
             clickLinkWithText(folder);
             clickLinkWithText(TEST_ASSAY_LINK_PERMS);
         }
-        clickNavButton("Study Security");
+        ExtHelper.clickExtTab(this, "Study Security");
+        waitAndClickNavButton("Study Security");
 
         selectOptionByValue("securityString", "ADVANCED_READ");
         waitForPageToLoad(30000);

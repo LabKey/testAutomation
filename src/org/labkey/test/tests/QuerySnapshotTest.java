@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -71,7 +72,8 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // enable advanced study security
         enterPermissionsUI();
-        clickNavButton("Study Security");
+        ExtHelper.clickExtTab(this, "Study Security");
+        waitAndClickNavButton("Study Security");
         selectOptionByValue("securityString", "BASIC_WRITE");
         waitForPageToLoad(30000);
 

@@ -146,14 +146,7 @@ public class ExtHelper
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String label, String text)
     {
-        Locator formElement = Locator.xpath("//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
-        if (!test.isElementPresent(formElement))
-        {
-            // try the ext4 version 
-            formElement = Locator.xpath("//div[./label[text()='"+label+"']]/div/*[self::input or self::textarea]");
-        }
-        test.setFormElement(formElement, text);
-        test.fireEvent(formElement, BaseSeleniumWebTest.SeleniumEvent.blur);
+        setExtFormElementByLabel(test, null, label, text);
     }
 
     public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label, String text)
@@ -168,6 +161,22 @@ public class ExtHelper
         test.fireEvent(formElement, BaseSeleniumWebTest.SeleniumEvent.blur);
     }
 
+    public static String getExtFormElementByLabel(BaseSeleniumWebTest test, String label)
+    {
+        return getExtFormElementByLabel(test, null, label);
+    }
+
+    public static String getExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label)
+    {
+        Locator formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        if (!test.isElementPresent(formElement))
+        {
+            // try the ext4 version
+            formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        }
+        return test.getFormElement(formElement);
+    }
+
     @Deprecated
     public static String getExtDialogXPath(String windowTitle)
     {
@@ -177,6 +186,7 @@ public class ExtHelper
 
     public static String getExtDialogXPath(BaseSeleniumWebTest test, String windowTitle)
     {
+        if (windowTitle == null) return "";
         String ext3Dialog = "//div[contains(@class, 'x-window') and " + Locator.NOT_HIDDEN + " and "+
             "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '" + windowTitle + "')]]";
         String ext4Dialog = "//div[contains(@class, 'x4-window') and @role='dialog' and " + Locator.NOT_HIDDEN + " and "+

@@ -332,7 +332,8 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         enterPermissionsUI();
-        clickNavButton("Study Security");
+        ExtHelper.clickExtTab(this, "Study Security");
+        waitAndClickNavButton("Study Security");
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED_READ");
