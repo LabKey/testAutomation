@@ -3951,7 +3951,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String columnLabel = getText(Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header")));
         runMenuItemHandler(id);
         ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
-        if(isTextPresent("Advanced"))
+        if(isElementPresent(Locator.xpath("//input[@name='filterType' and "+Locator.NOT_HIDDEN+"]")))
         {
             log("Switching to advanced filter UI");
             checkRadioButton("filterType", "default");
