@@ -220,7 +220,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 //    protected static final int CHANGE_PASSWORD = 2;
 
     /**RESET_PASSWORD means user or admin initiated password change that
-     * invovles visiting a webpage specified in an e-mail to change the password,
+     * involves visiting a webpage specified in an e-mail to change the password,
      * without knowing the past password.
      * CHANGE_PASSWORD means a user went into their account information and initiated the change by
      * selecting "change password".  This requires the old password to work.
@@ -229,13 +229,12 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected void attemptSetInvalidPasswords(PasswordAlterType changeType, String[][] passwords, String[][] errors)
     {
         //if reset, should already be at reset Url
-        for(int i = 0; i<errors.length; i++)
+        for (int i = 0; i < errors.length; i++)
         {
             switch (changeType)
             {
-                  case RESET_PASSWORD:
+                case RESET_PASSWORD:
                     attemptSetInvalidPassword(changeType, passwords[i], errors[i]);
-
             }
         }
     }
