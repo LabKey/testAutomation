@@ -442,7 +442,8 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getFolderName());
 
         enterPermissionsUI();
-        clickNavButton("Study Security");
+        ExtHelper.clickExtTab(this, "Study Security");
+        waitAndClickNavButton("Study Security");
 
         selectOptionByValue("securityString", "BASIC_WRITE");
         waitForPageToLoad(30000);
