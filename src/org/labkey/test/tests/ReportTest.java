@@ -115,9 +115,9 @@ public class ReportTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
-//        doCreateCharts();
-//        doCreateRReports();
-//        doAttachmentReportTest();
+        doCreateCharts();
+        doCreateRReports();
+        doAttachmentReportTest();
         doParticipantReportTest();
 
         // additional report and security tests
@@ -564,7 +564,8 @@ public class ReportTest extends StudyBaseTest
         // give the test group read access to only the DEM-1 dataset
         clickLinkWithText("My Study");
         enterPermissionsUI();
-        clickNavButton("Study Security");
+        ExtHelper.clickExtTab(this, "Study Security");
+        waitAndClickNavButton("Study Security");
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED_READ");
@@ -758,9 +759,9 @@ public class ReportTest extends StudyBaseTest
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // Delete a column save a copy of the report (Save As)
+        // Not testing column reorder. Ext4 and selenium don't play well together for drag & drop
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
-//        dragAndDrop(Locator.xpath("//div[contains(@class, 'selectedMeasures')]//table/tbody/tr[4]"), Locator.xpath("//div[contains(@class, 'selectedMeasures')]//table/tbody/tr[5]"), Position.bottom);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Severity Grade' column.
         clickNavButton("Save As", 0);
         ExtHelper.waitForExtDialog(this, "Save As");
@@ -772,10 +773,53 @@ public class ReportTest extends StudyBaseTest
         waitAndClickNavButton("OK", 0);
         waitForTextToDisappear("Severity Grade");
 
-        // TODO: Verify saving with existing report name.
+        // Verify saving with existing report name.
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Save As", 0);
+        ExtHelper.waitForExtDialog(this, "Save As");
+        ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Name", PARTICIPANT_REPORT_NAME);
+        ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
+        clickNavButtonByIndex("Save", 1, 0);
+        ExtHelper.waitForExtDialog(this, "Failure");
+        assertTextPresent("Another report with the same name already exists.");
+        waitAndClickNavButton("OK", 0);
+        clickNavButton("Cancel", 0); // Verify cancel button.
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
-        // TODO: Check saved report contents
-        // TODO: Blocked: 13949: Participant report: Save As button not working as intended
+        
+        // verify modified, saved report
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Views");
+        clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
+        waitForText("Creatinine", 8, WAIT_FOR_JAVASCRIPT); // 8 mice
+        assertTextPresent(PARTICIPANT_REPORT_NAME);
+        //TODO: 13905: Participant report: Column headers getting messed up.
+//        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice
+//        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
+        assertTextPresent("MouseId:", 8);
+        assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
+        log("Verify report name and description.");
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Wrong report description", PARTICIPANT_REPORT_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
+
+
+        // verify modified, saved-as report
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Views");
+        clickReportGridLink(PARTICIPANT_REPORT2_NAME, "view");
+
+        waitForText("Creatinine", 8, WAIT_FOR_JAVASCRIPT); // 8 mice
+        assertTextPresent(PARTICIPANT_REPORT2_NAME);
+        assertTextNotPresent("1a.ALT AE Severity Grade");
+        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
+        assertTextPresent("MouseId:", 8);
+        assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
+        log("Verify report name and description.");
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
     }
 }
