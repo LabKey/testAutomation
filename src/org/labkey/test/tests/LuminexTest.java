@@ -191,8 +191,14 @@ public class LuminexTest extends AbstractQCAssayTest
         addField("Run Fields", 12, "AssayType", "Assay Type", ListColumnType.String);
         addField("Run Fields", 13, "ExpPerformer", "Experiment Performer", ListColumnType.String);
 
+        // add run properties for use with Calculating Positivity
+        addField("Run Fields", 14, "CalculatePositivity", "Calculate Positivity", ListColumnType.Boolean);
+        addField("Run Fields", 15, "BaseVisit", "Baseline Visit", ListColumnType.Double);
+        addField("Run Fields", 16, "PositivityFoldChange", "Positivity Fold Change", ListColumnType.Integer);
+
         // add analyte property for tracking lot number
         addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
+        addField("Analyte Properties", 7, "PositivityThreshold", "Positivity Threshold", ListColumnType.Integer);
 
         // add the data properties for the calculated columns
         addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
@@ -207,6 +213,13 @@ public class LuminexTest extends AbstractQCAssayTest
         addField("Data Fields", 9, "Lower_4pl", "Lower_4pl", ListColumnType.Double);
         addField("Data Fields", 10, "Upper_4pl", "Upper_4pl", ListColumnType.Double);
         addField("Data Fields", 11, "Inflection_4pl", "Inflection_4pl", ListColumnType.Double);
+        addField("Data Fields", 12, "Slope_5pl", "Slope_5pl", ListColumnType.Double);
+        addField("Data Fields", 13, "Lower_5pl", "Lower_5pl", ListColumnType.Double);
+        addField("Data Fields", 14, "Upper_5pl", "Upper_5pl", ListColumnType.Double);
+        addField("Data Fields", 15, "Inflection_5pl", "Inflection_5pl", ListColumnType.Double);
+        addField("Data Fields", 16, "Asymmetry_5pl", "Asymmetry_5pl", ListColumnType.Double);
+        addField("Data Fields", 17, "Positivity", "Positivity", ListColumnType.String);
+
 
         // set format to two decimal place for easier testing later
         setFormat("Data Fields", 0, "0.0");
@@ -220,6 +233,11 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormat("Data Fields", 9, "0.0");
         setFormat("Data Fields", 10, "0.0");
         setFormat("Data Fields", 11, "0.0");
+        setFormat("Data Fields", 12, "0.0");
+        setFormat("Data Fields", 13, "0.0");
+        setFormat("Data Fields", 14, "0.0");
+        setFormat("Data Fields", 15, "0.0");
+        setFormat("Data Fields", 16, "0.0");
 
         sleep(1000);
         clickNavButton("Save", 0);
