@@ -929,7 +929,7 @@ public class TimeChartTest extends StudyBaseTest
         impersonate(USER1);
         popLocation(); // Saved chart
         waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
-        assertElementNotVisible(Locator.button("Save"));
+        assertElementNotPresent(Locator.button("Save"));
         assertElementPresent(Locator.button("Save As"));
         clickLinkWithText(FOLDER_NAME);
         assertTextNotPresent(REPORT_NAME_2);
