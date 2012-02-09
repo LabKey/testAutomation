@@ -474,6 +474,7 @@ public class LuminexTest extends AbstractQCAssayTest
         List<String> ec50 = table.getColumnDataAsText("EC50");
         List<String> auc= table.getColumnDataAsText("AUC");
         List<String> inflectionPoint = table.getColumnDataAsText("Inflection");
+        int rum5ec50count = 0;
 
         log("Write this");
         for(int i=0; i<formula.size(); i++)
@@ -487,7 +488,11 @@ public class LuminexTest extends AbstractQCAssayTest
             }
             else if(formula.get(i).equals(rum5))
             {
-                assertTrue("EC50 was unpopulated for row " + i, ((String) ec50.get(i)).length() > 0);
+                // ec50 will be populated for well formed curves (i.e. not expected for every row, so we'll keep a count and check at the end of the loop)
+                if (((String) ec50.get(i)).length() > 0)
+                    rum5ec50count++;
+
+                // auc should not be populated
                 assertEquals("", auc.get(i));
             }
             else if(formula.get(i).equals(trapezoidal))
@@ -496,9 +501,10 @@ public class LuminexTest extends AbstractQCAssayTest
                 assertEquals("", ec50.get(i));
                 //auc=populated (for all non-blank analytes)
                 if (!analyte.get(i).startsWith("Blank"))
-                    assertTrue( "AUC was unpopulated for row " + i, ((String) auc.get(i)).length()>0);
+                    assertTrue( "AUC was unpopulated for row " + i, auc.get(i).length()>0);
             }
         }
+        assertEquals("Unexpected number of Five Parameter EC50 values (expected 11 of 19).", 11, rum5ec50count);
 
 //        formula = getTableColumnValues()
 
@@ -1134,7 +1140,8 @@ public class LuminexTest extends AbstractQCAssayTest
         click(l);
         assertLinkPresentWithText("WithBlankBead.HIVIG_5PL.pdf");
         assertLinkPresentWithText("WithBlankBead.HIVIG_4PL.pdf");
-        assertLinkPresentWithText("WithBlankBead.HIVIG_QC_Curves.pdf");
+        assertLinkPresentWithText("WithBlankBead.HIVIG_QC_Curves_4PL.pdf");
+        assertLinkPresentWithText("WithBlankBead.HIVIG_QC_Curves_5PL.pdf");
 
         // verify that the lot number value are as expected
         clickLinkWithText("r script transformed assayId");
@@ -1268,14 +1275,14 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
-        double[] ec504plAverages = {179.78, 43426.10};
-        double[] ec504plStdDevs = {22.21, 794.95};
+        String[] ec504plAverages = {"179.78", "43426.10"};
+        String[] ec504plStdDevs = {"22.21", "794.95"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec504plAverages, ec504plStdDevs, "Four Parameter", "EC50Average", "EC50Std Dev");
-        double[] ec505plAverages = {12105.1, 2777412.81};
-        double[] ec505plStdDevs = {7337.32, 1999838.60};
+        String[] ec505plAverages = {"", "17565.52"};
+        String[] ec505plStdDevs = {"", "14331.71"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec505plAverages, ec505plStdDevs, "Five Parameter", "EC50Average", "EC50Std Dev");
-        double[] aucAverages = {8701.38, 80851.83};
-        double[] aucStdDevs = {466.81, 6523.08};
+        String[] aucAverages = {"8701.38", "80851.83"};
+        String[] aucStdDevs = {"466.81", "6523.08"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, aucAverages, aucStdDevs, "Trapezoidal", "AUCAverage", "AUCStd Dev");
 
         // upload the final set of runs (2 runs)
@@ -1370,14 +1377,14 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
         int[] rowCounts2 = {2, 3};
-        double[] ec504plAverages2 = {179.78, 42158.22};
-        double[] ec504plStdDevs2 = {22.21, 4833.76};
+        String[] ec504plAverages2 = {"179.78", "42158.22"};
+        String[] ec504plStdDevs2 = {"22.21", "4833.76"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec504plAverages2, ec504plStdDevs2, "Four Parameter", "EC50Average", "EC50Std Dev");
-        double[] ec505plAverages2 = {12105.1, 5568230.67};
-        double[] ec505plStdDevs2 = {7337.32, 3820010.22};
+        String[] ec505plAverages2 = {"", "25477.46"};
+        String[] ec505plStdDevs2 = {"", "5880.37"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec505plAverages2, ec505plStdDevs2, "Five Parameter", "EC50Average", "EC50Std Dev");
-        double[] aucAverages2 = {8701.38, 85268.04};
-        double[] aucStdDevs2 = {466.81, 738.55};
+        String[] aucAverages2 = {"8701.38", "85268.04"};
+        String[] aucStdDevs2 = {"466.81", "738.55"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, aucAverages2, aucStdDevs2, "Trapezoidal", "AUCAverage", "AUCStd Dev");
     }
 
@@ -1426,7 +1433,7 @@ public class LuminexTest extends AbstractQCAssayTest
         excludeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
-        assertEquals("AUC, EC50, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
+        assertEquals("AUC, EC50-4, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 QC Flag for GS Analyte (2) that was inserted in the previous step is removed
@@ -1441,7 +1448,7 @@ public class LuminexTest extends AbstractQCAssayTest
 //	- QC Flags added for EC50 and HMFI
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
-        String newQcFlags = "AUC, EC50, EC50_5PL, HMFI";
+        String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
         assertTextNotPresent(newQcFlags);
       applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
         //assert ec50 and HMFI red text present
@@ -1450,7 +1457,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent(newQcFlags);
         //verify new flags present in run list
         goToTestRunList();
-        assertTextPresent("AUC, EC50, EC50_5PL, HMFI, PCV");
+        assertTextPresent("AUC, EC50-4, EC50-5, HMFI, PCV");
 
 //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
 //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
@@ -1504,7 +1511,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         assertEquals("Unexpected QC Flag Highlight Present", 0,
                     getXpathCount(Locator.xpath("//div[contains(@style,'red')]")));
-        for(String flag : new String[] {"AUC", "HMFI", "EC50", "PCV"})
+        for(String flag : new String[] {"AUC", "HMFI", "EC50-4", "EC50-5", "PCV"})
         {
             assertElementNotPresent(Locator.xpath("//a[contains(text(),'" + flag + "')]"));
         }
@@ -1544,7 +1551,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("assay." + TEST_ASSAY_LUM + " QCFlags");
     }
 
-    String[] expectedFlags = {"AUC, EC50, HMFI, PCV","AUC, EC50, HMFI", "EC50_5PL, HMFI", "", "PCV"};
+    String[] expectedFlags = {"AUC, EC50-4, HMFI, PCV","AUC, EC50-4, HMFI", "HMFI", "", "PCV"};
 
     private void verifyQCFlagsInRunGrid()
     {
@@ -1760,8 +1767,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //verify QC flags
         //this locator finds an EC50 flag, then makes sure there's red text outlining
-        Locator.XPathLocator l = Locator.xpath("//td/div[contains(@style,'red')]/../../td/div/a[contains(text(),'EC50')]");
-        assertElementPresent(l,3);
+        Locator.XPathLocator l = Locator.xpath("//td/div[contains(@style,'red')]/../../td/div/a[contains(text(),'EC50-4')]");
+        assertElementPresent(l,2);
         assertTextPresent("QC Flags"); //should update to qc flags
     }
 
@@ -1940,7 +1947,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText(titrationName + " Levey-Jennings Report");
     }
 
-    private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, double[] averages, double[] stdDevs,
+    private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, String[] averages, String[] stdDevs,
                                           String curveType, String averageColName, String stdDevColName)
     {
         // go to the GuideSetCurveFit table to verify the calculated threshold values for the EC50 and AUC
@@ -1958,8 +1965,8 @@ public class LuminexTest extends AbstractQCAssayTest
             table.setFilter("GuideSetId/RowId", "Equals", guideSetIds.get(analytes[i]).toString());
             table.setFilter("CurveType", "Equals", curveType);
             assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[i]).toString(), rowCounts[i], Integer.parseInt(table.getDataAsText(0, "Run Count")));
-            assertEquals("Unexpected average for guide set " + guideSetIds.get(analytes[i]).toString(), averages[i], Double.parseDouble(table.getDataAsText(0, averageColName)));
-            assertEquals("Unexpected stddev for guide set " + guideSetIds.get(analytes[i]).toString(), stdDevs[i], Double.parseDouble(table.getDataAsText(0, stdDevColName)));
+            assertEquals("Unexpected average for guide set " + guideSetIds.get(analytes[i]).toString(), averages[i],table.getDataAsText(0, averageColName));
+            assertEquals("Unexpected stddev for guide set " + guideSetIds.get(analytes[i]).toString(), stdDevs[i], table.getDataAsText(0, stdDevColName));
             table.clearFilter("CurveType");
             table.clearFilter("GuideSetId/RowId");
         }
@@ -2051,7 +2058,8 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
         clickLinkWithText(table.getDataAsText(0, "Row Id"));
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves.pdf", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves_4PL.pdf", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves_5PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".tomaras_luminex_transform.Rout", 3);
 
