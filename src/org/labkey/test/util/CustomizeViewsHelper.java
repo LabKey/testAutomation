@@ -241,6 +241,11 @@ public class CustomizeViewsHelper
         }while (test.isElementPresent(item)); // Removes all clauses for a single fieldkey
     }
 
+    public static void showHiddenItems(BaseSeleniumWebTest test)
+    {
+        test.click(Locator.tagWithText("Label","Show Hidden Fields"));
+    }
+
     private static void removeCustomizeViewItem(BaseSeleniumWebTest test, int item_index, ViewItemType type)
     {
         changeTab(test, type);
