@@ -177,7 +177,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickNavButton("Execute Query", 0);
         waitForText("Seattle", WAIT_FOR_JAVASCRIPT);
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
-//        ExtHelper.clickExtTab(this, "Source");
+        ExtHelper.clickExtTab(this, "Source");
         clickNavButton("Save & Finish");
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonPresent("Insert New");
