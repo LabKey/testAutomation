@@ -367,6 +367,16 @@ public class ExtHelper
         }
     }
 
+    public static void clickSideTab(BaseSeleniumWebTest test, String tab)
+    {
+        if (test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]")))
+            // Tab hasn't rendered yet
+            test.mouseDown(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]"));
+        else
+            // Tab has rendered
+            test.mouseDown(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab + "')]]"));
+    }
+
     public static void clickExtTabContainingText(BaseSeleniumWebTest test, String tabText)
     {
         test.log("Selecting Ext tab " + tabText);

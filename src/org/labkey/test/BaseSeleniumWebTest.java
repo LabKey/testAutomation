@@ -29,6 +29,7 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
@@ -2616,7 +2617,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected void clickExportToText()
     {
         clickNavButton("Export", 0);
-        selenium.mouseDown("//a//span[contains(text(), \"Text\")]");
+        ExtHelper.clickSideTab(this, "Text");
         clickNavButton("Export to Text");
     }
 
