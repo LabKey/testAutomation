@@ -560,7 +560,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickTab("List");
         clickAndWait(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/..//a[text()='view data']"));
         clickNavButton("Export", 0);
-        selenium.mouseDown("//a//span[contains(text(), 'Text')]");
+        ExtHelper.clickSideTab(this, "Text");
         String exportUrl = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "href");
         clickLinkWithText("View Design");
 
