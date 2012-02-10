@@ -206,7 +206,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         log("Verify that modified participant group has no effect on ancillary study.");
         clickLinkWithText(STUDY_NAME);
         clickLinkWithText("Mice");
-        waitForText("Filter:"); // Wait for participant list to appear.
+        waitForText("Filter"); // Wait for participant list to appear.
 
         for( String str : PTIDS )
         {
