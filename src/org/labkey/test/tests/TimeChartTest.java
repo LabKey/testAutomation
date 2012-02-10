@@ -937,8 +937,8 @@ public class TimeChartTest extends StudyBaseTest
         signOut();
         popLocation(); // Saved chart
         waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
-        assertElementNotVisible(Locator.button("Save"));
-        assertElementNotVisible(Locator.button("Save As"));
+        assertElementNotPresent(Locator.button("Save"));
+        assertElementNotPresent(Locator.button("Save As"));
         simpleSignIn();
     }
 
