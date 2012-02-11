@@ -78,7 +78,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private void dataViewsWebpartTest()
     {
         log("Data Views Test");
-        clickLinkContainingText("Data Analysis");
+        clickLinkContainingText("Data & Reports");
         waitForText(someDataSets[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
