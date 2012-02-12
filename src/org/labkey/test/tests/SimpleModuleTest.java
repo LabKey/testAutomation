@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.json.simple.JSONObject;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
@@ -47,6 +48,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     public static final String MODULE_NAME = "simpletest";
     public static final String FOLDER_NAME = "subfolder";
     public static final String VEHICLE_SCHEMA = "vehicle";
+    public static final String CORE_SCHEMA = "core";
     public static final String LIST_NAME = "People";
     public static final String LIST_DATA = "Name\tAge\tCrazy\n" +
             "Dave\t39\tTrue\n" +
@@ -83,6 +85,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         doTestQueryViews();
         doTestReports();
         doTestParameterizedQueries();
+        doTestContainerColumns();
     }
     
     private void doTestCustomFolder()
@@ -473,6 +476,36 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("\"name\"");
         assertTextPresent("\"age\"");
         assertTextPresent("\"crazy\"");
+    }
+
+    private void doTestContainerColumns() throws Exception
+    {
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        log("** Testing container columns");
+        SelectRowsCommand selectCmd = new SelectRowsCommand(CORE_SCHEMA, "Containers");
+        selectCmd.setMaxRows(-1);
+        List<String> columns = new ArrayList<String>();
+        columns.add("*");
+        selectCmd.setColumns(columns);
+        selectCmd.setRequiredVersion(9.1);
+        SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
+        assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
+
+        Map<String,Object> row = selectResp.getRows().get(0);
+        String entityId = (String)((JSONObject)row.get("EntityId")).get("value");
+        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((JSONObject)row.get("Path")).get("value"));
+
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setColumns(columns);
+        selectCmd.setRequiredVersion(9.1);
+        selectResp = selectCmd.execute(cn, getProjectName());
+        JSONObject vehicleRow = (JSONObject)(selectResp.getRows().get(0)).get("container");
+
+        assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
+        assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
+
     }
 
     private void doTestParameterizedQueries()
