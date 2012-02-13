@@ -114,17 +114,7 @@ public class MS1Test extends BaseSeleniumWebTest
         //go back to the portal/data pipeline page and wait for all four experiments to be complete
         clickLinkWithText(project);
         clickLinkWithText("Data Pipeline");
-        while(countLinksWithText("COMPLETE") < 5)
-        {
-            if (countLinksWithText("ERROR") > 0)
-            {
-                fail("Job in ERROR state found in the list");
-            }
-
-            log("Wating for data to finish loading...");
-            sleep(3000);
-            refresh();
-        }
+        waitForPipelineJobsToComplete(5, "Experiment Import", false);
 
         log("Sample data imported.");
 
