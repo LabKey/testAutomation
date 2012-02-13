@@ -505,9 +505,22 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         assertEquals("Unexpected number of Five Parameter EC50 values (expected 11 of 19).", 11, rum5ec50count);
 
-//        formula = getTableColumnValues()
-
-        //you are here
+        // check that the 5PL parameters are within the expected ranges (note: exact values can change based on R 32-bit vs R 64-bit)
+        Double[] FiveParameterEC50mins = {32211.66, 44975.52, 110.72, 32.29, 32.46, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
+        Double[] FiveParameterEC50maxs = {32211.67, 45009.72, 111.23, 32.48, 35.80, 7826.90, 0.4309, 36465.86, 0.03965, 21075.29, 463.49};
+        table.setFilter("CurveType", "Equals", "Five Parameter");
+        table.setFilter("EC50", "Is Not Blank", "");
+        ec50 = table.getColumnDataAsText("EC50");
+        assertEquals("Unexpected number of Five Parameter EC50 values (expected 11)", 11, ec50.size());
+        for (int i = 0; i < ec50.size(); i++)
+        {
+            Double val = Double.parseDouble(ec50.get(i));
+            Double min = FiveParameterEC50mins[i];
+            Double max = FiveParameterEC50maxs[i];
+            assertTrue("Unexpected 5PL EC50 value for " + table.getDataAsText(i, "Analyte"), min <= val && val <= max);
+        }
+        table.clearFilter("EC50");
+        table.clearFilter("CurveType");
     }
 
     /**
@@ -1277,9 +1290,6 @@ public class LuminexTest extends AbstractQCAssayTest
         String[] ec504plAverages = {"179.78", "43426.10"};
         String[] ec504plStdDevs = {"22.21", "794.95"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec504plAverages, ec504plStdDevs, "Four Parameter", "EC50Average", "EC50Std Dev");
-        String[] ec505plAverages = {"", "17565.52"};
-        String[] ec505plStdDevs = {"", "14331.71"};
-        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec505plAverages, ec505plStdDevs, "Five Parameter", "EC50Average", "EC50Std Dev");
         String[] aucAverages = {"8701.38", "80851.83"};
         String[] aucStdDevs = {"466.81", "6523.08"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, aucAverages, aucStdDevs, "Trapezoidal", "AUCAverage", "AUCStd Dev");
@@ -1377,9 +1387,6 @@ public class LuminexTest extends AbstractQCAssayTest
         String[] ec504plAverages2 = {"179.78", "42158.22"};
         String[] ec504plStdDevs2 = {"22.21", "4833.76"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec504plAverages2, ec504plStdDevs2, "Four Parameter", "EC50Average", "EC50Std Dev");
-        String[] ec505plAverages2 = {"", "25477.46"};
-        String[] ec505plStdDevs2 = {"", "5880.37"};
-        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec505plAverages2, ec505plStdDevs2, "Five Parameter", "EC50Average", "EC50Std Dev");
         String[] aucAverages2 = {"8701.38", "85268.04"};
         String[] aucStdDevs2 = {"466.81", "738.55"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, aucAverages2, aucStdDevs2, "Trapezoidal", "AUCAverage", "AUCStd Dev");
