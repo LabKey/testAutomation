@@ -98,93 +98,99 @@ public class FolderTest extends BaseSeleniumWebTest
             clickNavButton("Move Up", 0);
         clickNavButton("Save");
 
-        // Use drag-and-drop to reorder folders.
-        log("Reorder Projects test");
-        reorderProjects(PROJECT_NAME, "Shared", Reorder.preceding, true);
-        sleep(500); // Wait for folder move to complete.
-        refresh();
-        // TODO : Figure out how to get the order of project names within the panel
-        //assertTextBefore("Shared", PROJECT_NAME);
+        // TODO: Use the 'old' UI options along the toolbar to perform the same actions reorder, move, rename, etc
 
-        clickNavButton("Change Display Order");
-        checkRadioButton("resetToAlphabetical", "false");
-        selectOptionByText(Locator.name("items"), PROJECT_NAME);
-        for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+PROJECT_NAME+"']")) > 0; i++)
-            clickNavButton("Move Up", 0);
-        clickNavButton("Save");
+//        // Use drag-and-drop to reorder folders.
+//        log("Reorder Projects test");
+//        reorderProjects(PROJECT_NAME, "Shared", Reorder.preceding, true);
+//        sleep(500); // Wait for folder move to complete.
+//        refresh();
+//        // TODO : Figure out how to get the order of project names within the panel
+//        //assertTextBefore("Shared", PROJECT_NAME);
+//
+//        clickNavButton("Change Display Order");
+//        checkRadioButton("resetToAlphabetical", "false");
+//        selectOptionByText(Locator.name("items"), PROJECT_NAME);
+//        for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+PROJECT_NAME+"']")) > 0; i++)
+//            clickNavButton("Move Up", 0);
+//        clickNavButton("Save");
+//
+//        log("Reorder folders test");
+//        expandFolderNode("AB");
+//        reorderFolder("[ABB]", "[ABA]", Reorder.preceding, true);
+//        sleep(500); // Wait for folder move to complete.
+//        refresh();
+//        expandNavFolders("[A]", "[AB]", "[AB]");
+//        assertTextBefore("[ABB]", "[ABA]");
+//
+//        log("Illegal folder move test: Project demotion");
+//        moveFolder(PROJECT_NAME, "home", false, false);
+//        ExtHelper.waitForExtDialog(this, "Change Display Order");  // it should only give option to reorder projects
+//        clickNavButton("Cancel", 0);
+//
+//        log("Illegal folder move test: Folder promotion");
+//        expandFolderNode("");
+//        moveFolder("[A]", SERVER_ROOT, false, false);
+//
+//        log("Move folder test");
+//        sleep(500); // wait for failed move ghost to disappear.
+//        expandFolderNode("ABB");
+//        moveFolder("[ABBA]", "[ABA]", true, false);
+//        sleep(500); // Wait for folder move to complete.
+//        refresh();
+//        expandNavFolders("[A]", "[AB]", "[ABA]");
+//        assertTextBefore("[ABB]", "[ABBA]");
 
-        log("Reorder folders test");
-        expandFolderNode("AB");
-        reorderFolder("[ABB]", "[ABA]", Reorder.preceding, true);
-        sleep(500); // Wait for folder move to complete.
-        refresh();
-        expandNavFolders("[A]", "[AB]", "[AB]");
-        assertTextBefore("[ABB]", "[ABA]");
 
-        log("Illegal folder move test: Project demotion");
-        moveFolder(PROJECT_NAME, "home", false, false);
-        ExtHelper.waitForExtDialog(this, "Change Display Order");  // it should only give option to reorder projects
-        clickNavButton("Cancel", 0);
+//        //Issue 12762: Provide way to cancel a folder move
+//        log("Cancel folder move test");
+//        sleep(500); // wait for failed move ghost to disappear.
+//        expandFolderNode("ABA");
+//        moveFolder("[ABBA]", "[F]", true, false, false);
+//        sleep(500); // Wait for folder move to complete.
+//        refresh();
+//        expandNavFolders("[A]", "[AB]", "[ABA]", "[F]");
+//        assertTextBefore("[ABB]", "[ABBA]");
 
-        log("Illegal folder move test: Folder promotion");
-        expandFolderNode("");
-        moveFolder("[A]", SERVER_ROOT, false, false);
-
-        log("Move folder test");
-        sleep(500); // wait for failed move ghost to disappear.
-        expandFolderNode("ABB");
-        moveFolder("[ABBA]", "[ABA]", true, false);
-        sleep(500); // Wait for folder move to complete.
-        refresh();
-        expandNavFolders("[A]", "[AB]", "[ABA]");
-        assertTextBefore("[ABB]", "[ABBA]");
-
-
-        //Issue 12762: Provide way to cancel a folder move
-        log("Cancel folder move test");
-        sleep(500); // wait for failed move ghost to disappear.
-        expandFolderNode("ABA");
-        moveFolder("[ABBA]", "[F]", true, false, false);
-        sleep(500); // Wait for folder move to complete.
-        refresh();
-        expandNavFolders("[A]", "[AB]", "[ABA]", "[F]");
-        assertTextBefore("[ABB]", "[ABBA]");
-
-        log("Illegal multiple folder move: non-siblings");
-        expandFolderNode("A");
-        expandFolderNode("B");
-        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[A]/[AA]', false)");
-        sleep(100);
-        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[B]/[BA]', true)");
-        sleep(500);
-        moveFolder("[AA]", "[C]", false, true);
-        waitForExtMaskToDisappear(); // shouldn't be a confirmation dialog.
-
-        log("Move multiple folders");
-        sleep(500); // wait for failed move ghost to disappear.
-        expandFolderNode("AB");
-        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[D]', false)");
-        sleep(100);
-        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[E]', true)");
-        sleep(100);
-        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[F]', true)");
-        sleep(500);
-        moveFolder("[D]", "[AB]", true, true);
-        sleep(500);
-        refresh();
-        expandNavFolders("[A]", "[AB]");
-        assertTextBefore("[AB]" ,"[D]");
-        assertTextBefore("[D]" ,"[E]");
-        assertTextBefore("[E]" ,"[F]");
-        assertTextBefore("[F]" ,"[AC]");
-        assertTextBefore("[F]" ,"[C]");
+//        log("Illegal multiple folder move: non-siblings");
+//        expandFolderNode("A");
+//        expandFolderNode("B");
+//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[A]/[AA]', false)");
+//        sleep(100);
+//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[B]/[BA]', true)");
+//        sleep(500);
+//        moveFolder("[AA]", "[C]", false, true);
+//        waitForExtMaskToDisappear(); // shouldn't be a confirmation dialog.
+//
+//        log("Move multiple folders");
+//        sleep(500); // wait for failed move ghost to disappear.
+//        expandFolderNode("AB");
+//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[D]', false)");
+//        sleep(100);
+//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[E]', true)");
+//        sleep(100);
+//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[F]', true)");
+//        sleep(500);
+//        moveFolder("[D]", "[AB]", true, true);
+//        sleep(500);
+//        refresh();
+//        expandNavFolders("[A]", "[AB]");
+//        assertTextBefore("[AB]" ,"[D]");
+//        assertTextBefore("[D]" ,"[E]");
+//        assertTextBefore("[E]" ,"[F]");
+//        assertTextBefore("[F]" ,"[AC]");
+//        assertTextBefore("[F]" ,"[C]");
     }
 
     private void reorderProjects(String project, String targetProject, Reorder order, boolean successExpected)
     {
         log("Reorder project: '" + project + "' " + order.toString() + " '" + targetProject + "'");
-        Locator p = Locator.xpath("//div/a/span[text()='"+project+"']");
-        Locator t = Locator.xpath("//div/a/span[text()='"+targetProject+"']");
+//        getXpathCount(Locator.xpath("//div[contains(@class, 'x4-unselectable') and text()='"+project+"']/.."));
+        Locator p = Locator.xpath("//div[contains(@class, 'x4-unselectable') and text()='"+project+"']/..");
+        Locator t = Locator.xpath("//div[contains(@class, 'x4-unselectable') and text()='"+targetProject+"']/..");
+
+//        Locator p = Locator.xpath("//div/a/span[text()='"+project+"']");
+//        Locator t = Locator.xpath("//div/a/span[text()='"+targetProject+"']");
 
         waitForElement(p, WAIT_FOR_JAVASCRIPT);
         waitForElement(t, WAIT_FOR_JAVASCRIPT);
