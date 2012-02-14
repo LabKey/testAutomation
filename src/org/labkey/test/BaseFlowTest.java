@@ -349,6 +349,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
         else if (fcsPath != null)
         {
+            sleep(1000); // Avoid intermittent failure (Form thinks root, '/', is selected
             ExtHelper.selectFileBrowserItem(this, fcsPath);
         }
         else
