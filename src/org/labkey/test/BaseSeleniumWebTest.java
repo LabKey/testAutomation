@@ -3172,6 +3172,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void dragAndDrop(Locator from, Locator to)
     {
+        selenium.mouseOver(from.toString());
         selenium.mouseDownAt(from.toString(), "1,1");
         selenium.mouseMoveAt(to.toString(), "1,1");
         selenium.mouseOver(to.toString());
@@ -3191,6 +3192,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else // pos == Position.middle
             y = selenium.getElementHeight(to.toString()).intValue() / 2;
 
+        selenium.mouseOver(from.toString());
         selenium.mouseDownAt(from.toString(), "1,1");
         selenium.mouseMoveAt(to.toString(), "1," + y);
         selenium.mouseOver(to.toString());
@@ -3957,6 +3959,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Switching to advanced filter UI");
             checkRadioButton("filterType", "default");
             waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
+            sleep(500);
         }
         ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
         if(filter1 != null) setFormElement("value_1", filter1);
