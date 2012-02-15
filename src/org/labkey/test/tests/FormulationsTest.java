@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
@@ -45,11 +46,22 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String TEMPERATURE_LIST = "Temperatures";
     private static final String TIME_LIST = "Timepoints";
     private static final String TYPES_LIST = "FormulationTypes";
+    private static final String MATERIAL_TYPES_LIST = "MaterialTypes";
+        private final ListColumn MATERIAL_COL_TYPE = new ListColumn(
+            "type",
+            "Type",
+            ListHelper.ListColumnType.String,
+            "Type of Compound.");
+    private final ListColumn MATERIAL_COL_UNITS = new ListColumn(
+            "units",
+            "Units",
+            ListHelper.ListColumnType.String,
+            "Measure of Units for given type.");
 
-    private static final String COMPOUNDS_HEADER = "Compound Name\tFull Name\tType of Material\tCAS Number\tDensity\tMolecular Weight\n";
-    private static final String COMPOUNDS_DATA_1 = "Alum\tAluminum Hydroxide\tadjuvant\t21645-51-2\t\t78.0\n";
-    private static final String COMPOUNDS_DATA_2 = "Squawk\tBean Oil\toil\t21235-51-3\t\t7.0\n";
-    private static final String COMPOUNDS_DATA_3 = "Cholesterol\tCholesterol\tsterol\t29935-53-9\t\t123.6\n";
+    private static final String COMPOUNDS_HEADER = "Compound Name\tFull Name\tCAS Number\tDensity\tMolecular Weight\n";
+    private static final String COMPOUNDS_DATA_1 = "Alum\tAluminum Hydroxide\t21645-51-2\t\t78.0\n";  // adjuvant
+    private static final String COMPOUNDS_DATA_2 = "Squawk\tBean Oil\t21235-51-3\t\t7.0\n";           // oil
+    private static final String COMPOUNDS_DATA_3 = "Cholesterol\tCholesterol\t29935-53-9\t\t123.6\n"; // sterol
     private static final String RAWMATERIALS_HEADER = "Identifier\tMaterial Name\tSupplier\tSource\tCatalogue ID\tLot ID\n";
     private static final String RAW_MATERIAL_1 = "IRM-0456";
     private static final String RAW_MATERIAL_2 = "IRM-0016";
@@ -64,6 +76,8 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String TIME_DATA = "T=0\t0\n1 wk\t7\n2 wk\t14\n1 mo\t30\n3 mo\t90\n6 mo\t180\n9 mo\t270\n12 mo\t360\n24 mo\t720\n36 mo\t1080\n";
     private static final String TYPES_HEADER = "Type\n";
     private static final String TYPES_DATA = "Emulsion\nAqueous\nPowder\nLiposome\nAlum\nNiosomes\n";
+    private static final String MTYPES_HEADER = "Type\tUnits\n";
+    private static final String MTYPES_DATA = "adjuvant\t%w/vol\nsterol\t%w/vol\noil\t%v/vol\n";
 
     private static final String PS_ASSAY = "Particle Size";
     private static final String PS_ASSAY_DESC = "IDRI Particle Size Data as provided by Nano and APS machine configurations.";
@@ -146,6 +160,18 @@ public class FormulationsTest extends BaseSeleniumWebTest
         ExtHelper.waitForExtDialog(this, "Success");
         assertTextPresent("6 rows inserted.");
         ExtHelper.clickExtButton(this, "Success", "OK");
+
+        clickLinkWithText("Lists");
+
+        log("Add list -- " + MATERIAL_TYPES_LIST);
+        ListHelper.createList(this, PROJECT_NAME, MATERIAL_TYPES_LIST, ListHelper.ListColumnType.AutoInteger, "key", MATERIAL_COL_TYPE, MATERIAL_COL_UNITS);
+        ListHelper.clickImportData(this);
+        ListHelper.submitTsvData(this, MTYPES_HEADER + MTYPES_DATA);
+//        setFormElement(Locator.id("tsv3"), MTYPES_HEADER + MTYPES_DATA);
+//        clickNavButton("Submit", 0);
+//        ExtHelper.waitForExtDialog(this, "Success");
+//        assertTextPresent("3 rows inserted.");
+//        ExtHelper.clickExtButton(this, "Success", "OK");
     }
 
     protected void setupCompounds()
@@ -154,9 +180,40 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Entering compound information");
         clickLinkWithText(COMPOUNDS_NAME);
+
+        // Add compound lookup
+        clickLinkWithText("Edit Fields");
+        clickNavButton("Add Field", 0);
+        setFormElement(Locator.name("ff_name5"), "CompoundLookup");
+        setFormElement(Locator.name("ff_label5"), "Type of Material");
+        click(Locator.xpath("//input[@name='ff_type5']/../img"));
+        ExtHelper.waitForExtDialog(this, "Choose Field Type", WAIT_FOR_JAVASCRIPT);
+
+        ListHelper.LookupInfo lookup = new ListHelper.LookupInfo(PROJECT_NAME, "lists", "MaterialTypes");
+        checkRadioButton(Locator.xpath("//label[text()='Lookup']/../input[@name = 'rangeURI']"));
+        setFormElement(Locator.tagWithName("input", "lookupContainer"), lookup.getFolder());
+        setFormElement(Locator.tagWithName("input", "schema"), lookup.getSchema());
+        setFormElement(Locator.tagWithName("input", "table"), lookup.getTable());
+        click(Locator.tagWithText("button", "Apply"));
+        sleep(1000);
+        clickNavButton("Save");
+
         clickNavButton("Import More Samples");
         clickRadioButtonById("insertOnlyChoice");
         setFormElement("data", COMPOUNDS_HEADER + COMPOUNDS_DATA_1 + COMPOUNDS_DATA_2 + COMPOUNDS_DATA_3);
+        clickNavButton("Submit");
+
+        DataRegionTable table = new DataRegionTable("Material", this);
+        table.clickLink(0,0);
+        selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), "adjuvant");
+        clickNavButton("Submit");
+
+        table.clickLink(1,0);
+        selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), "oil");
+        clickNavButton("Submit");
+
+        table.clickLink(2,0);
+        selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), "sterol");
         clickNavButton("Submit");
     }
 
