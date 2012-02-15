@@ -507,7 +507,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // check that the 5PL parameters are within the expected ranges (note: exact values can change based on R 32-bit vs R 64-bit)
         Double[] FiveParameterEC50mins = {32211.66, 44975.52, 110.72, 32.29, 32.46, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
-        Double[] FiveParameterEC50maxs = {32211.67, 45009.72, 111.23, 32.48, 35.80, 7826.90, 0.4309, 36465.86, 0.03965, 21075.29, 463.49};
+        Double[] FiveParameterEC50maxs = {32211.67, 45012.09, 112.85, 32.48, 35.80, 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
         table.setFilter("CurveType", "Equals", "Five Parameter");
         table.setFilter("EC50", "Is Not Blank", "");
         ec50 = table.getColumnDataAsText("EC50");
