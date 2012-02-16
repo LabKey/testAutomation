@@ -76,8 +76,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         assertTextNotPresent("Assigned To");
         assertTextNotPresent("Members");
         assertTextNotPresent("Expires");
-        assertTextPresent("Admin Broadcast");
-        
+
         setFormElement("title", MSG1_TITLE);
         setFormElement("body", MSG1_BODY_FIRST);
         selectOptionByText("rendererType", "Plain Text");

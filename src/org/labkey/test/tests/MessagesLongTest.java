@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 
 /**
  * User: tamram
@@ -33,8 +32,6 @@ public class MessagesLongTest extends BaseSeleniumWebTest
     private static final String MSG1_BODY = "this is a test message to Banana";
     private static final String MSG2_TITLE = "test message 2";
     private static final String MSG3_TITLE = "test message 3";
-    private static final String MSGB_TITLE = "admin broadcast";
-    private static final String MSGB_BODY = "this is a broadcast message";
     private static final String RESP1_TITLE = "test response 1";
     private static final String RESP1_BODY = "this is another test, thanks";
     private static final String RESP2_BODY = "third test, thanks";
@@ -128,8 +125,6 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         waitForExtMaskToDisappear();
         assertTextPresent("All conversations");
-        ExtHelper.selectComboBoxItem(this, folderDefaultCombo, "Broadcast messages only");
-        clickNavButton("Update Folder Default", 0);
 
         waitForExtMaskToDisappear();
         clickLinkWithText(PROJECT_NAME);
@@ -140,7 +135,6 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("expires", EXPIRES1);
         setFormElement("body", "1 <b>x</b>");
         selectOptionByText("rendererType", "Wiki Page");
-        assertTextPresent("Admin Broadcast");
         submit();
         assertTextPresent(MSG1_TITLE);
         clickLinkWithText("view message or respond");
@@ -341,35 +335,6 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent("<b>x</b>");
         assertLinkNotPresentWithText(MSG3_TITLE);
         assertLinkNotPresentWithText(MSG2_TITLE);
-
-        log("Clear mail record");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
-
-        log("Set broadcast preferences.");
-        impersonate(USER1);
-        clickLinkWithText(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "Email", "Preferences");
-        checkRadioButton("emailPreference", "0");
-        pushLocation();
-        clickNavButton("Update");
-        stopImpersonating();
-        impersonate(USER2);
-        popLocation();
-        checkRadioButton("emailPreference", "3");
-        clickNavButton("Update");
-        stopImpersonating();
-        clickLinkWithText(PROJECT_NAME);
-        log("Check admin broadcast message");
-        clickWebpartMenuItem("Messages", "New");
-        setFormElement("title", MSGB_TITLE);
-        setFormElement("body", MSGB_BODY);
-        checkCheckbox("broadcast");
-        submit();
-
-        goToModule("Dumbster");
-        assertTextPresent(USER2, USER3);
-        assertTextNotPresent(USER1); // opted out of broadcasts
     }
 }
 
