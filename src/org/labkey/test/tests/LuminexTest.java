@@ -1675,7 +1675,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         clickLinkContainingText(run);
 
-        log("Exclude well from from run");
+        log("Exclude well from run");
         clickExclusionMenuIconForWell(well);
         clickButton("Save");
         waitForExtMaskToDisappear();
