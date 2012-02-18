@@ -35,6 +35,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.openqa.selenium.internal.seleniumemulation.IsElementPresent;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -2188,6 +2189,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void deleteProject(String project)
     {
         deleteProject(project, 90000); // Wait for 90 seconds for project deletion
+    }
+
+    public void deleteProject(String project, boolean failIfFail)
+    {
+        if(linkIsPresent(project))
+        {
+            deleteProject(project);
+        }
+    }
+
+    private boolean linkIsPresent(String link)
+    {
+        return isElementPresent(Locator.tagWithText("a", link));
     }
 
     public void deleteProject(String project, int wait)
