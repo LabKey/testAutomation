@@ -183,6 +183,15 @@ public class StudyRedesignTest extends StudyBaseTest
         goToStudySchedule();
         click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[2]//a")); // go to dataset
         waitForText(dataset);
+
+        // test paging
+        goToStudySchedule();
+        click(Locator.xpath("//input[@role='checkbox']"));
+        waitForText("Next");
+        assertTextNotPresent("Cycle 2");
+        clickButton("Next", 0);
+        waitForText("Cycle 2");
+        waitForText(dataset);
     }
 
     private void goToStudySchedule()
