@@ -2170,7 +2170,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ensureAdminMode();
         clickAdminMenuItem(projectName.equals(folderName) ? "Project" : "Folder", "Management");
         clickLinkContainingText("Manage Subfolders");
-        waitForExtFolderTreeNode(folderName, 10000);
+        waitForExt4FolderTreeNode(folderName, 10000);
         clickNavButton("Move");
         if (createAlias)
             checkCheckbox("addAlias");
@@ -2634,6 +2634,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         public boolean check();
     }
 
+    public void waitForExt4FolderTreeNode(String nodeText, int wait)
+    {
+        final Locator locator = new Locator("//td[contains(@class, 'x-tree-node-current')]/div[text()=" + Locator.xq(nodeText) + "]");
+        String failMessage = "Ext 4 Tree Node with locator " + locator + " did not appear.";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return isElementPresent(locator);
+            }
+        }, failMessage, wait);
+    }
+
+    /**
+     * This function only works for Ext 3.4 or less.
+     */
+    @Deprecated
     public void waitForExtFolderTreeNode(String nodeText, int wait)
     {
         final Locator locator = new Locator("//a[contains(@class, 'x-tree-node-anchor')]/span[text() = " + Locator.xq(nodeText) + "]");
