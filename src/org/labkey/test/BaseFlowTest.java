@@ -167,7 +167,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void after() throws Exception
     {
-        deleteAllRuns();
+        if (!skipCleanup())
+            deleteAllRuns();
     }
 
     //Issue 12597: Need to delete exp.data objects when deleting a flow run
@@ -225,10 +226,20 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             else
             {
                 // If we are elsewhere, get back to the current test folder
-                clickLinkWithText(getProjectName());
-                clickLinkWithText(getFolderName());
+                goToFolder();
             }
         }
+    }
+
+    protected void goToFolder()
+    {
+        goToFolder(getProjectName(), getFolderName());
+    }
+
+    protected void goToFolder(String... folderPath)
+    {
+        for (String folderName : folderPath)
+            clickLinkWithText(folderName);
     }
 
 
@@ -279,7 +290,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         if (options.getFcsPath() != null || options.isExistingKeywordRun())
             importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
 
-        importAnalysis_analysisOptions(options.getContainerPath(), options.getImportGroupNames(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationParameters());
+        importAnalysis_analysisOptions(options.getContainerPath(), options.getImportGroupNames(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationSubsets(), options.getREngineNormalizationParameters());
 
         importAnalysis_analysisFolder(options.getContainerPath(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
@@ -292,6 +303,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 options.getImportGroupNames(),
                 options.isREngineNormalization(),
                 options.getREngineNormalizationReference(),
+                options.getREngineNormalizationSubsets(),
                 options.getREngineNormalizationParameters(),
                 options.getAnalysisName(),
                 options.isExistingAnalysisFolder());
@@ -369,7 +381,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickNavButton("Next");
     }
 
-    protected void importAnalysis_analysisOptions(String containerPath, List<String> groupNames, boolean rEngineNormalization, String rEngineNormalizationReference, String rEngineNormalizationParameters)
+    protected void importAnalysis_analysisOptions(String containerPath, List<String> groupNames, boolean rEngineNormalization, String rEngineNormalizationReference, List<String> rEngineNormalizationSubsets, List<String> rEngineNormalizationParameters)
     {
         assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
         if (groupNames != null && groupNames.size() > 0)
@@ -391,8 +403,11 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                     assertEquals(rEngineNormalizationReference, getFormElement("rEngineNormalizationReference"));
                 }
 
+                if (rEngineNormalizationSubsets != null)
+                    setFormElement("rEngineNormalizationSubsets", StringUtils.join(rEngineNormalizationSubsets, ImportAnalysisOptions.PARAMETER_SEPARATOR));
+
                 if (rEngineNormalizationParameters != null)
-                    setFormElement("rEngineNormalizationParameters", rEngineNormalizationParameters);
+                    setFormElement("rEngineNormalizationParameters", StringUtils.join(rEngineNormalizationParameters, ImportAnalysisOptions.PARAMETER_SEPARATOR));
             }
             else
             {
@@ -427,7 +442,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                                           String analysisFolder, boolean existingAnalysisFolder)
     {
         importAnalysis_confirm(containerPath, workspacePath, fcsPath, existingKeywordRun, fcsPath,
-                Arrays.asList("All Samples"), false, null, null,
+                Arrays.asList("All Samples"), false, null, null, null,
                 analysisFolder, existingAnalysisFolder);
     }
 
@@ -437,7 +452,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                                           List<String> importGroupNames,
                                           boolean rEngineNormalization,
                                           String rEngineNormalizationReference,
-                                          String rEngineNormalizationParameters,
+                                          List<String> rEngineNormalizationSubsets,
+                                          List<String> rEngineNormalizationParameters,
                                           String analysisFolder,
                                           boolean existingAnalysisFolder)
     {
@@ -456,7 +472,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         if (rEngineNormalization)
         {
             assertTextPresent("Reference Sample: " + rEngineNormalizationReference);
-            assertTextPresent("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : rEngineNormalizationParameters));
+            assertTextPresent("Normalize Subsets: " + (rEngineNormalizationSubsets == null ? "All subsets" : StringUtils.join(rEngineNormalizationSubsets, ", ")));
+            assertTextPresent("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : StringUtils.join(rEngineNormalizationParameters, ", ")));
         }
 
         if (existingAnalysisFolder)
@@ -503,6 +520,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected static class ImportAnalysisOptions
     {
+        public static final String PARAMETER_SEPARATOR = "\ufe50";
+
         private final String _containerPath;
         private final String _workspacePath;
         private final String _fcsPath;
@@ -511,11 +530,13 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         private final List<String> _importGroupNames;
         private final boolean _rEngineNormalization;
         private final String _rEngineNormalizationReference;
-        private final String _rEngineNormalizationParameters;
+        private final List<String> _rEngineNormalizationSubsets;
+        private final List<String> _rEngineNormalizationParameters;
         private final String _analysisName;
         private final boolean _existingAnalysisFolder;
         private final boolean _viaPipeline;
         private final List<String> _expectedErrors;
+
 
         public ImportAnalysisOptions(
                 String containerPath,
@@ -534,6 +555,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             _importGroupNames = Arrays.asList("All Samples");
             _rEngineNormalization = false;
             _rEngineNormalizationReference = null;
+            _rEngineNormalizationSubsets = null;
             _rEngineNormalizationParameters = null;
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
@@ -550,7 +572,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 List<String> importGroupNames,
                 boolean rEngineNormalization,
                 String rEngineNormalizationReference,
-                String rEngineNormalizationParameters,
+                List<String> rEngineNormalizationSubsets,
+                List<String> rEngineNormalizationParameters,
                 String analysisName,
                 boolean existingAnalysisFolder,
                 boolean viaPipeline,
@@ -564,6 +587,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             _importGroupNames = importGroupNames;
             _rEngineNormalization = rEngineNormalization;
             _rEngineNormalizationReference = rEngineNormalizationReference;
+            _rEngineNormalizationSubsets = rEngineNormalizationSubsets;
             _rEngineNormalizationParameters = rEngineNormalizationParameters;
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
@@ -611,7 +635,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             return _rEngineNormalizationReference;
         }
 
-        public String getREngineNormalizationParameters()
+        public List<String> getREngineNormalizationSubsets()
+        {
+            return _rEngineNormalizationSubsets;
+        }
+
+        public List<String> getREngineNormalizationParameters()
         {
             return _rEngineNormalizationParameters;
         }
