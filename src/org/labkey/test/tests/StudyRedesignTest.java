@@ -196,6 +196,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
     private void goToStudySchedule()
     {
+        clickLinkWithText(getFolderName());
         clickAdminMenuItem("Manage Study");
         clickLinkWithText("Study Schedule");
 
