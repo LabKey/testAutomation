@@ -1717,11 +1717,12 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         clickLinkContainingText(getProjectName());
         assertTextNotPresent("GS Analyte");
-        addWebPart("Wiki");
+         addWebPart("Wiki");
         createNewWikiPage("HTML");
         setWikiBody(getFileContents("server/test/data/api/LuminexGuideSet.html"));
         saveWikiPage();
 
+        waitForElement(Locator.id("button_loadqwps"), defaultWaitForPage);
         click(Locator.id("button_loadqwps"));
         waitForText("Done loading QWPs");
         assertTextNotPresent("Error:");
