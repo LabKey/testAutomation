@@ -95,6 +95,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setupEngine();
 
         waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("Minimum PeptideProphet prob", "Minimum ProteinProphet prob", "Quantitation engine");
+
+        searchMS2LibraCheck();
+
         log("Set analysis parameters.");
         setFormElement("protocolName", "test2");
         setFormElement("protocolDescription", "This is a test protocol for Verify.");
@@ -102,6 +106,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("configureXml", "");
         waitAndClick(Locator.xpath("//a[@class='labkey-button']/span[text() = 'OK']"));
         setFormElement("configureXml", INPUT_XML);
+        assertTextPresent("Quantitation mass tolerance", "Quantitation residue mass label");
+        setFormElement("minPeptideProphetProb", "0");
         submit();
         log("View the analysis log.");
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
@@ -197,5 +203,14 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("Next AA");
 
         basicChecks();
+    }
+
+    protected  void searchMS2LibraCheck()
+    {
+        selenium.select("//tr[td/table/tbody/tr/td/div[contains(text(),'Quantitation engine')]]/td/select","Libra");
+        assertTextPresent("Libra config name", "Libra normalization channel");
+        setFormElement("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input", "foo");
+        String text = getFormElement("configureXml");
+        assertTrue(text.contains("foo"));
     }
 }

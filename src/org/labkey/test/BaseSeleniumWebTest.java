@@ -3191,6 +3191,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.mouseDown(l.toString());
     }
 
+    public void mouseUp(Locator l)
+    {
+        selenium.mouseUp(l.toString());
+    }
+
     public void mouseDownAt(Locator l, int x, int y)
     {
         selenium.mouseDownAt(l.toString(), x + "," + y);
@@ -5545,6 +5550,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             log("MouseUp: " + locator);
             super.mouseUp(locator);
+        }
+
+        public void mouseUp(Locator l)
+        {
+            mouseUp(l.toString());
         }
 
         @Override
