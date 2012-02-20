@@ -2193,15 +2193,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void deleteProject(String project, boolean failIfFail)
     {
-        if(linkIsPresent(project))
+        if(isLinkPresentWithText(project))
         {
             deleteProject(project);
         }
-    }
-
-    private boolean linkIsPresent(String link)
-    {
-        return isElementPresent(Locator.tagWithText("a", link));
     }
 
     public void deleteProject(String project, int wait)
