@@ -427,7 +427,10 @@
         <fail unless="tomcat.home" />
         <echo message="Deleting log files from ${tomcat.home}/logs"/>
         <delete failonerror="false" dir="${tomcat.home}/logs" />
+        <echo message="Deleting tomcat temp dir ${tomcat.home}/temp"/>
+        <delete failonerror="false" dir="${tomcat.home}/temp" />
         <mkdir dir="${tomcat.home}/logs" />
+        <mkdir dir="${tomcat.home}/temp" />
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
         <antcall target="waitfor-labkey-started"/>
 
