@@ -120,7 +120,8 @@ public class GroupTest extends BaseSeleniumWebTest
         ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "All Site Users");
 
         clickButton("Save", 0);
-        sleep(500);
+        waitForText("save successful");
+        waitForExtMaskToDisappear();
 
         permissionsReportTest();
 
