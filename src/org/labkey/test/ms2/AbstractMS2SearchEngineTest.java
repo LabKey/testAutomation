@@ -116,7 +116,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         waitForPipelineJobsToComplete(1, SAMPLE_BASE_NAME + " (test2)", false);
 
-        clickAndWait(Locator.raw("//td[contains(text(), 'test2')]/../td/a"));
+        clickAndWait(Locator.raw("//a[contains(text(), '" + SAMPLE_BASE_NAME + " (test2)')]/../../td/a"));
 
         log("View log file.");
 
