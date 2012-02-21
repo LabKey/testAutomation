@@ -103,6 +103,13 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_ELISPOT_DESC);
 
+
+        // set the specimenId field default value to be : last entered
+        Locator specimenField = Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//div[@id='name1']");
+        click(specimenField);
+        click(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//span[text()='Advanced']"));
+        selectOptionByValue(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//select[@class='gwt-ListBox']"), "LAST_ENTERED");
+
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
 
@@ -115,25 +122,31 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickNavButton("Next");
 
         selectOptionByText("plateReader", "Cellular Technology Ltd. (CTL)");
-        uploadFile(TEST_ASSAY_ELISPOT_FILE1, "A", "Save and Import Another Run");
+        uploadFile(TEST_ASSAY_ELISPOT_FILE1, "A", "Save and Import Another Run", true);
         assertTextPresent("Upload successful.");
 
         selectOptionByText("plateReader", "AID");
-        uploadFile(TEST_ASSAY_ELISPOT_FILE2, "B", "Save and Import Another Run");
+        uploadFile(TEST_ASSAY_ELISPOT_FILE2, "B", "Save and Import Another Run", false);
         assertTextPresent("Upload successful.");
 
         selectOptionByText("plateReader", "Zeiss");
-        uploadFile(TEST_ASSAY_ELISPOT_FILE3, "C", "Save and Finish");
+        uploadFile(TEST_ASSAY_ELISPOT_FILE3, "C", "Save and Finish", false);
 
         assertElispotData();
         runTransformTest();
     }
 
-    private void uploadFile(String filePath, String uniqueifier, String finalButton)
+    private void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation)
     {
         for (int i = 0; i < 4; i++)
         {
-            setFormElement("specimen" + (i + 1) + "_ParticipantID", "ptid " + (i + 1) + " " + uniqueifier);
+            Locator specimenLocator = Locator.raw("specimen" + (i + 1) + "_ParticipantID");
+
+            // test for prepopulation of specimen form element values
+            if (testPrepopulation)
+                assertFormElementEquals(specimenLocator, "Specimen " + (i+1));
+            setFormElement(specimenLocator, "ptid " + (i + 1) + " " + uniqueifier);
+
             setFormElement("specimen" + (i + 1) + "_VisitID", "" + (i + 1));
             setFormElement("specimen" + (i + 1) + "_SampleDescription", "blood");
         }
@@ -146,7 +159,14 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         for (int i = 0; i < 6; i++)
         {
             setFormElement("antigen" + (i + 1) + "_AntigenID", "" + (i + 1));
-            setFormElement("antigen" + (i + 1) + "_AntigenName", "atg_" + (i + 1) + uniqueifier);
+
+            Locator antigenLocator = Locator.raw("antigen" + (i + 1) + "_AntigenName");
+
+            // test for prepopulation of antigen element values
+            if (testPrepopulation)
+                assertFormElementEquals(antigenLocator, "Antigen " + (i+1));
+
+            setFormElement(antigenLocator, "atg_" + (i + 1) + uniqueifier);
             setFormElement("antigen" + (i + 1) + "_CellWell", "150");
         }
 
@@ -215,25 +235,26 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkContainingText("details");
 
         assertTextPresent("Plate Summary Information");
-        assertTextPresent("Sample Well Groups:");
-        assertTextPresent("Antigen Well Groups:");
         assertTextPresent("Antigen 7 Mean");
         assertTextPresent("Antigen 7 Median");
         assertTextPresent("Antigen 8 Mean");
         assertTextPresent("Antigen 8 Median");
         assertTextPresent("blood");
 
+        waitForElement(Locator.xpath("//label[contains(@class, 'x4-form-item-label') and text() = 'Sample Well Groups']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//label[contains(@class, 'x4-form-item-label') and text() = 'Antigen Well Groups']"), WAIT_FOR_JAVASCRIPT);
+
         // test color hilighting of sample and antigen well groups
-        checkRadioButton("sampleGroup", 1);
-        assertElementPresent(getLocatorForHilightedWell("lk_sample_Specimen_2", "1023.0"));
-        assertElementPresent(getLocatorForHilightedWell("lk_sample_Specimen_2", "1021.0"));
-        assertElementPresent(getLocatorForHilightedWell("lk_sample_Specimen_2", "1028.0"));
+        click(Locator.xpath("//label[contains(@class, 'x4-form-cb-label') and text() = 'Specimen 2']"));
+        assertElementPresent(getLocatorForHilightedWell("labkey-sampleGroup-Specimen-2", "1023.0"));
+        assertElementPresent(getLocatorForHilightedWell("labkey-sampleGroup-Specimen-2", "1021.0"));
+        assertElementPresent(getLocatorForHilightedWell("labkey-sampleGroup-Specimen-2", "1028.0"));
 
         // antigen well group
-        checkRadioButton("sampleGroup", 5);
-        assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "765.0"));
-        assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "591.0"));
-        assertElementPresent(getLocatorForHilightedWell("lk_antigen_Antigen_2", "257.0"));
+        click(Locator.xpath("//label[contains(@class, 'x4-form-cb-label') and contains(text(), 'Antigen 2')]"));
+        assertElementPresent(getLocatorForHilightedWell("labkey-antigenGroup-Antigen-2", "765.0"));
+        assertElementPresent(getLocatorForHilightedWell("labkey-antigenGroup-Antigen-2", "591.0"));
+        assertElementPresent(getLocatorForHilightedWell("labkey-antigenGroup-Antigen-2", "257.0"));
 
         // test the mean and median values
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_ELISPOT + " AntigenStats", this);
@@ -318,7 +339,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         setFormElement("name", "transformed assayId");
         selectOptionByText("plateReader", "AID");
-        uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish");
+        uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish", false);
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
         clickLinkWithText("AID_0161456 W5.txt");
