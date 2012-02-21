@@ -223,9 +223,10 @@ public class EHRStudyTest extends SimpleApiTest
         log("Remove all webparts");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickWebpartMenuItem("Pages", false, "Layout", "Remove From Page");
-        removeWebPart("Wiki");
-        removeWebPart("Messages");
+        // Deleting webparts too quickly triggers optimistic concurrency exception.
+//        clickWebpartMenuItem("Pages", false, "Layout", "Remove From Page");
+//        removeWebPart("Wiki");
+//        removeWebPart("Messages");
         addWebPart("EHR Datasets");
 
         // TODO: Menu Bar causing permission dialog to appear when impersonating/stopping impersonation
