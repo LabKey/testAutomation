@@ -2299,7 +2299,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void removeWebPart(String webPartTitle)
     {
-        click(Locator.xpath("//tr[./th/span[@title='"+webPartTitle+"']]//a[./img[@title='Remove From Page']]"));
+        Locator.XPathLocator removeButton = Locator.xpath("//tr[./th/span[@title='"+webPartTitle+"']]//a[./img[@title='Remove From Page']]");
+        int startCount = getXpathCount(removeButton);
+        click(removeButton);
+        waitForExtMaskToDisappear();
+        assertElementPresent(removeButton, startCount - 1);
     }
 
     public boolean isTitleEqual(String match)
