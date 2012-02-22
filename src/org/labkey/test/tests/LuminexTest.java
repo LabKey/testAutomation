@@ -77,7 +77,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
-    private static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/tomaras_luminex_transform.R";
+    protected static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/tomaras_luminex_transform.R";
     private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "-34.0", "-33.0", "-29.8", "-19.8", "-639.8", "-640.2", "26430.8", "26556.2", "-216.2", "-204.2", "-158.5",
             "-208.0", "-4.0", "-4.0", "194.2", "198.8", "-261.2", "-265.2", "-211.5", "-213.0"};
@@ -239,10 +239,15 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormat("Data Fields", 16, "0.0");
 
         sleep(1000);
-        clickNavButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        saveAssay();
 
         configStatus = Configured.CONFIGURED;
+    }
+
+    protected void saveAssay()
+    {
+        clickNavButton("Save", 0);
+        waitForText("Save successful.", 20000);
     }
 
 
@@ -282,7 +287,6 @@ public class LuminexTest extends AbstractQCAssayTest
         log("Uploading Luminex Runs");
         clickNavButton("Import Data");
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
-        clickNavButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
         clickNavButton("Next", 60000);
@@ -1097,7 +1101,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     //helper function to go to test assay home from anywhere the project link is visible
-    private void goToTestAssayHome()
+    protected void goToTestAssayHome()
     {
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
@@ -1256,17 +1260,7 @@ public class LuminexTest extends AbstractQCAssayTest
         boolean displayingRowId = false;
         for (int i = 0; i < 2; i++)
         {
-            goToTestAssayHome();
-            clickNavButton("Import Data");
-            setFormElement("network", "NETWORK" + (i + 1));
-            clickNavButton("Next");
-
-            testDate.add(Calendar.DATE, 1);
-            importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
-                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
-            uncheckCheckbox("_titrationRole_standard_HIVIG");
-            checkCheckbox("_titrationRole_qccontrol_HIVIG");
-            clickNavButton("Save and Finish");
+            importRunForTestLuminexConfig(files[i], testDate, i);
 
             displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
         }
@@ -1331,6 +1325,21 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyQCFlagUpdatesAfterWellChange();
         verifyLeveyJenningsPermissions();
         verifyHighlightUpdatesAfterQCFlagChange();
+    }
+
+    protected void importRunForTestLuminexConfig(File file, Calendar testDate, int i)
+    {
+        goToTestAssayHome();
+        clickNavButton("Import Data");
+        setFormElement("network", "NETWORK" + (i + 1));
+        clickNavButton("Next");
+
+        testDate.add(Calendar.DATE, 1);
+        importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
+                    "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
+        uncheckCheckbox("_titrationRole_standard_HIVIG");
+        checkCheckbox("_titrationRole_qccontrol_HIVIG");
+        clickNavButton("Save and Finish");
     }
 
     private void verifyHighlightUpdatesAfterQCFlagChange()
