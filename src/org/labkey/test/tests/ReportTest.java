@@ -533,7 +533,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Files");
         if (isTextPresent(item))
         {
-            checkCheckbox(Locator.raw("//td[contains(text(), '" + item + "')]/../td/input"));
+            checkCheckbox(Locator.raw("//td/a[contains(text(), '" + item + "')]/../../td/input"));
             clickNavButton("Delete");
             assertTextNotPresent(item);
         }
