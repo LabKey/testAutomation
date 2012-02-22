@@ -72,7 +72,6 @@ public class StudyManualTest extends StudyTest
 
         // import visit map
         clickTab("Manage");
-        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Import Visit Map");
         String visitMapData = getFileContents(VISIT_MAP);
@@ -166,7 +165,6 @@ public class StudyManualTest extends StudyTest
         if (!isLinkPresentContainingText("Visit Import Mapping"))
         {
             clickTab("Manage");
-            clickLinkWithText("Study Schedule");
             clickLinkWithText("Manage Visits");
         }
 
@@ -203,7 +201,6 @@ public class StudyManualTest extends StudyTest
     protected void hideVisits(String... visitLabel)
     {
         clickTab("Manage");
-        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
 
         Set<String> labels = new HashSet<String>(Arrays.asList(visitLabel));

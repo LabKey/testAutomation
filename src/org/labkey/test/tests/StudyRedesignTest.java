@@ -164,7 +164,8 @@ public class StudyRedesignTest extends StudyBaseTest
         assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='checked']"));
 
         // change a required visit to optional
-        clickLinkWithText("Manage Visits");
+        clickWebpartMenuItem("Study Schedule", "Manage Visits");
+//        clickLinkWithText("Manage Visits");
         clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
         selectOption("dataSetStatus", 2, "OPTIONAL");
         clickNavButton("Save");
@@ -174,7 +175,8 @@ public class StudyRedesignTest extends StudyBaseTest
         assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='unchecked']"));
 
         // revert change
-        clickLinkWithText("Manage Visits");
+//        clickLinkWithText("Manage Visits");
+        clickWebpartMenuItem("Study Schedule", "Manage Visits");
         clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
         selectOption("dataSetStatus", 2, "REQUIRED");
         clickNavButton("Save");
@@ -186,10 +188,10 @@ public class StudyRedesignTest extends StudyBaseTest
 
         // test paging
         goToStudySchedule();
-        click(Locator.xpath("//input[@role='checkbox']"));
-        waitForText("Next");
+//        click(Locator.xpath("//input[@role='checkbox']"));
+        waitForText(">");
         assertTextNotPresent("Cycle 2");
-        clickButton("Next", 0);
+        clickButton(">", 0);
         waitForText("Cycle 2");
         waitForText(dataset);
     }

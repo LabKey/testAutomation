@@ -186,7 +186,6 @@ public class StudyExportTest extends StudyManualTest
         // verify visit display order
         clickLinkWithText(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Study Schedule");
         clickLinkWithText("Manage Visits");
         assertTextBefore("Cycle 3", MODIFIED_VISIT);
 
