@@ -273,6 +273,11 @@ public class Locator
         return xpath("//a[contains(@href, " + xq(url) + ")]");
     }
 
+    public static XPathLocator linkWithSpan(String text)
+    {
+        return xpath("//a//span[contains(text(), " + xq(text) + ")]");
+    }
+
     public static XPathLocator bodyLinkWithText(String text)
     {
         return xpath("//td[@id='bodypanel']//a[contains(text(), " + xq(text) + ")]");

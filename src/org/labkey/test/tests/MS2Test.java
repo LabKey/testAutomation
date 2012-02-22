@@ -95,7 +95,7 @@ public class MS2Test extends MS2TestBase
             refresh();
         }
         clickLinkWithText("MS2 Dashboard");
-        assertLinkPresentContainingText("MS2 Runs");
+        assertElementPresent(Locator.linkWithSpan("MS2 Runs"));
         assertLinkPresentContainingText(SAMPLE_BASE_NAME);
 
         log("Verify run view.");
