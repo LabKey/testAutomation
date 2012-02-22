@@ -131,9 +131,9 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         aggregates.add(new HashMap<String, String>(){{put("type", "SUM");put("label", "Total Age");}});
         setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
         assertTextPresent("Oldness Factor" + INJECT_CHARS_2);
-//TODO: enable this once aggregate labels work properly
-//        assertTextNotPresent("Total:");
-//        assertTextPresent("Total Age:");
+
+        assertTextNotPresent("Total:");
+        assertTextPresent("Total Age:");
 
         log("** Clear column title and SUM aggregate");
         setColumnProperties("Age", null, null);

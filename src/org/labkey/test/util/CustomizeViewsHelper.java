@@ -504,8 +504,7 @@ public class CustomizeViewsHelper
                     Locator labelCell = ExtHelper.locateExt3GridCell(row, 2);
                     test.dblclickAtAndWait(labelCell);
 
-                    //TODO: this is not setting the field correctly
-                    Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text')]");
+                    Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");
                     test.setFormElement(fieldPath, aggregate.get("label"));
                 }
 
