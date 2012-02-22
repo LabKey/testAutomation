@@ -21,6 +21,11 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * User: kevink
  * Date: Oct 14, 2010
@@ -110,10 +115,25 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
 
         log("** Set column title and SUM aggregate");
         assertTextNotPresent("Oldness Factor");
-        setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, "SUM");
+
+        List<Map<String, String>> aggregates = new ArrayList<Map<String, String>>();
+        aggregates.add(new HashMap<String, String>(){{put("type", "SUM");}});
+        aggregates.add(new HashMap<String, String>(){{put("type", "COUNT");}});
+        setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
         assertTextPresent("Oldness Factor" + INJECT_CHARS_2);
         assertTextPresent("Total:");
+        assertTextPresent("Count:");
+        assertTextNotPresent("Total Age:");
         assertTextPresent("279");
+
+        log("** Set custom aggregate label");
+        aggregates.remove(0);
+        aggregates.add(new HashMap<String, String>(){{put("type", "SUM");put("label", "Total Age");}});
+        setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
+        assertTextPresent("Oldness Factor" + INJECT_CHARS_2);
+//TODO: enable this once aggregate labels work properly
+//        assertTextNotPresent("Total:");
+//        assertTextPresent("Total Age:");
 
         log("** Clear column title and SUM aggregate");
         setColumnProperties("Age", null, null);
@@ -230,10 +250,10 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         CustomizeViewsHelper.applyCustomView(this);
     }
 
-    void setColumnProperties(String fieldKey, String columnTitle, String aggregate)
+    void setColumnProperties(String fieldKey, String columnTitle, List<Map<String, String>> aggregates)
     {
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.setColumnProperties(this, fieldKey, columnTitle, aggregate);
+        CustomizeViewsHelper.setColumnProperties(this, fieldKey, columnTitle, aggregates);
         CustomizeViewsHelper.applyCustomView(this);
     }
 

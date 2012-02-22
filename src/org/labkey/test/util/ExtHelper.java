@@ -215,6 +215,21 @@ public class ExtHelper
         return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + fileName + "']");
     }
 
+    public static Locator locateExt3GridRow(int rowIndex, String parent)
+    {
+        String base = "//div[contains(@class, 'x-grid-panel')]";
+
+        if(parent != null)
+            base = parent + base;
+
+        return Locator.xpath("(" + base + "//table[contains(@class, 'x-grid3-row-table')])[" + rowIndex + "]");
+    }
+
+    public static Locator locateExt3GridCell(Locator row, int cellIndex)
+    {
+        return Locator.xpath("(" + ((Locator.XPathLocator)row).getPath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
+    }
+
     public static void clickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
     {
         test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);

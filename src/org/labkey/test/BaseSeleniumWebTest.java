@@ -3156,6 +3156,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     }
 
+
+    public void dblclickAtAndWait(Locator l)
+    {
+        dblclickAtAndWait(l, 0);
+    }
+
+    public void dblclickAtAndWait(Locator l, int millis)
+    {
+        selenium.doubleClick(l.toString());
+        if (millis > 0)
+            waitForPageToLoad(millis);
+
+    }
+
     public void clickLink(String linkId)
     {
         clickLink(Locator.id(linkId));

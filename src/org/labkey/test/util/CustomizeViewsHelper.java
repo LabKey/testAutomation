@@ -20,6 +20,10 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * User: Trey Chadick
  * Date: Oct 6, 2010
@@ -436,7 +440,14 @@ public class CustomizeViewsHelper
 
     public static void removeColumnProperties(BaseSeleniumWebTest test, String fieldKey)
     {
-        setColumnProperties(test, fieldKey, null, null);
+        setColumnProperties(test, fieldKey, null, new ArrayList<Map<String,String>>());
+    }
+
+    public static void setColumnProperties(BaseSeleniumWebTest test, String fieldKey, String caption, Map<String, String> aggregate)
+    {
+        List<Map<String, String>> aggregates = new ArrayList<Map<String,String>>();
+        aggregates.add(aggregate);
+        setColumnProperties(test, fieldKey, caption, aggregates);
     }
 
     /**
@@ -444,15 +455,15 @@ public class CustomizeViewsHelper
      * @param test The test.
      * @param fieldKey The field key of the column to change.  Note that the column should already be in the selected column list.
      * @param caption The caption value or null to unset the column caption.
-     * @param aggregate The aggregate to apply to the column or null to unset.
+     * @param aggregates An array of the aggregates to apply to the column or null to unset.
      */
-    public static void setColumnProperties(BaseSeleniumWebTest test, String fieldKey, String caption, String aggregate)
+    public static void setColumnProperties(BaseSeleniumWebTest test, String fieldKey, String caption, List<Map<String, String>> aggregates)
     {
         String msg = "Setting column " + fieldKey;
         if (caption != null)
             msg = msg + " caption to '" + caption + "'";
-        if (aggregate != null)
-            msg = msg + " aggregate to '" + aggregate + "'";
+        if (aggregates != null && aggregates.size() > 0)
+            msg = msg + " aggregates to '" + StringUtils.join(aggregates, ", ") + "'";
         test.log(msg);
 
         changeTab(test, ViewItemType.Columns);
@@ -460,14 +471,47 @@ public class CustomizeViewsHelper
         String itemXPath = itemXPath(ViewItemType.Columns, fieldKey);
         test.click(Locator.xpath(itemXPath + "//div[contains(@class, 'labkey-tool-gear')]"));
         ExtHelper.waitForExtDialog(test, "Edit column properties for", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        String parent = "//div[contains(@class, 'x-window')]";
 
         if (caption == null)
             caption = "";
-        test.setFormElement(Locator.xpath("//div[contains(@class, 'x-window')]//input[@name='title']"), caption);
+        test.setFormElement(Locator.xpath(parent + "//input[contains(@class, 'x-form-text')]"), caption);
 
-        if (aggregate == null || "".equals(aggregate))
-            aggregate = "[None]";
-        ExtHelper.selectComboBoxItem(test, Locator.xpath("//div[contains(@class, 'x-window')]//input[@name='aggregate']/.."), aggregate);
+        //reset all aggregates
+        String deleteButtonXPath = "//div[contains(@class, 'x-window')]" + "//*[contains(@class, 'labkey-tool-close')]";
+        while (test.isElementPresent(Locator.xpath(deleteButtonXPath)))
+            test.click(Locator.xpath(deleteButtonXPath));
+
+        //then re-add them
+        int idx = 1;
+        Locator grid = Locator.xpath(parent + "//div[contains(@class, 'x-grid-panel')]");
+
+        if(aggregates != null)
+        {
+            for(Map<String, String> aggregate : aggregates)
+            {
+                if (aggregate == null || aggregate.get("type") == null)
+                    continue;
+
+                test.clickButton("Add Aggregate", 0);
+                Locator row = ExtHelper.locateExt3GridRow(idx, parent);
+
+                Locator comboCell = ExtHelper.locateExt3GridCell(row, 1);
+                test.dblclickAtAndWait(comboCell);
+                ExtHelper.selectComboBoxItem(test, (Locator.XPathLocator)grid, aggregate.get("type"));
+
+                if(aggregate.get("label") != null){
+                    Locator labelCell = ExtHelper.locateExt3GridCell(row, 2);
+                    test.dblclickAtAndWait(labelCell);
+
+                    //TODO: this is not setting the field correctly
+                    Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text')]");
+                    test.setFormElement(fieldPath, aggregate.get("label"));
+                }
+
+                idx++;
+            }
+        }
         test.clickButton("OK", 0);
     }
 
