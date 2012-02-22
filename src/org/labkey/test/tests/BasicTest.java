@@ -140,7 +140,7 @@ public class BasicTest extends BaseSeleniumWebTest
         refresh();
         assertTextBefore("No data to show", "No messages");
 
-        final Locator searchLocator = Locator.raw("//th[span[contains(text(), 'Search')]]/..//a/img[@title='Remove From Page']");
+        final Locator searchLocator = Locator.raw("//tr[th[@title='Search']]//a/img[@title='Remove From Page']");
         clickAndWait(searchLocator, 0);
         waitForExtMaskToDisappear();
         assertElementNotPresent(searchLocator);
