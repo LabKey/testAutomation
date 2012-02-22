@@ -42,7 +42,7 @@ public enum TestSet
         ExpTest.class,
         AssayTest.class,
         StudyExportTest.class,
-        //FolderExportTest.class,
+//        FolderExportTest.class,
         PipelineTest.class,
         FileContentTest.class,
         ClientAPITest.class,
@@ -53,7 +53,7 @@ public enum TestSet
         ButtonCustomizationTest.class,
         ReagentTest.class,
         FilterTest.class,
-//            GenotypingTest.class,            //TODO:  comment this out, genotyping shouldn't be run on TC
+//            GenotypingTest.class,
             GroupTest.class
     }),
 
@@ -109,6 +109,8 @@ public enum TestSet
         LuminexRTransformTest.class,
         LuminexEC50Test.class,
         LuminexGuideSetTest.class,
+        LuminexAsyncImportTest.class,
+        //LuminexPositivityTest.class,
         SimpleModuleTest.class,
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
@@ -143,7 +145,9 @@ public enum TestSet
         LuminexJavaTransformTest.class,
         LuminexRTransformTest.class,
         LuminexEC50Test.class,
-        LuminexGuideSetTest.class
+        LuminexGuideSetTest.class,
+        LuminexAsyncImportTest.class,
+        //LuminexPositivityTest.class,
     }),
 
     IE(new Class[]
@@ -231,6 +235,8 @@ public enum TestSet
         LuminexRTransformTest.class,
         LuminexEC50Test.class,
         LuminexGuideSetTest.class,
+        LuminexAsyncImportTest.class,
+        //LuminexPositivityTest.class,
         ViabilityTest.class,
         ModuleAssayTest.class,
         IDRIParticleSizeTest.class,
