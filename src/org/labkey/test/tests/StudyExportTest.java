@@ -127,7 +127,8 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickNavButton("Export Study");
 
-        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Queries", "Custom Views", "Reports", "Lists");
+        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
+        // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
 
         checkRadioButton("format", useXmlFormat ? "new" : "old");
         checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
