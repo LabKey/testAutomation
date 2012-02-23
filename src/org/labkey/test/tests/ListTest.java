@@ -472,7 +472,7 @@ public class ListTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent("Import Data");
         assertTextPresent("View Design");
-        click(Locator.linkWithSpan("This is my single list web part title"));
+        clickAndWait(Locator.linkWithSpan("This is my single list web part title"), WAIT_FOR_PAGE);
         assertTextPresent("Colors");
         assertTextPresent("Views");
 
