@@ -287,6 +287,7 @@ public class LuminexTest extends AbstractQCAssayTest
         log("Uploading Luminex Runs");
         clickNavButton("Import Data");
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
+        clickNavButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
         clickNavButton("Next", 60000);
