@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.StudyHelper;
 
 /**
  * User: elvan
@@ -37,6 +38,18 @@ public class StudyRedesignTest extends StudyBaseTest
     private static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
     private static final String NEW_CATEGORY = "A New Category";
     private static final String NEW_DESCRIPTION = "Description set in data views webpart";
+    private static final String PROJECT_NAME = "StudyVerifyProject";
+    private static final String PARTICIPANT_GROUP_ONE = "GROUP 1";
+    private static final String PARTICIPANT_GROUP_TWO = "GROUP 2";
+    private static final String[] PTIDS_ONE = {"999320016", "999320518", "999320529", "999320533", "999320541", "999320557",
+                                               "999320565", "999320576", "999320582", "999320590"};
+    private static final String[] PTIDS_TWO = {"999320004", "999320007", "999320010", "999320016", "999320018", "999320021",
+                                               "999320029", "999320033", "999320036","999320038", "999321033", "999321029",
+                                               "999320981"};
+    private static final String[] PTIDS = {"999320518", "999320529", "999320533", "999320541", "999320557",
+                                           "999320565", "999320576", "999320582", "999320590", "999320004", "999320007",
+                                           "999320010", "999320016", "999320018", "999320021", "999320029", "999320033",
+                                           "999320036","999320038", "999321033", "999321029", "999320981"};
 
     @Override
     protected void doCreateSteps()
@@ -60,6 +73,9 @@ public class StudyRedesignTest extends StudyBaseTest
         setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
         clickNavButton("Save");
 
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
+
 //        log("Create query for data view webpart.");
 //        goToSchemaBrowser();
 //        createNewQuery("study");
@@ -73,6 +89,7 @@ public class StudyRedesignTest extends StudyBaseTest
     {
         dataViewsWebpartTest();
         scheduleWebpartTest();
+        participantListWebpartTest();
     }
 
     private void dataViewsWebpartTest()
@@ -165,7 +182,6 @@ public class StudyRedesignTest extends StudyBaseTest
 
         // change a required visit to optional
         clickWebpartMenuItem("Study Schedule", "Manage Visits");
-//        clickLinkWithText("Manage Visits");
         clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
         selectOption("dataSetStatus", 2, "OPTIONAL");
         clickNavButton("Save");
@@ -175,7 +191,6 @@ public class StudyRedesignTest extends StudyBaseTest
         assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='unchecked']"));
 
         // revert change
-//        clickLinkWithText("Manage Visits");
         clickWebpartMenuItem("Study Schedule", "Manage Visits");
         clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
         selectOption("dataSetStatus", 2, "REQUIRED");
@@ -297,5 +312,60 @@ public class StudyRedesignTest extends StudyBaseTest
     {
       //ideally we'd grab the test names from the normal dataset part, but that would take a lot of time to write
         assertTextPresentInThisOrder(someDataSets);
+    }
+
+    private void participantListWebpartTest()
+    {
+        log("Participant List Webpart Test");
+        clickLinkWithText("Overview");
+        addWebPart("Mouse List");
+        waitForText("Filter"); // Wait for participant list to appear.
+
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("No matching Mice");
+
+        //Mouse down on GROUP 1
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Found 10 mice of 138.");
+
+        //Check if all PTIDs of GROUP 1 are visible.
+        for(String ptid : PTIDS_ONE)
+        {
+            assertTextPresent(ptid);
+        }
+
+        //Mouse down GROUP 2
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'GROUP 2')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Found 22 mice of 138.");
+        //Check that all PTIDs from GROUP 1 and GROUP 2 are present at the same time.
+        for(String ptid : PTIDS)
+        {
+            assertTextPresent(ptid);
+        }
+
+        //Mouse down on GROUP 1 to remove it.
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Found 13 mice of 138.");
+        
+        //Check if all PTIDs of GROUP 2 are visible
+        for(String ptid : PTIDS_TWO)
+        {
+            assertTextPresent(ptid);
+        }
+
+        //Filter a mouse in GROUP 2
+        setFormElement("//div[contains(text(), 'Filter')]//input", "999320038");
+        fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
+        waitForText("Found 1 mouse of 138.");
+
+        //Filter a mouse not in GROUP 2
+        setFormElement("//div[contains(text(), 'Filter')]//input", "999320518");
+        fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
+        waitForText("No mouse IDs contain \"999320518\".");
+
+        //Remove filter
+        setFormElement("//div[contains(text(), 'Filter')]//input", "");
+        fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
+        waitForText("Found 13 mice of 138.");
     }
 }
