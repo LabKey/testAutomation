@@ -37,9 +37,7 @@ public abstract class AbstractXTandemTest extends AbstractMS2SearchEngineTest
     {
         try {
             deleteViews(VIEW); } catch (Throwable t) {}
-        try {deleteRuns(); } catch (Throwable t) {}
         cleanPipe(SEARCH_TYPE);
-        try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
