@@ -183,7 +183,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         // Add compound lookup
         clickLinkWithText("Edit Fields");
-        clickNavButton("Add Field", 0);
+        waitAndClickNavButton("Add Field", 0);
         setFormElement(Locator.name("ff_name5"), "CompoundLookup");
         setFormElement(Locator.name("ff_label5"), "Type of Material");
         click(Locator.xpath("//input[@name='ff_type5']/../div[contains(@class, 'x-form-trigger-arrow')]"));
