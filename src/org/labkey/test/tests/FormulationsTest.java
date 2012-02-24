@@ -186,7 +186,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         clickNavButton("Add Field", 0);
         setFormElement(Locator.name("ff_name5"), "CompoundLookup");
         setFormElement(Locator.name("ff_label5"), "Type of Material");
-        click(Locator.xpath("//input[@name='ff_type5']/../img"));
+        click(Locator.xpath("//input[@name='ff_type5']/../div[contains(@class, 'x-form-trigger-arrow')]"));
         ExtHelper.waitForExtDialog(this, "Choose Field Type", WAIT_FOR_JAVASCRIPT);
 
         ListHelper.LookupInfo lookup = new ListHelper.LookupInfo(PROJECT_NAME, "lists", "MaterialTypes");

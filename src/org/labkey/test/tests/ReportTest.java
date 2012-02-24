@@ -730,9 +730,6 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT_NAME);
         ExtHelper.setExtFormElementByLabel(this, "Report Description", PARTICIPANT_REPORT_DESCRIPTION);
         clickNavButton("Save", 0);
-        ExtHelper.waitForExtDialog(this, "Success");
-        assertTextPresent("Report : " + PARTICIPANT_REPORT_NAME + " saved successfully");
-        waitAndClickNavButton("OK", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // verify visiting saved report
@@ -753,9 +750,6 @@ public class ReportTest extends StudyBaseTest
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Creatinine' column.
         clickNavButton("Save", 0);
-        ExtHelper.waitForExtDialog(this, "Success");
-        assertTextPresent("Report : " + PARTICIPANT_REPORT_NAME + " saved successfully");
-        waitAndClickNavButton("OK", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // Delete a column save a copy of the report (Save As)
@@ -768,9 +762,6 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Name", PARTICIPANT_REPORT2_NAME);
         ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
         clickNavButtonByIndex("Save", 1, 0);
-        ExtHelper.waitForExtDialog(this, "Success");
-        assertTextPresent("Report : " + PARTICIPANT_REPORT2_NAME + " saved successfully");
-        waitAndClickNavButton("OK", 0);
         waitForTextToDisappear("Severity Grade");
 
         // Verify saving with existing report name.
