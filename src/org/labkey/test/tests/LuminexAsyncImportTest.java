@@ -20,6 +20,6 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToComplete(1, "Assay upload", false);
         clickLinkWithText("COMPLETE");
-//        assertTextNotPresent("ERROR");
+        assertTextNotPresent("ERROR"); //Issue 14082
     }
 }
