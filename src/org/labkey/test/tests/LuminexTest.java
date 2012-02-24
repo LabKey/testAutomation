@@ -1321,7 +1321,7 @@ public class LuminexTest extends AbstractQCAssayTest
         applyStartAndEndDateFilter();
 
         excludableWellsWithTransformTest();
-//        applyLogYAxisScale(); // TODO: blocked by issue 13983
+        applyLogYAxisScale();
         guideSetApiTest();
         verifyQCFlagUpdatesAfterWellChange();
         verifyLeveyJenningsPermissions();
