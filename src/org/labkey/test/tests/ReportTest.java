@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 
@@ -106,7 +107,17 @@ public class ReportTest extends StudyBaseTest
 
         // import study and wait; no specimens needed
         importStudy();
+        startSpecimenImport(2);
+
+        // wait for study and specimens to finish loading
         waitForPipelineJobsToComplete(1, "study import", false);
+        waitForSpecimenImport();
+
+        //Need to create participant groups before we flip the demographics bit on DEM-1.
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), SPECIMEN_GROUP_ONE, "Mouse", SPEC_PTID_ONE);
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), SPECIMEN_GROUP_TWO, "Mouse", SPEC_PTID_TWO);
 
         // need this to turn off the demographic bit in the DEM-1 dataset
         clickLinkWithText(getFolderName());
@@ -115,14 +126,14 @@ public class ReportTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
-        doCreateCharts();
-        doCreateRReports();
-        doAttachmentReportTest();
+//        doCreateCharts();
+//        doCreateRReports();
+//        doAttachmentReportTest();
         doParticipantReportTest();
 
         // additional report and security tests
-        setupDatasetSecurity();
-        doReportSecurity();
+//        setupDatasetSecurity();
+//        doReportSecurity();
     }
 
     protected void deleteReport(String reportName)
@@ -673,8 +684,28 @@ public class ReportTest extends StudyBaseTest
     private static final String PARTICIPANT_REPORT2_NAME = "Test Participant Report 2";
     private static final String PARTICIPANT_REPORT2_DESCRIPTION = "Another participant report created by ReportTest";
     private static final String ADD_MEASURE_TITLE = "Add Measure";
+    private static final String PARTICIPANT_REPORT3_NAME = "Group Filter Report";
+    private static final String PARTICIPANT_GROUP_ONE = "TEST GROUP 1";
+    private static final String PARTICIPANT_GROUP_TWO = "TEST GROUP 2";
+    private static final String[] PTIDS_ONE = {"999320016", "999320485", "999320518", "999320529", "999320533", "999320541",
+                                               "999320557", "999320565", "999320576", "999320582", "999320590", "999320609"};
+    private static final String[] PTIDS_TWO = {"999320613", "999320624", "999320638", "999320646", "999320652", "999320660",
+                                               "999320671", "999320687", "999320695", "999320703", "999320719", "999321029",
+                                               "999321033"};
+    private static final String[] PTIDS = {"999320016", "999320485", "999320518", "999320529", "999320533", "999320541",
+                                           "999320557", "999320565", "999320576", "999320582", "999320590", "999320609",
+                                           "999320613", "999320624", "999320638", "999320646", "999320652", "999320660",
+                                           "999320671", "999320687", "999320695", "999320703", "999320719", "999321029",
+                                           "999321033"};
+    private static final String PARTICIPANT_REPORT4_NAME = "Specimen Filter Report";
+    private static final String SPECIMEN_GROUP_ONE = "SPEC GROUP 1";
+    private static final String SPECIMEN_GROUP_TWO = "SPEC GROUP 2";
+    private static final String[] SPEC_PTID_ONE = {"999320016"};
+    private static final String[] SPEC_PTID_TWO = {"999320518"};
     private void doParticipantReportTest()
     {
+        log("Testing Participant Report");
+
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText("Manage");
@@ -785,6 +816,8 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
         waitForText("Creatinine", 8, WAIT_FOR_JAVASCRIPT); // 8 mice
+        waitForText("Showing 8 Results", 1, WAIT_FOR_JAVASCRIPT); // There should only be 8 results, and it should state that.
+
         assertTextPresent(PARTICIPANT_REPORT_NAME);
         //TODO: 13905: Participant report: Column headers getting messed up.
 //        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice
@@ -812,5 +845,97 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
+
+        // Test group filtering
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Mouse Report");
+        // select some measures from a dataset
+        waitAndClickNavButton("Choose Measures", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "17a. Preg. test result", true);
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "1.Adverse Experience (AE)", true);
+
+        clickNavButton("Select", 0);
+
+        waitForText("Showing 25 Results", WAIT_FOR_JAVASCRIPT);
+
+        //Mouse down on GROUP 1
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'TEST GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 12 Results");
+
+        //Check if all PTIDs of GROUP 1 are visible.
+        for(String ptid : PTIDS_ONE)
+        {
+            assertTextPresent(ptid);
+        }
+
+        //Mouse down GROUP 2
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'TEST GROUP 2')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 25 Results");
+
+        //Check that all PTIDs from GROUP 1 and GROUP 2 are present at the same time.
+        for(String ptid : PTIDS)
+        {
+            assertTextPresent(ptid);
+        }
+
+        //Mouse down on GROUP 1 to remove it.
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'TEST GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 13 Results");
+        
+        //Check if all PTIDs of GROUP 2 are visible
+        for(String ptid : PTIDS_TWO)
+        {
+            assertTextPresent(ptid);
+        }
+        //Make sure none from Group 1 are visible.
+        for(String ptid : PTIDS_ONE)
+        {
+            assertTextNotPresent(ptid);
+        }
+
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT3_NAME);
+        clickNavButton("Save", 0);
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+
+        //Participant report with specimen fields.
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Mouse Report");
+        // select some measures from a dataset
+        waitAndClickNavButton("Choose Measures", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "Blood (whole)");
+        pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
+
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "Blood (Whole) Vial Count", true);
+        ExtHelper.clickXGridPanelCheckbox(this, "label", "Blood (Whole) Available Count", true);
+
+        clickNavButton("Select", 0);
+
+        waitForText("Showing 116 Results", WAIT_FOR_JAVASCRIPT);
+
+        //Mouse down on SPEC GROUP 1
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 1 Results");
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[2][text()='23']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='3']")));
+
+        //Add SPEC GROUP 2
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 2')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 2 Results");
+        //Remove SPEC GROUP 1
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 1 Results");
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[2][text()='15']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='1']")));
+
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT4_NAME);
+        clickNavButton("Save", 0);
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
     }
 }
