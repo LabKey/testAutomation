@@ -126,14 +126,14 @@ public class ReportTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
-//        doCreateCharts();
-//        doCreateRReports();
-//        doAttachmentReportTest();
+        doCreateCharts();
+        doCreateRReports();
+        doAttachmentReportTest();
         doParticipantReportTest();
 
         // additional report and security tests
-//        setupDatasetSecurity();
-//        doReportSecurity();
+        setupDatasetSecurity();
+        doReportSecurity();
     }
 
     protected void deleteReport(String reportName)
