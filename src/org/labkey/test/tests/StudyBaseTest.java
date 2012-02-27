@@ -205,7 +205,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickAndWait(Locator.id(id));
     }
 
-    protected void selectOption(String name, int i, String value)
+    public void selectOption(String name, int i, String value)
     {
         selectOptionByValue(Locator.tagWithName("select", name).index(i), value);
     }

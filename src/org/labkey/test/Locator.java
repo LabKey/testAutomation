@@ -198,6 +198,11 @@ public class Locator
         return xpath("//input[@role = 'checkbox' and following-sibling::label[text()='" + label + "']]");
     }
 
+    public static XPathLocator ext4Radio(String label)
+    {
+        return xpath("//input[@role = 'radio' and following-sibling::label[contains(text(), '" + label + "')]]");
+    }
+
     public static XPathLocator navButtonDisabled(String text)
     {
         return xpath("//a[normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");

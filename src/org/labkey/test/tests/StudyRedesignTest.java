@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.tests.study.StudyScheduleTester;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
@@ -170,55 +171,10 @@ public class StudyRedesignTest extends StudyBaseTest
 
     private void scheduleWebpartTest()
     {
-        log("Study Schedule Test");
-        String dataset = "PRE-1: Pre-Existing Conditions";
-        String visit = "Screening Cycle";
+        StudyScheduleTester tester = new StudyScheduleTester(this, getFolderName(), getSampleDataPath());
 
-        // check required timepoints
-        goToStudySchedule();
-//        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
-        assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='checked']"));
-
-        // change a required visit to optional
-        clickWebpartMenuItem("Study Schedule", "Manage Visits");
-        clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
-        selectOption("dataSetStatus", 2, "OPTIONAL");
-        clickNavButton("Save");
-
-        // verify that change is noted in schedule
-        goToStudySchedule();
-        assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='unchecked']"));
-
-        // revert change
-        clickWebpartMenuItem("Study Schedule", "Manage Visits");
-        clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
-        selectOption("dataSetStatus", 2, "REQUIRED");
-        clickNavButton("Save");
-
-        // verify dataset 'data' link
-        goToStudySchedule();
-        click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[2]//a")); // go to dataset
-        waitForText(dataset);
-
-        // test paging
-        goToStudySchedule();
-//        click(Locator.xpath("//input[@role='checkbox']"));
-        waitForText(">");
-        assertTextNotPresent("Cycle 2");
-        clickButton(">", 0);
-        waitForText("Cycle 2");
-        waitForText(dataset);
-    }
-
-    private void goToStudySchedule()
-    {
-        clickLinkWithText(getFolderName());
-        clickAdminMenuItem("Manage Study");
-        clickLinkWithText("Study Schedule");
-
-        // wait for grid to load
-        waitForText("verifyAssay"); // verify dataset column
-        waitForText("Termination"); // verify timepoint
+        tester.basicTest();
+        tester.linkDatasetTest();
     }
 
     private void clickExt4HeaderMenu(String title, String selection)
