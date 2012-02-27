@@ -229,6 +229,7 @@ src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/EscapeUtil.java -text
 src/org/labkey/test/util/ExperimentRunTable.java -text
+src/org/labkey/test/util/Ext4Helper.java -text
 src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
