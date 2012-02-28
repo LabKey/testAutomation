@@ -5127,6 +5127,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         sleep(2000);
         setFormElement(Locator.name("folderZip"), folderFile);
         clickButtonContainingText("Import Folder From Local Zip Archive");
+        assertTextPresent("Data Pipeline");
     }
 
     protected void importFolderFromPipeline(String folderFile)
