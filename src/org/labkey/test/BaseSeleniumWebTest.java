@@ -4324,6 +4324,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         checkCheckbox(Locator.radioButtonByName(name).index(index));
     }
 
+    public void assertRadioButtonSelected(String name, String value)
+    {
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue(name, value));
+    }
+
+    public void assertRadioButtonSelected(String name, int index)
+    {
+        assertRadioButtonSelected(Locator.radioButtonByName(name).index(index));
+    }
+
+    public void assertRadioButtonSelected(Locator radioButtonLocator)
+    {
+        assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
+    }
+
     public void checkCheckbox(String name, int index)
     {
         checkCheckbox(Locator.checkboxByName(name).index(index));

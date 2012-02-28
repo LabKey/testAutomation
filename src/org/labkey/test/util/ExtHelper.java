@@ -67,7 +67,7 @@ public class ExtHelper
     public static void clickExtDropDownMenu(BaseSeleniumWebTest test, Locator menuLocator, String value)
     {
         test.click(menuLocator);
-        Locator element = Locator.xpath("//*[(self::li[contains(@class, 'x4-boundlist-item')] or self::div[contains(@class, 'x-combo-list-item')]) and text()='" + value + "']");
+        Locator element = Locator.xpath("//*[(self::li[contains(@class, 'x4-boundlist-item')] or self::div[contains(@class, 'x-combo-list-item')] or self::span[contains(@class, 'x-menu-item-text')]) and text()='" + value + "']");
         test.waitForElement(element, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.click(element);
     }

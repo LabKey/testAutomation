@@ -128,6 +128,7 @@ public class ReportTest extends StudyBaseTest
     {
         doCreateCharts();
         doCreateRReports();
+        doReportDiscussionTest();
         doAttachmentReportTest();
         doParticipantReportTest();
 
@@ -862,6 +863,10 @@ public class ReportTest extends StudyBaseTest
 
         waitForText("Showing 25 Results", WAIT_FOR_JAVASCRIPT);
 
+        //Deselect All
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 0 Results");
+
         //Mouse down on GROUP 1
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'TEST GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 12 Results");
@@ -919,11 +924,15 @@ public class ReportTest extends StudyBaseTest
 
         waitForText("Showing 116 Results", WAIT_FOR_JAVASCRIPT);
 
+        //Deselect All
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText("Showing 0 Results");
+
         //Mouse down on SPEC GROUP 1
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 1 Results");
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[2][text()='23']")));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='3']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 2')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
@@ -931,11 +940,53 @@ public class ReportTest extends StudyBaseTest
         //Remove SPEC GROUP 1
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 1 Results");
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[2][text()='15']")));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='1']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT4_NAME);
         clickNavButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+    }
+
+    private static final String DISCUSSION_BODY_1 = "Starting a discussion";
+    private static final String DISCUSSION_TITLE_1 = "Discussion about R report";
+    private static final String DISCUSSION_BODY_2 = "Responding to a discussion";
+    private static final String DISCUSSION_BODY_3 = "Editing a discussion response";
+    private void doReportDiscussionTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickReportGridLink(R_SCRIPTS[0], "edit");
+
+        ExtHelper.clickExtDropDownMenu(this, "discussionMenuToggle", "Start new discussion");
+        waitForPageToLoad();
+
+        waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("title", DISCUSSION_TITLE_1);
+        setFormElement("body", DISCUSSION_BODY_1);
+        clickButton("Submit");
+        waitForPageToLoad();
+
+        ExtHelper.clickExtDropDownMenu(this, "discussionMenuToggle", DISCUSSION_TITLE_1);
+        waitForPageToLoad();
+
+        assertTextPresent(DISCUSSION_TITLE_1);
+        assertTextPresent(DISCUSSION_BODY_1);
+
+        clickButton("Respond");
+        waitForPageToLoad();
+        setFormElement("body", DISCUSSION_BODY_2);
+        clickButton("Submit");
+        waitForPageToLoad();
+
+        assertTextPresent(DISCUSSION_BODY_2);
+
+        clickLinkContainingText("edit");
+        waitForPageToLoad();
+        setFormElement("body", DISCUSSION_BODY_3);
+        clickButton("Submit");
+        waitForPageToLoad();
+
+        assertTextPresent(DISCUSSION_BODY_3);
     }
 }

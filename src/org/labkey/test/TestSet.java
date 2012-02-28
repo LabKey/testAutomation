@@ -219,6 +219,7 @@ public enum TestSet
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
         AncillaryStudyTest.class,
+        CAVDStudyTest.class
     }),
 
     Assays(new Class[] {

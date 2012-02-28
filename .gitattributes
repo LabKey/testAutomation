@@ -131,6 +131,7 @@ src/org/labkey/test/tests/AssayTest.java -text
 src/org/labkey/test/tests/AuditLogTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
+src/org/labkey/test/tests/CAVDStudyTest.java -text
 src/org/labkey/test/tests/CaBigTest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
 src/org/labkey/test/tests/CohortTest.java -text
