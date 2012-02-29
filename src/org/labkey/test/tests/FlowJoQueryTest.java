@@ -129,8 +129,15 @@ public class FlowJoQueryTest extends BaseFlowTest
 
 //        verifyNestedBooleans();
 
-         verifyFilterOnImport();
+        verifyACSImport();
+        verifyFilterOnImport();
 
+    }
+
+    private void verifyACSImport()
+    {
+        importAnalysis(containerPath, "/advanced/advanced-v7.6.5.wsp", "advanced/fcs", false, "Mac File", false, false);
+        assertTextPresent("931115-B02- Sample 01.fcs");
     }
 
     private void verifyNestedBooleans()
