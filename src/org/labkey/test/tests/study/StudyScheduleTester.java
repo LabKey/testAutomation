@@ -79,9 +79,9 @@ public class StudyScheduleTester
         // test paging
         goToStudySchedule();
 //        click(Locator.xpath("//input[@role='checkbox']"));
-        _test.waitForText(">");
+        _test.waitForElement(Locator.xpath("//span[@class='button-next'][1]"), _test.WAIT_FOR_JAVASCRIPT); //wait for next button to appear
         _test.assertTextNotPresent("Cycle 2");
-        _test.clickButton(">", 0);
+        _test.click(Locator.xpath("//span[@class='button-next'][1]")); //click next button
         _test.waitForText("Cycle 2");
         _test.waitForText(dataset);
     }
@@ -235,7 +235,7 @@ public class StudyScheduleTester
         {
             case defineManually:
                 _test.click(Locator.ext4Radio("Define dataset manually"));
-                _test.clickNavButton("Done");
+                _test.clickNavButton("Next");
 
                 _test.waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
@@ -245,7 +245,7 @@ public class StudyScheduleTester
                 break;
             case importFromFile:
                 _test.click(Locator.ext4Radio("Import data from file"));
-                _test.clickNavButton("Done");
+                _test.clickNavButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate001.tsv";
                 File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
