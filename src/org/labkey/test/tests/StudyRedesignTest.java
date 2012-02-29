@@ -148,7 +148,7 @@ public class StudyRedesignTest extends StudyBaseTest
         waitAndClick(Locator.xpath("//img[@data-qtip='Delete']"));
         ExtHelper.waitForExtDialog(this, "Delete Category");
         clickNavButton("OK", 0);
-        clickNavButton("Create New Category", 0);
+        clickNavButton("New Category", 0);
         setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[5]"), "testcategory"); // TODO: need a better xpath
         clickNavButton("Done", 0);
         clickNavButton("Save", 0);
