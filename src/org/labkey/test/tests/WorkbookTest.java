@@ -71,7 +71,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
 
         // Create Defaultche Workbook
         createWorkbook(PROJECT_NAME, DEFAULT_WORKBOOK_NAME, DEFAULT_WORKBOOK_DESCRIPTION, WorkbookFolderType.DEFAULT_WORKBOOK);
-        assertLinkPresentWithText("Pipeline Files");
+        assertLinkPresentWithText("Files");
         assertLinkPresentWithText("Experiment Runs");
         assertEquals(DEFAULT_WORKBOOK_NAME, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
         assertEquals(DEFAULT_WORKBOOK_DESCRIPTION, getText(Locator.xpath("//div[@id='wb-description']")));
