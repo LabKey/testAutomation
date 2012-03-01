@@ -79,9 +79,9 @@ public class StudyScheduleTester
         // test paging
         goToStudySchedule();
 //        click(Locator.xpath("//input[@role='checkbox']"));
-        _test.waitForElement(Locator.xpath("//span[@class='button-next'][1]"), _test.WAIT_FOR_JAVASCRIPT); //wait for next button to appear
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'button-next')][1]"), _test.WAIT_FOR_JAVASCRIPT); //wait for next button to appear
         _test.assertTextNotPresent("Cycle 2");
-        _test.click(Locator.xpath("//span[@class='button-next'][1]")); //click next button
+        _test.click(Locator.xpath("//div[contains(@class, 'button-next')][1]")); //click next button
         _test.waitForText("Cycle 2");
         _test.waitForText(dataset);
     }
