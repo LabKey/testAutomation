@@ -41,9 +41,10 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
 
     private final static String LAST_NAME_COLUMN = "LastName" + INJECT_CHARS_2;
+    private final static String FIRST_NAME = "FirstName";
     private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
             {
-                    new ListHelper.ListColumn("FirstName", "First Name" + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
+                    new ListHelper.ListColumn(FIRST_NAME, FIRST_NAME + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
                     new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
                     new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
             };
@@ -87,6 +88,10 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         setColumns(LAST_NAME_COLUMN, "Age");
         assertTextPresent("Norbertson");
         assertTextNotPresent("First Name");
+
+        log("test js injection attack (Issue 14103) ");
+        addFilter(FIRST_NAME, "Starts With", "K");
+        removeFilter(FIRST_NAME);
 
         log("** Add filter: LastName starts with 'J'");
         addFilter(LAST_NAME_COLUMN, "Starts With", "J");
