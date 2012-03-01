@@ -1448,10 +1448,10 @@ public class LuminexTest extends AbstractQCAssayTest
         goBack();
         refresh();
         // TODO: temp fix for test to check for parts of the QC Flag until SCHARP/Lab decides what they want to do with the 5PL EC50 values
-        //assertEquals("AUC, EC50-4, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
-        String qcFlagText = drt.getDataAsText(1, "QC Flags");
-        assertTrue("Expected QC Flags of [AUC, EC50-4, HMFI, PCV] was " + qcFlagText, qcFlagText.indexOf("AUC, EC50-4, ") > -1);
-        assertTrue("Expected QC Flags of [AUC, EC50-4, HMFI, PCV] was " + qcFlagText, qcFlagText.indexOf("HMFI, PCV") > -1);
+        assertEquals("AUC, EC50-4, HMFI, PCV",  drt.getDataAsText(1, "QC Flags")); // EC50-5 removed 2012/03/01
+        //String qcFlagText = drt.getDataAsText(1, "QC Flags");
+        //assertTrue("Expected QC Flags of [AUC, EC50-4, HMFI, PCV] was " + qcFlagText, qcFlagText.indexOf("AUC, EC50-4, ") > -1);
+        //assertTrue("Expected QC Flags of [AUC, EC50-4, HMFI, PCV] was " + qcFlagText, qcFlagText.indexOf("HMFI, PCV") > -1);
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 QC Flag for GS Analyte (2) that was inserted in the previous step is removed
@@ -1466,7 +1466,7 @@ public class LuminexTest extends AbstractQCAssayTest
 //	- QC Flags added for EC50 and HMFI
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
-        String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
+        String newQcFlags = "AUC, EC50-4, HMFI"; // EC50-5 removed 2012/03/01
         assertTextNotPresent(newQcFlags);
         applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
         //assert ec50 and HMFI red text present
@@ -1475,7 +1475,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent(newQcFlags);
         //verify new flags present in run list
         goToTestRunList();
-        assertTextPresent("AUC, EC50-4, EC50-5, HMFI, PCV");
+        assertTextPresent("AUC, EC50-4, HMFI, PCV"); // EC50-5 removed 2012/03/01s
 
 //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
 //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
@@ -1529,7 +1529,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         assertEquals("Unexpected QC Flag Highlight Present", 0,
                     getXpathCount(Locator.xpath("//div[contains(@style,'red')]")));
-        for(String flag : new String[] {"AUC", "HMFI", "EC50-4", "EC50-5", "PCV"})
+        for(String flag : new String[] {"AUC", "HMFI", "EC50-4", "PCV"}) // "EC50-5" removed 2012/03/01
         {
             assertElementNotPresent(Locator.xpath("//a[contains(text(),'" + flag + "')]"));
         }
@@ -1766,11 +1766,11 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("EC50 4PLTrendPlotDiv"));
 
-        // check5PL  ec50 trending R plot
-        click(Locator.tagWithText("span", "EC50 - 5PL Rumi"));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
-        assertElementPresent( Locator.id("EC50 5PLTrendPlotDiv"));        
+        // check5PL  ec50 trending R plot // removed 2012/03/01
+        //click(Locator.tagWithText("span", "EC50 - 5PL Rumi"));
+        //waitForTextToDisappear("Loading");
+        //assertTextNotPresent("Error");
+        //assertElementPresent( Locator.id("EC50 5PLTrendPlotDiv"));        
 
         // check auc trending R plot
         click(Locator.tagWithText("span", "AUC"));
