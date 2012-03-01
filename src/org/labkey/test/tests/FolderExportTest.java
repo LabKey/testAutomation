@@ -27,39 +27,43 @@ import org.labkey.test.BaseSeleniumWebTest;
 public class FolderExportTest extends BaseSeleniumWebTest
 {
 
-    String folderFromZip = "Folder 1" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    String[] webParts = {"Study Overview", "Data Pipeline", "Specimens", "Views", "Study Data Tools"};
+    String folderFromZip = "Folder 1";
+    String[] webParts = {"Study Overview", "Data Pipeline", "Specimens", "Views", "Study Data Tools", "List", "Report web part"};
     String dataDir = getSampledataPath() + "\\FolderExport";
     private String folderFromPipeplineZip = "Folder 2";
+    String folderZip = "Sample.folder.zip"; //"Sample.folder.zip";
 
 
 
     @Override
     protected String getProjectName()
     {
-        return "FolderExportTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        return "FolderExportTest";
 
     }
 
     @Override
     protected void doTestSteps() throws Exception
     {
+        if(!System.getProperty("os.name").contains("Windows"))   // this doesn't work on linux for non-roduct reasons
+            return;
+
         createProject(getProjectName());
         
         verifyImportFromZip();
         verifyImportFromPipelineZip();
         //Issue 13881
-//        verifyImportFromPipelineExpanded();
+        verifyImportFromPipelineExpanded();
     }
 
     private void verifyImportFromPipelineZip()
     {
-        verifyImportFromPipeline("Sample.folder.zip");
+        verifyImportFromPipeline(folderZip);
     }
 
     private void verifyImportFromPipelineExpanded()
     {
-        verifyImportFromPipeline("Sample.folder/folder.xml");
+        verifyImportFromPipeline("unzip/folder.xml");
 
     }
 
@@ -71,7 +75,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
         importFolderFromPipeline( "" + fileImport);
 
 
-        clickLinkContainingText(folderFromPipeplineZip);
+        clickLinkWithText(folderFromPipeplineZip);
         verifyFolderImportAsExpected();
         deleteFolder(getProjectName(), folderFromPipeplineZip);}
 
@@ -79,8 +83,10 @@ public class FolderExportTest extends BaseSeleniumWebTest
     {
         createSubfolder(getProjectName(), folderFromZip, null);
 
-        importFolderFromZip(dataDir + "\\Sample.folder.zip");
-        waitForPipelineJobsToComplete(1, "foo", false);
+        importFolderFromZip(dataDir + "\\" + folderZip);
+//        waitForPageToLoad();
+        beginAt(getCurrentRelativeURL()); //work around linux issue
+        waitForPipelineJobsToComplete(1, "Folder import", false);
         clickLinkWithText(folderFromZip);
         verifyFolderImportAsExpected();
     }
@@ -89,12 +95,28 @@ public class FolderExportTest extends BaseSeleniumWebTest
     {
         assertTextPresentInThisOrder(webParts);
         assertTextPresent("Test wikiTest wikiTest wiki");
+
+        log("Verify import of list");
+        String listName = "safe list";
+        assertTextPresent(listName);
+        clickLinkWithText(listName);
+        assertTextPresent("persimmon");
+        assertImagePresentWithSrc("/labkey/_images/mv_indicator.gif");
+        assertTextNotPresent("grapefruit");//this has been filtered out.  if "grapefruit" is present, the filter wasn't preserved
+        goBack();
+
+        log("verify import of query web part");
+        assertTextPresent("~!@#$%^&*()_+query web part", "Contains one row per announcement or reply");
+
+        log("verify report present");
+        assertTextPresent("pomegranate");
     }
 
     @Override
     protected void doCleanup() throws Exception
     {
-        deleteProject(getProjectName());
+        deleteProject(getProjectName() + TRICKY_CHARACTERS_FOR_PROJECT_NAMES, false);
+        deleteProject(getProjectName(), false);
     }
 
     @Override

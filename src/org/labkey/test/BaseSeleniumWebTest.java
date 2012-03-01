@@ -5126,12 +5126,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
-    protected void importStudyFromZip(String studyFile)
+    protected void startImportStudyFromZip(String studyFile)
     {
         clickNavButton("Import Study");
         setFormElement("studyZip", studyFile);
         clickNavButton("Import Study From Local Zip Archive");
         assertTextNotPresent("You must select a .study.zip file to import.");
+    }
+
+    protected void importStudyFromZip(String studyFile)
+    {
+        startImportStudyFromZip(studyFile);
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 

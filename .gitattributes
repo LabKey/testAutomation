@@ -184,6 +184,7 @@ src/org/labkey/test/tests/MissingValueIndicatorsTest.java -text
 src/org/labkey/test/tests/ModuleAssayTest.java -text
 src/org/labkey/test/tests/NabAssayTest.java -text
 src/org/labkey/test/tests/NabOldTest.java -text
+src/org/labkey/test/tests/PipelineCancelTest.java -text
 src/org/labkey/test/tests/PipelineTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/QuerySnapshotTest.java -text
