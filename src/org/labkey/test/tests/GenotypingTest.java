@@ -19,15 +19,13 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
+
 import java.io.File;
-import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 10/22/11
  * Time: 7:14 PM
- * To change this template use File | Settings | File Templates.
  */
 public class GenotypingTest extends BaseSeleniumWebTest
 {
@@ -109,7 +107,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
             clickLinkContainingText("configure",i, false);
             waitForExtMask();
             ExtHelper.clickExtDropDownMenu(this, "userQuery_schema", "lists");
-            ExtHelper.clickExtDropDownMenu(this,"userQuery_query", listVals[i]);
+            ExtHelper.clickExtDropDownMenu(this, "userQuery_query", listVals[i]);
             ExtHelper.clickExtDropDownMenu(this, "userQuery_view", "[default view]");
             clickButton("Submit", 0);
             waitForExtMaskToDisappear();
