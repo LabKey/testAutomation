@@ -25,7 +25,7 @@ public class Locator
 {
     private String loc;
     // XPATH fragments
-    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@style, 'left: -10000px')])";
+    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@style, 'left: -10000px')])";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
 
 

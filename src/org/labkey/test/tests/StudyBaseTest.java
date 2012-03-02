@@ -144,6 +144,29 @@ public abstract class StudyBaseTest extends SimpleApiTest
         selectImportDataAction("Import Study");
     }
 
+    protected void exportStudy(boolean useXmlFormat, boolean zipFile)
+    {
+        clickLinkWithText(getStudyLabel());
+        clickTab("Manage");
+        clickNavButton("Export Study");
+
+        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
+        // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
+
+        checkRadioButton("format", useXmlFormat ? "new" : "old");
+        checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
+        clickNavButton("Export");
+    }
+
+    protected void deleteStudy(String studyLabel)
+    {
+        clickLinkWithText(studyLabel);
+        clickTab("Manage");
+        clickNavButton("Delete Study");
+        checkCheckbox("confirm");
+        clickNavButton("Delete", WAIT_FOR_PAGE);
+    }
+
     private void initializePipeline()
     {
         clickAdminMenuItem("Folder", "Management");

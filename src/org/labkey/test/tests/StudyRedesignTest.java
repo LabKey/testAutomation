@@ -37,7 +37,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private static final String REPORT_NAME = "TestReport";
     private static final String WEBPART_TITLE = "TestDataViews";
     private static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
-    private static final String NEW_CATEGORY = "A New Category";
+    private static final String NEW_CATEGORY = "A New Category"; // + TRICKY_CHARACTERS_NO_QUOTES; // TODO: Add tricky characters to regress 14230
     private static final String NEW_DESCRIPTION = "Description set in data views webpart";
     private static final String PARTICIPANT_GROUP_ONE = "GROUP 1";
     private static final String PARTICIPANT_GROUP_TWO = "GROUP 2";
@@ -50,6 +50,7 @@ public class StudyRedesignTest extends StudyBaseTest
                                            "999320565", "999320576", "999320582", "999320590", "999320004", "999320007",
                                            "999320010", "999320016", "999320018", "999320021", "999320029", "999320033",
                                            "999320036","999320038", "999321033", "999321029", "999320981"};
+    private static final String REFRESH_DATE = "03/01/2012";
 
     @Override
     protected void doCreateSteps()
@@ -90,6 +91,7 @@ public class StudyRedesignTest extends StudyBaseTest
         dataViewsWebpartTest();
         scheduleWebpartTest();
         participantListWebpartTest();
+        exportImportTest();
     }
 
     private void dataViewsWebpartTest()
@@ -167,6 +169,35 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText(NEW_CATEGORY);
         clickLinkWithText(EDITED_DATASET);
         assertTextPresent(NEW_DESCRIPTION);
+
+        log("Verify refresh date");
+        String refreshDate = "03/01/2012";
+        clickLinkContainingText("Data & Reports");
+        waitForText(someDataSets[3]);
+        // Refresh date not present when not set.
+        mouseOver(Locator.linkWithText(EDITED_DATASET));
+        waitForText("Type:");
+        assertTextNotPresent("Refresh Date:");
+        clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
+        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
+        ExtHelper.checkCheckbox(this, "Modified");
+        ExtHelper.checkCheckbox(this, "Refresh Date");
+        Locator manageButton = getButtonLocator("Manage Categories");
+        clickButton("Save", 0);
+        waitForElementToDisappear(manageButton, WAIT_FOR_JAVASCRIPT);
+        waitForText("Refresh Date");
+        waitForText("Modified");
+        click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
+        ExtHelper.waitForExtDialog(this, EDITED_DATASET);
+        setFormElement("refreshDate", refreshDate);
+        ExtHelper.clickExtButton(this, EDITED_DATASET, "Save", 0);
+        waitForText(refreshDate, 1, WAIT_FOR_JAVASCRIPT);
+        // check hover box
+        mouseOver(Locator.linkWithText(EDITED_DATASET));
+        waitForText("Refresh Date:");
+        assertTextPresent("Thu Mar 01 2012");
+        clickLinkWithText(EDITED_DATASET);
+        assertTextPresent("Refresh Date: Thu Mar 01 00:00:00 PST 2012");
     }
 
     private void scheduleWebpartTest()
@@ -322,5 +353,30 @@ public class StudyRedesignTest extends StudyBaseTest
         setFormElement("//div[contains(text(), 'Filter')]//input", "");
         fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
         waitForText("Found 13 mice of 138.");
+    }
+
+    private void exportImportTest()
+    {
+        log("Verify roundtripping of study redesign features");
+        exportStudy(true, false);
+        deleteStudy(getStudyLabel());
+
+        clickNavButton("Import Study");
+        clickNavButton("Import Study Using Pipeline");
+        ExtHelper.selectFileBrowserItem(this, "export/study.xml");
+        selectImportDataAction("Import Study");
+
+        waitForPipelineJobsToComplete(3, "Study import", false);
+
+        clickLinkWithText("Data & Reports");
+
+        log("Verify export-import of refresh date settings");
+        waitForText(REFRESH_DATE, 1, WAIT_FOR_JAVASCRIPT);
+        // check hover box
+        mouseOver(Locator.linkWithText(EDITED_DATASET));
+        waitForText("Refresh Date:");
+        assertTextPresent("Thu Mar 01 2012");
+        clickLinkWithText(EDITED_DATASET);
+        assertTextPresent("Refresh Date: Thu Mar 01 00:00:00 PST 2012");
     }
 }

@@ -62,11 +62,7 @@ public class StudyExportTest extends StudyManualTest
         exportStudy(false, false);
 
         // delete manually created study
-        clickLinkWithText(getStudyLabel());
-        clickTab("Manage");
-        clickNavButton("Delete Study");
-        checkCheckbox("confirm");
-        clickNavButton("Delete", WAIT_FOR_PAGE * 2); // TODO: Shorten wait (Issue 12731)
+        deleteStudy(getStudyLabel());
 
         log("Importing exported study (legacy formats)");
         clickNavButton("Import Study");
@@ -99,11 +95,7 @@ public class StudyExportTest extends StudyManualTest
         exportStudy(true, true);
 
         // delete the study
-        clickLinkWithText(getStudyLabel());
-        clickTab("Manage");
-        clickNavButton("Delete Study");
-        checkCheckbox("confirm");
-        clickNavButton("Delete", WAIT_FOR_PAGE);
+        deleteStudy(getStudyLabel());
 
         log("Importing exported study (xml formats)");
         clickNavButton("Import Study");
@@ -119,22 +111,6 @@ public class StudyExportTest extends StudyManualTest
         // TODO: Move this earlier (after legacy format import) once issue 10074 is resolved. 
         setDemographicsBit();
     }
-
-
-    private void exportStudy(boolean useXmlFormat, boolean zipFile)
-    {
-        clickLinkWithText(getStudyLabel());
-        clickTab("Manage");
-        clickNavButton("Export Study");
-
-        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
-        // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
-
-        checkRadioButton("format", useXmlFormat ? "new" : "old");
-        checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
-        clickNavButton("Export");
-    }
-
 
     @Override
     protected void waitForSpecimenImport()
