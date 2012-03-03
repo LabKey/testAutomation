@@ -76,16 +76,16 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         //enableModule(getProjectName(), "Query");
 
         clickLinkWithText(getProjectName());
-        //doTestCustomFolder();
+        doTestCustomFolder();
         doTestSchemas();
-        //doTestViews();
-        //doTestWebParts();
-        //createList();
-        //doTestQueries();
-        //doTestQueryViews();
-        //doTestReports();
-        //doTestParameterizedQueries();
-        //doTestContainerColumns();
+        doTestViews();
+        doTestWebParts();
+        createList();
+        doTestQueries();
+        doTestQueryViews();
+        doTestReports();
+        doTestParameterizedQueries();
+        doTestContainerColumns();
     }
     
     private void doTestCustomFolder()
