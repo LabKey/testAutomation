@@ -21,6 +21,9 @@ public class StudyScheduleTester
     private static final String GHOST_DATASET_1 = "GhostDataset1";
     private static final String GHOST_DATASET_2 = "GhostDataset2";
     private static final String GHOST_DATASET_3 = "GhostDataset3";
+    private static final String GHOST_DATASET_4 = "GhostDataset4";
+    private static final String GHOST_DATASET_5 = "GhostDataset5";
+    private static final String GHOST_DATASET_6 = "GhostDataset6";
 
     // categories
     private static final String GHOST_CATEGORY = "GhostCategory";
@@ -115,7 +118,7 @@ public class StudyScheduleTester
         createPlaceholderDataset(GHOST_DATASET_3, GHOST_CATEGORY, false);
 
         // link the placeholder datasets
-        linkDataset(GHOST_DATASET_1, DatasetType.linkeToExisting, IMPORT_DATASET);
+        linkDatasetFromSchedule(GHOST_DATASET_1, DatasetType.linkeToExisting, IMPORT_DATASET);
 
         // verify the expectation dataset gets converted and the existing dataset is gone
         _test.waitForElement(Locator.xpath("//div[text()='" + GHOST_DATASET_1 + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
@@ -129,10 +132,10 @@ public class StudyScheduleTester
         goToStudySchedule();
 
         // link manually
-        linkDataset(GHOST_DATASET_2, DatasetType.defineManually, null);
+        linkDatasetFromSchedule(GHOST_DATASET_2, DatasetType.defineManually, null);
 
         // link by importing file
-        linkDataset(GHOST_DATASET_3, DatasetType.importFromFile, null);
+        linkDatasetFromSchedule(GHOST_DATASET_3, DatasetType.importFromFile, null);
 
         // verify the expectation dataset gets converted and the existing dataset is gone
         _test.waitForElement(Locator.xpath("//div[text()='" + GHOST_DATASET_3 + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
@@ -142,6 +145,25 @@ public class StudyScheduleTester
         _test.click(Locator.xpath("//div[text() = '" + GHOST_DATASET_3 + "']/../../../td//a"));
         _test.waitForPageToLoad();
         _test.assertTextPresent("Dataset:", GHOST_DATASET_3);
+    }
+
+    public void linkFromDatasetDetailsTest()
+    {
+        goToStudySchedule();
+
+        // create and verify a placeholder datasets
+        createPlaceholderDataset(GHOST_DATASET_4, GHOST_CATEGORY, true);
+        createPlaceholderDataset(GHOST_DATASET_5, null, false);
+        createPlaceholderDataset(GHOST_DATASET_6, GHOST_CATEGORY, false);
+
+        _test.clickAdminMenuItem("Manage Study");
+        _test.clickLinkWithText("Manage Datasets");
+
+        linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, GHOST_DATASET_1);
+        _test.assertElementPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_4 + "']"));
+        _test.assertElementNotPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_1 + "']"));
+        linkDatasetFromDetails(GHOST_DATASET_5, DatasetType.defineManually, null);
+        linkDatasetFromDetails(GHOST_DATASET_6, DatasetType.importFromFile, null);
     }
 
     private void createPlaceholderDataset(String name, String category, boolean verify)
@@ -217,9 +239,9 @@ public class StudyScheduleTester
         goToStudySchedule();
     }
 
-    private void linkDataset(String name, DatasetType type, String targetDataset)
+    private void linkDatasetFromSchedule(String name, DatasetType type, String targetDataset)
     {
-        _test.log("linking dataset: " + name + " to type: " + type);
+        _test.log("linking dataset: " + name + " to type: " + type + " from study schedule.");
         _test.waitForElement(Locator.xpath("//div[text()='" + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
         Locator link = Locator.xpath("//div[text() = '" + name + "']/../../../td//img[@alt='link data']/../..//div");
@@ -231,6 +253,26 @@ public class StudyScheduleTester
         _test.log("show define dataset dialog");
         _test.waitForElement(Locator.xpath("//span[text() = 'Define Dataset']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
+        linkDataset(name, type, targetDataset);
+        goToStudySchedule();
+    }
+
+    private void linkDatasetFromDetails(String name, DatasetType type, String targetDataset)
+    {
+        _test.log("linking dataset: " + name + " to type: " + type + "from dataset details.");
+
+        _test.clickLinkContainingText(name);
+        _test.click(Locator.xpath("//span[text()='Link or Define Dataset']"));
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-form-display-field')][text()='Define " + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+
+        linkDataset(name, type, targetDataset);
+
+        _test.clickTab("Manage");
+        _test.clickLinkContainingText("Manage Datasets");
+    }
+
+    private void linkDataset(String name, DatasetType type, String targetDataset)
+    {
         switch (type)
         {
             case defineManually:
@@ -271,7 +313,6 @@ public class StudyScheduleTester
                 _test.clickButton("Done", 0);
                 break;
         }
-        goToStudySchedule();
     }
 
     private void goToStudySchedule()

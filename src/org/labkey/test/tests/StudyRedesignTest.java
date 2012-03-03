@@ -50,7 +50,7 @@ public class StudyRedesignTest extends StudyBaseTest
                                            "999320565", "999320576", "999320582", "999320590", "999320004", "999320007",
                                            "999320010", "999320016", "999320018", "999320021", "999320029", "999320033",
                                            "999320036","999320038", "999321033", "999321029", "999320981"};
-    private static final String REFRESH_DATE = "03/01/2012";
+    private static final String REFRESH_DATE = "2012-03-01";
 
     @Override
     protected void doCreateSteps()
@@ -171,7 +171,7 @@ public class StudyRedesignTest extends StudyBaseTest
         assertTextPresent(NEW_DESCRIPTION);
 
         log("Verify refresh date");
-        String refreshDate = "03/01/2012";
+        String refreshDate = "2012-03-01";
         clickLinkContainingText("Data & Reports");
         waitForText(someDataSets[3]);
         // Refresh date not present when not set.
@@ -206,6 +206,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
         tester.basicTest();
         tester.linkDatasetTest();
+        tester.linkFromDatasetDetailsTest();
     }
 
     private void clickExt4HeaderMenu(String title, String selection)
