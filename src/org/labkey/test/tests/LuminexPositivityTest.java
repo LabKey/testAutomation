@@ -37,7 +37,7 @@ public class LuminexPositivityTest extends LuminexTest
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
 //        sleep(10000);
         saveAssay();
-        sleep(500);
+        sleep(5000);
 
         goToTestAssayHome();
         clickNavButton("Import Data");
@@ -49,7 +49,6 @@ public class LuminexPositivityTest extends LuminexTest
         setFormElement("__primaryFile__",  getLabKeyRoot() + "\\sampledata\\Luminex\\Positivity.xls");
         clickNavButton("Next");
         clickNavButton("Save and Finish");
-
         clickLinkWithText(assayName);
 
         assertTextPresent("positive", 6);
