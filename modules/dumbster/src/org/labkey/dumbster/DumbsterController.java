@@ -16,32 +16,34 @@
 
 package org.labkey.dumbster;
 
-import org.apache.log4j.Logger;
-import org.labkey.api.action.*;
+import org.labkey.api.action.ApiAction;
+import org.labkey.api.action.ApiResponse;
+import org.labkey.api.action.ApiSimpleResponse;
+import org.labkey.api.action.SimpleViewAction;
+import org.labkey.api.action.SpringActionController;
 import org.labkey.api.security.RequiresPermissionClass;
-import org.labkey.api.security.permissions.*;
+import org.labkey.api.security.RequiresSiteAdmin;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.settings.WriteableAppProps;
+import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.template.PageConfig;
 import org.labkey.dumbster.model.DumbsterManager;
+import org.labkey.dumbster.view.MailWebPart;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
-import org.labkey.dumbster.view.MailWebPart;
 
 /**
  * View action is like MultiActionController, but each action is a class not a method
  */
 public class DumbsterController extends SpringActionController
 {
-    static Logger _log = Logger.getLogger(DumbsterController.class);
-
-    static DefaultActionResolver _actionResolver = new DefaultActionResolver(DumbsterController.class);
+    @SuppressWarnings({"unchecked"})
+    private static final DefaultActionResolver _actionResolver = new DefaultActionResolver(DumbsterController.class);
 
     public DumbsterController()
     {
-        super();
         setActionResolver(_actionResolver);
     }
 
@@ -55,7 +57,10 @@ public class DumbsterController extends SpringActionController
     {
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
-            return new MailWebPart();
+            if (getUser().isAdministrator())
+                return new MailWebPart();
+            else
+                return new HtmlView("You must be a site administrator to use dumbster");
         }
 
         public NavTree appendNavTrail(NavTree root)
@@ -64,7 +69,7 @@ public class DumbsterController extends SpringActionController
         }
     }
 
-    @RequiresPermissionClass(AdminPermission.class)
+    @RequiresSiteAdmin
     public class SetRecordEmailAction extends ApiAction<RecordEmailForm>
     {
         public ApiResponse execute(RecordEmailForm form, BindException errors) throws Exception
@@ -95,6 +100,7 @@ public class DumbsterController extends SpringActionController
             return _record;
         }
 
+        @SuppressWarnings({"UnusedDeclaration"})
         public void setRecord(boolean record)
         {
             _record = record;
