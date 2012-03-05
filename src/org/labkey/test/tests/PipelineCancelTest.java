@@ -46,7 +46,9 @@ public class PipelineCancelTest  extends BaseSeleniumWebTest
         clickButton("Cancel");
 
         log("Verify cancel succeeded");
-        assertTextPresent("CANCELLING", "Attempting to cancel", "Interrupting job by sending interrupt request.");
+        waitForText("CANCELLING");
+        waitForText("Attempting to cancel");
+        waitForText("Interrupting job by sending interrupt request");
         waitForTextWithRefresh("CANCELLED", defaultWaitForPage);
 
         goToProjectHome();
