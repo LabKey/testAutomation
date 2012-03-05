@@ -30,7 +30,6 @@ public enum TestSet
 {
     DRT(new Class[] {
         BasicTest.class,
-        JUnitTest.class,
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
@@ -38,6 +37,7 @@ public enum TestSet
     }),
 
     BVT(DRT, new Class[] {
+        JUnitTest.class,
         WikiTest.class,
         ExpTest.class,
         AssayTest.class,
@@ -55,7 +55,7 @@ public enum TestSet
         ReagentTest.class,
         FilterTest.class,
 //            GenotypingTest.class,
-            GroupTest.class
+        GroupTest.class
     }),
 
     MS2(new Class[]
