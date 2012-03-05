@@ -402,6 +402,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("notifyList", USER3);
         setFormElement("comment", "Oh Noez!");
         clickNavButton("Save");
+        stopImpersonating();
 
         popLocation();
 
@@ -410,8 +411,6 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         assertTrue(USER3 + " did not receieve updated issue notification", USER3.equals(message.getTo()[0]));
         assertTrue("User did not receive updated issue notification",      PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
-
-        stopImpersonating();
     }
 
     private void entryTypeNameTest()
