@@ -468,10 +468,13 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("3.45399");
         
         checkEC50data();
+        checkCurveFitFailureFlag();
     }
 
     private void checkEC50data()
     {
+        // expect to already be viewing CurveFit query
+        assertTextPresent(TEST_ASSAY_LUM + " CurveFit");
         DataRegionTable table = new DataRegionTable("query", this);
         List<String> analyte = table.getColumnDataAsText("Analyte");
         List<String> formula = table.getColumnDataAsText("Curve Type");
@@ -526,6 +529,29 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         table.clearFilter("EC50");
         table.clearFilter("CurveType");
+    }
+
+    private void checkCurveFitFailureFlag()
+    {
+        // expect to already be viewing CurveFit query
+        assertTextPresent(TEST_ASSAY_LUM + " CurveFit");
+
+        DataRegionTable table = new DataRegionTable("query", this);
+        table.setFilter("FailureFlag", "Equals", "true");
+
+        // expect one 4PL curve fit failure (for HIVIG - VRC A 5304 gp140 (62))
+        table.setFilter("CurveType", "Equals", "Four Parameter");
+        assertEquals("Expected one Four Parameter curve fit failure flag", 1, table.getDataRowCount());
+        List<String> values = table.getColumnDataAsText("Analyte");
+        assertTrue("Unexpected analyte for Four Parameter curve fit failure", values.size() == 1 && values.get(0).equals("VRC A 5304 gp140 (62)"));
+        table.clearFilter("CurveType");
+
+        // expect ten 5PL curve fit failures
+        table.setFilter("CurveType", "Equals", "Five Parameter");
+        assertEquals("Expected ten Five Parameter curve fit failure flags", 10, table.getDataRowCount());
+        table.clearFilter("CurveType");
+
+        table.clearFilter("FailureFlag");
     }
 
     /**
@@ -1289,7 +1315,7 @@ public class LuminexTest extends AbstractQCAssayTest
         String[] aucStdDevs = {"466.81", "6523.08"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, aucAverages, aucStdDevs, "Trapezoidal", "AUCAverage", "AUCStd Dev");
 
-        // upload the final set of runs (2 runs)
+        // upload the final set of runs (3 runs)
         for (int i = 2; i < files.length; i++)
         {
             goToTestAssayHome();
