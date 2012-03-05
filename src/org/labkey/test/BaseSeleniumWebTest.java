@@ -220,6 +220,29 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return _fileUploadAvailable;
     }
 
+    protected boolean isPipelineToolsTest()
+    {
+        return false;
+    }
+
+    // Set pipeline tools directory to the default location if the current location does not exist.
+    private void fixPipelineToolsDirectory()
+    {
+        log("Ensuring pipeline tools directory points to the right place");
+        goToHome();
+        clickAdminMenuItem("Site", "Admin Console");
+        clickLinkWithText("site settings");
+        File currentToolsDirectory = new File(getFormElement("pipelineToolsDirectory"));
+        if(!currentToolsDirectory.exists())
+        {
+            log("Pipeline tools directory does not exist: " + currentToolsDirectory);
+            File defaultToolsDirectory = new File(getLabKeyRoot() + "/build/deploy/bin");
+            log("Setting to default tools directory" + defaultToolsDirectory.toString());
+            setFormElement("pipelineToolsDirectory", defaultToolsDirectory);
+            clickNavButton("Save");
+        }
+    }
+
     public String getBrowserType()
     {
         return System.getProperty("selenium.browser", FIREFOX_BROWSER);
@@ -1139,6 +1162,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 if (!isDatabaseSupported(info))
                 {
                     log("** Skipping " + getClass().getSimpleName() + " test for unsupported database: " + info.productName + " " + info.productVersion);
+                    _testFailed = false;
                     return;
                 }
             }
@@ -1232,6 +1256,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 {
                     resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                     resetSystemMaintenance(); // Return system maintenance config to its pre-test state.
+                    if(isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
+                        fixPipelineToolsDirectory();
                 }
             }
 

@@ -171,4 +171,10 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextNotPresent(SEARCH_FIND);
         assertTextPresent("No data to show");
     }
+
+    @Override
+    protected boolean isPipelineToolsTest()
+    {
+        return true;
+    }
 }

@@ -248,4 +248,10 @@ public class PipelineTest extends PipelineWebTestBase
         popLocation();
         return existingValue;
     }
+
+    @Override
+    protected boolean isPipelineToolsTest()
+    {
+        return true;
+    }
 }
