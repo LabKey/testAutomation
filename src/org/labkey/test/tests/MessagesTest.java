@@ -16,10 +16,18 @@
 
 package org.labkey.test.tests;
 
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 
 public class MessagesTest extends BaseSeleniumWebTest
@@ -32,6 +40,9 @@ public class MessagesTest extends BaseSeleniumWebTest
     private static final String MSG1_BODY = "this is a test message to Banana";
     private static final String RESP1_TITLE = "test response 1";
     private static final String RESP1_BODY = "this is another test, thanks";
+
+    String user = "message_user@gmail.com";
+    String group = "Message group";
 
     public String getAssociatedModuleDirectory()
     {
@@ -52,7 +63,9 @@ public class MessagesTest extends BaseSeleniumWebTest
 
     protected void doCleanup()
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteProject(PROJECT_NAME, false);
+        deleteUser(user, false);
+        deleteGroup(group);
     }
 
     protected void doTestSteps()
@@ -64,6 +77,15 @@ public class MessagesTest extends BaseSeleniumWebTest
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         submit();
         addWebPart("Search");
+        createUser(user, null);
+        goToHome();
+        goToProjectHome();
+        createPermissionsGroup(group);
+        setPermissions(group, "Editor");
+//        add
+        addUserToProjGroup(user, getProjectName(), group);
+        goToProjectHome();
+
 
         enableEmailRecorder();
 
@@ -116,6 +138,32 @@ public class MessagesTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent(MSG1_BODY);
 
+
+        log("verify a user can subscribe to a thread");
+        impersonate(user);
+        goToProjectHome();
+        clickLinkContainingText("view message");
+        Locator subscribeButton = Locator.tagWithText("span", "subscribe");
+        assertElementPresent(subscribeButton);
+        click(subscribeButton);
+        click(Locator.tagWithText("span", "thread"));
+        waitForPageToLoad();
+//        clickButton("Update");
+//        clickButton("Done");
+        clickLinkWithText("unsubscribe");
+        assertElementPresent(subscribeButton);
+
+        click(subscribeButton);
+        click(Locator.tagWithText("span", "forum"));
+        waitForPageToLoad();
+        clickButton("Update");
+        clickButton("Done");
+
+
+        stopImpersonating();
+        goToProjectHome();
+
+
         log("test customize");
         clickLinkWithText("Messages");
         clickLinkWithText("Customize");
@@ -139,11 +187,41 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("test the search module on messages");
         clickLinkWithText(PROJECT_NAME);
         searchFor(PROJECT_NAME, "Banana", 1, MSG1_TITLE);
+        
+        schemaTest();
 
         log("test delete message works and is recognized");
         clickNavButton("Delete Message");
         clickNavButton("Delete");
         assertTextNotPresent(MSG1_TITLE);
         assertTextNotPresent(RESP1_TITLE);
+    }
+
+    private void schemaTest()
+    {
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        SelectRowsCommand selectCmd = new SelectRowsCommand("announcement", "ForumSubscription");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(ContainerFilter.AllFolders);
+        selectCmd.setColumns(Arrays.asList("*"));
+        SelectRowsResponse selectResp = null;
+
+        String[] queries = {"Announcement", "AnnouncementSubscription", "EmailFormat", "EmailOption", "ForumSubscription"};
+        int[] counts = {2, 0, 2, 5, 1};
+
+        for(int i = 0; i<queries.length; i++)
+        {
+            selectCmd.setQueryName(queries[i]);
+            try
+            {
+                selectResp = selectCmd.execute(cn, "/" + getProjectName());
+            }
+            catch (Exception e)
+            {
+               fail(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
+            }
+            assertEquals(counts[i],selectResp.getRowCount().intValue());
+        }
     }
 }
