@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.tests.study.StudyScheduleTester;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
@@ -96,108 +97,11 @@ public class StudyRedesignTest extends StudyBaseTest
 
     private void dataViewsWebpartTest()
     {
-        log("Data Views Test");
-        clickLinkContainingText("Data & Reports");
-        waitForText(someDataSets[3]);
-        assertTextPresent("Data Views", "Name", "Type", "Access");
+        DataViewsTester test = new DataViewsTester(this, getFolderName());
 
-        assertDataDisplayedAlphabetically();
-
-        //TODO:  waiting on hypermove fix
-//        datasetBrowseClickDataTest();
-
-        log("Verify dataset category sorting.");
-        setDataBrowseSearch(BITS[4]);
-        waitForTextToDisappear(BITS[2]);
-        assertTextNotPresent(CATEGORIES[0]);
-        assertTextNotPresent(CATEGORIES[1]);
-        assertTextNotPresent(CATEGORIES[2]);
-        assertEquals("Incorrect number of dataset categories visible.", 2, getXpathCount(Locator.xpath("//div[contains(@class, 'x4-grid-group-title')]"))); // Two categories contain filter text.
-        // 10 datasets(CATEGORIES[3]) + 7 datasets(CATEGORIES[4]) - 1 hidden dataset == 16?
-        assertEquals("Incorrect number of datasets after filter", 16, getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
-        collapseCategory(CATEGORIES[3]);
-        assertEquals("Incorrect number of datasets after collapsing category.", 6, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
-        clickWebpartMenuItem("Data Views", false, "Customize");
-        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.uncheckCheckbox(this, "datasets");
-        setFormElement(Locator.name("webpart.title"), WEBPART_TITLE);
-        clickButton("Save", 0);
-        setDataBrowseSearch("");
-        waitForElement(Locator.linkWithText(REPORT_NAME), WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(WEBPART_TITLE);
-        assertEquals("Incorrect number of datasets after filter", 1, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
-
-        log("Verify cancel button");
-        clickWebpartMenuItem("Data Views", false, "Customize");
-        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.checkCheckbox(this, "datasets");
-        ExtHelper.uncheckCheckbox(this, "reports");
-        setFormElement(Locator.name("webpart.title"), "nothing");
-        clickButton("Cancel", 0);
-        sleep(500);               //TODO: \
-        refresh();                //TODO:  |remove: 13265: Data views webpart admin cancel button doesn't reset form
-        waitForText(REPORT_NAME); //TODO: /
-        assertTextNotPresent("nothing");
-        assertTextPresent(WEBPART_TITLE);
-        assertEquals("Incorrect number of datasets after filter", 1, getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
-
-        log("Verify category management");
-        clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
-        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.checkCheckbox(this, "datasets");
-        clickNavButton("Manage Categories", 0);
-        ExtHelper.waitForExtDialog(this, "Manage Categories");
-        waitAndClick(Locator.xpath("//img[@data-qtip='Delete']"));
-        ExtHelper.waitForExtDialog(this, "Delete Category");
-        clickNavButton("OK", 0);
-        clickNavButton("New Category", 0);
-        setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[5]"), "testcategory"); // TODO: need a better xpath
-        clickNavButton("Done", 0);
-        clickNavButton("Save", 0);
-        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
-        refresh(); // Deleted category is still present, but hidden.  Refresh to clear page.
-        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
-        assertTextNotPresent(CATEGORIES[0]);
-        assertTextPresentInThisOrder(CATEGORIES[2], CATEGORIES[3], "Uncategorized", "APX-1", REPORT_NAME);
-
-        log("Verify modify dataset");
-        click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
-        ExtHelper.waitForExtDialog(this, EDITED_DATASET);
-        setFormElement(Locator.xpath("//label[text() = 'Category']/..//input"), NEW_CATEGORY);
-        setFormElement(Locator.name("description"), NEW_DESCRIPTION);
-        ExtHelper.clickExtButton(this, EDITED_DATASET, "Save", 0);
-        waitForText(NEW_CATEGORY);
-        clickLinkWithText(EDITED_DATASET);
-        assertTextPresent(NEW_DESCRIPTION);
-
-        log("Verify refresh date");
-        String refreshDate = "2012-03-01";
-        clickLinkContainingText("Data & Reports");
-        waitForText(someDataSets[3]);
-        // Refresh date not present when not set.
-        mouseOver(Locator.linkWithText(EDITED_DATASET));
-        waitForText("Type:");
-        assertTextNotPresent("Refresh Date:");
-        clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
-        waitForElement(Locator.button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.checkCheckbox(this, "Modified");
-        ExtHelper.checkCheckbox(this, "Refresh Date");
-        Locator manageButton = getButtonLocator("Manage Categories");
-        clickButton("Save", 0);
-        waitForElementToDisappear(manageButton, WAIT_FOR_JAVASCRIPT);
-        waitForText("Refresh Date");
-        waitForText("Modified");
-        click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
-        ExtHelper.waitForExtDialog(this, EDITED_DATASET);
-        setFormElement("refreshDate", refreshDate);
-        ExtHelper.clickExtButton(this, EDITED_DATASET, "Save", 0);
-        waitForText(refreshDate, 1, WAIT_FOR_JAVASCRIPT);
-        // check hover box
-        mouseOver(Locator.linkWithText(EDITED_DATASET));
-        waitForText("Refresh Date:");
-        assertTextPresent("Thu Mar 01 2012");
-        clickLinkWithText(EDITED_DATASET);
-        assertTextPresent("Refresh Date: Thu Mar 01 00:00:00 PST 2012");
+        test.basicTest();
+        test.datasetStatusTest();
+        test.refreshDateTest();
     }
 
     private void scheduleWebpartTest()

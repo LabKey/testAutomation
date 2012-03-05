@@ -230,7 +230,7 @@ public class StudyScheduleTester
                 _test.click(Locator.ext4Radio("Import data from file"));
                 _test.clickNavButton("Next");
 
-                String datasetFileName = _sampleDataPath + "/datasets/plate001.tsv";
+                String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
                 File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
 
                 if (file.exists())
@@ -243,7 +243,7 @@ public class StudyScheduleTester
                     _test.clickNavButton("Import");
                 }
                 else
-                    StudyBaseTest.fail("The dataset import .tsv file (plate001.tsv) does not exist");
+                    StudyBaseTest.fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case placeholder:
                 _test.click(Locator.ext4Radio("do this later"));
@@ -304,7 +304,7 @@ public class StudyScheduleTester
                 _test.click(Locator.ext4Radio("Import data from file"));
                 _test.clickNavButton("Next");
 
-                String datasetFileName = _sampleDataPath + "/datasets/plate001.tsv";
+                String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
                 File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
 
                 if (file.exists())
@@ -317,7 +317,7 @@ public class StudyScheduleTester
                     _test.clickNavButton("Import");
                 }
                 else
-                    StudyBaseTest.fail("The dataset import .tsv file (plate001.tsv) does not exist");
+                    StudyBaseTest.fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case linkeToExisting:
                 _test.click(Locator.ext4Radio("Link to existing dataset"));
