@@ -102,6 +102,7 @@ public class ReportTest extends StudyBaseTest
 
     protected void doCreateSteps()
     {
+        enableEmailRecorder();
         // fail fast if R is not configured
         RReportHelper.ensureRConfig(this);
 
