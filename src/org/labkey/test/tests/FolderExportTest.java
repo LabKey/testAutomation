@@ -39,15 +39,16 @@ public class FolderExportTest extends BaseSeleniumWebTest
     protected String getProjectName()
     {
         return "FolderExportTest";
+    }
 
+    protected boolean isDatabaseSupported(DatabaseInfo info)
+    {
+        return System.getProperty("os.name").contains("Windows");
     }
 
     @Override
     protected void doTestSteps() throws Exception
     {
-        if(!System.getProperty("os.name").contains("Windows"))   // this doesn't work on linux for non-roduct reasons
-            return;
-
         createProject(getProjectName());
         
         verifyImportFromZip();
