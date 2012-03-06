@@ -2703,6 +2703,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }, failMessage, wait);
     }
 
+    public void waitForElement(final Locator locator)
+    {
+        waitForElement(locator, defaultWaitForPage);
+    }
+
     public void waitForElement(final Locator locator, int wait)
     {
         String failMessage = "Element with locator " + locator + " did not appear.";
@@ -3279,6 +3284,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Selecting tab " + tabname);
         assertLinkPresent(getTabLinkId(tabname));
         clickLink(getTabLinkId(tabname));
+    }
+
+    public void clickImageWithTitle(String title, int mills)
+    {
+        Locator l = Locator.tagWithAttribute("img", "title", title);
+        clickAndWait(l, mills);
     }
 
     public void clickImageWithAltText(String altText, int millis)

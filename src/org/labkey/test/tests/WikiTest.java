@@ -28,7 +28,7 @@ import java.io.File;
  */
 public class WikiTest extends BaseSeleniumWebTest
 {
-    private static final String PROJECT_NAME = "WikiVerifyProject";
+    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";
 
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_TEST = "Best Gene Name";
@@ -47,6 +47,11 @@ public class WikiTest extends BaseSeleniumWebTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    protected String getSubolderName()
+    {
+          return "Subfolder";
     }
 
     @Override
@@ -104,6 +109,7 @@ public class WikiTest extends BaseSeleniumWebTest
         log("test search wiki");
         searchFor(PROJECT_NAME, "Wiki", 1, WIKI_PAGE_TITLE);
 
+
         log("test edit wiki");
         clickLinkWithText("Edit");
         setFormElement("title", WIKI_PAGE_ALTTITLE);
@@ -112,14 +118,34 @@ public class WikiTest extends BaseSeleniumWebTest
             "<b>More HTML content</b><br>\n";
         setWikiBody(wikiPageContentEdited);
         saveWikiPage();
+        verifyWikiPagePresent();
 
-        assertTextPresent("More HTML content");
-        assertTextPresent(WIKI_PAGE_ALTTITLE);
+        log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
+        createSubfolder(getProjectName(), getSubolderName(), new String[] {});
+        addWebPart("Wiki");
+        click(Locator.tagWithAttribute("img", "title", "More"));
+        clickLink(Locator.tagWithText("span", "Customize"));
+        waitForElement(getButtonLocator("Submit"));
+        selectOptionByText(Locator.name("webPartContainer"), "/"+getProjectName());
+        clickButton("Submit");
+        verifyWikiPagePresent();
 
         log("test delete wiki");
-        clickLinkWithText("Edit");
+        goToProjectHome();
+        clickImageWithTitle("Edit", defaultWaitForPage);
         clickNavButton("Delete Page");
         clickNavButton("Delete");
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
+
+        log("verify second wiki part pointing to first handled delete well");
+        clickLinkWithText(getSubolderName());
+        assertTextPresent("This folder does not currently contain any wiki pages to display");
+    }
+
+    protected void verifyWikiPagePresent()
+    {
+        assertTextPresent("More HTML content");
+        assertTextPresent(WIKI_PAGE_ALTTITLE);
+
     }
 }
