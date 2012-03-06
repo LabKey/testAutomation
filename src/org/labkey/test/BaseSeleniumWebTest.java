@@ -238,7 +238,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Pipeline tools directory does not exist: " + currentToolsDirectory);
             File defaultToolsDirectory = new File(getLabKeyRoot() + "/build/deploy/bin");
             log("Setting to default tools directory" + defaultToolsDirectory.toString());
-            setFormElement("pipelineToolsDirectory", defaultToolsDirectory);
+            setFormElement("pipelineToolsDirectory", defaultToolsDirectory.toString());
             clickNavButton("Save");
         }
     }
