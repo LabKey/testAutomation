@@ -175,7 +175,6 @@ public class FileContentTest extends BaseSeleniumWebTest
             //waitForExtMaskToDisappear();
             //waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             
-            clickButton("Upload Files", 0);
             String filename = "InlineFile.html";
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
