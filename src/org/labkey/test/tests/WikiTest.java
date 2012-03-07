@@ -127,6 +127,7 @@ public class WikiTest extends BaseSeleniumWebTest
         clickLink(Locator.tagWithText("span", "Customize"));
         waitForElement(getButtonLocator("Submit"));
         selectOptionByText(Locator.name("webPartContainer"), "/"+getProjectName());
+        sleep(50);
         clickButton("Submit");
         verifyWikiPagePresent();
 
