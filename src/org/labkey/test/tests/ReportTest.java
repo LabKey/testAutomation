@@ -720,7 +720,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
-        assertEquals("", 18, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-grid3-body')]/div[contains(@class, 'x-grid3-row')]")));
+        assertEquals("", 17, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-grid3-body')]/div[contains(@class, 'x-grid3-row')]")));
 
         ExtHelper.clickXGridPanelCheckbox(this, "label", "2a. Creatinine", true);
         ExtHelper.clickXGridPanelCheckbox(this, "label", "1a.ALT AE Severity Grade", true);
