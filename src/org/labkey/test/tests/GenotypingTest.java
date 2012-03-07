@@ -179,8 +179,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         goToProjectHome();
 
-        clickLinkContainingText("View Analyses");
-        clickLinkContainingText("" + getRunNumber());
+        clickLinkWithText("View Analyses");
+        clickLinkWithText("" + getRunNumber());  // TODO: This is probably still too permissive... need a more specific way to get the run link
 
         assertTextPresent("Reads", "Sample Id", "Percent");
 
