@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-EXEC sp_addapprole 'vehicle', 'password';
+CREATE SCHEMA vehicle;
+GO
 
 CREATE TABLE vehicle.Colors
 (
