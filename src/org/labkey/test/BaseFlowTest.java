@@ -287,7 +287,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
 
         // Analysis engine can only be selected when no FCS files are associated with the run
-        if (options.getFcsPath() != null || options.isExistingKeywordRun())
+        // or if the workspace is not a PC workspace (.wsp)
+        if ((options.getFcsPath() != null || options.isExistingKeywordRun()) && !options.getWorkspacePath().endsWith(".wsp"))
             importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
 
         importAnalysis_analysisOptions(options.getContainerPath(), options.getImportGroupNames(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationSubsets(), options.getREngineNormalizationParameters());
