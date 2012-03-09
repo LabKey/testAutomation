@@ -123,11 +123,9 @@ public class WikiTest extends BaseSeleniumWebTest
         log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
         createSubfolder(getProjectName(), getSubolderName(), new String[] {});
         addWebPart("Wiki");
-        click(Locator.tagWithAttribute("img", "title", "More"));
-        clickLink(Locator.tagWithText("span", "Customize"));
-        waitForElement(getButtonLocator("Submit"));
+        clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/"+getProjectName());
-        sleep(50);
+        waitForElement(Locator.xpath("//option[@value='Test Wiki']"));
         clickButton("Submit");
         verifyWikiPagePresent();
 
