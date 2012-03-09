@@ -126,11 +126,11 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertElementContains(Locator.id("HiddenData_div"), "super secret!");
 
 
-        log("Test assay query metadata when module is active");
+        log("Issue 13404: Test assay query metadata is available when module is active or inactive");
         selenium.goBack();
         waitForPageToLoad();
         clickLinkContainingText("view runs");
-        assertTextNotPresent("Simple Assay Button");
+        assertTextPresent("Simple Assay Button");
         pushLocation();
         enableModule(PROJECT_NAME, "miniassay");
         popLocation();
