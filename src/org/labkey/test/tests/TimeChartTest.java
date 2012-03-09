@@ -725,9 +725,9 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Test charting with participant groups");
         log("Create participant groups");
-        StudyHelper.createParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP1_NAME, GROUP1_PTIDS);
-        StudyHelper.createParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP2_NAME, GROUP2_PTIDS);
-        StudyHelper.createParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP3_NAME, GROUP3_PTIDS);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP1_NAME, "Participant", true, GROUP1_PTIDS);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP2_NAME, "Participant", false, GROUP2_PTIDS);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP3_NAME, "Participant", false, GROUP3_PTIDS);
 
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("Manage Views");
@@ -816,6 +816,9 @@ public class TimeChartTest extends StudyBaseTest
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(REPORT_NAME_3);
         assertTextNotPresent(GROUP3_NAME);
+
+        waitForElement(Locator.xpath("//div[contains(@class, x-form-display-field)][contains(text(), 'One or more of the participant groups originally saved with this chart are not currently visible.')]"), WAIT_FOR_JAVASCRIPT);
+
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 1); // One chart per group.
         // Expected counts = one for the legend plus one for each point on the line
@@ -861,10 +864,20 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("Save", 0);
         ExtHelper.waitForExtDialog(this, "Success");
         ExtHelper.clickExtButton(this, "Success", "OK", 0);
+
+        //Now impersonate another user, make sure only 2 groups show up and warning was given.
+        pushLocation();
+        impersonate(USER1);
+        popLocation(); // Saved Chart with groups.
+        waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[contains(@class, x-form-display-field)][contains(text(), 'One or more of the participant groups originally saved with this chart are not currently visible.')]"), WAIT_FOR_JAVASCRIPT);
+        stopImpersonating();
+
     }
 
     private void multiAxisTimeChartTest()
     {
+        clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText("Manage Views");
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));

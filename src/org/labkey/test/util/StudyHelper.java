@@ -34,6 +34,11 @@ public class StudyHelper
 
     public static void createCustomParticipantGroup(BaseSeleniumWebTest test, String projectName, String studyFolder, String groupName, String participantString, String... ptids)
     {
+        createCustomParticipantGroup(test, projectName, studyFolder, groupName, participantString, false, ptids);
+    }
+
+    public static void createCustomParticipantGroup(BaseSeleniumWebTest test, String projectName, String studyFolder, String groupName, String participantString, Boolean shared, String... ptids)
+    {
         if( !test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
             test.clickLinkWithText(projectName);
@@ -52,6 +57,10 @@ public class StudyHelper
             for( int i = 1; i < ptids.length; i++ )
                 csp += ","+ptids[i];
             test.setFormElement("categoryIdentifiers", csp);
+        }
+        if(shared)
+        {
+            test.checkCheckbox("Shared");
         }
         ExtHelper.clickExtButton(test, "Define "+participantString+" Group", "Save", 0);
         test.waitForExtMaskToDisappear();
