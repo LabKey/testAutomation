@@ -738,7 +738,7 @@ public class StudyTest extends StudyBaseTest
         assertTextNotPresent("Screening Cycle");
         assertTextNotPresent("Cycle 1");
         assertTextPresent("Pre-exist Cond");
-        clickLinkWithText("Show Hidden Data");
+        clickLinkWithText("Show All Datasets");
         assertTextPresent("Screening Cycle");
         assertTextPresent("Cycle 1");
         assertTextPresent("Pre-exist Cond");
