@@ -728,8 +728,8 @@ public class ReportTest extends StudyBaseTest
 
         clickNavButton("Select", 0);
 
-        waitForText("MouseId:", 8, WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("2a. Creatinine", 11); // 8 mice + 1 Report Field list + 2 in hidden add field dialog
+        waitForText("Visit Date", 8, WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("2a. Creatinine", 19); // 8 mice + 8 grid field tooltips + 1 Report Field list + 2 in hidden add field dialog
         //TODO: 13905: Participant report: Column headers getting messed up.
 //        assertTextPresent("1a.ALT AE Severity Grade", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
 //        assertTextPresent("1a. ALT (SGPT)", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
@@ -738,21 +738,18 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cps-1");
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "2a. Creatinine");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
-        assertEquals("", 11, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-grid3-body')]/div[contains(@class, 'x-grid3-row')]")));
-
-        ExtHelper.clickXGridPanelCheckbox(this, "label", "2a. Creatinine", true);
-        ExtHelper.clickXGridPanelCheckbox(this, "label", "1a. ALT (SGPT)", true);
-
+        assertEquals("", 4, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//div[contains(@class, 'x-grid3-body')]/div[contains(@class, 'x-grid3-row')]")));
+        ExtHelper.clickXGridPanelCheckbox(this, "queryName", "CPS-1", true);
         clickNavButton("Select", 0);
 
         // at this point the report should render some content
-        waitForText("Creatinine", 21, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns) + 1 Report Field list + 2 in hidden add field dialog
+        waitForText("Creatinine", 37, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns + tooltips) + 1 Report Field list + 2 in hidden add field dialog
         //TODO: 13905: Participant report: Column headers getting messed up.
 //        assertTextPresent("1a.ALT AE Severity Grade", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
 //        assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice (x2 columns) + 1 Report Field list + 1 in hidden add field dialog
-        assertTextPresent("MouseId:", 8);
+        assertTextPresent("Showing 8 Results");
 
         // verify form validation
         clickNavButton("Save", 0);
@@ -770,12 +767,12 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Views");
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
-        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns)
+        waitForText("Creatinine", 32, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns)
         assertTextPresent(PARTICIPANT_REPORT_NAME);
         //TODO: 13905: Participant report: Column headers getting messed up.
 //        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice
 //        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
-        assertTextPresent("MouseId:", 8);
+        assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
 
         // Delete a column and save report
@@ -817,14 +814,14 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Views");
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
-        waitForText("Creatinine", 8, WAIT_FOR_JAVASCRIPT); // 8 mice
+        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice
         waitForText("Showing 8 Results", 1, WAIT_FOR_JAVASCRIPT); // There should only be 8 results, and it should state that.
 
         assertTextPresent(PARTICIPANT_REPORT_NAME);
         //TODO: 13905: Participant report: Column headers getting messed up.
 //        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice
 //        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
-        assertTextPresent("MouseId:", 8);
+        assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
@@ -837,11 +834,11 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Views");
         clickReportGridLink(PARTICIPANT_REPORT2_NAME, "view");
 
-        waitForText("Creatinine", 8, WAIT_FOR_JAVASCRIPT); // 8 mice
+        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice
         assertTextPresent(PARTICIPANT_REPORT2_NAME);
         assertTextNotPresent("1a.ALT AE Severity Grade");
         assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
-        assertTextPresent("MouseId:", 8);
+        assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
