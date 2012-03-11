@@ -19,6 +19,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: Trey Chadick
@@ -38,13 +39,49 @@ public class SearchHelper
     public static void verifySearchResults(BaseSeleniumWebTest test, String container, boolean crawlResults)
     {
         test.log("Verify search results.");
-        for ( SearchItem item : _searchQueue )
+
+        List<SearchItem> notFound = verifySearchItems(_searchQueue, test, container, crawlResults);
+
+        if (!notFound.isEmpty())
+        {
+            test.sleep(5000);
+            notFound = verifySearchItems(notFound, test, container, crawlResults);
+
+            if (!notFound.isEmpty())
+            {
+                test.sleep(10000);
+                notFound = verifySearchItems(notFound, test, container, crawlResults);
+
+                test.assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
+            }
+        }
+    }
+
+    private static List<SearchItem> verifySearchItems(List<SearchItem> items, BaseSeleniumWebTest test, String container, boolean crawlResults)
+    {
+        test.log("Verifying " + items.size() + " items");
+        LinkedList<SearchItem> notFound = new LinkedList<SearchItem>();
+
+        for ( SearchItem item : items)
         {
             searchFor(test, item._searchTerm);
+            boolean success = true;
+
             for( Locator loc : item._searchResults )
             {
-                test.assertElementPresent(loc);
+                if (!test.isElementPresent(loc))
+                {
+                    success = false;
+                    break;
+                }
             }
+
+            if (!success)
+            {
+                notFound.add(item);
+                continue;
+            }
+
             if ( container != null )
             {
                 if ( test.isLinkPresentContainingText("@files") )
@@ -52,11 +89,19 @@ public class SearchHelper
                 else
                     test.assertLinkPresentWithText(container);
             }
+
             if ( crawlResults )
             {
                 test.fail("Search result crawling not yet implemented");
             }
         }
+
+        if (notFound.isEmpty())
+            test.log("All items were found");
+        else
+            test.log(notFound.size() + " items were not found.");
+
+        return notFound;
     }
 
     public static void verifyNoSearchResults(BaseSeleniumWebTest test)
@@ -116,6 +161,12 @@ public class SearchHelper
             _searchTerm = term;
             _searchResults = results.clone();
             _file = file;
+        }
+
+        @Override
+        public String toString()
+        {
+            return _searchTerm;
         }
     }
 }
