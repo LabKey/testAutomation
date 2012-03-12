@@ -48,7 +48,7 @@ public class LuminexPositivityTest extends LuminexTest
         checkCheckbox("calculatePositivity");
         setFormElement("baseVisit", "1");
         setFormElement("positivityFoldChange", "3");
-        File positivityData = new File(getSampledataPath(), "/Luminex/Positivity.xls");
+        File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
         assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
         setFormElement("__primaryFile__", positivityData);
         clickNavButton("Next");
