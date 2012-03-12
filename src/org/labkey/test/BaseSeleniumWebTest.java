@@ -904,11 +904,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             log("Register the first user");
             pushLocation();
+            assertTextPresent("Retype Password");
             verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword(), null);
 
             log("Attempting to register another initial user");
             popLocation();
-            assertTextPresent("Initial user has already been created.");
+            // Make sure we got redirected to the module status page, since we already have a user
+            assertTextNotPresent("Retype Password");
+            assertTextPresent("Please wait, this page will automatically update with progress information");
             goToHome();
         }
 
