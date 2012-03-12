@@ -367,6 +367,14 @@ public class Locator
             return xpath("//img[@src=" + xq(src) + "]");
     }
 
+    public static XPathLocator imageWithAltText(String altText, boolean substringMatch)
+    {
+        if (substringMatch)
+            return xpath("//img[contains(@src, " + xq(altText) + ")]");
+        else
+            return xpath("//img[@alt=" + xq(altText) + "]");
+    }
+
     public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
     {
         String linkText = schemaName + "." + queryName + "." + (null != pkName ? pkName : "");
