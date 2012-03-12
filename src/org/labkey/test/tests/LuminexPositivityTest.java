@@ -35,7 +35,9 @@ public class LuminexPositivityTest extends LuminexTest
     protected void runUITests()
     {
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
-//        sleep(10000);
+
+        //clickNavButton("Save & Close");
+        //TODO: Just 'Save & Close' to avoid timing issues. Blocked
         saveAssay();
         sleep(5000);
 
@@ -46,10 +48,9 @@ public class LuminexPositivityTest extends LuminexTest
         checkCheckbox("calculatePositivity");
         setFormElement("baseVisit", "1");
         setFormElement("positivityFoldChange", "3");
-        File  positivityData = new File(getLabKeyRoot() + "\\sampledata\\Luminex\\Positivity.xls");
-        assertTrue("Positivity Data absent", positivityData.exists());
+        File positivityData = new File(getSampledataPath(), "/Luminex/Positivity.xls");
+        assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
         setFormElement("__primaryFile__", positivityData);
-        sleep(100);
         clickNavButton("Next");
         clickNavButton("Save and Finish");
         clickLinkWithText(assayName);
