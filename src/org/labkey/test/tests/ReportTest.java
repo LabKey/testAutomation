@@ -912,7 +912,7 @@ public class ReportTest extends StudyBaseTest
         waitAndClickNavButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "Blood (whole)");
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "primary type vial counts");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x-form-text') and @type='text']");
 
         ExtHelper.clickXGridPanelCheckbox(this, "label", "Blood (Whole) Vial Count", true);
