@@ -1221,10 +1221,11 @@ public class MS2Test extends MS2TestBase
     private void pepXMLtest()
     {
         clickNavButton("Process and Import Data");
-        sleep(2000);
+//        sleep(2000);
         ExtHelper.selectFileBrowserItem(this, "pepXML/truncated.pep.xml");
         selectImportDataAction("Import Search Results");
-        clickLinkWithText("drt/CAexample_mini (DRT2)");
+        refresh();
+        clickLinkWithText("ms2pipe/truncated (pepXML)");
         String windowName = "peptideProphetSummary";
         selenium.openWindow("", windowName);
         clickLinkWithText("Show Peptide Prophet Details", false);
@@ -1232,7 +1233,7 @@ public class MS2Test extends MS2TestBase
         selenium.selectWindow(windowName);
         assertElementPresent(Locator.imageWithAltText("Charge 3+ Cumulative Observed vs. Model", false));
         assertEquals("Incorrect number of graphs", 13, getXpathCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
-        assertTextPresent("PeptideProphet Details: CAexample_mini.pep.xml - Experiment Import - CAexample_mini.search.xar.xml ");
+        assertTextPresent("PeptideProphet Details: ms2pipe/truncated (pepXML)");
         selenium.close();
         selenium.selectWindow(null);
 
