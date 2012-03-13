@@ -45,8 +45,8 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
                                                      PTIDS[0] + "\t"+SEQ_NUMBER+"\n" +
                                                      PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
-    private final File PROTOCOL_DOC = new File( getLabKeyRoot() + getSampleDataPath() + "/Protocol.txt");
-    private final File PROTOCOL_DOC2 = new File( getLabKeyRoot() + getSampleDataPath() + "/Protocol2.txt");
+    private final File PROTOCOL_DOC = new File( getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
+    private final File PROTOCOL_DOC2 = new File( getLabKeyRoot() + getStudySampleDataPath() + "/Protocol2.txt");
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -58,14 +58,8 @@ public class AncillaryStudyTest extends StudyBaseTest
     public void doCleanup()
     {
         // Delete any containers and users created by the test.
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Exception e)
-        {
-            /* ingnore */
-        }
+        try{deleteProject(PROJECT_NAME);}catch (Exception e){/* ingnore */}
+        deleteDir(new File(getPipelinePath(), "export"));
     }
 
     @Override

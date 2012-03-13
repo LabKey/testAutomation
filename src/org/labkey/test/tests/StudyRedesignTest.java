@@ -106,7 +106,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
     private void scheduleWebpartTest()
     {
-        StudyScheduleTester tester = new StudyScheduleTester(this, getFolderName(), getSampleDataPath());
+        StudyScheduleTester tester = new StudyScheduleTester(this, getFolderName(), getStudySampleDataPath());
 
         tester.basicTest();
         tester.linkDatasetTest();

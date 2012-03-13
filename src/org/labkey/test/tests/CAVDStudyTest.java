@@ -93,7 +93,7 @@ public class CAVDStudyTest extends StudyBaseTest
         click(Locator.ext4Radio("Import data from file"));
         clickNavButton("Next");
 
-        String datasetFileName = getSampleDataPath() + "/datasets/plate001.tsv";
+        String datasetFileName = getStudySampleDataPath() + "/datasets/plate001.tsv";
         File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
 
         if (file.exists())

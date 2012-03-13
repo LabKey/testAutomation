@@ -33,8 +33,8 @@ import java.io.FilenameFilter;
 // verification steps.
 public abstract class StudyBaseTest extends SimpleApiTest
 {
-    protected static final String ARCHIVE_TEMP_DIR = getSampleDataPath() + "drt_temp";
-    protected static final String SPECIMEN_ARCHIVE_A = getSampleDataPath() + "specimens/sample_a.specimens";
+    protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";
+    protected static final String SPECIMEN_ARCHIVE_A = getStudySampleDataPath() + "specimens/sample_a.specimens";
 
     private SpecimenImporter _specimenImporter;
 
@@ -47,14 +47,14 @@ public abstract class StudyBaseTest extends SimpleApiTest
         return "server/modules/study";
     }
 
-    protected static String getSampleDataPath()
+    protected static String getStudySampleDataPath()
     {
         return "/sampledata/study/";
     }
 
     protected String getPipelinePath()
     {
-        return getLabKeyRoot() + getSampleDataPath();
+        return getLabKeyRoot() + getStudySampleDataPath();
     }
 
     protected String getProjectName()

@@ -32,9 +32,9 @@ import java.util.Set;
  */
 public class StudyManualTest extends StudyTest
 {
-    private final String CRF_SCHEMAS = getSampleDataPath() + "datasets/schema.tsv";
+    private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
 
-    protected final String VISIT_MAP = getSampleDataPath() + "v068_visit_map.txt";
+    protected final String VISIT_MAP = getStudySampleDataPath() + "v068_visit_map.txt";
 
     @Override
     protected boolean isFileUploadTest()
