@@ -159,7 +159,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public static String getSampledataPath()
     {
-        return getLabKeyRoot() + "\\sampledata";
+        File path = new File(getLabKeyRoot(), "sampledata");
+        return path.toString();
     }
     public static String getContextPath()
     {
