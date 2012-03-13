@@ -1224,8 +1224,9 @@ public class MS2Test extends MS2TestBase
 //        sleep(2000);
         ExtHelper.selectFileBrowserItem(this, "pepXML/truncated.pep.xml");
         selectImportDataAction("Import Search Results");
-        refresh();
-        clickLinkWithText("ms2pipe/truncated (pepXML)");
+        String ms2Run = "ms2pipe/truncated (pepXML)";
+        waitForTextWithRefresh(ms2Run, defaultWaitForPage);
+        clickLinkWithText(ms2Run);
         String windowName = "peptideProphetSummary";
         selenium.openWindow("", windowName);
         clickLinkWithText("Show Peptide Prophet Details", false);
