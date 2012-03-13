@@ -279,9 +279,9 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText(REFRESH_DATE, 1, WAIT_FOR_JAVASCRIPT);
         // check hover box
         mouseOver(Locator.linkWithText(EDITED_DATASET));
-        waitForText("Refresh Date:");
+        waitForText("Data Cut Date:");
         assertTextPresent("Thu Mar 01 2012");
         clickLinkWithText(EDITED_DATASET);
-        assertTextPresent("Refresh Date: Thu Mar 01 00:00:00 PST 2012");
+        assertTextPresent("Data Cut Date: Thu Mar 01 00:00:00 PST 2012");
     }
 }

@@ -221,15 +221,15 @@ public class DataViewsTester
         // Refresh date not present when not set.
         _test.mouseOver(Locator.linkWithText(EDITED_DATASET));
         _test.waitForText("Type:");
-        _test.assertTextNotPresent("Refresh Date:");
+        _test.assertTextNotPresent("Data Cut Date:");
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         ExtHelper.checkCheckbox(_test, "Modified");
-        ExtHelper.checkCheckbox(_test, "Refresh Date");
+        ExtHelper.checkCheckbox(_test, "Data Cut Date");
         Locator manageButton = _test.getButtonLocator("Manage Categories");
         _test.clickButton("Save", 0);
         _test.waitForElementToDisappear(manageButton, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForText("Refresh Date");
+        _test.waitForText("Data Cut Date");
         _test.waitForText("Modified");
         _test.click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
         ExtHelper.waitForExtDialog(_test, EDITED_DATASET);
@@ -238,9 +238,9 @@ public class DataViewsTester
         _test.waitForText(refreshDate, 1, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         // check hover box
         _test.mouseOver(Locator.linkWithText(EDITED_DATASET));
-        _test.waitForText("Refresh Date:");
+        _test.waitForText("Data Cut Date:");
         _test.assertTextPresent("Thu Mar 01 2012");
         _test.clickLinkWithText(EDITED_DATASET);
-        _test.assertTextPresent("Refresh Date: Thu Mar 01 00:00:00 PST 2012");
+        _test.assertTextPresent("Data Cut Date: Thu Mar 01 00:00:00 PST 2012");
     }
 }
