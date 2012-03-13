@@ -33,7 +33,7 @@ public enum TestSet
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
-        StudyTest.class
+        StudyTest.class,
     }),
 
     BVT(DRT, new Class[] {
@@ -41,21 +41,16 @@ public enum TestSet
         WikiTest.class,
         ExpTest.class,
         AssayTest.class,
-        StudyExportTest.class,
-        FolderExportTest.class,
         PipelineTest.class,
-        PipelineCancelTest.class,
         FileContentTest.class,
         ClientAPITest.class,
-        MissingValueIndicatorsTest.class,
         ReportTest.class,
         MicroarrayTest.class,
-        ViabilityTest.class,
         ButtonCustomizationTest.class,
         ReagentTest.class,
         FilterTest.class,
-//            GenotypingTest.class,
-        GroupTest.class
+        GroupTest.class,
+        StudyRedesignTest.class,
     }),
 
     MS2(new Class[]
@@ -133,9 +128,14 @@ public enum TestSet
         GpatAssayTest.class,
         FolderTest.class,
         StudyDemoModeTest.class,
-        StudyRedesignTest.class,
         LibraTest.class,
         AncillaryStudyTest.class,
+        FolderExportTest.class,
+//            GenotypingTest.class,
+        MissingValueIndicatorsTest.class,
+        PipelineCancelTest.class,
+        StudyExportTest.class,
+        ViabilityTest.class,
     }),
 
     MiniTest(new Class[]
