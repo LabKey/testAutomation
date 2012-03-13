@@ -44,7 +44,7 @@ public enum TestSet
         StudyExportTest.class,
         FolderExportTest.class,
         PipelineTest.class,
-        //PipelineCancelTest.class,
+        PipelineCancelTest.class,
         FileContentTest.class,
         ClientAPITest.class,
         MissingValueIndicatorsTest.class,

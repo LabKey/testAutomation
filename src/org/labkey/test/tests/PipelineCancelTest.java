@@ -29,7 +29,7 @@ import java.io.File;
  */
 public class PipelineCancelTest  extends BaseSeleniumWebTest
 {
-    private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
+    private static final String STUDY_ZIP = "/sampledata/pipelineCancel/LabkeyDemoStudy.zip";
     @Override
     protected String getProjectName()
     {
@@ -42,17 +42,18 @@ public class PipelineCancelTest  extends BaseSeleniumWebTest
         startImportStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
 
         log("Cancel import");
-        clickLinkWithText("LOAD STUDY RUNNING");
+        waitForText("Delaying import");
+        clickLinkContainingText("Delaying import");
         clickButton("Cancel");
 
         log("Verify cancel succeeded");
-        waitForText("CANCELLING");
+//        waitForText("CANCELLED");
         waitForText("Attempting to cancel");
-        waitForText("Interrupting job by sending interrupt request");
+//        waitForTextWithRefresh("Interrupting job by sending interrupt request", defaultWaitForPage);
         waitForTextWithRefresh("CANCELLED", defaultWaitForPage);
 
         goToProjectHome();
-        assertTextPresent("Data is present for 0 Participants"); //part of the import will be done, but it shouldn't have gotten to participants.
+        assertTextPresent("This folder does not contain a study."); //part of the import will be done, but it shouldn't have gotten to participants.
 
     }
 
