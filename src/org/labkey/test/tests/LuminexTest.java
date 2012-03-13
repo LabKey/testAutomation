@@ -1691,6 +1691,14 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void verifyQCReport()
     {
+        //make sure all the columns we want are viable
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.showHiddenItems(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Five ParameterCurveFit/FailureFlag");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Four ParameterCurveFit/FailureFlag");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "Five ParameterCurveFit/EC50");
+        CustomizeViewsHelper.saveCustomView(this);
+
         assertTextPresent(TEST_ASSAY_LUM + " QC Report");
         DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " AnalyteTitration", this);
         String isotype = drt.getDataAsText(0, "Isotype");
@@ -1699,6 +1707,24 @@ public class LuminexTest extends AbstractQCAssayTest
         String conjugate = drt.getDataAsText(0, "Conjugate");
         if(conjugate.length()==0)
             conjugate =  "[None]";
+
+        log("verify the calculation failure flag");
+        List<String> fourParamFlag = drt.getColumnDataAsText("Four Parameter Curve Fit Failure Flag");
+        for(String flag: fourParamFlag)
+        {
+            assertEquals("", flag);
+        }
+
+        List<String> fiveParamFlag = drt.getColumnDataAsText("Five Parameter Curve Fit Failure Flag");
+        List<String> fiveParamData = drt.getColumnDataAsText("Five Parameter Curve Fit EC50");
+
+        for(int i=0; i<fiveParamData.size(); i++)
+        {
+            assertTrue("Row " + i + " was flagged as 5PL failure but had EC50 data", ((fiveParamFlag.get(i).length() == 0) ^ (fiveParamData.get(i).length() == 0)));
+        }
+
+
+        //verify the Levey-Jennings plot
         clickLinkWithText("graph",0);
         waitForText(" - " + isotype + " " + conjugate);
         assertTextPresent( "HIVIG Levey-Jennings Report");

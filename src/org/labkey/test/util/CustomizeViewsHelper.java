@@ -96,6 +96,15 @@ public class CustomizeViewsHelper
         test.clickNavButton("Revert");
     }
 
+    /**
+     * add a column to an already open customize view gried
+     *
+     * @param test The BaseSeleniumWebTest that will be used to make Selenium calls.  Almost always "this"
+     * @param column_name Name of the column.  If your column is nested, should be of the form
+     *          "nodename/nodename/lastnodename", where nodename is not the displayed text of a node
+     *          but the name included in the span containing the checkbox.  It will often be the same name,
+     *          but with less whitespace
+     */
     public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String column_name)
     {
         addCustomizeViewColumn(test, column_name, column_name);
@@ -245,6 +254,7 @@ public class CustomizeViewsHelper
         }while (test.isElementPresent(item)); // Removes all clauses for a single fieldkey
     }
 
+    //enable customize view grid to show hidden fields
     public static void showHiddenItems(BaseSeleniumWebTest test)
     {
         test.click(Locator.tagWithText("Label","Show Hidden Fields"));
