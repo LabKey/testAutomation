@@ -333,7 +333,7 @@
     "Good": 9,
     "Like": "Robust",
     "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Green",
-    "Month": "2000/04/01 00:00:00",
+    "Month": "2000/04/04 00:00:00",
     "Color": "Green"
 },
 {
@@ -534,7 +534,7 @@
     "Good": 8,
     "Like": "Mellow",
     "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Red",
-    "Month": "2000/03/01 00:00:00",
+    "Month": "2000/03/03 00:00:00",
     "Color": "Red"
 },
 {
@@ -687,7 +687,7 @@
     "Good": 7,
     "Like": "Light",
     "_labkeyurl_Like": "/labkey/list/HTTPApiVerifyProject/details.view?listId=64&amp;pk=Yellow",
-    "Month": "2 Feb 2000 00:00:00",
+    "Month": "2000/02/02 00:00:00",
     "Color": "Yellow"
 }],
 "rowCount":5}]]></response>
