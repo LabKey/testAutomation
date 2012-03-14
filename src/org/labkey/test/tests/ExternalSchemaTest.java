@@ -92,7 +92,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             String text = (String)map.get("text");
             Number intNotNull = (Number)map.get("intnotnull");
             String dateStr = (String)map.get("datetimenotnull");
-            SimpleDateFormat fmt = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
+            SimpleDateFormat fmt = new SimpleDateFormat("yyyy/MM/d HH:mm:ss");
             Date dateNotNull = fmt.parse(dateStr);
             return new Row(rowid.intValue(), text, intNotNull.intValue(), dateNotNull);
         }
