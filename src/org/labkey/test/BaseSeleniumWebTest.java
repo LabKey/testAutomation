@@ -2142,12 +2142,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void deleteDir(File dir)
     {
+        log("Deleting from filesystem: " + dir.toString());
         if (!dir.exists())
             return;
 
         try
         {
             FileUtils.deleteDirectory(dir);
+            log("Deletion successful.");
         }
         catch (IOException e)
         {
