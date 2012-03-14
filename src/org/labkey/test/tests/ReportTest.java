@@ -316,6 +316,7 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Views", "Create", "R View");
         setQueryEditorValue("script", "labkey.data");
         clickViewTab();
+        waitForText(R_SORT1);
         assertTextNotPresent(R_REMCOL);
         assertTextNotPresent(R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
@@ -730,9 +731,8 @@ public class ReportTest extends StudyBaseTest
 
         waitForText("Visit Date", 8, WAIT_FOR_JAVASCRIPT);
         assertTextPresent("2a. Creatinine", 19); // 8 mice + 8 grid field tooltips + 1 Report Field list + 2 in hidden add field dialog
-        //TODO: 13905: Participant report: Column headers getting messed up.
-//        assertTextPresent("1a.ALT AE Severity Grade", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
-//        assertTextPresent("1a. ALT (SGPT)", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
+        assertTextPresent("1a.ALT AE Severity Grade", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
+        assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
 
         // select additional measures from another dataset
         clickNavButton("Choose Measures", 0);
@@ -746,9 +746,8 @@ public class ReportTest extends StudyBaseTest
 
         // at this point the report should render some content
         waitForText("Creatinine", 37, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns + tooltips) + 1 Report Field list + 2 in hidden add field dialog
-        //TODO: 13905: Participant report: Column headers getting messed up.
-//        assertTextPresent("1a.ALT AE Severity Grade", 10); // 8 mice + 1 Report Field list + 1 in hidden add field dialog
-//        assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice (x2 columns) + 1 Report Field list + 1 in hidden add field dialog
+        assertTextPresent("1a.ALT AE Severity Grade", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
+        assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
         assertTextPresent("Showing 8 Results");
 
         // verify form validation
@@ -769,9 +768,8 @@ public class ReportTest extends StudyBaseTest
 
         waitForText("Creatinine", 32, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns)
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        //TODO: 13905: Participant report: Column headers getting messed up.
-//        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice
-//        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
+        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a. ALT (SGPT)", 32); // (8 mice + 8 grid field tooltips) x2 columns
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
 
@@ -818,9 +816,8 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 8 Results", 1, WAIT_FOR_JAVASCRIPT); // There should only be 8 results, and it should state that.
 
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        //TODO: 13905: Participant report: Column headers getting messed up.
-//        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice
-//        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
+        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a. ALT (SGPT)", 32); // (8 mice + 8 grid field tooltips) x2 columns
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
