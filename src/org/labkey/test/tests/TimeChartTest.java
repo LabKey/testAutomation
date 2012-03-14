@@ -30,9 +30,7 @@ import java.util.Map;
 
 public class TimeChartTest extends StudyBaseTest
 {
-//    /?TODO:  Folder and Project names should contain TRICKY_CHARACTERS, don't due to Issue 12830
-    private static final String PROJECT_NAME =  "TimeChartTest Project";
-//    private static final String PROJECT_NAME =  TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "TimeChartTest Project";
+    private static final String PROJECT_NAME =  "TimeChartTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String FOLDER_NAME =  "Demo Study";
     private static final String VISIT_FOLDER_NAME =  "Demo Visit Study";
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
