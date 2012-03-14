@@ -41,38 +41,53 @@ public class LuminexPositivityTest extends LuminexTest
         saveAssay();
         sleep(5000);
 
+        // Test positivity data upload with 3x Fold Change
+        uploadPositivityFile(assayName + " 3x Fold Change", 3);
+        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A8", "B8", "A9", "B9"};
+        checkPositivityValues("positive", posWells.length, posWells);
+        String[] negWells = new String[] {"A3", "B3", "A5", "B5", "A10", "B10"};
+        checkPositivityValues("negative", negWells.length, negWells);
+
+        // Test positivity data upload with 5x Fold Change
+        uploadPositivityFile(assayName + " 5x Fold Change", 5);
+        posWells = new String[] {"A8", "B8", "A9", "B9"};
+        checkPositivityValues("positive", posWells.length, posWells);
+        negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6", "A10", "B10"};
+        checkPositivityValues("negative", negWells.length, negWells);
+    }
+
+    private void uploadPositivityFile(String assayName, int foldChange)
+    {
         goToTestAssayHome();
         clickNavButton("Import Data");
         clickNavButton("Next");
         setFormElement("name", assayName);
         checkCheckbox("calculatePositivity");
         setFormElement("baseVisit", "1");
-        setFormElement("positivityFoldChange", "3");
+        setFormElement("positivityFoldChange", String.valueOf(foldChange));
         File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
         assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
         setFormElement("__primaryFile__", positivityData);
         clickNavButton("Next");
         clickNavButton("Save and Finish");
         clickLinkWithText(assayName);
+    }
 
-        assertTextPresent("positive", 6);
-        assertTextPresent("negative", 4);
+    private void checkPositivityValues(String type, int numExpected, String[] positivityWells)
+    {
+        // verify that we are already on the Data results view
+        assertTextPresent(TEST_ASSAY_LUM+ " Results");
+
+        assertTextPresent(type, numExpected);
 
         DataRegionTable drt = new DataRegionTable( TEST_ASSAY_LUM+ " Data", this);
         List<String> posivitiy = drt.getColumnDataAsText("Positivity");
         List<String> wells = drt.getColumnDataAsText("Well");
 
-        for(String well : new String[] {"A2", "B2", "A6", "B6"})
+        for(String well : positivityWells)
         {
             int i = wells.indexOf(well);
-            assertEquals("positive", posivitiy.get(i));
-        }
-
-
-        for(String well : new String[] {"A3", "B3", "A5", "B5"})
-        {
-            int i = wells.indexOf(well);
-            assertEquals("negative", posivitiy.get(i));
+            assertEquals(type, posivitiy.get(i));
         }
     }
 }
