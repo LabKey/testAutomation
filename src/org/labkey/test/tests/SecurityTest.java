@@ -44,7 +44,8 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin@security.test";
     protected static final String NORMAL_USER = "user@security.test";
-    protected static String NORMAL_USER_PASSWORD = "";
+    protected static final String[] PASSWORDS= {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
+    protected static String NORMAL_USER_PASSWORD = PASSWORDS[0];
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin@security.test";
 
@@ -86,8 +87,12 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
-        passwordStrengthTest();
         cantReachAdminToolFromUserAccount(false);
+        if(!isQuickTest())
+        {
+            passwordStrengthTest();
+            dumbsterTest();
+        }
         passwordResetTest();
     }
 
@@ -195,6 +200,20 @@ public class SecurityTest extends BaseSeleniumWebTest
         ensureSignedInAsAdmin();
     }
 
+    private void dumbsterTest()
+    {
+        assertNoDumbsterPermission(PROJECT_ADMIN_USER);
+        assertNoDumbsterPermission(NORMAL_USER);
+    }
+
+    private void assertNoDumbsterPermission(String user)
+    {
+        impersonate(user);
+        clickLinkWithText(PROJECT_NAME);
+        goToModule("Dumbster");
+        assertTextPresent("You must be a site administrator to view the email record");
+        stopImpersonating();
+    }
 
     protected static enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
 
@@ -669,10 +688,8 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void passwordStrengthTest()
     {
-        String[] passwords = {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
         String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
         String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
-
         setDbLoginConfig(PasswordRule.Strong, null);
 
         setInitialPassword(NORMAL_USER, simplePassword);
@@ -683,42 +700,41 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickNavButton("Set Password");
         assertTextPresent("Your password must be eight characters or more."); // fail, too short
 
-        setFormElement("password", passwords[0]);
-        setFormElement("password2", passwords[0]);
+        setFormElement("password", PASSWORDS[0]);
+        setFormElement("password2", PASSWORDS[0]);
         clickNavButton("Set Password");
         assertSignOutAndMyAccountPresent();
         //success
         impersonate(NORMAL_USER);
 
-        changePassword(passwords[0], passwords[1]);
+        changePassword(PASSWORDS[0], PASSWORDS[1]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[1], simplePassword); // fail, too simple
+        changePassword(PASSWORDS[1], simplePassword); // fail, too simple
         assertTextPresent("Your password must contain three of the following");
-        changePassword(passwords[1], shortPassword); // fail, too short
+        changePassword(PASSWORDS[1], shortPassword); // fail, too short
         assertTextPresent("Your password must be eight characters or more.");
-        changePassword(passwords[1], passwords[2]);
+        changePassword(PASSWORDS[1], PASSWORDS[2]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[2], passwords[3]);
+        changePassword(PASSWORDS[2], PASSWORDS[3]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[3], passwords[4]);
+        changePassword(PASSWORDS[3], PASSWORDS[4]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[4], passwords[5]);
+        changePassword(PASSWORDS[4], PASSWORDS[5]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[5], passwords[6]);
+        changePassword(PASSWORDS[5], PASSWORDS[6]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[6], passwords[7]);
+        changePassword(PASSWORDS[6], PASSWORDS[7]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[7], passwords[8]);
+        changePassword(PASSWORDS[7], PASSWORDS[8]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[8], passwords[9]);
+        changePassword(PASSWORDS[8], PASSWORDS[9]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[9], passwords[10]);
+        changePassword(PASSWORDS[9], PASSWORDS[10]);
         assertTextNotPresent("Choose a new password.");
-        changePassword(passwords[10], passwords[1]); // fail, used 9 passwords ago.
+        changePassword(PASSWORDS[10], PASSWORDS[1]); // fail, used 9 passwords ago.
         assertTextPresent("Your password must not match a recently used password.");
-        changePassword(passwords[10], passwords[0]);
+        changePassword(PASSWORDS[10], PASSWORDS[0]);
         assertTextNotPresent("Choose a new password.");
-        NORMAL_USER_PASSWORD = passwords[0];
 
         stopImpersonating();
         resetDbLoginConfig();

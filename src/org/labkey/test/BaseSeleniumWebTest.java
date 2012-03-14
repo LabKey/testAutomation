@@ -1362,6 +1362,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return false;
     }
 
+    protected boolean isQuickTest()
+    {
+        return "DRT".equals(System.getProperty("suite"));
+    }
+
     public void checkLeaksAndErrors()
     {
         if ( isGuestModeTest() )
