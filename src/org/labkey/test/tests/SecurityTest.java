@@ -208,9 +208,11 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     private void assertNoDumbsterPermission(String user)
     {
-        impersonate(user);
         clickLinkWithText(PROJECT_NAME);
         goToModule("Dumbster");
+        pushLocation();
+        impersonate(user);
+        popLocation();
         assertTextPresent("You must be a site administrator to view the email record");
         stopImpersonating();
     }
