@@ -2951,9 +2951,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return getSelectedOptionText(new Locator(selectName));
     }
 
+    public void assertElementNotPresent(String errorMsg, Locator loc)
+    {
+        assertFalse(errorMsg, isElementPresent(loc));
+    }
+
     public void assertElementNotPresent(Locator loc)
     {
-        assertFalse("Element was present in page: " + loc, isElementPresent(loc));
+        assertElementNotPresent("Element was present in page: " + loc, loc);
     }
 
     public void assertElementNotVisible(Locator loc)
@@ -5140,6 +5145,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void goToHome()
     {
         beginAt("/project/home/begin.view");
+    }
+
+    /**
+     * go to the project settings page of a project, or of the current project if argument=null
+     * @param project project name, or null if current project
+     */
+    public void goToProjectSettings(String project)
+    {
+        if(project!=null)
+        {
+            goToHome();
+            clickLinkWithText(project);
+        }
+        goToContainerManagementPage(true);
+        clickLinkWithText("Project Settings");
     }
 
     public void goToAdmin()
