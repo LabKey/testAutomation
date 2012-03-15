@@ -239,8 +239,8 @@ public class DataViewsTester
         // check hover box
         _test.mouseOver(Locator.linkWithText(EDITED_DATASET));
         _test.waitForText("Data Cut Date:");
-        _test.assertTextPresent("Thu Mar 01 2012");
+        _test.assertTextPresent("2012-03-01");
         _test.clickLinkWithText(EDITED_DATASET);
-        _test.assertTextPresent("Data Cut Date: Thu Mar 01 00:00:00 PST 2012");
+        _test.assertTextPresent("2012-03-01");
     }
 }
