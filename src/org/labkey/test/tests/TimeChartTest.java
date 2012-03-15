@@ -869,6 +869,9 @@ public class TimeChartTest extends StudyBaseTest
         popLocation(); // Saved Chart with groups.
         waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("//div[contains(@class, x-form-display-field)][contains(text(), 'One or more of the participant groups originally saved with this chart are not currently visible.')]"), WAIT_FOR_JAVASCRIPT);
+        assertTextPresent(GROUP1_NAME);
+        assertTextNotPresent(GROUP2_NAME);
+        assertTextNotPresent(GROUP3_NAME);
         stopImpersonating();
 
     }
