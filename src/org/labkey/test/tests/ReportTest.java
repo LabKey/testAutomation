@@ -173,7 +173,6 @@ public class ReportTest extends StudyBaseTest
         waitForElement(report, 10000);
 
         // click the row to expand it
-        //Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//div[contains(@class, 'x-grid3-row-expander')]");
         Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']");
         selenium.click(expander.toString());
 
@@ -205,7 +204,6 @@ public class ReportTest extends StudyBaseTest
         assertTableRowsEqual("report", 3, new String[][] {row3});
 
         setFormElement("label", "TestReport");
-        //selectOptionByText("showWithDataset", "DEM-1: Demographics");
         clickNavButton("Save");
 
         clickLinkWithText(getStudyLabel());
@@ -226,8 +224,6 @@ public class ReportTest extends StudyBaseTest
         selectOptionByText("params", "ECI-1: Eligibility Criteria");
         clickNavButton("Create View");
         assertLinkPresentWithText("999320016");
-        //Not sure what we are lookgin for here
-        //assertTextPresent("urn:lsid");
         assertNavButtonNotPresent("go");
         clickLinkWithText(getStudyLabel());
         clickTab("Manage");
@@ -352,19 +348,10 @@ public class ReportTest extends StudyBaseTest
         clickViewTab();
 
         log("Check that R script worked");
-        // Add once issue 3738 is fixed
-//        assertElementNotPresent(Locator.id(R_SCRIPT1_IMG));
-//        assertTextNotPresent(R_SCRIPT1_PDF);
         assertTextPresent(R_SCRIPT2_TEXT1);
         saveReport(R_SCRIPTS[1]);
 
         log("Check that background run works");
-        //clickNavButton("Reports >>", 0);
-        //clickLinkWithText(R_SCRIPTS[1]);
-        //selectOptionByText("Dataset.viewName", R_SCRIPTS[1]);
-        //goToPipelineItem(R_SCRIPTS[1]);
-        //assertTextPresent(R_SCRIPT2_TEXT1);
-
         log("Test user permissions");
         enterPermissionsUI();
         clickManageGroup("Users");
@@ -381,21 +368,11 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         pushLocation();
-        //clickNavButton("Reports >>", 0);
-        //assertTextNotPresent(R_SCRIPTS[0]);
         assertElementNotPresent(Locator.raw("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
 
         clickMenuButton("Views", R_SCRIPTS[1]);
-        //goToPipelineItem(R_SCRIPTS[1]);
-        //assertTextPresent(R_SCRIPT2_TEXT1);
-        popLocation();
-        // Exception is logged with the server and creates an error at the end
-//        log("Try to create an R Report");
-//        clickNavButton("Reports >>", 0);
-//        clickLinkWithText("Create R Report");
-//        assertTextPresent("401");
-//        clickNavButton("Home");
 
+        popLocation();
         log("Change user permission");
         stopImpersonating();
         clickLinkWithText(getProjectName());
@@ -464,14 +441,14 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Create", "Attachment Report");
         clickButton("Cancel");
 
-        //TODO: Test uploaded attachment report. Unable to set form element to do so.
-        if(false)//isFileUploadAvailable())
+       if(isFileUploadAvailable())
         {
             clickMenuButton("Create", "Attachment Report");
             setFormElement("label", ATTACHMENT_REPORT_NAME);
             setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
             setFormElement("uploadFile", ATTACHMENT_REPORT_FILE.toString());
             setFormElement(Locator.xpath("id('uploadFile')/div/input"), ATTACHMENT_REPORT_FILE.toString());
+            clickNavButton("Submit");
         }
 
         clickMenuButton("Create", "Attachment Report");
@@ -482,10 +459,18 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Submit");
 
         clickLinkWithText("Clinical and Assay Data");
-        //waitForText(ATTACHMENT_REPORT_NAME);
+        if(isFileUploadAvailable())
+        {
+            waitForText(ATTACHMENT_REPORT_NAME);
+        }
         waitForText(ATTACHMENT_REPORT2_NAME);
 
-        //TODO: Verify report. Blocked: 13761: Attachment report on server localhost doesn't know what kind of file it is.
+        //TODO: Verify reports. Blocked: 13761: Attachment reports can't be viewed
+//        if(isFileUploadAvailable())
+//        {
+//            clickReportGridLink(ATTACHMENT_REPORT_NAME, "view");
+//        }
+//        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "view");
     }
 
     private void saveReport(String name)
@@ -768,8 +753,8 @@ public class ReportTest extends StudyBaseTest
 
         waitForText("Creatinine", 32, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns)
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice + 8 grid field tooltips
-        assertTextPresent("1a. ALT (SGPT)", 32); // (8 mice + 8 grid field tooltips) x2 columns
+        assertTextPresent("1a.ALT AE Severity Grade", 16); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
 
@@ -816,8 +801,8 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 8 Results", 1, WAIT_FOR_JAVASCRIPT); // There should only be 8 results, and it should state that.
 
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        assertTextPresent("1a.ALT AE Severity Grade", 8); // 8 mice + 8 grid field tooltips
-        assertTextPresent("1a. ALT (SGPT)", 32); // (8 mice + 8 grid field tooltips) x2 columns
+        assertTextPresent("1a.ALT AE Severity Grade", 16); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
@@ -831,10 +816,10 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Views");
         clickReportGridLink(PARTICIPANT_REPORT2_NAME, "view");
 
-        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice
+        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips
         assertTextPresent(PARTICIPANT_REPORT2_NAME);
         assertTextNotPresent("1a.ALT AE Severity Grade");
-        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice (x2 columns)
+        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
@@ -863,7 +848,7 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 0 Results");
 
         //Mouse down on GROUP 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'TEST GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + PARTICIPANT_GROUP_ONE + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 12 Results");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -873,7 +858,7 @@ public class ReportTest extends StudyBaseTest
         }
 
         //Mouse down GROUP 2
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'TEST GROUP 2')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + PARTICIPANT_GROUP_TWO + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 25 Results");
 
         //Check that all PTIDs from GROUP 1 and GROUP 2 are present at the same time.
@@ -883,7 +868,7 @@ public class ReportTest extends StudyBaseTest
         }
 
         //Mouse down on GROUP 1 to remove it.
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'TEST GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + PARTICIPANT_GROUP_ONE + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 13 Results");
         
         //Check if all PTIDs of GROUP 2 are visible
@@ -924,16 +909,16 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 0 Results");
 
         //Mouse down on SPEC GROUP 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + SPECIMEN_GROUP_ONE + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 1 Results");
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 2')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + SPECIMEN_GROUP_TWO + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 2 Results");
         //Remove SPEC GROUP 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'SPEC GROUP 1')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + SPECIMEN_GROUP_ONE + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("Showing 1 Results");
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
