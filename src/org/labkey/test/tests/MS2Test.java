@@ -514,7 +514,6 @@ public class MS2Test extends MS2TestBase
         CustomizeViewsHelper.addCustomizeViewFilter(this, "DeltaMass", "dMass", "Is Less Than", "0");
         CustomizeViewsHelper.addCustomizeViewFilter(this, "RowId", "Row Id", "Is Greater Than", "3");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "NextAA", "Next AA");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "OrigScore", "Orig Score");
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "Expect");
         CustomizeViewsHelper.removeCustomizeViewColumn(this, "ProteinHits");
         CustomizeViewsHelper.saveCustomView(this, VIEW4);
