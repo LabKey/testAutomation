@@ -74,7 +74,6 @@
                         "objectid": "26e8080a-5fb5-102e-b27b-fe05e4821f99",
                         "requestid": null,
                         "enddate": null,
-                        "_row": null,
                         "lsid": "urn:lsid:labkey.com:Study.Data-33:1045.2.0110512E7.1052976.26e8080a-5fb5-102e-b27b-fe05e4821f99"
                     },
                     "oldKeys": {"lsid": "ext-record-195"}
