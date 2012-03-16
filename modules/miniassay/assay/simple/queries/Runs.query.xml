@@ -20,6 +20,11 @@
     <metadata>
         <tables xmlns="http://labkey.org/data/xml">
             <table tableName="Runs" tableDbType="TABLE">
+                <columns>
+                  <column columnName="DoubleRun">
+                    <columnTitle>MetaOverride Double Run</columnTitle>
+                  </column>
+                </columns>
                 <buttonBarOptions position="both" includeStandardButtons="true">
                     <item text="Simple Assay Button" permission="READ" insertPosition="end">
                       <onClick>alert('button clicked');</onClick>
