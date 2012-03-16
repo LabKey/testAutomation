@@ -1263,7 +1263,7 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement("conjugate", conjugate);
             setFormElement("stndCurveFitInput", stndCurveFitInput);
             setFormElement("unkCurveFitInput", unkCurveFitInput);
-            // TODO: set uncheckCheckbox("curveFitLogTransform") 
+            uncheckCheckbox("curveFitLogTransform"); 
             setFormElement("notebookNo", notebookNo);
             setFormElement("assayType", assayType);
             setFormElement("expPerformer", expPerformer);
@@ -1320,7 +1320,6 @@ public class LuminexTest extends AbstractQCAssayTest
         String[] ec504plAverages = {"179.78", "43426.10"};
         String[] ec504plStdDevs = {"22.21", "794.95"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec504plAverages, ec504plStdDevs, "Four Parameter", "EC50Average", "EC50Std Dev");
-        // TODO: add check for ec505pl
         String[] aucAverages = {"8701.38", "80851.83"};
         String[] aucStdDevs = {"466.81", "6523.08"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, aucAverages, aucStdDevs, "Trapezoidal", "AUCAverage", "AUCStd Dev");
@@ -1433,7 +1432,6 @@ public class LuminexTest extends AbstractQCAssayTest
         String[] ec504plAverages2 = {"179.78", "42158.22"};
         String[] ec504plStdDevs2 = {"22.21", "4833.76"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, ec504plAverages2, ec504plStdDevs2, "Four Parameter", "EC50Average", "EC50Std Dev");
-        // TODO: add check for ec505pl
         String[] aucAverages2 = {"8701.38", "85268.04"};
         String[] aucStdDevs2 = {"466.81", "738.55"};
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, aucAverages2, aucStdDevs2, "Trapezoidal", "AUCAverage", "AUCStd Dev");
@@ -1476,71 +1474,64 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyQCFlagUpdatesAfterWellChange()
     {
         importPlateFiveAgain();
-         DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
-        //
+        DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
+
         //2. exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 for GS Analyte (2) is changed to be under the Guide Set range so new QC Flag inserted for that
-        //
         excludeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
-        // TODO: temp fix for test to check for parts of the QC Flag until SCHARP/Lab decides what they want to do with the 5PL EC50 values
-        assertEquals("AUC, EC50-4, HMFI, PCV",  drt.getDataAsText(1, "QC Flags")); // EC50-5 removed 2012/03/01
-        //String qcFlagText = drt.getDataAsText(1, "QC Flags");
-        //assertTrue("Expected QC Flags of [AUC, EC50-4, HMFI, PCV] was " + qcFlagText, qcFlagText.indexOf("AUC, EC50-4, ") > -1);
-        //assertTrue("Expected QC Flags of [AUC, EC50-4, HMFI, PCV] was " + qcFlagText, qcFlagText.indexOf("HMFI, PCV") > -1);
+        assertEquals("AUC, EC50-4, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));  
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 QC Flag for GS Analyte (2) that was inserted in the previous step is removed
-
         includeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
         assertEquals("AUC, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
-
-//4. For GS Analyte (2), apply the non-current guide set to plate 5a
-//	- QC Flags added for EC50 and HMFI
+        //4. For GS Analyte (2), apply the non-current guide set to plate 5a
+        //	- QC Flags added for EC50 and HMFI
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
-        String newQcFlags = "AUC, EC50-4, HMFI"; // EC50-5 removed 2012/03/01
+        String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
         assertTextNotPresent(newQcFlags);
         applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
         //assert ec50 and HMFI red text present
         assertElementPresent(Locator.xpath("//div[text()='28040.51' and contains(@style,'red')]"));
+        assertElementPresent(Locator.xpath("//div[text()='28310.06' and contains(@style,'red')]"));
+        assertElementPresent(Locator.xpath("//div[text()='79121.90' and contains(@style,'red')]"));
         assertElementPresent(Locator.xpath("//div[text()='32145.80' and contains(@style,'red')]"));
         assertTextPresent(newQcFlags);
         //verify new flags present in run list
         goToTestRunList();
-        assertTextPresent("AUC, EC50-4, HMFI, PCV"); // EC50-5 removed 2012/03/01s
+        assertTextPresent("AUC, EC50-4, EC50-5, HMFI, PCV");
 
-//5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
-//	- the EC50 and HMFI QC Flags that were added in step 4 are removed
+        //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
+        //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
         goToLeveyJenningsGraphPage("HIVIG");
         setUpGuideSet("GS Analyte (2)");
         applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT, -1);
         assertTextNotPresent(newQcFlags);
-//
-//6. Create new Guide Set for GS Analyte (2) that includes plate 5 (but not plate 5a)
-//	- the AUC QC Flag for plate 5 is removed
-//
+
+        //6. Create new Guide Set for GS Analyte (2) that includes plate 5 (but not plate 5a)
+        //	- the AUC QC Flag for plate 5 is removed
         Locator.XPathLocator aucLink =  Locator.xpath("//a[contains(text(),'AUC')]");
         int aucCount = getXpathCount(aucLink);
         createGuideSet("GS Analyte (2)", false);
         editGuideSet(new String[]{"allRunsRow_1"}, "Guide set includes plate 5", true);
         assertEquals("Wrong count for AUC flag links", aucCount-1, (getXpathCount(aucLink)));
 
-
-//7. Switch to GS Analyte (1), and edit the current guide set to include plate 3
-//	- the QC Flag for plate 3 (the run included) and the other plates (4, 5, and 5a) are all removed as all values are within the guide set ranges
+        //7. Switch to GS Analyte (1), and edit the current guide set to include plate 3
+        //	- the QC Flag for plate 3 (the run included) and the other plates (4, 5, and 5a) are all removed as all values are within the guide set ranges
         setUpGuideSet("GS Analyte (1)");
         assertExpectedAnalyte1QCFlagsPresent();
         clickButtonContainingText("Edit", 0);
         editGuideSet(new String[]{"allRunsRow_3"}, "edited analyte 1", false);
-        assertNoQCFlagsPresent();
+        assertEC505PLQCFlagsPresent(2);
 
-//8. Edit the GS Analyte (1) guide set and remove plate 3
-//	- the QC Flags for plates 3, 4, 5, and 5a return (HMFI for all 4 and AUC for plates 4, 5, and 5a)
+        //8. Edit the GS Analyte (1) guide set and remove plate 3
+        //	- the QC Flags for plates 3, 4, 5, and 5a return (HMFI for all 4 and AUC for plates 4, 5, and 5a)
         removePlate3FromGuideSet();
         assertExpectedAnalyte1QCFlagsPresent();
     }
@@ -1562,11 +1553,12 @@ public class LuminexTest extends AbstractQCAssayTest
             assertElementPresent(Locator.xpath("//a[contains(text(),'HMFI')]"), 4);
     }
 
-    private void assertNoQCFlagsPresent()
+    private void assertEC505PLQCFlagsPresent(int count)
     {
-        assertEquals("Unexpected QC Flag Highlight Present", 0,
+        assertEquals("Unexpected QC Flag Highlight Present", count,
                     getXpathCount(Locator.xpath("//div[contains(@style,'red')]")));
-        for(String flag : new String[] {"AUC", "HMFI", "EC50-4", "PCV"}) // "EC50-5" removed 2012/03/01
+        assertElementPresent(Locator.xpath("//a[contains(text(),'EC50-5')]"), count);
+        for(String flag : new String[] {"AUC", "HMFI", "EC50-4", "PCV"})
         {
             assertElementNotPresent(Locator.xpath("//a[contains(text(),'" + flag + "')]"));
         }
@@ -1606,7 +1598,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("assay." + TEST_ASSAY_LUM + " QCFlags");
     }
 
-    String[] expectedFlags = {"AUC, EC50-4, HMFI, PCV","AUC, EC50-4, HMFI", "HMFI", "", "PCV"};
+    String[] expectedFlags = {"AUC, EC50-4, EC50-5, HMFI, PCV", "AUC, EC50-4, EC50-5, HMFI", "EC50-5, HMFI", "", "PCV"};
 
     private void verifyQCFlagsInRunGrid()
     {
@@ -1829,11 +1821,11 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
         assertElementPresent( Locator.id("EC50 4PLTrendPlotDiv"));
 
-        // check5PL  ec50 trending R plot // removed 2012/03/01
-        //click(Locator.tagWithText("span", "EC50 - 5PL Rumi"));
-        //waitForTextToDisappear("Loading");
-        //assertTextNotPresent("Error");
-        //assertElementPresent( Locator.id("EC50 5PLTrendPlotDiv"));        
+        // check5PL  ec50 trending R plot
+        click(Locator.tagWithText("span", "EC50 - 5PL Rumi"));
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        assertElementPresent( Locator.id("EC50 5PLTrendPlotDiv"));
 
         // check auc trending R plot
         click(Locator.tagWithText("span", "AUC"));
