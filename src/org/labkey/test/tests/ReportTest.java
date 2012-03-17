@@ -444,19 +444,19 @@ public class ReportTest extends StudyBaseTest
        if(isFileUploadAvailable())
         {
             clickMenuButton("Create", "Attachment Report");
-            setFormElement("label", ATTACHMENT_REPORT_NAME);
+            setFormElement("viewName", ATTACHMENT_REPORT_NAME);
             setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
             setFormElement("uploadFile", ATTACHMENT_REPORT_FILE.toString());
             setFormElement(Locator.xpath("id('uploadFile')/div/input"), ATTACHMENT_REPORT_FILE.toString());
-            clickNavButton("Submit");
+            clickNavButton("Save");
         }
 
         clickMenuButton("Create", "Attachment Report");
-        setFormElement("label", ATTACHMENT_REPORT2_NAME);
+        setFormElement("viewName", ATTACHMENT_REPORT2_NAME);
         setFormElement("description", ATTACHMENT_REPORT2_DESCRIPTION);
         click(Locator.xpath("//input[../label[string()='Use a file on server localhost']]"));
         setFormElement("filePath", ATTACHMENT_REPORT2_FILE.toString());
-        clickNavButton("Submit");
+        clickNavButton("Save");
 
         clickLinkWithText("Clinical and Assay Data");
         if(isFileUploadAvailable())
