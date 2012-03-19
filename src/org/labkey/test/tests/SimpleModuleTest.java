@@ -345,6 +345,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
             if (selectResp.getRowCount().intValue() > 0)
             {
+                String keyField = selectResp.getMetaData().get("id").toString();
+
                 Map<String, List<Map<String, Object>>> rowsByContainer = new LinkedHashMap<String, List<Map<String, Object>>>();
                 for (Map<String, Object> row : selectResp.getRows())
                 {
@@ -355,7 +357,6 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                     if (convertedRow.getValue("Container") != null)
                         container = convertedRow.getValue("Container").toString();
 
-                    String keyField = selectResp.getMetaData().get("id").toString();
                     Map<String, Object> newRow = new HashMap<String, Object>();
                     Object value = convertedRow.getValue(keyField);
                     newRow.put(keyField, value);
