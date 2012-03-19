@@ -1346,6 +1346,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //verify Levey-Jennings report R plots are displayed without errors
         verifyLeveyJenningsRplots();
+
         verifyQCFlags();
         verifyQCAnalysis();
 
@@ -1474,6 +1475,13 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyQCFlagUpdatesAfterWellChange()
     {
         importPlateFiveAgain();
+
+        //add QC flag colum
+        assertTextPresent(TEST_ASSAY_LUM + " Runs");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCFlags");
+        CustomizeViewsHelper.saveCustomView(this, "QC Flags View");
+
         DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
 
         //2. exclude wells A4, B4 from plate 5a for both analytes
@@ -1481,6 +1489,7 @@ public class LuminexTest extends AbstractQCAssayTest
         excludeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
+        ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
         assertEquals("AUC, EC50-4, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));  
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
@@ -1488,6 +1497,7 @@ public class LuminexTest extends AbstractQCAssayTest
         includeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
+        ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
         assertEquals("AUC, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //4. For GS Analyte (2), apply the non-current guide set to plate 5a
@@ -1505,6 +1515,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent(newQcFlags);
         //verify new flags present in run list
         goToTestRunList();
+        ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
         assertTextPresent("AUC, EC50-4, EC50-5, HMFI, PCV");
 
         //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
@@ -1843,7 +1854,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //this locator finds an EC50 flag, then makes sure there's red text outlining
         Locator.XPathLocator l = Locator.xpath("//td/div[contains(@style,'red')]/../../td/div/a[contains(text(),'EC50-4')]");
         assertElementPresent(l,2);
-        assertTextPresent("QC Flags"); //should update to qc flags
+        assertTextPresent("QC Flags");
     }
 
     private void verifyGuideSetsNotApplied()
