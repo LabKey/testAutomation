@@ -33,13 +33,6 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     }
 
     @Override
-    protected boolean isDatabaseSupported(DatabaseInfo info)
-    {
-        return info.productName.equals("PostgreSQL") ||
-                (info.productName.equals("Microsoft SQL Server") && !info.productVersion.startsWith("08.00"));
-    }
-
-    @Override
     protected boolean isFileUploadTest()
     {
         return true;
