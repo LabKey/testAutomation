@@ -101,9 +101,49 @@ public class StudyTest extends StudyBaseTest
         manageSubjectClassificationTest();
         emptyParticipantPickerList(); // Delete participant lists to avoid interfering with api test.
         verifyStudyAndDatasets();
+        verifyParticipantReports();
         waitForSpecimenImport();
         verifySpecimens();
         verifyParticipantComments();
+    }
+
+    private void verifyParticipantReports()
+    {
+        clickLinkWithText(getFolderName());
+        addWebPart("Study Data Tools");
+        clickLinkWithImage("/labkey/study/tools/participant_report.png");
+        clickButton("Choose Measures", 0);
+        waitForExtMask();
+
+        String textToFilter = "AE-1:(VTN) AE Log";
+        waitForText(textToFilter);
+        assertTextPresent(textToFilter, 27);
+        assertTextPresent("Abbrevi", 79);
+
+        log("filter participant results donw");
+        Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
+        selenium.type(filterSearchText.toXpath(), "a");
+        selenium.typeKeys(filterSearchText.toXpath(), "bbrev");
+        setFormElement(Locator.xpath("//input[@type='text']"), "abbrevi");
+        assertTextPresent(textToFilter, 0);
+        assertTextPresent("Abbrevi", 79);
+
+        log("select some records and include them in a report");
+        ExtHelper.clickXGridPanelCheckbox(this, 4, true);
+        ExtHelper.clickXGridPanelCheckbox(this, 40, true);
+        ExtHelper.clickXGridPanelCheckbox(this, 20, true);
+        ExtHelper.clickExtButton(this, "Select", 0);
+        waitForExtMaskToDisappear();
+
+        log("Verify report page looks as expected");
+        String reportName = "Foo";
+        String reportDescription = "Desc";
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", reportName);
+        ExtHelper.setExtFormElementByLabel(this, "Report Description", reportDescription);
+        clickButton("Save", 0);
+        waitForText(reportName);
+        assertTextPresent(reportName, 2);
+
     }
 
     protected static final String SUBJECT_NOUN = "Mouse";
