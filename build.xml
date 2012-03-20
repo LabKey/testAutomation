@@ -1214,7 +1214,7 @@
     <target name="install-rlabkey" depends="install-rlabkey-init, install-rlabkey-binary, install-rlabkey-source">
     </target>
 
-    <target name="install-rlabkey-dependencies" depends="check-rlabkey-installed">
+    <target name="install-rlabkey-dependencies" if="R.present" depends="check-rlabkey-installed">
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
               input="${project.root}/tools/Rpackages/install-rlabkey-dependencies.R">
             <arg line="--vanilla --quiet"/>
