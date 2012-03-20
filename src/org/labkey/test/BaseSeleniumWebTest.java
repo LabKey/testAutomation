@@ -1162,12 +1162,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             if ( !isGuestModeTest() )
             {
-                DatabaseInfo info = getDatabaseInfo();
-                if (!isDatabaseSupported(info))
+                if(!isDatabaseSupported(new DatabaseInfo())) // skip this check if it returns true with no database info.
                 {
-                    log("** Skipping " + getClass().getSimpleName() + " test for unsupported database: " + info.productName + " " + info.productVersion);
-                    _testFailed = false;
-                    return;
+                    DatabaseInfo info = getDatabaseInfo();
+                    if (!isDatabaseSupported(info))
+                    {
+                        log("** Skipping " + getClass().getSimpleName() + " test for unsupported database: " + info.productName + " " + info.productVersion);
+                        _testFailed = false;
+                        return;
+                    }
                 }
             }
 

@@ -26,6 +26,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.tests.SimpleApiTest;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -47,7 +48,7 @@ import java.util.regex.Pattern;
  * Date: Mar 21, 2011
  * Time: 1:59:12 PM
  */
-public class EHRStudyTest extends SimpleApiTest
+public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
 {
     // Project/folder names are hard-coded into some links in the module.
     private static final String PROJECT_NAME = "WNPRC";

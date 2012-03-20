@@ -30,6 +30,8 @@ import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
+import org.labkey.test.util.PostgresOnlyTest;
+import org.labkey.test.util.SqlserverOnlyTest;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -127,7 +129,7 @@ public class Runner extends TestSuite
 
     private static Class[] readClasses(File file)
     {
-        List<Class> testClasses = new ArrayList<Class>(20);
+        List<Class> testClasses = new ArrayList<Class>();
 
         if (file.exists())
         {
@@ -365,7 +367,9 @@ public class Runner extends TestSuite
                 for (Class c : sortedTests)
                     System.out.println("    " + c.getSimpleName());
             }
-            else
+//            else if ((testClass instanceof PostgresOnlyTest && System.getProperty("serverType").contains("postgres")) ||
+//                    (testClass instanceof SqlserverOnlyTest && System.getProperty("serverType").contains("sqlserver")) ||
+//                    !(System.getProperty("serverType").contains("postgres") || System.getProperty("serverType").contains("postgres")))
                 testClasses.add(testClass);
         }
 
@@ -389,6 +393,7 @@ public class Runner extends TestSuite
         for (Class testClass : testClasses)
         {
             Test test = null;
+            boolean illegalTest = false;
             Boolean isServerSideTest = false;
             try
             {
@@ -413,6 +418,29 @@ public class Runner extends TestSuite
 
             if (test == null)
             {
+                Class interfaces[] = testClass.getInterfaces();
+                String databaseType = System.getProperty("serverType");                
+                for (Class i : interfaces)
+                {
+                    if (i.getName().equals(PostgresOnlyTest.class.getCanonicalName()))
+                    {
+                        if(databaseType != null && !"postgres".equals(databaseType))
+                        {
+                            illegalTest = true;
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: postgres");
+                        }
+                        break;
+                    }
+                    if (i.getName().equals(SqlserverOnlyTest.class.getCanonicalName()))
+                    {
+                        if(databaseType != null && !"sqlserver".equals(databaseType))
+                        {
+                            illegalTest = true;
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: sqlserver");
+                        }
+                        break;
+                    }
+                }
                 test = new JUnit4TestAdapter(testClass);
             }
             else isServerSideTest = true;
@@ -422,8 +450,8 @@ public class Runner extends TestSuite
                 // Clear errors and enable dumbster before JUnitTest runs.
                 suite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
             }
-
-            suite.addTest(test);
+            if(!illegalTest)
+                suite.addTest(test);
 
             if (isServerSideTest)
             {

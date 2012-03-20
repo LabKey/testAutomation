@@ -484,6 +484,7 @@
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
+            <sysproperty key="serverType" value="${serverType}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>

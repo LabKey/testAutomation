@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.PostgresOnlyTest;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +25,7 @@ import org.labkey.test.Locator;
  * Date: Sep 13, 2010
  * Time: 1:41:34 PM
  */
-public class ReagentTest extends BaseSeleniumWebTest
+public class ReagentTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 {
     protected static final String PROJECT_NAME = "ReagentProject";
     protected static final String FOLDER_NAME = "ReagentFolder";
