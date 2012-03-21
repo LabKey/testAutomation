@@ -55,7 +55,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String[] GROUP2_PTIDS = {"249320127", "249320489"};
     private static final String[] GROUP3_PTIDS = {"249320489"/*Duplicate from group 2*/, "249320897", "249325717"};
 
-    private static final String[] VISIT_STRINGS = {"1 week Post-V#1", "2 week Post-V#1", "Int. Vis. %{S.1.1} .%{S.2.1}", "3 week Post-V#1", "Grp1:F/U/Grp2:V#2", "1 week Post-V#2", "G1: 6wk/G2: 2wk", "3 week Post-V#2"};
+    private static final String[] VISIT_STRINGS = {"2 week Post-V#1", "Int. Vis. %{S.1.1} .%{S.2.1}", "3 week Post-V#1", "Grp1:F/U/Grp2:V#2", "1 week Post-V#2", "G1: 6wk/G2: 2wk", "3 week Post-V#2"};
 
     private static final String USER1 = "user1@timechart.test";
 
@@ -407,7 +407,7 @@ public class TimeChartTest extends StudyBaseTest
         ExtHelper.clickExtTab(this, "X-Axis");
         checkRadioButton("chartType", "visit");
         waitForTextToDisappear("Days Since Contact Date");
-        waitForText("1 week Post-V#1");
+        waitForText("2 week Post-V#1"); // There may be intermittent failures on this line as Protovis occasionally decides it's going to render different x-axis tick marks.
         assertTextPresentInThisOrder(VISIT_STRINGS);
         assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[contains(@class, 'x-item-disabled')]/input"));
         assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x-item-disabled')]/input"));
