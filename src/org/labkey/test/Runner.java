@@ -424,19 +424,19 @@ public class Runner extends TestSuite
                 {
                     if (i.getName().equals(PostgresOnlyTest.class.getCanonicalName()))
                     {
-                        if(databaseType != null && !"postgres".equals(databaseType))
+                        if(databaseType != null && !("postgres".equals(databaseType) || "pg".equals(databaseType)))
                         {
                             illegalTest = true;
-                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: postgres");
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
                         }
                         break;
                     }
                     if (i.getName().equals(SqlserverOnlyTest.class.getCanonicalName()))
                     {
-                        if(databaseType != null && !"sqlserver".equals(databaseType))
+                        if(databaseType != null && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType)))
                         {
                             illegalTest = true;
-                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: sqlserver");
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
                         }
                         break;
                     }
