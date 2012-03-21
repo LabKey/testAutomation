@@ -1132,7 +1132,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     /**
      * Override this method to skip running this test for a given database version.
      * @param info
-     * @return true to run the test, false to skip.
+     * @return true to run the test, false to skip. Empty info should return false for overrides.
      */
     protected boolean isDatabaseSupported(DatabaseInfo info)
     {
@@ -6083,6 +6083,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public static class DatabaseInfo
     {
         public String serverURL, productName, productVersion, driverName, driverVersion;
+
+        public DatabaseInfo()
+        {
+            serverURL = "";
+            productName = "";
+            productVersion = "";
+            driverName = "";
+            driverVersion = "";
+        }
     }
 
     public void clickManageSubjectCategory(String subjectNoun)
