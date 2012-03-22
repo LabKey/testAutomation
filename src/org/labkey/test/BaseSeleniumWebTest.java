@@ -4586,7 +4586,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             String input = "$add$" + role;
             String combo = "$combo$";
             click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + groupName + "']"));
+            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + groupName + "']"));
             sleep(100);
             savePermissions();
             assertPermissionSetting(groupName, permissionString);

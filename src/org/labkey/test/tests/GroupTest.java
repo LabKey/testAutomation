@@ -117,7 +117,7 @@ public class GroupTest extends BaseSeleniumWebTest
         clickLinkWithText("Permissions");
         waitForPageToLoad();
         waitForText("Author");
-        ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "All Site Users");
+        ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "Site: All Site Users");
 
         clickButton("Save", 0);
         waitForText("save successful");
@@ -160,18 +160,18 @@ public class GroupTest extends BaseSeleniumWebTest
         }
         else
         {
-            assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite group2AuthorSite group2, Site Users".split(" "),
+            assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite: group2AuthorSite: group2, Site: Users".split(" "),
                     drt.getDataAsText(rowIndex, 2).split(" ")));
         }
 
 
         //exapnd plus  to check specific groups
         clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+3), "1,1");
-        assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite group2AuthorSite group2, Site Users".split(" "),
+        assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite: group2AuthorSite: group2, Site: Users".split(" "),
                 drt.getDataAsText(rowIndex, 2).split(" ")));
 
         //confirm hover over produces list of broups
-        Locator groupSpecification = Locator.tagContainingText("span","Site group2");
+        Locator groupSpecification = Locator.tagContainingText("span","Site: group2");
         String groupHierarchy = getAttribute(groupSpecification, "ext:qtip");
         String[] expectedMessagesInHierarchy = new String[] {"user1@group1.group.test is a member of <strong>group1</strong>",
                 "Which is a member of <strong>group2</strong><BR/>",
@@ -289,7 +289,7 @@ public class GroupTest extends BaseSeleniumWebTest
         startCreateGlobalPermissionsGroup(BAD_GROUP, true);
         setFormElement("Users_dropdownMenu", "All Site Users");
 
-        ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//input[@id='Users_dropdownMenu']/../img"), "All Site Users");
+        ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//input[@id='Users_dropdownMenu']/../img"), "Site: All Site Users");
         waitForText("Can't add a system group to another group");
         clickButton("OK", 0);
         clickButton("Done");
