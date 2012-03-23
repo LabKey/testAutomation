@@ -1191,8 +1191,8 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the transform script and ruminex versions are as expected
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
-        assertEquals("Unexpected Transform Script Version number", "3.0.20120315", table.getDataAsText(0, "Transform Script Version"));
-        assertEquals("Unexpected Ruminex Version number", "0.0.7", table.getDataAsText(0, "Ruminex Version"));
+        assertEquals("Unexpected Transform Script Version number", "3.0.20120323", table.getDataAsText(0, "Transform Script Version"));
+        assertEquals("Unexpected Ruminex Version number", "0.0.8", table.getDataAsText(0, "Ruminex Version"));
 
         // verify that the lot number value are as expected
         clickLinkWithText("r script transformed assayId");
@@ -1490,7 +1490,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goBack();
         refresh();
         ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
-        assertEquals("AUC, EC50-4, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));  
+        assertEquals("AUC, EC50-4, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));  
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 QC Flag for GS Analyte (2) that was inserted in the previous step is removed
@@ -1498,7 +1498,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goBack();
         refresh();
         ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
-        assertEquals("AUC, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
+        assertEquals("AUC, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //4. For GS Analyte (2), apply the non-current guide set to plate 5a
         //	- QC Flags added for EC50 and HMFI
@@ -1509,7 +1509,7 @@ public class LuminexTest extends AbstractQCAssayTest
         applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
         //assert ec50 and HMFI red text present
         assertElementPresent(Locator.xpath("//div[text()='28040.51' and contains(@style,'red')]"));
-        assertElementPresent(Locator.xpath("//div[text()='28310.06' and contains(@style,'red')]"));
+        assertElementPresent(Locator.xpath("//div[text()='27950.73' and contains(@style,'red')]"));
         assertElementPresent(Locator.xpath("//div[text()='79121.90' and contains(@style,'red')]"));
         assertElementPresent(Locator.xpath("//div[text()='32145.80' and contains(@style,'red')]"));
         assertTextPresent(newQcFlags);
@@ -1539,7 +1539,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertExpectedAnalyte1QCFlagsPresent();
         clickButtonContainingText("Edit", 0);
         editGuideSet(new String[]{"allRunsRow_3"}, "edited analyte 1", false);
-        assertEC505PLQCFlagsPresent(2);
+        assertEC505PLQCFlagsPresent(1);
 
         //8. Edit the GS Analyte (1) guide set and remove plate 3
         //	- the QC Flags for plates 3, 4, 5, and 5a return (HMFI for all 4 and AUC for plates 4, 5, and 5a)
