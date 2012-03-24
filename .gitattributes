@@ -83,6 +83,7 @@ src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
 src/org/labkey/test/module/AdaptiveTest.java -text
 src/org/labkey/test/module/AdaptiveVisualizationPerf.java -text
+src/org/labkey/test/module/CDSTest.java -text
 src/org/labkey/test/module/EHRStudyTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text

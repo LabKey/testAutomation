@@ -136,7 +136,8 @@ public enum TestSet
         PipelineCancelTest.class,
         StudyExportTest.class,
         ViabilityTest.class,
-        ProjectSettingsTest.class
+        ProjectSettingsTest.class,
+        CDSTest.class,
     }),
 
     MiniTest(new Class[]
