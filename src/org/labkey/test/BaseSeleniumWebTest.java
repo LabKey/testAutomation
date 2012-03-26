@@ -4059,13 +4059,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         String columnLabel = getText(Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header")));
         runMenuItemHandler(id);
         ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
-        if(isElementPresent(Locator.xpath("//input[@name='filterType' and "+Locator.NOT_HIDDEN+"]")))
-        {
-            log("Switching to advanced filter UI");
-            checkRadioButton("filterType", "default");
-            waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
-            sleep(500);
-        }
+
+        log("Switching to advanced filter UI");
+        ExtHelper.clickExtTab(this, "Choose Filters");
+        waitForText("Filter Type");
+        //waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
+        sleep(500);
+
         ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
         if(filter1 != null) setFormElement("value_1", filter1);
         if(filter2Type!=null)

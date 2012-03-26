@@ -66,9 +66,7 @@ public class FilterTest extends ListTest
         click(Locator.tagWithText("div", "Color"));
         click(Locator.tagWithText("span", "Filter..."));
         waitForExtMask();
-        waitForTextToDisappear("loading");
-        waitForText("Select All");
-
+        waitForText("[All]");
     }
 
     private void facetedFilterTest()
@@ -79,18 +77,24 @@ public class FilterTest extends ListTest
         startFilter();
 
         log("Verifying expected faceted filter elements present");
-        assertTextPresent("Choose Values To Display", "Advanced");
-        waitForTextToDisappear("loading");
-        assertTextPresent("Light", 4);
-        assertTextPresent("Robust", 4);
+        assertTextPresent("Choose Filters", "Choose Values");
+
+        assertTextPresent("Light", 2);
+        assertTextPresent("Robust", 2);
 
         ExtHelper.clickExtButton(this, "OK");
         assertTextPresent("Light", "Robust");
 
 
         startFilter();
-        checkCheckbox("Light");
-        uncheckCheckbox("Robust");
+        String parent = "//div[contains(@class, 'x-window')]";
+
+        Locator row = ExtHelper.locateExt3GridRow(2, parent);
+        Locator cell = ExtHelper.locateExt3GridCell(row, 1);
+        cell = Locator.xpath(((Locator.XPathLocator)cell).getPath() + "//*[contains(@class, 'x-grid3-row-checker')]");
+
+        mouseDown(cell);
+
         ExtHelper.clickExtButton(this, "OK");
         assertTextPresent("Light");
         assertTextNotPresent("Robust");
