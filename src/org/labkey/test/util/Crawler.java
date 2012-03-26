@@ -487,7 +487,6 @@ public class Crawler
 
     private void testNavTrail(UrlToCheck relativeURL)
     {
-        System.out.println("Testing the nav trail");
         Collection<String> navTrailEntries = _test.getNavTrailEntries();
         if(navTrailEntries.size()==0)
             return;
