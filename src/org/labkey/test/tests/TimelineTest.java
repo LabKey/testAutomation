@@ -71,7 +71,7 @@ public class TimelineTest extends BaseSeleniumWebTest
             "    // Since the above code has already executed, we can access the init method immediately:\n" +
             "    Ext.onReady(demoNamespace.myModule.init, demoNamespace.myModule, true);\n" +
             "</script>\n" +
-            "<div id=\"" + TEST_DIV_NAME + "\" style='height:400'></div>";
+            "<div id=\"" + TEST_DIV_NAME + "\" style='height:400px'></div>";
 
     private static final String TIMELINE_TEST_SRC = "    var tl = LABKEY.Timeline.create({\n" +
             "        renderTo:'testDiv',\n" +
