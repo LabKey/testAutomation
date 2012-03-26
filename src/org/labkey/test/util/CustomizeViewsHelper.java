@@ -74,9 +74,17 @@ public class CustomizeViewsHelper
         test.clickNavButton("Save", 0);
         if (name != null)
         {
-            test.log("Saving custom view '" + name + "'");
-            test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "named"));
-            test.setFormElement(Locator.xpath("//input[@name='saveCustomView_name']"), name);
+            if ("".equals(name))
+            {
+                test.log("Saving default custom view");
+                test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "default"));
+            }
+            else
+            {
+                test.log("Saving custom view '" + name + "'");
+                test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "named"));
+                test.setFormElement(Locator.xpath("//input[@name='saveCustomView_name']"), name);
+            }
         }
         else
         {
