@@ -29,6 +29,8 @@ public class SecurityTestExtended extends SecurityTest
 
     protected void doTestSteps()
     {
+        enableEmailRecorder();
+
         clonePermissionsTest();
         cantReachAdminToolFromUserAccount(true);
     }
