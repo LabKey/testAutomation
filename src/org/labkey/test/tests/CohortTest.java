@@ -29,9 +29,9 @@ public class CohortTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "Cohort Test Project";
     private static final String COHORT_STUDY_ZIP = "/sampledata/study/CohortStudy.zip";
-    private static final String XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE = "//td[@id='bodypanel']/div[2]/div/table[1]";
-    private static final String XPATH_SPECIMEN_REPORT_TABLE_POSITIVE = "//td[@id='bodypanel']/div[2]/div/table[2]";
-    private static final String XPATH_SPECIMEN_REPORT_TABLE_UNASSIGNED = "//td[@id='bodypanel']/div[2]/div/table[3]";
+    private static final String XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE = "//td[@id='bodypanel']/div[2]/div[1]/table";
+    private static final String XPATH_SPECIMEN_REPORT_TABLE_POSITIVE = "//td[@id='bodypanel']/div[2]/div[2]/table";
+    private static final String XPATH_SPECIMEN_REPORT_TABLE_UNASSIGNED = "//td[@id='bodypanel']/div[2]/div[3]/table";
     private static final String TABLE_NEGATIVE = "tableNegative";
     private static final String TABLE_POSITIVE = "tablePositive";
     private static final String TABLE_UNASSIGNED = "tableUnassigned";
