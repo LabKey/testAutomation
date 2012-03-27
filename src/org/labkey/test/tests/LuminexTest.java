@@ -1673,9 +1673,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //verify rechecking a box adds the flag back
         waitForText(expectedFlags[0]);
-        clickAtAndWait(strikeoutAUC, 0, "1,1");
+        clickAt(strikeoutAUC, "1,1");
         waitForExtMask();
-//        waitForPageToLoad();
         waitForElement(aucCheckBox, defaultWaitForPage);
         clickAt(aucCheckBox,  "1,1");
 

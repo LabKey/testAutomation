@@ -3206,22 +3206,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             waitForExtMaskToDisappear();
     }
 
-    public void clickAtAndWait(Locator l, int millis, String coord)
-    {
-        selenium.clickAt(l.toString(), coord);
-        if (millis > 0)
-            waitForPageToLoad(millis);
-
-    }
-
     public void clickAtAndWait(Locator l, String coord, int millis)
     {
         selenium.clickAt(l.toString(), coord);
         if (millis > 0)
             waitForPageToLoad(millis);
-
     }
-
 
     public void dblclickAtAndWait(Locator l)
     {
@@ -3837,7 +3827,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         Locator.XPathLocator buttonLocator = getButtonLocator(text);
         if (buttonLocator != null)
-            clickAtAndWait(buttonLocator, waitMillis, coord);
+            clickAtAndWait(buttonLocator, coord, waitMillis);
         else
             fail("No button found with text \"" + text + "\"");
     }
