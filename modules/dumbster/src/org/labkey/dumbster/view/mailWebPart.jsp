@@ -126,19 +126,25 @@ function toggleRecorder(checkbox)
             StringBuilder body = new StringBuilder();
             boolean sawHtml = false;
             boolean inHtml = false;
+            boolean inMessageBody = false;
             for (String line : lines)
             {
-                if (inHtml)
-                    body.append(line).append('\n');
-                else
-                    body.append(h(line)).append("<br>\n");
-
                 if (line.indexOf("Content-Type: text/html") == 0)
                     sawHtml = true;
                 else if (sawHtml && "".equals(line))
                     inHtml = true;    
                 else if (line.indexOf("------=") == 0)
                     sawHtml = inHtml = false;
+                else if (inHtml && line.trim().equals("</td></tr>"))
+                    inMessageBody = false;
+
+                if (inHtml && !inMessageBody)
+                    body.append(line).append('\n');
+                else
+                    body.append(h(line)).append("<br>\n");
+
+                if (inHtml && line.indexOf("id=\"message-body\"") > 0)
+                    inMessageBody = true;
             }
 
             StringBuilder headers = new StringBuilder();
