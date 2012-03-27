@@ -260,7 +260,7 @@ public class Locator
 
     public static XPathLocator menuItem(String text)
     {
-        return xpath("//a/span["+ NOT_HIDDEN +" and contains(text(), " + xq(text) + ") and contains(@class, 'x-menu-item-text')]");
+        return xpath("//a/span["+ NOT_HIDDEN +" and text() = " + xq(text) + " and contains(@class, 'x-menu-item-text')]");
     }
 
     public static XPathLocator menuBarItem(String text)
