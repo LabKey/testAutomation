@@ -110,13 +110,13 @@ public class FileContentTest extends BaseSeleniumWebTest
             ExtHelper.waitForExtDialog(this, "Update complete", WAIT_FOR_JAVASCRIPT);            
             waitForExtMaskToDisappear();
             // Change user setting TEST_USER -> No Email
-            checkDataRegionCheckbox("Users", 1);
+            DataRegionTable table = new DataRegionTable("Users", this);
+            checkDataRegionCheckbox("Users", table.getRow("Email", TEST_USER));
             ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
             click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Settings']"));
             waitAndClickNavButton("Yes");
             waitForPageToLoad();
-            DataRegionTable table = new DataRegionTable("Users", this);
-            assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(1, "File Settings"));
+            assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
 
             waitForElement(Locator.xpath("//a/span[text() = 'Admin']"), WAIT_FOR_JAVASCRIPT);
             enableEmailRecorder();

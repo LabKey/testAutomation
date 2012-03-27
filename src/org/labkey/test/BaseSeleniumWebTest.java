@@ -2900,7 +2900,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             public boolean check()
             {
-                return elementContains(locator, value);
+                return getFormElement(locator) == value;
             }
         }, failMessage, WAIT_FOR_JAVASCRIPT);
     }

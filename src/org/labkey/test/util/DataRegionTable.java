@@ -116,13 +116,17 @@ public class DataRegionTable
         return rows;
     }
 
-    public int getIndexOfColumnCellWithData(String cellContents, int columnIndex)
+    public int getRow(String columnLabel, String value)
     {
-//          getColumn(columnName);
+        return getRow(getColumn(columnLabel), value);
+    }
+
+    public int getRow(int columnIndex, String value)
+    {
         int rowCount = getDataRowCount();
         for(int i=0; i<rowCount; i++)
         {
-            if(cellContents.equals(getDataAsText(i, columnIndex)))
+            if(value.equals(getDataAsText(i, columnIndex)))
                 return i;
         }
           return -1;

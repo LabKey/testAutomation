@@ -149,7 +149,7 @@ public class GroupTest extends BaseSeleniumWebTest
         int userColumn = 1;
         int accessColumn = 2;
 
-        int rowIndex = drt.getIndexOfColumnCellWithData(TEST_USERS_FOR_GROUP[0], userColumn);
+        int rowIndex = drt.getRow(userColumn, TEST_USERS_FOR_GROUP[0]);
 
         if(getBrowser().startsWith(FIREFOX_BROWSER))
         //IE displays correctly but selenium retrieves the data differently
