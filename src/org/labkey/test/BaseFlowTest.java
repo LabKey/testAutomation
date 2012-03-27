@@ -358,8 +358,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         if (existingRun)
         {
-            selectOptionByText("existingKeywordRunId", fcsPath);            
             clickRadioButtonById("previousFCSFiles");
+            selectOptionByText("existingKeywordRunId", fcsPath);
         }
         else if (fcsPath != null)
         {
