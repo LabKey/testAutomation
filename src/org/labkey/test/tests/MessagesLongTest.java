@@ -133,13 +133,13 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MSG1_TITLE);
         setFormElement("expires", EXPIRES1);
-        setFormElement("body", "1 <b>x</b>");
+        setFormElement("body", "1 <b>first message testing</b>");
         selectOptionByText("rendererType", "Wiki Page");
         submit();
         assertTextPresent(MSG1_TITLE);
         clickLinkWithText("view message or respond");
         assertTextPresent(EXPIRES1);
-        assertTextPresent("<b>x</b>");
+        assertTextPresent("<b>first message testing</b>");
         clickNavButton("Delete Message");
         clickNavButton("Delete");
 
@@ -329,10 +329,10 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 4); // TODO: switch to 3 when empty messages are emailed
         clickLinkWithText(MSG1_TITLE, 0, false);
-        assertTextPresent("1 x");
-        assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
+        assertTextPresent("1 <b>x</b>");
+        assertTextPresent("<a href=\"/labkey/list/MessagesVerifyProject/begin.view?\" class=\"labkey-text-link\">manage lists</a>");
         clickLinkWithText(MSG1_TITLE, 1, false);
-        assertTextPresent("<b>x</b>");
+        assertTextPresent("first message testing");
         assertLinkNotPresentWithText(MSG3_TITLE);
         assertLinkNotPresentWithText(MSG2_TITLE);
     }
