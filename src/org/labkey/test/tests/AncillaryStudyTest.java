@@ -58,7 +58,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     public void doCleanup()
     {
         // Delete any containers and users created by the test.
-        try{deleteProject(PROJECT_NAME);}catch (Exception e){/* ingnore */}
+        try{deleteProject(PROJECT_NAME);}catch (Throwable e){/* ingnore */}
         deleteDir(new File(getPipelinePath(), "export"));
     }
 
