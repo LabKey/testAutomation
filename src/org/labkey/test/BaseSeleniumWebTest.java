@@ -2893,6 +2893,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertFormElementEquals(new Locator(elementName), value);
     }
 
+    public void waitForFormElementToEqual(final Locator locator, final String value)
+    {
+        String failMessage = "Field with locator " + locator + " did not equal " + value + ".";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return elementContains(locator, value);
+            }
+        }, failMessage, WAIT_FOR_JAVASCRIPT);
+    }
+
     public String getFormElement(Locator loc)
     {
         return selenium.getValue(loc.toString());

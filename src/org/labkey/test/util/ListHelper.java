@@ -348,8 +348,8 @@ public class ListHelper
         test.waitForElement(Locator.name("ff_name0"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         test.log("Check that list was created correctly");
-        test.assertFormElementEquals("ff_name", listName);
-        test.assertFormElementEquals("ff_name0", listKeyName);
+        test.waitForFormElementToEqual(Locator.name("ff_name"), listName);
+        test.waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
 
         test.log("Add columns");
 //        test.clickLinkWithText("edit fields");
