@@ -85,9 +85,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertLinkNotPresentWithText("Admin");
 
         assertCDSPortalRow("Studies", "Demo Study, Not Actually CHAVI 001, NotRV144", "3 total");
-        assertCDSPortalRow("Antigen", "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, null)", "32 total");
+        assertCDSPortalRow("Antigen", "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, other)", "32 total");
         assertCDSPortalRow("Assays", "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
-        assertCDSPortalRow("Contributors", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
+        assertCDSPortalRow("Contributors", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
         assertCDSPortalRow("Demographics", "9 ethnicities, 2 locations", "23 total participants");
 
         clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Studies']"), "1,1");
