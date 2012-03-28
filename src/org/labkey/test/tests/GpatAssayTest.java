@@ -37,10 +37,12 @@ public class GpatAssayTest extends BaseSeleniumWebTest
     private static final String ALIASED_ASSAY_2 = "trial01columns2.tsv";
     private static final String ALIASED_ASSAY_3 = "trial01columns3.tsv";
     private static final String ALIASED_ASSAY_4 = "trial01columns4.tsv";
+    private static final String GPAT_ASSAY_FNA = "trial03.fna";
     private static final String ASSAY_NAME_XLS = "XLS Assay";
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
-    
+    private static final String ASSAY_NAME_FNA = "FASTA Assay";
+
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -201,5 +203,24 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("VisitID", "visitId");
         assertFormElementEquals("Date", "date");
         clickNavButton("Cancel");
+
+        log("Import FASTA GPAT assay");
+        clickLinkWithText(PROJECT_NAME);
+        ExtHelper.waitForFileGridReady(this);
+        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_FNA);
+        selectImportDataAction("Create New General Assay Design");
+        waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
+        setFormElement("AssayDesignerName", ASSAY_NAME_FNA);
+
+        clickNavButton("Begin import");
+        clickNavButton("Next");
+        clickNavButton("Save and Finish");
+        clickLinkWithText(GPAT_ASSAY_FNA);
+
+        assertTextPresent("Header");
+        assertTextPresent("Sequence");
+
+        assertTextPresent("HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ");
+        assertTextPresent("CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
     }
 }
