@@ -119,7 +119,6 @@ public class MessagesTest extends BaseSeleniumWebTest
         clickLinkWithText("view list");
         assertTextPresent(MSG1_TITLE);
         goToModule("Messages");
-        clickLinkWithText("Messages");
         clickLinkWithText(MSG1_TITLE);
 
         log("test edit messages");
