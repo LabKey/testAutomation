@@ -67,6 +67,7 @@ public class FilterTest extends ListTest
         click(Locator.tagWithText("span", "Filter..."));
         waitForExtMask();
         waitForText("[All]");
+        sleep(400);
     }
 
     private void facetedFilterTest()
@@ -86,18 +87,36 @@ public class FilterTest extends ListTest
         assertTextPresent("Light", "Robust");
 
 
-        startFilter();
         String parent = "//div[contains(@class, 'x-window')]";
 
-        Locator row = ExtHelper.locateExt3GridRow(2, parent);
-        Locator cell = ExtHelper.locateExt3GridCell(row, 1);
-        cell = Locator.xpath(((Locator.XPathLocator)cell).getPath() + "//*[contains(@class, 'x-grid3-row-checker')]");
-
-        mouseDown(cell);
+        //this should click the row, selecting only this value.  clicking the cell will toggle it
+        startFilter();
+        Locator row = ExtHelper.locateExt3GridRow(1, parent);
+        mouseDown(row);
 
         ExtHelper.clickExtButton(this, "OK");
         assertTextPresent("Light");
         assertTextNotPresent("Robust");
+
+
+        //this should click the row, selecting only this value.  clicking the cell will toggle it
+        startFilter();
+
+        //toggle 'Light'
+        row = ExtHelper.locateExt3GridRow(1, parent);
+        Locator cell = ExtHelper.locateExt3GridCell(row, 1);
+        cell = Locator.xpath(((Locator.XPathLocator)cell).getPath() + "//div//div"); //+ "//*[contains(@class, 'x-grid3-row-checker')]");
+        mouseDown(cell);
+
+        //enable 'Robust'
+        row = ExtHelper.locateExt3GridRow(2, parent);
+        cell = ExtHelper.locateExt3GridCell(row, 1);
+        cell = Locator.xpath(((Locator.XPathLocator)cell).getPath() + "//div//div");
+        mouseDown(cell);
+
+        ExtHelper.clickExtButton(this, "OK");
+        assertTextNotPresent("Light");
+        assertTextPresent("Robust");
     }
 
 
