@@ -32,6 +32,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 {
     private static final String PROJECT_NAME = "CDSTest Project";
     private static final File STUDY_ZIP = new File(getSampledataPath(), "CDS/Dataspace.study.zip");
+    private static final String STUDIES[] = {"Demo Study", "Not Actually CHAVI 001", "NotRV144"};
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -78,31 +79,49 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void verifyCDSApplication()
     {
+        clickLinkWithText(PROJECT_NAME);
         goToModule("CDS");
         clickLinkWithText("Application");
 
         assertLinkNotPresentWithText("Home");
         assertLinkNotPresentWithText("Admin");
 
-        assertCDSPortalRow("Studies", "Demo Study, Not Actually CHAVI 001, NotRV144", "3 total");
-        assertCDSPortalRow("Antigen", "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, other)", "32 total");
-        assertCDSPortalRow("Assays", "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
-        assertCDSPortalRow("Contributors", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
-        assertCDSPortalRow("Demographics", "9 ethnicities, 2 locations", "23 total participants");
+        assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
+        assertCDSPortalRow(SearchBy.Antigen, "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, other)", "32 total");
+        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
+        assertCDSPortalRow(SearchBy.Contributors, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
+        assertCDSPortalRow(SearchBy.Demographics, "9 ethnicities, 2 locations", "23 total participants");
 
-        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Studies']"), "1,1");
+        click(SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[0], 6, 1, 5, 3, 21, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[1], 12, 1, 3, 3, 9, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[2], 5, 1, 3, 2, 4, 12, SearchBy.Studies);
         goToAppHome();
-        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Antigen']"), "1,1");
+        click(SearchBy.Antigen);
+        assertFilterStatusPanel("1A", 6, 1, 5, 3, 21, 23, SearchBy.Antigen);
+        assertFilterStatusPanel("2", 18, 2, 6, 4, 29, 23, SearchBy.Antigen);
+        assertFilterStatusPanel("1B", 6, 1, 5, 3, 21, 23, SearchBy.Antigen);
+        assertFilterStatusPanel("3", 18, 2, 6, 4, 29, 23, SearchBy.Antigen);
         goToAppHome();
-        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Assays']"), "1,1");
+        click(SearchBy.Assays);
+        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 3, 9, 23, SearchBy.Assays);
+        assertFilterStatusPanel("NIV Test Results", 6, 1, 5, 3, 21, 23, SearchBy.Assays);
+        assertFilterStatusPanel("Lab Results", 23, 3, 7, 4, 32, 23, SearchBy.Assays);
+        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 5, 3, 21, 23, SearchBy.Assays);
+        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 2, 4, 23, SearchBy.Assays);
+        assertFilterStatusPanel("NAb-Sample-LabKey", 23, 3, 7, 4, 32, 23, SearchBy.Assays);
+        assertFilterStatusPanel("Physical Exam", 6, 1, 5, 3, 21, 23, SearchBy.Assays);
         goToAppHome();
-        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Contributors']"), "1,1");
+        click(SearchBy.Contributors);
+        assertFilterStatusPanel("Arnold/Bellew Lab", 6, 1, 5, 3, 21, 23, SearchBy.Contributors);
+        assertFilterStatusPanel("LabKey Lab", 23, 3, 7, 4, 32, 23, SearchBy.Contributors);
+        assertFilterStatusPanel("Piehler/Eckels Lab", 12, 1, 3, 3, 9, 23, SearchBy.Contributors);
         goToAppHome();
-        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Demographics']"), "1,1");
+        click(SearchBy.Demographics);
         goToAppHome();
     }
 
-    private void assertCDSPortalRow(String by, String expectedDetail, String expectedTotal)
+    private void assertCDSPortalRow(SearchBy by, String expectedDetail, String expectedTotal)
     {
         waitForText(" " + by);
         assertTrue("'by "+by+"' search option is not present", isElementPresent(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
@@ -116,7 +135,24 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "/div[contains(@class, 'totalcolumn')]"));
         assertEquals("Wrong total for search by "+by+".", expectedTotal, actualTotal);
     }
-    
+
+    // Sequential calls to this should have different participant counts.
+    private void assertFilterStatusPanel(String barLabel, int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount, int maxCount, SearchBy searchBy)
+    {
+        click(Locator.xpath("//span[text() = '"+barLabel+"']"));
+        waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"));
+        assertTextPresent(studyCount+" Study", assayCount+" Assays", contributorCount+" Contributors", antigenCount+" Antigens");
+        assertElementPresent(Locator.xpath("//div[@class='selection']/div[text()='"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"']"));
+    }
+
+    private String genCurrentSelectionString(String hierarchy, String name)
+    {
+        if(name.length() <= 17)
+            return hierarchy + ": " + name;
+        else
+            return hierarchy + ": " + name.substring(0, 14) + "...";
+    }
+
     private void importCDSData(String query, File dataFile)
     {
         goToModule("CDS");
@@ -155,7 +191,42 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void goToAppHome()
     {
-        clickAt(Locator.xpath("//div[contains(@class, 'logo')]"), "1,1");
+        clickAt(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]"), "1,1");
+        waitForElement(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]/h2/br"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void click(SearchBy by)
+    {
+        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' "+by+"']"), "1,1");
+        waitForText("Showing number of: Participants", WAIT_FOR_JAVASCRIPT);
+    }
+
+    private String getHierarchy(SearchBy searchBy)
+    {
+        switch(searchBy)
+        {
+            case Studies:
+                return "Study";
+            case Antigen:
+                return "Tier";
+            case Assays:
+                return "Assay";
+            case Contributors:
+                return "Contributor";
+            case Demographics:
+                return "Participant";
+        }
+        fail("Unknown Search Axis: " + searchBy);
+        return null;
+    }
+
+    private static enum SearchBy
+    {
+        Studies,
+        Antigen,
+        Assays,
+        Contributors,
+        Demographics
     }
 
     private class CDSTester
