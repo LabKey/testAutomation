@@ -38,7 +38,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private static final String REPORT_NAME = "TestReport";
     private static final String WEBPART_TITLE = "TestDataViews";
     private static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
-    private static final String NEW_CATEGORY = "A New Category"; // + TRICKY_CHARACTERS_NO_QUOTES; // TODO: Add tricky characters to regress 14230
+    private static final String NEW_CATEGORY = "A New Category" + TRICKY_CHARACTERS_NO_QUOTES;
     private static final String NEW_DESCRIPTION = "Description set in data views webpart";
     private static final String PARTICIPANT_GROUP_ONE = "GROUP 1";
     private static final String PARTICIPANT_GROUP_TWO = "GROUP 2";
@@ -66,7 +66,7 @@ public class StudyRedesignTest extends StudyBaseTest
         setStudyRedesign();
         setupDatasetCategories();
         log("Create report for data view webpart test.");
-        goToModule("Study");
+        goToModule("StudyRedesign");
         clickTab("Manage");
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "R View");
