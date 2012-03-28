@@ -84,16 +84,39 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertLinkNotPresentWithText("Home");
         assertLinkNotPresentWithText("Admin");
 
-//        assertCDSPortalRow("Demo Study, Not Actually CHAVI 001, NotRV144");
-        waitForText(" Studies");
-        assertTextPresent(
-                "Demo Study, Not Actually CHAVI 001, NotRV144",
-                "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, null)",
-                "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...",
-                "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other",
-                "9 ethnicities, 2 locations");
+        assertCDSPortalRow("Studies", "Demo Study, Not Actually CHAVI 001, NotRV144", "3 total");
+        assertCDSPortalRow("Antigen", "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, null)", "32 total");
+        assertCDSPortalRow("Assays", "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
+        assertCDSPortalRow("Contributors", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
+        assertCDSPortalRow("Demographics", "9 ethnicities, 2 locations", "23 total participants");
+
+        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Studies']"), "1,1");
+        goToAppHome();
+        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Antigen']"), "1,1");
+        goToAppHome();
+        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Assays']"), "1,1");
+        goToAppHome();
+        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Contributors']"), "1,1");
+        goToAppHome();
+        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' Demographics']"), "1,1");
+        goToAppHome();
     }
 
+    private void assertCDSPortalRow(String by, String expectedDetail, String expectedTotal)
+    {
+        waitForText(" " + by);
+        assertTrue("'by "+by+"' search option is not present", isElementPresent(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
+                "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]")));
+        String actualDetail = getText(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
+                "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]"+
+                "/div[contains(@class, 'detailcolumn')]"));
+        assertEquals("Wrong details for search by "+by+".", expectedDetail, actualDetail);
+        String actualTotal = getText(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
+                "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]"+
+                "/div[contains(@class, 'totalcolumn')]"));
+        assertEquals("Wrong total for search by "+by+".", expectedTotal, actualTotal);
+    }
+    
     private void importCDSData(String query, File dataFile)
     {
         goToModule("CDS");
@@ -128,6 +151,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "rows added to Assay from 'Lab Results'",
                 "23 rows added to fact table.",
                 "48 rows added to fact table.");
+    }
+
+    private void goToAppHome()
+    {
+        clickAt(Locator.xpath("//div[contains(@class, 'logo')]"), "1,1");
     }
 
     private class CDSTester
