@@ -4673,11 +4673,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Save and Finish");
     }
 
-    public void impersonateGroup(String group)
+    public void impersonateGroup(String group, boolean isSiteGroup)
     {
         log("Impersonating group: " + group);
         goToHome();
-        clickAdminMenuItem("Impersonate", "Group", group);
+        clickAdminMenuItem("Impersonate", "Group", (isSiteGroup ? "Site: " : "") + group);
 
     }
 

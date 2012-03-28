@@ -215,7 +215,7 @@ public class GroupTest extends BaseSeleniumWebTest
         stopImpersonating();
 
         //impersonate simple group, they should have full editor permissions
-        impersonateGroup(SIMPLE_GROUP);
+        impersonateGroup(SIMPLE_GROUP, true);
         clickLinkContainingText(getProjectName());
         assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
         assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
@@ -223,7 +223,7 @@ public class GroupTest extends BaseSeleniumWebTest
         stopImpersonatingGroup();
 
         //impersonate compound group, should only have author permissions
-        impersonateGroup(COMPOUND_GROUP);
+        impersonateGroup(COMPOUND_GROUP, true);
         clickLinkContainingText(getProjectName());
         assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP,canSeePages(nameTitleBody));
 //        assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
@@ -233,7 +233,7 @@ public class GroupTest extends BaseSeleniumWebTest
         //Issue 13802: add child group to SIMPLE_GROUP, child group should also have access to pages
         createGlobalPermissionsGroup(CHILD_GROUP, "");
         addUserToSiteGroup(CHILD_GROUP, SIMPLE_GROUP);
-        impersonateGroup(CHILD_GROUP);
+        impersonateGroup(CHILD_GROUP, true);
         clickLinkContainingText(getProjectName());
         assertTrue("could not see wiki pages when impersonating " + CHILD_GROUP, canSeePages(nameTitleBody));
         assertTrue("could not edit wiki pages when impersonating " + CHILD_GROUP, canEditPages(nameTitleBody));
