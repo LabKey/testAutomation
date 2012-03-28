@@ -679,7 +679,7 @@ public class StudyTest extends StudyBaseTest
         clickNavButton("Save Changes");
 
         selenium.click(".toggle");
-        clickMenuButton("Comments and QC", "Set");
+        clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         clickMenuButton("Copy or Move Comment(s)", "Copy", "To Mouse", "999320812");
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Copied PTID Comment");
         clickNavButton("Submit");
