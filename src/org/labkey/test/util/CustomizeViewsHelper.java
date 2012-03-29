@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.internal.seleniumemulation.IsElementPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,17 +141,17 @@ public class CustomizeViewsHelper
         Sort
     }
 
-    private static void addCustomizeViewItem(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, ViewItemType type)
+    /**
+     * expand customize view menu to all but the last of fieldKeyParts
+     * @param test
+     * @param fieldKeyParts
+     * @return
+     */
+    private static Locator expandPivots(BaseSeleniumWebTest test, String[] fieldKeyParts)
     {
-        // fieldKey is the value contained in @fieldKey
-        test.log("Adding " + column_name + " " + type.toString());
-
-        changeTab(test, type);
-
-        String fieldKey = StringUtils.join(fieldKeyParts, "/");
         String nodePath = "";
+        String fieldKey = StringUtils.join(fieldKeyParts, "/");
 
-        // Expand all nodes necessary to reveal the desired node.
         for( int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
             nodePath += fieldKeyParts[i];
@@ -161,7 +162,23 @@ public class CustomizeViewsHelper
             nodePath += "/";
         }
 
-        test.checkCheckbox(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(fieldKey) + "]/input[@type='checkbox']"));
+        return Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(fieldKey) + "]/input[@type='checkbox']");
+    }
+
+    private static void addCustomizeViewItem(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, ViewItemType type)
+    {
+        // fieldKey is the value contained in @fieldKey
+        test.log("Adding " + column_name + " " + type.toString());
+
+        changeTab(test, type);
+
+//        String fieldKey = StringUtils.join(fieldKeyParts, "/");
+//        String nodePath = "";
+
+        // Expand all nodes necessary to reveal the desired node.
+        Locator checkbox = expandPivots(test, fieldKeyParts);
+
+        test.checkCheckbox(checkbox);
     }
 
     public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String fieldKey, String column_name)
@@ -554,5 +571,11 @@ public class CustomizeViewsHelper
 
         test.setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
         ExtHelper.clickExtButton(test, "Save");
+    }
+
+    public static boolean isColumnPresent(BaseSeleniumWebTest test, String fieldKey)
+    {
+        Locator checkbox = expandPivots(test,fieldKey.split("/"));
+        return test.isElementPresent(checkbox);
     }
 }

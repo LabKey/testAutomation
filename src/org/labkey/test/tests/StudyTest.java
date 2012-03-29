@@ -39,6 +39,7 @@ import java.util.Set;
 public class StudyTest extends StudyBaseTest
 {
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
+    protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
 
     protected String _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\taliasedColumn\n" +
         "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\taliasedData\n" +
@@ -707,6 +708,16 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("999320016");
         clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
         assertTextPresent("right deltoid");
+        
+        verifyDemoCustomizeOptions();
+    }
+
+    private void verifyDemoCustomizeOptions()
+    {
+        log("verify demographic data set not present");
+        clickLinkContainingText(DEMOGRAPHICS_TITLE);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        assertFalse(CustomizeViewsHelper.isColumnPresent(this,  "MouseVisit/DEM-1"));
     }
 
     protected void verifyVisitMapPage()
@@ -769,6 +780,11 @@ public class StudyTest extends StudyBaseTest
 
         // "Demographics Data" bit needs to be false for the rest of the test
         setDemographicsBit("DEM-1: Demographics", false);
+
+        log("verify ");
+        clickButtonContainingText("View Data");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        assertTrue(CustomizeViewsHelper.isColumnPresent(this,  "MouseVisit/DEM-1"));
     }
 
     private void verifyHiddenVisits()
