@@ -85,8 +85,8 @@ public class FolderTest extends BaseSeleniumWebTest
     {
         log("Moving Folders");
         clickLinkWithText(PROJECT_NAME);
-        clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Manage Subfolders");
+        clickAdminMenuItem("Folder", "Management");
+        waitForExt4FolderTreeNode(PROJECT_NAME, 10000);
 
         log("Ensure folders will be visible");
         selenium.windowMaximize();

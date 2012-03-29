@@ -54,8 +54,8 @@ public class FlowJoQueryTest extends BaseFlowTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         CustomizeViewsHelper.applyCustomView(this);
         clickLinkWithText(PROJECT_NAME);
-        clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Folder Settings");
+        clickAdminMenuItem("Folder", "Management");
+        clickLinkWithText("Folder Type");
         toggleCheckboxByTitle("Query");
         toggleCheckboxByTitle("Flow");
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);

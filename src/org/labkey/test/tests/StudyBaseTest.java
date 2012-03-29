@@ -170,7 +170,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     private void initializePipeline()
     {
         clickAdminMenuItem("Folder", "Management");
-        clickLinkContainingText("Folder Settings");
+        clickLinkWithText("Folder Type");
         toggleCheckboxByTitle("Pipeline");
         submit();
         addWebPart("Data Pipeline");
@@ -250,7 +250,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void setStudyRedesign()
     {
         clickAdminMenuItem("Folder", "Management");
-        clickLinkContainingText("Folder Settings");
+        clickLinkWithText("Folder Type");
         checkRadioButton("folderType", "Study Redesign (ITN)");
         clickButton("Update Folder");
     }

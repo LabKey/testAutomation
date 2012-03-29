@@ -105,7 +105,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         "user/showUsers.view?","security/project.view?returnUrl=%2Fuser%2FshowUsers.view%3F","admin/createFolder.view?",
         "/analytics/begin.view?","/login/configure.view?", "/admin/customizeEmail.view?",
         "/admin/filesSiteSettings.view?", "/admin/projectSettings.view?",
-        "/flow/flowAdmin.view?","/admin/folderSettings.view?",
+        "/flow/flowAdmin.view?","/admin/folderManagement.view?",
         "/admin/reorderFolders.view?", "/admin/customizeSite.view?",
         "/reports/configureReportsAndScripts.view?", "/audit/showAuditLog.view?",
         "/search/admin.view?", "/ms1/showAdmin.view?", "/ms2/showMS2Admin.view?",

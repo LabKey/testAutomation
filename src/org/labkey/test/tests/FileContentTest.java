@@ -100,8 +100,7 @@ public class FileContentTest extends BaseSeleniumWebTest
         {
             // Setup notificaiton emails
             // as they are now digest based.
-            clickAdminMenuItem("Project", "Management");
-            clickLinkContainingText("Folder Settings");
+            clickAdminMenuItem("Folder", "Management");
             clickLinkWithText("Email Notifications");
             click(Locator.navButton("Update Settings"));
             // Set folder default

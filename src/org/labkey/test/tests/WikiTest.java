@@ -69,8 +69,8 @@ public class WikiTest extends BaseSeleniumWebTest
     {
         log("Create Project");
         createProject(PROJECT_NAME);
-        clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Folder Settings");
+        clickAdminMenuItem("Folder", "Management");
+        clickLinkWithText("Folder Type");
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
