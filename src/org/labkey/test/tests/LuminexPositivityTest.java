@@ -42,35 +42,48 @@ public class LuminexPositivityTest extends LuminexTest
         sleep(5000);
 
         // Test positivity data upload with 3x Fold Change
-        uploadPositivityFile(assayName + " 3x Fold Change", 3);
+        uploadPositivityFile(assayName + " 3x Fold Change", "1", "3");
         String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
         String[] negWells = new String[] {"A3", "B3", "A5", "B5", "A10", "B10"};
         checkPositivityValues("negative", negWells.length, negWells);
 
         // Test positivity data upload with 5x Fold Change
-        uploadPositivityFile(assayName + " 5x Fold Change", 5);
+        uploadPositivityFile(assayName + " 5x Fold Change", "1", "5");
         posWells = new String[] {"A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
         negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6", "A10", "B10"};
         checkPositivityValues("negative", negWells.length, negWells);
+
+        // Test positivity data upload w/out a baseline visit and/or fold change
+        uploadPositivityFile(assayName + " No Fold Change", "1", "");
+        // should result in error for having a base visit without a fold change
+        assertTextPresent("An error occurred when running the script (exit code: 1).", "Error: No value provided for 'Positivity Fold Change'.");
+        clickNavButton("Cancel");
+        // TODO: set positivity threshold analyte props to 1000
+        uploadPositivityFile(assayName + " No Base Visit", "", "");
+        posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A8", "B8", "A9", "B9"};
+        checkPositivityValues("positive", posWells.length, posWells);
+        negWells = new String[] {"A5", "B5", "A10", "B10"};
+        checkPositivityValues("negative", negWells.length, negWells);
     }
 
-    private void uploadPositivityFile(String assayName, int foldChange)
+    private void uploadPositivityFile(String assayName, String baseVisit, String foldChange)
     {
         goToTestAssayHome();
         clickNavButton("Import Data");
         clickNavButton("Next");
         setFormElement("name", assayName);
         checkCheckbox("calculatePositivity");
-        setFormElement("baseVisit", "1");
-        setFormElement("positivityFoldChange", String.valueOf(foldChange));
+        setFormElement("baseVisit", baseVisit);
+        setFormElement("positivityFoldChange", foldChange);
         File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
         assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
         setFormElement("__primaryFile__", positivityData);
         clickNavButton("Next");
         clickNavButton("Save and Finish");
-        clickLinkWithText(assayName);
+        if (!isTextPresent("Error"))
+            clickLinkWithText(assayName);
     }
 
     private void checkPositivityValues(String type, int numExpected, String[] positivityWells)
