@@ -22,15 +22,12 @@ import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StringHelper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 11/4/11
  * Time: 2:08 PM
- * To change this template use File | Settings | File Templates.
  */
 public class GroupTest extends BaseSeleniumWebTest
 {
-
     protected static final String[] TEST_USERS_FOR_GROUP = {"user1@group1.group.test", "user2@group1.group.test", "user3@group2.group.test"};
     protected static final String SIMPLE_GROUP = "group1";
     protected static final String COMPOUND_GROUP = "group2";
@@ -43,7 +40,7 @@ public class GroupTest extends BaseSeleniumWebTest
     @Override
     protected String getProjectName()
     {
-        return "Group Verify Test Project";  //To change body of implemented methods use File | Settings | File Templates.
+        return "Group Verify Test Project";
     }
 
     protected String getProject2Name()
@@ -68,8 +65,6 @@ public class GroupTest extends BaseSeleniumWebTest
 
     protected void init()
     {
-
-
         for(int i=0; i<TEST_USERS_FOR_GROUP.length; i++)
         {
             createUser(TEST_USERS_FOR_GROUP[i], null);
@@ -90,15 +85,12 @@ public class GroupTest extends BaseSeleniumWebTest
         stopImpersonating();
         //create users
 
-
         createGlobalPermissionsGroup(SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
         createGlobalPermissionsGroup(COMPOUND_GROUP, SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[2]);
-
 
         verifyExportFunction();
 
         verifyRedundantUserWarnings();
-
 
         //add read permissions to group2
         goToHome();
@@ -336,7 +328,7 @@ public class GroupTest extends BaseSeleniumWebTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     protected void assertUserCanSeeFolder(String user, String folder)
