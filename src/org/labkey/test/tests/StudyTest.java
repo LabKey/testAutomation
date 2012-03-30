@@ -66,7 +66,7 @@ public class StudyTest extends StudyBaseTest
     //lists created in participant picker tests must be cleaned up afterwards
     LinkedList<String> persistingLists  = new LinkedList<String>();
     private String Study001 = "Study 001";
-    private String authorUser = "author@user.com";
+    private String authorUser = "author@study.test";
     private String specimenUrl = null;
 
     protected File[] getTestFiles()
@@ -76,6 +76,7 @@ public class StudyTest extends StudyBaseTest
 
     protected void doCreateSteps()
     {
+        enableEmailRecorder();
         importStudy();
         startSpecimenImport(2);
 
