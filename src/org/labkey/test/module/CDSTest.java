@@ -105,7 +105,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         goToAppHome();
         click(SearchBy.Assays);
         assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 3, 9, 23, SearchBy.Assays);
-        assertFilterStatusPanel("NIV Test Results", 6, 1, 5, 3, 21, 23, SearchBy.Assays);
+        assertFilterStatusPanel("HIV Test Results", 6, 1, 5, 3, 21, 23, SearchBy.Assays);
         assertFilterStatusPanel("Lab Results", 23, 3, 7, 4, 32, 23, SearchBy.Assays);
         assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 5, 3, 21, 23, SearchBy.Assays);
         assertFilterStatusPanel("mRNA assay", 5, 1, 3, 2, 4, 23, SearchBy.Assays);
@@ -138,19 +138,27 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     // Sequential calls to this should have different participant counts.
     private void assertFilterStatusPanel(String barLabel, int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount, int maxCount, SearchBy searchBy)
-    {
-        click(Locator.xpath("//span[text() = '"+barLabel+"']"));
-        waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"));
-        assertTextPresent(studyCount+" Study", assayCount+" Assays", contributorCount+" Contributors", antigenCount+" Antigens");
-        assertElementPresent(Locator.xpath("//div[@class='selection']/div[text()='"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"']"));
+    {        
+        Double barLen = ((double)participantCount/(double)maxCount)*100;
+        String barLenStr = ((Long)Math.round(Math.floor(barLen))).toString();
+        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']"));
+        waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
+        assertTextPresent(studyCount+(studyCount==1?" Study":" Studies"),
+                assayCount+(assayCount==1?" Assay":" Assays"),
+                contributorCount+(contributorCount==1?" Contributor":" Contributors"),
+                antigenCount+(antigenCount==1?" Antigen":" Antigens"));
+        assertElementPresent(Locator.xpath("//div[@class='selection']/div[text()='"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"']"));        
+        assertElementPresent(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"));
+        assertElementPresent(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"));
     }
 
     private String genCurrentSelectionString(String hierarchy, String name)
     {
-        if(name.length() <= 17)
+        if(name.length() <= 16)
             return hierarchy + ": " + name;
         else
-            return hierarchy + ": " + name.substring(0, 14) + "...";
+            return hierarchy + ": " + name.substring(0, 13).trim() + "...";
     }
 
     private void importCDSData(String query, File dataFile)
