@@ -84,8 +84,7 @@ public class FileContentTest extends BaseSeleniumWebTest
         assertFalse("ERROR: Add project with special characters failed; check that tomcat's server.xml contains the following attribute " +
             "in its Connector element: URIEncoding=\"UTF-8\"", isTextPresent("404: page not found"));
 
-        clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Project Settings");
+        clickAdminMenuItem("Folder", "Project Settings");
         clickLinkWithText("Files");
 
         File dir = getTestTempDir();
@@ -101,7 +100,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Setup notificaiton emails
             // as they are now digest based.
             clickAdminMenuItem("Folder", "Management");
-            clickLinkWithText("Email Notifications");
+            clickLinkWithText("Notifications");
             click(Locator.navButton("Update Settings"));
             // Set folder default
             ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");

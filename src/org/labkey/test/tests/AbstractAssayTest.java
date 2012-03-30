@@ -47,7 +47,6 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected final static String TEST_ASSAY_FLDR_STUDY1 = "Study 1";                 //sub-folder of Studies
     protected final static String TEST_ASSAY_FLDR_STUDY2 = "Study 2";                 //another sub of Studies
     protected final static String TEST_ASSAY_FLDR_STUDY3 = "Study 3";                 //another sub of Studies
-    private final static String TEST_ASSAY_LINK_PERMS = "Permissions";               //name of Permissions link
     protected final static String TEST_ASSAY_PERMS_STUDY_READALL = "READ";
 
     /**
@@ -170,15 +169,11 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected void setSubfolderSecurity(String project, String subfolder, String group, String perms)
     {
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
-        if (!isLinkPresent(TEST_ASSAY_LINK_PERMS))
-        {
-            if (isNavButtonPresent("Save and Finish"))
-                clickNavButton("Save and Finish");
-            clickLinkWithText(project);
-            clickLinkWithText(subfolder);
-            clickLinkWithText(TEST_ASSAY_LINK_PERMS);
-        }
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
+            clickNavButton("Save and Finish");
+        clickLinkWithText(project);
+        clickLinkWithText(subfolder);
+        enterPermissionsUI();
         uncheckInheritedPermissions();
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
         {
@@ -200,14 +195,11 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected void setStudyPerms(String project, String folder, String group, String perms)
     {
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
-        if (!isLinkPresent(TEST_ASSAY_LINK_PERMS))
-        {
-            if (isNavButtonPresent("Save and Finish"))
-                clickNavButton("Save and Finish");
-            clickLinkWithText(project);
-            clickLinkWithText(folder);
-            clickLinkWithText(TEST_ASSAY_LINK_PERMS);
-        }
+        if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
+            clickNavButton("Save and Finish");
+        clickLinkWithText(project);
+        clickLinkWithText(folder);
+        enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
         waitAndClickNavButton("Study Security");
 

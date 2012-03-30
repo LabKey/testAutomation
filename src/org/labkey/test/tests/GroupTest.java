@@ -95,7 +95,7 @@ public class GroupTest extends BaseSeleniumWebTest
         //add read permissions to group2
         goToHome();
         clickLinkWithText(getProjectName());
-        clickLinkWithText("Permissions", 0);
+        enterPermissionsUI();
         waitForText("Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
@@ -106,8 +106,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
         //give a system group permissions, so that we can verify copying them doesn't cause a problem
         clickLinkWithText(getProjectName());
-        clickLinkWithText("Permissions");
-        waitForPageToLoad();
+        enterPermissionsUI();
         waitForText("Author");
         ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "Site: All Site Users");
 

@@ -141,8 +141,8 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
     {
         log("Setting MV indicators");
         
-        clickAdminMenuItem("Project", "Management");
-        clickLinkWithText("Missing Value Indicators");
+        clickAdminMenuItem("Folder", "Management");
+        clickLinkWithText("Missing Values");
         clickCheckboxById("inherit");
 
         // Delete all site-level settings
