@@ -66,6 +66,8 @@ public class StudyTest extends StudyBaseTest
     //lists created in participant picker tests must be cleaned up afterwards
     LinkedList<String> persistingLists  = new LinkedList<String>();
     private String Study001 = "Study 001";
+    private String authorUser = "author@user.com";
+    private String specimenUrl = null;
 
     protected File[] getTestFiles()
     {
@@ -84,6 +86,7 @@ public class StudyTest extends StudyBaseTest
     protected void doCleanup() throws Exception //child class cleanup method throws Exception
     {
         try{emptyParticipantPickerList();}catch(Throwable t){ /* Ignore */ }
+        deleteUser(authorUser, false);
         super.doCleanup();
     }
 
@@ -106,6 +109,18 @@ public class StudyTest extends StudyBaseTest
         waitForSpecimenImport();
         verifySpecimens();
         verifyParticipantComments();
+        verifyPermissionsRestrictions();
+    }
+
+    private void verifyPermissionsRestrictions()
+    {
+        createUserWithPermissions(authorUser, null, "Author");
+        impersonate(authorUser);
+        beginAt(specimenUrl);
+        clickButton("Request Options", 0);
+        assertElementNotPresent(Locator.tagWithText("span", "Create New Request"));
+        stopImpersonating();
+
     }
 
     private void verifyParticipantReports()
@@ -540,6 +555,14 @@ public class StudyTest extends StudyBaseTest
         addWebPart("Specimens");
         waitForText("Blood (Whole)");
         clickLinkWithText("Blood (Whole)");
+        specimenUrl = getCurrentRelativeURL();
+
+
+        log("verify presence of \"create new request\" button");
+        clickButton("Request Options", 0);
+        assertElementPresent(Locator.tagWithText("span", "Create New Request"));
+
+        log("verify presence of create");
         clickMenuButton("Page Size", "Show All");
         assertTextNotPresent("DRT000XX-01");
         assertTextPresent("GAA082NH-01");
@@ -717,7 +740,7 @@ public class StudyTest extends StudyBaseTest
         log("verify demographic data set not present");
         clickLinkContainingText(DEMOGRAPHICS_TITLE);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        assertFalse(CustomizeViewsHelper.isColumnPresent(this,  "MouseVisit/DEM-1"));
+        assertFalse(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
     }
 
     protected void verifyVisitMapPage()
@@ -784,7 +807,7 @@ public class StudyTest extends StudyBaseTest
         log("verify ");
         clickButtonContainingText("View Data");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        assertTrue(CustomizeViewsHelper.isColumnPresent(this,  "MouseVisit/DEM-1"));
+        assertTrue(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
     }
 
     private void verifyHiddenVisits()

@@ -4735,6 +4735,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         _impersonationStack.push(fakeUser);
     }
 
+    /** create a user with the specified permissions for the specified project
+     *
+     * @param userName
+     * @param projectName
+     * @param permissions
+     */
+    public void createUserWithPermissions(String userName, String projectName, String permissions)
+    {
+        createUser(userName, null);
+        if(projectName==null)
+            goToProjectHome();
+        else
+            clickLinkWithText(projectName);
+        setUserPermissions(userName, permissions);
+
+    }
+
     public void createUser(String userName, String cloneUserName)
     {
         createUser(userName, cloneUserName, true);
