@@ -4082,6 +4082,48 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("OK");
     }
 
+    public void setUpFacetedFilter(String regionName, String columnName, String... values)
+    {
+        String log = "Setting filter in " + regionName + " for " + columnName+" to one of: [";
+        for(String v : values)
+        {
+            log += v + ", ";
+        }
+        log = log.substring(0, log.length() - 2) + "]";
+        log(log);
+        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
+        String columnLabel = getText(Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header")));
+        runMenuItemHandler(id);
+        ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
+
+        sleep(500);
+
+        // Clear selections.
+        if(!isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
+            clickLinkWithText("[All]", false);
+        clickLinkWithText("[All]", false);
+
+        if(values.length > 1)
+        {
+            for(String v : values)
+            {
+                mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Show Rows Where "+columnLabel+"...")+
+                    "//div[contains(@class,'x-grid3-row') and .//span[text()='"+v+"']]//div[@class='x-grid3-row-checker']"));
+            }
+        }
+        else if (values.length == 1)
+        {
+            mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Show Rows Where "+columnLabel+"...")+
+                    "//div[contains(@class,'x-grid3-row')]//span[text()='"+values[0]+"']"));
+        }
+    }
+
+    public void setFacetedFilter(String regionName, String columnName, String... values)
+    {
+        setUpFacetedFilter(regionName, columnName, values);
+        clickNavButton("OK");
+    }
+
     public void clearFilter(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);

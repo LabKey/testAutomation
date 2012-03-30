@@ -65,14 +65,13 @@ public class FilterTest extends ListTest
     {
         click(Locator.tagWithText("div", "Color"));
         click(Locator.tagWithText("span", "Filter..."));
-        waitForExtMask();
+        ExtHelper.waitForExtDialog(this, "Show Rows Where Color...");
         waitForText("[All]");
         sleep(400);
     }
 
     private void facetedFilterTest()
     {
-
         createList2();
         assertTextPresent("Light", "Robust");
         startFilter();
@@ -86,36 +85,16 @@ public class FilterTest extends ListTest
         ExtHelper.clickExtButton(this, "OK");
         assertTextPresent("Light", "Robust");
 
-
-        String parent = "//div[contains(@class, 'x-window')]";
-
-        //this should click the row, selecting only this value.  clicking the cell will toggle it
-        startFilter();
-        Locator row = ExtHelper.locateExt3GridRow(1, parent);
-        mouseDown(row);
-
-        ExtHelper.clickExtButton(this, "OK");
+        setFacetedFilter("query", "Color", "Light");
         assertTextPresent("Light");
         assertTextNotPresent("Robust");
 
-
-        //this should click the row, selecting only this value.  clicking the cell will toggle it
-        startFilter();
-
-        //toggle 'Light'
-        row = ExtHelper.locateExt3GridRow(1, parent);
-        Locator cell = ExtHelper.locateExt3GridCell(row, 1);
-        cell = Locator.xpath(((Locator.XPathLocator)cell).getPath() + "//div//div"); //+ "//*[contains(@class, 'x-grid3-row-checker')]");
-        mouseDown(cell);
-
-        //enable 'Robust'
-        row = ExtHelper.locateExt3GridRow(2, parent);
-        cell = ExtHelper.locateExt3GridCell(row, 1);
-        cell = Locator.xpath(((Locator.XPathLocator)cell).getPath() + "//div//div");
-        mouseDown(cell);
-
-        ExtHelper.clickExtButton(this, "OK");
+        setFacetedFilter("query", "Color", "Robust");
         assertTextNotPresent("Light");
+        assertTextPresent("Robust");
+
+        setFacetedFilter("query", "Color");
+        assertTextPresent("Light");
         assertTextPresent("Robust");
     }
 
