@@ -83,6 +83,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         goToModule("CDS");
         clickLinkWithText("Application");
 
+        selenium.windowMaximize(); // Count bars don't render properly when hidden.
+
         assertLinkNotPresentWithText("Home");
         assertLinkNotPresentWithText("Admin");
 
