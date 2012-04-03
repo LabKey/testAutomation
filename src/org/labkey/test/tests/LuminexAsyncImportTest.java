@@ -15,6 +15,9 @@
  */
 package org.labkey.test.tests;
 
+import org.labkey.test.WebTestHelper;
+
+import java.io.File;
 import java.util.Calendar;
 
 /**
@@ -29,12 +32,28 @@ public class LuminexAsyncImportTest extends LuminexTest
     protected void runUITests()
     {
         clickCheckbox("backgroundUpload");
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
         saveAssay();
         sleep(1500);
+
+        // test successful background upload
         importRunForTestLuminexConfig(TEST_ASSAY_LUM_FILE5, Calendar.getInstance(), 0);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToComplete(1, "Assay upload", false);
         clickLinkWithText("COMPLETE");
         assertTextNotPresent("ERROR"); //Issue 14082
+        assertTextPresent("Starting assay upload", "Finished assay upload");
+        clickButton("Data"); // data button links to the run results
+        assertTextPresent(TEST_ASSAY_LUM + " Results");
+
+        // test background upload failure
+        uploadPositivityFile("No Fold Change", "1", "", true);
+        assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
+        waitForPipelineJobsToFinish(2);
+        clickLinkWithText("ERROR");
+        assertTextPresent("An error occurred when running the script (exit code: 1).", 3);
+        assertTextPresent("output lines omitted, see full output in log for details]", 2);
+        assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);
+        checkExpectedErrors(2);
     }
 }

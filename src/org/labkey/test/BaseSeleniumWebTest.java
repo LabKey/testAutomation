@@ -3595,6 +3595,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return complete;
     }
 
+    // Returns count of "COMPLETE" and "ERROR"
+    public int getFinishedbCount(List<String> statusValues)
+    {
+        int finsihed = 0;
+        for (String statusValue : statusValues)
+            if ("COMPLETE".equals(statusValue) || "ERROR".equals(statusValue))
+                finsihed++;
+        return finsihed;
+    }
+
     // Returns the value of all cells in the specified column
     public List<String> getTableColumnValues(String tableName, int column)
     {
@@ -6038,6 +6048,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!expectError)
             assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
         assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(statusValues));
+    }
+
+    // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
+    protected void waitForPipelineJobsToFinish(int jobsExpected)
+    {
+        log("Waiting for " + jobsExpected + " pipeline jobs to finish");
+        List<String> statusValues = getPipelineStatusValues();
+        startTimer();
+        while (getFinishedbCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
+        {
+            sleep(1000);
+            refresh();
+            statusValues = getPipelineStatusValues();
+        }
+        assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedbCount(statusValues));
     }
 
     // Note: unverified

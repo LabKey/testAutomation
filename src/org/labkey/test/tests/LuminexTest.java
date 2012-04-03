@@ -2150,4 +2150,22 @@ public class LuminexTest extends AbstractQCAssayTest
 
         return true;
     }
+
+    public void uploadPositivityFile(String assayName, String baseVisit, String foldChange, boolean isBackgroundUpload)
+    {
+        goToTestAssayHome();
+        clickNavButton("Import Data");
+        clickNavButton("Next");
+        setFormElement("name", assayName);
+        checkCheckbox("calculatePositivity");
+        setFormElement("baseVisit", baseVisit);
+        setFormElement("positivityFoldChange", foldChange);
+        File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
+        assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
+        setFormElement("__primaryFile__", positivityData);
+        clickNavButton("Next");
+        clickNavButton("Save and Finish");
+        if (!isBackgroundUpload && !isTextPresent("Error"))
+            clickLinkWithText(assayName);
+    }    
 }
