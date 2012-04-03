@@ -39,6 +39,7 @@ public class ReportTest extends StudyBaseTest
     protected static final String TEST_GROUP = "firstGroup";
     protected static final String TEST_USER = "user1@report.test";
     private static final String TEST_GRID_VIEW = "Test Grid View";
+    public static final String AUTHOR_REPORT = "Author report";
 
     private String R_SCRIPT1(String function, String database)
     {
@@ -84,6 +85,7 @@ public class ReportTest extends StudyBaseTest
     }
     private final static String R_SCRIPT2_TEXT1 = "999320648";
     private final static String R_USER = "r_user@report.test";
+    private final static String AUTHOR_USER = "author_user@report.test";
     private String R_SCRIPT3(String database, String colName)
     {
         return "source(\"" + R_SCRIPTS[1] + ".R\")\n" +
@@ -97,6 +99,7 @@ public class ReportTest extends StudyBaseTest
     {
         deleteUser(TEST_USER);
         deleteUser(R_USER);
+        deleteUser(AUTHOR_USER, false);
         super.doCleanup();
     }
 
@@ -156,12 +159,13 @@ public class ReportTest extends StudyBaseTest
         click(Locator.id(btnId));
 
         // make sure the report is deleted
-        waitFor(new Checker() {
-            public boolean check()
-            {
-                return !isElementPresent(report);
-            }
-        }, "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
+        waitFor(new Checker()
+                {
+                    public boolean check()
+                    {
+                        return !isElementPresent(report);
+                    }
+                }, "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
     }
 
     protected void clickReportGridLink(String reportName, String linkText)
@@ -336,6 +340,21 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent(R_SCRIPT1_PDF);
         popLocation();
 
+        log("Test user permissions");
+        pushLocation();
+        createSiteDeveloper(AUTHOR_USER);
+        clickLinkWithText(getProjectName());
+        enterPermissionsUI();
+        setUserPermissions(AUTHOR_USER, "Author");
+        impersonate(AUTHOR_USER);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText(DATA_SET);
+        createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true);
+        stopImpersonating();
+        popLocation();
+
+
         log("Create second R script");
         clickMenuButton("Views", "Create", "R View");
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
@@ -352,7 +371,7 @@ public class ReportTest extends StudyBaseTest
         saveReport(R_SCRIPTS[1]);
 
         log("Check that background run works");
-        log("Test user permissions");
+
         enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement("names", R_USER);
@@ -361,6 +380,9 @@ public class ReportTest extends StudyBaseTest
         enterPermissionsUI();
         setPermissions("Users", "Editor");
         exitPermissionsUI();
+
+
+        //create R report with dev
         impersonate(R_USER);
 
         log("Access shared R script");
@@ -369,8 +391,9 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(DATA_SET);
         pushLocation();
         assertElementNotPresent(Locator.raw("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
-
         clickMenuButton("Views", R_SCRIPTS[1]);
+        goBack();
+        clickMenuButton("Views", AUTHOR_REPORT);
 
         popLocation();
         log("Change user permission");
@@ -424,6 +447,35 @@ public class ReportTest extends StudyBaseTest
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
+    }
+
+    /**create an R report from the dataset page
+     *
+     * @param name name of script
+     * @param scriptValue actual script value
+     * @param share should this be shared with others?
+     * @param shareSource if so, should they be able to see the source (ignored if share is false)
+     */
+    private void createRReport(String name, String scriptValue, boolean share, boolean shareSource)
+    {
+
+        clickMenuButton("Views", "Create", "R View");
+        setQueryEditorValue("script", scriptValue);
+
+        if(share)
+        {
+            checkCheckbox("shareReport");
+            if(shareSource)
+                checkCheckbox("sourceTabVisible");
+        }
+        clickButtonContainingText("Save", 0);
+        waitForExtMask();
+
+        Locator l = Locator.xpath("//div[span[text()='Please enter a view name:']]/div/input");
+        setFormElement(l, name);
+        ExtHelper.clickExtButton(this, "Save");
+        waitForPageToLoad();
+
     }
 
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
