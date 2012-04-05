@@ -4200,7 +4200,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         // If domain hasn't been saved yet, the 'OK' prompt will not appear.
         Locator.XPathLocator buttonLocator = getButtonLocator("OK");
-        // TODO: Be smarter about this.  Might miss the OK that should be there. 
+        // TODO: Be smarter about this.  Might miss the OK that should be there.
         if (buttonLocator != null)
         {
             // Confirm the deletion
@@ -4212,7 +4212,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setLongTextField(final String elementName, final String text)
     {
         setFormElement(Locator.name(elementName), text, true);
-        
+
         waitFor(new Checker()
         {
             public boolean check()

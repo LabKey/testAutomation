@@ -92,6 +92,7 @@ public class StudyScheduleTester
         // verify dataset 'data' link
         goToStudySchedule();
         _test.click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[2]//a")); // go to dataset
+        _test.waitForPageToLoad();
         _test.waitForText(dataset);
 
         // test paging

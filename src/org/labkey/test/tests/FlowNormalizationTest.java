@@ -62,7 +62,7 @@ public class FlowNormalizationTest extends BaseFlowTest
                 true,
                 "118969.fcs",
                 Arrays.asList("S"),
-                Arrays.asList("APC-A"),
+                Arrays.asList("<APC-A>"),
                 "RAnalysis",
                 false,
                 true,

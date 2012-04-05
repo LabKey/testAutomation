@@ -168,7 +168,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("** Testing vehicle.Model RowId url link...");
         beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
-        viewQueryData(VEHICLE_SCHEMA, "models");
+        viewQueryData(VEHICLE_SCHEMA, "Models");
         clickLinkWithText("Prius");
         assertTextPresent("Hooray!");
         String rowidStr = getText(Locator.id("model.rowid"));

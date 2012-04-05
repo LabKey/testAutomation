@@ -140,7 +140,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     // Sequential calls to this should have different participant counts.
     private void assertFilterStatusPanel(String barLabel, int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount, int maxCount, SearchBy searchBy)
-    {        
+    {
         Double barLen = ((double)participantCount/(double)maxCount)*100;
         String barLenStr = ((Long)Math.round(Math.floor(barLen))).toString();
         waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
@@ -150,7 +150,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 assayCount+(assayCount==1?" Assay":" Assays"),
                 contributorCount+(contributorCount==1?" Contributor":" Contributors"),
                 antigenCount+(antigenCount==1?" Antigen":" Antigens"));
-        assertElementPresent(Locator.xpath("//div[@class='selection']/div[text()='"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"']"));        
+        waitForElement(Locator.xpath("//div[@class='selection']/div[contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"));
         assertElementPresent(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"));
     }
@@ -241,6 +241,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private class CDSTester
     {
-        
+
     }
 }
