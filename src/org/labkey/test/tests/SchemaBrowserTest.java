@@ -31,13 +31,16 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
     public static final String TEST_DESC_BOOKS = "This is a test description on books";
     public static final String TEST_DESC_AUTHORS = "This is a test description on authors";
     public static final String TEST_DESC_PUBLISHERS = "This is a test description on publishers";
+    public static final String AUTHORS_LIST = "Authors" + TRICKY_CHARACTERS_NO_QUOTES;
+    public static final String PUBLISHERS_LIST = "Publishers" + TRICKY_CHARACTERS_NO_QUOTES;
+    public static final String BOOKS_LIST = "Books" + TRICKY_CHARACTERS_NO_QUOTES;
 
     protected void doTestSteps() throws Exception
     {
         createProject(PROJECT_NAME, "Collaboration");
         createLists();
         goToSchemaBrowser();
-        selectQuery("lists", "Books");
+        selectQuery("lists", BOOKS_LIST);
 
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_BOOKS + "')]"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Title");
@@ -47,34 +50,34 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
         assertTextPresent("TitleId");
 
         //test lookup links, tab management
-        clickLookupLink("lists", "Authors", "AuthorId");
+        clickLookupLink("lists", AUTHORS_LIST, "AuthorId");
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_AUTHORS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        ExtHelper.closeExtTab(this, "lists.Authors");
+        ExtHelper.closeExtTab(this, "lists." + AUTHORS_LIST);
         sleep(500);
         assertTextNotPresent(TEST_DESC_AUTHORS);
 
-        clickLookupLink("lists", "Publishers", "PublisherId");
+        clickLookupLink("lists", PUBLISHERS_LIST, "PublisherId");
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_PUBLISHERS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        ExtHelper.closeExtTab(this, "lists.Publishers");
+        ExtHelper.closeExtTab(this, "lists." + PUBLISHERS_LIST);
         sleep(500);
         assertTextNotPresent(TEST_DESC_PUBLISHERS);
 
         //test in-place fk expansion
-        clickFkExpando("lists", "Books", "AuthorId");
+        clickFkExpando("lists", BOOKS_LIST, "AuthorId");
         waitForText("AuthorId/FirstName", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("AuthorId/LastName");
         assertTextPresent(TEST_DESC_AUTHORS);
 
-        clickFkExpando("lists", "Books", "PublisherId");
+        clickFkExpando("lists", BOOKS_LIST, "PublisherId");
         waitForText("PublisherId/Name", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(TEST_DESC_PUBLISHERS);
 
-        clickFkExpando("lists", "Books", "AuthorId");
+        clickFkExpando("lists", BOOKS_LIST, "AuthorId");
         assertTextNotPresent(TEST_DESC_AUTHORS); //it's really just hidden, but the new selenium won't report it as present
 
-        clickFkExpando("lists", "Books", "PublisherId");
+        clickFkExpando("lists", BOOKS_LIST, "PublisherId");
         assertTextNotPresent(TEST_DESC_PUBLISHERS);
 
         validateQueries();
@@ -82,23 +85,23 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
     public void createLists()
     {
-        ListHelper.createList(this, PROJECT_NAME, "Authors",
+        ListHelper.createList(this, PROJECT_NAME, AUTHORS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "AuthorId",
                 new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, TEST_DESC_AUTHORS),
                 new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "")
         );
 
-        ListHelper.createList(this, PROJECT_NAME, "Publishers",
+        ListHelper.createList(this, PROJECT_NAME, PUBLISHERS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "PublisherId",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, TEST_DESC_PUBLISHERS)
         );
 
-        ListHelper.createList(this, PROJECT_NAME, "Books",
+        ListHelper.createList(this, PROJECT_NAME, BOOKS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "TitleId",
                 new ListHelper.ListColumn("Title", "Title", ListHelper.ListColumnType.String, TEST_DESC_BOOKS),
                 new ListHelper.ListColumn("Subtitle", "Subtitle", ListHelper.ListColumnType.String, ""),
-                new ListHelper.ListColumn("AuthorId", "AuthorId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", "Authors")),
-                new ListHelper.ListColumn("PublisherId", "PublisherId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", "Publishers"))
+                new ListHelper.ListColumn("AuthorId", "AuthorId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", AUTHORS_LIST)),
+                new ListHelper.ListColumn("PublisherId", "PublisherId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", PUBLISHERS_LIST))
         );
     }
 
