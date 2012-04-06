@@ -27,9 +27,11 @@ import org.labkey.test.Locator;
  */
 public class ProjectSettingsTest extends BaseSeleniumWebTest
 {
-    Locator supportLink = Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");
-    Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Help')]");
-    Locator helpMenuLink =  Locator.tagWithText("span", "Help (default)");
+    private static final Locator supportLink = Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");
+    private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Help')]");
+    private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
+    private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
+    private Locator helpMenuLink = enableDevMode()?helpMenuLinkDev:helpMenuLinkProduction;
 
     @Override
     //this project will remain unaltered and copy every property from the site.
@@ -54,7 +56,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     {
         if(projectName!=null)
             clickLinkWithText(projectName);
-        clickAndWait(helpMenuLink, 0);
+        click(helpMenuLink);
         assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
         assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
     }
@@ -82,7 +84,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
 
         //assert both locators are present in clone project
         goToProjectHome();
-        clickAndWait(Locator.tagWithText("span", "Help (default)"), 0);
+        click(helpMenuLink);
         checkHelpLinks(null, true, true);
 
         //change global settings to exclude help link
