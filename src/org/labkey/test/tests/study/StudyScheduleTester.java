@@ -71,7 +71,7 @@ public class StudyScheduleTester
         // check required timepoints
         goToStudySchedule();
 //        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
-        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='checked']"));
+        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[5]//div[@class='checked']"));
 
         // change a required visit to optional
         _test.clickWebpartMenuItem("Study Schedule", "Manage Visits");
@@ -81,7 +81,7 @@ public class StudyScheduleTester
 
         // verify that change is noted in schedule
         goToStudySchedule();
-        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//div[@class='unchecked']"));
+        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[5]//div[@class='unchecked']"));
 
         // revert change
         _test.clickWebpartMenuItem("Study Schedule", "Manage Visits");
@@ -91,7 +91,7 @@ public class StudyScheduleTester
 
         // verify dataset 'data' link
         goToStudySchedule();
-        _test.click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[2]//a")); // go to dataset
+        _test.click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//a")); // go to dataset
         _test.waitForPageToLoad();
         _test.waitForText(dataset);
 
