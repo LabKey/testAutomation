@@ -15,10 +15,12 @@
  */
 package org.labkey.test.tests.study;
 
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.tests.StudyBaseTest;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -43,6 +45,13 @@ public class StudyScheduleTester
     // categories
     private static final String GHOST_CATEGORY = "GhostCategory";
     private static final String ASSAY_CATEGORY = "Assay Data";
+
+    private static final String[][] datasets = {
+            {"PRE-1: Pre-Existing Conditions", "Unlocked"},
+            {"URS-1: Screening Urinalysis", "Draft"},
+            {"LLS-1: Screening Local Lab Results (Page 1)", "Final"},
+            {"LLS-2: Screening Local Lab Results (Page 2)", "Locked"}
+    };
 
     private enum DatasetType {
         importFromFile,
@@ -331,6 +340,34 @@ public class StudyScheduleTester
         }
     }
 
+    public void datasetStatusTest()
+    {
+        _test.log("Testing status settings for datasets");
+
+        goToStudySchedule();
+
+        for (String[] entry : datasets)
+        {
+            clickCustomizeView(entry[0]);
+
+            Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/..");
+            Ext4Helper.selectComboBoxItem(_test, comboParent, entry[1]);
+
+            _test.clickNavButton("Save", 0);
+
+            Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + entry[0] + "')]/../../..//img[@alt='" + entry[1] + "']");
+            _test.waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
+            // visit the dataset page and make sure we inject the correct class onto the page
+            _test.log("Verify dataset view has the watermark class");
+            Locator datasetLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + entry[0] + "')]/../../..//a");
+            _test.click(datasetLink);
+            _test.waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
+            goToStudySchedule();
+        }
+    }
+
     private void goToStudySchedule()
     {
         _test.clickLinkWithText(_folderName);
@@ -340,5 +377,14 @@ public class StudyScheduleTester
         // wait for grid to load
         _test.waitForText("verifyAssay"); // verify dataset column
         _test.waitForText("Termination"); // verify timepoint
+    }
+
+    private void clickCustomizeView(String viewName)
+    {
+        Locator editLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + viewName + "')]/../../..//span[contains(@class, 'edit-views-link')]");
+        _test.waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.click(editLink);
+
+        ExtHelper.waitForExtDialog(_test, viewName);
     }
 }
