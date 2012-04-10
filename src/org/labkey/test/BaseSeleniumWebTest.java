@@ -4626,6 +4626,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             if (!isElementPresent(Locator.permissionRendered()))
                 enterPermissionsUI();
+            ExtHelper.clickExtTabContainingText(this, "Permissions");
 
             String role = toRole(permissionString);
             if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
