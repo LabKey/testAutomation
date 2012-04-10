@@ -69,7 +69,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
         assertEquals(ASSAY_WORKBOOK_DESCRIPTION, getText(Locator.xpath("//div[@id='wb-description']")));
         assertLinkNotPresentWithText(ASSAY_WORKBOOK_NAME); // Should not appear in folder tree.
 
-        // Create Defaultche Workbook
+        // Create Default Workbook
         createWorkbook(PROJECT_NAME, DEFAULT_WORKBOOK_NAME, DEFAULT_WORKBOOK_DESCRIPTION, WorkbookFolderType.DEFAULT_WORKBOOK);
         assertLinkPresentWithText("Files");
         assertLinkPresentWithText("Experiment Runs");
@@ -99,6 +99,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("Renamed"+DEFAULT_WORKBOOK_NAME);
         assertLinkPresentWithText(ASSAY_WORKBOOK_NAME);
         assertLinkPresentWithText(FILE_WORKBOOK_NAME);
+        assertTextPresentInThisOrder(FILE_WORKBOOK_NAME, ASSAY_WORKBOOK_NAME, "Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // Delete a workbook
         checkDataRegionCheckbox("query", 2); // Select renamed workbook
