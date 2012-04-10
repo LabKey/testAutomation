@@ -123,8 +123,7 @@
                     , LongTextFld = "Four score and seven years ago"
                     , RequiredText = "I"
                     , RequiredInt = 0
-                    , Category = "LOOKUP2"
-                    , stringsAsFactors=FALSE)
+                    , Category = "LOOKUP2")
 
                 insertedRow <- labkey.insertRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toInsert=newrow)
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
@@ -154,8 +153,7 @@
                     RowId=selectedRow[1, "Row Id"]
                     , DisplayFld="Updated via Rlabkey"
                     , TextFld="how to update"
-                    , IntFld= 777
-                    , stringsAsFactors=FALSE)
+                    , IntFld= 777)
 
                 updatedRow <- labkey.updateRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toUpdate=updaterow)
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
@@ -178,7 +176,7 @@
                         ,showHidden=TRUE, colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
                 selectedRow[1,"Row Id"]
 
-                deleterow <- data.frame(RowId=selectedRow[1, "Row Id"], stringsAsFactors=FALSE)
+                deleterow <- data.frame(RowId=selectedRow[1, "Row Id"])
                 labkey.deleteRows(baseUrl="%baseUrl%", folderPath="/RlabkeyVerifyProject", schemaName="lists", queryName="AllTypes",  toDelete=deleterow)
 
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
