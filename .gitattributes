@@ -49,8 +49,10 @@ modules/simpletest/queries/vehicle/colors.js -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-1.00.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-11.30-11.31.sql -text
+modules/simpletest/schemas/dbscripts/postgresql/vehicle-11.30-12.10.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-1.00.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-11.30-11.31.sql -text
+modules/simpletest/schemas/dbscripts/sqlserver/vehicle-11.30-12.10.sql -text
 modules/simpletest/schemas/vehicle.xml -text
 modules/simpletest/scripts/simpletest/Debug.js -text
 modules/simpletest/scripts/simpletest/ScriptValidationExports.js -text

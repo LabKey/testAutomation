@@ -61,7 +61,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME, "Study");
 
         ensureAdminMode();
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         if (isTextPresent("Microsoft SQL Server"))
         {
             log("NOTE: Database type is SQL Server...skipping test...re-enable this on SQL Server once the following bugs are resolved: 8451, 8452, 8453, 8454, 8455.");

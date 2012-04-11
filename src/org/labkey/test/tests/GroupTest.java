@@ -157,7 +157,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
 
         //exapnd plus  to check specific groups
-        clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+3), "1,1");
+        clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+1), "1,1");
         assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite: group2AuthorSite: group2, Site: Users".split(" "),
                 drt.getDataAsText(rowIndex, 2).split(" ")));
 
@@ -296,7 +296,7 @@ public class GroupTest extends BaseSeleniumWebTest
         if (isLinkPresentWithText(projectName))
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
-        clickLinkWithText("Create Project");
+        clickAdminMenuItem("Site", "Create Project");
         waitForElement(Locator.name("name"), 100*WAIT_FOR_JAVASCRIPT);
         setText("name", projectName);
 

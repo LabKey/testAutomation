@@ -150,9 +150,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 assayCount+(assayCount==1?" Assay":" Assays"),
                 contributorCount+(contributorCount==1?" Contributor":" Contributors"),
                 antigenCount+(antigenCount==1?" Antigen":" Antigens"));
-        waitForElement(Locator.xpath("//div[@class='selection']/div[contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"));
-        assertElementPresent(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"));
+        waitForElement(Locator.xpath("//li[@class='selection' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private String genCurrentSelectionString(String hierarchy, String name)

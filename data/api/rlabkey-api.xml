@@ -198,7 +198,8 @@
                 newrow <- data.frame(
                     DisplayFld="Inserted with plus (+) sign"
                     , RequiredText = "Required"
-                    , RequiredInt = 0)
+                    , RequiredInt = 0
+                    , stringsAsFactors=FALSE)
 
                 insertedRow <- labkey.insertRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toInsert=newrow)
 

@@ -256,7 +256,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("** Testing vehicle.Vehicles details url link...");
         beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
-        viewQueryData(VEHICLE_SCHEMA, "vehicles");
+        viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         clickLinkWithText("details");
         assertTextPresent("Hooray!");
         rowidStr = getText(Locator.id("vehicle.rowid"));
@@ -538,7 +538,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     protected void assertModuleDeployed(String moduleName)
     {
         log("Ensuring that that '" + moduleName + "' module is deployed");
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         assertTextPresent(moduleName);
     }
 

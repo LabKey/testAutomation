@@ -678,7 +678,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Attempting to change user email from " + userEmail + " to " + newUserEmail);
 
 
-        clickLinkContainingText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         clickLinkContainingText(userEmail);
 
         clickNavButton("Change Email");
@@ -1926,7 +1926,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isLinkPresentWithText(projectName))
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
-        clickLinkWithText("Create Project");
+        clickAdminMenuItem("Site", "Create Project");
         waitForElement(Locator.name("name"), 1*WAIT_FOR_JAVASCRIPT);
         setText("name", projectName);
 
@@ -1953,7 +1953,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
 
         goToHome();
-        clickLinkWithText("Site Groups");
+        clickAdminMenuItem("Site", "Site Groups");
         if(isElementPresent(Locator.tagWithText("div", groupName)))
         {
             if(failIfAlreadyExists)
@@ -4073,9 +4073,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         log("Switching to advanced filter UI");
         ExtHelper.clickExtTab(this, "Choose Filters");
-        waitForText("Filter Type");
-        //waitForElement(Locator.xpath("//*[contains(@class,'filterTestMarker-default')]"), WAIT_FOR_JAVASCRIPT);
-        sleep(500);
+        waitForElement(Locator.xpath("//span["+Locator.NOT_HIDDEN+" and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
 
         ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
         if(filter1 != null) setFormElement("value_1", filter1);
@@ -4677,7 +4675,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected void addUserToSiteGroup(String userName, String groupName)
     {
         goToHome();
-        clickLinkWithText("Site Groups");
+        clickAdminMenuItem("Site", "Site Groups");
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
         waitForElement(groupLoc, defaultWaitForPage);
         click(groupLoc);
@@ -4815,7 +4813,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         goToHome();
         ensureAdminMode();
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         clickNavButton("Add Users");
 
         setFormElement("newUsers", userName);
@@ -4839,7 +4837,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void createUserAndNotify(String userName, String cloneUserName, boolean verifySuccess)
     {
         ensureAdminMode();
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         clickNavButton("Add Users");
 
         setFormElement("newUsers", userName);
@@ -4857,7 +4855,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void createSiteDeveloper(String userEmail)
     {
         ensureAdminMode();
-        clickLinkWithText("Site Developers");
+        clickAdminMenuItem("Site", "Site Developers");
 
         if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
         {
@@ -4912,7 +4910,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void deleteUser(String userEmail, boolean failIfNotFound)
     {
         ensureAdminMode();
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         String userXPath = "//a[text()=\"details\"]/../../td[text()=\"" + userEmail + "\"]";
 
         boolean isPresent = isElementPresent(new Locator(userXPath));
@@ -4949,7 +4947,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("asserting that user " + email + " exists...");
         ensureAdminMode();
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         assertTextPresent(email);
         log("user " + email + " exists.");
     }

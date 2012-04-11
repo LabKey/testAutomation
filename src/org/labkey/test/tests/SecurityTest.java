@@ -336,7 +336,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     private String adminPasswordResetTest(String username, String password)
     {
         String newPassword = password +"1";
-        clickLinkContainingText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         clickLinkContainingText(username);
         clickButtonContainingText("Reset Password", 0);
         getConfirmationAndWait();
@@ -366,7 +366,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected void addRemoveSiteAdminTest()
     {
         // test for issue 13921
-        clickLinkWithText("Site Admins");
+        clickAdminMenuItem("Site", "Site Admins");
         setFormElement("names", NORMAL_USER);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
@@ -468,7 +468,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void checkGroupMembership(String userName, String groupName, int expectedCount)
     {
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
 
         Locator userAccessLink = Locator.xpath("//td[text()='" + userName + "']/..//td/a[contains(@href,'userAccess.view')]");
         boolean isPresent = isElementPresent(userAccessLink);
@@ -665,13 +665,13 @@ public class SecurityTest extends BaseSeleniumWebTest
         impersonate(SITE_ADMIN_USER);
         String siteAdminDisplayName = getDisplayName();
         ensureAdminMode();
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         assertTextPresent("Already impersonating; click here to change back to " + testUserDisplayName);
         deleteUser(TO_BE_DELETED_USER, true);
         stopImpersonating();
 
         ensureAdminMode();
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         clickLinkWithText("audit log");
 
         selectOptionByText("view", "User events");

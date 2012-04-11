@@ -362,15 +362,14 @@ public class ExtHelper
         }
         else
         {
-            test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            test.click(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"));
+            test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
             test.mouseDown(Locator.xpath("/html/body"));
         }
     }
 
     public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
     {
-        selectComboBoxItem(test, Locator.xpath("//div[./label/span[text()='"+label+":']]/div/div"), selection);
+        selectComboBoxItem(test, Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+":']]/div/div"), selection);
     }
 
     public static void selectGWTComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)

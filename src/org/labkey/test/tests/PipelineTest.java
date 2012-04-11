@@ -240,7 +240,7 @@ public class PipelineTest extends PipelineWebTestBase
         log("Set tools bin directory to " + path);
         pushLocation();
         goToHome();
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         clickLinkWithText("site settings");
         String existingValue = getFormElement("pipelineToolsDirectory");
         setFormElement("pipelineToolsDirectory", path);

@@ -694,9 +694,7 @@ public class ReportTest extends StudyBaseTest
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickNavButton("Save");
 
-        click(Locator.linkWithText("Manage Site"));
-        sleep(3000);
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         impersonate(TEST_USER);
         clickLinkWithText(getProjectName());
         clickLinkWithText("My Study");
@@ -815,7 +813,7 @@ public class ReportTest extends StudyBaseTest
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Creatinine' column.
         clickNavButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // Delete a column save a copy of the report (Save As)
         // Not testing column reorder. Ext4 and selenium don't play well together for drag & drop
@@ -841,7 +839,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("Another report with the same name already exists.");
         waitAndClickNavButton("OK", 0);
         clickNavButton("Cancel", 0); // Verify cancel button.
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         
         // verify modified, saved report
@@ -936,7 +934,7 @@ public class ReportTest extends StudyBaseTest
 
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT3_NAME);
         clickNavButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         //Participant report with specimen fields.
         clickLinkWithText("Manage");
@@ -977,7 +975,7 @@ public class ReportTest extends StudyBaseTest
 
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT4_NAME);
         clickNavButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[not(contains(@style, 'display: none'))]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
     }
 
     private static final String DISCUSSION_BODY_1 = "Starting a discussion";

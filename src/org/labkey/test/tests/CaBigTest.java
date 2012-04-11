@@ -102,7 +102,7 @@ public class CaBigTest extends BaseSeleniumWebTest
     {
         pushLocation();
 
-        clickLinkWithText("Admin Console");
+        gotoAdminConsole();
         clickLinkWithText("site settings");
 
         if (enable)

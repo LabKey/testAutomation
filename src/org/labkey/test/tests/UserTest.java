@@ -69,7 +69,7 @@ public class UserTest extends SecurityTest
 
     private void siteUsersTest()
     {
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         assertTextPresent("Last Login");
         assertTextPresent("Last Name");
         assertTextPresent("Active");
@@ -140,7 +140,7 @@ public class UserTest extends SecurityTest
      */
     private void requiredFieldsTest()
     {
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         clickNavButton("Preferences");
 
         for (String field : REQUIRED_FIELDS)
@@ -173,7 +173,7 @@ public class UserTest extends SecurityTest
     {
         enableEmailRecorder();
 
-        clickLinkWithText("Site Users");
+        clickAdminMenuItem("Site", "Site Users");
         clickLinkWithText(NORMAL_USER);
         selenium.chooseOkOnNextConfirmation();
         clickButtonContainingText("Reset Password", 0);
