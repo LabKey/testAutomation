@@ -4722,6 +4722,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void exitPermissionsUI()
     {
+        ExtHelper.clickExtTabContainingText(this, "Permissions");
         clickNavButton("Save and Finish");
     }
 
