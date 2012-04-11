@@ -32,7 +32,7 @@ public class LuminexAsyncImportTest extends LuminexTest
     protected void runUITests()
     {
         clickCheckbox("backgroundUpload");
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         saveAssay();
         sleep(1500);
 

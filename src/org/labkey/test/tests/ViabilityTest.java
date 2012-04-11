@@ -166,9 +166,8 @@ public class ViabilityTest extends AbstractViabilityTest
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design", false);
         getConfirmationAndWait();
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickNavButton("Save & Close");
 
         clickLinkWithText(getProjectName());
@@ -234,7 +233,7 @@ public class ViabilityTest extends AbstractViabilityTest
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design", false);
         getConfirmationAndWait();
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.navButton("Add Script"));
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
         deleteField("Batch Fields", 0);

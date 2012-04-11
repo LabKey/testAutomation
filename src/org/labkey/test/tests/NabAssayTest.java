@@ -602,9 +602,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_NAB);
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickNavButton("Save & Close");
 
         clickLinkWithText(TEST_ASSAY_FLDR_NAB);

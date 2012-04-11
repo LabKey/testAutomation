@@ -1105,9 +1105,8 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_LUM);
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickNavButton("Save & Close");
 
         goToTestAssayHome();
@@ -1152,8 +1151,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToTestAssayHome();
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
 
         // save changes to assay design
         clickNavButton("Save & Close");
@@ -1283,8 +1281,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToTestAssayHome();
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerTransformScript']"), WAIT_FOR_JAVASCRIPT);
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         // save changes to assay design
         clickNavButton("Save & Close");
 

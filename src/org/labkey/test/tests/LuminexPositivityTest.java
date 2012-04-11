@@ -34,7 +34,7 @@ public class LuminexPositivityTest extends LuminexTest
     private String assayName = "Positivity";
     protected void runUITests()
     {
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
 
         //clickNavButton("Save & Close");
         //TODO: Just 'Save & Close' to avoid timing issues. Blocked

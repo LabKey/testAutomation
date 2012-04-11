@@ -152,18 +152,14 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         }
     }
 
-    public void addValidationScript(File qcScript)
-    {
-        if (qcScript.exists())
-            selenium.type("//input[@id='AssayDesignerQCScript']", qcScript.getAbsolutePath());
-        else
-            fail("unable to locate the QC script");
-    }
-
-    public void addTransformScript(File transformScript)
+    public void addTransformScript(File transformScript, int index)
     {
         if (transformScript.exists())
-            selenium.type("//input[@id='AssayDesignerTransformScript']", transformScript.getAbsolutePath());
+        {
+            waitForElement(Locator.navButton("Add Script"));
+            clickNavButton("Add Script", 0);
+            selenium.type("//input[@id='AssayDesignerTransformScript" + index + "']", transformScript.getAbsolutePath());
+        }
         else
             fail("unable to locate the Transform script");
     }

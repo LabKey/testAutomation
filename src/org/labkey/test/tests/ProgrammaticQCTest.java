@@ -114,7 +114,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
 
-        addValidationScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
@@ -145,9 +145,9 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         selenium.type("//input[@id='AssayDesignerName']", assayName);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         if (addQCScript)
-            addValidationScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
+            addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 1);
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
