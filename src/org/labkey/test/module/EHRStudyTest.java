@@ -1066,7 +1066,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
     private String getDataRegionName(String title)
     {
         // Specific to the EHR Animal History page.
-        waitForElement(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), WAIT_FOR_JAVASCRIPT * 2);
         return getAttribute(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), "id").substring(11);
     }
 
