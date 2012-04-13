@@ -2142,7 +2142,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(table.getDataAsText(0, "Row Id"));
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves_4PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves_5PL.pdf", 3);
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 4);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".tomaras_luminex_transform.Rout", 3);
 
         return true;
