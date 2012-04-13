@@ -150,17 +150,18 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 assayCount+(assayCount==1?" Assay":" Assays"),
                 contributorCount+(contributorCount==1?" Contributor":" Contributors"),
                 antigenCount+(antigenCount==1?" Antigen":" Antigens"));
-        waitForElement(Locator.xpath("//li[@class='selection' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
+//        waitForElement(Locator.xpath("//td[contains(text(), '" + searchBy + ":'"));
+        waitForElement(Locator.xpath("//td[@class='subselect' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private String genCurrentSelectionString(String hierarchy, String name)
     {
-        if(name.length() <= 16)
-            return hierarchy + ": " + name;
+        if(name.length() <= 21)
+            return name;
         else
-            return hierarchy + ": " + name.substring(0, 13).trim() + "...";
+            return name.substring(0, 18).trim() + "...";
     }
 
     private void importCDSData(String query, File dataFile)
