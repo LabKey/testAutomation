@@ -611,6 +611,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test that the right filters are present for each type");
         runMenuItemHandler("qwp3:" + _listCol4.getName() + ":filter");
         ExtHelper.waitForExtDialog(this, "Show Rows Where " + _listCol4.getLabel());
+        ExtHelper.clickExtTab(this, "Choose Filters");
         click(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
 
         assertElementNotPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Starts With']"));

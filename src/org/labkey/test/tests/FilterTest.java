@@ -135,7 +135,7 @@ public class FilterTest extends ListTest
             setUpFilter(regionName, columnName, filterType,
                 filterValue);
         sleep(300);
-        pressEnter("//input[@id='value_1']");
+        //pressEnter("//input[@id='value_1']");
         clickButton("OK",0);
         assert(isElementPresent(Locator.extButton("OK")));
         assert(!isElementPresent(Locator.extButtonEnabled("OK")));
@@ -256,6 +256,7 @@ public class FilterTest extends ListTest
 
         //open filter
         runMenuItemHandler(TABLE_NAME + ":" + columnName + ":filter");
+        ExtHelper.clickExtTab(this, "Choose Filters");
 
         if(filter1!=null)
         {
