@@ -92,12 +92,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigen, "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, other)", "32 total");
         assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
         assertCDSPortalRow(SearchBy.Contributors, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "9 ethnicities, 2 locations", "23 total participants");
+        assertCDSPortalRow(SearchBy.Demographics, "7 ethnicities, 4 locations", "29 total participants");
 
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], 6, 1, 5, 3, 21, 12, SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[1], 12, 1, 3, 3, 9, 12, SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[2], 5, 1, 3, 2, 4, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[2], 11, 1, 3, 3, 4, 12, SearchBy.Studies);
         goToAppHome();
         click(SearchBy.Antigen);
         assertFilterStatusPanel("1A", 6, 1, 5, 3, 21, 23, SearchBy.Antigen);
@@ -143,7 +143,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         Double barLen = ((double)participantCount/(double)maxCount)*100;
         String barLenStr = ((Long)Math.round(Math.floor(barLen))).toString();
-        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
+//        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']"));
         waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent(studyCount+(studyCount==1?" Study":" Studies"),
@@ -152,7 +152,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 antigenCount+(antigenCount==1?" Antigen":" Antigens"));
 //        waitForElement(Locator.xpath("//td[contains(text(), '" + searchBy + ":'"));
         waitForElement(Locator.xpath("//td[@class='subselect' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
+//        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
     }
 
@@ -189,7 +189,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertLinkPresentWithText("ADCC");
         assertTextPresent(
                 "1 rows added to Antigen from VirusName",
-                "177 rows added to fact table.",
+                "195 rows added to fact table.",
                 "6 rows added to fact table. ",
                 "1 rows added to Assay from 'HIV Test Results'",
                 "6 rows added to fact table. ",
@@ -197,6 +197,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "6 rows added to fact table.",
                 "rows added to Assay from 'Lab Results'",
                 "23 rows added to fact table.",
+                "5 rows added to fact table.",   // MRNA
                 "48 rows added to fact table.");
     }
 
