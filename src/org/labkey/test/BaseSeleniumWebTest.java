@@ -3805,6 +3805,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isElementPresent(locator))
             return locator;
 
+        // check for GWT button:
+        locator = Locator.gwtButton(text);
+        if (isElementPresent(locator))
+            return locator;
+
         return null;
     }
 
