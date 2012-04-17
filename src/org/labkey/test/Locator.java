@@ -71,6 +71,11 @@ public class Locator
         return new Locator("name=" + name);
     }
 
+    public static Locator css(String selector)
+    {
+        return new Locator("css=" + selector);
+    }
+
     /**
      * Element by name and index within the set of elements with that name
      * @param name
@@ -141,6 +146,11 @@ public class Locator
     public static XPathLocator linkWithImage(String image)
     {
         return xpath("//a/img[contains(@src, " + xq(image) + ")]");
+    }
+
+    public static XPathLocator gwtButton(String text)
+    {
+        return xpath("//a[contains(@class, 'gwt-Anchor') and text() = '" + text + "']");
     }
 
     public static XPathLocator button(String text)

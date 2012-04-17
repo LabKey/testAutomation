@@ -43,8 +43,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         addWebPart("Vaccine Study Protocols");
         clickNavButton("New Protocol");
 
-        while(isTextPresent("Loading"))
-            sleep(500);
+        waitForTextToDisappear("Loading", WAIT_FOR_JAVASCRIPT);        
 
         waitForElement(Locator.inputByLabel("Protocol Name", 1), defaultWaitForPage);
         setFormElement(Locator.inputByLabel("Protocol Name", 1), STUDY_FOLDER);
@@ -55,11 +54,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         setFormElement("protocolDescription", "This is a very important protocol");
 
         clickNavButton("Save", 0);
-        //This is done async so need to sleep a bit...
-        int n = 1;
-        while (!isTextPresent("Revision 1 saved successfully") && n++ < 20)
-            sleep(500);
-        assertTextPresent("Revision 1 saved successfully");
+        waitForText("Revision 1 saved successfully", WAIT_FOR_JAVASCRIPT);
 
         setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[2]/input", "Immunogen1");
         //Make sure that Immunization schedule updated
@@ -90,11 +85,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/../..//input");
         clickNavButton("Finished");
 
-        //Can't simply wait for page load here cause also need to wait for
-        //GWT to do its thing.
-        n = 1;
-        while (!isTextPresent("This is a very important protocol") && n++ < 10)
-            sleep(1000);
+        waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
 
         assertTextPresent("Immunogen3");
         assertTextPresent("Fowlpox");
@@ -102,9 +93,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Pre-immunization");
 
         clickNavButton("Edit");
-        n = 1;
-        while (!isTextPresent("This is a very important protocol") && n++ < 10)
-            sleep(1000);
+        waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
 
 		selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Add Timepoint')]");
 		selenium.type("timepointCount", "8");
@@ -112,11 +101,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/ancestor::tr/td[5]//input");
         clickNavButton("Finished");
 
-        //Can't simply wait for page load here cause also need to wait for
-        //GWT to do its thing.
-        n = 1;
-        while (!isTextPresent("This is a very important protocol") && n++ < 10)
-            sleep(1000);
+        waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
 
         clickNavButton("Create Study Folder");
         setFormElement("beginDate", "2007-01-01");

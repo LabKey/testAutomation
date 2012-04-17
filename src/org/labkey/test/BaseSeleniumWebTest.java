@@ -2416,6 +2416,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
     }
 
+    /** Verifies that all the strings are present in the page */
+    public void assertTextPresent(ArrayList texts)
+    {
+        if(texts==null)
+            return;
+
+        for (Object text : texts)
+        {
+            String _text = ((String)text).replace("&nbsp;", " ");
+            assertTrue("Text '" + text + "' was not present", isTextPresent(_text));
+        }
+    }
+
     //takes the arguments used to set a filter and transforms them into the description in the grid view
     //then verifies that this description is present
     public void assertFilterTextPresent(String column, String type, String value)
