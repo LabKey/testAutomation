@@ -534,9 +534,6 @@
             <arg value="-port" />
             <arg value="${sysprop.selenium.server.port}" />
             <arg value="-Dcaching=true"/>
-            <arg value="-debug"/>
-            <!--<arg value="-log"/>-->
-            <!--<arg value="selenium.log"/>-->
         </java>
         <echo message="Checking for Selenium Server on port ${sysprop.selenium.server.port}" />
         <waitfor maxwait="60" maxwaitunit="second" checkevery="2" checkeveryunit="second" timeoutproperty="noSeleniumServer">
