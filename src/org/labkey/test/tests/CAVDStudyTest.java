@@ -41,7 +41,7 @@ public class CAVDStudyTest extends StudyBaseTest
     @Override
     protected void  doVerifySteps()
     {
-//        doVerifyEmptyStudy();
+        doVerifyEmptyStudy();
         doVerifyStudyDesign();
         doVerifyAssaySchedule();
         doVerifyDatasets();
