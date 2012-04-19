@@ -2181,6 +2181,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         assertLinkNotPresentWithText(folderName);
     }
 
+    /**
+     * from the file management page, select a file and rename it
+     *
+     * @param oldFilename the name of the file to select
+     * @param newFilename the new file name
+     */
+    public void renameFile(String oldFilename, String newFilename)
+    {
+        Locator l = Locator.xpath("//div[text()='" + oldFilename + "']");
+        clickAt(l, "1,1");
+        clickButton("Rename", 0);
+        waitForDraggableMask();
+        ExtHelper.setExtFormElementByLabel(this, "Filename:", newFilename);
+        clickButtonByIndex("Rename", 1, 0);
+    }
+
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
@@ -2633,6 +2649,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitForExtMask(int wait)
     {
         waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'display: block')]"), wait);
+    }
+
+    //like wait for ExtMask, but waits for a draggable mask (for example, the file rename mask)
+    public void waitForDraggableMask()
+    {
+        waitForDraggableMask(WAIT_FOR_JAVASCRIPT);
+    }
+
+    //like wait for ExtMask, but waits for a draggable mask (for example, the file rename mask)
+    public void waitForDraggableMask(int wait)
+    {
+        waitForElement(Locator.xpath("//div[contains(@class, 'x-window-draggable')]"), wait);
+
     }
 
     protected File getTestTempDir()

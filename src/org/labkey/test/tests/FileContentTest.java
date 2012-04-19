@@ -60,6 +60,7 @@ public class FileContentTest extends BaseSeleniumWebTest
         return true;
     }
 
+
     protected void doCleanup() throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
@@ -81,8 +82,10 @@ public class FileContentTest extends BaseSeleniumWebTest
         setPermissions(TEST_GROUP, "Editor");
         exitPermissionsUI();
 
-        assertFalse("ERROR: Add project with special characters failed; check that tomcat's server.xml contains the following attribute " +
-            "in its Connector element: URIEncoding=\"UTF-8\"", isTextPresent("404: page not found"));
+//        StudyHelper.createNestedFolders(this, PROJECT_NAME, FolderTest.WIKITEST_NAME, FolderTest.FOLDER_CREATION_FILE);
+
+                assertFalse("ERROR: Add project with special characters failed; check that tomcat's server.xml contains the following attribute " +
+                        "in its Connector element: URIEncoding=\"UTF-8\"", isTextPresent("404: page not found"));
 
         clickAdminMenuItem("Folder", "Project Settings");
         clickLinkWithText("Files");
@@ -126,7 +129,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             ExtHelper.waitForFileGridReady(this);
             clickButton("Admin", 0);
             ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
-            clickConfigTab(FileTab.file);
+            ExtHelper.clickExtTab(this, "File Properties");
             checkRadioButton("fileOption", "useCustom");
             clickButton("Edit Properties...");
             waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
@@ -143,12 +146,21 @@ public class FileContentTest extends BaseSeleniumWebTest
             uncheckCheckbox("importAction");
 
             // enable custom file properties.
-            clickConfigTab(FileTab.file);
+            ExtHelper.clickExtTab(this, "File Properties");
             checkRadioButton("fileOption", "useCustom");
 
+            //NOTE: after selenium clicked on the grid settings tab, some of the time the grid's menu bar
+            // would not render correctly.
+            sleep(300);
+
             // Modify toolbar.
-            clickConfigTab(FileTab.toolbar);
-            click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconFolderNew')]"));
+            ExtHelper.clickExtTab(this, "Toolbar and Grid Settings");
+            waitForText("Configure Grid columns and Toolbar");
+
+            waitForText("Import Data");
+            waitForText("file1.xls");
+            Locator folderBtn = Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconFolderNew')]");
+            click(folderBtn);
             click(Locator.xpath("//a[./span[text()='remove']]")); // Remove upload button
             click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconUp')]"));
             click(Locator.xpath("//a[./span[text()='show/hide text']]")); // Add text to 'Parent Folder' button
@@ -192,6 +204,13 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForText(FILE_DESCRIPTION, WAIT_FOR_JAVASCRIPT);
             waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT);
             waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
+
+            log("rename file");
+            String newFileName = "changedFilename.html";
+            renameFile(filename, newFileName);
+            waitForText(newFileName);
+            filename = newFileName;
+
 
             // Check custom actions as non-administrator.
             impersonate(TEST_USER);
@@ -242,12 +261,5 @@ public class FileContentTest extends BaseSeleniumWebTest
             //Issue 13844: FileSystem log events not included in LabAuditEvents
 //            validateLabAuditTrail();
         }
-    }
-
-    private enum FileTab
-    {action, file, toolbar, email}
-    private void clickConfigTab(FileTab tab)
-    {
-        click(Locator.xpath("//li[contains(@id, '__"+tab+"Tab')]/a[contains(@class, 'x-tab-right')]"));
     }
 }

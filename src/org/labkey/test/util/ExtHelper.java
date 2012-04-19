@@ -441,10 +441,24 @@ public class ExtHelper
         clickExtButton(test, windowTitle, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
     }
 
-    public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption, int wait)
+     public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption, int wait)
+     {
+         clickExtButton(test, windowTitle, caption, wait, 1);
+     }
+
+    /**
+     * click an ext button
+     *
+     * @param test  the calling test
+     * @param windowTitle title of the extWindow, or null if you would like to autodetect
+     * @param caption the button text
+     * @param wait time to wait for page to load
+     * @param index
+     */
+    public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption, int wait, int index)
     {
         test.log("Clicking Ext button with caption: " + caption);
-        Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(test, windowTitle):"")+"//button[(contains(@class, 'x-btn-text') and text()='" + caption + "') or (@role='button' and ./span[text()='" + caption + "'])]");
+        Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(test, windowTitle):"")+"//button[(contains(@class, 'x-btn-text') and text()='" + caption + "') or (@role='button' and ./span[text()='" + caption + "'])]["+index+"]");
         test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         if (wait > 0)
             test.clickAndWait(loc, wait);
