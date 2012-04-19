@@ -269,7 +269,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
-        ExtHelper.selectFileBrowserItem(this, "export/study.xml");
+        ExtHelper.selectFileBrowserItem(this, "export/study/study.xml");
         selectImportDataAction("Import Study");
 
         waitForPipelineJobsToComplete(3, "Study import", false);

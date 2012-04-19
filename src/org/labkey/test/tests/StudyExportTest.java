@@ -67,7 +67,7 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (legacy formats)");
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
-        ExtHelper.selectFileBrowserItem(this, "export/study.xml");
+        ExtHelper.selectFileBrowserItem(this, "export/study/study.xml");
 
         selectImportDataAction("Import Study");
 
@@ -100,6 +100,7 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (xml formats)");
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
+        ExtHelper.selectFileBrowserRoot(this);
         ExtHelper.selectFileBrowserItem(this, "export/");
         ExtHelper.selectAllFileBrowserFiles(this);
 
