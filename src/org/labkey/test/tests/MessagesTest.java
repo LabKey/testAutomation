@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -26,7 +25,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 
@@ -201,7 +199,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         SelectRowsCommand selectCmd = new SelectRowsCommand("announcement", "ForumSubscription");
         selectCmd.setMaxRows(-1);
-        selectCmd.setContainerFilter(ContainerFilter.AllFolders);
+        selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         selectCmd.setColumns(Arrays.asList("*"));
         SelectRowsResponse selectResp = null;
 
@@ -217,9 +215,9 @@ public class MessagesTest extends BaseSeleniumWebTest
             }
             catch (Exception e)
             {
-               fail(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
+               fail(e.getMessage());
             }
-            assertEquals(counts[i],selectResp.getRowCount().intValue());
+            assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
         }
     }
 }
