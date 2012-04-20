@@ -23,6 +23,7 @@ data/api/security-api.xml -text
 data/api/study-api.xml -text
 data/api/timechart-api.xml -text
 data/api/webPartTest.js -text
+data/api/webdavTest.html -text
 data/api/workbookAPITest.html -text
 modules/miniassay/assay/simple/config.xml -text
 modules/miniassay/assay/simple/domains/result.xml -text

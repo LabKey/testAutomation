@@ -151,7 +151,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
 
         clickLinkWithText(FOLDER_NAME);
-        
+
         createWiki();
 
         lineChartTest();
@@ -177,7 +177,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
         emailApiTest();
 
         extIntegrationTest();
-        
+
+        webdavAPITest();
+
         //clear the test page so the crawler doesn't refetch a test and cause errors
         clearTestPage("Test Complete.");
     }
@@ -744,5 +746,15 @@ public class ClientAPITest extends BaseSeleniumWebTest
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Month of the Year");
         clearTestPage("Ext integration Test complete.");
+    }
+
+    private void webdavAPITest()
+    {
+        setSourceFromFile("webdavTest.html", true);
+        Locator loc = Locator.id(TEST_DIV_NAME);
+        assertElementContains(loc, "Test Started");
+        waitForText("Test Complete", 1000);
+        assertTextNotPresent("ERROR");
+        clearTestPage("WebDav Client API Test complete.");
     }
 }
