@@ -216,6 +216,7 @@ src/org/labkey/test/tests/StudyExportTest.java -text
 src/org/labkey/test/tests/StudyExtraTest.java -text
 src/org/labkey/test/tests/StudyManualTest.java -text
 src/org/labkey/test/tests/StudyRedesignTest.java -text
+src/org/labkey/test/tests/StudyReloadTest.java -text
 src/org/labkey/test/tests/StudySecurityTest.java -text
 src/org/labkey/test/tests/StudyTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
