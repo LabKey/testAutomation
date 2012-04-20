@@ -6302,4 +6302,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         return intersect;
     }
+
+
+    protected void reloadStudyFromZip(String studyFile)
+    {
+        clickAdminMenuItem("Manage Study");
+        clickNavButton("Reload Study");
+        setFormElement("studyZip", studyFile);
+        clickNavButton("Reload Study From Local Zip Archive");
+        waitForPipelineJobsToComplete(2, "Study Reload", false);
+
+    }
+
 }
