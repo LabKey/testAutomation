@@ -753,7 +753,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         setSourceFromFile("webdavTest.html", true);
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Test Started");
-        waitForText("Test Complete", 1000);
+        waitForText("Test Complete");
         assertTextNotPresent("ERROR");
         clearTestPage("WebDav Client API Test complete.");
     }
