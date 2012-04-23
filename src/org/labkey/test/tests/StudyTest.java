@@ -130,14 +130,15 @@ public class StudyTest extends StudyBaseTest
         addWebPart("Study Data Tools");
         clickLinkWithImage("/labkey/study/tools/participant_report.png");
         clickButton("Choose Measures", 0);
-        waitForExtMask();
+        ExtHelper.waitForExtDialog(this, "Add Measure");
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
         String textToFilter = "AE-1:(VTN) AE Log";
         waitForText(textToFilter);
         assertTextPresent(textToFilter, 27);
         assertTextPresent("Abbrevi", 79);
 
-        log("filter participant results donw");
+        log("filter participant results down");
         Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
         selenium.type(filterSearchText.toXpath(), "a");
         selenium.typeKeys(filterSearchText.toXpath(), "bbrev");
@@ -146,9 +147,9 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Abbrevi", 79);
 
         log("select some records and include them in a report");
-        ExtHelper.clickXGridPanelCheckbox(this, 4, true);
-        ExtHelper.clickXGridPanelCheckbox(this, 40, true);
-        ExtHelper.clickXGridPanelCheckbox(this, 20, true);
+        ExtHelper.clickX4GridPanelCheckbox(this, 4, true);
+        ExtHelper.clickX4GridPanelCheckbox(this, 40, true);
+        ExtHelper.clickX4GridPanelCheckbox(this, 20, true);
         ExtHelper.clickExtButton(this, "Select", 0);
         waitForExtMaskToDisappear();
 

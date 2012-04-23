@@ -111,6 +111,32 @@ selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, ke
     }
 };
 
+selenium.selectExt4GridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {
+    // find the grid view ext element
+    var domQuery = selenium.browserbot.getCurrentWindow().Ext4.DomQuery;
+    var ext = selenium.browserbot.getCurrentWindow().Ext4;
+
+    var el = domQuery.selectNode("div[class*='"+markerCls+"']");
+    if (el)
+    {
+        var grid = ext.getCmp(el.id);
+        if (grid)
+        {
+            if (idx == -1)
+                idx = grid.getStore().find(columnName, columnVal);
+
+            if (idx == -1)
+                throw new Error("Unable to locate " + columnName + ": " + columnVal);
+
+            grid.getSelectionModel().select(idx, keepExisting);
+        }
+    }
+    else
+    {
+        throw new Error("Unable to locate grid: " + markerCls)
+    }
+};
+
 // Example: ExtHelper.selectFolderManagementTreeItem(this, "/home/545dcbbc9f7fa0f85a86190b9acd6381/14/15/3/2", true);
 selenium.selectFolderManagementItem = function(path, keepExisting) {
     selenium.selectExtFolderTreeNode(path, 'folder-management-tree', keepExisting);
