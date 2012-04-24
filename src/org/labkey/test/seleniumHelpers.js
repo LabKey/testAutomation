@@ -128,6 +128,9 @@ selenium.selectExt4GridItem = function (columnName, columnVal, idx, markerCls, k
             if (idx == -1)
                 throw new Error("Unable to locate " + columnName + ": " + columnVal);
 
+            if (idx >= grid.getStore().getCount())
+                throw new Error("No such row: " + idx);
+
             grid.getSelectionModel().select(idx, keepExisting);
         }
     }

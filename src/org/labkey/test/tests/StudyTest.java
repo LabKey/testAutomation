@@ -147,9 +147,9 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Abbrevi", 79);
 
         log("select some records and include them in a report");
-        ExtHelper.clickX4GridPanelCheckbox(this, 4, true);
-        ExtHelper.clickX4GridPanelCheckbox(this, 40, true);
-        ExtHelper.clickX4GridPanelCheckbox(this, 20, true);
+        ExtHelper.clickX4GridPanelCheckbox(this, 4, "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, 40, "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, 20, "measuresGridPanel", true);
         ExtHelper.clickExtButton(this, "Select", 0);
         waitForExtMaskToDisappear();
 

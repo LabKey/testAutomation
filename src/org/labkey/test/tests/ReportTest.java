@@ -758,9 +758,9 @@ public class ReportTest extends StudyBaseTest
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
         assertEquals("", 17, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
 
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "2a. Creatinine", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a.ALT AE Severity Grade", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a. ALT (SGPT)", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "2a. Creatinine", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a. ALT (SGPT)", "measuresGridPanel", true);
 
         clickNavButton("Select", 0);
 
@@ -776,8 +776,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "2a. Creatinine");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
         assertEquals("", 4, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
-//        ExtHelper.clickXGridPanelCheckbox(this, "queryName", "CPS-1", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, 3, true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "queryName", "CPS-1", "measuresGridPanel", true);
         clickNavButton("Select", 0);
 
         // at this point the report should render some content
@@ -887,8 +886,8 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "17a. Preg. test result", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1.Adverse Experience (AE)", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "17a. Preg. test result", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1.Adverse Experience (AE)", "measuresGridPanel", true);
 
         clickNavButton("Select", 0);
 
@@ -948,8 +947,8 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
 
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):Vial Count", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):Available Count", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):Vial Count", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):Available Count", "measuresGridPanel", true);
 
         clickNavButton("Select", 0);
 

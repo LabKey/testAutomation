@@ -243,20 +243,20 @@ public class ExtHelper
         test.getWrapper().getEval("selenium.selectExtGridItem(null, null, " + index + ", 'x-grid-panel', " + keepExisting + ")");
     }
 
-    public static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, int index, boolean keepExisting)
+    public static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, int index, String markerCls, boolean keepExisting)
     {
-        clickX4GridPanelCheckbox(test, null, null, index, keepExisting);
+        clickX4GridPanelCheckbox(test, null, null, index, markerCls, keepExisting);
     }
 
-    public static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, boolean keepExisting)
+    public static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, String markerCls, boolean keepExisting)
     {
-        clickX4GridPanelCheckbox(test, colName, colValue, -1, keepExisting);
+        clickX4GridPanelCheckbox(test, colName, colValue, -1, markerCls, keepExisting);
     }
 
-    protected static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, int rowIndex, boolean keepExisting)
+    protected static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, int rowIndex, String markerCls, boolean keepExisting)
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-view')]"), 60000);
-        test.getWrapper().getEval("selenium.selectExt4GridItem('" + colName + "', '" + colValue + "', " + rowIndex + ", 'x4-grid-view', " + keepExisting + ")");
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid')]"), 60000);
+        test.getWrapper().getEval("selenium.selectExt4GridItem('" + colName + "', '" + colValue + "', " + rowIndex + ", '" + markerCls + "', " + keepExisting + ")");
     }
 
     @Deprecated
