@@ -71,6 +71,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         importCDSData("Studies", new File(getSampledataPath(), "CDS/studies.tsv"));
         importCDSData("Labs", new File(getSampledataPath(), "CDS/labs.tsv"));
         importCDSData("People", new File(getSampledataPath(), "CDS/people.tsv"));
+        importCDSData("AssayPublications", new File(getSampledataPath(), "CDS/assay_publications.tsv"));
 
         populateFactTable();
 
