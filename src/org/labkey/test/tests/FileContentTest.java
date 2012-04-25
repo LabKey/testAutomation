@@ -242,7 +242,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Delete file.
             clickLinkWithText(PROJECT_NAME);
             ExtHelper.selectFileBrowserItem(this, filename);
-            click(Locator.xpath("//button[contains(@class, 'iconDelete')]"));
+            click(Locator.css("button.iconDelete"));
             clickButton("Yes", 0);
             waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);
                   

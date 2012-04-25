@@ -33,6 +33,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String PROJECT_NAME = "CDSTest Project";
     private static final File STUDY_ZIP = new File(getSampledataPath(), "CDS/Dataspace.study.zip");
     private static final String STUDIES[] = {"Demo Study", "Not Actually CHAVI 001", "NotRV144"};
+    private static final String LABS[] = {"Arnold/Bellew Lab", "LabKey Lab", "Piehler/Eckels Lab"};
+    private static final String GROUP_NAME = "CDSTest_AGroup";
+    private static final String GROUP_NAME2 = "CDSTest_BGroup";
+    private static final String GROUP_NAME3 = "CDSTest_CGroup";
+    private static final String GROUP_NULL = "Group creation cancelled";
+    private static final String GROUP_DESC = "Intersection of " +LABS[1]+ " and " + LABS[2];
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -89,11 +95,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertLinkNotPresentWithText("Home");
         assertLinkNotPresentWithText("Admin");
 
-        assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
-        assertCDSPortalRow(SearchBy.Antigen, "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, other)", "32 total");
-        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
-        assertCDSPortalRow(SearchBy.Contributors, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "7 ethnicities, 4 locations", "29 total participants");
+        assertAllParticipantsPortalPage();
 
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], 6, 1, 5, 3, 21, 12, SearchBy.Studies);
@@ -116,12 +118,136 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusPanel("Physical Exam", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
         goToAppHome();
         click(SearchBy.Contributors);
-        assertFilterStatusPanel("Arnold/Bellew Lab", 6, 1, 5, 3, 21, 23, SearchBy.Contributors);
-        assertFilterStatusPanel("LabKey Lab", 23, 3, 7, 4, 32, 23, SearchBy.Contributors);
-        assertFilterStatusPanel("Piehler/Eckels Lab", 18, 2, 3, 3, 12, 23, SearchBy.Contributors);
+        assertFilterStatusPanel(LABS[0], 6, 1, 5, 3, 21, 23, SearchBy.Contributors);
+        assertFilterStatusPanel(LABS[1], 23, 3, 7, 4, 32, 23, SearchBy.Contributors);
+        assertFilterStatusPanel(LABS[2], 18, 2, 3, 3, 12, 23, SearchBy.Contributors);
         goToAppHome();
         click(SearchBy.Demographics);
         goToAppHome();
+
+        log("Verify multi-select");
+        click(SearchBy.Contributors);
+        selectBars(LABS[0], LABS[1]);
+        assertFilterStatusCounts(6,1,5,3,21);
+        selectBars(LABS[0], LABS[2]);
+        assertFilterStatusCounts(0,0,0,0,0);
+        selectBars(LABS[1], LABS[2]);
+        assertFilterStatusCounts(12,1,3,3,9);
+        clickButton("keep overlap", 0);
+        clickButton("save group", 0);
+        waitForText("Selection and Active Filters");
+//        waitForText("Selection and Active Filters (6)");
+//        assertTextPresent("Only Active Filters (6)");
+        setFormElement("groupname", GROUP_NAME);
+        setFormElement("groupdescription", GROUP_DESC);
+        clickButton("Save", 0);
+        waitForTextToDisappear(LABS[0]);
+        assertFilterStatusCounts(12,1,3,3,9);
+        clickButton("clear all", 0);
+        waitForText(LABS[0]);
+        assertFilterStatusCounts(29,3,7,4,32);
+
+        //TODO: Shouldn't be able to create unfiltered group
+//        clickButton("save group", 0);
+//        waitForText("Selection and Active Filters (29)");
+//        assertTextPresent("Only Active Filters (29)");
+//        setFormElement("groupname", "Unfiltered" + GROUP_NAME);
+//        clickButton("Save", 0);
+
+        goToAppHome();
+        refresh(); // TODO: Remove, shouldn't require a refresh for group to show up.
+        selectCDSGroup(GROUP_NAME, true);
+        assertTextPresent(GROUP_DESC);
+
+        assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
+        assertCDSPortalRow(SearchBy.Antigen, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
+        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
+        assertCDSPortalRow(SearchBy.Contributors, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
+
+        click(SearchBy.Contributors);
+        assertFilterStatusCounts(12,1,3,3,9);
+
+        goToAppHome();
+        selectCDSGroup("All participants", false);
+        assertAllParticipantsPortalPage();
+
+        //test more group saving
+        selectCDSGroup(GROUP_NAME, true);
+        click(SearchBy.Demographics);
+        pickCDSSort("Gender");
+        selectBars("f");
+
+        clickButton("save group", 0);
+        waitForText("Selection and Active Filters (8)");
+        assertTextPresent("Only Active Filters (12)");
+        click(Locator.css("div.withSelectionRadio input"));
+        setFormElement("groupname", GROUP_NULL);
+        clickButton("Cancel", 0);
+        waitForTextToDisappear("Selection and Active Filters (8)");
+
+        clickButton("save group", 0);
+        waitForText("Selection and Active Filters (8)");
+        assertTextPresent("Only Active Filters (12)");
+        click(Locator.css("div.filterOnlyRadio input"));
+        setFormElement("groupname", GROUP_NAME2);
+        clickButton("Save", 0);
+
+        clickButton("save group", 0);
+        waitForText("Selection and Active Filters (8)");
+        assertTextPresent("Only Active Filters (12)");
+        click(Locator.css("div.withSelectionRadio input"));
+        setFormElement("groupname", GROUP_NAME3);
+        clickButton("Save", 0);
+
+        // saved filter without including current selection (should be the same as initial group)
+        goToAppHome();
+        refresh(); // TODO: Remove, shouldn't require a refresh for group to show up.
+        selectCDSGroup(GROUP_NAME2, true);
+        assertTextNotPresent(GROUP_DESC);
+
+        assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
+        assertCDSPortalRow(SearchBy.Antigen, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
+        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
+        assertCDSPortalRow(SearchBy.Contributors, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
+
+        click(SearchBy.Contributors);
+        assertFilterStatusCounts(12,1,3,3,9);
+
+        // saved filter including current selection (Gender: f)
+        goToAppHome();
+        selectCDSGroup(GROUP_NAME3, true);
+        assertTextNotPresent(GROUP_DESC);
+        assertTextPresent("Gender:");
+
+        assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
+        assertCDSPortalRow(SearchBy.Antigen, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
+        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
+        assertCDSPortalRow(SearchBy.Contributors, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "8 total participants");
+
+        click(SearchBy.Contributors);
+        assertFilterStatusCounts(8,1,3,3,9);
+
+        // Group creation cancelled
+        goToAppHome();
+        assertTextNotPresent(GROUP_NULL);
+    }
+
+    private void pickCDSSort(String sortBy)
+    {
+        click(Locator.css("div.sortDropdown"));
+        waitAndClick(Locator.xpath("//span[text()='"+sortBy+"']"));
+    }
+
+    private void assertAllParticipantsPortalPage()
+    {
+        assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
+        assertCDSPortalRow(SearchBy.Antigen, "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, other)", "32 total");
+        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
+        assertCDSPortalRow(SearchBy.Contributors, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
+        assertCDSPortalRow(SearchBy.Demographics, "7 ethnicities, 4 locations", "29 total participants");
     }
 
     private void assertCDSPortalRow(SearchBy by, String expectedDetail, String expectedTotal)
@@ -145,16 +271,58 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         Double barLen = ((double)participantCount/(double)maxCount)*100;
         String barLenStr = ((Long)Math.round(Math.floor(barLen))).toString();
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']"));
-        waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(studyCount+(studyCount==1?" Study":" Studies"),
-                assayCount+(assayCount==1?" Assay":" Assays"),
-                contributorCount+(contributorCount==1?" Contributor":" Contributors"),
-                antigenCount+(antigenCount==1?" Antigen":" Antigens"));
+        selectBars(barLabel);
+        assertFilterStatusCounts(participantCount, studyCount, assayCount, contributorCount, antigenCount);
 //        waitForElement(Locator.xpath("//td[contains(text(), '" + searchBy + ":'"));
         waitForElement(Locator.xpath("//td[@class='subselect' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void assertFilterStatusCounts(int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount)
+    {
+        waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
+        assertTextPresent(studyCount+(studyCount>1?" Studies":" Study"),
+        assayCount+(assayCount>1?" Assays":" Assay"),
+        contributorCount+(contributorCount>1?" Contributors":" Contributor"),
+        antigenCount+(antigenCount>1?" Antigens":" Antigen"));
+    }
+
+    private void selectBars(String... bars)
+    {
+        click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+        if(bars.length > 1)
+        {
+            selenium.controlKeyDown();
+            for(int i = 1; i < bars.length; i++)
+            {
+                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[i]+"']"));
+            }
+            selenium.controlKeyUp();
+        }
+    }
+
+    private void shiftSelectBars(String... bars)
+    {
+        click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+        if(bars.length > 1)
+        {
+            selenium.shiftKeyDown();
+            for(int i = 1; i < bars.length; i++)
+            {
+                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+            }
+            selenium.shiftKeyUp();
+        }
+    }
+
+    private void selectCDSGroup(String group, boolean titleShown)
+    {
+        waitAndClick(Locator.xpath("//span[text()='"+group+"']"));
+        if(titleShown)
+            waitForElement(Locator.css("div.title:contains('"+group+"')"));
+        else
+            waitForElement(Locator.xpath("//div[@class='title' and ancestor-or-self::*[contains(@style,'display: none')]]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private String genCurrentSelectionString(String hierarchy, String name)
