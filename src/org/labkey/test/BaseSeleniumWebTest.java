@@ -2191,10 +2191,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         Locator l = Locator.xpath("//div[text()='" + oldFilename + "']");
         clickAt(l, "1,1");
-        clickButton("Rename", 0);
+        click(Locator.css("button.iconRename"));
+
         waitForDraggableMask();
         ExtHelper.setExtFormElementByLabel(this, "Filename:", newFilename);
-        clickButtonByIndex("Rename", 1, 0);
+        Locator btnLocator = Locator.extButton("Rename");
+        click(btnLocator);
     }
 
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
