@@ -496,8 +496,12 @@ public class SecurityTest extends BaseSeleniumWebTest
     {
         clickLinkWithText(PROJECT_NAME);
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
-        String baseUrl = removeUrlParameters(getCurrentRelativeURL()).replaceAll("/project/", "/login/").replaceAll("begin.view", "");
-
+        String relUrl = getCurrentRelativeURL();
+        boolean newSchool = relUrl.contains("project-");
+        String baseUrl = removeUrlParameters(getCurrentRelativeURL()).replaceAll("/project/", "/login/");
+        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/')+1);
+        if (newSchool)
+            baseUrl += "login-";
         // Attempt to verify bogus token -- should result in failure
         String xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=ABC");
         assertFailureAuthenticationToken(xml);
