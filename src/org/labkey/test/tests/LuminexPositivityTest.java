@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PerlHelper;
 
 import java.io.File;
 import java.util.List;
@@ -32,9 +33,20 @@ public class LuminexPositivityTest extends LuminexTest
 {
 
     private String assayName = "Positivity";
+
+
+    protected void ensureConfigured()
+    {
+        if(!PerlHelper.ensurePerlConfig(this))
+            fail("No Perl engine");
+        super.ensureConfigured();
+    }
+
+
     protected void runUITests()
     {
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"), 0);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 1);
 
         //clickNavButton("Save & Close");
         //TODO: Just 'Save & Close' to avoid timing issues. Blocked
@@ -47,6 +59,7 @@ public class LuminexPositivityTest extends LuminexTest
         checkPositivityValues("positive", posWells.length, posWells);
         String[] negWells = new String[] {"A3", "B3", "A5", "B5", "A10", "B10"};
         checkPositivityValues("negative", negWells.length, negWells);
+        checkDescriptionParsingForPositivityXLS();
 
         // Test positivity data upload with 5x Fold Change
         uploadPositivityFile(assayName + " 5x Fold Change", "1", "5", false);
@@ -54,6 +67,7 @@ public class LuminexPositivityTest extends LuminexTest
         checkPositivityValues("positive", posWells.length, posWells);
         negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6", "A10", "B10"};
         checkPositivityValues("negative", negWells.length, negWells);
+        checkDescriptionParsingForPositivityXLS();
 
         // Test positivity data upload w/out a baseline visit and/or fold change
         uploadPositivityFile(assayName + " No Fold Change", "1", "", false);
@@ -66,6 +80,31 @@ public class LuminexPositivityTest extends LuminexTest
         checkPositivityValues("positive", posWells.length, posWells);
         negWells = new String[] {"A5", "B5", "A10", "B10"};
         checkPositivityValues("negative", negWells.length, negWells);
+        checkDescriptionParsingForPositivityXLS();
+    }
+
+    /**
+     * This function verify three specific descriptions present in positivity.xls are present in the
+     * data grid and that they have been correctly processed
+     */
+    private void checkDescriptionParsingForPositivityXLS()
+    {
+        //TODO:  bug
+//        checkDescriptionParsing("123400001 1 2012-10-01", "", "123400001", "1", "2012-10-01");
+        checkDescriptionParsing("123400002,2,1/15/2012", "", "123400002", "2.0", "2012-01-15");
+        checkDescriptionParsing("P562, Wk 48, 7-27-2011", "", "P562", "48.0", "2011-07-27");
+
+    }
+
+    private void checkDescriptionParsing(String description, String specimenID, String participantID, String visitID, String date)
+    {
+        DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
+        drt.ensureColumnsPresent("Description", "Specimen ID", "Participant ID", "Visit ID", "Date");
+        int rowID = drt.getIndexWhereDataAppears(description, "Description");
+        assertEquals(specimenID, drt.getDataAsText(rowID, "Specimen ID"));
+        assertEquals(participantID, drt.getDataAsText(rowID, "Participant ID"));
+        assertEquals(visitID, drt.getDataAsText(rowID, "Visit ID"));
+        assertEquals(date, drt.getDataAsText(rowID, "Date"));
     }
 
     private void checkPositivityValues(String type, int numExpected, String[] positivityWells)
@@ -84,5 +123,7 @@ public class LuminexPositivityTest extends LuminexTest
             int i = wells.indexOf(well);
             assertEquals(type, posivitiy.get(i));
         }
+
+        //verify correctly parsed the description file into participant id, visit id, and date
     }
 }

@@ -132,6 +132,58 @@ public class DataRegionTable
           return -1;
     }
 
+    /**
+     * do nothing if column is already present, add it if it is not
+     * @param columnName   name of column to add, if necessary
+     */
+    public void ensureColumnPresent(String columnName)
+    {
+        if(getColumn(columnName) > -1)
+            return;
+        else
+        {
+            CustomizeViewsHelper.openCustomizeViewPanel(_test);
+            CustomizeViewsHelper.addCustomizeViewColumn(_test, columnName);
+            CustomizeViewsHelper.applyCustomView(_test);
+        }
+    }
+
+    /**
+     * check for presence of columns, add them if they are not already present
+     * requires columns actually exist
+     * @param names names of columns to add
+     */
+    public void ensureColumnsPresent(String... names)
+    {
+        boolean opened = false;
+        for(String name: names)
+        {
+            if(getColumn(name) == -1)
+            {
+                if(!opened)
+                {
+                    CustomizeViewsHelper.openCustomizeViewPanel(_test);
+                    opened = true;
+                }
+                CustomizeViewsHelper.addCustomizeViewColumn(_test, name);
+            }
+        }
+        if(opened)
+            CustomizeViewsHelper.applyCustomView(_test);
+    }
+
+    /**
+     * returns index of the row of the first appearance of the specified data, in the specified column
+     * @param data
+     * @param column
+     * @return
+     */
+    public int getIndexWhereDataAppears(String data, String column)
+    {
+        List<String> allData = getColumnDataAsText(column);
+        return allData.indexOf(data);
+    }
+
     public int getDataRowCount(int div)
     {
         int rows = 0;

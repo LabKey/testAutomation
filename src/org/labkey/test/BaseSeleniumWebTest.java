@@ -32,6 +32,7 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -2060,6 +2061,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForPageToLoad();
     }
 
+    public void createSubFolderFromTemplate(String project, String child, String template, String[] objectsToCopy)
+    {
+        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToCopy, false);
+
+    }
+
 
     public void createSubfolder(String project, String child, String[] tabsToAdd)
     {
@@ -2067,13 +2074,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         createSubfolder(project, project, child, "None", tabsToAdd);
     }
 
+
     public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd)
     {
         createSubfolder(project, parent, child, folderType, tabsToAdd, false);
     }
 
-    public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd, boolean inheritPermissions)
+
+    private  void startCreateFolder(String project, String parent, String child)
     {
+
         ensureAdminMode();
         if (isLinkPresentWithText(child))
             fail("Cannot create folder; A link with text " + child + " already exists.  " +
@@ -2088,8 +2098,40 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setText("name", child);
 
+
+    }
+
+    public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd, boolean inheritPermissions)
+    {
+        createSubfolder(project, parent, child, folderType, null, tabsToAdd, inheritPermissions);
+    }
+
+    /**
+     *
+     * @param project project in which to create new folder
+     * @param parent immediate parent of the new folder (project, if it's a top level subfolder)
+     * @param child name of folder to create
+     * @param folderType type of folder (null for custom)
+     * @param templateFolder if folderType = "create from Template Folder", this is the template folder used.  Otherwise, ignored
+     * @param tabsToAdd module tabs to add iff foldertype=null,  or the copy related checkboxes iff foldertype=create from template
+     * @param inheritPermissions should folder inherit permissions from parent?
+     */
+    public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
+    {
+        startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
+        {
             click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input[@role='radio']"));
+            if(folderType.equals("Create From Template Folder"))
+            {
+                log("create from template");
+                click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input[@role='radio']"));
+                Locator.XPathLocator l = Locator.xpath("//div[div/div[contains(text(), 'Choose Template Folder:')]]");
+                Ext4Helper.selectComboBoxItem(this, l, templateFolder);
+
+                //TODO:  the checkboxes.  I don't need this right now so I haven't written it, but my intention is to use tabsToAdd
+            }
+        }
         else {
             click(Locator.xpath("//div[./label[text()='Custom']]/input[@role='radio']"));
 
@@ -2099,7 +2141,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 for (String tabname : tabsToAdd)
                     waitAndClick(Locator.xpath("//div[./label[text()='"+tabname+"']]/input[@role='checkbox']"));
             }
-
         }
 
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
@@ -2616,21 +2657,28 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(Locator.id("seleniumExtReady"), defaultWaitForPage);
     }
 
-    public void waitFor(Checker checker, String failMessage, int wait)
+    public boolean doesElementAppear(Checker checker, String failMessage, int wait)
     {
+
         int time = 0;
         while ( time < wait )
         {
             if( checker.check() )
-                return;
+                return true;
             sleep(100);
             time += 100;
         }
         if (!checker.check())
         {
             _testTimeout = true;
-            fail(failMessage + " ["+wait+"ms]");
+            return false;
         }
+        return false;
+    }
+
+    public void waitFor(Checker checker, String failMessage, int wait)
+    {
+        doesElementAppear(checker, failMessage, wait);
     }
 
     public void waitForExtMaskToDisappear()
@@ -2672,17 +2720,31 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return new File(buildDir, "testTemp");
     }
 
+    /**
+     * pre-condition: on Views and Scripting Configuration page
+     * @return is a Perl enginge configured?
+     */
+    public boolean isPerlEngineConfigured()
+    {
+        return waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='pl']"), WAIT_FOR_JAVASCRIPT, false);
+    }
+
+    /**
+     * pre-condition: on Views and Scripting Configuration page
+     * @return is an R enginge configured?
+     */
     public boolean isREngineConfigured()
     {
         // need to allow time for the server to return the engine list and the ext grid to render
         Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
-        int time = 0;
-        while (!isElementPresent(engine) && time < WAIT_FOR_JAVASCRIPT)
-        {
-            sleep(100);
-            time += 100;
-        }
-        return isElementPresent(engine);
+        return waitForElement(engine, WAIT_FOR_JAVASCRIPT, false);
+//        int time = 0;
+//        while (!isElementPresent(engine) && time < WAIT_FOR_JAVASCRIPT)
+//        {
+//            sleep(100);
+//            time += 100;
+//        }
+//        return isElementPresent(engine);
     }
 
     public void mouseClick(String locator)
@@ -2765,16 +2827,44 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(locator, defaultWaitForPage);
     }
 
-    public void waitForElement(final Locator locator, int wait)
+    /**
+     *
+     * @param locator Element to wait for
+     * @param wait amount of time to wait for
+     * @param failIfNotFound should fail if element is not found?  If not, will return false
+     * @return
+     */
+    public boolean waitForElement(final Locator locator, int wait, boolean failIfNotFound)
     {
+
         String failMessage = "Element with locator " + locator + " did not appear.";
-        waitFor(new Checker()
+        Checker checker = new Checker()
         {
             public boolean check()
             {
                 return isElementPresent(locator);
             }
-        }, failMessage, wait);
+        };
+
+        if(!doesElementAppear(checker, failMessage, wait))
+            if(failIfNotFound)
+                fail(failMessage);
+            else
+                return false;
+        return true;
+    }
+
+    public void waitForElement(final Locator locator, int wait)
+    {
+        waitForElement(locator, wait, true);
+//        String failMessage = "Element with locator " + locator + " did not appear.";
+//        waitFor(new Checker()
+//        {
+//            public boolean check()
+//            {
+//                return isElementPresent(locator);
+//            }
+//        }, failMessage, wait);
     }
 
     public void waitForElementToDisappear(final Locator locator, int wait)
