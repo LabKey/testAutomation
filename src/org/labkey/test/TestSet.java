@@ -288,6 +288,10 @@ public enum TestSet
             EHRStudyTest.class
     }),
 
+    CDSPopulation(new Class[] {
+            CDSPopulation.class
+    }),
+
     CONTINUE(new Class[] {})
     {
         public boolean isSuite()
