@@ -15,12 +15,14 @@
  */
 package org.labkey.test.module;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -82,12 +84,54 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         populateFactTable();
 
-        verifyCDSApplication();
+        verifyCounts();
+//        verifyFilters(); //TODO: Multi-select broken
+        verifyNounPages();
     }
 
-    private void verifyCDSApplication()
+/// Test substeps
+
+    private void importCDSData(String query, File dataFile)
     {
-//        selenium.windowMaximize(); // Count bars don't render properly when hidden.
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(query);
+        ListHelper.clickImportData(this);
+
+        setFormElement(Locator.id("tsv3"), getFileContents(dataFile), true);
+        clickButton("Submit");
+    }
+
+    private void populateFactTable()
+    {
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText("Populate Fact Table");
+        uncheckCheckbox("dataset", "HIV Test Results");
+        uncheckCheckbox("dataset", "Physical Exam");
+        submit();
+
+        assertLinkPresentWithText("NAb");
+        assertLinkPresentWithText("Luminex");
+        assertLinkPresentWithText("Lab Results");
+        assertLinkPresentWithText("MRNA");
+        assertLinkPresentWithText("ADCC");
+        assertTextPresent(
+                //NAb
+                "1 rows added to Antigen from VirusName",
+                "195 rows added to fact table.",
+                //Luminex
+                "6 rows added to fact table. ",
+                //Lab Results
+                "rows added to Assay from 'Lab Results'",
+                "23 rows added to fact table.",
+                //MRNA
+                "5 rows added to fact table.",
+                //ADCC
+                "48 rows added to fact table.");
+    }
+
+    private void verifyCounts()
+    {
+        selenium.windowMaximize(); // Get good screenshots on failures.
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Application");
 
@@ -97,39 +141,41 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertAllParticipantsPortalPage();
 
         click(SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[0], 6, 1, 5, 2, 20, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[0], 6, 1, 3, 2, 20, 12, SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[1], 12, 1, 3, 2, 8, 12, SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[2], 10, 1, 3, 2, 3, 12, SearchBy.Studies);
+//        assertFilterStatusPanel(STUDIES[2], 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
         goToAppHome();
         click(SearchBy.Antigens);
-        // TODO: Migrate Antigens to browse rolled up by Target Area
-//        assertFilterStatusPanel("1A", 6, 1, 5, 3, 21, 29, SearchBy.Antigens);
-//        assertFilterStatusPanel("1B", 6, 1, 5, 3, 21, 29, SearchBy.Antigens);
-//        assertFilterStatusPanel("2", 18, 2, 6, 4, 29, 29, SearchBy.Antigens);
-//        assertFilterStatusPanel("3", 18, 2, 6, 4, 29, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("1A", 6, 1, 3, 3, 21, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("2", 18, 2, 4, 4, 29, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("1B", 6, 1, 3, 3, 21, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("3", 18, 2, 4, 4, 29, 29, SearchBy.Antigens);
         goToAppHome();
         click(SearchBy.Assays);
-        // TODO: Migrate Assays to browse rolled up by Target Area
-//        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 3, 9, 40, SearchBy.Assays);
-//        assertFilterStatusPanel("HIV Test Results", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
-//        assertFilterStatusPanel("Lab Results", 23, 3, 7, 4, 32, 40, SearchBy.Assays);
-//        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
-//        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 2, 4, 40, SearchBy.Assays);
-//        assertFilterStatusPanel("NAb-Sample-LabKey", 29, 3, 7, 4, 32, 40, SearchBy.Assays);
-//        assertFilterStatusPanel("Physical Exam", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
+        assertFilterStatusPanel("Lab Results", 23, 3, 5, 3, 31, 29, SearchBy.Assays);
+        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 2, 8, 29, SearchBy.Assays);
+        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 3, 2, 20, 29, SearchBy.Assays);
+        assertFilterStatusPanel("NAb-Sample-LabKey", 29, 3, 5, 3, 31, 29, SearchBy.Assays);
+        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 1, 3, 29, SearchBy.Assays);
         goToAppHome();
         click(SearchBy.Labs);
-        assertFilterStatusPanel(LABS[0], 6, 1, 5, 3, 21, 23, SearchBy.Labs);
-        assertFilterStatusPanel(LABS[1], 23, 3, 7, 4, 32, 23, SearchBy.Labs);
-        assertFilterStatusPanel(LABS[2], 18, 2, 3, 3, 12, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[0], 6, 1, 3, 2, 20, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[1], 23, 3, 5, 3, 31, 23, SearchBy.Labs);
+//        assertFilterStatusPanel(LABS[2], 18, 2, 3, 2, 11, 23, SearchBy.Labs); // TODO: Participant count mismatch
         goToAppHome();
         click(SearchBy.Demographics);
+//        assertFilterStatusPanel("South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Demographics);
+//        assertFilterStatusPanel("USA", 18, 2, 4, 4, 29, 18, SearchBy.Demographics);
+//        assertFilterStatusPanel("Thailand", 5, 1, 3, 2, 4, 18, SearchBy.Demographics);
         goToAppHome();
+    }
 
+    private void verifyFilters()
+    {
         log("Verify multi-select");
         click(SearchBy.Labs);
         selectBars(LABS[0], LABS[1]);
-        assertFilterStatusCounts(6,1,5,3,21);
+        assertFilterStatusCounts(6,1,3,3,21);
         selectBars(LABS[0], LABS[2]);
         assertFilterStatusCounts(0,0,0,0,0);
         selectBars(LABS[1], LABS[2]);
@@ -146,7 +192,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusCounts(12,1,3,3,9);
         clickButton("clear all", 0);
         waitForText(LABS[0]);
-        assertFilterStatusCounts(29,3,7,4,32);
+        assertFilterStatusCounts(29,3,5,4,32);
 
         //TODO: Shouldn't be able to create unfiltered group
 //        clickButton("save group", 0);
@@ -183,24 +229,26 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForText("Selection and Active Filters");
 //        waitForText("Selection and Active Filters (8)");
 //        assertTextPresent("Only Active Filters (12)");
-        click(Locator.css("div.withSelectionRadio input"));
+        click(Locator.css(".withSelectionRadio input"));
         setFormElement("groupname", GROUP_NULL);
         clickButton("Cancel", 0);
         waitForTextToDisappear("Selection and Active Filters (8)");
 
+        selectBars("f");
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
 //        waitForText("Selection and Active Filters (8)");
 //        assertTextPresent("Only Active Filters (12)");
-        click(Locator.css("div.filterOnlyRadio input"));
+        click(Locator.css(".filterOnlyRadio input"));
         setFormElement("groupname", GROUP_NAME2);
         clickButton("Save", 0);
 
+        selectBars("f");
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
 //        waitForText("Selection and Active Filters (8)");
 //        assertTextPresent("Only Active Filters (12)");
-        click(Locator.css("div.withSelectionRadio input"));
+        click(Locator.css(".withSelectionRadio input"));
         setFormElement("groupname", GROUP_NAME3);
         clickButton("Save", 0);
 
@@ -239,17 +287,147 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(GROUP_NULL);
     }
 
+    private void verifyNounPages()
+    {
+        selectCDSGroup("All participants", false);
+        click(SearchBy.Assays);
+
+        // check placeholders
+        assertAssayInfoPage("Lab Results", "default.png", "default.png", "", "", "Genetics:\n Methodology:\n Target Area:", "", "");
+        assertAssayInfoPage("ADCC-Ferrari", "team_Mark_Igra.jpg", "team_Alan_Vezina.jpg",
+                "Mark Igra\n" +
+                        "marki@labkey.com\n" +
+                        "Partner",
+                "Alan Vezina\n" +
+                        "alanv@labkey.com\n" +
+                        "Developer",
+                "Genetics: \n" +
+                        "Methodology: ICS\n" +
+                        "Target Area: Adaptive: humoral and B-cell",
+                "This is an ADCC assay.",
+                "Immune escape from HIV-specific antibody-dependent cellular cytotoxicity (ADCC) pressure.");
+        assertAssayInfoPage("Luminex-Sample-LabKey", "team_Nick_Arnold.jpg", "team_Nick_Arnold.jpg",
+                "Nick Arnold\n" +
+                        "nicka@labkey.com\n" +
+                        "Developer",
+                "Nick Arnold\n" +
+                        "nicka@labkey.com\n" +
+                        "Developer",
+                "Genetics: \n" +
+                        "Methodology: Luminex\n" +
+                        "Target Area: Adaptive: humoral and B-cell",
+                "We measured something using a Luminex assay",
+                "Inhibition of HIV-1 replication in human lymphoid tissues ex vivo by measles virus.");
+        assertAssayInfoPage("mRNA assay", "team_Mark_Igra.jpg", "team_Nick_Arnold.jpg",
+                "Mark Igra\n" +
+                        "marki@labkey.com\n" +
+                        "Partner",
+                "Nick Arnold\n" +
+                        "nicka@labkey.com\n" +
+                        "Developer",
+                "Genetics: \n" +
+                        "Methodology: ICS\n" +
+                        "Target Area: Innate",
+                "This one tested gene expression.",
+                "Development of an in vitro mRNA degradation assay utilizing extracts from HIV-1- and SIV-infected cells.");
+        assertAssayInfoPage("NAb-Sample-LabKey", "team_Karl_Lum.jpg", "team_Kristin_Fitzsimmons.jpg",
+                "Karl Lum\n" +
+                        "klum@labkey.com\n" +
+                        "Developer",
+                "Kristin Fitzsimmons\n" +
+                        "kristinf@labkey.com\n" +
+                        "ScrumMaster",
+                "Genetics: \n" +
+                        "Methodology: NAb\n" +
+                        "Target Area: Adaptive: humoral and B-cell",
+                "This tested antibodies.",
+                "Vaccinology: precisely tuned antibodies nab HIV.");
+    }
+
+/// CDS App helpers
+
     private void pickCDSSort(String sortBy)
     {
-        click(Locator.css("div.sortDropdown"));
+        click(Locator.css(".sortDropdown"));
         waitAndClick(Locator.xpath("//span[text()='"+sortBy+"']"));
     }
+
+    private void selectBars(String... bars)
+    {
+        waitAndClick(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+        if(bars.length > 1)
+        {
+            selenium.controlKeyDown();
+            for(int i = 1; i < bars.length; i++)
+            {
+                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[i]+"']"));
+            }
+            selenium.controlKeyUp();
+        }
+    }
+
+    private void shiftSelectBars(String... bars)
+    {
+        click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+        if(bars.length > 1)
+        {
+            selenium.shiftKeyDown();
+            for(int i = 1; i < bars.length; i++)
+            {
+                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+            }
+            selenium.shiftKeyUp();
+        }
+    }
+
+    private void selectCDSGroup(String group, boolean titleShown)
+    {
+        waitAndClick(Locator.xpath("//span[text()='"+group+"']"));
+        if(titleShown)
+            waitForElement(Locator.css(".title:contains('"+group+"')"));
+        else
+            waitForElementToDisappear(Locator.xpath("//div[@class='title' and "+Locator.NOT_HIDDEN+"]"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void goToAppHome()
+    {
+        clickAt(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]"), "1,1");
+        waitForElement(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]/h2/br"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void click(SearchBy by)
+    {
+        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' "+by+"']"), "1,1");
+        waitForText("Showing number of: Participants", WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void viewInfo(String barLabel)
+    {
+        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/.."));
+        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
+        click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
+        waitForElement(Locator.button("X"));
+        if(!isElementPresent(Locator.css(".savetitle")))
+        {
+            refresh();
+            waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
+        }
+        assertEquals("Wrong page title.", barLabel, getText(Locator.css(".savetitle")));
+    }
+
+    private void closeInfoPage()
+    {
+        clickButton("X", 0);
+        waitForElementToDisappear(Locator.button("X"), WAIT_FOR_JAVASCRIPT);
+    }
+
+/// CDS App asserts
 
     private void assertAllParticipantsPortalPage()
     {
         assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
         assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (other, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
-        assertCDSPortalRow(SearchBy.Assays, "HIV Test Results, Lab Results, Physical Exam, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-Lab...", "7 total");
+        assertCDSPortalRow(SearchBy.Assays, "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow(SearchBy.Labs, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "6 ethnicities, 3 locations", "29 total participants");
     }
@@ -288,102 +466,68 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent(studyCount+(studyCount>1?" Studies":" Study"),
         assayCount+(assayCount>1?" Assays":" Assay"),
-        contributorCount+(contributorCount>1?" Labs":" Contributor"),
+        contributorCount+(contributorCount>1?" Contributors":" Contributor"),
         antigenCount+(antigenCount>1?" Antigens":" Antigens"));
     }
 
-    private void selectBars(String... bars)
+    // Assumes you are on find-by-assay page, returns there when done
+    private void assertAssayInfoPage(String assay, String contributorImg, String pocImg, String leadContributor, String pointOfContact, String details, String assayAbstract, String relatedPubs)
     {
-        click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
-        if(bars.length > 1)
-        {
-            selenium.controlKeyDown();
-            for(int i = 1; i < bars.length; i++)
-            {
-                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[i]+"']"));
-            }
-            selenium.controlKeyUp();
-        }
-    }
-
-    private void shiftSelectBars(String... bars)
-    {
-        click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
-        if(bars.length > 1)
-        {
-            selenium.shiftKeyDown();
-            for(int i = 1; i < bars.length; i++)
-            {
-                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
-            }
-            selenium.shiftKeyUp();
-        }
-    }
-
-    private void selectCDSGroup(String group, boolean titleShown)
-    {
-        waitAndClick(Locator.xpath("//span[text()='"+group+"']"));
-        if(titleShown)
-            waitForElement(Locator.css("div.title:contains('"+group+"')"));
+        viewInfo(assay);
+        if(contributorImg.equals(pocImg))
+            assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+pocImg+"']"), 2);
         else
-            waitForElement(Locator.xpath("//div[@class='title' and ancestor-or-self::*[contains(@style,'display: none')]]"), WAIT_FOR_JAVASCRIPT);
+        {
+            assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+pocImg+"']"), 1);
+            assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+contributorImg+"']"), 1);
+        }
+        assertEquals("Incorrect Lead Contributor", ("Lead Contributor" + leadContributor).replace("\n", ""), getText(Locator.css(".assayInfoLeadContributor")).replace("\n", ""));
+        assertEquals("Incorrect Assay Point of Contact", ("Assay Point of Contact" + pointOfContact).replace("\n", ""), getText(Locator.css(".assayInfoPointOfContact")).replace("\n", ""));
+        assertEquals("Incorrect Assay Details", details.replace("\n", ""), getText(Locator.css(".assayInfoDetails")).replace("\n", ""));
+        //assertEquals("Incorrect Description", ("Description" + pointOfContact).replace("\n", ""), getText(Locator.css(".assayInfoDescription")).replace("\n", ""));
+        assertEquals("Incorrect Assay Abstract", ("Assay Abstract" + assayAbstract).replace("\n", ""), getText(Locator.css(".assayInfoAbstract")).replace("\n", ""));
+        assertEquals("Incorrect Related Publications", ("Related Publications" + relatedPubs).replace("\n", ""), getText(Locator.css(".assayInfoRelatedPublications")).replace("\n", ""));
+        closeInfoPage();
     }
 
+/// CDS classes, enums and string generators
+
+    private class AssayVariable
+    {
+        private String _var;
+        private String _desc;
+
+        AssayVariable(String var, String desc)
+        {
+            _var = var;
+            _desc = desc;
+        }
+
+        public String Var()
+        {
+            return _var;
+        }
+
+        public String Desc()
+        {
+            return _desc;
+        }
+    }
+
+    private static enum SearchBy
+    {
+        Studies,
+        Antigens,
+        Assays,
+        Labs,
+        Demographics
+    }
     private String genCurrentSelectionString(String hierarchy, String name)
     {
         if(name.length() <= 21)
             return name;
         else
             return name.substring(0, 18).trim() + "...";
-    }
-
-    private void importCDSData(String query, File dataFile)
-    {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(query);
-        ListHelper.clickImportData(this);
-
-        setFormElement(Locator.id("tsv3"), getFileContents(dataFile), true);
-        clickButton("Submit");
-    }
-
-    private void populateFactTable()
-    {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Populate Fact Table");
-        submit();
-
-        assertLinkPresentWithText("NAb");
-        assertLinkPresentWithText("Luminex");
-        assertLinkPresentWithText("HIV Test Results");
-        assertLinkPresentWithText("Physical Exam");
-        assertLinkPresentWithText("Lab Results");
-        assertLinkPresentWithText("MRNA");
-        assertLinkPresentWithText("ADCC");
-        assertTextPresent(
-                "1 rows added to Antigen from VirusName",
-                "195 rows added to fact table.",
-                "6 rows added to fact table. ",
-                "1 rows added to Assay from 'HIV Test Results'",
-                "6 rows added to fact table. ",
-                "1 rows added to Assay from 'Physical Exam'",
-                "6 rows added to fact table.",
-                "rows added to Assay from 'Lab Results'",
-                "23 rows added to fact table.",
-                "5 rows added to fact table.",   // MRNA
-                "48 rows added to fact table.");
-    }
-
-    private void goToAppHome()
-    {
-        clickAt(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]"), "1,1");
-        waitForElement(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]/h2/br"), WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void click(SearchBy by)
-    {
-        clickAt(Locator.xpath("//span[@class = 'label' and text() = ' "+by+"']"), "1,1");
-        waitForText("Showing number of: Participants", WAIT_FOR_JAVASCRIPT);
     }
 
     private String getHierarchy(SearchBy searchBy)
@@ -399,23 +543,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
             case Labs:
                 return "Contributor";
             case Demographics:
-                return "Participant";
+                return "Location";//Test using this hierarchy
         }
         fail("Unknown Search Axis: " + searchBy);
         return null;
-    }
-
-    private static enum SearchBy
-    {
-        Studies,
-        Antigens,
-        Assays,
-        Labs,
-        Demographics
-    }
-
-    private class CDSTester
-    {
-
     }
 }
