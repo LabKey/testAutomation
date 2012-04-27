@@ -71,6 +71,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         createProject(PROJECT_NAME, "Study");
         importStudyFromZip(STUDY_ZIP.getPath());
         enableModule(PROJECT_NAME, "CDS");
+        addWebPart("CDS Management");
 
         importCDSData("Antigens", new File(getSampledataPath(), "CDS/antigens.tsv"));
         importCDSData("Assays", new File(getSampledataPath(), "CDS/assays.tsv"));
@@ -88,8 +89,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
 //        selenium.windowMaximize(); // Count bars don't render properly when hidden.
         clickLinkWithText(PROJECT_NAME);
-        goToModule("CDS");
-
         clickLinkWithText("Application");
 
         assertLinkNotPresentWithText("Home");
@@ -98,35 +97,37 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertAllParticipantsPortalPage();
 
         click(SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[0], 6, 1, 5, 3, 21, 12, SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[1], 12, 1, 3, 3, 9, 12, SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[2], 11, 1, 3, 3, 4, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[0], 6, 1, 5, 2, 20, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[1], 12, 1, 3, 2, 8, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[2], 10, 1, 3, 2, 3, 12, SearchBy.Studies);
         goToAppHome();
-        click(SearchBy.Antigen);
-        assertFilterStatusPanel("1A", 6, 1, 5, 3, 21, 29, SearchBy.Antigen);
-        assertFilterStatusPanel("2", 18, 2, 6, 4, 29, 29, SearchBy.Antigen);
-        assertFilterStatusPanel("1B", 6, 1, 5, 3, 21, 29, SearchBy.Antigen);
-        assertFilterStatusPanel("3", 18, 2, 6, 4, 29, 29, SearchBy.Antigen);
+        click(SearchBy.Antigens);
+        // TODO: Migrate Antigens to browse rolled up by Target Area
+//        assertFilterStatusPanel("1A", 6, 1, 5, 3, 21, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("1B", 6, 1, 5, 3, 21, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("2", 18, 2, 6, 4, 29, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("3", 18, 2, 6, 4, 29, 29, SearchBy.Antigens);
         goToAppHome();
         click(SearchBy.Assays);
-        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 3, 9, 40, SearchBy.Assays);
-        assertFilterStatusPanel("HIV Test Results", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
-        assertFilterStatusPanel("Lab Results", 23, 3, 7, 4, 32, 40, SearchBy.Assays);
-        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
-        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 2, 4, 40, SearchBy.Assays);
-        assertFilterStatusPanel("NAb-Sample-LabKey", 29, 3, 7, 4, 32, 40, SearchBy.Assays);
-        assertFilterStatusPanel("Physical Exam", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
+        // TODO: Migrate Assays to browse rolled up by Target Area
+//        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 3, 9, 40, SearchBy.Assays);
+//        assertFilterStatusPanel("HIV Test Results", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
+//        assertFilterStatusPanel("Lab Results", 23, 3, 7, 4, 32, 40, SearchBy.Assays);
+//        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
+//        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 2, 4, 40, SearchBy.Assays);
+//        assertFilterStatusPanel("NAb-Sample-LabKey", 29, 3, 7, 4, 32, 40, SearchBy.Assays);
+//        assertFilterStatusPanel("Physical Exam", 6, 1, 5, 3, 21, 40, SearchBy.Assays);
         goToAppHome();
-        click(SearchBy.Contributors);
-        assertFilterStatusPanel(LABS[0], 6, 1, 5, 3, 21, 23, SearchBy.Contributors);
-        assertFilterStatusPanel(LABS[1], 23, 3, 7, 4, 32, 23, SearchBy.Contributors);
-        assertFilterStatusPanel(LABS[2], 18, 2, 3, 3, 12, 23, SearchBy.Contributors);
+        click(SearchBy.Labs);
+        assertFilterStatusPanel(LABS[0], 6, 1, 5, 3, 21, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[1], 23, 3, 7, 4, 32, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[2], 18, 2, 3, 3, 12, 23, SearchBy.Labs);
         goToAppHome();
         click(SearchBy.Demographics);
         goToAppHome();
 
         log("Verify multi-select");
-        click(SearchBy.Contributors);
+        click(SearchBy.Labs);
         selectBars(LABS[0], LABS[1]);
         assertFilterStatusCounts(6,1,5,3,21);
         selectBars(LABS[0], LABS[2]);
@@ -160,12 +161,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextPresent(GROUP_DESC);
 
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigen, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
+        assertCDSPortalRow(SearchBy.Antigens, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
         assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
-        assertCDSPortalRow(SearchBy.Contributors, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
 
-        click(SearchBy.Contributors);
+        click(SearchBy.Labs);
         assertFilterStatusCounts(12,1,3,3,9);
 
         goToAppHome();
@@ -210,12 +211,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(GROUP_DESC);
 
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigen, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
+        assertCDSPortalRow(SearchBy.Antigens, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
         assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
-        assertCDSPortalRow(SearchBy.Contributors, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
 
-        click(SearchBy.Contributors);
+        click(SearchBy.Labs);
         assertFilterStatusCounts(12,1,3,3,9);
 
         // saved filter including current selection (Gender: f)
@@ -225,12 +226,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextPresent("Gender:");
 
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigen, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
+        assertCDSPortalRow(SearchBy.Antigens, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
         assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
-        assertCDSPortalRow(SearchBy.Contributors, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "8 total participants");
 
-        click(SearchBy.Contributors);
+        click(SearchBy.Labs);
         assertFilterStatusCounts(8,1,3,3,9);
 
         // Group creation cancelled
@@ -247,10 +248,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void assertAllParticipantsPortalPage()
     {
         assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
-        assertCDSPortalRow(SearchBy.Antigen, "5 clades, 5 tiers, 5 sources (ccPBMC, Lung, Plasma, ucPBMC, other)", "32 total");
-        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, HIV Test Results, Lab Results, Fake Luminex data, mRNA assay, Fake NAb data,...", "7 total");
-        assertCDSPortalRow(SearchBy.Contributors, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab, other", "4 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "7 ethnicities, 4 locations", "29 total participants");
+        assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (other, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
+        assertCDSPortalRow(SearchBy.Assays, "HIV Test Results, Lab Results, Physical Exam, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-Lab...", "7 total");
+        assertCDSPortalRow(SearchBy.Labs, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
+        assertCDSPortalRow(SearchBy.Demographics, "6 ethnicities, 3 locations", "29 total participants");
     }
 
     private void assertCDSPortalRow(SearchBy by, String expectedDetail, String expectedTotal)
@@ -287,8 +288,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent(studyCount+(studyCount>1?" Studies":" Study"),
         assayCount+(assayCount>1?" Assays":" Assay"),
-        contributorCount+(contributorCount>1?" Contributors":" Contributor"),
-        antigenCount+(antigenCount>1?" Antigens":" Antigen"));
+        contributorCount+(contributorCount>1?" Labs":" Contributor"),
+        antigenCount+(antigenCount>1?" Antigens":" Antigens"));
     }
 
     private void selectBars(String... bars)
@@ -338,7 +339,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void importCDSData(String query, File dataFile)
     {
-        goToModule("CDS");
+        clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(query);
         ListHelper.clickImportData(this);
 
@@ -348,7 +349,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void populateFactTable()
     {
-        goToModule("CDS");
+        clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Populate Fact Table");
         submit();
 
@@ -391,11 +392,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         {
             case Studies:
                 return "Study";
-            case Antigen:
+            case Antigens:
                 return "Tier";
             case Assays:
                 return "Assay";
-            case Contributors:
+            case Labs:
                 return "Contributor";
             case Demographics:
                 return "Participant";
@@ -407,9 +408,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static enum SearchBy
     {
         Studies,
-        Antigen,
+        Antigens,
         Assays,
-        Contributors,
+        Labs,
         Demographics
     }
 
