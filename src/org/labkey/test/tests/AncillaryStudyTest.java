@@ -145,7 +145,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickNavButton("Next", 0);
         clickNavButton("Next", 0);
         checkRadioButton("autoRefresh", "false");
-        clickNavButton("Finish");
+        clickNavButton("Finish", WAIT_FOR_PAGE * 2);
     }
 
     @Override
