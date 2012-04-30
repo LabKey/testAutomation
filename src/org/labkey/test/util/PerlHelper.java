@@ -32,13 +32,13 @@ public class PerlHelper
         String perlHome = System.getenv("PERL_HOME");
         if (perlHome != null)
         {
-            test.log("PERL_HOME is set to: " + perlHome + " searching for the R application");
+            test.log("PERL_HOME is set to: " + perlHome + " searching for the Perl application");
             File perlHomeDir = new File(perlHome);
             FilenameFilter perlFilenameFilter = new FilenameFilter()
             {
                 public boolean accept(File dir, String name)
                 {
-                    return name.contains("perl.exe");
+                    return "perl.exe".equalsIgnoreCase(name) || "perl".equalsIgnoreCase(name);
                 }
             };
             File[] files = perlHomeDir.listFiles(perlFilenameFilter);
