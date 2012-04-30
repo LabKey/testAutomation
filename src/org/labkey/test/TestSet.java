@@ -131,7 +131,7 @@ public enum TestSet
         LibraTest.class,
         AncillaryStudyTest.class,
         FolderExportTest.class,
-//            GenotypingTest.class,
+        GenotypingTest.class,
         MissingValueIndicatorsTest.class,
         PipelineCancelTest.class,
         StudyExportTest.class,

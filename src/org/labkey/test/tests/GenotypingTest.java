@@ -21,6 +21,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * User: elvan
@@ -30,6 +31,8 @@ import java.io.File;
 public class GenotypingTest extends BaseSeleniumWebTest
 {
     public static final String importNum = "207";
+    public static final String illuminaImportNum = "208";
+
     String pipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     protected int runNum = 0; //this is globally unique, so we need to retrieve it every time.
     protected String checkboxId = ".select";
@@ -99,7 +102,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void configureAdmin()
     {
         clickLinkContainingText(getProjectName());
-        clickLinkContainingText("Admin", 2);
+        waitForPageToLoad();
+        clickLinkContainingText("Admin");
 
         String[] listVals = {"sequences", "runs", _libraryDesign};
         for(int i=0; i<3; i++)
@@ -128,18 +132,20 @@ public class GenotypingTest extends BaseSeleniumWebTest
         setUp2();
         clickLinkContainingText(getProjectName());
 
-        importRunTest();
-//        importRunAgainTest(); //bug Issue 13695
-        runAnalysisTest();
-        importSecondRunTest();
-        //To change body of implemented methods use File | Settings | File Templates.
+        importIlluminaRunTest();
+
+        //TODO: need to fix 454/genotyping tests
+//        importRunTest();
+////        importRunAgainTest(); //bug Issue 13695
+//        runAnalysisTest();
+//        importSecondRunTest();
 
     }
 
     private void importSecondRunTest()
     {
         goToProjectHome();
-        startImportRun("secondRead/reads.txt");
+        startImportRun("secondRead/reads.txt", "Import Reads");
         waitForPipelineJobsToComplete(4, "Import reads for 206", true);
         clickLinkWithText("COMPLETE");
         clickButton("Data");
@@ -151,7 +157,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         log("verify we can't import the same run twice");
         goToProjectHome();
-        startImportRun("reads.txt");
+        startImportRun("reads.txt", "Import Reads");
 //        assertTextNotPresent("ERROR");
         waitForText("ERROR");
 
@@ -344,10 +350,25 @@ public class GenotypingTest extends BaseSeleniumWebTest
         runNum = i;
     }
 
+    private void importIlluminaRunTest()
+    {
+        log("import illumina run");
+        startImportIlluminaRun("IlluminaSamples.csv", "Import Illumina Reads");
+        waitForPipelineJobsToComplete(1, "Import Run", false);
+        assertTextNotPresent("IMPORT");
+        assertTextNotPresent("ERROR");
+
+        goToProjectHome();
+        clickLinkWithText("View Runs");
+        clickLinkWithText(illuminaImportNum);
+
+        verifyIlluminaSamples();
+    }
+
     private void importRunTest()
     {
         log("import genotyping run");
-        startImportRun("reads.txt");
+        startImportRun("reads.txt", "Import Reads");
         //TODO:  isn't there a helper for this?
        waitForPipelineJobsToComplete(1, "Import Run", false);
         assertTextNotPresent("IMPORT");
@@ -360,6 +381,24 @@ public class GenotypingTest extends BaseSeleniumWebTest
         verifySamples();
 
 
+    }
+
+    private class OutputFilter implements FilenameFilter
+    {
+        public boolean accept(File dir, String name)
+        {
+            return name.startsWith("IlluminaSamples-");
+        }
+    }
+    private void verifyIlluminaSamples()
+    {
+        File dir = new File(pipelineLoc);
+        FilenameFilter filter = new OutputFilter();
+        File[] files = dir.listFiles(filter);
+
+        assertEquals(30, files.length);
+        DataRegionTable d = new DataRegionTable("Reads", this);
+        assertEquals(d.getDataRowCount(), 30);
     }
 
     private void verifySamples()
@@ -376,12 +415,26 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     }
 
-    private void startImportRun(String file)
+    private void startImportRun(String file, String importAction)
     {
         clickLinkContainingText("Import Run");
         ExtHelper.selectFileBrowserItem(this, file);
 
-         selectImportDataAction("Import Reads");
+        selectImportDataAction(importAction);
+        clickButton("Import Reads");
+
+    }
+
+    private void startImportIlluminaRun(String file, String importAction)
+    {
+        clickLinkContainingText("Import Run");
+        ExtHelper.selectFileBrowserItem(this, file);
+
+        selectImportDataAction(importAction);
+
+        //TODO: set run ID to 208
+        setFormElement("run", "208");
+        setFormElement("prefix", "Illumina-");
         clickButton("Import Reads");
 
     }
@@ -403,7 +456,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 //                getConfirmationAndWait();
 //            }
 //        }
-            deleteProject(getProjectName());
+        deleteProject(getProjectName());
         File dir = new File(pipelineLoc);
         File[] files = dir.listFiles();
         for(File file: files)
@@ -412,14 +465,19 @@ public class GenotypingTest extends BaseSeleniumWebTest
                 deleteDir(file);
             if(file.getName().startsWith("import_reads_"))
                 file.delete();
+            if(file.getName().startsWith("IlluminaSamples-"))
+                file.delete();
         }
 
-        files = new File(pipelineLoc + "/secondaryRead").listFiles();
+        files = new File(pipelineLoc + "/secondRead").listFiles();
 
-        for(File file: files)
+        if(files != null)
         {
-            if(!file.getName().equals("reads.txt"))
-                file.delete();
+            for(File file: files)
+            {
+                if(!file.getName().equals("reads.txt"))
+                    file.delete();
+            }
         }
 
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + getRunNumber()));
