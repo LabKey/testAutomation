@@ -130,10 +130,12 @@ public abstract class StudyBaseTest extends SimpleApiTest
                 log("WARNING: couldn't delete log file " + f.getAbsolutePath());
     }
 
-    protected void importStudy()
+    protected void importStudy(){importStudy(null);}
+
+    protected void importStudy(String pipelinePath)
     {
         initializeFolder();
-        initializePipeline();
+        initializePipeline(pipelinePath);
 
         // Start importing study.xml to create the study and load all the datasets.  We'll wait for this import to
         // complete before doing any further tests.
@@ -169,6 +171,13 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     private void initializePipeline()
     {
+        initializePipeline(null);
+    }
+    private void initializePipeline(String pipelinePath)
+    {
+        if(pipelinePath==null)
+            pipelinePath = getPipelinePath();
+
         clickAdminMenuItem("Folder", "Management");
         clickLinkWithText("Folder Type");
         toggleCheckboxByTitle("Pipeline");
@@ -181,7 +190,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         // in IE testing
         selenium.runScript("LABKEY.disablePipelineRefresh = true;");
         waitAndClickNavButton("Setup");
-        setPipelineRoot(getPipelinePath());
+        setPipelineRoot(pipelinePath);
     }
 
     // Must be on study home page or "manage study" page
