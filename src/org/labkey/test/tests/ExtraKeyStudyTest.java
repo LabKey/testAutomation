@@ -18,18 +18,10 @@ public class ExtraKeyStudyTest extends StudyBaseTest
     @Override
     protected void doCreateSteps()
     {
-        /*
         initializeFolder();
         initializePipeline();
 
         importFolderFromPipeline(studyFolder);
-        */
-    }
-
-    @Override
-    protected void doCleanup() throws Exception
-    {
-        //super.doCleanup();
     }
 
     @Override
