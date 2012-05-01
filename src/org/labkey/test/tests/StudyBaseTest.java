@@ -169,11 +169,12 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickNavButton("Delete", WAIT_FOR_PAGE);
     }
 
-    private void initializePipeline()
+    protected void initializePipeline()
     {
         initializePipeline(null);
     }
-    private void initializePipeline(String pipelinePath)
+    
+    protected void initializePipeline(String pipelinePath)
     {
         if(pipelinePath==null)
             pipelinePath = getPipelinePath();

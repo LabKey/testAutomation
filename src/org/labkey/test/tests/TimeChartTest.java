@@ -236,20 +236,6 @@ public class TimeChartTest extends StudyBaseTest
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 
-    private void initializePipeline()
-    {
-        clickAdminMenuItem("Folder", "Management");
-        clickLinkWithText("Folder Type");
-        toggleCheckboxByTitle("Pipeline");
-        submit();
-        addWebPart("Data Pipeline");
-        // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
-        // in IE testing
-        selenium.runScript("LABKEY.disablePipelineRefresh = true;");
-        waitAndClickNavButton("Setup");
-        setPipelineRoot(getLabKeyRoot() + SAMPLE_DATA_PATH);
-    }
-
     protected File[] getTestFiles()
     {
         return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/timechart-api.xml")};

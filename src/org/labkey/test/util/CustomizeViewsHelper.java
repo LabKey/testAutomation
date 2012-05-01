@@ -145,7 +145,7 @@ public class CustomizeViewsHelper
      * expand customize view menu to all but the last of fieldKeyParts
      * @param test
      * @param fieldKeyParts
-     * @return
+     * @return A Locator for the &lt;div&gt; item in the "Available Fields" column tree.
      */
     private static Locator expandPivots(BaseSeleniumWebTest test, String[] fieldKeyParts)
     {
@@ -162,7 +162,7 @@ public class CustomizeViewsHelper
             nodePath += "/";
         }
 
-        return Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(fieldKey) + "]/input[@type='checkbox']");
+        return Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(fieldKey) + "]");
     }
 
     private static void addCustomizeViewItem(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, ViewItemType type)
@@ -172,11 +172,9 @@ public class CustomizeViewsHelper
 
         changeTab(test, type);
 
-//        String fieldKey = StringUtils.join(fieldKeyParts, "/");
-//        String nodePath = "";
-
         // Expand all nodes necessary to reveal the desired node.
-        Locator checkbox = expandPivots(test, fieldKeyParts);
+        Locator columnItem = expandPivots(test, fieldKeyParts);
+        Locator checkbox = Locator.xpath(columnItem.toXpath() + "/input[@type='checkbox']");
 
         test.checkCheckbox(checkbox);
     }
@@ -573,9 +571,47 @@ public class CustomizeViewsHelper
         ExtHelper.clickExtButton(test, "Save");
     }
 
+    /** Check that a column is present. */
     public static boolean isColumnPresent(BaseSeleniumWebTest test, String fieldKey)
     {
-        Locator checkbox = expandPivots(test,fieldKey.split("/"));
-        return test.isElementPresent(checkbox);
+        Locator columnItem = expandPivots(test,fieldKey.split("/"));
+        return test.isElementPresent(columnItem);
     }
+
+    /** Check that a column is present and is not selectable. */
+    public static boolean isColumnUnselectable(BaseSeleniumWebTest test, String fieldKey)
+    {
+        Locator columnItem = expandPivots(test,fieldKey.split("/"));
+        return test.isElementPresent(columnItem) && "on".equals(test.getAttribute(columnItem, "unselectable"));
+    }
+
+    /** Check that a column is present and not hidden. Assumes that the 'show hidden columns' is unchecked. */
+    public static boolean isColumnVisible(BaseSeleniumWebTest test, String fieldKey)
+    {
+        return isColumnHidden(test, fieldKey, false);
+    }
+
+    /** Check that a column is present and is hidden. Assumes that the 'show hidden columns' is unchecked. */
+    public static boolean isColumnHidden(BaseSeleniumWebTest test, String fieldKey)
+    {
+        return isColumnHidden(test, fieldKey, true);
+    }
+
+    private static boolean isColumnHidden(BaseSeleniumWebTest test, String fieldKey, boolean hidden)
+    {
+        Locator columnItem = expandPivots(test,fieldKey.split("/"));
+        if (!test.isElementPresent(columnItem))
+            return false;
+
+        // back up the DOM one element to find the <li> node
+        Locator li = Locator.xpath(columnItem.toXpath() + "/..");
+        String liStyle = test.getAttribute(li, "style");
+        test.log("Column '" + li.toString() + "' style attribute: " + liStyle);
+
+        if (hidden)
+            return liStyle.contains("display: none");
+        else
+            return !liStyle.contains("display: none");
+    }
+
 }

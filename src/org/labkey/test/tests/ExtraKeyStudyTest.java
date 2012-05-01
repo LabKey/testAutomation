@@ -13,18 +13,30 @@ import org.labkey.test.util.CustomizeViewsHelper;
 public class ExtraKeyStudyTest extends StudyBaseTest
 {
 
-    static String studyDataPath = "/sampledata/study/ExtraKeyStudy/study";
+    static String studyFolder = "/ExtraKeyStudy/folder.xml";
 
     @Override
     protected void doCreateSteps()
     {
-        importStudy(getLabKeyRoot() + studyDataPath);
+        /*
+        initializeFolder();
+        initializePipeline();
+
+        importFolderFromPipeline(studyFolder);
+        */
+    }
+
+    @Override
+    protected void doCleanup() throws Exception
+    {
+        //super.doCleanup();
     }
 
     @Override
     protected void doVerifySteps()
     {
         log("TODO");
+        clickLinkContainingText(getProjectName());
         clickLinkContainingText(getFolderName());
         clickLinkContainingText("datasets");
         waitForTextWithRefresh("PVDouble_Two", defaultWaitForPage);
@@ -65,12 +77,21 @@ public class ExtraKeyStudyTest extends StudyBaseTest
 
     private void verifyElements(boolean demoVisibile, boolean visitVisible, boolean extraKeyVisibile)
     {
-        assertTextNotPresent("Panda Visit");
+        // P lookup
+        assertTrue("PandaId/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaId/PandaId"));
+        assertTrue("PandaId/DataSet lookup should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaId/DataSet"));
+
+        // PV lookup
+        assertTrue("Panda Visit/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/PandaId"));
+        assertTrue("Panda Visit/Visit should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/Visit"));
+        assertTrue("Panda Visit/PV_One should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_One"));
+        assertTrue("Panda Visit/PV_Two should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_Two"));
+
+        // PVK lookup
         assertTextPresent("DataSets");
-        assertElementNotPresent(Locator.xpath("//div[a/span[text()='Panda Id']]/img[contains(@class, 'plus')]"));
-        assertEquals("Visibility of id only data sets what was expected", demoVisibile, CustomizeViewsHelper.isColumnPresent(this, "DataSets/P_Two"));
-        assertEquals("Visibility of id + visit data sets not what was expected", visitVisible, CustomizeViewsHelper.isColumnPresent(this, "DataSets/PV_Two"));
-        assertEquals("Visibility of id, visit, extra key data sets not what was expected", extraKeyVisibile, CustomizeViewsHelper.isColumnPresent(this, "DataSets/PVInt_Two"));
+        assertEquals("Visibility of id only data sets what was expected", demoVisibile, CustomizeViewsHelper.isColumnVisible(this, "DataSets/P_Two"));
+        assertEquals("Visibility of id + visit data sets not what was expected", visitVisible, CustomizeViewsHelper.isColumnVisible(this, "DataSets/PV_Two"));
+        assertEquals("Visibility of id, visit, extra key data sets not what was expected", extraKeyVisibile, CustomizeViewsHelper.isColumnVisible(this, "DataSets/PVInt_Two"));
         assertFalse("Visibility of discordant key data sets not what was expected", CustomizeViewsHelper.isColumnPresent(this, "DataSets/PVSInt_Two"));
 
     }
