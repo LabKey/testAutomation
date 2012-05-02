@@ -1005,6 +1005,7 @@ public class ReportTest extends StudyBaseTest
 
         clickButton("Respond");
         waitForPageToLoad();
+        waitForElement(Locator.id("body"));
         setFormElement("body", DISCUSSION_BODY_2);
         clickButton("Submit");
         waitForPageToLoad();
@@ -1013,6 +1014,7 @@ public class ReportTest extends StudyBaseTest
 
         clickLinkContainingText("edit");
         waitForPageToLoad();
+        waitForElement(Locator.id("body"));
         setFormElement("body", DISCUSSION_BODY_3);
         clickButton("Submit");
         waitForPageToLoad();
