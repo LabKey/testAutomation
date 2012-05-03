@@ -16,6 +16,8 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
+import org.labkey.test.util.RReportHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,6 +33,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
     String[] webParts = {"Study Overview", "Data Pipeline", "Specimens", "Views", "Study Data Tools", "List", "Report web part"};
     String dataDir = getSampledataPath() + "\\FolderExport";
     private String folderFromPipeplineZip = "Folder 2";
+    private String folderFromTemplateZip = "Folder From Template";
     String folderZip = "Sample.folder.zip"; //"Sample.folder.zip";
 
 
@@ -49,12 +52,20 @@ public class FolderExportTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
+        RReportHelper.ensureRConfig(this);
         createProject(getProjectName());
         
         verifyImportFromZip();
         verifyImportFromPipelineZip();
         //Issue 13881
         verifyImportFromPipelineExpanded();
+        verifyCreateFolderFromTemplate();
+    }
+
+    private void verifyCreateFolderFromTemplate()
+    {
+        createSubFolderFromTemplate(getProjectName(), folderFromTemplateZip, "/" + getProjectName() + "/" + folderFromZip, null);
+        verifyExpectedWebPartsPresent();
     }
 
     private void verifyImportFromPipelineZip()
@@ -71,7 +82,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
     private void verifyImportFromPipeline(String fileImport)
     {
 
-        createSubfolder(getProjectName(), folderFromPipeplineZip, null);
+         createSubfolder(getProjectName(), getProjectName(), folderFromPipeplineZip, "Collaboration", null);
         setPipelineRoot(dataDir);
         importFolderFromPipeline( "" + fileImport);
 
@@ -92,10 +103,14 @@ public class FolderExportTest extends BaseSeleniumWebTest
         verifyFolderImportAsExpected();
     }
 
-    private void verifyFolderImportAsExpected()
+    private void verifyExpectedWebPartsPresent()
     {
         assertTextPresentInThisOrder(webParts);
-        assertTextPresent("Test wikiTest wikiTest wiki");
+    }
+    private void verifyFolderImportAsExpected()
+    {
+        verifyExpectedWebPartsPresent();
+        assertTextPresent("Demo Study tracks data in 12 datasets over 26 time points. Data is present for 6 Participants", "Test wikiTest wikiTest wiki");
 
         log("Verify import of list");
         String listName = "safe list";
@@ -111,6 +126,15 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
         log("verify report present");
         assertTextPresent("pomegranate");
+
+        log("verify search settings as expected");
+        clickAdminMenuItem("Folder", "Management");
+        clickLinkContainingText("Search");
+        assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
+
+        log("verify folder type was overwritten on import");
+        clickLinkContainingText("Folder Type");
+        assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
     }
 
     @Override
