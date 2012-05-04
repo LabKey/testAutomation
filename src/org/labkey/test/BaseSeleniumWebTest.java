@@ -4868,7 +4868,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Impersonating group: " + group);
         goToHome();
         clickAdminMenuItem("Impersonate", "Group", (isSiteGroup ? "Site: " : "") + group);
+    }
 
+    public void impersonateRole(String role)
+    {
+        log("Impersonating role: " + role);
+        clickAdminMenuItem("Impersonate", "Role",  role);
+//        goToHome();
+
+    }
+
+    public void stopImpersonatingRole()
+    {
+       stopImpersonatingGroup();
     }
 
     public void stopImpersonatingGroup()
