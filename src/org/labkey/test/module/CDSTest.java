@@ -85,7 +85,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         populateFactTable();
 
         verifyCounts();
-        verifyFilters(); //TODO: Multi-select broken
+        verifyFilters();
         verifyNounPages();
     }
 
@@ -131,7 +131,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void verifyCounts()
     {
-        selenium.windowMaximize(); // Get good screenshots on failures.
+//        selenium.windowMaximize(); // Get good screenshots on failures.
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Application");
 
@@ -152,21 +152,22 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 //        assertFilterStatusPanel("3", 18, 2, 4, 4, 29, 29, SearchBy.Antigens);
         goToAppHome();
         click(SearchBy.Assays);
-        assertFilterStatusPanel("Lab Results", 23, 3, 5, 3, 31, 29, SearchBy.Assays);
-        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 2, 8, 29, SearchBy.Assays);
-        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 3, 2, 20, 29, SearchBy.Assays);
+        assertFilterStatusPanel("Lab Results", 23, 3, 5, 0, 0, 29, SearchBy.Assays);
+        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 1, 4, 29, SearchBy.Assays);
+        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 3, 1, 1, 29, SearchBy.Assays);
 //        assertFilterStatusPanel("NAb-Sample-LabKey", 29, 3, 5, 3, 31, 29, SearchBy.Assays); // TODO: Participant count mismatch
-        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 1, 3, 29, SearchBy.Assays);
+        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 1, 0, 0, SearchBy.Assays);
         goToAppHome();
         click(SearchBy.Labs);
-        assertFilterStatusPanel(LABS[0], 6, 1, 3, 2, 20, 23, SearchBy.Labs);
-        assertFilterStatusPanel(LABS[1], 23, 3, 5, 3, 31, 23, SearchBy.Labs);
-//        assertFilterStatusPanel(LABS[2], 18, 2, 3, 2, 11, 23, SearchBy.Labs); // TODO: Participant count mismatch
+        assertFilterStatusPanel(LABS[0], 6, 1, 1, 2, 1, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[1], 23, 3, 2, 3, 26, 23, SearchBy.Labs);
+//        assertFilterStatusPanel(LABS[2], 18, 2, 2, 2, 7, 23, SearchBy.Labs); // TODO: Participant count mismatch
         goToAppHome();
         click(SearchBy.Demographics);
-//        assertFilterStatusPanel("South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Demographics);
-//        assertFilterStatusPanel("USA", 18, 2, 4, 4, 29, 18, SearchBy.Demographics);
-//        assertFilterStatusPanel("Thailand", 5, 1, 3, 2, 4, 18, SearchBy.Demographics);
+        pickCDSSort("Country");
+        assertFilterStatusPanel("South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Demographics);
+        assertFilterStatusPanel("USA", 18, 2, 4, 3, 28, 18, SearchBy.Demographics);
+        assertFilterStatusPanel("Thailand", 5, 1, 3, 1, 3, 18, SearchBy.Demographics);
         goToAppHome();
     }
 
@@ -175,24 +176,24 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         log("Verify multi-select");
         click(SearchBy.Labs);
         selectBars(LABS[0], LABS[1]);
-        assertFilterStatusCounts(6,1,3,3,21);
+        assertFilterStatusCounts(6,1,0,2,0);
         selectBars(LABS[0], LABS[2]);
         assertFilterStatusCounts(0,0,0,0,0);
         selectBars(LABS[1], LABS[2]);
-        assertFilterStatusCounts(12,1,3,3,9);
-        clickButton("keep overlap", 0);
+        assertFilterStatusCounts(12,1,0,2,0);
+        clickButton("keep", 0);
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
-//        waitForText("Selection and Active Filters (6)");
-//        assertTextPresent("Only Active Filters (6)");
+        waitForText("Selection and Active Filters (12)");
+        assertTextPresent("Only Active Filters (29)");
         setFormElement("groupname", GROUP_NAME);
         setFormElement("groupdescription", GROUP_DESC);
         clickButton("Save", 0);
         waitForTextToDisappear(LABS[0]);
-        assertFilterStatusCounts(12,1,3,3,9);
-        clickButton("clear all", 0);
+        assertFilterStatusCounts(12,1,0,2,0);
+        clickButton("clear filters", 0);
         waitForText(LABS[0]);
-        assertFilterStatusCounts(29,3,5,4,32);
+        assertFilterStatusCounts(29,3,5,3,31);
 
         //TODO: Shouldn't be able to create unfiltered group
 //        clickButton("save group", 0);
@@ -202,24 +203,22 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 //        clickButton("Save", 0);
 
         goToAppHome();
-//        refresh(); // TODO: Remove, shouldn't require a refresh for group to show up.
         selectCDSGroup(GROUP_NAME, true);
         assertTextPresent(GROUP_DESC);
 
-//        assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-//        assertCDSPortalRow(SearchBy.Antigens, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
-//        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
-//        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
-//        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
+        assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
+        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Other)", "0 total");
+        assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
+        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
+        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
 
         click(SearchBy.Labs);
-        assertFilterStatusCounts(12,1,3,3,9);
+        assertFilterStatusCounts(12,1,0,2,0);
 
         goToAppHome();
         selectCDSGroup("All participants", false);
         assertAllParticipantsPortalPage();
 
-/* TODO: Change this. Can't filter by gender anymore. 
         //test more group saving
         selectCDSGroup(GROUP_NAME, true);
         click(SearchBy.Demographics);
@@ -228,8 +227,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
-//        waitForText("Selection and Active Filters (8)");
-//        assertTextPresent("Only Active Filters (12)");
+        waitForText("Selection and Active Filters (8)");
+        assertTextPresent("Only Active Filters (12)");
         click(Locator.css(".withSelectionRadio input"));
         setFormElement("groupname", GROUP_NULL);
         clickButton("Cancel", 0);
@@ -238,8 +237,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectBars("f");
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
-//        waitForText("Selection and Active Filters (8)");
-//        assertTextPresent("Only Active Filters (12)");
+        waitForText("Selection and Active Filters (8)");
+        assertTextPresent("Only Active Filters (12)");
         click(Locator.css(".filterOnlyRadio input"));
         setFormElement("groupname", GROUP_NAME2);
         clickButton("Save", 0);
@@ -247,26 +246,26 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectBars("f");
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
-//        waitForText("Selection and Active Filters (8)");
-//        assertTextPresent("Only Active Filters (12)");
+        waitForText("Selection and Active Filters (8)");
+        assertTextPresent("Only Active Filters (12)");
         click(Locator.css(".withSelectionRadio input"));
         setFormElement("groupname", GROUP_NAME3);
         clickButton("Save", 0);
 
         // saved filter without including current selection (should be the same as initial group)
         goToAppHome();
-        refresh(); // TODO: Remove, shouldn't require a refresh for group to show up.
         selectCDSGroup(GROUP_NAME2, true);
         assertTextNotPresent(GROUP_DESC);
 
+        refresh();//TODO: doubled up portal row. Refresh to eliminate
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigens, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
-        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
-        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Other)", "0 total");
+        assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
+        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
 
         click(SearchBy.Labs);
-        assertFilterStatusCounts(12,1,3,3,9);
+        assertFilterStatusCounts(12,1,0,2,0);
 
         // saved filter including current selection (Gender: f)
         goToAppHome();
@@ -275,18 +274,17 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextPresent("Gender:");
 
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigens, "3 clades, 3 tiers, 3 sources (ccPBMC, Lung, other)", "9 total");
-        assertCDSPortalRow(SearchBy.Assays, "Fake ADCC data, Lab Results, Fake NAb data", "3 total");
-        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab, other", "3 total labs");
+        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Other)", "0 total");
+        assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
+        assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "8 total participants");
 
         click(SearchBy.Labs);
-        assertFilterStatusCounts(8,1,3,3,9);
+        assertFilterStatusCounts(8,1,0,2,0);
 
         // Group creation cancelled
         goToAppHome();
         assertTextNotPresent(GROUP_NULL);
-*/
     }
 
     private void verifyNounPages()
@@ -428,7 +426,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void assertAllParticipantsPortalPage()
     {
         assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
-        assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (other, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
+        assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (Other, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
         assertCDSPortalRow(SearchBy.Assays, "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow(SearchBy.Labs, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "6 ethnicities, 3 locations", "29 total participants");
@@ -466,11 +464,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void assertFilterStatusCounts(int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount)
     {
         waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
-//TODO: 14810: Filter status-panel counts are wrong
-//        assertTextPresent(studyCount+(studyCount>1?" Studies":" Study"),
-//        assayCount+(assayCount>1?" Assays":" Assay"),
-//        contributorCount+(contributorCount>1?" Contributors":" Contributor"),
-//        antigenCount+(antigenCount>1?" Antigens":" Antigens"));
+        assertTextPresent(studyCount+(studyCount!=1?" Studies":" Study"),
+        assayCount+(assayCount!=1?" Assays":" Assay"),
+        contributorCount+(contributorCount!=1?" Contributors":" Contributor"),
+        antigenCount+(antigenCount!=1?" Antigens":" Antigen"));
     }
 
     // Assumes you are on find-by-assay page, returns there when done
