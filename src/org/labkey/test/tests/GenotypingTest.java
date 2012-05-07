@@ -38,8 +38,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
     protected String checkboxId = ".select";
 //    private String expectedAnalysisCount = "1 - 61 of 61";
 
-        DataRegionTable drt = null;
-    private String _libraryDesign = "libraryDesign";
+    DataRegionTable drt = null;
+    private String samples = "libraryDesign";
 
     @Override
     protected String getProjectName()
@@ -74,24 +74,13 @@ public class GenotypingTest extends BaseSeleniumWebTest
         clickLinkContainingText(getProjectName());
         clickLinkContainingText("manage lists");
 
-//        ListHelper.createListFromFile(this, getProjectName(), "sequences", new File(pipelineLoc + "\\" +  "Sequences.tsv"));
-//        clickLinkContainingText(getProjectName());
-//        clickLinkContainingText("manage lists");
-
         clickButton("Import List Archive");
 //        sleep(500);
         setFormElement("listZip", new File(pipelineLoc, "gs_archive.lists.zip"));
         clickButton("Import List Archive");
 
-
-        //get the second list set
-        //TODO:  integrate these, or at least label the second one better
-//        clickButton("Import List Archive");
-//        setFormElement("listZip", new File(pipelineLoc, "genotyping.lists.zip"));
-//        clickButton("Import List Archive");
-
         assertTextPresent(
-                _libraryDesign,
+                samples,
                 "mids",
                 "sequences",
                 "runs"
@@ -105,7 +94,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         waitForPageToLoad();
         clickLinkContainingText("Admin");
 
-        String[] listVals = {"sequences", "runs", _libraryDesign};
+        String[] listVals = {"sequences", "runs", samples};
         for(int i=0; i<3; i++)
         {
             clickLinkContainingText("configure",i, false);
@@ -153,12 +142,12 @@ public class GenotypingTest extends BaseSeleniumWebTest
     }
 
     //importing the same thing again should fail
+    //Issue 13695
     private void importRunAgainTest()
     {
         log("verify we can't import the same run twice");
         goToProjectHome();
         startImportRun("reads.txt", "Import Reads");
-//        assertTextNotPresent("ERROR");
         waitForText("ERROR");
 
     }
@@ -190,7 +179,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         assertTextPresent("Reads", "Sample Id", "Percent");
 
-        waitForTextWithRefresh("TEST14", 999999);
+        waitForTextWithRefresh("TEST14", 930000);
         assertTextPresent("TEST14", 2);
         assertTextPresent("TEST28");
         startAlterMatches();
@@ -305,18 +294,13 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void receiveDataFromGalaxyServer()
     {
         String[] filesToCopy = {"matches.txt", "analysis_complete.txt"};
-        String analysisFolder = "analysis_" + getRunNumber();          //TODO:  how to get this
+        String analysisFolder = "analysis_" + getRunNumber();
         for(String file: filesToCopy)
         {
             copyFile(pipelineLoc + "/" + file, pipelineLoc + "/" + analysisFolder + "/" + file);
         }
         refresh();
         waitForText("Submit genotyping analysis ");
-//        clickLinkContainingText("COMPLETE");
-//        assertTextPresent("genotyping analysis");
-//        waitForText("Submitting genotyping analysis job complete");
-        //TODO:  more checks?
-        //TODO
     }
 
     private int getRunNumber()
@@ -369,8 +353,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         log("import genotyping run");
         startImportRun("reads.txt", "Import Reads");
-        //TODO:  isn't there a helper for this?
-       waitForPipelineJobsToComplete(1, "Import Run", false);
+        waitForPipelineJobsToComplete(1, "Import Run", false);
         assertTextNotPresent("IMPORT");
         assertTextNotPresent("ERROR");
 
@@ -379,8 +362,6 @@ public class GenotypingTest extends BaseSeleniumWebTest
         clickLinkWithText(importNum);
 
         verifySamples();
-
-
     }
 
     private class OutputFilter implements FilenameFilter
@@ -399,11 +380,14 @@ public class GenotypingTest extends BaseSeleniumWebTest
         assertEquals(30, files.length);
         DataRegionTable d = new DataRegionTable("Reads", this);
         assertEquals(d.getDataRowCount(), 30);
+        assertTextPresent("Read Count");
+        assertEquals("9", d.getDataAsText(d.getIndexWhereDataAppears("IlluminaSamples-R1-4947.fastq.gz", "Filename"), "Read Count"));
     }
 
     private void verifySamples()
     {
-//        String indexSampleSequence[][] = {{"3", "TEST15", "tcagtatatatacaGTGGGCTACGTGGACGACACGCAGTTCGTGCGGTTCGACAGCGACGCCGAGAGTCCGAGGATGGAGCCGCGGGCGccgtggatggagcaggaggggccggaggtattgggaagagggagacacggatcgccaagggccacgcacagactgagcgggctggcaaggcgcatagnnnnnnnnnnnnnnnnnnnnnnn"}};
+        //TODO:  deal with the nondeterminism
+//        String indexSampleSequence[][] = {{"4", "TEST14", "tcagtgtcacacgaGTGGCTACGTGGACGACCGTATCGCCTCCTGCGGAGATCATCGTGTGACActgagcgggctggcaaggcgcatag"}};
 //        DataRegionTable drt = new DataRegionTable("Reads", this);
 //
 //        for(int i=0; i<indexSampleSequence.length; i++)
