@@ -362,14 +362,6 @@ public class ListHelper
             test.clickNavButton("Add Field", 0);
             test.setFormElement(Locator.name("ff_name" + i),  col.getName());
             test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
-            test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
-
-            if (col.isMvEnabled())
-                clickMvEnabled(test, "");
-
-            if (col.isRequired())
-                clickRequired(test, "");
-
             // Set type.
             LookupInfo lookup = col.getLookup();
             // click the combobox trigger image
@@ -389,17 +381,30 @@ public class ListHelper
 
                 test.setFormElement(Locator.tagWithName("input","table"), lookup.getTable());
             }
-                
-            //test.clickNavButton("Apply", 0);
-            test.click(Locator.tagWithText("button","Apply"));
+
+            test.clickButton("Apply", 0);
 
             // wait a while to make sure rangeURI is set (async check)
             test.sleep(1000);
+
+            ExtHelper.clickExtTab(test, "Display");
+            test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
 
             if (col.getFormat() != null)
             {
                 ExtHelper.clickExtTab(test, "Format");
                 test.setFormElement("propertyFormat", col.getFormat());
+            }
+
+            if (null != col.getURL())
+            {
+                test.setFormElement("url", col.getURL());
+            }
+
+            if (col.isRequired())
+            {
+                ExtHelper.clickExtTab(test, "Validators");
+                clickRequired(test, "");
             }
 
             FieldValidator validator = col.getValidator();
@@ -425,9 +430,10 @@ public class ListHelper
                 test.clickNavButton("OK", 0);
             }
 
-            if (null != col.getURL())
+            if (col.isMvEnabled())
             {
-                test.setFormElement("url", col.getURL());
+                ExtHelper.clickExtTab(test, "Advanced");
+                clickMvEnabled(test, "");
             }
         }
 
