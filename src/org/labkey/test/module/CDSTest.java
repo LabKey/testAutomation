@@ -181,11 +181,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusCounts(0,0,0,0,0);
         selectBars(LABS[1], LABS[2]);
         assertFilterStatusCounts(12,1,0,2,0);
-        clickButton("keep", 0);
+        clickButton("use as filter", 0);
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
         waitForText("Selection and Active Filters (12)");
-        assertTextPresent("Only Active Filters (29)");
+        assertTextPresent("Only Active Filters (12)");
         setFormElement("groupname", GROUP_NAME);
         setFormElement("groupdescription", GROUP_DESC);
         clickButton("Save", 0);
@@ -207,7 +207,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextPresent(GROUP_DESC);
 
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Other)", "0 total");
+        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
@@ -259,7 +259,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         refresh();//TODO: doubled up portal row. Refresh to eliminate
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Other)", "0 total");
+        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
@@ -274,7 +274,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextPresent("Gender:");
 
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
-        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Other)", "0 total");
+        assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "8 total participants");
@@ -426,7 +426,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void assertAllParticipantsPortalPage()
     {
         assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
-        assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (Other, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
+        assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
         assertCDSPortalRow(SearchBy.Assays, "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow(SearchBy.Labs, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
         assertCDSPortalRow(SearchBy.Demographics, "6 ethnicities, 3 locations", "29 total participants");
@@ -456,7 +456,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectBars(barLabel);
         assertFilterStatusCounts(participantCount, studyCount, assayCount, contributorCount, antigenCount);
 //        waitForElement(Locator.xpath("//td[contains(text(), '" + searchBy + ":'"));
-        waitForElement(Locator.xpath("//td[@class='subselect' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
     }
@@ -524,10 +524,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     }
     private String genCurrentSelectionString(String hierarchy, String name)
     {
-        if(name.length() <= 21)
+        if(name.length() <= 20)
             return name;
         else
-            return name.substring(0, 18).trim() + "...";
+            return name.substring(0, 17).trim() + "...";
     }
 
     private String getHierarchy(SearchBy searchBy)
