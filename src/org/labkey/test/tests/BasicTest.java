@@ -116,17 +116,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         log("Test browser version");
         String source = getHtmlSource();
-        assertTrue("The LabKey test suite requires Firefox 2.0 - 12.0", source.contains("Firefox/12.") || source.contains("Firefox/11.") || source.contains("Firefox/10.") || source.contains("Firefox/9.") || source.contains("Firefox/8.") || source.contains("Firefox/7.") || source.contains("Firefox/6.") || source.contains("Firefox/5.") || source.contains("Firefox/4.") || source.contains("Firefox/3.6") || source.contains("Firefox/3.5") || source.contains("Firefox/3.0") || source.contains("Firefox/2.0") || source.contains("MSIE 8") || source.contains("MSIE 7"));
-        String version = "unknown";
-        if(source.indexOf("Firefox") != -1 )
-        {
-            version = source.substring(source.indexOf("Firefox"), source.indexOf("Firefox") + 11);
-        }
-        if(source.indexOf("MSIE") != -1 )
-        {
-            version = source.substring(source.indexOf("MSIE"), source.indexOf("MSIE") + 6);
-        }
-        log("Browser = " + version);
+        assertTrue("Unsupported browser", isBrowser(source, "Firefox", 2.0, 12.0) || isBrowser(source, "MSIE", 7.0, 8.0));
 
         log("Test webpart buttons");
         clickWebpartMenuItem("Messages", "Customize");      
@@ -154,6 +144,23 @@ public class BasicTest extends BaseSeleniumWebTest
         gotoAdminConsole();
         clickLinkWithText("running threads");
         assertTextNotPresent("SystemMaintenance");
+    }
+
+    private boolean isBrowser(String source, String browserName, double startVersion, double endVersion)
+    {
+        if (source.indexOf(source) != -1)
+        {
+            int start = source.indexOf(browserName);
+            int end = source.indexOf("-->", start);
+            String version = source.substring(start, end);
+
+            double versionNumber = Double.parseDouble(version.substring(8));
+            assertTrue("The LabKey test suite requires " + browserName + " " + startVersion + " - " + endVersion, versionNumber >= startVersion && versionNumber <= endVersion);
+            log("Browser = " + version);
+            return true;
+        }
+
+        return false;
     }
 
     public String getAssociatedModuleDirectory()

@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.tests.SecurityTest;
 
 /**
  * Created by IntelliJ IDEA.

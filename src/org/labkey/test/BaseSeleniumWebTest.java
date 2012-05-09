@@ -29,14 +29,12 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.openqa.selenium.internal.seleniumemulation.IsElementPresent;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -4744,20 +4742,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         _setPermissions(groupName, permissionString, "pSite");
     }
 
-    public void setUserPermissions(String groupName, String permissionString)
+    public void setUserPermissions(String userName, String permissionString)
     {
-        _setPermissions(groupName, permissionString, "pUser");
+        _setPermissions(userName, permissionString, "pUser");
     }
 
-    public void _setPermissions(String groupName, String permissionString, String className)
+    public void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
         if (1==0)
         {
-            log("Setting permissions for group " + groupName + " to " + permissionString);
+            log("Setting permissions for " + userOrGroupName + " to " + permissionString);
             //setWorkingForm("updatePermissions");
-            selenium.select(Locator.permissionSelect(groupName).toString(), permissionString);
+            selenium.select(Locator.permissionSelect(userOrGroupName).toString(), permissionString);
             clickNavButton("Update");
-            assertPermissionSetting(groupName, permissionString);
+            assertPermissionSetting(userOrGroupName, permissionString);
         }
         else
         {
@@ -4771,16 +4769,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 fail("call removePermission()");
                 return;
             }
-            log("Setting permissions for group " + groupName + " to " + role);
+            log("Setting permissions for group " + userOrGroupName + " to " + role);
 
             waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             String input = "$add$" + role;
             String combo = "$combo$";
             click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + groupName + "']"));
+            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + userOrGroupName + "']"));
             sleep(100);
             savePermissions();
-            assertPermissionSetting(groupName, permissionString);
+            assertPermissionSetting(userOrGroupName, permissionString);
         }
     }
 

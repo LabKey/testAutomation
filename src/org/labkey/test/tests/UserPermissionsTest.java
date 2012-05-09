@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.PasswordUtil;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,7 +33,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
     protected static final String GAMMA_EDITOR_GROUP_NAME = "GammaEditor";
     protected static final String GAMMA_AUTHOR_GROUP_NAME = "GammaAuthor";
     protected static final String GAMMA_READER_GROUP_NAME = "GammaReader";
-    protected static final String GAMMA_RESTRICTED_READER_GROUP_NAME = "GammaRestrictedReader";
+//    protected static final String GAMMA_RESTRICTED_READER_GROUP_NAME = "GammaRestrictedReader";
     protected static final String GAMMA_SUBMITTER_GROUP_NAME = "GammaSubmitter";
     protected static final String GAMMA_ADMIN_GROUP_NAME = "GammaAdmin";
     //permissions
@@ -42,10 +43,11 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
     protected static final String GAMMA_AUTHOR_USER = "gammaauthor@security.test";
     protected static final String GAMMA_AUTHOR_PAGE_TITLE = "This is a Test Message from : " + GAMMA_AUTHOR_USER;
     protected static final String GAMMA_READER_USER = "gammareader@security.test";
+    protected static final String GAMMA_PROJECT_ADMIN_USER = "gammaadmin@security.test";
+
     //I can't really find any docs on what this is exactly?
-    protected static final String GAMMA_RESTRICTED_READER_USER = "gammarestricted@security.test";
-    protected static final String GAMMA_SUBMITTER_USER = "gammasubmitter@security.test";
-    protected static final String GAMMA_ADMIN_USER = "gammaadmin@security.test";
+//    protected static final String GAMMA_RESTRICTED_READER_USER = "gammarestricted@security.test";
+//    protected static final String GAMMA_SUBMITTER_USER = "gammasubmitter@security.test";
 
     public String getAssociatedModuleDirectory()
     {
@@ -60,7 +62,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
 
     protected void doCleanup()
     {
-        log(this.getClass().getName() + " Cleaning UP");
+        log(this.getClass().getName() + " Cleaning Up");
         if (isLinkPresentContainingText(PERM_PROJECT_NAME))
         {
             try {deleteProject(PERM_PROJECT_NAME); } catch (Throwable t) { t.printStackTrace();}
@@ -69,7 +71,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         deleteUser(GAMMA_EDITOR_USER);
         deleteUser(GAMMA_AUTHOR_USER);
         deleteUser(GAMMA_READER_USER);
-        deleteUser(GAMMA_SUBMITTER_USER);
+        deleteUser(GAMMA_PROJECT_ADMIN_USER);
     }
 
     protected void doTestSteps()
@@ -82,12 +84,13 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
      * Create some users, assign to groups and validate the permissions by
      * impersonating the user.
      */
-    private void userPermissionRightsTest(){
+    private void userPermissionRightsTest()
+    {
         createProject(PERM_PROJECT_NAME);
         createPermissionsGroup(GAMMA_EDITOR_GROUP_NAME);
         assertPermissionSetting(GAMMA_EDITOR_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_EDITOR_GROUP_NAME, "Editor");
-        createUserInProjectForGroup(GAMMA_EDITOR_USER, PERM_PROJECT_NAME, GAMMA_EDITOR_GROUP_NAME);
+        createUserInProjectForGroup(GAMMA_EDITOR_USER, PERM_PROJECT_NAME, GAMMA_EDITOR_GROUP_NAME, false);
 
         createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
         createSubfolder(PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, GAMMA_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
@@ -104,14 +107,14 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         createPermissionsGroup(GAMMA_READER_GROUP_NAME);
         assertPermissionSetting(GAMMA_READER_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_READER_GROUP_NAME, "Reader");
-        createUserInProjectForGroup(GAMMA_READER_USER, PERM_PROJECT_NAME, GAMMA_READER_GROUP_NAME);
+        createUserInProjectForGroup(GAMMA_READER_USER, PERM_PROJECT_NAME, GAMMA_READER_GROUP_NAME, false);
         //Create Author User
         clickLinkWithText(PERM_PROJECT_NAME);
         enterPermissionsUI();
         createPermissionsGroup(GAMMA_AUTHOR_GROUP_NAME);
         assertPermissionSetting(GAMMA_AUTHOR_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_AUTHOR_GROUP_NAME, "Author");
-        createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME);
+        createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME, false);
         //Create the Submitter User
         clickLinkWithText(PERM_PROJECT_NAME);
         enterPermissionsUI();
@@ -200,6 +203,22 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         removePermission(GAMMA_READER_GROUP_NAME, "Reader");
         clickNavButton("Save and Finish");
 
+        // Test that a project admin is confined to a single project when impersonating a project user. Site admins
+        // are not restricted in this way, so we need to create and login as a new user with project admin permissions.
+        clickLinkWithText(PERM_PROJECT_NAME);
+        createPermissionsGroup(GAMMA_ADMIN_GROUP_NAME);
+        setPermissions(GAMMA_ADMIN_GROUP_NAME, "Project Administrator");
+        createUserInProjectForGroup(GAMMA_PROJECT_ADMIN_USER, PERM_PROJECT_NAME, GAMMA_ADMIN_GROUP_NAME, true);
+        clickLinkWithText("here", false);
+        selenium.selectWindow("_blank");
+        clickLinkContainingText("setPassword.view");
+        setText("password", PasswordUtil.getPassword());
+        setText("password2", PasswordUtil.getPassword());
+        clickNavButton("Set Password");
+        selenium.close();
+        selenium.selectWindow(null);
+        signOut();
+        signIn(GAMMA_PROJECT_ADMIN_USER, PasswordUtil.getPassword(), true);
         clickLinkWithText(PERM_PROJECT_NAME);
         projectImpersonate(GAMMA_READER_USER);
         clickLinkWithText(PERM_PROJECT_NAME);
@@ -219,7 +238,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
      * @param projectName
      * @param groupName
      */
-    private void createUserInProjectForGroup(String userName, String projectName, String groupName)
+    private void createUserInProjectForGroup(String userName, String projectName, String groupName, boolean sendEmail)
     {
         if (isElementPresent(Locator.permissionRendered()))
         {
@@ -228,8 +247,9 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
-        setFormElement("names", userName );
-        uncheckCheckbox("sendEmail");
+        setFormElement("names", userName);
+        if (!sendEmail)
+            uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
     }
 }
