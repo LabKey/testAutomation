@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.labkey.remoteapi.assay.ExpObject;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -22,6 +23,7 @@ import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.text.DecimalFormat;
 
 /**
  * User: elvan
@@ -31,7 +33,7 @@ import java.io.FilenameFilter;
 public class GenotypingTest extends BaseSeleniumWebTest
 {
     public static final String importNum = "207";
-    public static final String illuminaImportNum = "208";
+    public static final String illuminaImportNum = "206";
 
     String pipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     protected int runNum = 0; //this is globally unique, so we need to retrieve it every time.
@@ -39,7 +41,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 //    private String expectedAnalysisCount = "1 - 61 of 61";
 
     DataRegionTable drt = null;
-    private String samples = "libraryDesign";
+    private String samples = "samples";
 
     @Override
     protected String getProjectName()
@@ -47,10 +49,10 @@ public class GenotypingTest extends BaseSeleniumWebTest
         return "GenotypingVerifyProject";
     }
 
-    protected int analysisCount = 3;
-    protected int getExpectedAnalysisCount()
+    protected int analysisCount = 1410;
+    protected String getExpectedAnalysisCount()
     {
-        return analysisCount;
+        return new DecimalFormat().format(analysisCount);
     }
 
     public boolean isFileUploadTest()
@@ -76,7 +78,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         clickButton("Import List Archive");
 //        sleep(500);
-        setFormElement("listZip", new File(pipelineLoc, "gs_archive.lists.zip"));
+        setFormElement("listZip", new File(pipelineLoc, "sequencing.lists.zip"));
         clickButton("Import List Archive");
 
         assertTextPresent(
@@ -119,22 +121,23 @@ public class GenotypingTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         setUp2();
-        clickLinkContainingText(getProjectName());
+        goToProjectHome();
 
-        importIlluminaRunTest();
 
         //TODO: need to fix 454/genotyping tests
 //        importRunTest();
-////        importRunAgainTest(); //bug Issue 13695
+//////        importRunAgainTest(); //bug Issue 13695
 //        runAnalysisTest();
 //        importSecondRunTest();
+//        goToProjectHome();
+        importIlluminaRunTest();
 
     }
 
     private void importSecondRunTest()
     {
         goToProjectHome();
-        startImportRun("secondRead/reads.txt", "Import Reads");
+        startImportRun("secondRead/reads.txt", "Import 454 Reads", "207");
         waitForPipelineJobsToComplete(4, "Import reads for 206", true);
         clickLinkWithText("COMPLETE");
         clickButton("Data");
@@ -145,10 +148,10 @@ public class GenotypingTest extends BaseSeleniumWebTest
     //Issue 13695
     private void importRunAgainTest()
     {
-        log("verify we can't import the same run twice");
-        goToProjectHome();
-        startImportRun("reads.txt", "Import Reads");
-        waitForText("ERROR");
+//        log("verify we can't import the same run twice");
+//        goToProjectHome();
+//        startImportRun("/reads.txt", "Import Reads");
+//        waitForText("ERROR");
 
     }
 
@@ -179,9 +182,9 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         assertTextPresent("Reads", "Sample Id", "Percent");
 
-        waitForTextWithRefresh("TEST14", 930000);
-        assertTextPresent("TEST14", 2);
-        assertTextPresent("TEST28");
+        waitForTextWithRefresh("TEST09", 30000);
+//        assertTextPresent("TEST14", 2);
+        waitForTextWithRefresh("1 - 100 of 1,410", 15000);
         startAlterMatches();
         deleteMatchesTest();
         alterMatchesTest();
@@ -194,14 +197,14 @@ public class GenotypingTest extends BaseSeleniumWebTest
         String[] alleleContentsBeforeDeletion = (String[]) drt.getColumnDataAsText("Allele Name").toArray(new String[] {"a"});
 
 
-        //attempt to delete ar ow and cancel
+        //attempt to delete a row and cancel
         click(Locator.name(checkboxId, 2));
 //        click(Locator.name(checkboxId, 15));
 
         selenium.chooseCancelOnNextConfirmation();
         clickButton("Delete", 0);
         selenium.getConfirmation();
-        assertEquals(getExpectedAnalysisCount(), drt.getDataRowCount());
+        assertTextPresent(getExpectedAnalysisCount());
 
 
         //delete some rows
@@ -230,7 +233,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         /*verify the list is what we expct.  Because the two samples had the following lists
         * WE expect them to combine to the following:
          */
-        String[] alleles = {"Mamu-A1*003:w:09"};
+        String[] alleles = {"Mamu-A1*004:01:01", "Mamu-A1*004:01:02"};
         for(String allele: alleles)
         {
             Locator l =  Locator.tagWithText("div", allele);
@@ -248,11 +251,11 @@ public class GenotypingTest extends BaseSeleniumWebTest
         refresh();
 
         int newIdIndex = getCombinedSampleRowIndex();
-        assertEquals("7", drt.getDataAsText(newIdIndex, "Reads") );
-        assertEquals("116.7%", drt.getDataAsText(newIdIndex, "Percent") );
-        assertEquals("299.7", drt.getDataAsText(newIdIndex,"Average Length") );
-        assertEquals("5", drt.getDataAsText(newIdIndex, "Pos Reads") );
-        assertEquals("2", drt.getDataAsText(newIdIndex, "Neg Reads") );
+        assertEquals("19", drt.getDataAsText(newIdIndex, "Reads") );
+        assertEquals("7.3%", drt.getDataAsText(newIdIndex, "Percent") );
+        assertEquals("300.0", drt.getDataAsText(newIdIndex,"Average Length") );
+        assertEquals("14", drt.getDataAsText(newIdIndex, "Pos Reads") );
+        assertEquals("5", drt.getDataAsText(newIdIndex, "Neg Reads") );
         assertEquals("0", drt.getDataAsText(newIdIndex, "Pos Ext Reads") );
         assertEquals("0", drt.getDataAsText(newIdIndex, "Neg Ext Reads") );
 //        String[] allelesAfterMerge = drt.getDataAsText(newIdIndex, "Allele Name").replace(" ", "").split(",") ;
@@ -339,7 +342,6 @@ public class GenotypingTest extends BaseSeleniumWebTest
         log("import illumina run");
         startImportIlluminaRun("IlluminaSamples.csv", "Import Illumina Reads");
         waitForPipelineJobsToComplete(1, "Import Run", false);
-        assertTextNotPresent("IMPORT");
         assertTextNotPresent("ERROR");
 
         goToProjectHome();
@@ -349,12 +351,32 @@ public class GenotypingTest extends BaseSeleniumWebTest
         verifyIlluminaSamples();
     }
 
+    private void assertExportButtonPresent()
+    {
+        String[] exportTypes = {"Excel 97", "Excel 2007", ".iqy"};
+        String xpath =  "//a[contains(@class, 'disabled-button')]/span[text()='Download Selected']";
+        assertElementPresent(Locator.xpath(xpath));
+
+        xpath = xpath.replace("disabled", "labkey");
+        click(Locator.name(checkboxId, 2));
+        click(Locator.name(checkboxId, 3));
+        click(Locator.name(checkboxId, 9));
+        Locator exportButton = Locator.xpath(xpath);
+
+        click(exportButton);
+        waitForText("Export Files");
+        assertTextPresent("ZIP Archive", "Merge");
+        clickButtonContainingText("Cancel", 0);
+        waitForExtMaskToDisappear();
+
+    }
+
     private void importRunTest()
     {
         log("import genotyping run");
-        startImportRun("reads.txt", "Import Reads");
+        startImportRun("reads.txt", "Import 454 Reads", importNum);
         waitForPipelineJobsToComplete(1, "Import Run", false);
-        assertTextNotPresent("IMPORT");
+//        assertTextNotPresent("IMPORT");
         assertTextNotPresent("ERROR");
 
         goToProjectHome();
@@ -373,6 +395,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     }
     private void verifyIlluminaSamples()
     {
+        assertExportButtonPresent();
         File dir = new File(pipelineLoc);
         FilenameFilter filter = new OutputFilter();
         File[] files = dir.listFiles(filter);
@@ -381,12 +404,13 @@ public class GenotypingTest extends BaseSeleniumWebTest
         DataRegionTable d = new DataRegionTable("Reads", this);
         assertEquals(d.getDataRowCount(), 30);
         assertTextPresent("Read Count");
-        assertEquals("9", d.getDataAsText(d.getIndexWhereDataAppears("IlluminaSamples-R1-4947.fastq.gz", "Filename"), "Read Count"));
+        assertEquals("9", d.getDataAsText(d.getIndexWhereDataAppears("IlluminaSamples-R1-4947.fastq.gz", "Filename") + 1, "Read Count"));
     }
 
     private void verifySamples()
     {
-        //TODO:  deal with the nondeterminism
+        waitForTextWithRefresh("1 - 100 of 9,411", defaultWaitForPage);
+        assertTextPresent("Name", "Sample Id", "Sequence", "G3BT");
 //        String indexSampleSequence[][] = {{"4", "TEST14", "tcagtgtcacacgaGTGGCTACGTGGACGACCGTATCGCCTCCTGCGGAGATCATCGTGTGACActgagcgggctggcaaggcgcatag"}};
 //        DataRegionTable drt = new DataRegionTable("Reads", this);
 //
@@ -399,12 +423,13 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     }
 
-    private void startImportRun(String file, String importAction)
+    private void startImportRun(String file, String importAction, String associatedRun)
     {
         clickLinkContainingText("Import Run");
         ExtHelper.selectFileBrowserItem(this, file);
 
         selectImportDataAction(importAction);
+        setFormElement("run", associatedRun);
         clickButton("Import Reads");
 
     }
@@ -412,12 +437,13 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void startImportIlluminaRun(String file, String importAction)
     {
         clickLinkContainingText("Import Run");
+        sleep(1000);
+        ExtHelper.selectFileBrowserRoot(this);
         ExtHelper.selectFileBrowserItem(this, file);
 
         selectImportDataAction(importAction);
 
-        //TODO: set run ID to 208
-        setFormElement("run", "208");
+        setFormElement("run", illuminaImportNum);
         setFormElement("prefix", "Illumina-");
         clickButton("Import Reads");
 
