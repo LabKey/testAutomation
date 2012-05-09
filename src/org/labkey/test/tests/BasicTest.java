@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -116,7 +117,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         log("Test browser version");
         String source = getHtmlSource();
-//        assertTrue("Unsupported browser", isBrowser(source, "Firefox", 2.0, 12.0) || isBrowser(source, "MSIE", 7.0, 8.0));
+        assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 12.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
 
         log("Test webpart buttons");
         clickWebpartMenuItem("Messages", "Customize");      
@@ -148,13 +149,20 @@ public class BasicTest extends BaseSeleniumWebTest
 
     private boolean isBrowser(String source, String browserName, double startVersion, double endVersion)
     {
-        if (source.indexOf(source) != -1)
+        if (source.indexOf(browserName) != -1)
         {
             int start = source.indexOf(browserName);
             int end = source.indexOf("-->", start);
             String version = source.substring(start, end);
 
-            double versionNumber = Double.parseDouble(version.substring(8));
+            // Handle "Firefox/3.6.25", etc.
+            if (StringUtils.countMatches(version, ".") > 1)
+            {
+                int secondDot = version.indexOf(".", version.indexOf(".") + 1);
+                version = version.substring(0, secondDot);
+            }
+
+            double versionNumber = Double.parseDouble(version.substring(browserName.length()));
             assertTrue("The LabKey test suite requires " + browserName + " " + startVersion + " - " + endVersion, versionNumber >= startVersion && versionNumber <= endVersion);
             log("Browser = " + version);
             return true;
