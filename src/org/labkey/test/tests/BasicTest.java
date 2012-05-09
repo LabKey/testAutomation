@@ -154,15 +154,7 @@ public class BasicTest extends BaseSeleniumWebTest
             int end = source.indexOf("-->", start);
             String version = source.substring(start, end);
 
-            double versionNumber;
-            try
-            {
-                versionNumber = Double.parseDouble(version.substring(8))
-            }
-            catch (NumberFormatException x)
-            {
-                fail("could not parse version string: " + version);
-            }
+            double versionNumber = Double.parseDouble(version.substring(8));
             assertTrue("The LabKey test suite requires " + browserName + " " + startVersion + " - " + endVersion, versionNumber >= startVersion && versionNumber <= endVersion);
             log("Browser = " + version);
             return true;
