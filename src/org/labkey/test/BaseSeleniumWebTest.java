@@ -821,6 +821,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text() = 'Admin']"), items);
     }
 
+    public void clickUserMenuItem(String... items)
+    {
+        ExtHelper.clickExtMenuButton(this, true, Locator.id("userMenuPopupLink"), items);
+    }
+
     // Click on a module listed on the admin menu
     public void goToModule(String moduleName)
     {
@@ -4865,15 +4870,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("Impersonating group: " + group);
         goToHome();
-        clickAdminMenuItem("Impersonate", "Group", (isSiteGroup ? "Site: " : "") + group);
+        clickUserMenuItem("Impersonate", "Group", (isSiteGroup ? "Site: " : "") + group);
     }
 
     public void impersonateRole(String role)
     {
         log("Impersonating role: " + role);
-        clickAdminMenuItem("Impersonate", "Role",  role);
-//        goToHome();
-
+        clickUserMenuItem("Impersonate", "Role", role);
     }
 
     public void stopImpersonatingRole()
@@ -4884,10 +4887,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void stopImpersonatingGroup()
     {
         log("Ending impersonation");
-        Locator menuLink =  Locator.id("userMenuPopupLink");
-        waitAndClick(menuLink);
-        waitForText("Stop Impersonating");
-        clickLinkWithText("Stop Impersonating");
+        clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
         goToHome();
     }
@@ -4912,9 +4912,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         String fakeUser = _impersonationStack.pop();
         log("Ending impersonation");
-        assertEquals(fakeUser,getDisplayName());
-        click(Locator.id("userMenuPopupLink"));
-        clickLinkWithText("Stop Impersonating");
+        assertEquals(fakeUser, getDisplayName());
+        clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
         goToHome();
         assertFalse(fakeUser.equals(getDisplayName()));
