@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -30,10 +31,12 @@ import java.text.DecimalFormat;
  * Date: 10/22/11
  * Time: 7:14 PM
  */
-public class GenotypingTest extends BaseSeleniumWebTest
+public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 {
-    public static final String importNum = "207";
+    public static final String first454importNum = "207";
+    public static final String second454importNum = "208";
     public static final String illuminaImportNum = "206";
+    protected int pipelineJobCount=1;
 
     String pipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     protected int runNum = 0; //this is globally unique, so we need to retrieve it every time.
@@ -125,11 +128,11 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
 
         //TODO: need to fix 454/genotyping tests
-//        importRunTest();
-//////        importRunAgainTest(); //bug Issue 13695
-//        runAnalysisTest();
-//        importSecondRunTest();
-//        goToProjectHome();
+        importRunTest();
+////        importRunAgainTest(); //bug Issue 13695
+        runAnalysisTest();
+        importSecondRunTest();
+        goToProjectHome();
         importIlluminaRunTest();
 
     }
@@ -137,8 +140,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void importSecondRunTest()
     {
         goToProjectHome();
-        startImportRun("secondRead/reads.txt", "Import 454 Reads", "207");
-        waitForPipelineJobsToComplete(4, "Import reads for 206", true);
+        startImportRun("secondRead/reads.txt", "Import 454 Reads", second454importNum);
+        waitForPipelineJobsToComplete(pipelineJobCount++, "Import reads for 206", true);
         clickLinkWithText("COMPLETE");
         clickButton("Data");
         assertTextPresent("G3BTA6P01BEVU9", "G3BTA6P01BD5P9");
@@ -157,9 +160,10 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void runAnalysisTest()
     {
-        getToRunScreen();
+//        getToRunScreen();
         sendDataToGalaxyServer();
         receiveDataFromGalaxyServer();
+        pipelineJobCount+=2;
         verifyAnalysis();
 
 
@@ -169,7 +173,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText("View Runs");
-        clickLinkWithText(importNum);
+        clickLinkWithText(first454importNum);
 
     }
 
@@ -341,7 +345,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         log("import illumina run");
         startImportIlluminaRun("IlluminaSamples.csv", "Import Illumina Reads");
-        waitForPipelineJobsToComplete(1, "Import Run", false);
+        waitForPipelineJobsToComplete(pipelineJobCount++, "Import Run", false);
         assertTextNotPresent("ERROR");
 
         goToProjectHome();
@@ -374,14 +378,14 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void importRunTest()
     {
         log("import genotyping run");
-        startImportRun("reads.txt", "Import 454 Reads", importNum);
-        waitForPipelineJobsToComplete(1, "Import Run", false);
+        startImportRun("reads.txt", "Import 454 Reads", first454importNum);
+        waitForPipelineJobsToComplete(pipelineJobCount++, "Import Run", false);
 //        assertTextNotPresent("IMPORT");
         assertTextNotPresent("ERROR");
 
         goToProjectHome();
         clickLinkWithText("View Runs");
-        clickLinkWithText(importNum);
+        clickLinkWithText(first454importNum);
 
         verifySamples();
     }
