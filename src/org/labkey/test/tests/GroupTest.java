@@ -215,12 +215,17 @@ public class GroupTest extends BaseSeleniumWebTest
         verifyAuthorPermission(nameTitleBody);
         stopImpersonatingGroup();
 
-        impersonateRole("Editor");
-        verifyEditorPermission(nameTitleBody);
-        stopImpersonatingRole();
 
+        Locator unavailableEditorChoice = Locator.xpath("//li[contains(@class,'disabled')]//span[text()='Editor']");
         impersonateRole("Author");
+        clickUserMenuItem(false, "Impersonate", "Role", "Author");
+        assertElementNotPresent(unavailableEditorChoice);
         verifyAuthorPermission(nameTitleBody);
+        impersonateRole("Editor");
+        clickUserMenuItem(false, "Impersonate", "Role", "Author");
+        assertElementPresent(unavailableEditorChoice);
+        assertElementPresent(Locator.xpath("//li[contains(@class,'disabled')]//span[text()='Author']"));
+        verifyEditorPermission(nameTitleBody);
         stopImpersonatingRole();
 
         //Issue 13802: add child group to SIMPLE_GROUP, child group should also have access to pages

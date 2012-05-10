@@ -821,7 +821,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickUserMenuItem(String... items)
     {
-        ExtHelper.clickExtMenuButton(this, true, Locator.id("userMenuPopupLink"), items);
+        clickUserMenuItem(true, items);
+    }
+
+    public void clickUserMenuItem(boolean wait, String... items)
+    {
+        ExtHelper.clickExtMenuButton(this, wait, Locator.id("userMenuPopupLink"), items);
     }
 
     // Click on a module listed on the admin menu
@@ -4876,7 +4881,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Impersonating role: " + role);
         clickUserMenuItem("Impersonate", "Role", role);
     }
-
     public void stopImpersonatingRole()
     {
        stopImpersonatingGroup();
