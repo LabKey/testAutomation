@@ -135,8 +135,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         //verify that you can see the text "history" in the appropriate area as admin.  If this fails, the
         //check below is worthless
 
-        click(Locator.id("userMenuPopupLink"));
-        clickLinkWithText("My Account");
+        goToMyAccount();
         assertTextPresent(HISTORY_TAB_TITLE);
 
         //log in as normal user
@@ -165,10 +164,8 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         //shouldn't be able to view own history either
         clickNavButton("Home");
-        click(Locator.id("userMenuPopupLink"));
-        clickLinkWithText("My Account");
+        goToMyAccount();
         assertTextNotPresent(HISTORY_TAB_TITLE);
-
 
         stopImpersonating();
     }
@@ -407,8 +404,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     {
         //set display name to user's email minus domain
         String oldDisplayName = getDisplayName();
-        click(Locator.id("userMenuPopupLink"));
-        clickLinkWithText("My Account");
+        goToMyAccount();
         clickNavButton("Edit");
 
         String email = PasswordUtil.getUsername();

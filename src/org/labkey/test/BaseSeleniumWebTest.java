@@ -593,7 +593,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void attemptSignIn(String email, String password)
     {
-
         clickLinkWithText("Sign In");
 
         assertTitleEquals("Sign In");
@@ -657,8 +656,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void changePassword(String oldPassword, String password)
     {
-        click(Locator.id("userMenuPopupLink"));
-        clickLinkWithText("My Account");
+        goToMyAccount();
         clickNavButton("Change Password");
 
         setFormElement("oldPassword", oldPassword);
@@ -5380,6 +5378,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void goToAdmin()
     {
         beginAt("/admin/showAdmin.view");
+    }
+
+    public void goToMyAccount()
+    {
+        clickUserMenuItem("My Account");
     }
 
     public void goToPipelineItem(String item)
