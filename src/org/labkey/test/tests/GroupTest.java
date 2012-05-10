@@ -99,6 +99,7 @@ public class GroupTest extends BaseSeleniumWebTest
         waitForText("Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
+        setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
         clickButton("Save and Finish");
         assertUserCanSeeFolder(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
@@ -243,8 +244,7 @@ public class GroupTest extends BaseSeleniumWebTest
     {
         clickLinkContainingText(getProjectName());
         assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
-//        assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
-        //TODO:  waiting on Matt
+        assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
         sleep(500);
     }
 
