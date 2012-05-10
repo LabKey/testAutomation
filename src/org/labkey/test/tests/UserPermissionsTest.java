@@ -209,14 +209,11 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
         createPermissionsGroup(GAMMA_ADMIN_GROUP_NAME);
         setPermissions(GAMMA_ADMIN_GROUP_NAME, "Project Administrator");
         createUserInProjectForGroup(GAMMA_PROJECT_ADMIN_USER, PERM_PROJECT_NAME, GAMMA_ADMIN_GROUP_NAME, true);
-        clickLinkWithText("here", false);
-        selenium.selectWindow("_blank");
+        clickLinkWithTextNoTarget("here");
         clickLinkContainingText("setPassword.view");
         setText("password", PasswordUtil.getPassword());
         setText("password2", PasswordUtil.getPassword());
         clickNavButton("Set Password");
-        selenium.close();
-        selenium.selectWindow(null);
         signOut();
         signIn(GAMMA_PROJECT_ADMIN_USER, PasswordUtil.getPassword(), true);
         clickLinkWithText(PERM_PROJECT_NAME);
@@ -229,6 +226,12 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
 
         //Reset ourselves to the global user so we can do cleanup
         stopImpersonating();
+    }
+
+    private void clickLinkWithTextNoTarget(String text)
+    {
+        String href = getAttribute(Locator.linkWithText(text), "href");
+        beginAt(href);
     }
 
     /**
