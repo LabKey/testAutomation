@@ -15,14 +15,12 @@
  */
 package org.labkey.test.module;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -141,33 +139,33 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertAllParticipantsPortalPage();
 
         click(SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[0], 6, 1, 3, 2, 20, 12, SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[1], 12, 1, 3, 2, 8, 12, SearchBy.Studies);
-//        assertFilterStatusPanel(STUDIES[2], 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
+        assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[1], "Not Actually...", 12, 1, 3, 2, 8, 12, SearchBy.Studies);
+//        assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
         goToAppHome();
         click(SearchBy.Antigens);
-//        assertFilterStatusPanel("1A", 6, 1, 3, 3, 21, 29, SearchBy.Antigens);
+//        assertFilterStatusPanel("1A", 6, 1, 3, 3, 21, 29, SearchBy.Antigens); // TODO: Get these working for when they are collapsed to begin
 //        assertFilterStatusPanel("2", 18, 2, 4, 4, 29, 29, SearchBy.Antigens);
 //        assertFilterStatusPanel("1B", 6, 1, 3, 3, 21, 29, SearchBy.Antigens);
 //        assertFilterStatusPanel("3", 18, 2, 4, 4, 29, 29, SearchBy.Antigens);
         goToAppHome();
         click(SearchBy.Assays);
-        assertFilterStatusPanel("Lab Results", 23, 3, 5, 0, 0, 29, SearchBy.Assays);
-        assertFilterStatusPanel("ADCC-Ferrari", 12, 1, 3, 1, 4, 29, SearchBy.Assays);
-        assertFilterStatusPanel("Luminex-Sample-LabKey", 6, 1, 3, 1, 1, 29, SearchBy.Assays);
-//        assertFilterStatusPanel("NAb-Sample-LabKey", 29, 3, 5, 3, 31, 29, SearchBy.Assays); // TODO: Participant count mismatch
-        assertFilterStatusPanel("mRNA assay", 5, 1, 3, 1, 0, 0, SearchBy.Assays);
+        assertFilterStatusPanel("Lab Results", "Lab Results", 23, 3, 5, 0, 0, 29, SearchBy.Assays);
+        assertFilterStatusPanel("ADCC-Ferrari", "ADCC-Ferrari", 12, 1, 3, 1, 4, 29, SearchBy.Assays);
+        assertFilterStatusPanel("Luminex-Sample-LabKey", "Luminex-Sample...", 6, 1, 3, 1, 1, 29, SearchBy.Assays);
+//        assertFilterStatusPanel("NAb-Sample-LabKey", "NAb-Sample-LabKey", 29, 3, 5, 3, 31, 29, SearchBy.Assays); // TODO: Participant count mismatch
+        assertFilterStatusPanel("mRNA assay", "mRNA assay", 5, 1, 3, 1, 0, 0, SearchBy.Assays);
         goToAppHome();
         click(SearchBy.Labs);
-        assertFilterStatusPanel(LABS[0], 6, 1, 1, 2, 1, 23, SearchBy.Labs);
-        assertFilterStatusPanel(LABS[1], 23, 3, 2, 3, 26, 23, SearchBy.Labs);
-//        assertFilterStatusPanel(LABS[2], 18, 2, 2, 2, 7, 23, SearchBy.Labs); // TODO: Participant count mismatch
+        assertFilterStatusPanel(LABS[0], "Arnold/Bellew Lab", 6, 1, 1, 2, 1, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[1], "LabKey Lab", 23, 3, 2, 3, 26, 23, SearchBy.Labs);
+//        assertFilterStatusPanel(LABS[2], "Piehler/Eckels...", 18, 2, 2, 2, 7, 23, SearchBy.Labs); // TODO: Participant count mismatch
         goToAppHome();
         click(SearchBy.Demographics);
         pickCDSSort("Country");
-        assertFilterStatusPanel("South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Demographics);
-        assertFilterStatusPanel("USA", 18, 2, 4, 3, 28, 18, SearchBy.Demographics);
-        assertFilterStatusPanel("Thailand", 5, 1, 3, 1, 3, 18, SearchBy.Demographics);
+        assertFilterStatusPanel("South Africa", "South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Demographics);
+        assertFilterStatusPanel("USA", "USA", 18, 2, 4, 3, 28, 18, SearchBy.Demographics);
+        assertFilterStatusPanel("Thailand", "Thailand", 5, 1, 3, 1, 3, 18, SearchBy.Demographics);
         goToAppHome();
     }
 
@@ -176,16 +174,16 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         log("Verify multi-select");
         click(SearchBy.Labs);
         selectBars(LABS[0], LABS[1]);
-        assertFilterStatusCounts(6,1,0,2,0);
+        assertFilterStatusCounts(6, 1, 0, 2, 0);
         selectBars(LABS[0], LABS[2]);
-        assertFilterStatusCounts(0,0,0,0,0);
+        assertFilterStatusCounts(0, 0, 0, 0, 0);
         selectBars(LABS[1], LABS[2]);
-        assertFilterStatusCounts(12,1,0,2,0);
+        assertFilterStatusCounts(12, 1, 0, 2, 0);
         clickButton("use as filter", 0);
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
         waitForText("Selection and Active Filters (12)");
-        assertTextPresent("Only Active Filters (12)");
+        waitForText("Only Active Filters (12)");
         setFormElement("groupname", GROUP_NAME);
         setFormElement("groupdescription", GROUP_DESC);
         clickButton("Save", 0);
@@ -354,13 +352,22 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void selectBars(String... bars)
     {
-        waitAndClick(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+        String subselect = bars[0];
+        if (subselect.length() > 10)
+            subselect = subselect.substring(0, 9);
+        sleep(1000);
+        waitAndClick(Locator.xpath("//span[@class='barlabel' and text() = '" + bars[0] + "']"));
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
         if(bars.length > 1)
         {
             selenium.controlKeyDown();
             for(int i = 1; i < bars.length; i++)
             {
                 click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[i]+"']"));
+                subselect = bars[i];
+                if (subselect.length() > 10)
+                    subselect = subselect.substring(0, 9);
+                waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
             }
             selenium.controlKeyUp();
         }
@@ -448,7 +455,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     }
 
     // Sequential calls to this should have different participant counts.
-    private void assertFilterStatusPanel(String barLabel, int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount, int maxCount, SearchBy searchBy)
+    private void assertFilterStatusPanel(String barLabel, String filteredLabel, int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount, int maxCount, SearchBy searchBy)
     {
         Double barLen = ((double)participantCount/(double)maxCount)*100;
         String barLenStr = ((Long)Math.round(Math.floor(barLen))).toString();
@@ -456,7 +463,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectBars(barLabel);
         assertFilterStatusCounts(participantCount, studyCount, assayCount, contributorCount, antigenCount);
 //        waitForElement(Locator.xpath("//td[contains(text(), '" + searchBy + ":'"));
-        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ genCurrentSelectionString(getHierarchy(searchBy), barLabel) +"')]"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ filteredLabel +"')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
     }
@@ -464,8 +471,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void assertFilterStatusCounts(int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount)
     {
         waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(studyCount+(studyCount!=1?" Studies":" Study"),
-        assayCount+(assayCount!=1?" Assays":" Assay"),
+        waitForText(studyCount+(studyCount!=1?" Studies":" Study"));
+        assertTextPresent(assayCount+(assayCount!=1?" Assays":" Assay"),
         contributorCount+(contributorCount!=1?" Contributors":" Contributor"),
         antigenCount+(antigenCount!=1?" Antigens":" Antigen"));
     }
@@ -492,28 +499,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
 /// CDS classes, enums and string generators
 
-    private class AssayVariable
-    {
-        private String _var;
-        private String _desc;
-
-        AssayVariable(String var, String desc)
-        {
-            _var = var;
-            _desc = desc;
-        }
-
-        public String Var()
-        {
-            return _var;
-        }
-
-        public String Desc()
-        {
-            return _desc;
-        }
-    }
-
     private static enum SearchBy
     {
         Studies,
@@ -521,31 +506,5 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         Assays,
         Labs,
         Demographics
-    }
-    private String genCurrentSelectionString(String hierarchy, String name)
-    {
-        if(name.length() <= 20)
-            return name;
-        else
-            return name.substring(0, 17).trim() + "...";
-    }
-
-    private String getHierarchy(SearchBy searchBy)
-    {
-        switch(searchBy)
-        {
-            case Studies:
-                return "Study";
-            case Antigens:
-                return "Tier";
-            case Assays:
-                return "Assay";
-            case Labs:
-                return "Contributor";
-            case Demographics:
-                return "Location";//Test using this hierarchy
-        }
-        fail("Unknown Search Axis: " + searchBy);
-        return null;
     }
 }
