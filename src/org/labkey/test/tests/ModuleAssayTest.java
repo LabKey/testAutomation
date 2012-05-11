@@ -170,6 +170,9 @@ public class ModuleAssayTest extends AbstractAssayTest
         selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
         selenium.type("//textarea[@id='AssayDesignerDescription']", "My Simple Assay Description");
 
+        // Make the ParticipantViewResolver field not required
+        setRequired("Batch Fields", 0);
+
         sleep(1000);
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);

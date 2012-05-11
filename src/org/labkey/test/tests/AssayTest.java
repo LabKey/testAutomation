@@ -246,15 +246,6 @@ public class AssayTest extends AbstractAssayTest
 
     } //defineAssay()
 
-    private void setRequired(String where, int index)
-    {
-        String prefix = getPropertyXPath(where);
-        ListHelper.clickRow(this, prefix, index);
-        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
-    }
-
-
     /**
      * Generates the text that appears in the target study drop-down for a given study name
      * @param studyName name of the target study

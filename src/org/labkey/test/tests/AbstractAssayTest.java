@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -265,5 +266,13 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected File[] getTestFiles()
     {
         return new File[0];
+    }
+
+    protected void setRequired(String where, int index)
+    {
+        String prefix = getPropertyXPath(where);
+        ListHelper.clickRow(this, prefix, index);
+        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
     }
 }
