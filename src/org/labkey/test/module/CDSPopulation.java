@@ -65,13 +65,11 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
         enableModule(PROJECT_NAME, "CDS");
 
         importCDSData("Antigens", new File(getSampledataPath(), "CDS/antigens.tsv"));
-        importCDSData("Assays", new File(getSampledataPath(), "CDS/assays.tsv"));
-        importCDSData("Studies", new File(getSampledataPath(), "CDS/studies.tsv"));
-        importCDSData("Labs", new File(getSampledataPath(), "CDS/labs.tsv"));
-        importCDSData("People", new File(getSampledataPath(), "CDS/people.tsv"));
+        importCDSData("Labs", new File(getSampledataPath(), "CDS/notforcheckin/labs.tsv"));
+        importCDSData("People", new File(getSampledataPath(), "CDS/notforcheckin/people.tsv"));
         importCDSData("Assays", new File(getSampledataPath(), "CDS/notforcheckin/cds_assays.txt"));
         importCDSData("Studies", new File(getSampledataPath(), "CDS/notforcheckin/cds_studies.txt"));
-        importCDSData("AssayPublications", new File(getSampledataPath(), "CDS/assay_publications.tsv"));
+        importCDSData("AssayPublications", new File(getSampledataPath(), "CDS/notforcheckin/assay_publications.tsv"));
 
         populateFactTable();
         verifyCDSApplication();

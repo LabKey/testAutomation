@@ -31,7 +31,7 @@ import java.io.File;
 public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 {
     private static final String PROJECT_NAME = "CDSTest Project";
-    private static final File STUDY_ZIP = new File(getSampledataPath(), "CDS/Dataspace.study.zip");
+    private static final File STUDY_ZIP = new File(getSampledataPath(), "CDS/Dataspace.folder.zip");
     private static final String STUDIES[] = {"Demo Study", "Not Actually CHAVI 001", "NotRV144"};
     private static final String LABS[] = {"Arnold/Bellew Lab", "LabKey Lab", "Piehler/Eckels Lab"};
     private static final String GROUP_NAME = "CDSTest_AGroup";
@@ -141,7 +141,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[1], "Not Actually...", 12, 1, 3, 2, 8, 12, SearchBy.Studies);
-//        assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
+       assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
         goToAppHome();
         click(SearchBy.Antigens);
 //        assertFilterStatusPanel("1A", 6, 1, 3, 3, 21, 29, SearchBy.Antigens); // TODO: Get these working for when they are collapsed to begin
@@ -153,18 +153,18 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusPanel("Lab Results", "Lab Results", 23, 3, 5, 0, 0, 29, SearchBy.Assays);
         assertFilterStatusPanel("ADCC-Ferrari", "ADCC-Ferrari", 12, 1, 3, 1, 4, 29, SearchBy.Assays);
         assertFilterStatusPanel("Luminex-Sample-LabKey", "Luminex-Sample...", 6, 1, 3, 1, 1, 29, SearchBy.Assays);
-//        assertFilterStatusPanel("NAb-Sample-LabKey", "NAb-Sample-LabKey", 29, 3, 5, 3, 31, 29, SearchBy.Assays); // TODO: Participant count mismatch
+        assertFilterStatusPanel("NAb-Sample-LabKey", "NAb-Sample-LabKey", 29, 3, 5, 2, 26, 29, SearchBy.Assays);
         assertFilterStatusPanel("mRNA assay", "mRNA assay", 5, 1, 3, 1, 0, 0, SearchBy.Assays);
         goToAppHome();
         click(SearchBy.Labs);
         assertFilterStatusPanel(LABS[0], "Arnold/Bellew Lab", 6, 1, 1, 2, 1, 23, SearchBy.Labs);
         assertFilterStatusPanel(LABS[1], "LabKey Lab", 23, 3, 2, 3, 26, 23, SearchBy.Labs);
-//        assertFilterStatusPanel(LABS[2], "Piehler/Eckels...", 18, 2, 2, 2, 7, 23, SearchBy.Labs); // TODO: Participant count mismatch
+        assertFilterStatusPanel(LABS[2], "Piehler/Eckels...", 18, 2, 2, 2, 7, 23, SearchBy.Labs);
         goToAppHome();
         click(SearchBy.Demographics);
         pickCDSSort("Country");
         assertFilterStatusPanel("South Africa", "South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Demographics);
-        assertFilterStatusPanel("USA", "USA", 18, 2, 4, 3, 28, 18, SearchBy.Demographics);
+        assertFilterStatusPanel("USA", "USA", 19, 3, 4, 3, 31, 19, SearchBy.Demographics);
         assertFilterStatusPanel("Thailand", "Thailand", 5, 1, 3, 1, 3, 18, SearchBy.Demographics);
         goToAppHome();
     }
@@ -208,7 +208,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
+        assertCDSPortalRow(SearchBy.Demographics, "4 races, 1 locations", "12 total participants");
 
         click(SearchBy.Labs);
         assertFilterStatusCounts(12,1,0,2,0);
@@ -260,7 +260,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "12 total participants");
+        assertCDSPortalRow(SearchBy.Demographics, "4 races, 1 locations", "12 total participants");
 
         click(SearchBy.Labs);
         assertFilterStatusCounts(12,1,0,2,0);
@@ -275,7 +275,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "4 ethnicities, 1 locations", "8 total participants");
+        assertCDSPortalRow(SearchBy.Demographics, "4 races, 1 locations", "8 total participants");
 
         click(SearchBy.Labs);
         assertFilterStatusCounts(8,1,0,2,0);
@@ -436,7 +436,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
         assertCDSPortalRow(SearchBy.Assays, "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow(SearchBy.Labs, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "6 ethnicities, 3 locations", "29 total participants");
+        assertCDSPortalRow(SearchBy.Demographics, "6 races, 3 locations", "29 total participants");
     }
 
     private void assertCDSPortalRow(SearchBy by, String expectedDetail, String expectedTotal)
