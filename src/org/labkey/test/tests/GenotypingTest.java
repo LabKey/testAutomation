@@ -186,7 +186,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 
         assertTextPresent("Reads", "Sample Id", "Percent");
 
-        waitForTextWithRefresh("TEST09", 30000);
+        waitForTextWithRefresh("TEST09", 60000);
 //        assertTextPresent("TEST14", 2);
         waitForTextWithRefresh("1 - 100 of 1,410", 15000);
         startAlterMatches();
