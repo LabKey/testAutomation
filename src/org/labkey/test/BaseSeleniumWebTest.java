@@ -90,6 +90,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
  */
 public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable, WebTest
 {
+    public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     protected DefaultSeleniumWrapper selenium;
     private static final int DEFAULT_SELENIUM_PORT = 4444;
     private static final String DEFAULT_SELENIUM_SERVER = "localhost";
@@ -824,10 +825,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickUserMenuItem(true, items);
     }
 
+
     public void clickUserMenuItem(boolean wait, String... items)
     {
-        ExtHelper.clickExtMenuButton(this, wait, Locator.id("userMenuPopupLink"), items);
+        waitForElement(USER_MENU_LOC);
+        ExtHelper.clickExtMenuButton(this, wait, USER_MENU_LOC, items);
     }
+
 
     // Click on a module listed on the admin menu
     public void goToModule(String moduleName)
