@@ -472,9 +472,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
         waitForText(studyCount+(studyCount!=1?" Studies":" Study"));
-        assertTextPresent(assayCount+(assayCount!=1?" Assays":" Assay"),
-        contributorCount+(contributorCount!=1?" Contributors":" Contributor"),
-        antigenCount+(antigenCount!=1?" Antigens":" Antigen"));
+        waitForText(assayCount+(assayCount!=1?" Assays":" Assay"));
+        waitForText(contributorCount!=1?" Contributors":" Contributor");
+        waitForText(antigenCount+(antigenCount!=1?" Antigens":" Antigen"));
     }
 
     // Assumes you are on find-by-assay page, returns there when done
