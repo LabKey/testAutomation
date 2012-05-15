@@ -76,6 +76,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        enableEmailRecorder();
         userPermissionRightsTest();
     }
 
