@@ -470,7 +470,6 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 //                getConfirmationAndWait();
 //            }
 //        }
-        deleteProject(getProjectName());
         File dir = new File(pipelineLoc);
         File[] files = dir.listFiles();
         for(File file: files)
@@ -493,6 +492,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
                     file.delete();
             }
         }
+        deleteProject(getProjectName());
 
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + getRunNumber()));
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + (getRunNumber()-1)));
