@@ -188,6 +188,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         setFormElement("groupdescription", GROUP_DESC);
         clickButton("Save", 0);
         waitForTextToDisappear(LABS[0]);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ GROUP_NAME +"')]"), WAIT_FOR_JAVASCRIPT);
         assertFilterStatusCounts(12,1,0,2,0);
         clickButton("clear filters", 0);
         waitForText(LABS[0]);
@@ -241,6 +242,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.css(".filterOnlyRadio input"));
         setFormElement("groupname", GROUP_NAME2);
         clickButton("Save", 0);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ GROUP_NAME2 +"')]"), WAIT_FOR_JAVASCRIPT);
 
         selectBars("f");
         clickButton("save group", 0);
@@ -250,6 +252,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.css(".withSelectionRadio input"));
         setFormElement("groupname", GROUP_NAME3);
         clickButton("Save", 0);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ GROUP_NAME3 +"')]"), WAIT_FOR_JAVASCRIPT);
 
         // saved filter without including current selection (should be the same as initial group)
         goToAppHome();
