@@ -204,6 +204,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup(GROUP_NAME, true);
         assertTextPresent(GROUP_DESC);
 
+        waitForText("No Matching Assays Found.", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
@@ -255,7 +256,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup(GROUP_NAME2, true);
         assertTextNotPresent(GROUP_DESC);
 
-        refresh();//TODO: doubled up portal row. Refresh to eliminate
+        waitForText("12 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
@@ -271,6 +272,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(GROUP_DESC);
         assertTextPresent("Gender:");
 
+        waitForText("8 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow(SearchBy.Studies, STUDIES[1], "1 total");
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
