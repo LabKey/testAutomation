@@ -133,7 +133,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
-        assertEquals("", table.getDataAsText(4, "SpecimenMatchCount"));
+        assertEquals("0", table.getDataAsText(4, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(4, "Recovery"));
         
         assertEquals("", table.getDataAsText(5, "Specimen IDs"));
@@ -294,13 +294,13 @@ public class ViabilityTest extends AbstractViabilityTest
 
         assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
-        assertEquals("", table.getDataAsText(2, "SpecimenMatchCount"));
+        assertEquals("0", table.getDataAsText(2, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(2, "Recovery"));
         assertEquals("", table.getDataAsText(2, "TargetStudy"));
 
         assertEquals("vial3", table.getDataAsText(3, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
-        assertEquals("", table.getDataAsText(3, "SpecimenMatchCount"));
+        assertEquals("0", table.getDataAsText(3, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(3, "Recovery"));
         assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, "TargetStudy"));
 
