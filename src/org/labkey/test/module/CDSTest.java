@@ -82,6 +82,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         populateFactTable();
 
+        selenium.windowMaximize(); // Provides more useful screenshots on failure
         verifyCounts();
         verifyFilters();
         verifyNounPages();
@@ -129,7 +130,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void verifyCounts()
     {
-//        selenium.windowMaximize(); // Get good screenshots on failures.
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Application");
 
@@ -511,5 +511,32 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         Assays,
         Labs,
         Demographics
+    }
+    private String genCurrentSelectionString(String hierarchy, String name)
+    {
+        return name.substring(0, 14);
+//        if(name.length() <= 20)
+//            return name;
+//        else
+//            return name.substring(0, 17).trim() + "...";
+    }
+
+    private String getHierarchy(SearchBy searchBy)
+    {
+        switch(searchBy)
+        {
+            case Studies:
+                return "Study";
+            case Antigens:
+                return "Tier";
+            case Assays:
+                return "Assay";
+            case Labs:
+                return "Contributor";
+            case Demographics:
+                return "Location";//Test using this hierarchy
+        }
+        fail("Unknown Search Axis: " + searchBy);
+        return null;
     }
 }
