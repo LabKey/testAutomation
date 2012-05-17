@@ -161,11 +161,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusPanel(LABS[1], "LabKey Lab", 23, 3, 2, 3, 26, 23, SearchBy.Labs);
         assertFilterStatusPanel(LABS[2], "Piehler/Eckels...", 18, 2, 2, 2, 7, 23, SearchBy.Labs);
         goToAppHome();
-        click(SearchBy.Demographics);
+        click(SearchBy.Participants);
         pickCDSSort("Country");
-        assertFilterStatusPanel("South Africa", "South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Demographics);
-        assertFilterStatusPanel("USA", "USA", 19, 3, 4, 3, 31, 19, SearchBy.Demographics);
-        assertFilterStatusPanel("Thailand", "Thailand", 5, 1, 3, 1, 3, 18, SearchBy.Demographics);
+        assertFilterStatusPanel("South Africa", "South Africa", 5, 1, 1, 1, 3, 18, SearchBy.Participants);
+        assertFilterStatusPanel("USA", "USA", 19, 3, 4, 3, 31, 19, SearchBy.Participants);
+        assertFilterStatusPanel("Thailand", "Thailand", 5, 1, 3, 1, 3, 18, SearchBy.Participants);
         goToAppHome();
     }
 
@@ -210,7 +210,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "4 races, 1 locations", "12 total participants");
+        assertCDSPortalRow(SearchBy.Participants, "4 races, 1 locations", "12 total participants");
 
         click(SearchBy.Labs);
         assertFilterStatusCounts(12,1,0,2,0);
@@ -221,7 +221,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         //test more group saving
         selectCDSGroup(GROUP_NAME, true);
-        click(SearchBy.Demographics);
+        click(SearchBy.Participants);
         pickCDSSort("Gender");
         selectBars("f");
 
@@ -264,7 +264,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "4 races, 1 locations", "12 total participants");
+        assertCDSPortalRow(SearchBy.Participants, "4 races, 1 locations", "12 total participants");
 
         click(SearchBy.Labs);
         assertFilterStatusCounts(12,1,0,2,0);
@@ -280,7 +280,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow(SearchBy.Assays, "No Matching Assays Found.", "0 total");
         assertCDSPortalRow(SearchBy.Labs, "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "4 races, 1 locations", "8 total participants");
+        assertCDSPortalRow(SearchBy.Participants, "4 races, 1 locations", "8 total participants");
 
         click(SearchBy.Labs);
         assertFilterStatusCounts(8,1,0,2,0);
@@ -441,7 +441,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
         assertCDSPortalRow(SearchBy.Assays, "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow(SearchBy.Labs, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
-        assertCDSPortalRow(SearchBy.Demographics, "6 races, 3 locations", "29 total participants");
+        assertCDSPortalRow(SearchBy.Participants, "6 races, 3 locations", "29 total participants");
     }
 
     private void assertCDSPortalRow(SearchBy by, String expectedDetail, String expectedTotal)
@@ -510,6 +510,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         Antigens,
         Assays,
         Labs,
-        Demographics
+        Participants
     }
     }
