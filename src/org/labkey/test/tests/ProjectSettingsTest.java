@@ -28,7 +28,7 @@ import org.labkey.test.Locator;
 public class ProjectSettingsTest extends BaseSeleniumWebTest
 {
     private static final Locator supportLink = Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");
-    private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Help')]");
+    private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
     private Locator helpMenuLink = enableDevMode()?helpMenuLinkDev:helpMenuLinkProduction;
