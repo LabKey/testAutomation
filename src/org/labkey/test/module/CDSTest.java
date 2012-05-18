@@ -140,8 +140,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[1], "Not Actually...", 12, 1, 3, 2, 8, 12, SearchBy.Studies);
-       assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
+        assertFilterStatusPanel(STUDIES[1], "Not Actually ...", 12, 1, 3, 2, 8, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
         goToAppHome();
         click(SearchBy.Antigens);
 //        assertFilterStatusPanel("1A", 6, 1, 3, 3, 21, 29, SearchBy.Antigens); // TODO: Get these working for when they are collapsed to begin
@@ -152,14 +152,14 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(SearchBy.Assays);
         assertFilterStatusPanel("Lab Results", "Lab Results", 23, 3, 5, 0, 0, 29, SearchBy.Assays);
         assertFilterStatusPanel("ADCC-Ferrari", "ADCC-Ferrari", 12, 1, 3, 1, 4, 29, SearchBy.Assays);
-        assertFilterStatusPanel("Luminex-Sample-LabKey", "Luminex-Sample...", 6, 1, 3, 1, 1, 29, SearchBy.Assays);
-        assertFilterStatusPanel("NAb-Sample-LabKey", "NAb-Sample-LabKey", 29, 3, 5, 2, 26, 29, SearchBy.Assays);
+        assertFilterStatusPanel("Luminex-Sample-LabKey", "Luminex-Sampl...", 6, 1, 3, 1, 1, 29, SearchBy.Assays);
+        assertFilterStatusPanel("NAb-Sample-LabKey", "NAb-Sample-La...", 29, 3, 5, 2, 26, 29, SearchBy.Assays);
         assertFilterStatusPanel("mRNA assay", "mRNA assay", 5, 1, 3, 1, 0, 0, SearchBy.Assays);
         goToAppHome();
         click(SearchBy.Labs);
-        assertFilterStatusPanel(LABS[0], "Arnold/Bellew Lab", 6, 1, 1, 2, 1, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[0], "Arnold/Bellew...", 6, 1, 1, 2, 1, 23, SearchBy.Labs);
         assertFilterStatusPanel(LABS[1], "LabKey Lab", 23, 3, 2, 3, 26, 23, SearchBy.Labs);
-        assertFilterStatusPanel(LABS[2], "Piehler/Eckels...", 18, 2, 2, 2, 7, 23, SearchBy.Labs);
+        assertFilterStatusPanel(LABS[2], "Piehler/Eckel...", 18, 2, 2, 2, 7, 23, SearchBy.Labs);
         goToAppHome();
         click(SearchBy.Participants);
         pickCDSSort("Country");
