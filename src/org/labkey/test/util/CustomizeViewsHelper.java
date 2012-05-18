@@ -152,13 +152,13 @@ public class CustomizeViewsHelper
         String nodePath = "";
         String fieldKey = StringUtils.join(fieldKeyParts, "/");
 
-        for( int i = 0; i < fieldKeyParts.length - 1; i ++ )
+        for (int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
             nodePath += fieldKeyParts[i];
             test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            if( test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
+            if (test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
                 test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
-            test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT*2);
             nodePath += "/";
         }
 
