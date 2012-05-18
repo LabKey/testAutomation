@@ -141,10 +141,12 @@ public class StudyTest extends StudyBaseTest
         log("filter participant results down");
         Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
         selenium.type(filterSearchText.toXpath(), "a");
-        selenium.typeKeys(filterSearchText.toXpath(), "bbrev");
+        selenium.type(filterSearchText.toXpath(), "abbrev");
         setFormElement(Locator.xpath("//input[@type='text']"), "abbrevi");
-        assertTextPresent(textToFilter, 0);
+        fireEvent(filterSearchText, SeleniumEvent.change);
+        sleep(1000);
         assertTextPresent("Abbrevi", 79);
+        assertTextNotPresent(textToFilter);
 
         log("select some records and include them in a report");
         ExtHelper.clickX4GridPanelCheckbox(this, 4, "measuresGridPanel", true);
