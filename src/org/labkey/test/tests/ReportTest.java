@@ -894,7 +894,8 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 25 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[1]")));
+        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[2]")));
         waitForText("Showing 0 Results");
 
         //Mouse down on GROUP 1
@@ -955,7 +956,8 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 116 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[1]")));
+        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[2]")));
         waitForText("Showing 0 Results");
 
         //Mouse down on SPEC GROUP 1

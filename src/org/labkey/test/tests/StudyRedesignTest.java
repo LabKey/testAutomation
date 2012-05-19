@@ -213,7 +213,8 @@ public class StudyRedesignTest extends StudyBaseTest
         addWebPart("Mouse List");
         waitForText("Filter"); // Wait for participant list to appear.
 
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[1]")));
+        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[2]")));
         waitForText("No matching Mice");
 
         //Mouse down on GROUP 1
