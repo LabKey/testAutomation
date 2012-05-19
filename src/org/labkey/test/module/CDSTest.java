@@ -296,7 +296,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(SearchBy.Assays);
 
         // check placeholders
-        assertAssayInfoPage("Lab Results", "default.png", "default.png", "", "", "Genetics:\n Methodology:\n Target Area:", "", "");
+        assertAssayInfoPage("Lab Results", "default.png", "default.png", "", "", "", "", "");
         assertAssayInfoPage("ADCC-Ferrari", "team_Mark_Igra.jpg", "team_Alan_Vezina.jpg",
                 "Mark Igra\n" +
                         "marki@labkey.com\n" +
@@ -304,8 +304,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "Alan Vezina\n" +
                         "alanv@labkey.com\n" +
                         "Developer",
-                "Genetics: \n" +
-                        "Methodology: ICS\n" +
+                "Methodology: ICS\n" +
                         "Target Area: Adaptive: humoral and B-cell",
                 "This is an ADCC assay.",
                 "Immune escape from HIV-specific antibody-dependent cellular cytotoxicity (ADCC) pressure.");
@@ -316,8 +315,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "Nick Arnold\n" +
                         "nicka@labkey.com\n" +
                         "Developer",
-                "Genetics: \n" +
-                        "Methodology: Luminex\n" +
+                "Methodology: Luminex\n" +
                         "Target Area: Adaptive: humoral and B-cell",
                 "We measured something using a Luminex assay",
                 "Inhibition of HIV-1 replication in human lymphoid tissues ex vivo by measles virus.");
@@ -328,8 +326,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "Nick Arnold\n" +
                         "nicka@labkey.com\n" +
                         "Developer",
-                "Genetics: \n" +
-                        "Methodology: ICS\n" +
+                "Methodology: ICS\n" +
                         "Target Area: Innate",
                 "This one tested gene expression.",
                 "Development of an in vitro mRNA degradation assay utilizing extracts from HIV-1- and SIV-infected cells.");
@@ -340,8 +337,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "Kristin Fitzsimmons\n" +
                         "kristinf@labkey.com\n" +
                         "ScrumMaster",
-                "Genetics: \n" +
-                        "Methodology: NAb\n" +
+                "Methodology: NAb\n" +
                         "Target Area: Adaptive: humoral and B-cell",
                 "This tested antibodies.",
                 "Vaccinology: precisely tuned antibodies nab HIV.");
@@ -424,6 +420,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
             refresh();
             waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
         }
+        waitForText(barLabel);
         assertEquals("Wrong page title.", barLabel, getText(Locator.css(".savetitle")));
     }
 
