@@ -27,8 +27,55 @@ import org.labkey.test.util.CustomizeViewsHelper;
  */
 public class ExtraKeyStudyTest extends StudyBaseTest
 {
-
     static String studyFolder = "/ExtraKeyStudy/folder.xml";
+
+    String[] datasets = {
+            "P_One",
+            "P_Two",
+
+            "PV_One",
+            "PV_Two",
+
+            "PVInt_One",
+            "PVInt_Two",
+            "PVInt_Three",
+
+            "PVString_One",
+            "PVString_Two",
+
+            "PVDouble_One",
+            "PVDouble_Two",
+
+            "PVDate_One",
+            "PVDate_Two",
+
+            "PVCode_One",
+            "PVCode_Two"
+    };
+
+    int[] visibility = {
+            Integer.parseInt("000000000000010", 2), // P_One
+            Integer.parseInt("000000000000001", 2), // P_Two
+
+            Integer.parseInt("000000000001011", 2), // PV_One
+            Integer.parseInt("000000000000111", 2), // PV_Two
+
+            Integer.parseInt("000000000101111", 2), // PVInt_One
+            Integer.parseInt("000000000011111", 2), // PVInt_Two
+            Integer.parseInt("000000000001111", 2), // PVInt_Three
+
+            Integer.parseInt("000000100001111", 2), // PVString_One
+            Integer.parseInt("000000010001111", 2), // PVString_Two
+
+            Integer.parseInt("000010000001111", 2), // PVDouble_One
+            Integer.parseInt("000001000001111", 2), // PVDouble_Two
+
+            Integer.parseInt("001000000001111", 2), // PVDate_One
+            Integer.parseInt("000100000001111", 2), // PVDate_Two
+
+            Integer.parseInt("100000000001111", 2), // PVCode_One
+            Integer.parseInt("010000000001111", 2), // PVCode_Two
+    };
 
     @Override
     protected void doCreateSteps()
@@ -46,60 +93,48 @@ public class ExtraKeyStudyTest extends StudyBaseTest
         clickLinkContainingText(getProjectName());
         clickLinkContainingText(getFolderName());
         clickLinkContainingText("datasets");
-        waitForTextWithRefresh("PVDouble_Two", defaultWaitForPage);
-        verifyDemoDataset();
-        goBack();
-        verifyDemoVisitDataset();
-        goBack();
-        verifyDemoVisitKeyDataset();
 
-
+        for (int i = 0; i < datasets.length; i++)
+        {
+            String datasetName = datasets[i];
+            verifyColumnVisibility(datasetName, visibility[i]);
+        }
     }
 
-    private void verifyDemoVisitKeyDataset()
+    private void verifyColumnVisibility(String datasetName, int visibility)
     {
-        clickLinkContainingText("PVInt_One");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        verifyElements(true, true, true);
-    }
-
-    private void verifyDemoVisitDataset()
-    {
-        clickLinkWithText("PV_Two");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        verifyElements(true, true, false);
-
-
-    }
-
-    private void verifyDemoDataset()
-    {
-
-        clickLinkWithText("P_One");
+        pushLocation();
+        log("** Verifying visibility of other datasets from " + datasetName);
+        clickLinkContainingText(datasetName);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
 
-        verifyElements(true, false, false);
-
-    }
-
-    private void verifyElements(boolean demoVisibile, boolean visitVisible, boolean extraKeyVisibile)
-    {
-        // P lookup
+        // Participant columns should be visible, old "Participant/DataSet" lookup should be hidden.
         assertTrue("PandaId/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaId/PandaId"));
         assertTrue("PandaId/DataSet lookup should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaId/DataSet"));
 
-        // PV lookup
+        // ParticipantVisit columns should be visible, old "Paricipant Visit/<dataset>" lookups should be hidden.
         assertTrue("Panda Visit/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/PandaId"));
         assertTrue("Panda Visit/Visit should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/Visit"));
         assertTrue("Panda Visit/PV_One should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_One"));
         assertTrue("Panda Visit/PV_Two should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_Two"));
 
-        // PVK lookup
-        assertTextPresent("DataSets");
-        assertEquals("Visibility of id only data sets what was expected", demoVisibile, CustomizeViewsHelper.isColumnVisible(this, "DataSets/P_Two"));
-        assertEquals("Visibility of id + visit data sets not what was expected", visitVisible, CustomizeViewsHelper.isColumnVisible(this, "DataSets/PV_Two"));
-        assertEquals("Visibility of id, visit, extra key data sets not what was expected", extraKeyVisibile, CustomizeViewsHelper.isColumnVisible(this, "DataSets/PVInt_Two"));
-        assertFalse("Visibility of discordant key data sets not what was expected", CustomizeViewsHelper.isColumnPresent(this, "DataSets/PVSInt_Two"));
+        // DataSets auto-join lookups
+        for (int j = 0; j < datasets.length; j++)
+        {
+            String otherDataset = datasets[j];
+            boolean visible = isBitSet(visibility, j);
+            String lookup = "DataSets/" + otherDataset;
+            log("** Checking " + lookup + " is " + (visible ? "" : "not ") + "visible from " + datasetName);
+            assertEquals("Expected " + lookup + " to be " + (visible ? "" : "not ") + "visible from " + datasetName,
+                    visible, CustomizeViewsHelper.isColumnVisible(this, lookup));
+        }
 
+        popLocation();
     }
+
+    private boolean isBitSet(int bits, int bit)
+    {
+        return (bits & (1 << bit)) != 0;
+    }
+
 }
