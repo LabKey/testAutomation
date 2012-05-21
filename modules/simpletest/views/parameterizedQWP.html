@@ -1,10 +1,14 @@
 <div id='queryTestDiv1'></div>
 <script type="text/javascript">
 
-var qwp1 = new LABKEY.QueryWebPart({
-	renderTo: 'queryTestDiv1',
-	title: 'My Query Web Part',
-	schemaName: 'vehicle',
-	queryName: 'ParamParamVehicles'
-});
+function run()
+{
+    var qwp1 = new LABKEY.QueryWebPart({
+        renderTo: 'queryTestDiv1',
+        title: 'My Query Web Part',
+        schemaName: 'vehicle',
+        queryName: 'ParamParamVehicles'
+    });
+}
+Ext.onReady(run);
 </script>
