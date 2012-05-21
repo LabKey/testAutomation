@@ -69,9 +69,9 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final File TEST_ASSAY_LUM_FILE9 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls");
     protected final File TEST_ASSAY_LUM_FILE10 = new File(getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx");
 
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (b12 IgA std).xls");
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (b12 IgA std).xls");
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgG-Biot (HIVIG std).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (Standard2).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (Standard2).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgA-Biot (Standard1).xls");
 
     protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
     private static final String THAW_LIST_NAME = "LuminexThawList";
@@ -540,11 +540,11 @@ public class LuminexTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable("query", this);
         table.setFilter("FailureFlag", "Equals", "true");
 
-        // expect one 4PL curve fit failure (for HIVIG - VRC A 5304 gp140 (62))
+        // expect one 4PL curve fit failure (for Standard1 - ENV6 (97))
         table.setFilter("CurveType", "Equals", "Four Parameter");
         assertEquals("Expected one Four Parameter curve fit failure flag", 1, table.getDataRowCount());
         List<String> values = table.getColumnDataAsText("Analyte");
-        assertTrue("Unexpected analyte for Four Parameter curve fit failure", values.size() == 1 && values.get(0).equals("VRC A 5304 gp140 (62)"));
+        assertTrue("Unexpected analyte for Four Parameter curve fit failure", values.size() == 1 && values.get(0).equals("ENV6 (97)"));
         table.clearFilter("CurveType");
 
         // expect ten 5PL curve fit failures
@@ -774,8 +774,8 @@ public class LuminexTest extends AbstractQCAssayTest
     private String[] getListOfAnalytesMultipleCurveData()
     {
         //TODO:  make this a dynamic list, acquired from the current data set, rather than hardcoded
-        return new String[] {"VRC A 5304 gp140 (62)", "VRC B gp140 (63)", "B.con.env03 140 CF (65)",
-                        "JRFL gp140 (66)", "Blank (53)"};
+        return new String[] {"ENV6 (97)", "ENV7 (93)", "ENV4 (26)",
+                        "ENV5 (58)", "Blank (53)"};
     }
 
 
@@ -828,11 +828,11 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         String name = startCreateMultipleCurveAssayRun();
 
-        String[] standardsNames = {"HIVIG", "b12 IgA"};
+        String[] standardsNames = {"Standard1", "Standard2"};
         checkStandardsCheckBoxesExist(standardsNames);
 
         String[] possibleAnalytes = getListOfAnalytesMultipleCurveData();
-        String[] possibleStandards = new String[] {"b12 IgA", "HIVIG"};
+        String[] possibleStandards = new String[] {"Standard2", "Standard1"};
 
         Map<String, Set<String>> analytesAndStandardsConfig = generateAnalytesAndStandardsConfig(possibleAnalytes, possibleStandards);
         configureStandardsForAnalytes(analytesAndStandardsConfig, possibleStandards);
@@ -852,11 +852,11 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
         // the same curve fits
-        assertTrue("BioPlex curve fit for VRC A 5304 gp140 (62) in plate 1, 2, or 3",
+        assertTrue("BioPlex curve fit for ENV6 (97) in plate 1, 2, or 3",
                 isTextPresent("FI = 0.465914 + (1.5417E+006 - 0.465914) / ((1 + (Conc / 122.733)^-0.173373))^7.64039") ||
                 isTextPresent("FI = 0.582906 + (167.081 - 0.582906) / ((1 + (Conc / 0.531813)^-5.30023))^0.1"));
-        assertTrue("BioPlex FitProb for VRC A 5304 gp140 (62) in plate 1, 2, or 3", isTextPresent("0.9667") || isTextPresent("0.4790"));
-        assertTrue("BioPlex ResVar for VRC A 5304 gp140 (62) in plate 1, 2, 3", isTextPresent("0.1895") || isTextPresent("0.8266"));
+        assertTrue("BioPlex FitProb for ENV6 (97) in plate 1, 2, or 3", isTextPresent("0.9667") || isTextPresent("0.4790"));
+        assertTrue("BioPlex ResVar for ENV6 (97) in plate 1, 2, 3", isTextPresent("0.1895") || isTextPresent("0.8266"));
 
         compareColumnValuesAgainstExpected("Analyte", "Standard", analytesAndStandardsConfig);
 
@@ -868,8 +868,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
         // the same curve fits
-        assertTrue("BioPlex curve fit parameter for VRC A 5304 gp140 (62) in plate 1, 2, or 3", isTextPresent("0.465914") || isTextPresent("0.582906"));
-        assertTrue("BioPlex curve fit parameter for VRC A 5304 gp140 (62) in plate 1, 2, or 3", isTextPresent("7.64039") || isTextPresent("0.1"));
+        assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("0.465914") || isTextPresent("0.582906"));
+        assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("7.64039") || isTextPresent("0.1"));
     }
 
     private void compareColumnValuesAgainstExpected(String column1, String column2, Map<String, Set<String>> column1toColumn2)
@@ -1168,12 +1168,12 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE4);
         clickNavButton("Next", 60000);
         // make sure the Standard checkboxes are checked
-        checkCheckbox("_titrationRole_standard_HIVIG");
-        checkCheckbox("titration_CN54 (1)_HIVIG");
-        checkCheckbox("titration_Con S (2)_HIVIG");
-        checkCheckbox("titration_Blank (3)_HIVIG");
+        checkCheckbox("_titrationRole_standard_Standard1");
+        checkCheckbox("titration_MyAnalyte (1)_Standard1");
+        checkCheckbox("titration_MyAnalyte (2)_Standard1");
+        checkCheckbox("titration_Blank (3)_Standard1");
         // make sure that that QC Control checkbox is checked
-        checkCheckbox("_titrationRole_qccontrol_HIVIG");
+        checkCheckbox("_titrationRole_qccontrol_Standard1");
         // set LotNumber for the first analyte
         selenium.type("//input[@type='text' and contains(@name, '_LotNumber')][1]", TEST_ANALYTE_LOT_NUMBER);
         clickNavButton("Save and Finish");
@@ -1181,10 +1181,10 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the PDF of curves was generated
         Locator l = Locator.tagWithAttribute("img", "src", "/labkey/_images/sigmoidal_curve.png");
         click(l);
-        assertLinkPresentWithText("WithBlankBead.HIVIG_5PL.pdf");
-        assertLinkPresentWithText("WithBlankBead.HIVIG_4PL.pdf");
-        assertLinkPresentWithText("WithBlankBead.HIVIG_QC_Curves_4PL.pdf");
-        assertLinkPresentWithText("WithBlankBead.HIVIG_QC_Curves_5PL.pdf");
+        assertLinkPresentWithText("WithBlankBead.Standard1_5PL.pdf");
+        assertLinkPresentWithText("WithBlankBead.Standard1_4PL.pdf");
+        assertLinkPresentWithText("WithBlankBead.Standard1_QC_Curves_4PL.pdf");
+        assertLinkPresentWithText("WithBlankBead.Standard1_QC_Curves_5PL.pdf");
 
         // verify that the transform script and ruminex versions are as expected
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
@@ -1302,7 +1302,7 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyGuideSetsNotApplied();
 
         //create initial guide sets for the 2 analytes
-        goToLeveyJenningsGraphPage("HIVIG");
+        goToLeveyJenningsGraphPage("Standard1");
         createInitialGuideSets();
 
         // check guide set IDs and make sure appropriate runs are associated to created guide sets
@@ -1331,8 +1331,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
             importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
                         "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
-            uncheckCheckbox("_titrationRole_standard_HIVIG");
-            checkCheckbox("_titrationRole_qccontrol_HIVIG");
+            uncheckCheckbox("_titrationRole_standard_Standard1");
+            checkCheckbox("_titrationRole_qccontrol_Standard1");
             clickNavButton("Save and Finish");
 
             displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
@@ -1350,7 +1350,7 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyExcludingRuns(guideSetIds, analytes);
 
         // test the start and end date filter for the report
-        goToLeveyJenningsGraphPage("HIVIG");
+        goToLeveyJenningsGraphPage("Standard1");
         applyStartAndEndDateFilter();
 
         excludableWellsWithTransformTest();
@@ -1371,8 +1371,8 @@ public class LuminexTest extends AbstractQCAssayTest
         testDate.add(Calendar.DATE, 1);
         importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
                     "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
-        uncheckCheckbox("_titrationRole_standard_HIVIG");
-        checkCheckbox("_titrationRole_qccontrol_HIVIG");
+        uncheckCheckbox("_titrationRole_standard_Standard1");
+        checkCheckbox("_titrationRole_qccontrol_Standard1");
         clickNavButton("Save and Finish");
     }
 
@@ -1453,7 +1453,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         beginAt(ljUrl);
         setUpGuideSet("GS Analyte (2)");
-        assertTextPresent("HIVIG Levey-Jennings Report");
+        assertTextPresent("Standard1 Levey-Jennings Report");
         assertTextNotPresent("Apply Guide Set");
         stopImpersonating();
         deleteUser(reader);
@@ -1499,7 +1499,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //4. For GS Analyte (2), apply the non-current guide set to plate 5a
         //	- QC Flags added for EC50 and HMFI
-        goToLeveyJenningsGraphPage("HIVIG");
+        goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
         String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
         assertTextNotPresent(newQcFlags);
@@ -1517,7 +1517,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
         //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
-        goToLeveyJenningsGraphPage("HIVIG");
+        goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
         applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT, -1);
         assertTextNotPresent(newQcFlags);
@@ -1584,8 +1584,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         importLuminexRunPageTwo(newGuideSetPlate, isotype, conjugate, "", "", "Notebook" + 11,
                     "Experimental", "TECH" + (11), "",  TEST_ASSAY_LUM_FILE9.toString(), 6);
-        uncheckCheckbox("_titrationRole_standard_HIVIG");
-        checkCheckbox("_titrationRole_qccontrol_HIVIG");
+        uncheckCheckbox("_titrationRole_standard_Standard1");
+        checkCheckbox("_titrationRole_qccontrol_Standard1");
         clickNavButton("Save and Finish");
 
 
@@ -1656,7 +1656,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("CV", 4); // 3 occurances of PCV and 1 of %CV
 
         //verify text is in expected form
-        waitForText("HIVIG GS Analyte (1) - " + isotype + " " + conjugate + " under threshold for AUC");
+        waitForText("Standard1 GS Analyte (1) - " + isotype + " " + conjugate + " under threshold for AUC");
 
         //verify unchecking a box  removes the flag
         Locator aucCheckBox = Locator.xpath("//div[text()='AUC']/../../td/div/div[contains(@class, 'check')]");
@@ -1737,7 +1737,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //verify the Levey-Jennings plot
         clickLinkWithText("graph",0);
         waitForText(" - " + isotype + " " + conjugate);
-        assertTextPresent( "HIVIG Levey-Jennings Report");
+        assertTextPresent( "Standard1 Levey-Jennings Report");
     }
 
     private String getQCLink()
@@ -1777,7 +1777,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkContainingText(getProjectName());
         clickLinkContainingText(TEST_ASSAY_LUM);
         excludeWellFromRun("Guide Set plate 5", "A6,B6");
-        goToLeveyJenningsGraphPage("HIVIG");
+        goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
         assertTextPresent("28040.51");
 
@@ -1819,7 +1819,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void verifyLeveyJenningsRplots()
     {
-        goToLeveyJenningsGraphPage("HIVIG");
+        goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
 
         // check 4PL ec50 trending R plot
@@ -1946,7 +1946,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // wait for the test headers in the guide set and tracking data regions
         waitForText(analyte + " - " + isotype + " " + conjugate);
-        waitForText("HIVIG Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
+        waitForText("Standard1 Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
     }
@@ -2140,8 +2140,8 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
         clickLinkWithText(table.getDataAsText(0, "Row Id"));
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves_4PL.pdf", 3);
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".HIVIG_QC_Curves_5PL.pdf", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_4PL.pdf", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_5PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 4);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".tomaras_luminex_transform.Rout", 3);
 
