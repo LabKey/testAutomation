@@ -90,6 +90,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
  */
 public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable, WebTest
 {
+    public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     protected DefaultSeleniumWrapper selenium;
     private static final int DEFAULT_SELENIUM_PORT = 4444;
@@ -817,7 +818,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickAdminMenuItem(String... items)
     {
-        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text() = 'Admin']"), items);
+        ExtHelper.clickExtMenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), items);
     }
 
     public void clickUserMenuItem(String... items)
@@ -825,13 +826,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickUserMenuItem(true, items);
     }
 
-
     public void clickUserMenuItem(boolean wait, String... items)
     {
         waitForElement(USER_MENU_LOC);
         ExtHelper.clickExtMenuButton(this, wait, USER_MENU_LOC, items);
     }
-
 
     // Click on a module listed on the admin menu
     public void goToModule(String moduleName)
@@ -2304,6 +2303,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             deleteProject(project);
         }
+
+
     }
 
     public void deleteProject(String project, int wait)
@@ -2621,8 +2622,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return (source.indexOf(text1) < source.indexOf(text2));
     }
 
-    // Searches only the displayed text in the body of the page, not the HTML source.
-    public void assertTextPresentInThisOrder(String... text)
+    /**
+     *
+     * @param text
+     * @return null = yes, present in this order
+     * otherwise returns out of order string and explanation of error
+     */
+    public String isPresentInThisOrder(String... text)
     {
         String source = selenium.getBodyText();
         int previousIndex = -1;
@@ -2632,11 +2638,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             int index = source.indexOf(s);
 
-            assertTrue("'" + s + "' is not present", index > -1);
-            assertTrue("'" + previousString + "' appears after '" + s + "'", index > previousIndex);
+            if(index == -1)
+                return s + " not found";
+            if(index <= previousIndex)
+                return s + " occured out of order";
             previousIndex = index;
             previousString = s;
         }
+        return null;
+    }
+    // Searches only the displayed text in the body of the page, not the HTML source.
+    public void assertTextPresentInThisOrder(String... text)
+    {
+        String success = isPresentInThisOrder(text);
+        assertTrue(success, success==null);
     }
 
     public void assertTextBefore(String text1, String text2)
@@ -4312,6 +4327,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return selenium.getXpathCount(xpath.getPath()).intValue();
     }
 
+    /**
+     * From the assay design page, add a field with the given name, label, and type
+     * @param name
+     * @param label
+     * @param type
+     */
+    public void addRunField(String name, String label, ListHelper.ListColumnType type)
+    {
+        String xpath = ("//input[starts-with(@name, 'ff_name");
+        int newFieldIndex = getXpathCount(Locator.xpath(xpath + "')]"));
+        clickButtonByIndex("Add Field", 1, 0);
+        ListHelper.setColumnName(this, newFieldIndex, name);
+        ListHelper.setColumnLabel(this, newFieldIndex, label);
+        ListHelper.setColumnType(this, newFieldIndex, type);
+    }
+
     // UNDONE: move usages to use ListHelper
     @Deprecated
     public void addField(String areaTitle, int index, String name, String label, ListHelper.ListColumnType type)
@@ -5431,7 +5462,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected void importStudyFromZip(String studyFile)
     {
         startImportStudyFromZip(studyFile);
-        waitForPipelineJobsToComplete(1, "Study import", false);
+        waitForPipelineJobsToComplete(0, "Study import", true);
     }
 
     protected void importFolderFromZip(String folderFile)

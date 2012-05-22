@@ -129,6 +129,7 @@ public enum TestSet
         FolderTest.class,
         StudyDemoModeTest.class,
         LibraTest.class,
+//        StudyReloadTest.class,
         AncillaryStudyTest.class,
         FolderExportTest.class,
         GenotypingTest.class,
@@ -276,6 +277,7 @@ public enum TestSet
     Weekly(600000, BVTnDaily, new Class[] {
             // Add special test classes, not in daily or BVT.
             SecurityTestExtended.class,
+            NabMigrationTest.class
     }),
 
     Adaptive(new Class[]{

@@ -163,4 +163,16 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         else
             fail("unable to locate the Transform script");
     }
+
+    protected void startCreateNabAssay(String name)
+    {
+        clickNavButton("New Assay Design");
+        checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
+        clickNavButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+        selenium.type("//input[@id='AssayDesignerName']", name);
+
+        log("Setting up NAb assay");
+    }
 }

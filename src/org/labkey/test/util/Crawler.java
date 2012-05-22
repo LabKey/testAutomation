@@ -126,7 +126,9 @@ public class Crawler
             new ControllerActionId("study-samples", "emailLabSpecimenLists"),
             new ControllerActionId("study-samples", "getSpecimenExcel"),
             new ControllerActionId("study-samples", "download"),
+            new ControllerActionId("NAb", "download"),
             new ControllerActionId("user", "impersonate"));
+
 
         return list;
     }
@@ -408,6 +410,8 @@ public class Crawler
         while ((!_urlsToCheck.isEmpty()) && (_crawlTime < _maxCrawlTime))
         {
             _urlToCheck = _urlsToCheck.remove(0);
+            if(_urlToCheck.toString().contains("showMaterialSource"))
+                System.out.println("pay attention");
             String urlText = _urlToCheck.getUrlText();
             // Make sure it is a link to inside the page
             if (urlText.startsWith("http://") ||

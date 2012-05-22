@@ -131,14 +131,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             //create a new nab assay
             clickNavButton("Manage Assays");
-            clickNavButton("New Assay Design");
-            checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
-            clickNavButton("Next");
-
-            waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-            log("Setting up NAb assay");
-            selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAB);
+            startCreateNabAssay(TEST_ASSAY_NAB);
             selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_NAB_DESC);
 
             sleep(1000);
@@ -397,6 +390,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             runTransformTest();
         }
     } //doTestSteps()
+
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton)
     {

@@ -25,12 +25,12 @@ import java.io.File;
  * Date: May 13, 2006
  * Time: 2:53:13 PM
  */
-public class NabOldTest extends BaseSeleniumWebTest
+public class NabOldTest extends AbstractQCAssayTest
 {
-    private static final String PROJECT_NAME = "NabVerifyProject";
-    private static final String FOLDER_NAME = "NabFolder";
-    private static final String TEST_FILE_NAME = "m0902051;3997.xls";
-    private static final String TEST_FILE_PATH = "/sampledata/Nab/" + TEST_FILE_NAME;
+    protected static final String PROJECT_NAME = "NabVerifyProject";
+    protected static final String FOLDER_NAME = "NabFolder";
+    protected static final String TEST_FILE_NAME = "m0902051;3997.xls";
+    protected static final String TEST_FILE_PATH = "/sampledata/Nab/" + TEST_FILE_NAME;
 
 
     public String getAssociatedModuleDirectory()
@@ -56,40 +56,14 @@ public class NabOldTest extends BaseSeleniumWebTest
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
-    protected void doTestSteps()
+    protected void runUITests()
     {
-        if (!isFileUploadAvailable())
-        {
-            log("\n\n====\nNAB Test requires file upload for any testing. Test is being skipped in this browser\n\n===");
-            return;
-        }
-        
-        createProject(PROJECT_NAME);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Nab", "Study"});
+        if(createRuns()) return;
+        checkRuns();
+    }
 
-        // click the study tab to force creation of the study table row:
-        clickTab("Study");
-        clickNavButton("Create Study");
-        clickNavButton("Create Study");
-        clickTab("Nab");
-        clickLinkWithText("Deprecated NAb Run");
-        File testFile = new File(getLabKeyRoot() + TEST_FILE_PATH);
-        setFormElement("dataFile", testFile);
-        setFormElement("metadata.virusName", "First run");
-        uncheckCheckbox("runSettings.inferFromFile");
-        clickNavButton("Calculate", longWaitForPage);
-        assertTextPresent(TEST_FILE_NAME);
-        assertTextPresent("1547");
-        assertTextPresent("109935");
-
-        clickTab("Nab");
-        clickLinkWithText("Deprecated NAb Run");
-        setFormElement("dataFile", testFile);
-        setFormElement("metadata.virusName", "Second run");
-        clickNavButton("Calculate");
-        assertTextPresent(TEST_FILE_NAME);
-        assertTextPresent("1353");
-
+    protected void checkRuns()
+    {
         log("Verify saved run");
         clickTab("Nab");
         clickLinkWithText("Deprecated NAb Run");
@@ -131,9 +105,45 @@ public class NabOldTest extends BaseSeleniumWebTest
         log("Delete run");
         clickImgButtonNoNav("Select All");
         clickNavButton("Delete");
-
         log("Verify deleted run");
         assertTextPresent("Incubation Time");
         assertTextNotPresent(TEST_FILE_NAME);
+    }
+
+    protected boolean createRuns()
+    {
+        if (!isFileUploadAvailable())
+        {
+            log("\n\n====\nNAB Test requires file upload for any testing. Test is being skipped in this browser\n\n===");
+            return true;
+        }
+
+        createProject(PROJECT_NAME);
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Nab", "Study"});
+
+        // click the study tab to force creation of the study table row:
+        clickTab("Study");
+        clickNavButton("Create Study");
+        clickNavButton("Create Study");
+        clickTab("Nab");
+        clickLinkWithText("Deprecated NAb Run");
+        File testFile = new File(getLabKeyRoot() + TEST_FILE_PATH);
+        setFormElement("dataFile", testFile);
+        setFormElement("metadata.virusName", "First run");
+        uncheckCheckbox("runSettings.inferFromFile");
+        clickNavButton("Calculate", longWaitForPage);
+        assertTextPresent(TEST_FILE_NAME);
+        assertTextPresent("1547");
+        assertTextPresent("109935");
+
+        clickTab("Nab");
+        clickLinkWithText("Deprecated NAb Run");
+        setFormElement("dataFile", testFile);
+        setFormElement("metadata.virusName", "Second run");
+        clickNavButton("Calculate");
+        assertTextPresent(TEST_FILE_NAME);
+        assertTextPresent("1353");
+
+        return false;
     }
 }
