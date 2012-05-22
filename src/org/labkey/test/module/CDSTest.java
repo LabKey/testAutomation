@@ -490,12 +490,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
             assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+pocImg+"']"), 1);
             assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+contributorImg+"']"), 1);
         }
-        assertEquals("Incorrect Lead Contributor", ("Lead Contributor" + leadContributor).replace("\n", ""), getText(Locator.css(".assayInfoLeadContributor")).replace("\n", ""));
-        assertEquals("Incorrect Assay Point of Contact", ("Assay Point of Contact" + pointOfContact).replace("\n", ""), getText(Locator.css(".assayInfoPointOfContact")).replace("\n", ""));
+        assertEquals("Incorrect Lead Contributor", leadContributor.replace("\n", ""), getText(Locator.css(".assayInfoLeadContributor")).replace("\n", ""));
+        assertEquals("Incorrect Assay Point of Contact", pointOfContact.replace("\n", ""), getText(Locator.css(".assayInfoPointOfContact")).replace("\n", ""));
         assertEquals("Incorrect Assay Details", details.replace("\n", ""), getText(Locator.css(".assayInfoDetails")).replace("\n", ""));
         //assertEquals("Incorrect Description", ("Description" + pointOfContact).replace("\n", ""), getText(Locator.css(".assayInfoDescription")).replace("\n", ""));
-        assertEquals("Incorrect Assay Abstract", ("Assay Abstract" + assayAbstract).replace("\n", ""), getText(Locator.css(".assayInfoAbstract")).replace("\n", ""));
-        assertEquals("Incorrect Related Publications", ("Related Publications" + relatedPubs).replace("\n", ""), getText(Locator.css(".assayInfoRelatedPublications")).replace("\n", ""));
+        assertEquals("Incorrect Assay Abstract", assayAbstract.replace("\n", ""), getText(Locator.css(".assayInfoAbstract")).replace("\n", ""));
+        assertEquals("Incorrect Related Publications", relatedPubs.replace("\n", ""), getText(Locator.css(".assayInfoRelatedPublications")).replace("\n", ""));
         closeInfoPage();
     }
 
