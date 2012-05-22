@@ -15,16 +15,26 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.remoteapi.assay.ExpObject;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ExecuteSqlCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * User: elvan
@@ -134,6 +144,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
         importSecondRunTest();
         goToProjectHome();
         importIlluminaRunTest();
+        verifyIlluminaExport();
 
     }
 
@@ -353,6 +364,76 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
         clickLinkWithText(illuminaImportNum);
 
         verifyIlluminaSamples();
+    }
+
+    private void verifyIlluminaExport() throws Exception
+    {
+        String url = WebTestHelper.getBaseURL() + "/genotyping/" + getProjectName() + "/mergeFastqFiles.view";
+        HttpClient httpClient = WebTestHelper.getHttpClient(url);
+        PostMethod method = null;
+
+        try
+        {
+            ExecuteSqlCommand cmd = new ExecuteSqlCommand("genotyping", "SELECT s.* from genotyping.SequenceFiles s LEFT JOIN (select max(rowid) as rowid from genotyping.Runs r WHERE platform = 'Illumina' group by rowid) r ON r.rowid = s.run");
+            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+            SelectRowsResponse resp = cmd.execute(cn, getProjectName());
+
+            //first try FASTQ merge
+            method = new PostMethod(url);
+            for (Map<String, Object> row : resp.getRows())
+            {
+                method.addParameter("dataIds", row.get("DataId").toString());
+            }
+
+            method.addParameter("zipFileName", "genotypingExport");
+            int status = httpClient.executeMethod(method);
+            assertTrue("FASTQ Downloaded", status == HttpStatus.SC_OK);
+            assertTrue("Response is Attachment", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
+            assertTrue("Response is application/x-gzip", method.getResponseHeader("Content-Type").getValue().startsWith("application/x-gzip"));
+            assertTrue("Length of response matches expected value", method.getResponseBody().length == 29587);
+
+            Checksum c = new CRC32();
+            c.update(method.getResponseBody(), 0, method.getResponseBody().length);
+            log("Checksum: " + c.getValue());
+            String os = System.getProperty("os.name").toLowerCase();
+
+            if(os.contains("win"))
+            {
+                assertTrue("Checksum matches", c.getValue() == 125618213);
+            }
+            else if (os.contains("nix"))
+            {
+                assertTrue("Checksum matches", c.getValue() == 125618213);
+            }
+            else
+            {
+                //todo: need to verify the checksum on OSX
+                throw new Exception("Unrecognized OS: " + os);
+            }
+            method.releaseConnection();
+
+            //then ZIP export
+            url = WebTestHelper.getBaseURL() + "/experiment/" + getProjectName() + "/exportFiles.view";
+            httpClient = WebTestHelper.getHttpClient(url);
+
+            method = new PostMethod(url);
+            for (Map<String, Object> row : resp.getRows())
+            {
+                method.addParameter("dataIds", row.get("DataId").toString());
+            }
+
+            method.addParameter("zipFileName", "genotypingZipExport");
+            status = httpClient.executeMethod(method);
+            assertTrue("ZIP Downloaded", status == HttpStatus.SC_OK);
+            assertTrue("Response is Attachment", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
+            assertTrue("Response is application/zip", method.getResponseHeader("Content-Type").getValue().startsWith("application/zip"));
+        }
+        finally
+        {
+            if (null != method)
+                method.releaseConnection();
+        }
     }
 
     private void assertExportButtonPresent()
