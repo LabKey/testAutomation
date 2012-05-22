@@ -45,6 +45,7 @@ modules/simpletest/queries/study/verifyAssay.js -text
 modules/simpletest/queries/vehicle/ParamParamVehicles.sql -text
 modules/simpletest/queries/vehicle/ParameterizedVehicles.sql -text
 modules/simpletest/queries/vehicle/Toyotas.sql -text
+modules/simpletest/queries/vehicle/Vehicles/AlternateImportTemplate.qview.xml -text
 modules/simpletest/queries/vehicle/Vehicles/VehiclesInCurrentAndSubfolders.qview.xml -text
 modules/simpletest/queries/vehicle/colors.js -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text

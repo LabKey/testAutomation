@@ -84,6 +84,11 @@
   <ns:table tableName="Vehicles" tableDbType="TABLE">
     <ns:pkColumnName>RowId</ns:pkColumnName>
     <ns:tableUrl>/simpletest/vehicle.view?rowid=${RowId}</ns:tableUrl>
+    <ns:importMessage>Hello.  Please read this before you import data</ns:importMessage>
+    <ns:importTemplates>
+        <ns:template label="Template 1" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles" />
+        <ns:template label="Template 2" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles&amp;query.viewName=AlternateImportTemplate" />
+    </ns:importTemplates>
     <ns:columns>
       <ns:column columnName="RowId">
         <ns:datatype>serial</ns:datatype>
