@@ -1851,6 +1851,24 @@ public class LuminexTest extends AbstractQCAssayTest
         Locator.XPathLocator l = Locator.xpath("//td/div[contains(@style,'red')]/../../td/div/a[contains(text(),'EC50-4')]");
         assertElementPresent(l,2);
         assertTextPresent("QC Flags");
+
+        // Verify as much of the Curve Comparison window as we can - most of its content is in the image, so it's opaque
+        // to the test
+        for (int i = 1; i <= 5; i++)
+        {
+            clickAt(ExtHelper.locateGridRowCheckbox("NETWORK" + i), "1,2");
+        }
+        clickButton("View 4PL Curves", 0);
+        waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent("Error executing command");
+        assertTextPresent("Export to PDF");
+        clickButton("View Log Y-Axis", 0);
+        waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent("Error executing command");
+        clickButton("View Linear Y-Axis", 0);
+        waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent("Error executing command");
+        assertTextPresent("View Log Y-Axis");
     }
 
     private void verifyGuideSetsNotApplied()
@@ -2056,12 +2074,12 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void applyGuideSetToRun(String network, int runRowIndex, String comment, int guideSetIndex)
     {
-        clickAt(ExtHelper.locateBrowserFileCheckbox(network), "1," + runRowIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + runRowIndex);
         clickButton("Apply Guide Set", 0);
         sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
 
         if(guideSetIndex!=-1) //not clicking anything will apply the current guide set
-            clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1," + guideSetIndex);
+            clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + guideSetIndex);
 
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0);
         waitForExtMaskToDisappear();
@@ -2072,18 +2090,18 @@ public class LuminexTest extends AbstractQCAssayTest
     }
     private void verifyGuideSetToRun(String network, int networkColIndex, String comment, int commentColIndex)
     {
-        clickAt(ExtHelper.locateBrowserFileCheckbox(network), "1," + networkColIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + networkColIndex);
         clickButton("Apply Guide Set", 0);
-        waitForElement(ExtHelper.locateBrowserFileCheckbox(network), defaultWaitForPage);
-        waitForElement(ExtHelper.locateBrowserFileCheckbox(comment), defaultWaitForPage);
+        waitForElement(ExtHelper.locateGridRowCheckbox(network), defaultWaitForPage);
+        waitForElement(ExtHelper.locateGridRowCheckbox(comment), defaultWaitForPage);
         sleep(1000);
         // deselect the current guide set to test error message
-        clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1," + commentColIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
         clickButton("Apply Thresholds", 0);
         waitForText("Please select a guide set to be applied to the selected records.");
         clickButton("OK", 0);
         // reselect the current guide set and apply it
-        clickAt(ExtHelper.locateBrowserFileCheckbox(comment), "1," + commentColIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0); 
         waitForExtMaskToDisappear();
         // verify that the plot is reloaded
@@ -2100,13 +2118,13 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 5; i > 0; i--)
         {
-            clickAt(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + i), i+","+columnIndex);
+            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), i+","+columnIndex);
         }
         // set start and end date filter
         setFormElement("start-date-field", "2011-03-26");
         setFormElement("end-date-field", "2011-03-28");
         // click a different element on the page to trigger the date change event
-        clickAt(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
         Locator l = Locator.extButton("Apply", 1);
         clickAt(l,  "1,1");
         waitForTextToDisappear("Loading");
@@ -2114,10 +2132,10 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that only 3 runs are now present
         for (int i = 4; i > 1; i--)
         {
-            clickAt(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
+            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
         }
-        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + "5"));
-        assertElementNotPresent(ExtHelper.locateBrowserFileCheckbox(colValuePrefix + "1"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "1"));
     }
 
     private void applyLogYAxisScale()

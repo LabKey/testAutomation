@@ -205,9 +205,9 @@ public class ExtHelper
         test.waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x-mask-loading')]"), wait);
     }
 
-    public static Locator locateBrowserFileCheckbox(String fileName)
+    public static Locator locateGridRowCheckbox(String rowTextContent)
     {
-        return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + fileName + "']//..//..//div[@class='x-grid3-row-checker']");
+        return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + rowTextContent + "']//..//..//div[@class='x-grid3-row-checker']");
     }
 
     public static Locator locateBrowserFileName(String fileName)
@@ -262,7 +262,7 @@ public class ExtHelper
     @Deprecated
     public static void prevClickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
     {
-        Locator file = locateBrowserFileCheckbox(fileName);
+        Locator file = locateGridRowCheckbox(fileName);
 
         test.waitForElement(file, 60000);
         test.mouseDown(file);
