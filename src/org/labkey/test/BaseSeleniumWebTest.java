@@ -1162,6 +1162,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             logToServer("=== Starting " + getClass().getSimpleName() + Runner.getProgress() + " ===");
             signIn();
 			resetErrors();
+            enableEmailRecorder();
 
             if( isMaintenanceDisabled() )
             {
@@ -2912,7 +2913,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitForTextToDisappear(final String text)
     {
-        waitForTextToDisappear(text, defaultWaitForPage);
+        waitForTextToDisappear(text, WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForTextToDisappear(final String text, int wait)
