@@ -39,6 +39,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String GROUP_NAME3 = "CDSTest_CGroup";
     private static final String GROUP_NULL = "Group creation cancelled";
     private static final String GROUP_DESC = "Intersection of " +LABS[1]+ " and " + LABS[2];
+    public final static int CDS_WAIT = 5000;
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -138,16 +139,39 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         assertAllParticipantsPortalPage();
 
+        // 14902
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
+        clickButton("use as filter", 0);
+        waitForTextToDisappear("Not Actually CHAVI 001", CDS_WAIT);
+        assertFilterStatusCounts(6, 1, 3, 2, 20);
+        goToAppHome();
+        waitForText("Current Active Filters", CDS_WAIT);
+        waitForText("Demo Study", 2, CDS_WAIT);
+        assertTextNotPresent("Not Actually CHAVI 001");
+        selectCDSGroup("All participants", false);
+        waitForText("Not Actually CHAVI 001", CDS_WAIT);
+        selectCDSGroup("Active filters", false);
+        assertTextPresent("This is the set of filters");
+        click(SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
+        clickButton("clear filters", 0);
+        waitForText("NotRV144", CDS_WAIT);
+        goToAppHome();
+        waitForText("Not Actually CHAVI 001", CDS_WAIT);
+        // end 14902
+
+        click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[1], "Not Actually ...", 12, 1, 3, 2, 8, 12, SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies); // TODO: Participant count mismatch
+        assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies);
         goToAppHome();
         click(SearchBy.Antigens);
-//        assertFilterStatusPanel("1A", 6, 1, 3, 3, 21, 29, SearchBy.Antigens); // TODO: Get these working for when they are collapsed to begin
-//        assertFilterStatusPanel("2", 18, 2, 4, 4, 29, 29, SearchBy.Antigens);
-//        assertFilterStatusPanel("1B", 6, 1, 3, 3, 21, 29, SearchBy.Antigens);
-//        assertFilterStatusPanel("3", 18, 2, 4, 4, 29, 29, SearchBy.Antigens);
+        toggleExplorerBar("3");
+        assertFilterStatusPanel("H061.14", "H061.14", 12, 1, 1, 1, 8, 12, SearchBy.Antigens);
+        toggleExplorerBar("1A");
+        assertFilterStatusPanel("SF162.LS", "SF162.LS", 6, 1, 1, 1, 20, 12, SearchBy.Antigens);
+        toggleExplorerBar("1B");
+        assertFilterStatusPanel("MW965.26", "MW965.26", 6, 1, 1, 1, 20, 6, SearchBy.Antigens);
         goToAppHome();
         click(SearchBy.Assays);
         assertFilterStatusPanel("Lab Results", "Lab Results", 23, 3, 5, 0, 0, 29, SearchBy.Assays);
@@ -172,6 +196,19 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void verifyFilters()
     {
         log("Verify multi-select");
+
+        // 14910
+        click(SearchBy.Antigens);
+        toggleExplorerBar("1A");
+        toggleExplorerBar("1B");
+        shiftSelectBars("MW965.26", "ZM197M.PB7");
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), 'DJ263.8')]"), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[@class='filtermember']"), 6);
+        assertFilterStatusCounts(6, 1, 1, 1, 20);
+        clickButton("clear selection", 0);
+        goToAppHome();
+        // end 14910
+
         click(SearchBy.Labs);
         selectBars(LABS[0], LABS[1]);
         assertFilterStatusCounts(6, 1, 0, 2, 0);
@@ -376,13 +413,22 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void shiftSelectBars(String... bars)
     {
-        click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+        String subselect = bars[0];
+        if (subselect.length() > 10)
+            subselect = subselect.substring(0, 9);
+        sleep(1000);
+        waitAndClick(Locator.xpath("//span[@class='barlabel' and text() = '" + bars[0] + "']"));
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
         if(bars.length > 1)
         {
             selenium.shiftKeyDown();
             for(int i = 1; i < bars.length; i++)
             {
-                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[0]+"']"));
+                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[i]+"']"));
+                subselect = bars[i];
+                if (subselect.length() > 10)
+                    subselect = subselect.substring(0, 9);
+                waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
             }
             selenium.shiftKeyUp();
         }
@@ -507,6 +553,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertEquals("Incorrect Assay Abstract", assayAbstract.replace("\n", ""), getText(Locator.css(".assayInfoAbstract")).replace("\n", ""));
         assertEquals("Incorrect Related Publications", relatedPubs.replace("\n", ""), getText(Locator.css(".assayInfoRelatedPublications")).replace("\n", ""));
         closeInfoPage();
+    }
+
+    private void toggleExplorerBar(String largeBarText)
+    {
+        click(Locator.xpath("//div[@class='bar large']//span[contains(@class, 'barlabel') and text()='" + largeBarText + "']//..//..//div[contains(@class, 'saecollapse')]"));
+        sleep(350);
     }
 
 /// CDS classes, enums and string generators
