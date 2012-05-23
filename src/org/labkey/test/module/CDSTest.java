@@ -484,11 +484,21 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         viewInfo(assay);
         if(contributorImg.equals(pocImg))
-            assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+pocImg+"']"), 2);
+        {
+            Locator.XPathLocator imgLoc = Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+pocImg+"']");
+            waitForElement(imgLoc);
+            assertElementPresent(imgLoc, 2);
+        }
         else
         {
-            assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+pocImg+"']"), 1);
-            assertElementPresent(Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+contributorImg+"']"), 1);
+            Locator.XPathLocator imgLead = Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+pocImg+"']");
+            Locator.XPathLocator imgContact= Locator.xpath("//img[@src='/labkey/cds/images/pictures/"+contributorImg+"']");
+
+            waitForElement(imgLead);
+            waitForElement(imgContact);
+
+            assertElementPresent(imgLead, 1);
+            assertElementPresent(imgContact, 1);
         }
         assertEquals("Incorrect Lead Contributor", leadContributor.replace("\n", ""), getText(Locator.css(".assayInfoLeadContributor")).replace("\n", ""));
         assertEquals("Incorrect Assay Point of Contact", pointOfContact.replace("\n", ""), getText(Locator.css(".assayInfoPointOfContact")).replace("\n", ""));
