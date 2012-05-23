@@ -598,6 +598,7 @@ public class TimeChartTest extends StudyBaseTest
         fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur );
         ExtHelper.clickExtTab(this, "Overview");
         setFormElement("reportName", REPORT_NAME_3);
+        sleep(200);
         clickNavButton("Save");
         waitForText(CHART_TITLE, WAIT_FOR_JAVASCRIPT);
 
