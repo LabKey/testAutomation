@@ -44,7 +44,7 @@ public class CAVDStudyTest extends StudyBaseTest
         doVerifyEmptyStudy();
         doVerifyStudyDesign();
         doVerifyAssaySchedule();
-//        doVerifyDatasets();
+        doVerifyDatasets();
     }
 
     @Override
@@ -75,16 +75,6 @@ public class CAVDStudyTest extends StudyBaseTest
         waitForText("Timepoint Type");
         assertRadioButtonSelected("TimepointType", "VISIT");
 
-        addDataset();
-
-        clickLinkWithText("Overview");
-
-        assertTabPresent("Data");
-
-        clickLinkWithText("Edit");
-
-        waitForText("Timepoint Type");
-        assertEquals(2, getXpathCount(Locator.xpath("//input[@type='radio'][@name='TimepointType'][@disabled]")));
     }
 
     private void doVerifyStudyDesign()
@@ -177,7 +167,8 @@ public class CAVDStudyTest extends StudyBaseTest
         clickButton("Done", 0);
         waitForElementToDisappear(Locator.xpath("//div[@class='Caption'][text()='Define Assay']"), WAIT_FOR_JAVASCRIPT);
 
-        assertTrue("Create Study Timepoints button not disabled when no timepoints exist.", null == getButtonLocator("Create Study Timepoints"));
+        clickButton("Create Study Timepoints", 0);
+        assertAlert("No timepoints are defined in the assay schedule.");
         
         addTimepoint("CAVDTestTimepoint", "13", TimeUnit.Days);
         waitForText("CAVDTestTimepoint: 13 days", WAIT_FOR_JAVASCRIPT);
@@ -210,6 +201,17 @@ public class CAVDStudyTest extends StudyBaseTest
 
         assertTextPresent("Study Start: 0 days");
         assertTextPresent("CAVDTestTimepoint: 13 days");
+//
+//        addDataset();
+//
+//        clickLinkWithText("Overview");
+//
+//        assertTabPresent("Data");
+//
+//        clickLinkWithText("Edit");
+//
+//        waitForText("Timepoint Type");
+//        assertEquals(2, getXpathCount(Locator.xpath("//input[@type='radio'][@name='TimepointType'][@disabled]")));
     }
 
     private void deleteStudyDesignRow(RowType type, int row)
@@ -320,7 +322,7 @@ public class CAVDStudyTest extends StudyBaseTest
         while(!isAlertPresent() && (System.currentTimeMillis() - startTime) < WAIT_FOR_JAVASCRIPT)
         {
             clickButton(buttonText, 0);
-            sleep(500);
+            sleep(1000);
         }
         assertAlert(alertText);
     }
