@@ -139,7 +139,8 @@ public enum TestSet
         ViabilityTest.class,
         ProjectSettingsTest.class,
         CDSTest.class,
-        ExtraKeyStudyTest.class
+        ExtraKeyStudyTest.class,
+        CAVDStudyTest.class,
     }),
 
     MiniTest(new Class[]
