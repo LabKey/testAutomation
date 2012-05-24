@@ -1162,7 +1162,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             logToServer("=== Starting " + getClass().getSimpleName() + Runner.getProgress() + " ===");
             signIn();
 			resetErrors();
-            enableEmailRecorder();
 
             if( isMaintenanceDisabled() )
             {
@@ -5463,7 +5462,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected void importStudyFromZip(String studyFile)
     {
         startImportStudyFromZip(studyFile);
-        waitForPipelineJobsToComplete(0, "Study import", true);
+        waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
     protected void importFolderFromZip(String folderFile)
