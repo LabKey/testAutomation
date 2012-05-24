@@ -694,11 +694,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent(EMAIL_SUBJECT_1);
         assertTextPresent(EMAIL_SUBJECT_2);
         assertTextPresent(EMAIL_SUBJECT_3);
-
-        // clear mail record messages
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
-        uncheckCheckbox("emailRecordOn");
     }
 
     private String createEmailSource(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody, boolean allowUnregisteredUser)
