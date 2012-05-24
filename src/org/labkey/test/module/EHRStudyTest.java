@@ -308,15 +308,14 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
 
         log("Verify Single animal history");
         setFormElement("subjectBox", PROTOCOL_MEMBER_IDS[0]);
-        sleep(200);//weird timing issue.  Nothing to wait for, so we just pause for a moment.
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
 
         //crawlReportTabs(); // TOO SLOW. TODO: Enable when performance is better.
 
         log("Verify Entire colony history");
         checkRadioButton("selector", "renderColony");
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         dataRegionName = getDataRegionName("Abstract");
         assertEquals("Did not find the expected number of Animals", 44, getDataRegionRowCount(dataRegionName));
 
@@ -325,7 +324,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='areaField']/.."), AREA_ID);
         setFormElement("roomField", ROOM_ID);
         setFormElement("cageField", CAGE_ID);
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         // No results expected due to anonymized cage info.
         waitForText("No records found", WAIT_FOR_JAVASCRIPT);
 
@@ -336,7 +335,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID);
         clickNavButton("Submit", 0);
         waitForElement(Locator.button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Verify Protocol search");
@@ -348,7 +347,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
 
         // Check protocol search results.
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         dataRegionName = getDataRegionName("Abstract");
         assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length, getDataRegionRowCount(dataRegionName));
         assertLinkPresentWithText(PROTOCOL_MEMBER_IDS[0]);
@@ -356,7 +355,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         // Check animal count after removing one from search.
         waitAndClick(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"));
         waitForElementToDisappear(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         dataRegionName = getDataRegionName("Abstract");
         assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length - 1, getDataRegionRowCount(dataRegionName));
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[0]);
@@ -365,7 +364,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         setFormElement("subjectBox",  PROTOCOL_MEMBER_IDS[0]);
         clickNavButton("  Append -->", 0);
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         dataRegionName = getDataRegionName("Abstract");
         waitForText(PROTOCOL_MEMBER_IDS[0]);
         assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length, getDataRegionRowCount(dataRegionName));
@@ -443,7 +442,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         clickNavButton("  Append -->", 0);
         setFormElement("subjectBox", PROTOCOL_MEMBER_IDS[2]);
         clickNavButton("  Append -->", 0);
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         dataRegionName = getDataRegionName("Abstract");
         assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
         assertTextPresent(PROTOCOL_MEMBER_IDS[0], PROTOCOL_MEMBER_IDS[2]);
@@ -451,16 +450,22 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         log("Check subjectBox parsing");
         setFormElement("subjectBox",  MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
         clickNavButton("  Replace -->", 0);
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         dataRegionName = getDataRegionName("Abstract");
         assertEquals("Did not find the expected number of Animals", 5, getDataRegionRowCount(dataRegionName));
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[2]);
                                       
         clickNavButton(" Clear ", 0);
-        clickNavButton("Refresh", 0);
+        refreshAnimalHistoryReport();
         assertAlert("Must Enter At Least 1 Animal ID");
         assertElementNotPresent(Locator.buttonContainingText("(X)"));
+    }
+
+    private void refreshAnimalHistoryReport()
+    {
+        waitForText("Abstract");
+        clickNavButton("Refresh", 0);
     }
 
     private void quickSearchTest()
