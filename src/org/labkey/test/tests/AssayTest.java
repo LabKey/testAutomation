@@ -133,6 +133,8 @@ public class AssayTest extends AbstractAssayTest
         uploadRuns(TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_USR_TECH1);
         editResults();
         publishData();
+        publishDataToDateBasedStudy();
+        publishDataToVisitBasedStudy();
         editAssay();
         viewCrossFolderData();
         verifyStudyList();
@@ -541,6 +543,205 @@ public class AssayTest extends AbstractAssayTest
 
         stopImpersonating();
     } //publishData()
+
+    /**
+     * Designed to test automatic timepoint generation when copying to a date based study.
+     * Most tests of timepoint matching are covered by separate junit tests; however,
+     * this will create 1 pre-existing timepoint, and when copying data this timepoint should be
+     * chosen for appropriate records.
+     */
+    private void publishDataToDateBasedStudy()
+    {
+        log("Prepare visit map to check PTID counts in study navigator.");
+
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDY3);
+
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Timepoints");
+        clickLinkWithText("Create New Timepoint");
+        setFormElement("label", "Preexisting Timepoint");
+        setFormElement("sequenceNumMin", "50");
+        setFormElement("sequenceNumMax", "89");
+        setFormElement("typeCode", "Screening");
+
+        clickNavButton("Save");
+
+        //select the Lab1 folder and view all the data for the test assay
+        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickLinkWithText(TEST_ASSAY);
+        clickLinkWithText("view results");
+
+        //select all the data rows and click publish
+        selenium.click(".toggle");
+        clickNavButton("Copy to Study");
+
+        checkCheckbox(Locator.xpath("//td//input[@type='checkbox']"));
+
+        // Make sure the selected study is Study3
+        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY3));
+
+        clickNavButton("Next");
+        assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY3 + " Study: Verify Results");
+
+        //populate initial set of values and verify the timepoint preview column
+        String[] dates = new String[]{"2000-02-02", "2000-03-03", "2000-04-04", "2000-05-05", "2000-06-06", "2000-01-01", "2000-02-02", "2000-03-03"};
+        int idx = 1;
+        for (String d : dates)
+        {
+            setFormElement(Locator.xpath("(//input[@name='date'])[" + idx + "]"), d);
+            idx++;
+        }
+
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[1]"), "new1");
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[2]"), "new2");
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[3]"), "new3");
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[4]"), "new4");
+
+        clickButton("Re-Validate");
+        waitForPageToLoad();
+
+        //validate timepoints:
+        //assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td[text()='AAA07XK5-05' and following-sibling::td[text()='301.0']]]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='AAA07XMC-02' and following-sibling::td[text()='301.0']]]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='AAA07XMC-04' and following-sibling::td[not(text())]]]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 90 - 95' and following-sibling::td[text()='AAA07XSF-02' and following-sibling::td[not(text())]]]")));
+
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 120 - 127' and following-sibling::td[text()='AssayTestControl1' and following-sibling::td[text()='5.0']]]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 152 - 159' and following-sibling::td[text()='AssayTestControl2' and following-sibling::td[text()='6.0']]]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td[text()='BAQ00051-09' and following-sibling::td[text()='7.0']]]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='BAQ00051-08' and following-sibling::td[text()='8.0']]]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='BAQ00051-11' and following-sibling::td[text()='9.0']]]")));
+
+        clickNavButton("Copy to Study");
+
+        log("Verifying that the data was published");
+        assertTextPresent("a");
+        assertTextPresent(TEST_RUN1_COMMENTS);
+        assertTextPresent("2000-01-01");
+        clickTab("Overview");
+        clickLinkWithText("Study Navigator");
+
+        log("Test participant counts and row counts in study overview");
+        String[] row2 = new String[]{TEST_ASSAY, "8", "1", "2", "2", "1", "1", "1"};
+        assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
+        // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
+        click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
+        waitForPageToLoad();
+        row2 = new String[]{TEST_ASSAY, "8 / 8", "1 / 1", "2 / 2", "2 / 2", "1 / 1", "1 / 1", "1 / 1"};
+        assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
+
+        log("Test that correct timepoints were created");
+
+        clickTab("Overview");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Timepoints");
+        assertTrue(isTextPresent("Day 0 - 7"));
+        assertTrue(isTextPresent("Day 32 - 39"));
+        assertTrue(isTextPresent("Day 90 - 95"));
+        assertTrue(isTextPresent("Day 120 - 127"));
+        assertTrue(isTextPresent("Day 152 - 159"));
+    } //publishDataToDateBasedStudy()
+
+
+    /**
+     * Designed to test automatic timepoint generation when copying to a date based study.
+     * Most tests of timepoint matching are covered by separate junit tests; however,
+     * this will create 1 pre-existing timepoint, and when copying data this timepoint should be
+     * chosen for appropriate records.
+     */
+    private void publishDataToVisitBasedStudy()
+    {
+        log("Prepare visit map to check PTID counts in study navigator.");
+
+        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDY2);
+
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Visits");
+        clickLinkWithText("Import Visit Map");
+        setFormElement("content",
+            "6-13|X|Test Visit1\n" +
+            "50-70|X|Test Visit2\n" +
+            "302-303|X|Test Visit3\n"
+        );
+        clickNavButton("Import");
+
+        //select the Lab1 folder and view all the data for the test assay
+        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickLinkWithText(TEST_ASSAY);
+        clickLinkWithText("view results");
+
+        //select all the data rows and click publish
+        selenium.click(".toggle");
+        clickNavButton("Copy to Study");
+
+        checkCheckbox(Locator.xpath("//td//input[@type='checkbox']"));
+
+        // Make sure the selected study is Study2
+        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2));
+
+        clickNavButton("Next");
+        assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY2 + " Study: Verify Results");
+
+        //populate initial set of values and verify the timepoint preview column
+        String[] visits = new String[]{"302", "33", "4", "70"};
+        int idx = 1;
+        for (String v : visits)
+        {
+            setFormElement(Locator.xpath("(//input[@name='visitId'])[" + idx + "]"), v);
+            idx++;
+        }
+
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[1]"), "new1");
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[2]"), "new2");
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[3]"), "new3");
+        setFormElement(Locator.xpath("(//input[@name='participantId'])[4]"), "new4");
+
+        clickButton("Re-Validate");
+        waitForPageToLoad();
+
+        //validate timepoints:
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td[text()='AAA07XMC-02']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td[text()='AAA07XMC-04']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td[text()='AAA07XSF-02']]")));
+
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-09']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-08']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-11']]")));
+
+        clickNavButton("Copy to Study");
+
+        log("Verifying that the data was published");
+        assertTextPresent("a");
+        assertTextPresent(TEST_RUN1_COMMENTS);
+        assertTextPresent("2000-01-01");
+        clickTab("Overview");
+        clickLinkWithText("Study Navigator");
+
+        log("Test participant counts and row counts in study overview");
+        String[] row2 = new String[]{TEST_ASSAY, "8", "", "", "", "", "", "", "1", "", "", "4", "", "", "", "", "1", "1", "", "", "", "1", "", "", "", "", ""};
+        assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
+        // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
+        click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
+        waitForPageToLoad();
+        row2 = new String[]{TEST_ASSAY, "8 / 8", "", "", "", "", "", "", "1 / 1", "", "", "4 / 4", "", "", "", "", "1 / 1", "1 / 1", "", "", "", "1 / 1", "", "", "", "", ""};
+        assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
+
+        log("Test that correct timepoints were created");
+
+        clickTab("Overview");
+        clickLinkWithText("Manage Study");
+        clickLinkWithText("Manage Visits");
+        assertTrue(isTextPresent("Test Visit1"));
+        assertTrue(isTextPresent("6.0-13.0"));
+        assertTrue(isTextPresent("Test Visit2"));
+        assertTrue(isTextPresent("50.0-70.0"));
+        assertTrue(isTextPresent("Test Visit3"));
+        assertTrue(isTextPresent("302.0-303.0"));
+    } //publishDataToVisitBasedStudy()
 
     /**
      * Tests editing of an existing assay definition

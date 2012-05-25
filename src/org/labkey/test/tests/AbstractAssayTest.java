@@ -126,7 +126,14 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickNavButton("Create Study");
         createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY3, "Study", null, true);
         clickNavButton("Create Study");
+        //use date-based study
+        click(Locator.xpath("(//input[@name='timepointType'])[1]"));
+        setFormElement(Locator.xpath("//input[@name='startDate']"), "2000-01-01");
         clickNavButton("Create Study");
+
+        clickLinkWithText("Manage Timepoints");
+        setFormElement(Locator.xpath("//input[@name='defaultTimepointDuration']"), "8");
+        clickNavButton("Update");
 
         //setup security on sub-folders:
         // PIs should be Editors on Lab1 and Study1, but not Study2 or Study3
