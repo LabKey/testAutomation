@@ -154,9 +154,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         createWiki();
 
-        lineChartTest();
+//        lineChartTest(); // TODO re-write lineChartTest to work with new charting API.
 
-        scatterChartTest();
+//        scatterChartTest(); // TODO re-write scatterChartTest to work with new charting API.
 
         createLists();
 

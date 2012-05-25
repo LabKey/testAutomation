@@ -242,7 +242,7 @@ function init() {
 
     //Lots of async script loading. Make sure everything is loaded before starting
     LABKEY.Utils.onTrue({
-        testCallback:function() {return Ext.isReady && LABKEY.vis && window.pv},
+        testCallback:function() {return Ext.isReady && LABKEY.vis},
         //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
         successCallback:function () {formInit.defer(100)},
         errorCallback:doError
