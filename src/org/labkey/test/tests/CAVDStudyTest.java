@@ -18,15 +18,26 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class CAVDStudyTest extends StudyBaseTest
 {
     private static final String PROJECT_NAME = "CAVDStudyTest Project";
     private static final String FOLDER_NAME = "CAVDStudyTest Folder";
     private static final String STUDY_NAME = FOLDER_NAME + " Study";
+    private static final String FOLDER_NAME2 = "CAVDStudy2";
+    private static final String FOLDER_NAME3 = "CAVDStudy3";
+    private static final String FOLDER_NAME4 = "VerifyStudyList";
+    private static final String CAVD_TEST_STUDY_ZIP = "/sampledata/study/CAVDTestStudy.folder.zip";
+    private static Map<Integer, String> DATASETS = new TreeMap<Integer, String>();
     private ArrayList<String> _expectedVaccineDesignText = new ArrayList<String>();
     private ArrayList<String> _expectedImmunizationText = new ArrayList<String>();
     private ArrayList<String> _expectedAssayDesignText = new ArrayList<String>();
@@ -36,6 +47,11 @@ public class CAVDStudyTest extends StudyBaseTest
     {
         createProject(PROJECT_NAME, "None");
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "CAVD Study", null);
+
+        // used for doVerifyCrossContainerDatasetStatus
+        configureStudy(FOLDER_NAME2);
+        configureStudy(FOLDER_NAME3);
+        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME4, "Collaboration", null);
     }
 
     @Override
@@ -45,6 +61,14 @@ public class CAVDStudyTest extends StudyBaseTest
         doVerifyStudyDesign();
         doVerifyAssaySchedule();
         doVerifyDatasets();
+        doVerifyCrossContainerDatasetStatus();
+    }
+
+    public void configureStudy(String folderName)
+    {
+        createSubfolder(PROJECT_NAME, PROJECT_NAME, folderName, "Collaboration", null);
+        importFolderFromZip(new File(getLabKeyRoot() + CAVD_TEST_STUDY_ZIP).getPath());
+        waitForPipelineJobsToComplete(1, "Folder import", false);
     }
 
     @Override
@@ -56,6 +80,8 @@ public class CAVDStudyTest extends StudyBaseTest
     private void doVerifyEmptyStudy()
     {
         log("Verifying that the study is empty.");
+        clickLinkWithText(FOLDER_NAME);
+
         // Make sure a study was made.
         assertTextNotPresent("No study is active in the current container.");
         assertTextPresent(STUDY_NAME + " tracks data in");
@@ -125,7 +151,7 @@ public class CAVDStudyTest extends StudyBaseTest
         saveRevision();
         addStudyDesignRow(RowType.Immunization, "Vaccine2", "3");
         finishRevision();
-        waitForText("Immunization Schedule");
+        waitForText("Immunization Schedule", 3);
         assertTextPresent(_expectedImmunizationText);
         assertElementNotPresent(Locator.tagWithText("div", "30")); // From deleted rows
     }
@@ -181,7 +207,7 @@ public class CAVDStudyTest extends StudyBaseTest
     private void doVerifyDatasets()
     {
         clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Assays");
+        clickLinkWithText("Assays", true);
 
         clickUntilAlert("Create Assay Datasets", "Placeholder datasets created. Use Manage/Study Schedule to define datasets or link to assay data.");
 
@@ -212,6 +238,205 @@ public class CAVDStudyTest extends StudyBaseTest
 //
 //        waitForText("Timepoint Type");
 //        assertEquals(2, getXpathCount(Locator.xpath("//input[@type='radio'][@name='TimepointType'][@disabled]")));
+    }
+
+    private void doVerifyCrossContainerDatasetStatus()
+    {
+        // setup the dataset map (ID > Name)
+        DATASETS.put(5001, "NAbTest");
+        DATASETS.put(5002, "FlowTest");
+        DATASETS.put(5003, "LuminexTest");
+        DATASETS.put(5004, "ELISATest");
+
+        String[][] statuses = {
+            {"Draft", "/labkey/reports/icon_draft.png", "D"},
+            {"Final", "/labkey/reports/icon_final.png", "F"},
+            {"Locked", "/labkey/reports/icon_locked.png", "L"},
+            {"Unlocked", "/labkey/reports/icon_unlocked.png", "U"}
+        };
+
+        String study2name = FOLDER_NAME2 + " Study";
+        String study3name = FOLDER_NAME3 + " Study";
+
+        log("Set study name for " + FOLDER_NAME2 + " and verify datasets exist.");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME2);
+        // workaround for issue 15023: go to manage views page to initialize study dataset properties
+        clickAdminMenuItem("Manage Views");
+        waitForText("Manage Views");
+        clickLinkWithText("Manage");
+        clickLinkWithText("Change Study Properties");
+        waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("Label", study2name);
+        clickNavButton("Submit");
+        waitForText("General Study Settings");
+        assertTextPresent(study2name);
+        clickLinkWithText("Manage Datasets");
+        for (Map.Entry<Integer, String> dataset : DATASETS.entrySet())
+        {
+            assertTextPresentInThisOrder(dataset.getKey().toString(), dataset.getValue());
+        }
+
+        log("Set study name for " + FOLDER_NAME3 + " and verify datasets exist.");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME3);
+        // workaround for issue 15023: go to manage views page to initialize study dataset properties
+        clickAdminMenuItem("Manage Views");
+        waitForText("Manage Views");
+        clickLinkWithText("Manage");
+        clickLinkWithText("Change Study Properties");
+        waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
+        setFormElement("Label", study3name);
+        clickNavButton("Submit");
+        waitForText("General Study Settings");
+        assertTextPresent(study3name);
+        clickLinkWithText("Manage Datasets");
+        for (Map.Entry<Integer, String> dataset : DATASETS.entrySet())
+        {
+            assertTextPresentInThisOrder(dataset.getKey().toString(), dataset.getValue());
+        }
+
+        log("Verify study list query from sibling folder contains studies and dataset status.");
+        goToViscStudiesQuery(FOLDER_NAME4);
+        assertLinkPresentWithText(study2name);
+        assertLinkPresentWithText(study3name);
+        for (String datasetName : DATASETS.values())
+        {
+            assertTextPresent(datasetName, 2);
+        }
+        // verify that there are no status icons to start
+        for (String[] status : statuses)
+        {
+            assertElementNotPresent("Status icon not expected in studies query at this time.", Locator.tagWithAttribute("img", "src", status[1]));
+        }
+
+        log("Change study dataset status for " + FOLDER_NAME2 + " and verify changes in study list query.");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME2);
+        waitForText("Study Schedule");
+        // wait for the study schedule grid to load, any dataset name will do
+        waitForText(DATASETS.values().iterator().next());
+        int statusCounter = 0;
+        for (String dataset : DATASETS.values())
+        {
+            setDatasetStatus(dataset, statuses[statusCounter][0]);
+            statusCounter++;
+        }
+        
+        log("Verify each status icon appears once in the studies list.");
+        goToViscStudiesQuery(FOLDER_NAME4);
+        for (String[] status : statuses)
+        {
+            assertElementPresent(Locator.tagWithAttribute("img", "src", status[1]), 1);
+        }
+
+        log("Create list in " + FOLDER_NAME4 + " with lookup to the studies list query.");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME4);
+        addWebPart("Lists");
+        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
+                new ListHelper.ListColumn("MyStudyName", "MyStudyName", ListHelper.ListColumnType.String, ""),
+                new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "viscstudies", "studies"))
+        };
+        ListHelper.createList(this, FOLDER_NAME4, "AllStudiesList", ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        clickNavButton("Done");
+
+        log("Add records to list for each study.");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME4);
+        clickLinkWithText("AllStudiesList", true);
+        clickNavButton("Insert New");
+        setFormElement("quf_MyStudyName", "Something");
+        selectOptionByText("quf_StudyLookup", study2name);
+        clickNavButton("Submit");
+        clickNavButton("Insert New");
+        setFormElement("quf_MyStudyName", "TheOtherOne");
+        selectOptionByText("quf_StudyLookup", study3name);
+        clickNavButton("Submit");
+
+        log("Verify that the list lookup displays dataset status values.");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME4);
+        clickLinkWithText("AllStudiesList", true);
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "StudyLookup/Dataset Status");
+        CustomizeViewsHelper.applyCustomView(this);
+        CustomizeViewsHelper.closeCustomizeViewPanel(this);
+        // verify each status icon appears once originally
+        for (String[] status : statuses)
+        {
+            assertElementPresent(Locator.tagWithAttribute("img", "src", status[1]), 1);
+        }
+        log("Verify that you can navigate to study and set status from study list.");
+        clickLinkWithText(study3name, true);
+        // wait for the study schedule grid to load, any dataset name will do
+        waitForText(DATASETS.values().iterator().next());
+        // set the status to Locked for all of the datasets
+        for (String dataset : DATASETS.values())
+        {
+            setDatasetStatus(dataset, "Locked");
+        }
+        assertElementPresent(Locator.tagWithAttribute("img", "src", "/labkey/reports/icon_locked.png"), DATASETS.size());
+        clickButton("Save Changes", defaultWaitForPage);
+        // verify that we are back on the list view
+        assertTextPresent("AllStudiesList");
+        assertTextPresent("Dataset Status");
+        // locked icon should now appear once for study2 and for all datasets in study3
+        assertElementPresent(Locator.tagWithAttribute("img", "src", "/labkey/reports/icon_locked.png"), DATASETS.size() + 1);
+
+        log("Verify data status exports to text as expected.");
+        pushLocation();
+        addUrlParameter("exportAsWebPage=true");
+        waitForElement(Locator.navButton("Export"), WAIT_FOR_JAVASCRIPT);
+        clickExportToText();
+        // verify column names
+        assertTextPresentInThisOrder("myStudyName", "studyLookup", "studyLookupDatasetStatus");
+        // verify first study values
+        assertTextPresentInThisOrder("Something", study2name);
+        statusCounter = 0;
+        for (String dataset : DATASETS.values())
+        {
+            assertTextPresent(statuses[statusCounter][2] + ": " + dataset);
+            statusCounter++;
+        }
+        // verify second study values
+        assertTextPresentInThisOrder("TheOtherOne", study3name);
+        for (String dataset : DATASETS.values())
+        {
+            assertTextPresent("L: " + dataset);
+        }
+        popLocation();
+    }
+
+    private void setDatasetStatus(String dataset, String status)
+    {
+        clickEditDatasetIcon(dataset);
+        Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/..");
+        Ext4Helper.selectComboBoxItem(this, comboParent, status);
+        clickNavButton("Save", 0);
+
+        // verify that the status icon appears
+        Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + dataset + "')]/../../..//img[@alt='" + status + "']");
+        waitForElement(statusLink, WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void goToViscStudiesQuery(String folderName)
+    {
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(folderName);
+        goToSchemaBrowser();
+        selectQuery("viscstudies", "studies");
+        waitForText("view data");
+        clickLinkContainingText("view data", true);
+    }
+
+    private void clickEditDatasetIcon(String dataset)
+    {
+        Locator editLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + dataset + "')]/../../..//span[contains(@class, 'edit-views-link')]");
+        waitForElement(editLink, WAIT_FOR_JAVASCRIPT);
+        click(editLink);
+
+        ExtHelper.waitForExtDialog(this, dataset);
     }
 
     private void deleteStudyDesignRow(RowType type, int row)
@@ -321,7 +546,8 @@ public class CAVDStudyTest extends StudyBaseTest
         long startTime = System.currentTimeMillis();
         while(!isAlertPresent() && (System.currentTimeMillis() - startTime) < WAIT_FOR_JAVASCRIPT)
         {
-            clickButton(buttonText, 0);
+            if (isButtonPresent(buttonText))
+                clickButton(buttonText, 0);
             sleep(1000);
         }
         assertAlert(alertText);
