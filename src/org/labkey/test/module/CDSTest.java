@@ -39,6 +39,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String GROUP_NAME3 = "CDSTest_CGroup";
     private static final String GROUP_NULL = "Group creation cancelled";
     private static final String GROUP_DESC = "Intersection of " +LABS[1]+ " and " + LABS[2];
+    private static final String TOOLTIP = "Hold shift, CTRL, or CMD to select multiple";
     public final static int CDS_WAIT = 5000;
 
     @Override
@@ -142,10 +143,25 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         // 14902
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
+
+        // Verify multi-select tooltip -- this only shows the first time
+        assertTextPresent(TOOLTIP);
+
+        // 14992
+        goToAppHome();
+        selectCDSGroup("Active filters", false);
+        selectCDSGroup("All participants", false);
+        click(SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
+
         clickButton("use as filter", 0);
         waitForTextToDisappear("Not Actually CHAVI 001", CDS_WAIT);
         assertFilterStatusCounts(6, 1, 3, 2, 20);
         goToAppHome();
+
+        // Verify multi-select tooltip has dissappeared
+        assertTextNotPresent(TOOLTIP);
+
         waitForText("Current Active Filters", CDS_WAIT);
         waitForText("Demo Study", 2, CDS_WAIT);
         assertTextNotPresent("Not Actually CHAVI 001");
@@ -163,6 +179,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[1], "Not Actually ...", 12, 1, 3, 2, 8, 12, SearchBy.Studies);
+        assertTextNotPresent(TOOLTIP);
         assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies);
         goToAppHome();
         click(SearchBy.Antigens);
