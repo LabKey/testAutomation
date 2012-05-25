@@ -756,7 +756,8 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");                                                                            
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
-        assertEquals("", 17, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
+        waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][18]"), WAIT_FOR_JAVASCRIPT);
+        assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
 
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "2a. Creatinine", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);
