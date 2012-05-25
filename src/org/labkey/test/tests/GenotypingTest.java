@@ -152,7 +152,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
     {
         goToProjectHome();
         startImportRun("secondRead/reads.txt", "Import 454 Reads", second454importNum);
-        waitForPipelineJobsToComplete(pipelineJobCount++, "Import reads for 206", true);
+        waitForPipelineJobsToComplete(++pipelineJobCount, "Import reads for run 208", true);
         clickLinkWithText("COMPLETE");
         clickButton("Data");
         assertTextPresent("G3BTA6P01BEVU9", "G3BTA6P01BD5P9");
@@ -174,10 +174,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 //        getToRunScreen();
         sendDataToGalaxyServer();
         receiveDataFromGalaxyServer();
-        pipelineJobCount+=2;
         verifyAnalysis();
-
-
     }
 
     private void getToRunScreen()
@@ -197,9 +194,9 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 
         assertTextPresent("Reads", "Sample Id", "Percent");
 
-        waitForTextWithRefresh("TEST09", 60000);
+        assertTextPresent("TEST09");
 //        assertTextPresent("TEST14", 2);
-        waitForTextWithRefresh("1 - 100 of 1,410", 15000);
+        assertTextPresent("1 - 100 of 1,410");
         startAlterMatches();
         deleteMatchesTest();
         alterMatchesTest();
@@ -318,7 +315,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
             copyFile(pipelineLoc + "/" + file, pipelineLoc + "/" + analysisFolder + "/" + file);
         }
         refresh();
-        waitForText("Submit genotyping analysis ");
+        waitForPipelineJobsToComplete(pipelineJobCount+=1, "Import genotyping analysis", false);
     }
 
     private int getRunNumber()
@@ -400,11 +397,11 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 
             if(os.contains("win"))
             {
-                assertTrue("Checksum matches", c.getValue() == 125618213);
+                assertEquals("Incorrect CRC from illumina export.", 125618213, c.getValue());
             }
             else if (os.contains("nix"))
             {
-                assertTrue("Checksum matches", c.getValue() == 125618213);
+                assertEquals("Incorrect CRC from illumina export.", 125618213, c.getValue());
             }
             else
             {
