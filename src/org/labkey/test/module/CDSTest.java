@@ -117,12 +117,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertLinkPresentWithText("ADCC");
         assertTextPresent(
                 //NAb
-                "1 rows added to Antigen from VirusName",
+                //"1 rows added to Antigen from VirusName",
                 "195 rows added to fact table.",
                 //Luminex
                 "6 rows added to fact table. ",
                 //Lab Results
-                "rows added to Assay from 'Lab Results'",
+                //"rows added to Assay from 'Lab Results'",
                 "23 rows added to fact table.",
                 //MRNA
                 "5 rows added to fact table.",
