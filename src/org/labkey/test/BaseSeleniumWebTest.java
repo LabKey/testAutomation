@@ -2973,7 +2973,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 int actualCount = countText(text);
                 if (actualCount != count)
                 {
-                    fail(failMessage + " Actual text was present " + actualCount + " times.");
                     return false;
                 }
                 return true;
