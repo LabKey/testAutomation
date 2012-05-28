@@ -2487,14 +2487,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /** Verifies that all the strings are present in the page */
-    public void assertTextPresent(ArrayList texts)
+    public void assertTextPresent(List<String> texts)
     {
         if(texts==null)
             return;
 
-        for (Object text : texts)
+        for (String text : texts)
         {
-            String _text = ((String)text).replace("&nbsp;", " ");
+            String _text = text.replace("&nbsp;", " ");
             assertTrue("Text '" + text + "' was not present", isTextPresent(_text));
         }
     }
@@ -2682,7 +2682,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForElement(Locator.id("seleniumExtReady"), defaultWaitForPage);
     }
 
-    public boolean doesElementAppear(Checker checker, String failMessage, int wait)
+    public boolean doesElementAppear(Checker checker, int wait)
     {
 
         int time = 0;
@@ -2703,7 +2703,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitFor(Checker checker, String failMessage, int wait)
     {
-        doesElementAppear(checker, failMessage, wait);
+        if (!doesElementAppear(checker, wait))
+            fail(failMessage + " ["+wait+"ms]");
     }
 
     public void waitForExtMaskToDisappear()
@@ -2871,7 +2872,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
         };
 
-        if(!doesElementAppear(checker, failMessage, wait))
+        if(!doesElementAppear(checker, wait))
             if(failIfNotFound)
                 fail(failMessage);
             else
@@ -2964,12 +2965,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitForText(final String text, final int count, int wait)
     {
-        String failMessage = "'"+text+"' was not present "+count+" times.";
+        final String failMessage = "'"+text+"' was not present "+count+" times.";
         waitFor(new Checker()
         {
             public boolean check()
             {
-                return countText(text) == count;
+                int actualCount = countText(text);
+                if (actualCount != count)
+                {
+                    fail(failMessage + " Actual text was present " + actualCount + " times.");
+                    return false;
+                }
+                return true;
             }
         }, failMessage, wait);
     }

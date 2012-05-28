@@ -21,6 +21,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -88,6 +90,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         verifyCounts();
         verifyFilters();
         verifyNounPages();
+        verifyMultiNounPages();
     }
 
 /// Test substeps
@@ -115,19 +118,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertLinkPresentWithText("Lab Results");
         assertLinkPresentWithText("MRNA");
         assertLinkPresentWithText("ADCC");
-        assertTextPresent(
-                //NAb
-                //"1 rows added to Antigen from VirusName",
-                "195 rows added to fact table.",
-                //Luminex
-                "6 rows added to fact table. ",
-                //Lab Results
-                //"rows added to Assay from 'Lab Results'",
-                "23 rows added to fact table.",
-                //MRNA
-                "5 rows added to fact table.",
-                //ADCC
-                "48 rows added to fact table.");
     }
 
     private void verifyCounts()
@@ -149,7 +139,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // 14992
         goToAppHome();
-        selectCDSGroup("Active filters", false);
+        selectCDSGroup("Active filters", true, "Current Active Filters");
         selectCDSGroup("All participants", false);
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
@@ -163,11 +153,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(TOOLTIP);
 
         waitForText("Current Active Filters", CDS_WAIT);
-        waitForText("Demo Study", 2, CDS_WAIT);
-        assertTextNotPresent("Not Actually CHAVI 001");
+        waitForText("Demo Study", 4, CDS_WAIT);
+        assertElementNotPresent(Locator.xpath("//div[contains(text(), 'Not Actually CHAVI 001)]"));
         selectCDSGroup("All participants", false);
         waitForText("Not Actually CHAVI 001", CDS_WAIT);
-        selectCDSGroup("Active filters", false);
+        selectCDSGroup("Active filters", true, "Current Active Filters");
         assertTextPresent("This is the set of filters");
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
@@ -347,6 +337,25 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void verifyNounPages()
     {
         selectCDSGroup("All participants", false);
+
+        // placeholder pages
+        click(SearchBy.Antigens);
+        toggleExplorerBar("1A");
+        assertNounInfoPage("MW965.26", Arrays.asList("Clade", "Tier", "MW965.26", "U08455"));
+        assertNounInfoPage("SF162.LS", Arrays.asList("Clade", "Tier", "SF162.LS", "EU123924"));
+        toggleExplorerBar("1B");
+        assertNounInfoPage("ZM109F.PB4", Arrays.asList("Zambia", "Tier", "AY424138"));
+
+        click(SearchBy.Studies);
+        assertNounInfoPage("Demo Study", Arrays.asList("marki@labkey.com", "kristinf@labkey.com", "Trial", "LabKey"));
+        assertNounInfoPage("Not Actually CHAVI 001", Arrays.asList("mbellew@labkey.com", "nicka@labkey.com", "Observational", "CHAVI"));
+        assertNounInfoPage("NotRV144", Arrays.asList("brittp@labkey.com", "klum@labkey.com", "Trial", "USMHRP"));
+
+        click(SearchBy.Labs);
+        assertNounInfoPage("Arnold/Bellew Lab", Arrays.asList("Description", "PI", "Nick Arnold"));
+        assertNounInfoPage("LabKey Lab", Arrays.asList("Description", "PI", "Mark Igra"));
+        assertNounInfoPage("Piehler/Eckels Lab", Arrays.asList("Description", "PI", "Britt Piehler"));
+
         click(SearchBy.Assays);
 
         // check placeholders
@@ -395,6 +404,14 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                         "Target Area: Adaptive: humoral and B-cell",
                 "This tested antibodies.",
                 "Vaccinology: precisely tuned antibodies nab HIV.");
+    }
+
+    private void verifyMultiNounPages()
+    {
+        click(SearchBy.Assays);
+        assertMultiAssayInfoPage();
+        assertMultiStudyInfoPage();
+        assertMultiAntigenInfoPage();
     }
 
 /// CDS App helpers
@@ -453,9 +470,14 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void selectCDSGroup(String group, boolean titleShown)
     {
+        selectCDSGroup(group, titleShown, null);
+    }
+
+    private void selectCDSGroup(String group, boolean titleShown, String title)
+    {
         waitAndClick(Locator.xpath("//span[text()='"+group+"']"));
         if(titleShown)
-            waitForElement(Locator.css(".title:contains('"+group+"')"));
+            waitForElement(Locator.css(".title:contains('" + ((title != null) ? title : group) + "')"));
         else
             waitForElementToDisappear(Locator.xpath("//div[@class='title' and "+Locator.NOT_HIDDEN+"]"), WAIT_FOR_JAVASCRIPT);
     }
@@ -478,13 +500,32 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
         click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
         waitForElement(Locator.button("X"));
+/*
         if(!isElementPresent(Locator.css(".savetitle")))
         {
             refresh();
             waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
         }
+*/
+        waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
         waitForText(barLabel);
         assertEquals("Wrong page title.", barLabel, getText(Locator.css(".savetitle")));
+    }
+
+    private void viewMulti(String btnLabel, String infoLabel, String titleCss)
+    {
+        Locator btnLocator = Locator.xpath("//div[contains(@class, 'status-row')]/span[contains(text(), '" + btnLabel + "')]");
+        waitForElement(btnLocator);
+        mouseOver(btnLocator);
+        click(btnLocator);
+        waitForElement(Locator.button("X"));
+        if(!isElementPresent(Locator.css(titleCss)))
+        {
+            refresh();
+            waitForElement(Locator.css(titleCss), WAIT_FOR_JAVASCRIPT);
+        }
+        waitForText(infoLabel);
+        assertEquals("Wrong page title.", infoLabel, getText(Locator.css(titleCss)));
     }
 
     private void closeInfoPage()
@@ -572,6 +613,88 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         closeInfoPage();
     }
 
+    private void assertNounInfoPage(String noun, List<String> textToCheck)
+    {
+        viewInfo(noun);
+
+        // just do simple checks for the placeholder noun pages for now, layout will change so there is no use
+        // investing too much automation right now.
+        for (String text : textToCheck)
+        {
+            waitForText(text);
+            assertTextPresent(text);
+        }
+        closeInfoPage();
+    }
+
+    private void assertMultiAssayInfoPage()
+    {
+        viewMulti("Assays", "5 Assays", ".assaytitle");
+
+        List<String> assays = Arrays.asList("ADCC-Ferrari", "Lab Results", "Luminex-Sample-LabKey", "mRNA assay", "NAb-Sample-LabKey");
+        for (String assay : assays)
+        {
+            waitForText(assay);
+            assertTextPresent(assay);
+        }
+
+        // people
+        assertPeopleTip("lead-contributor", "Mark Igra", "team_Mark_Igra.jpg", "Partner");
+        assertPeopleTip("contact-person", "Nick Arnold", "team_Nick_Arnold.jpg", "Developer");
+        assertPeopleTip("contact-person", "Alan Vezina", "team_Alan_Vezina.jpg", "Developer");
+
+        closeInfoPage();
+    }
+
+    private void assertMultiStudyInfoPage()
+    {
+        viewMulti("Studies", "3 Studies", ".studytitle");
+
+        // just do simple checks for the placeholder noun pages for now, layout will change so there is no use
+        // investing too much automation right now.
+        List<String> labels = Arrays.asList("Demo Study", "Not Actually CHAVI 001", "NotRV144",
+                "marki@labkey.com", "kristinf@labkey.com", "brittp@labkey.com",
+                "LabKey", "CHAVI", "USMHRP");
+        for (String label : labels)
+        {
+            waitForText(label);
+            assertTextPresent(label);
+        }
+
+        closeInfoPage();
+    }
+
+    private void assertMultiAntigenInfoPage()
+    {
+        viewMulti("Antigens", "31 Antigens", ".antigentitle");
+
+        // just do simple checks for the placeholder noun pages for now, layout will change so there is no use
+        // investing too much automation right now.
+        List<String> labels = Arrays.asList("96ZM651.02", "CAP210.2.00.E8", "BaL.01",
+                "Zambia", "S. Africa", "USA",
+                "AF286224", "DQ435683", "AF063223");
+        for (String label : labels)
+        {
+            waitForText(label);
+            assertTextPresent(label);
+        }
+
+        closeInfoPage();
+    }
+
+    private void assertPeopleTip(String cls, String name, String img, String description)
+    {
+        Locator btnLocator = Locator.xpath("//a[contains(@class, '" + cls + "') and contains(text(), '" + name + "')]");
+        waitForElement(btnLocator);
+        mouseOver(btnLocator);
+
+        Locator.XPathLocator imgLoc = Locator.xpath("//img[@src='/labkey/cds/images/pictures/" + img + "']");
+        waitForElement(imgLoc);
+        assertElementPresent(imgLoc);
+        mouseOut(btnLocator);
+        sleep(500);
+    }
+    
     private void toggleExplorerBar(String largeBarText)
     {
         click(Locator.xpath("//div[@class='bar large']//span[contains(@class, 'barlabel') and text()='" + largeBarText + "']//..//..//div[contains(@class, 'saecollapse')]"));
@@ -588,4 +711,4 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         Labs,
         Participants
     }
-    }
+}
