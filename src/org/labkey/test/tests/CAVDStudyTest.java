@@ -209,9 +209,11 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText(STUDY_NAME);
         clickLinkWithText("Assays", true);
 
-        clickUntilAlert("Create Assay Datasets", "Placeholder datasets created. Use Manage/Study Schedule to define datasets or link to assay data.");
+        waitAndClickNavButton("Create Assay Datasets", 0);
+        waitForAlert("Placeholder datasets created. Use Manage/Study Schedule to define datasets or link to assay data.", WAIT_FOR_JAVASCRIPT);
 
-        clickUntilAlert("Create Study Timepoints", "2 timepoints created.");
+        waitAndClickNavButton("Create Study Timepoints", 0);
+        waitForAlert("2 timepoints created.", WAIT_FOR_JAVASCRIPT);
 
         clickLinkWithText("Manage");
         clickLinkWithText("Manage Datasets");
@@ -539,18 +541,6 @@ public class CAVDStudyTest extends StudyBaseTest
         setFormElement("timepointUnit", unit.toString());
         clickButton("OK", 0);
         waitForElementToDisappear(Locator.id("DefineTimepointDialog"), WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void clickUntilAlert(String buttonText, String alertText)
-    {
-        long startTime = System.currentTimeMillis();
-        while(!isAlertPresent() && (System.currentTimeMillis() - startTime) < WAIT_FOR_JAVASCRIPT)
-        {
-            if (isButtonPresent(buttonText))
-                clickButton(buttonText, 0);
-            sleep(1000);
-        }
-        assertAlert(alertText);
     }
 
     private void addDataset()
