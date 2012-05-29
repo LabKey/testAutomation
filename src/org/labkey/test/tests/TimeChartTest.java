@@ -410,7 +410,6 @@ public class TimeChartTest extends StudyBaseTest
 
     private void visitBasedChartTest()
     {
-        // TODO: update for Ext4 UI
         log("Create multi-measure time chart.");
         clickLinkWithText(VISIT_FOLDER_NAME);
         clickTab("Manage");
@@ -420,21 +419,22 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("Choose a Measure", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath(ExtHelper.getExtDialogXPath(CHOOSE_MEASURE_DIALOG)+"//dl[./dt/em[starts-with(text(), '1. Weight')]]"));
+        clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), '1. Weight')]]"), "1,1");
         clickNavButton("Select", 0);
         waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
 
-        ExtHelper.clickExtTab(this, "X-Axis");
-        checkRadioButton("chartType", "visit");
+        goToXAxisTab();
+        Ext4Helper.selectRadioButton(this, "Chart Type:", "Visit Based Chart");
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[contains(@class, 'x4-item-disabled')]/input"));
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x4-item-disabled')]/input"));
+        apply();
         waitForTextToDisappear("Days Since Contact Date");
         waitForText("2 week Post-V#1"); // There may be intermittent failures on this line as Protovis occasionally decides it's going to render different x-axis tick marks.
         assertTextPresentInThisOrder(VISIT_STRINGS);
-        assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[contains(@class, 'x-item-disabled')]/input"));
-        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x-item-disabled')]/input"));
 
         log("Check visit data.");
         clickNavButton("View Data", 0);
-        waitForText("1 - 19 of 19");
+        waitForText("1 - 47 of 47"); // change back to "1 - 19 of 19" if we only select 5 ptids by default
 
         String tableId = getAttribute(Locator.xpath("//table[starts-with(@id, 'dataregion_') and contains(@class, 'labkey-data-region')]"), "id");
         String tableName = tableId.substring(tableId.indexOf('_') + 1, tableId.length());
@@ -457,18 +457,20 @@ public class TimeChartTest extends StudyBaseTest
         }
 
         clickNavButton("View Chart(s)", 0);
-        waitForTextToDisappear("1 - 33 of 33");
+        waitForTextToDisappear("1 - 47 of 47");
         log("Revert to Date-based chart.");
-        checkRadioButton("chartType", "date");
+        goToXAxisTab();
+        Ext4Helper.selectRadioButton(this, "Chart Type:", "Date Based Chart");
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[not(contains(@class, 'x4-item-disabled'))]/input"));
+        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[not(contains(@class, 'x4-item-disabled'))]/input"));
+        apply();
         waitForText("Days Since Contact Date");
         assertTextNotPresent(VISIT_STRINGS);
-        assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[not(contains(@class, 'x-item-disabled'))]/input"));
-        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[not(contains(@class, 'x-item-disabled'))]/input"));
 
-        ExtHelper.clickExtTab(this, "Overview");
+        openSaveMenu();
         setFormElement("reportName", VISIT_REPORT_NAME);
         setFormElement("reportDescription", REPORT_DESCRIPTION);
-        clickNavButton("Save");
+        saveReport(true);
         waitForText(VISIT_CHART_TITLE, WAIT_FOR_JAVASCRIPT);
     }
 
@@ -550,20 +552,18 @@ public class TimeChartTest extends StudyBaseTest
         Ext4Helper.selectComboBoxItem(this, "Draw x-axis as:", "Weeks");
         apply();
         waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
-        setAxisValue("X", null, null, X_AXIS_LABEL, null, new String[]{X_AXIS_LABEL}, null); 
+        setAxisValue("X", null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
         goToXAxisTab();
         Ext4Helper.selectComboBoxItem(this, "Draw x-axis as:", "Days");
         assertEquals(X_AXIS_LABEL, getFormElement("x-axis-label-textfield")); // Label shouldn't change automatically once it has been set manually
 
         // set manual x-axis range
-        setAxisValue("X", "15", "40", null, null, new String[] {"15", "20", "25", "30", "35", "40"}, null);
+        setAxisValue("X", "xaxis_range_manual", "15", "40", null, null, null, new String[] {"15", "20", "25", "30", "35", "40"}, null);
 
         log("Test Y-Axis");
-        // TODO: me, enable before commit
-        setAxisValue("Left", null, null, Y_AXIS_LABEL, null, new String[]{Y_AXIS_LABEL}, null);  // todo: me, remove
-//        setAxisValue("Left", "200000", "400000", Y_AXIS_LABEL, null, new String[] {Y_AXIS_LABEL}, new String[] {"500000","200000"});
-//        setAxisValue("Left", "10000", "1000000", null,"Log", new String[] {"100000", "900000"}, null );
+        setAxisValue("Left", "leftaxis_range_manual", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {Y_AXIS_LABEL}, new String[] {"500000","200000"});
+        setAxisValue("Left", "leftaxis_range_manual", "10000", "1000000", null, "leftaxis_scale", "Log", new String[] {"100000", "900000"}, null );
     }
 
     /**
@@ -576,7 +576,7 @@ public class TimeChartTest extends StudyBaseTest
      *                      TODO:  calculate not-present number automatically
      *                      TODO: find a better way to determine if the range has changed approprietely (Something other than asserting text is or isnt present).
      */
-    protected void setAxisValue(String axis, String lowerBound, String upperBound, String label, String scale, String[] textPresent, String[] textNotPresent)
+    protected void setAxisValue(String axis, String rangeId, String lowerBound, String upperBound, String label, String scaleId, String scale, String[] textPresent, String[] textNotPresent)
     {
         if(!(axis.equals("X") || axis.equals("Left") || axis.equals("Right")))
         {
@@ -588,9 +588,9 @@ public class TimeChartTest extends StudyBaseTest
         //don't want to worry about case for the rest of the function
         axis = axis.toLowerCase();
 
-        if(scale!=null)
+        if(scaleId!=null && scale!=null)
         {
-            Ext4Helper.selectComboBoxItem(this, "Scale:", scale);
+            Ext4Helper.selectComboBoxItemById(this, scaleId + "-labelEl", scale);        
         }
 
         if(label!=null)
@@ -599,20 +599,21 @@ public class TimeChartTest extends StudyBaseTest
             fireEvent(Locator.name(axis + "-axis-label-textfield"), SeleniumEvent.blur);
         }
 
-        if(axis.equals("left") || axis.equals("right"))
-            axis = "y";        
-
-        if (lowerBound!=null && upperBound!=null)
+        if (rangeId!=null)
         {
-            Ext4Helper.selectRadioButton(this, "Range:", "Manual");
-            Locator minInput = Locator.name(axis + "axis_rangemin");
-            Locator maxInput = Locator.name(axis + "axis_rangemax");
-            setFormElement(minInput, lowerBound);
-            assertEquals(lowerBound, getFormElement(minInput));
-            sleep(500);
-            setFormElement(maxInput, upperBound);
-            assertEquals(upperBound, getFormElement(maxInput));
-            sleep(500);
+            Ext4Helper.selectRadioButtonById(this, rangeId + "-boxLabelEl");
+            if (lowerBound!=null && upperBound!=null)
+            {
+                Locator minInput = Locator.name(axis + "axis_rangemin");
+                setFormElement(minInput, lowerBound);
+                assertEquals(lowerBound, getFormElement(minInput));
+                sleep(500);
+
+                Locator maxInput = Locator.name(axis + "axis_rangemax");
+                setFormElement(maxInput, upperBound);
+                assertEquals(upperBound, getFormElement(maxInput));
+                sleep(500);
+            }
         }
 
         apply();
@@ -966,27 +967,20 @@ public class TimeChartTest extends StudyBaseTest
         Ext4Helper.selectComboBoxItem(this, "Draw y-axis on:", "Right");
         apply();
 
-        // todo: to be enabled, issue with selecting manual range for y-axis
-//        setAxisValue("Right", "12", "16", "Hemogoblins", null, null, null);
-//        waitForText("Hemogoblins");
-//        assertTextNotPresent("17");
-//        assertTextPresent("16");
-//        assertTextPresent("12.5");
-//        assertTextNotPresent("11.5");
-        // TODO: until here
+        setAxisValue("Right", "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
+        waitForText("Hemogoblins");
+        assertTextNotPresent("17");
+        assertTextPresent("16");
+        assertTextPresent("12.5");
+        assertTextNotPresent("11.5");
 
 //        String newTransform = getAttribute(Locator.xpath("//a[starts-with(@title, '"+GROUP1_PTIDS[0]+" Hemoglobin:')]/path"), "transform");
 //        double newHeight = Double.parseDouble(transform.substring(newTransform.indexOf(" "), newTransform.indexOf(")") - 1));
 //        assertTrue("Hemoglobin not graphed relative to right axis.", newHeight < height);        
 
-        // todo: to be enabled, issue with selecting automatic range for y-axis
-//        ExtHelper.clickExtButton(this, "Right-Axis", 0);   // todo: change this to click axis label
-//        Ext4Helper.selectRadioButton(this, "Range:", "Automatic");
-//        Ext4Helper.selectComboBoxItem(this, "Scale:", "Log");
-//        apply();
-//        assertTextNotPresent("16");
-//        assertTextNotPresent("11.5");
-        // todo: until here
+        setAxisValue("Right", "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
+        assertTextNotPresent("15");
+        assertTextNotPresent("12.5");
 
 //        assertTextPresent("100"); TODO: Issue 14846
 //        assertTextPresent("10");
