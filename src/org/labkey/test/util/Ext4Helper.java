@@ -50,4 +50,10 @@ public class Ext4Helper
     {
         selectComboBoxItem(test, Locator.xpath("//div[./label[text()='" + label + "']]"), selection);
     }
+
+    public static void selectRadioButton(BaseSeleniumWebTest test, String label, String selection)
+    {
+        Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");
+        test.click(l);
+    }
 }

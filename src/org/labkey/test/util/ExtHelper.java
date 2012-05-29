@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import com.thoughtworks.selenium.Selenium;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -243,6 +244,7 @@ public class ExtHelper
         test.getWrapper().getEval("selenium.selectExtGridItem(null, null, " + index + ", 'x-grid-panel', " + keepExisting + ")");
     }
 
+    //TODO:  comment this
     public static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, int index, String markerCls, boolean keepExisting)
     {
         clickX4GridPanelCheckbox(test, null, null, index, markerCls, keepExisting);
