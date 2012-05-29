@@ -41,12 +41,14 @@ public class LibraTest extends MS2Test
     {
         createProject(getProjectName(), "MS2");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe/iTRAQ/");
-        clickLinkContainingText(getProjectName());
+        clickLinkWithText(getProjectName());
 
         clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "xtandem/Libra/iTRAQ.search.xar.xml");
         selectImportDataAction("Import Experiment");
-        waitForTextToDisappear("LOADING");
+        goToModule("Pipeline");
+        waitForPipelineJobsToComplete(1, "Experiment Import - iTRAQ.search.xar.xml", false);
+        clickLinkWithText(getProjectName());
         for (int i = 0; i < 10; i++)
         {
             refresh();
