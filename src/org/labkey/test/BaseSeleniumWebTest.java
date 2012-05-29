@@ -2740,6 +2740,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     }
 
+    public void waitForAlert(String alertText, int wait)
+    {
+        waitFor(new Checker(){public boolean check(){return isAlertPresent();}}, "No alert appeared.", wait);
+        assertAlert(alertText);
+    }
+
     protected File getTestTempDir()
     {
         File buildDir = new File(getLabKeyRoot(), "build");
