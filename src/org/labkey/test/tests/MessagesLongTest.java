@@ -18,6 +18,10 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PasswordUtil;
+
+import java.util.List;
 
 /**
  * User: tamram
@@ -38,6 +42,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
     private static final String USER1 = "user1@messages.test";
     private static final String USER2 = "user2@messages.test";
     private static final String USER3 = "user3@messages.test";
+    private static final String RESPONDER = "responder@messages.test";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
             "<b>${labkey.webPart(partName='Lists')}</b>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
@@ -76,6 +81,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         deleteUser(USER1);
         deleteUser(USER2);
         deleteUser(USER3);
+        deleteUser(RESPONDER);
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }
 
@@ -100,6 +106,9 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         enableEmailRecorder();
 
+        doTestEmailPrefsMine();
+
+        clickLinkWithText(PROJECT_NAME);
         log("Check email preferences");
         clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "1");
@@ -336,5 +345,58 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithText(MSG3_TITLE);
         assertLinkNotPresentWithText(MSG2_TITLE);
     }
-}
 
+    //Expects an empty email record
+    //Regression test: 14824: forum not sending email for message replies to users configured as "my conversations"
+    private void doTestEmailPrefsMine()
+    {
+        String _messageTitle = "Mine Message";
+        String _messageBody = "test";
+
+        clickLinkWithText(PROJECT_NAME);
+        createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
+        clickButton("Done");
+
+        clickWebpartMenuItem("Messages", "Email", "Preferences");
+        checkRadioButton("emailPreference", "2");
+        clickButton("Update");
+        clickButton("Done");
+
+        createNewMessage(_messageTitle, _messageBody);
+
+        impersonate(RESPONDER);
+
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(_messageTitle);
+        clickButton("Respond");
+        setFormElement("title", _messageTitle + " response");
+        setFormElement("body", _messageBody + " response");
+        clickButton("Submit");
+
+        stopImpersonating();
+
+        clickLinkWithText(PROJECT_NAME);        
+        goToModule("Dumbster");
+        DataRegionTable record = new DataRegionTable("EmailRecord", this, false, false);
+        List<String> subject = record.getColumnDataAsText("Message");
+        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
+        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));
+        List<String> to = record.getColumnDataAsText("To");
+        assertTrue("Incorrect message notifications.",
+                to.get(0).equals(RESPONDER) && to.get(1).equals(PasswordUtil.getUsername()) ||
+                to.get(1).equals(RESPONDER) && to.get(0).equals(PasswordUtil.getUsername()));
+
+        assertLinkPresentWithText(_messageTitle);
+        assertLinkPresentWithText("RE: "+_messageTitle);
+        clickLinkWithText("RE: "+_messageTitle, 1, false);
+    }
+
+    private void createNewMessage(String title, String body)
+    {
+        clickNavButton("New");
+        setFormElement("title", title);
+        setFormElement("body", body);
+        selectOptionByText("rendererType", "HTML");
+        clickButton("Submit");
+    }
+}
