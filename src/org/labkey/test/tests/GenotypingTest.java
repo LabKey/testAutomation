@@ -224,7 +224,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
         clickButton("Delete", 0);
         selenium.getConfirmation();
 
-        sleep(500);
+        waitForPageToLoad();
         waitForText("1 match was deleted.");
 
     }
