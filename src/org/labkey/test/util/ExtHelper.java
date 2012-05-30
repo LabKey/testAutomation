@@ -261,6 +261,50 @@ public class ExtHelper
         test.getWrapper().getEval("selenium.selectExt4GridItem('" + colName + "', '" + colValue + "', " + rowIndex + ", '" + markerCls + "', " + keepExisting + ")");
     }
 
+    //Pick measure from split panel measure picker
+    public static void pickMeasure(BaseSeleniumWebTest test, String source, String measure, boolean keepSelection)
+    {
+        test.waitForElement(Locator.css(".sourcepanel tr:contains('"+source+"')"));
+        test.mouseDown(Locator.css(".sourcepanel tr:contains('"+source+"')"));
+        if(!keepSelection)
+        {
+            test.waitForElement(Locator.css(".measurepanel tr:contains('"+measure+"')"));
+            test.mouseDown(Locator.css(".measurepanel tr:contains('"+measure+"')"));
+        }
+        else
+        {
+            test.waitForElement(Locator.css(".measurepanel tr:contains('"+measure+"')"));
+            test.mouseDown(Locator.css(".measurepanel tr:contains('"+measure+"') div.x4-grid-row-checker"));
+        }
+    }
+
+    public static void pickMeasure(BaseSeleniumWebTest test, String source, String measure)
+    {
+        pickMeasure(test, source, measure, false);
+    }
+
+    //Pick measure from one of multiple split panel measure pickers   
+    public static void pickMeasure(BaseSeleniumWebTest test, String panelCls, String source, String measure, boolean keepSelection)
+    {
+        test.waitForElement(Locator.css("."+panelCls+" .sourcepanel tr:contains('"+source+"')"));
+        test.mouseDown(Locator.css("."+panelCls+" .sourcepanel tr:contains('"+source+"')"));
+        if(!keepSelection)
+        {
+            test.waitForElement(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"')"));
+            test.mouseDown(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"')"));
+        }
+        else
+        {
+            test.waitForElement(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"')"));
+            test.mouseDown(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"') div.x4-grid-row-checker"));
+        }
+    }
+
+    public static void pickMeasure(BaseSeleniumWebTest test, String panelCls, String source, String measure)
+    {
+        pickMeasure(test, panelCls, source, measure, false);
+    }
+
     @Deprecated
     public static void prevClickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
     {
