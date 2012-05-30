@@ -361,9 +361,10 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText(FOLDER_NAME4);
         clickLinkWithText("AllStudiesList", true);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, "StudyLookup");
         CustomizeViewsHelper.addCustomizeViewColumn(this, "StudyLookup/Dataset Status");
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "StudyLookup/Label");
         CustomizeViewsHelper.applyCustomView(this);
-        CustomizeViewsHelper.closeCustomizeViewPanel(this);
         // verify each status icon appears once originally
         for (String[] status : statuses)
         {
@@ -392,7 +393,7 @@ public class CAVDStudyTest extends StudyBaseTest
         waitForElement(Locator.navButton("Export"), WAIT_FOR_JAVASCRIPT);
         clickExportToText();
         // verify column names
-        assertTextPresentInThisOrder("myStudyName", "studyLookup", "studyLookupDatasetStatus");
+        assertTextPresentInThisOrder("myStudyName", "studyLookupLabel", "studyLookupDatasetStatus");
         // verify first study values
         assertTextPresentInThisOrder("Something", study2name);
         statusCounter = 0;
