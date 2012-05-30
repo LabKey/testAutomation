@@ -46,7 +46,6 @@ public class TimeChartTest extends StudyBaseTest
     private static final String Y_AXIS_LABEL = "New Y-Axis Label";
     private static final String CHART_TITLE = "New Chart Title";
     private static final String VISIT_CHART_TITLE = "APX-1: Abbreviated Physical Exam";
-    private static final String CHOOSE_MEASURE_DIALOG = "Choose a Measure...";
     private static final String ADD_MEASURE_DIALOG = "Add Measure...";
     protected static final String PARTICIPANTS = "Participants";
     protected static final String PARTICIPANTS_GROUPS = "Participant Groups";
@@ -318,8 +317,6 @@ public class TimeChartTest extends StudyBaseTest
 //        ExtHelper.checkCheckbox(this, "Show Individual Lines"); // Issue 14844: getData API not honoring the passed in sorts when grouping data for aggregates
         apply();
 
-        // TODO: add check for group mean legend labels or data point labels
-
         // uncheck group 1 and 2
         waitForText("Not in any group");
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'Not in any group')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
@@ -331,6 +328,10 @@ public class TimeChartTest extends StudyBaseTest
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP1_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP2_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
+
+        waitForText(GROUP1_NAME + " CD4");
+        assertTextPresent(GROUP1_NAME + " CD4", 11); // 10 for the mean line chart and 1 for the legend
+        assertTextPresent(GROUP2_NAME + " CD4", 13); // 12 for the mean line chart and 1 for the legend        
 
         goToGroupingTab();
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
@@ -979,7 +980,7 @@ public class TimeChartTest extends StudyBaseTest
 //        assertTrue("Hemoglobin not graphed relative to right axis.", newHeight < height);        
 
         setAxisValue("Right", "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
-        assertTextNotPresent("15");
+        assertTextNotPresent("13");
         assertTextNotPresent("12.5");
 
 //        assertTextPresent("100"); TODO: Issue 14846
