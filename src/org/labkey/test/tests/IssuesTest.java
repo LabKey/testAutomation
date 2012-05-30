@@ -30,9 +30,11 @@ import org.labkey.test.util.PasswordUtil;
 public class IssuesTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "IssuesVerifyProject";
+    protected static final String SUB_FOLDER_NAME = "SubFolder";
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
     private static final String ISSUE_TITLE_2 = "A not so serious issue";
+    private static final String ISSUE_TITLE_3 = "A sub-folder issue";
     private static final String USER1 = "user1@issues.test";
     private static final String USER2 = "user2@issues.test";
     private static final String USER3 = "user3@issues.test";
@@ -86,6 +88,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         addWebPart("Search");
         assertTextPresent("Open");
 
+        createSubfolder(PROJECT_NAME, SUB_FOLDER_NAME, null);
+        addWebPart("Issues List");
+
         enableEmailRecorder();
     }
 
@@ -93,6 +98,7 @@ public class IssuesTest extends BaseSeleniumWebTest
     {
         initProject();
 
+        clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("view open Issues");
         assertNavButtonPresent("New Issue");
 
@@ -315,6 +321,10 @@ public class IssuesTest extends BaseSeleniumWebTest
 //        requiredFieldsTest();
 //        viewSelectedDetailsTest();
 //        entryTypeNameTest();
+
+        // Test issues grid with issues in a sub-folder
+        testSubFolderIssues();
+
 
         // UNDONE test these actions
         // CompleteUserAction
@@ -557,4 +567,31 @@ public class IssuesTest extends BaseSeleniumWebTest
         waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
         clickLinkWithText(PROJECT_NAME);
     }
+
+    public void testSubFolderIssues()
+    {
+        log("Testing issues in sub-folders");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(SUB_FOLDER_NAME);
+
+        clickNavButton("New Issue");
+        setFormElement("title", ISSUE_TITLE_3);
+        selectOptionByText("assignedTo", getDisplayName());
+        setFormElement("comment", "We are in a sub-folder");
+        clickNavButton("Save");
+
+        clickLinkContainingText(PROJECT_NAME);
+        clickLinkWithText("Issues Summary");
+        // Set the container filter to include subfolders
+        clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+
+        // Verify the URL of ISSUE_TITLE_0 goes to PROJECT_NAME
+        String href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_0), "href");
+        assertTrue("Expected issue details URL to link to project container", href.contains("/issues/" + PROJECT_NAME + "/details.view"));
+
+        // Verify the URL of ISSUE_TITLE_3 goes to PROJECT_NAME/SUB_FOLDER_NAME
+        href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_3), "href");
+        assertTrue("Expected issue details URL to link to sub-folder container", href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view"));
+    }
+
 }
