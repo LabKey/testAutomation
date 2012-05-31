@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.labkey.experimentQuery.xml.Folder;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -41,6 +42,7 @@ public class ListTest extends BaseSeleniumWebTest
 {
     protected final static String PROJECT_NAME = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
+    private String project2_url;
     protected final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
@@ -479,6 +481,8 @@ public class ListTest extends BaseSeleniumWebTest
         log("Create second project");
         createProject(PROJECT_NAME2);
 
+        project2_url = getCurrentRelativeURL();
+
         log("Add List -- " + LIST3_NAME);
         ListHelper.createList(this, PROJECT_NAME2, LIST3_NAME, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
         assertTextPresent("<AUTO> (Owner)");
@@ -593,6 +597,30 @@ public class ListTest extends BaseSeleniumWebTest
         doUploadTest();
         customFormattingTest();
         customizeURLTest();
+        crossContainerLookupTest();
+     }
+
+    String crossContainerLookupList = "CCLL";
+    private void crossContainerLookupTest()
+    {
+        //create list with look up A
+        String lookupColumn = "lookup";
+        ListHelper.createList(this, PROJECT_NAME2, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_NAME, lookupColumn, Integer, "A" ));
+        clickImportData();
+        setListImportAsTestDataField(lookupColumn + "\n1");
+
+        log("verify look column set properly");
+        assertTextPresent("one A");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "lookup/Bfk/Cfk/title");
+        CustomizeViewsHelper.saveCustomView(this);
+
+        clickLink(Locator.linkContainingText("one C"));
+        assertElementPresent(Locator.xpath("//input[@type='submit']"));
+        goBack();
+
+
+        //add columns to look all the way to C
     }
 
     private void filterTest()
@@ -812,7 +840,12 @@ public class ListTest extends BaseSeleniumWebTest
 
     ListHelper.ListColumn col(String name, ListHelper.ListColumnType type, String table)
     {
-        return new ListHelper.ListColumn(name, "", type, "", new ListHelper.LookupInfo(null, "lists", table));
+        return col( null, name,type, table);
+    }
+
+    ListHelper.ListColumn col(String folder, String name, ListHelper.ListColumnType type, String table)
+    {
+        return new ListHelper.ListColumn(name, "", type, "", new ListHelper.LookupInfo(folder, "lists", table));
     }
     
     ListHelper.ListColumn colURL(String name, ListHelper.ListColumnType type, String url)
@@ -898,7 +931,12 @@ public class ListTest extends BaseSeleniumWebTest
         selectOptionByText("ff_titleColumn", cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
         clickSave();
         clickImportData();
-        setFormElement("text", toTSV(cols,data));
+        setListImportAsTestDataField(toTSV(cols,data));
+    }
+
+    private void setListImportAsTestDataField(String data)
+    {
+        setFormElement("text", data);
         submitImportTsv();
     }
 
