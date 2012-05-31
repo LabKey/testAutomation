@@ -16,18 +16,14 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TimeChartTest extends StudyBaseTest
 {
@@ -715,13 +711,14 @@ public class TimeChartTest extends StudyBaseTest
         setWikiBody(getFileContents(htmlPage));
         saveWikiPage();
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
-
-
+        clickLinkWithText(WIKIPAGE_NAME);
+        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
 
         // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
         int testCount = Integer.parseInt(getFormElement(Locator.name("configCount")));
         int testIndex = 0;
-        while(testIndex < testCount){
+        while(testIndex < testCount)
+        {
             // check title is present
             waitForText(testTitles[testIndex], WAIT_FOR_JAVASCRIPT);
             // check # of rows
@@ -730,7 +727,7 @@ public class TimeChartTest extends StudyBaseTest
             DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
 
             // check values in interval column for the first participant
-            if(numbercheck!=null)
+            if (numbercheck!=null)
             {
                 for (int i = 0; i < numbercheck[testIndex].length; i++)
                 {
@@ -742,7 +739,7 @@ public class TimeChartTest extends StudyBaseTest
                     catch(NumberFormatException e){}
                 }
             }
-            if(stringCheck!=null)
+            if (stringCheck!=null)
             {
                 for (int i = 0; i < stringCheck[testIndex].length; i++)
                 {
@@ -782,8 +779,8 @@ public class TimeChartTest extends StudyBaseTest
 
             testIndex++;
         }
-
     }
+
 
     private void getDataVisitTest()
     {
