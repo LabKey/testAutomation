@@ -36,6 +36,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String VISIT_FOLDER_NAME =  "Demo Visit Study";
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
     private static final String SAMPLE_DATA_PATH = "/sampledata/study/";
+    private static final String TEST_DATA_API_PATH = "server/test/data/api";
 
     private static final String REPORT_NAME_1 = "TimeChartTest Report";
     private static final String REPORT_NAME_2 = "TimeChartTest 2Report";
@@ -125,25 +126,25 @@ public class TimeChartTest extends StudyBaseTest
     };
 
     private static final String[][] GETDATA_API_DATETEST_COLNAMES = {
-        {"Study Lab Results Date", "Study Lab Results CD4", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Hemoglobin", "Study Lab Results Participant Visit Visit Date", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Physical Exam Weight Kg", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study HIVTest Results HIVLoad Quant", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"},
-        {"Study Lab Results Date", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Hemoglobin", "Visit Date", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "Weight (kg)", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "Viral Load Quantified (copies/ml)", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Visit Date", "ObsConc", "ObsConc OOR Indicator", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "ObsConc", "ObsConc OOR Indicator", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
     };
 
     private static final String[][] GETDATA_API_VISITTEST_COLNAMES = {
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order"},
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Hemoglobin"},
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Physical Exam Weight Kg"},
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study HIVTest Results HIVLoad Quant"},
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Luminex Assay Obs Conc", "Study Luminex Assay Obs Conc OORIndicator"},
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"},
-        {"Study Lab Results Participant Visitsequencenum", "Study Lab Results CD4", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"}
+        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date"},
+        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "Hemoglobin"},
+        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "Weight (kg)"},
+        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "Viral Load Quantified (copies/ml)"},
+        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "ObsConc", "ObsConc OOR Indicator"},
+        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "ObsConc", "ObsConc OOR Indicator"},
+        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"},
+        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"}
     };
 
     private static final double[][] GETDATA_API_TEST_DAYS = {
@@ -246,7 +247,7 @@ public class TimeChartTest extends StudyBaseTest
 
     protected File[] getTestFiles()
     {
-        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/timechart-api.xml")};
+        return new File[]{new File(getLabKeyRoot() + "/" + TEST_DATA_API_PATH + "/timechart-api.xml")};
     }
 
     protected void doCreateSteps()
@@ -278,20 +279,20 @@ public class TimeChartTest extends StudyBaseTest
 
         aggregateTimeChartTest();
 
-        visitBasedChartTest(); //Issue 14844
+        visitBasedChartTest(); 
 
     }
 
     private void aggregateTimeChartTest()
     {
         aggregateTimeChartUITest();
-        // bug 13061
+
         aggregateTimeChartSQLTest();
     }
 
     private void aggregateTimeChartSQLTest()
     {
-        sqlTest(testDataAPI + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE, GETDATA_API_TEST_NUMROWS_AGGREGATE,  GETDATA_API_COLNAMES_AGGREGATE, null, null, null, null);
+        sqlTest(TEST_DATA_API_PATH + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE, GETDATA_API_TEST_NUMROWS_AGGREGATE,  GETDATA_API_COLNAMES_AGGREGATE, null, null, null, null);
     }
 
     //depends on:  participantGroupTimeChartTest
@@ -313,13 +314,12 @@ public class TimeChartTest extends StudyBaseTest
         waitForText("Lab Results: " + GROUP1_NAME);
 
         goToGroupingTab();
-        ExtHelper.checkCheckbox(this, "Show Mean");
-//        ExtHelper.checkCheckbox(this, "Show Individual Lines"); // Issue 14844: getData API not honoring the passed in sorts when grouping data for aggregates
+        ExtHelper.checkCheckbox(this, "Show Mean"); // select show mean
+//        ExtHelper.uncheckCheckbox(this, "Show Individual Lines"); // de-select show individual lines
         apply();
 
         // uncheck group 1 and 2
-        waitForText("Not in any group");
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'Not in any group')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        waitForText(GROUP1_NAME);
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP1_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP2_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
@@ -419,7 +419,7 @@ public class TimeChartTest extends StudyBaseTest
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Choose a Measure", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.waitForLoadingMaskToDisappear(this, 5*WAIT_FOR_JAVASCRIPT);
         clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), '1. Weight')]]"), "1,1");
         clickNavButton("Select", 0);
         waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
@@ -434,7 +434,7 @@ public class TimeChartTest extends StudyBaseTest
 
         log("Check visit data.");
         clickNavButton("View Data", 0);
-        waitForText("1 - 47 of 47"); // change back to "1 - 19 of 19" if we only select 5 ptids by default
+        waitForText("1 - 19 of 19");
 
         String tableId = getAttribute(Locator.xpath("//table[starts-with(@id, 'dataregion_') and contains(@class, 'labkey-data-region')]"), "id");
         String tableName = tableId.substring(tableId.indexOf('_') + 1, tableId.length());
@@ -457,7 +457,7 @@ public class TimeChartTest extends StudyBaseTest
 //        }
 
         clickNavButton("View Chart(s)", 0);
-        waitForTextToDisappear("1 - 47 of 47");
+        waitForTextToDisappear("1 - 19 of 19");
         log("Revert to Date-based chart.");
         goToXAxisTab();
         Ext4Helper.selectRadioButton(this, "Chart Type:", "Date Based Chart");
@@ -530,8 +530,8 @@ public class TimeChartTest extends StudyBaseTest
         assertTextNotPresent("No data found");
 
         clickNavButton("View Data", 0);
-//        waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT); // TODO: re-enable if we change to pre-selecting only first 5 ptids
-//        ExtHelper.clickX4GridPanelCheckbox(this, 5, "participantsGridPanel", true);
+        waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT); 
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '249325717')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("1 - 38 of 38", WAIT_FOR_JAVASCRIPT);
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '249320127')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
@@ -683,10 +683,9 @@ public class TimeChartTest extends StudyBaseTest
         getDataVisitTest();
     }
 
-    private String testDataAPI = "server/test/data/api";
     private void getDataDateTest()
     {
-        sqlTest(testDataAPI+"/getDataDateTest.html", GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
+        sqlTest(TEST_DATA_API_PATH+"/getDataDateTest.html", GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
     }
 
 
@@ -727,7 +726,6 @@ public class TimeChartTest extends StudyBaseTest
             waitForText(testTitles[testIndex], WAIT_FOR_JAVASCRIPT);
             // check # of rows
             waitForText(testNumRows[testIndex], WAIT_FOR_JAVASCRIPT);
-            waitForText("Study Lab Results", WAIT_FOR_JAVASCRIPT);
             // check column headers
             DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
 
@@ -748,7 +746,13 @@ public class TimeChartTest extends StudyBaseTest
             {
                 for (int i = 0; i < stringCheck[testIndex].length; i++)
                 {
-                    assertEquals(stringCheck[testIndex][i], table.getDataAsText(i, "Study Lab Results Participant Visit Visit Label"));
+                    // visit label column may not have dataset name prefix
+                    int colIndex = table.getColumn("Study Lab Results Participant Visit Visit Label");
+                    if (colIndex == -1)
+                        colIndex = table.getColumn("Visit Label");     
+
+                    String colData = table.getDataAsText(i, colIndex);
+                    assertEquals(stringCheck[testIndex][i], colData);
                 }
             }
             // check values in measure column
@@ -783,7 +787,7 @@ public class TimeChartTest extends StudyBaseTest
 
     private void getDataVisitTest()
     {
-        sqlTest("server/test/data/api/getDataVisitTest.html", GETDATA_API_VISITTEST_COLNAMES, GETDATA_API_TEST_VISITLABEL, null, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
+        sqlTest(TEST_DATA_API_PATH + "/getDataVisitTest.html", GETDATA_API_VISITTEST_COLNAMES, GETDATA_API_TEST_VISITLABEL, null, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
     }
 
     private void participantGroupTimeChartTest()
@@ -807,11 +811,8 @@ public class TimeChartTest extends StudyBaseTest
         setParticipantSelection(PARTICIPANTS_GROUPS);
         setNumberOfCharts(PER_GROUP);
         apply();
-        waitForText("Not in any group");
+        waitForText(GROUP1_NAME);
         assertLinkPresentWithText("Manage Groups");  
-        // uncheck the "Not in any group" group
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), 'Not in any group')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
-        sleep(2000);
         
         log("Verify one line per measure per participant. All groups.");
         waitForText(CHART_TITLE);
