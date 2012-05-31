@@ -62,7 +62,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String[] GROUP2_PTIDS = {"249320127", "249320489"};
     private static final String[] GROUP3_PTIDS = {"249320489"/*Duplicate from group 2*/, "249320897", "249325717"};
 
-    private static final String[] VISIT_STRINGS = {"2 week Post-V#1", "Int. Vis. %{S.1.1} .%{S.2.1}", "3 week Post-V#1", "Grp1:F/U/Grp2:V#2", "1 week Post-V#2", "G1: 6wk/G2: 2wk", "3 week Post-V#2"};
+    private static final String[] VISIT_STRINGS = {"Int. Vis. %{S.1.1} .%{S.2.1}", "Grp1:F/U/Grp2:V#2", "6 week Post-V#2", "3 wk Post-V#2/V#3"};
 
     private static final String USER1 = "user1@timechart.test";
 
@@ -278,7 +278,7 @@ public class TimeChartTest extends StudyBaseTest
 
         aggregateTimeChartTest();
 
-//        visitBasedChartTest(); //Issue 14844
+        visitBasedChartTest(); //Issue 14844
 
     }
 
@@ -426,11 +426,10 @@ public class TimeChartTest extends StudyBaseTest
 
         goToXAxisTab();
         Ext4Helper.selectRadioButton(this, "Chart Type:", "Visit Based Chart");
-        assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[contains(@class, 'x4-item-disabled')]/input"));
-        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x4-item-disabled')]/input"));
+//        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x4-item-disabled')]/input"));
         apply();
         waitForTextToDisappear("Days Since Contact Date");
-        waitForText("2 week Post-V#1"); // There may be intermittent failures on this line as Protovis occasionally decides it's going to render different x-axis tick marks.
+        waitForText("6 week Post-V#2"); // There may be intermittent failures on this line as Protovis occasionally decides it's going to render different x-axis tick marks.
         assertTextPresentInThisOrder(VISIT_STRINGS);
 
         log("Check visit data.");
@@ -452,10 +451,10 @@ public class TimeChartTest extends StudyBaseTest
             String visit = visits.get(i).toString();
             visits.set(i, visit);
         }
-        for( String str : VISIT_STRINGS )
-        {
-            assertTrue("Not all visits present in data table.", visits.contains(str));
-        }
+//        for( String str : VISIT_STRINGS ) //issue 15089
+//        {
+//            assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
+//        }
 
         clickNavButton("View Chart(s)", 0);
         waitForTextToDisappear("1 - 47 of 47");
@@ -613,11 +612,12 @@ public class TimeChartTest extends StudyBaseTest
                 Locator maxInput = Locator.name(axis + "axis_rangemax");
                 setFormElement(maxInput, upperBound);
                 assertEquals(upperBound, getFormElement(maxInput));
-                sleep(500);
             }
         }
 
         apply();
+        waitForTextToDisappear("Calculate");  //for super fast computers, we have to wait to make sure the mask is gone
+//        waitForElementToDisappear(Locator.button("Apply"));
 
         if(textNotPresent!=null)
         {
@@ -627,7 +627,7 @@ public class TimeChartTest extends StudyBaseTest
 
         if(textPresent!=null)
         {
-            waitForText(textPresent[0]);
+            waitForText(textPresent[0], 5*defaultWaitForPage);
             for (String text : textPresent)
                 assertTextPresent(text);
         }
@@ -644,7 +644,9 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("Choose a Measure", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'CD4+')]]"), "1,1");
+        Locator.XPathLocator measure = Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'CD4+')]]");
+        waitForElement(measure);
+        clickAt(measure, "1,1");
         clickNavButton("Select", 0);
         enterMeasuresPanel();
         addMeasure();
