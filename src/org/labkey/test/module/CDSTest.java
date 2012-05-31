@@ -416,9 +416,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertMultiAntigenInfoPage();
     }
 
-    private static final String CD4_LYMPH = "Created with Raphaël 2.1.0CD4050100150200250300350400450Lymphocytes200400600800100012001400160018002000";
-    private static final String HEMO_CD4 = "Created with Raphaël 2.1.0Hemoglobin05101520CD450100150200250300350400450";
-    private static final String HEMO_CD4_UNFILTERED = "Created with Raphaël 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
+    private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0CD4050100150200250300350400450Lymphocytes200400600800100012001400160018002000";
+    private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD450100150200250300350400450";
+    private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
     private void verifyScatterPlot()
     {
         selectCDSGroup(GROUP_NAME, true);
@@ -531,8 +531,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void viewInfo(String barLabel)
     {
-        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/.."));
-        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
+        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '" + barLabel + "']/.."));
+        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '" + barLabel + "']/..//button"));
         click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
         waitForElement(Locator.button("X"));
 /*
@@ -573,7 +573,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void assertAllParticipantsPortalPage()
     {
-        assertCDSPortalRow(SearchBy.Studies, STUDIES[0]+", "+STUDIES[1]+", "+STUDIES[2], "3 total");
+        assertCDSPortalRow(SearchBy.Studies, STUDIES[0] + ", " + STUDIES[1] + ", " + STUDIES[2], "3 total");
         assertCDSPortalRow(SearchBy.Antigens, "5 clades, 5 tiers, 5 sources (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
         assertCDSPortalRow(SearchBy.Assays, "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow(SearchBy.Labs, "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
@@ -592,7 +592,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         String actualTotal = getText(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
                 "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]"+
                 "/div[contains(@class, 'totalcolumn')]"));
-        assertEquals("Wrong total for search by "+by+".", expectedTotal, actualTotal);
+        assertEquals("Wrong total for search by " + by + ".", expectedTotal, actualTotal);
     }
 
     // Sequential calls to this should have different participant counts.
@@ -604,18 +604,18 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectBars(barLabel);
         assertFilterStatusCounts(participantCount, studyCount, assayCount, contributorCount, antigenCount);
 //        waitForElement(Locator.xpath("//td[contains(text(), '" + searchBy + ":'"));
-        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ filteredLabel +"')]"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '" + filteredLabel + "')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
 //        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void assertFilterStatusCounts(int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount)
     {
-        waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='"+participantCount+"']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='" + participantCount + "']"), WAIT_FOR_JAVASCRIPT);
         waitForText(studyCount+(studyCount!=1?" Studies":" Study"));
         waitForText(assayCount+(assayCount!=1?" Assays":" Assay"));
         waitForText(contributorCount!=1?" Contributors":" Contributor");
-        waitForText(antigenCount+(antigenCount!=1?" Antigens":" Antigen"));
+        waitForText(antigenCount + (antigenCount != 1 ? " Antigens" : " Antigen"));
     }
 
     // Assumes you are on find-by-assay page, returns there when done
