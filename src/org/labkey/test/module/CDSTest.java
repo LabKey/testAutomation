@@ -17,6 +17,7 @@ package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 
@@ -91,6 +92,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         verifyFilters();
         verifyNounPages();
         verifyMultiNounPages();
+        verifyScatterPlot();
     }
 
 /// Test substeps
@@ -414,6 +416,39 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertMultiAntigenInfoPage();
     }
 
+    private static final String CD4_LYMPH = "Created with Raphaël 2.1.0CD4050100150200250300350400450Lymphocytes200400600800100012001400160018002000";
+    private static final String HEMO_CD4 = "Created with Raphaël 2.1.0Hemoglobin05101520CD450100150200250300350400450";
+    private static final String HEMO_CD4_UNFILTERED = "Created with Raphaël 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
+    private void verifyScatterPlot()
+    {
+        selectCDSGroup(GROUP_NAME, true);
+        click(SearchBy.Studies);
+
+        click(Locator.tagWithText("span", "Plot Data"));
+        ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "CD4");
+        ExtHelper.pickMeasure(this, "YaxisPicker", "Lab Results", "Lymphocytes");
+        clickButton("plot", 0);
+        waitForText(CD4_LYMPH); // svg to text
+
+        clickButton(">", 0); // Choose variables button
+        ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "Hemoglobin");
+        ExtHelper.pickMeasure(this, "YaxisPicker", "Lab Results", "CD4");
+        clickButton("plot", 0);
+        waitForText(HEMO_CD4); // svg to text
+
+        //TODO: Test cancel button [BLOCKED] 15095: Measure picker cancel button doesn't reset selections
+
+        click(Locator.tagWithText("span", "Explore Categories"));
+        waitForTextToDisappear(HEMO_CD4);
+
+        click(Locator.tagWithText("span", "Plot Data"));
+        waitForText(HEMO_CD4);
+
+        clickButton("clear filters", 0);
+        waitForTextToDisappear(HEMO_CD4);
+        waitForText(HEMO_CD4_UNFILTERED);
+    }
+
 /// CDS App helpers
 
     private void pickCDSSort(String sortBy)
@@ -694,7 +729,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         mouseOut(btnLocator);
         sleep(500);
     }
-    
+
     private void toggleExplorerBar(String largeBarText)
     {
         click(Locator.xpath("//div[@class='bar large']//span[contains(@class, 'barlabel') and text()='" + largeBarText + "']//..//..//div[contains(@class, 'saecollapse')]"));
