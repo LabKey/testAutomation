@@ -333,7 +333,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     private String adminPasswordResetTest(String username, String password)
     {
         String newPassword = password +"1";
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
         clickLinkContainingText(username);
         clickButtonContainingText("Reset Password", 0);
         getConfirmationAndWait();
@@ -363,7 +363,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected void addRemoveSiteAdminTest()
     {
         // test for issue 13921
-        clickAdminMenuItem("Site", "Site Admins");
+        goToSiteAdmins();
         setFormElement("names", NORMAL_USER);
         uncheckCheckbox("sendEmail");
         clickNavButton("Update Group Membership");
@@ -464,7 +464,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void checkGroupMembership(String userName, String groupName, int expectedCount)
     {
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
 
         Locator userAccessLink = Locator.xpath("//td[text()='" + userName + "']/..//td/a[contains(@href,'userAccess.view')]");
         boolean isPresent = isElementPresent(userAccessLink);

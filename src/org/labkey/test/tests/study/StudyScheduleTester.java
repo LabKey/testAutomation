@@ -181,7 +181,7 @@ public class StudyScheduleTester
         createPlaceholderDataset(GHOST_DATASET_5, null, false);
         createPlaceholderDataset(GHOST_DATASET_6, GHOST_CATEGORY, false);
 
-        _test.clickAdminMenuItem("Manage Study");
+        _test.goToManageStudy();
         _test.clickLinkWithText("Manage Datasets");
 
         linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, GHOST_DATASET_1);
@@ -202,7 +202,7 @@ public class StudyScheduleTester
         {
             // verify a placeholder dataset cannot be edited from the manage dataset page
             _test.clickLinkWithText(_folderName);
-            _test.clickAdminMenuItem("Manage Study");
+            _test.goToManageStudy();
             _test.clickLinkWithText("Manage Datasets");
             _test.clickLinkWithText(name);
 
@@ -371,7 +371,7 @@ public class StudyScheduleTester
     private void goToStudySchedule()
     {
         _test.clickLinkWithText(_folderName);
-        _test.clickAdminMenuItem("Manage Study");
+        _test.goToManageStudy();
         _test.clickLinkWithText("Study Schedule");
 
         // wait for grid to load

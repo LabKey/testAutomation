@@ -132,7 +132,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         setFormElement("specimenTSV", specimens);
 		clickNavButton("Next");
         clickNavButton("Finish");
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkCheckbox(Locator.checkboxByTitle("Experiment"));
         checkCheckbox(Locator.checkboxByTitle("Query"));

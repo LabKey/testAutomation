@@ -275,7 +275,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         exitPermissionsUI();
 
         // USER2 is a nobody
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
         clickNavButton("Add Users");
         setFormElement("newUsers", USER2);
         uncheckCheckbox("sendMail");

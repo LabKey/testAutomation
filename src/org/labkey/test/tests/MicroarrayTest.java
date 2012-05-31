@@ -68,7 +68,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         log("Create Project");
         log("Create Project");
         createProject(PROJECT_NAME);
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Microarray"));
         submit();

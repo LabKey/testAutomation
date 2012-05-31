@@ -125,7 +125,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         createProject(PROJECT_NAME, "Adaptive Home Folder");
         enableModule(PROJECT_NAME, "Dumbster");
 
-        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
+        goToModule("Dumbster");
         uncheckCheckbox("emailRecordOn");
         checkCheckbox("emailRecordOn");
 
@@ -225,7 +225,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         assertTextPresent("We will review your order and will be in touch shortly when it is processed");
 
         // Verify notification emails.
-        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
+        goToModule("Dumbster");
         verifyMailRecord(ADAPTIVE_NOTIFY_EMAIL, "A new Adaptive order has been created");
 
         popLocation();
@@ -283,7 +283,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         // Verify notification emails.
         pushLocation();
-        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
+        goToModule("Dumbster");
         verifyMailRecord(2, USERA1, "Your Adaptive order has been shipped");
         verifyMailRecord(2, ADAPTIVE_NOTIFY_EMAIL, "An Adaptive order has been shipped");
         popLocation();
@@ -356,7 +356,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         // Verify notification emails.
         pushLocation();
-        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
+        goToModule("Dumbster");
         verifyMailRecord(2, USERA1, "Your Adaptive plates have been received");
         verifyMailRecord(2, ADAPTIVE_NOTIFY_EMAIL, "Your Adaptive plates have been received");
         popLocation();
@@ -498,7 +498,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         // Verify notification emails.
         pushLocation();
-        clickAdminMenuItem("Go To Module", "More Modules", "Dumbster");
+        goToModule("Dumbster");
 
         // TODO: fix when Issue 67 is resolved.
         //verifyMailRecord(2, USERA1, "Your Adaptive samples have been processed", SAMPLE_B, SEQUENCE_SAMPLE_B);
@@ -881,8 +881,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
     {
         ensureAdminMode();
 
-        clickAdminMenuItem("Project", "Management");
-        clickLinkContainingText("Project Settings");
+        goToProjectSettings();
         clickLinkWithText("Resources");
 
         File file = new File(cssPath, cssFile);

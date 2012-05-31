@@ -1046,7 +1046,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         log("Define QC states for EHR study");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickAdminMenuItem("Manage Study");
+        goToManageStudy();
         clickLinkWithText("Manage Dataset QC States");
 
         for(EHRQCState qcState : EHRQCState.values())

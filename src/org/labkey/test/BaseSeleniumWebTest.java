@@ -677,7 +677,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Attempting to change user email from " + userEmail + " to " + newUserEmail);
 
 
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
         clickLinkContainingText(userEmail);
 
         clickNavButton("Change Email");
@@ -816,7 +816,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         ExtHelper.clickExtMenuButton(this, wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
     }
 
-    public void clickAdminMenuItem(String... items)
+    private void clickAdminMenuItem(String... items)
     {
         ExtHelper.clickExtMenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), items);
     }
@@ -841,6 +841,51 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void goToSchemaBrowser()
     {
         goToModule("Query");
+    }
+
+    public void goToFolderManagement()
+    {
+        clickAdminMenuItem("Folder", "Management");
+    }
+
+    public void goToProjectSettings()
+    {
+        clickAdminMenuItem("Folder", "Project Settings");
+    }
+
+    public void goToSiteUsers()
+    {
+        clickAdminMenuItem("Site", "Site Users");
+    }
+
+    public void goToSiteGroups()
+    {
+        clickAdminMenuItem("Site", "Site Groups");
+    }
+
+    public void goToSiteDevelopers()
+    {
+        clickAdminMenuItem("Site", "Site Developers");
+    }
+
+    public void goToSiteAdmins()
+    {
+        clickAdminMenuItem("Site", "Site Admins");
+    }
+
+    public void goToManageViews()
+    {
+        clickAdminMenuItem("Manage Views");
+    }
+
+    public void goToManageStudy()
+    {
+        clickAdminMenuItem("Manage Study");
+    }
+
+    public void goToCreateProject()
+    {
+        clickAdminMenuItem("Site", "Create Project");
     }
 
     private void waitForStartup()
@@ -1936,7 +1981,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isLinkPresentWithText(projectName))
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
-        clickAdminMenuItem("Site", "Create Project");
+        goToCreateProject();
         waitForElement(Locator.name("name"), 1*WAIT_FOR_JAVASCRIPT);
         setText("name", projectName);
 
@@ -1963,7 +2008,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
 
         goToHome();
-        clickAdminMenuItem("Site", "Site Groups");
+        goToSiteGroups();
         if(isElementPresent(Locator.tagWithText("div", groupName)))
         {
             if(failIfAlreadyExists)
@@ -2101,7 +2146,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log("Creating subfolder " + child + " under project " + parent);
         String _active = (!parent.equals(project)? parent : project);
         clickLinkWithText(_active);
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         waitForExt4FolderTreeNode(parent, 10000);
         clickNavButton("Create Subfolder");
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
@@ -2172,7 +2217,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (null == tabsToAdd || tabsToAdd.length == 0)
             return;
 
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Folder Type");
 
         if (tabsToAdd != null)
@@ -2218,7 +2263,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(project);
         clickLinkWithText(folderName);
         ensureAdminMode();
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
         clickNavButton("Delete");
         // confirm delete subfolders if present
@@ -2255,7 +2300,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(project);
         clickLinkWithText(folderName);
         ensureAdminMode();
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
         clickNavButton("Rename");
         setText("name", newFolderName);
@@ -2276,7 +2321,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText(projectName);
         clickLinkWithText(folderName);
         ensureAdminMode();
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
         clickNavButton("Move");
         if (createAlias)
@@ -2320,7 +2365,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickNavButton("Agree");
         }
         ensureAdminMode();
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         waitForExt4FolderTreeNode(project, 10000);
         clickNavButton("Delete");
         // in case there are sub-folders
@@ -2813,7 +2858,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void exportFolderAsZip()
     {
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Export");
         checkRadioButton("location", 1);
 
@@ -3732,7 +3777,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setPipelineRoot(String rootPath, boolean inherit)
     {
-        clickAdminMenuItem("Go To Module", "More Modules", "Pipeline");
+        goToModule("Pipeline");
         clickNavButton("Setup");
 
         if (isLinkPresentWithText("override"))
@@ -4867,7 +4912,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected void addUserToSiteGroup(String userName, String groupName)
     {
         goToHome();
-        clickAdminMenuItem("Site", "Site Groups");
+        goToSiteUsers();
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
         waitForElement(groupLoc, defaultWaitForPage);
         click(groupLoc);
@@ -5010,7 +5055,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         goToHome();
         ensureAdminMode();
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
         clickNavButton("Add Users");
 
         setFormElement("newUsers", userName);
@@ -5034,7 +5079,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void createUserAndNotify(String userName, String cloneUserName, boolean verifySuccess)
     {
         ensureAdminMode();
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
         clickNavButton("Add Users");
 
         setFormElement("newUsers", userName);
@@ -5052,7 +5097,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void createSiteDeveloper(String userEmail)
     {
         ensureAdminMode();
-        clickAdminMenuItem("Site", "Site Developers");
+        goToSiteDevelopers();
 
         if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
         {
@@ -5098,7 +5143,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void selectGroup(String groupName)
     {
         if(!isElementPresent(Locator.xpath("//li[contains(@class,'tab-strip-active')]//span[text()='Site Groups']")))
-            clickAdminMenuItem("Site", "Site Groups");
+            goToSiteGroups();
 
         waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
         ExtHelper.waitForExtDialog(this, groupName + " Information");
@@ -5107,7 +5152,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void deleteUser(String userEmail, boolean failIfNotFound)
     {
         ensureAdminMode();
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
         String userXPath = "//a[text()=\"details\"]/../../td[text()=\"" + userEmail + "\"]";
 
         boolean isPresent = isElementPresent(new Locator(userXPath));
@@ -5144,7 +5189,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("asserting that user " + email + " exists...");
         ensureAdminMode();
-        clickAdminMenuItem("Site", "Site Users");
+        goToSiteUsers();
         assertTextPresent(email);
         log("user " + email + " exists.");
     }
@@ -5395,7 +5440,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void enableModule(String moduleName, boolean isProject)
     {
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkCheckbox(Locator.checkboxByTitle(moduleName));
         clickNavButton("Update Folder");
@@ -5418,12 +5463,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void goToProjectSettings(String project)
     {
-        if(project!=null)
-        {
+        if(!isLinkPresentWithText(project))
             goToHome();
-            clickLinkWithText(project);
-        }
-        clickAdminMenuItem("Folder", "Project Settings");
+        clickLinkWithText(project);
+        goToProjectSettings();
     }
 
     public void goToAdmin()
@@ -5479,7 +5522,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void importFolderFromZip(String folderFile)
     {
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Import");
         sleep(2000);
         setFormElement(Locator.name("folderZip"), folderFile);
@@ -5489,7 +5532,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void importFolderFromPipeline(String folderFile)
     {
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Import");
         clickButtonContainingText("Import Folder Using Pipeline");
         ExtHelper.selectFileBrowserItem(this, folderFile);
@@ -6461,7 +6504,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void reloadStudyFromZip(String studyFile)
     {
-        clickAdminMenuItem("Manage Study");
+        goToManageStudy();
         clickNavButton("Reload Study");
         setFormElement("studyZip", studyFile);
         clickNavButton("Reload Study From Local Zip Archive");

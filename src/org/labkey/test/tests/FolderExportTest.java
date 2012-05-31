@@ -128,7 +128,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
         assertTextPresent("pomegranate");
 
         log("verify search settings as expected");
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkContainingText("Search");
         assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
 

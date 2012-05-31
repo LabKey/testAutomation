@@ -54,7 +54,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         CustomizeViewsHelper.applyCustomView(this);
         clickLinkWithText(PROJECT_NAME);
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Folder Type");
         toggleCheckboxByTitle("Query");
         toggleCheckboxByTitle("Flow");

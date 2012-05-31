@@ -179,7 +179,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         if(pipelinePath==null)
             pipelinePath = getPipelinePath();
 
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Folder Type");
         toggleCheckboxByTitle("Pipeline");
         submit();
@@ -259,7 +259,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     //must be in folder whose designation you wish to change.
     protected void setStudyRedesign()
     {
-        clickAdminMenuItem("Folder", "Management");
+        goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkRadioButton("folderType", "Study Redesign (ITN)");
         clickButton("Update Folder");

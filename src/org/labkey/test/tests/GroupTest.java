@@ -317,7 +317,7 @@ public class GroupTest extends BaseSeleniumWebTest
         if (isLinkPresentWithText(projectName))
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
-        clickAdminMenuItem("Site", "Create Project");
+        goToCreateProject();
         waitForElement(Locator.name("name"), 100*WAIT_FOR_JAVASCRIPT);
         setText("name", projectName);
 

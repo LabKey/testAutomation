@@ -213,7 +213,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         assertLinkNotPresentWithText("Custom Query Snapshot");
 
         // create a custom query for a cross study scenario
-        clickAdminMenuItem("Go To Module", "Query");
+        goToModule("Query");
         createNewQuery("study");
 
         setFormElement("ff_newQueryName", "cross study query");

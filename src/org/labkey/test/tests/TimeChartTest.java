@@ -383,7 +383,7 @@ public class TimeChartTest extends StudyBaseTest
         addWebPart("Views");
         addWebPart("Datasets");
         addWebPart("Specimens");
-        clickAdminMenuItem("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Choose a Measure", 0);
@@ -667,7 +667,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 2);
 
         clickLinkWithText(FOLDER_NAME);
-        clickAdminMenuItem("Manage Views");
+        goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
         clickLinkWithText("view");
         waitForText(CHART_TITLE);

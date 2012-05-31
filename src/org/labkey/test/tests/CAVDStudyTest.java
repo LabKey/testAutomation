@@ -264,7 +264,7 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME2);
         // workaround for issue 15023: go to manage views page to initialize study dataset properties
-        clickAdminMenuItem("Manage Views");
+        goToManageViews();
         waitForText("Manage Views");
         clickLinkWithText("Manage");
         clickLinkWithText("Change Study Properties");
@@ -283,7 +283,7 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME3);
         // workaround for issue 15023: go to manage views page to initialize study dataset properties
-        clickAdminMenuItem("Manage Views");
+        goToManageViews();
         waitForText("Manage Views");
         clickLinkWithText("Manage");
         clickLinkWithText("Change Study Properties");
