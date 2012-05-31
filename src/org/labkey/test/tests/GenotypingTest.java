@@ -389,9 +389,9 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
             method.addParameter("zipFileName", "genotypingExport");
             int status = httpClient.executeMethod(method);
             assertTrue("FASTQ Downloaded", status == HttpStatus.SC_OK);
-            assertTrue("Response is Attachment", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-            assertTrue("Response is application/x-gzip", method.getResponseHeader("Content-Type").getValue().startsWith("application/x-gzip"));
-            assertTrue("Length of response matches expected value", method.getResponseBody().length == 29587);
+            assertTrue("Response header incorrect", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
+            assertTrue("Response header incorrect", method.getResponseHeader("Content-Type").getValue().startsWith("application/x-gzip"));
+            assertTrue("Length of response doesnt matches expected value, was: " + method.getResponseBody().length, method.getResponseBody().length == 29587);
 
             Checksum c = new CRC32();
             CheckedInputStream cis = null;
@@ -449,9 +449,9 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 
             method.addParameter("zipFileName", "genotypingZipExport");
             status = httpClient.executeMethod(method);
-            assertTrue("ZIP Downloaded", status == HttpStatus.SC_OK);
-            assertTrue("Response is Attachment", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-            assertTrue("Response is application/zip", method.getResponseHeader("Content-Type").getValue().startsWith("application/zip"));
+            assertTrue("Status code incorrect", status == HttpStatus.SC_OK);
+            assertTrue("Response header incorrect", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
+            assertTrue("Response header incorrect", method.getResponseHeader("Content-Type").getValue().startsWith("application/zip"));
         }
         finally
         {
