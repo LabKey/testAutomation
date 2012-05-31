@@ -17,6 +17,7 @@ package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
@@ -89,6 +90,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         selenium.windowMaximize(); // Provides more useful screenshots on failure
         verifyCounts();
+        verifyGrid();
         verifyFilters();
         verifyNounPages();
         verifyMultiNounPages();
@@ -334,6 +336,73 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         // Group creation cancelled
         goToAppHome();
         assertTextNotPresent(GROUP_NULL);
+    }
+
+    private void verifyGrid()
+    {
+        log("Verify Grid");
+        goToAppHome();
+        selectCDSGroup("All participants", false);
+        click(SearchBy.Studies);
+
+        click(Locator.tagContainingText("span", "View raw data"));
+        waitForElement(Locator.css("div.sourcepanel"));
+        ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
+        ExtHelper.pickMeasure(this, "NAb", "Study Name", true);
+        clickButton("select", 0);
+
+        waitForGridCount(668);
+        assertElementPresent(Locator.tagWithText("span", "Point IC50"));
+        assertElementPresent(Locator.tagWithText("span", "Study Name"));
+        click(Locator.tagWithText("span", "Explore Categories"));
+        waitForText("Demo Study");
+        selectBars("Demo Study");
+        clickButton("use as filter", 0);
+
+        waitForTextToDisappear("Not Actually CHAVI 001", CDS_WAIT);
+
+        //Check to see if grid is properly filtering based on primary filter
+        click(Locator.tagWithText("span", "View raw data"));
+        waitForGridCount(437);
+        click(Locator.tagWithText("span", "Explore Categories"));
+        clickButton("clear filters", 0);
+        waitForElement(Locator.tagWithText("span", "NotRV144"));
+        click(Locator.tagContainingText("span", "View raw data"));
+        waitForGridCount(668);
+
+        clickButton("Choose Columns", 0);
+        waitForElement(Locator.css("div.sourcepanel"));
+        ExtHelper.pickMeasure(this, "Demographics", "Gender", true);
+        ExtHelper.pickMeasure(this, "Demographics", "Ethnicity", true);
+        clickButton("select", 0);
+
+        waitForElement(Locator.tagWithText("span", "Gender"));
+        waitForElement(Locator.tagWithText("span", "Ethnicity"));
+
+        //Make sure we can remove a column
+        clickButton("Choose Columns", 0);
+        waitForElement(Locator.css("div.sourcepanel"));
+        ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
+        clickButton("select", 0);
+        waitForTextToDisappear("Point IC50");
+        //But other column from same table is still there
+        assertElementPresent(Locator.tagContainingText("span", "Study Name"));
+
+        goToAppHome();
+
+    }
+
+    private void waitForGridCount(int count)
+    {
+        String displayText;
+        if (count == 0)
+            displayText = "No data to display";
+        else if (count < 100)
+            displayText = "Displaying 1 - " + count + " of " + count;
+        else
+            displayText = "Displaying 1 - 100 of " + count;
+
+        waitForElement(Locator.tagContainingText("div", displayText));
     }
 
     private void verifyNounPages()
@@ -582,7 +651,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void assertCDSPortalRow(SearchBy by, String expectedDetail, String expectedTotal)
     {
-        waitForText(" " + by);
+        waitForText(" " + by, 120000);
         assertTrue("'by "+by+"' search option is not present", isElementPresent(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
                 "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]")));
         String actualDetail = getText(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
