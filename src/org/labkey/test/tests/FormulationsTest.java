@@ -62,30 +62,39 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String COMPOUNDS_DATA_1 = "Alum\tAluminum Hydroxide\t21645-51-2\t\t78.0\n";  // adjuvant
     private static final String COMPOUNDS_DATA_2 = "Squawk\tBean Oil\t21235-51-3\t\t7.0\n";           // oil
     private static final String COMPOUNDS_DATA_3 = "Cholesterol\tCholesterol\t29935-53-9\t\t123.6\n"; // sterol
+    private static final String COMPOUNDS_DATA_4 = "SPD\tSPD\t2313-23-1\t\t32.23\n";                  // buffer
+
     private static final String RAWMATERIALS_HEADER = "Identifier\tMaterial Name\tSupplier\tSource\tCatalogue ID\tLot ID\n";
     private static final String RAW_MATERIAL_1 = "IRM-0456";
     private static final String RAW_MATERIAL_2 = "IRM-0016";
     private static final String RAW_MATERIAL_3 = "IRM-0023";
-    private static final String FORMULATION = "TD789";
+    private static final String RAW_MATERIAL_4 = "IRM-0234";
     private static final String RAWMATERIALS_DATA_1 = RAW_MATERIAL_1 + "\tAlum\tAlum Supplier\tsynthetic\t\t99999\n";
     private static final String RAWMATERIALS_DATA_2 = RAW_MATERIAL_2 + "\tSquawk\tAlpha\tanimal\t\t123456\n";
     private static final String RAWMATERIALS_DATA_3 = RAW_MATERIAL_3 + "\tCholesterol\tFresh Supplies\tanimal\t\t314159265\n";
-    private static final String TEMPERATURE_HEADER = "Temperature\n";
-    private static final String TEMPERATURE_DATA = "5\n25\n37\n60\n";
-    private static final String TIME_HEADER = "Time\tSort\n";
-    private static final String TIME_DATA = "T=0\t0\n1 wk\t7\n2 wk\t14\n1 mo\t30\n3 mo\t90\n6 mo\t180\n9 mo\t270\n12 mo\t360\n24 mo\t720\n36 mo\t1080\n";
-    private static final String TYPES_HEADER = "Type\n";
-    private static final String TYPES_DATA = "Emulsion\nAqueous\nPowder\nLiposome\nAlum\nNiosomes\n";
-    private static final String MTYPES_HEADER = "Type\tUnits\n";
-    private static final String MTYPES_DATA = "adjuvant\t%w/vol\nsterol\t%w/vol\noil\t%v/vol\n";
+    private static final String RAWMATERIALS_DATA_4 = RAW_MATERIAL_4 + "\tSPD\tSPD Supplier\tsynthetic\t9123D-AS\t12331-CC\n";
 
-    private static final String PS_ASSAY = "Particle Size";
+    private static final String FORMULATION = "TD789";
+
+    private static final String TEMPERATURE_HEADER = "Temperature\n";
+    private static final String TEMPERATURE_DATA   = "5\n25\n37\n60\n";
+
+    private static final String TIME_HEADER = "Time\tSort\n";
+    private static final String TIME_DATA   = "T=0\t0\n1 wk\t7\n2 wk\t14\n1 mo\t30\n3 mo\t90\n6 mo\t180\n9 mo\t270\n12 mo\t360\n24 mo\t720\n36 mo\t1080\n";
+
+    private static final String TYPES_HEADER = "Type\n";
+    private static final String TYPES_DATA   = "Emulsion\nAqueous\nPowder\nLiposome\nAlum\nNiosomes\n";
+
+    private static final String MTYPES_HEADER = "Type\tUnits\n";
+    private static final String MTYPES_DATA   = "adjuvant\t%w/vol\nsterol\t%w/vol\noil\t%v/vol\nbuffer\tmM\n";
+
+    private static final String PS_ASSAY      = "Particle Size";
     private static final String PS_ASSAY_DESC = "IDRI Particle Size Data as provided by Nano and APS machine configurations.";
 
-    private static final String VIS_ASSAY = "Visual";
+    private static final String VIS_ASSAY      = "Visual";
     private static final String VIS_ASSAY_DESC = "IDRI Visual Data.";
 
-    private static final String HPLC_ASSAY = "HPLC";
+    private static final String HPLC_ASSAY      = "HPLC";
     private static final String HPLC_ASSAY_DESC = "IDRI HPLC Assay Data";
 
     @Override
@@ -167,11 +176,6 @@ public class FormulationsTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, MATERIAL_TYPES_LIST, ListHelper.ListColumnType.AutoInteger, "key", MATERIAL_COL_TYPE, MATERIAL_COL_UNITS);
         ListHelper.clickImportData(this);
         ListHelper.submitTsvData(this, MTYPES_HEADER + MTYPES_DATA);
-//        setFormElement(Locator.id("tsv3"), MTYPES_HEADER + MTYPES_DATA);
-//        clickNavButton("Submit", 0);
-//        ExtHelper.waitForExtDialog(this, "Success");
-//        assertTextPresent("3 rows inserted.");
-//        ExtHelper.clickExtButton(this, "Success", "OK");
     }
 
     protected void setupCompounds()
@@ -200,20 +204,21 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         clickNavButton("Import More Samples");
         clickRadioButtonById("insertOnlyChoice");
-        setFormElement("data", COMPOUNDS_HEADER + COMPOUNDS_DATA_1 + COMPOUNDS_DATA_2 + COMPOUNDS_DATA_3);
+        setFormElement("data", COMPOUNDS_HEADER + COMPOUNDS_DATA_1 + COMPOUNDS_DATA_2 + COMPOUNDS_DATA_3 + COMPOUNDS_DATA_4);
         clickNavButton("Submit");
 
+        this.setCompoundMaterial("adjuvant", 0);
+        this.setCompoundMaterial("oil", 1);
+        this.setCompoundMaterial("sterol", 2);
+        this.setCompoundMaterial("buffer", 3);
+    }
+
+    private void setCompoundMaterial(String materialName, int rowIdx)
+    {
         DataRegionTable table = new DataRegionTable("Material", this);
-        table.clickLink(0,0);
-        selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), "adjuvant");
-        clickNavButton("Submit");
 
-        table.clickLink(1,0);
-        selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), "oil");
-        clickNavButton("Submit");
-
-        table.clickLink(2,0);
-        selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), "sterol");
+        table.clickLink(rowIdx,0);
+        selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), materialName);
         clickNavButton("Submit");
     }
 
@@ -225,17 +230,19 @@ public class FormulationsTest extends BaseSeleniumWebTest
         clickLinkWithText(RAWMATERIALS_SET_NAME);
         clickNavButton("Import More Samples");
         clickRadioButtonById("insertOnlyChoice");
-        setFormElement("data", RAWMATERIALS_HEADER + RAWMATERIALS_DATA_1 + RAWMATERIALS_DATA_2 + RAWMATERIALS_DATA_3);
+        setFormElement("data", RAWMATERIALS_HEADER + RAWMATERIALS_DATA_1 + RAWMATERIALS_DATA_2 + RAWMATERIALS_DATA_3 + RAWMATERIALS_DATA_4);
         clickNavButton("Submit");
     }
 
     protected void insertFormulation()
     {
+        String addButton = "Add Another Material";
+
         clickLinkWithText(PROJECT_NAME);
 
         log("Inserting a Formulation");
         clickLinkWithText("Sample Sets");
-        clickLinkWithText(FORMULATIONS_NAME, 1); // skip nav trail
+        clickLinkWithText(FORMULATIONS_NAME, 2); // skip nav trail
         clickNavButton("Insert New");
 
         assertTextPresent("Formulation Type*");
@@ -250,16 +257,15 @@ public class FormulationsTest extends BaseSeleniumWebTest
         setFormElement("comments", "This might fail.");
         setFormElement("nbpg", "549-87");
 
-        clickButton("Add Another Material", 0);
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material0']]"), RAW_MATERIAL_1);
+        clickButton(addButton, 0);
+        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(0), RAW_MATERIAL_1);
         waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
         setFormElement("concentration", "25.4");
 
         // Test Duplicate Material
         log("Test Duplicate Material");
-        clickButton("Add Another Material", 0);
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material1']]"), RAW_MATERIAL_1);
-//        waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
+        clickButton(addButton, 0);
+        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(1), RAW_MATERIAL_1);
         sleep(2000);
         setFormElements("input", "concentration", new String[]{"25.4", "66.2"});
         clickButton("Create", 0);
@@ -267,7 +273,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         // Test empty combo
         log("Test empty combo");
-        clickButton("Add Another Material", 0);
+        clickButton(addButton, 0);
         waitForExtMaskToDisappear();
         clickButton("Create", 0);
         waitForExtMaskToDisappear();
@@ -275,7 +281,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         
         // Test empty concentration
         log("Test empty concentration");
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@id='material2']]"), RAW_MATERIAL_2);
+        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(2), RAW_MATERIAL_2);
         waitForText("%v/vol", WAIT_FOR_JAVASCRIPT);
         clickButton("Create", 0);
         waitForText("Invalid material.", WAIT_FOR_JAVASCRIPT);
@@ -283,13 +289,21 @@ public class FormulationsTest extends BaseSeleniumWebTest
         // Remove duplicate material
         log("Remove duplicate material");
         click(Locator.xpath("//a[text() = 'Remove'][1]")); // remove
+
+        // Add final material
+        clickButton(addButton, 0);
+        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(3), RAW_MATERIAL_4);
+        waitForText("mM", WAIT_FOR_JAVASCRIPT);
         
         // Create        
-        setFormElements("input", "concentration", new String[]{"25.4", "66.2"});
+        setFormElements("input", "concentration", new String[]{"25.4", "66.2", "12.91"});
         clickButton("Create", 0);
         waitForText("has been created.", WAIT_FOR_JAVASCRIPT);
+    }
 
-        // TODO: Need to confirm it was created while still on this page.
+    private Locator.XPathLocator getRawMaterialLocator(Integer index)
+    {
+        return Locator.xpath("//div[./input[@id='material" + index + "']]");
     }
 
     protected void defineParticleSizeAssay()

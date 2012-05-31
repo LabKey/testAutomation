@@ -111,7 +111,6 @@ public enum TestSet
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
-        IDRIParticleSizeTest.class,
         FormulationsTest.class,
         CohortTest.class,
         RlabkeyTest.class,
@@ -208,7 +207,6 @@ public enum TestSet
         ClientAPITest.class,
         ButtonCustomizationTest.class,
         EmbeddedWebPartTest.class,
-        IDRIParticleSizeTest.class,
         TimelineTest.class
     }),
 
@@ -247,7 +245,6 @@ public enum TestSet
         LuminexPositivityTest.class,
         ViabilityTest.class,
         ModuleAssayTest.class,
-        IDRIParticleSizeTest.class,
         FormulationsTest.class,
     }),
 
@@ -269,8 +266,7 @@ public enum TestSet
     }),
 
     IDRI(new Class[] {
-        IDRIParticleSizeTest.class,
-        FormulationsTest.class,
+        FormulationsTest.class
     }),
 
     BVTnDaily(BVT, Daily.tests),
