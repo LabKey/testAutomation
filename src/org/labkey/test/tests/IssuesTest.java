@@ -323,7 +323,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 //        entryTypeNameTest();
 
         // Test issues grid with issues in a sub-folder
-        testSubFolderIssues();
+        subFolderIssuesTest();
 
 
         // UNDONE test these actions
@@ -568,7 +568,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
     }
 
-    public void testSubFolderIssues()
+    public void subFolderIssuesTest()
     {
         log("Testing issues in sub-folders");
         clickLinkWithText(PROJECT_NAME);
