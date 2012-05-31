@@ -424,7 +424,7 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("Select", 0);
         waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
 
-        goToXAxisTab();
+        goToAxisTab("X-Axis");
         Ext4Helper.selectRadioButton(this, "Chart Type:", "Visit Based Chart");
 //        assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[contains(@class, 'x4-item-disabled')]/input"));
         apply();
@@ -459,7 +459,7 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("View Chart(s)", 0);
         waitForTextToDisappear("1 - 19 of 19");
         log("Revert to Date-based chart.");
-        goToXAxisTab();
+        goToAxisTab("X-Axis");
         Ext4Helper.selectRadioButton(this, "Chart Type:", "Date Based Chart");
         assertElementPresent(Locator.xpath("//div[./label/. = 'Draw x-axis as:']/div/div[not(contains(@class, 'x4-item-disabled'))]/input"));
         assertElementPresent(Locator.xpath("//div[./label/. = 'Calculate time interval(s) relative to:']/div/div[not(contains(@class, 'x4-item-disabled'))]/input"));
@@ -548,13 +548,13 @@ public class TimeChartTest extends StudyBaseTest
         log("Test X-Axis");
         clickNavButton("View Chart(s)", 0);
 
-        goToXAxisTab();
+        goToAxisTab("X-Axis");
         Ext4Helper.selectComboBoxItem(this, "Draw x-axis as:", "Weeks");
         apply();
         waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
         setAxisValue("X", null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
-        goToXAxisTab();
+        goToAxisTab("X-Axis");
         Ext4Helper.selectComboBoxItem(this, "Draw x-axis as:", "Days");
         assertEquals(X_AXIS_LABEL, getFormElement("x-axis-label-textfield")); // Label shouldn't change automatically once it has been set manually
 
@@ -582,8 +582,8 @@ public class TimeChartTest extends StudyBaseTest
         {
             Assert.fail("Invalid axis marker");
         }
-        clickNavButton(axis + "-Axis", 0); // todo: change this to selecting x-axis label text
-        waitForElement(Locator.button("Apply"));
+
+        goToAxisTab(axis + "-Axis");
 
         //don't want to worry about case for the rest of the function
         axis = axis.toLowerCase();
@@ -1096,13 +1096,13 @@ public class TimeChartTest extends StudyBaseTest
 
     private void goToMainTitleTab()
     {
-        clickNavButton("Main Title", 0); // todo: change this to selecting main title text
+        getWrapper().getEval("window.showTimeChartAxisPanel('Title');");
         waitForElement(Locator.button("Apply"));
     }
 
-    private void goToXAxisTab()
+    private void goToAxisTab(String axisName)
     {
-        clickNavButton("X-Axis", 0); // todo: change this to selecting x-axis label text
+        getWrapper().getEval("window.showTimeChartAxisPanel('" + axisName + "');");
         waitForElement(Locator.button("Apply"));
     }
 
