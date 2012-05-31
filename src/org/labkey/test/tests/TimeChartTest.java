@@ -169,12 +169,12 @@ public class TimeChartTest extends StudyBaseTest
     };
 
     private static final String[] GETDATA_API_TEST_MEASURES = {
-        "Study Lab Results CD4",
-        "Study Lab Results Hemoglobin",
-        "Study Physical Exam Weight Kg",
-        "Study HIVTest Results HIVLoad Quant",
-        "Study Luminex Assay Obs Conc",
-        "Study Luminex Assay Obs Conc",
+        "CD4+ (cells/mm3)",
+        "Hemoglobin",
+        "Weight (kg)",
+        "Viral Load Quantified (copies/ml)",
+        "ObsConc",
+        "ObsConc",
         "IL-10 (23)",
         "IL-10 (23)"
     };
@@ -752,16 +752,24 @@ public class TimeChartTest extends StudyBaseTest
                 }
             }
             // check values in measure column
-            if(measureValue!=null)
+            if (measureValue!=null)
             {
                 for (int i = 0; i < measureValue[testIndex].length; i++)
                 {
+                    String text = table.getDataAsText(i, measure[testIndex]);
                     try
                     {
-                        double value = Double.parseDouble(table.getDataAsText(i, measure[testIndex]));
+                        double value = Double.parseDouble(text);
                         assertEquals("Unexpected measure value", measureValue[testIndex][i], value);
                     }
-                    catch(NumberFormatException e){}
+                    catch (NumberFormatException e)
+                    {
+//                        fail("NFE parsing measure " + measure[testIndex] + ": " + text);
+                    }
+                    catch (NullPointerException e)
+                    {
+                        fail("NPE parsing measure " + measure[testIndex] + ": " + text);
+                    }
                 }
             }
 
