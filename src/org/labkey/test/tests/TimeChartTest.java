@@ -537,11 +537,11 @@ public class TimeChartTest extends StudyBaseTest
         waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
 
         // verify column headers for date based plotting option
-        assertTextPresent("Study HIVTest Results Participant Id");
-        assertTextPresent("Study HIVTest Results Participant Visit Visit Date");
-        assertTextPresent("Study HIVTest Results Participant Visit Visit");
-        assertTextPresent("Study HIVTest Results HIVLoad Quant");
-        assertTextPresent("Study Demographics Start Date");
+        assertTextPresent("Participant ID");
+        assertTextPresent("Visit Date");
+        assertTextPresent("Visit");
+        assertTextPresent("Viral Load Quantified");
+        assertTextPresent("Start Date");
         assertTextPresent("Days");
         assertTextNotPresent("sequencenum");
 
