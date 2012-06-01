@@ -648,6 +648,7 @@ public class TimeChartTest extends StudyBaseTest
         addMeasure();
         clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Lymphs')]]"), "1,1");
         clickNavButton("Select", 0);
+        waitForText("Lymphs (cells/mm3) from Lab Results");
         apply();
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS);
@@ -966,6 +967,7 @@ public class TimeChartTest extends StudyBaseTest
         addMeasure();
         clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Hemoglobin')]]"), "1,1");
         clickNavButton("Select", 0);
+        waitForText("Hemoglobin from Lab Results");
         apply();
         waitForText(GROUP2_PTIDS[0]+" Hemoglobin");
         //sadly, can't get data from within svg.
