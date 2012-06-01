@@ -120,4 +120,34 @@ public class Ext4Helper
         }
     }
 
+    public static void clickTabContainingText(BaseSeleniumWebTest test, String tabText)
+    {
+        test.click(Locator.xpath("//span[contains(@class, 'x4-tab-inner') and contains( text(), '" + tabText + "')]"));
+    }
+
+    public static void waitForMaskToDisappear(BaseSeleniumWebTest test)
+    {
+        waitForMaskToDisappear(test, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static void waitForMaskToDisappear(BaseSeleniumWebTest test, int wait)
+    {
+        test.waitForElementToDisappear(getExtMask(), wait);
+    }
+
+    public static void waitForMask(BaseSeleniumWebTest test)
+    {
+        waitForMask(test, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static void waitForMask(BaseSeleniumWebTest test, int wait)
+    {
+        test.waitForElement(getExtMask(), wait);
+    }
+
+    private static Locator getExtMask()
+    {
+        return Locator.xpath("//div[contains(@class, 'ext4-mask')]");
+    }
+
 }

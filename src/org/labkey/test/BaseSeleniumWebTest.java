@@ -884,6 +884,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAdminMenuItem("Manage Study");
     }
 
+    public void goToManageAssays()
+    {
+        clickAdminMenuItem("Manage Assays");
+    }
+
     public void goToCreateProject()
     {
         clickAdminMenuItem("Site", "Create Project");
@@ -5441,9 +5446,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void enableModule(String moduleName, boolean isProject)
     {
+        enableModules(Collections.singletonList(moduleName), isProject);
+    }
+
+    public void enableModules(List<String> moduleNames, boolean isProject)
+    {
         goToFolderManagement();
         clickLinkWithText("Folder Type");
-        checkCheckbox(Locator.checkboxByTitle(moduleName));
+        for (String moduleName : moduleNames)
+        {
+            checkCheckbox(Locator.checkboxByTitle(moduleName));
+        }
         clickNavButton("Update Folder");
     }
 
