@@ -17,6 +17,7 @@ package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4CmpRef;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -386,12 +387,64 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("select", 0);
         waitForTextToDisappear("Point IC50");
         //But other column from same table is still there
-        assertElementPresent(Locator.tagContainingText("span", "Study Name"));
+        waitForElement(Locator.tagContainingText("span", "Study Name"));
+
+        openFilterPanel("Ethnicity");
+        waitForElement(Locator.id("value_1"));
+        setFormElement(Locator.css("#value_1 input"), "White");
+        clickButton("OK", 0);
+        waitForGridCount(246);
+
+        //Put back a column and make sure the count stays
+        clickButton("Choose Columns", 0);
+        waitForElement(Locator.css("div.sourcepanel"));
+        ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
+        clickButton("select", 0);
+        waitForElement(Locator.tagWithText("span", "Point IC50"));
+        waitForGridCount(246);
+
+        openFilterPanel("Study Name");
+        waitForElement(Locator.tagWithText("div", "PI1"));
+        ExtHelper.clickX4GridPanelCheckbox(this, 3, "lookupcols", true);
+
+        clickButton("OK", 0);
+        waitForElement(Locator.tagWithText("span", "PI1"));
+        waitForElement(Locator.tagWithText("div", "marki@labkey.com"));
+        openFilterPanel("PI1");
+        waitForElement(Locator.id("value_1"));
+        setFormElement(Locator.css("#value_1 input"), "mark");
+        clickButton("OK", 0);
+        waitForGridCount(152);
+
+        //Uncheck the PI by checking a different col and make sure it disappears AND unfilters
+        openFilterPanel("Study Name");
+        waitForElement(Locator.tagWithText("div", "PI1"));
+        ExtHelper.clickX4GridPanelCheckbox(this, 2, "lookupcols", false);
+        clickButton("OK", 0);
+        waitForTextToDisappear("PI1");
+        waitForGridCount(246);
+
+
 
         goToAppHome();
 
     }
 
+    private void openFilterPanel (String colHeader)
+    {
+        List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, "#raw-data-view grid gridcolumn");
+        for (Ext4CmpRef ref : headers)
+        {
+            String colNameStr = ref.eval("this.text");
+            if (null != colNameStr && colNameStr.contains(colHeader))
+            {
+                String triggerid = ref.eval("this.triggerEl.id");
+                mouseOver(Locator.id(triggerid));
+                click(Locator.id(triggerid));
+                waitFor(new Ext4Helper.Ext4SelectorChecker(this, "rawdatafilterwin"), "No filter win", WAIT_FOR_JAVASCRIPT);
+            }
+        }
+    }
     private void waitForGridCount(int count)
     {
         String displayText;

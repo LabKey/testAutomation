@@ -107,7 +107,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 60000;
     protected int defaultWaitForPage = WAIT_FOR_PAGE;
-    public final static int WAIT_FOR_JAVASCRIPT = 10000;
+    public final static int WAIT_FOR_JAVASCRIPT = 20000;
     protected int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
     protected long _startTime;

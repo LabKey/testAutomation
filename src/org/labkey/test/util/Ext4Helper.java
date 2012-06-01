@@ -15,8 +15,13 @@
  */
 package org.labkey.test.util;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,6 +71,53 @@ public class Ext4Helper
     {
         Locator l = Locator.xpath("//label[@id='" + labelId + "']");
         test.click(l);
+    }
+
+    public static List<Ext4CmpRef> componentQuery(BaseSeleniumWebTest test, String componentSelector)
+    {
+        String res = test.getWrapper().getEval("selenium.ext4ComponentQuery('" + componentSelector + "')");
+        return componentsFromJson(test, res);
+    }
+
+    public static Ext4CmpRef queryOne(BaseSeleniumWebTest test, String componentSelector)
+    {
+        List<Ext4CmpRef> cmpRefs = componentQuery(test, componentSelector);
+        if (null == cmpRefs || cmpRefs.size() == 0)
+            return null;
+
+        return cmpRefs.get(0);
+    }
+
+    static List<Ext4CmpRef> componentsFromJson(BaseSeleniumWebTest test, String jsonArrayStr)
+    {
+        if (null == jsonArrayStr || "null".equals(jsonArrayStr))
+            return null;
+
+        JSONArray array = (JSONArray) JSONValue.parse(jsonArrayStr);
+        List<Ext4CmpRef> ret = new ArrayList<Ext4CmpRef>(array.size());
+        for (Object o : array)
+            ret.add(new Ext4CmpRef(o.toString(), test));
+
+        return ret;
+
+    }
+
+    public static class Ext4SelectorChecker implements BaseSeleniumWebTest.Checker
+    {
+        private BaseSeleniumWebTest _test;
+        private String _selector;
+
+        public Ext4SelectorChecker(BaseSeleniumWebTest test, String selector)
+        {
+            this._selector = selector;
+            this._test = test;
+        }
+
+        @Override
+        public boolean check()
+        {
+            return queryOne(_test, _selector) != null;
+        }
     }
 
 }

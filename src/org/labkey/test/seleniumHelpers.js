@@ -140,6 +140,40 @@ selenium.selectExt4GridItem = function (columnName, columnVal, idx, markerCls, k
     }
 };
 
+selenium.ext4ComponentQuery = function (selector, parentId) {
+    var ext = selenium.browserbot.getCurrentWindow().Ext4;
+    var res =  null;
+    if (parentId)
+        res = ext.getCmp(parentId).query(selector);
+    else
+        res = ext.ComponentQuery.query(selector);
+
+    return null == res ? null : ext.JSON.encode(ext.Array.pluck(res, "id"));
+};
+
+selenium.ext4Down = function (cmpId, selector) {
+    var ext = selenium.browserbot.getCurrentWindow().Ext4;
+    var cmp = ext.getCmp(cmpId);
+    if (null == cmp)
+        return null;
+    var res = cmp.down(selector);
+
+    return null == res ? null : res.id;
+};
+
+selenium.ext4DomQuerySelect = function (root, selector) {
+    var ext = selenium.browserbot.getCurrentWindow().Ext4;
+    var res = ext.DomQuery.select(root == null ? null : ext.getDom(root), selector);
+
+    return null == res ? null : ext.JSON.encode(ext.Array.pluck(res, "id"));
+};
+
+selenium.ext4ComponentEval = function(cmpId, expr) {
+    var ext = selenium.browserbot.getCurrentWindow().Ext4;
+    var fn = new Function("return " + expr + ";");
+    return fn.call(ext.getCmp(cmpId));
+};
+
 // Example: ExtHelper.selectFolderManagementTreeItem(this, "/home/545dcbbc9f7fa0f85a86190b9acd6381/14/15/3/2", true);
 selenium.selectFolderManagementItem = function(path, keepExisting) {
     selenium.selectExtFolderTreeNode(path, 'folder-management-tree', keepExisting);
