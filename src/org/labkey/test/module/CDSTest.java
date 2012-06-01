@@ -362,7 +362,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         waitForTextToDisappear("Not Actually CHAVI 001", CDS_WAIT);
 
-        //Check to see if grid is properly filtering based on primary filter
+        //Check to see if grid is properly filtering based on explorer filter
         click(Locator.tagWithText("span", "View raw data"));
         waitForGridCount(437);
         click(Locator.tagWithText("span", "Explore Categories"));
@@ -380,7 +380,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForElement(Locator.tagWithText("span", "Gender"));
         waitForElement(Locator.tagWithText("span", "Ethnicity"));
 
-        //Make sure we can remove a column
+        log("Remove a column");
         clickButton("Choose Columns", 0);
         waitForElement(Locator.css("div.sourcepanel"));
         ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
@@ -389,13 +389,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         //But other column from same table is still there
         waitForElement(Locator.tagContainingText("span", "Study Name"));
 
-        openFilterPanel("Ethnicity");
-        waitForElement(Locator.id("value_1"));
-        setFormElement(Locator.css("#value_1 input"), "White");
-        clickButton("OK", 0);
+        setRawDataFilter("Ethnicity", "White");
         waitForGridCount(246);
 
-        //Put back a column and make sure the count stays
+        log("Change column set and ensure still filtered");
         clickButton("Choose Columns", 0);
         waitForElement(Locator.css("div.sourcepanel"));
         ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
@@ -406,17 +403,15 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         openFilterPanel("Study Name");
         waitForElement(Locator.tagWithText("div", "PI1"));
         ExtHelper.clickX4GridPanelCheckbox(this, 3, "lookupcols", true);
-
         clickButton("OK", 0);
+
+        log("Filter on a looked-up column");
         waitForElement(Locator.tagWithText("span", "PI1"));
         waitForElement(Locator.tagWithText("div", "marki@labkey.com"));
-        openFilterPanel("PI1");
-        waitForElement(Locator.id("value_1"));
-        setFormElement(Locator.css("#value_1 input"), "mark");
-        clickButton("OK", 0);
+        setRawDataFilter("PI1", "mark");
         waitForGridCount(152);
 
-        //Uncheck the PI by checking a different col and make sure it disappears AND unfilters
+        log("Ensure filtering goes away when column does");
         openFilterPanel("Study Name");
         waitForElement(Locator.tagWithText("div", "PI1"));
         ExtHelper.clickX4GridPanelCheckbox(this, 2, "lookupcols", false);
@@ -424,10 +419,34 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForTextToDisappear("PI1");
         waitForGridCount(246);
 
+        setRawDataFilter("Point IC50", "Is Greater Than", "60");
+        waitForGridCount(2);
+        openFilterPanel("Ethnicity");
+        clickButton("Clear Filters", 0);
+        waitForGridCount(5);
 
+        openFilterPanel("Point IC50");
+        clickButton("Clear Filters", 0);
+        waitForGridCount(668);
 
         goToAppHome();
 
+    }
+
+    private void setRawDataFilter(String colName, String value)
+    {
+        setRawDataFilter(colName, null, value);
+    }
+
+    private void setRawDataFilter(String colName, String filter, String value)
+    {
+        openFilterPanel(colName);
+        if (null != filter)
+            Ext4Helper.selectComboBoxItem(this, "Value:", filter);
+
+        waitForElement(Locator.id("value_1"));
+        setFormElement(Locator.css("#value_1 input"), value);
+        clickButton("OK", 0);
     }
 
     private void openFilterPanel (String colHeader)
