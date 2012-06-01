@@ -242,7 +242,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Inserting a Formulation");
         clickLinkWithText("Sample Sets");
-        clickLinkWithText(FORMULATIONS_NAME, 2); // skip nav trail
+        clickLinkWithText(FORMULATIONS_NAME, 1); // skip nav trail
         clickNavButton("Insert New");
 
         assertTextPresent("Formulation Type*");
