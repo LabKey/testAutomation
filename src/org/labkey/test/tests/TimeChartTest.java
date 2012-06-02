@@ -1073,6 +1073,7 @@ public class TimeChartTest extends StudyBaseTest
 
     private void saveReport(boolean expectReload)
     {
+        sleep(500); // Needed or the test will often be unable to find the save button with index 1
         clickNavButtonByIndex("Save", 1, 0);
         if (expectReload)
             waitForPageToLoad();
