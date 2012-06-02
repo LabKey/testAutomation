@@ -29,15 +29,14 @@ import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PostgresOnlyTest;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.Map;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedInputStream;
-import java.util.zip.Checksum;
+import java.util.zip.GZIPInputStream;
 
 /**
  * User: elvan
@@ -391,50 +390,36 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
             assertTrue("FASTQ Downloaded", status == HttpStatus.SC_OK);
             assertTrue("Response header incorrect", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
             assertTrue("Response header incorrect", method.getResponseHeader("Content-Type").getValue().startsWith("application/x-gzip"));
-            assertTrue("Length of response doesnt matches expected value, was: " + method.getResponseBody().length, method.getResponseBody().length == 29587);
 
-            Checksum c = new CRC32();
-            CheckedInputStream cis = null;
-            BufferedInputStream in = null;
             InputStream is = null;
+            GZIPInputStream gz = null;
+            BufferedReader br = null;
 
             try
             {
                 is = method.getResponseBodyAsStream();
-                cis = new CheckedInputStream(is, c);
-                in = new BufferedInputStream(cis);
-                while (in.read() != -1) {
-                    // Read file in completely
+                gz = new GZIPInputStream(is);
+                br = new BufferedReader(new InputStreamReader(gz));
+                int count = 0;
+                String thisLine;
+                while ((thisLine = br.readLine()) != null)
+                {
+                    count++;
                 }
 
-                long check = cis.getChecksum().getValue();
-                String os = System.getProperty("os.name").toLowerCase();
-                log("OS: " + os);
-                log("Checksum: " + check);
+                int expectedLength = 1088;
+                assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
 
-//                if(os.contains("win"))
-//                {
-//                    assertEquals("Incorrect CRC from illumina export.", 125618213, check); //1872567426
-//                }
-//                else if (os.contains("nix"))
-//                {
-//                    assertEquals("Incorrect CRC from illumina export.", 125618213, check);
-//                }
-//                else
-//                {
-//                    //todo: need to verify the checksum on OSX
-//                    throw new Exception("Unrecognized OS: " + os);
-//                }
                 method.releaseConnection();
             }
-            catch (Exception e)
+            finally
             {
                 if(is != null)
                     is.close();
-                if(in != null)
-                    in.close();
-                if(cis != null)
-                    cis.close();
+                if(gz != null)
+                    gz.close();
+                if(br != null)
+                    br.close();
             }
 
             //then ZIP export
