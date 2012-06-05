@@ -401,8 +401,7 @@ public class TimeChartTest extends StudyBaseTest
         addMeasuresPath = ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG) + "//table/tbody/tr/td";
         clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Cutoff Percentage (3)']]"), "1,1");
         clickNavButton("Select", 0);
-//        waitForText("No data found", WAIT_FOR_JAVASCRIPT);  // TODO: re-enable, see note in newTimeChartPanel.js: "report if a series doesn't have any data"
-        sleep(2000);
+        waitForText("No data found for the following measures/dimensions: RunCutoff3", WAIT_FOR_JAVASCRIPT);
     }
 
     private void visitBasedChartTest()
