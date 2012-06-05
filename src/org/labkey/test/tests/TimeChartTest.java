@@ -967,6 +967,7 @@ public class TimeChartTest extends StudyBaseTest
         addMeasure();
         clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Hemoglobin')]]"), "1,1");
         clickNavButton("Select", 0);
+        sleep(1000); // attempt fix for intermittent failure issue where apply button is clicked too quickly (selected measure properties need to be initialized)
         waitForText("Hemoglobin from Lab Results");
         apply();
         waitForText(GROUP2_PTIDS[0]+" Hemoglobin");
