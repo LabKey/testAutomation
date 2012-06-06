@@ -150,4 +150,23 @@ public class Ext4Helper
         return Locator.xpath("//div[contains(@class, 'ext4-mask')]");
     }
 
+    public static Locator invalidField()
+    {
+        return Locator.xpath("//input[contains(@class, 'x4-form-field') and contains(@class, 'x4-form-invalid-field')]");
+    }
+
+    public static void clickExt4MenuItem(BaseSeleniumWebTest test, String text)
+    {
+        test.click(ext4MenuItem(text));
+    }
+
+    public static Locator ext4MenuItem(String text)
+    {
+        return Locator.xpath("//span[contains(@class, 'x4-menu-item-text') and text() = '" + text + "']");
+    }
+
+    public static Locator ext4Window(String title)
+    {
+        return Locator.xpath("//div[contains(@class, 'x4-window-header')]//span[text() = '" + title + "']");
+    }
 }
