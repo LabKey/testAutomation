@@ -3,8 +3,8 @@
 <input type="button" value="Test Insert,Update,Delete" onClick="getValidDataAndRunId();" id="button_testiud"/>
 <input type="button" value="Attempt update CurveFit"  onClick="updateCurveFit('CurveFit', 'RowId');" id="button_updateCurveFit"/>
 <input type="button" value="Attempt update GuideSetCurveFit"  onClick="updateCurveFit('GuideSetCurveFit', 'GuideSetId');" id="button_updateGuideSetCurveFit"/>
-<div id='qwp-div'></div>
-<div id="log-info"></div>
+<div id="qwp-div">Query Web Part DIV</div>
+<div id="log-info">Logging Info DIV</div>
 
 <script type="text/javascript">
         var tablePrefix = "&TestAssayLuminex></% 1";
@@ -42,7 +42,7 @@
                sql: sql,
                sort: record.sort,
                renderTo: 'qwp-div',
-               success: function(dataRegion, request) {
+               success: function(dataRegion) {
                    updateLog("Success: loaded " + record.table + " QWP with " + dataRegion.rowCount + ".", true);
                    if (record.expectedRows != undefined && record.expectedRows != dataRegion.rowCount)
                    {
@@ -148,8 +148,7 @@
                     updateLog("<span class='labkey-error'>Error: unexpected number of rows affected by update in " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
 
                 var deleteRow = {};
-                var keyVal = (data.rows[0][record.keyVar] ? data.rows[0][record.keyVar] : data.rows[0][record.keyVar.toLowerCase()]);
-                deleteRow[record.keyVar] = keyVal;
+                deleteRow[record.keyVar] = (data.rows[0][record.keyVar] ? data.rows[0][record.keyVar] : data.rows[0][record.keyVar.toLowerCase()]);
 
                 if (record.deleteFailureExpected)
                 {
@@ -164,7 +163,7 @@
                         schemaName: 'assay',
                         queryName: tablePrefix + ' ' + record.table,
                         rows: [deleteRow],
-                        success: function(data){
+                        success: function(){
                             updateLog("Success: deleted record from " + record.table, true);
                             checkForNextInsert(index);
                         },
