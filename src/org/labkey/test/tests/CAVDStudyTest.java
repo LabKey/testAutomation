@@ -151,7 +151,7 @@ public class CAVDStudyTest extends StudyBaseTest
         saveRevision();
         addStudyDesignRow(RowType.Immunization, "Vaccine2", "3");
         finishRevision();
-        waitForText("Immunization Schedule", 3);
+        waitForText("Immunization Schedule", 3, defaultWaitForPage);
         assertTextPresent(_expectedImmunizationText);
         assertElementNotPresent(Locator.tagWithText("div", "30")); // From deleted rows
     }
