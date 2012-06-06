@@ -367,6 +367,8 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 
     private void verifyIlluminaExport() throws Exception
     {
+        log("Verifying FASTQ and ZIP export");
+
         String url = WebTestHelper.getBaseURL() + "/genotyping/" + getProjectName() + "/mergeFastqFiles.view";
         HttpClient httpClient = WebTestHelper.getHttpClient(url);
         PostMethod method = null;
@@ -384,10 +386,11 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
             {
                 method.addParameter("dataIds", row.get("DataId").toString());
             }
+            assertTrue("Wrong number of files found.  Expected 30, found " + resp.getRows().size(), resp.getRows().size() == 30);
 
             method.addParameter("zipFileName", "genotypingExport");
             int status = httpClient.executeMethod(method);
-            assertTrue("FASTQ Downloaded", status == HttpStatus.SC_OK);
+            assertTrue("FASTQ was not Downloaded", status == HttpStatus.SC_OK);
             assertTrue("Response header incorrect", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
             assertTrue("Response header incorrect", method.getResponseHeader("Content-Type").getValue().startsWith("application/x-gzip"));
 
