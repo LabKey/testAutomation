@@ -817,7 +817,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
-    private void clickAdminMenuItem(String... items)
+    protected void clickAdminMenuItem(String... items)
     {
         ExtHelper.clickExtMenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), items);
     }
@@ -4918,7 +4918,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected void addUserToSiteGroup(String userName, String groupName)
     {
         goToHome();
-        goToSiteUsers();
+        goToSiteGroups();
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
         waitForElement(groupLoc, defaultWaitForPage);
         click(groupLoc);
