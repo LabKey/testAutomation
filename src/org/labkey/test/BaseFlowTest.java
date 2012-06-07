@@ -37,12 +37,11 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         return "server/modules/flow";
     }
 
-
     //need not fill all three, but must be the same length.  If you wish to skip a field, set it to an empty string,
     // or the default in the case of op
     public void setFlowFilter(String[] fields, String[] ops, String[] values)
     {
-        clickLinkWithText("Flow Dashboard");
+        goToFlowDashboard();
         clickLinkWithText("Other settings");
         clickLinkWithText("Edit FCS Analysis Filter");
 
@@ -60,6 +59,21 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         return PROJECT_NAME;
     }
+
+    protected String getFolderName()
+    {
+        return getClass().getSimpleName();
+    }
+
+    private String _containerPath = null;
+
+    protected String getContainerPath()
+    {
+        if (_containerPath == null)
+            _containerPath = "/" + getProjectName() + "/" + getFolderName();
+        return _containerPath;
+    }
+
 
     protected void setFlowPipelineRoot(String rootPath)
     {
@@ -107,7 +121,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        try {deleteProject(getProjectName()); } catch (Throwable t) {}
         deletePipelineWorkDirectory();
         try
         {
@@ -159,8 +173,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             assertTextNotPresent("Please install the flowWorkspace R library");
         }
 
-        createProject(PROJECT_NAME);
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, getFolderName(), "Flow", null);
+        createProject(getProjectName());
+        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
     }
@@ -207,11 +221,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
     }
 
-    protected String getFolderName()
-    {
-        return getClass().getSimpleName();
-    }
-
     // if we aren't already on the Flow Dashboard, try to get there.
     protected void goToFlowDashboard()
     {
@@ -243,15 +252,52 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     }
 
 
-    protected void gotoProjectQuery()
-    {
-        beginAt("/query/" + PROJECT_NAME + "/begin.view?schemaName=flow");
-    }
-
     protected void createQuery(String container, String name, String sql, String xml, boolean inheritable)
     {
         super.createQuery(container, name, "flow", sql, xml, inheritable);
         goToSchemaBrowser();
+    }
+
+    protected void uploadSampleDescriptions(String sampleFilePath, String [] idCols, String[] keywordCols)
+    {
+        log("** Uploading sample set");
+        goToFlowDashboard();
+        clickLinkWithText("Upload Sample Descriptions");
+        setFormElement("data", getFileContents(sampleFilePath));
+        for (int i = 0; i < idCols.length; i++)
+            selectOptionByText("idColumn" + (i+1), idCols[i]);
+        submit();
+
+        log("** Join sample set with FCSFile keywords");
+        clickLinkWithText("Flow Dashboard");
+        clickLinkWithText("Define sample description join fields");
+        for (int i = 0; i < idCols.length; i++)
+            selectOptionByText(Locator.name("ff_samplePropertyURI", i), idCols[i]);
+        for (int i = 0; i < keywordCols.length; i++)
+            selectOptionByText(Locator.name("ff_dataField", i), keywordCols[i]);
+        submit();
+    }
+
+    protected void setProtocolMetadata()
+    {
+        log("** Specify ICS metadata");
+        goToFlowDashboard();
+        clickLinkWithText("Other settings");
+        clickLinkWithText("Edit ICS Metadata");
+
+        // specify PTID and Visit columns
+        selectOptionByText("ff_participantColumn", "Sample PTID");
+        selectOptionByText("ff_visitColumn", "Sample Visit");
+
+        // specify forground-background match columns
+        assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
+        selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
+
+        // specify background values
+        selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
+        assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
+        setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
+        submit();
     }
 
     protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, boolean existingKeywordRun, String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)

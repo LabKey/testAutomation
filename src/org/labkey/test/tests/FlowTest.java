@@ -33,18 +33,12 @@ public class FlowTest extends BaseFlowTest
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
     private static final String JOIN_FIELD_LINK_TEXT = "Define sample description join fields";
-    String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
     private static final String FCS_FILE_2 = "L04-060120-QUV-JS";
 
     private void clickButtonWithText(String text)
     {
         click(Locator.raw("//input[@value = '" + text + "']"));
-    }
-
-    protected String getProjectName()
-    {
-        return PROJECT_NAME;
     }
 
     public int countEnabledInputs(String name)
@@ -72,7 +66,6 @@ public class FlowTest extends BaseFlowTest
 
     protected void _doTestSteps()
     {
-        containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
         setupQuery();
 
         importFiles();
@@ -92,7 +85,7 @@ public class FlowTest extends BaseFlowTest
     String analysisName = "FCSAnalyses";
     protected void setupQuery()
     {
-        beginAt("/query" + containerPath + "/begin.view?schemaName=flow");
+        beginAt("/query" + getContainerPath() + "/begin.view?schemaName=flow");
         createNewQuery("flow");
         setFormElement(Locator.nameOrId("ff_newQueryName"), query1);
         selectOptionByText("identifier=ff_baseTableName",  analysisName);
@@ -135,14 +128,14 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("Current Directory (25 fcs files)");
         assertTextNotPresent(FCS_FILE_2);
         clickNavButton("Import Selected Runs");
-        waitForPipeline(containerPath);
+        waitForPipeline(getContainerPath());
         clickLinkWithText("Flow Dashboard");
         // Drill into the run, and see that it was uploaded, and keywords were read.
         clickLinkWithText("1 run");
-        setSelectedFields(containerPath, "flow", "Runs", null, new String[] { "Flag","Name","ProtocolStep","AnalysisScript","CompensationMatrix","WellCount","Created","RowId","FilePathRoot" } );
+        setSelectedFields(getContainerPath(), "flow", "Runs", null, new String[] { "Flag","Name","ProtocolStep","AnalysisScript","CompensationMatrix","WellCount","Created","RowId","FilePathRoot" } );
 
         clickLinkWithText("details");
-        setSelectedFields(containerPath, "flow", "FCSFiles", null, new String[] { "Keyword/ExperimentName", "Keyword/Stim","Keyword/Comp","Keyword/PLATE NAME","Flag","Name","RowId"});
+        setSelectedFields(getContainerPath(), "flow", "FCSFiles", null, new String[] { "Keyword/ExperimentName", "Keyword/Stim","Keyword/Comp","Keyword/PLATE NAME","Flag","Name","RowId"});
         assertTextPresent("PerCP-Cy5.5 CD8");
 
         assertLinkNotPresentWithImage("/flagFCSFile.gif");
@@ -207,7 +200,7 @@ public class FlowTest extends BaseFlowTest
         clickNavButton("Analyze selected runs");
         setFormElement("ff_analysisName", "FlowExperiment2");
         submit();
-        waitForPipeline(containerPath);
+        waitForPipeline(getContainerPath());
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("FlowExperiment2");
         URL urlBase = getURL();
@@ -226,7 +219,7 @@ public class FlowTest extends BaseFlowTest
         beginAt(urlCompensation.getFile());
         clickLinkWithText("details");
 
-        setSelectedFields(containerPath, "flow", "CompensationControls", null, new String[] {"Name","Flag","Created","Run","FCSFile","RowId"});
+        setSelectedFields(getContainerPath(), "flow", "CompensationControls", null, new String[] {"Name","Flag","Created","Run","FCSFile","RowId"});
 
         assertLinkPresentWithText("PE Green laser-A+");
         assertLinkNotPresentWithText("91918.fcs");
@@ -272,7 +265,7 @@ public class FlowTest extends BaseFlowTest
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);
         clickNavButton("Import Selected Runs");
-        waitForPipeline(containerPath);
+        waitForPipeline(getContainerPath());
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("QUV analysis");
@@ -289,15 +282,15 @@ public class FlowTest extends BaseFlowTest
 
         checkCheckbox(".toggle");
         clickNavButton("Analyze selected runs");
-        waitForPipeline(containerPath);
+        waitForPipeline(getContainerPath());
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("FlowExperiment2");
         clickMenuButton("Query", query1);
         assertTextPresent("File Path Root");
 
-        setSelectedFields(containerPath, "flow", query1, "MostColumns", new String[] {"RowId", "Count","WellCount"});
-        setSelectedFields(containerPath, "flow", query1, "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
+        setSelectedFields(getContainerPath(), "flow", query1, "MostColumns", new String[] {"RowId", "Count","WellCount"});
+        setSelectedFields(getContainerPath(), "flow", query1, "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
         clickMenuButton("Views", "MostColumns");
         assertTextNotPresent("File Path Root");
         clickMenuButton("Views", "AllColumns");
@@ -307,41 +300,15 @@ public class FlowTest extends BaseFlowTest
     // Test sample set and ICS metadata
     protected void configureSampleSetAndMetadata()
     {
-        log("** Uploading sample set");
+        uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", new String[] { "Exp Name", "Well Id" }, new String[] { "EXPERIMENT NAME", "WELL ID"});
+        setProtocolMetadata();
+
         goToFlowDashboard();
-        clickLinkWithText("Upload Sample Descriptions");
-        setFormElement("data", getFileContents("/sampledata/flow/8color/sample-set.tsv"));
-        selectOptionByText("idColumn1", "Exp Name");
-        selectOptionByText("idColumn2", "Well Id");
-        submit();
-
-        log("** Join sample set with FCSFile keywords");
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Define sample description join fields");
-        selectOptionByText(Locator.name("ff_samplePropertyURI", 0), "Exp Name");
-        selectOptionByText(Locator.name("ff_samplePropertyURI", 1), "Well Id");
-        selectOptionByText(Locator.name("ff_dataField", 0), "EXPERIMENT NAME");
-        selectOptionByText(Locator.name("ff_dataField", 1), "WELL ID");
-        submit();
-        assertTextPresent("39 FCS files were linked to samples in this sample set.");
-
-        log("** Specify ICS metadata");
-        clickLinkWithText("Protocol 'Flow'");
-        clickLinkWithText("Edit ICS Metadata");
-
-        // specify PTID and Visit columns
-        selectOptionByText("ff_participantColumn", "Sample PTID");
-        selectOptionByText("ff_visitColumn", "Sample Visit");
-
-        // specify forground-background match columns
-        assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
-        selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
-
-        // specify background values
-        selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
-        assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
-        setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
-        submit();
+        clickLinkContainingText("49 sample descriptions");
+        assertTextPresent("49 sample descriptions");
+        assertTextPresent("10 samples are not joined");
+        assertTextPresent("39 FCS Files have been joined");
+        assertTextPresent("0 FCS Files are not joined");
     }
 
     public void sampleSetAndMetadataTest()
@@ -467,7 +434,7 @@ public class FlowTest extends BaseFlowTest
 
         clickLinkWithText(reportName);
         clickButton("Execute Report");
-        waitForPipeline(containerPath);
+        waitForPipeline(getContainerPath());
     }
 
     private void verifyReportError(String reportName, String errorText)
@@ -487,7 +454,7 @@ public class FlowTest extends BaseFlowTest
     private void verifyReport(String reportName)
     {
         log("** Verifying positivity report '" + reportName + "'");
-        beginAt("/flow" + containerPath + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
 
         // HACK: need FieldKey.encodePart() in the test module
         String reportNameEscaped = "><$A$S%\\' \"1 positivity report";
@@ -518,7 +485,7 @@ public class FlowTest extends BaseFlowTest
     private void verifyDeleted(String reportName)
     {
         log("** Verifying positivity report was deleted '" + reportName + "'");
-        beginAt("/flow" + containerPath + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         assertTextPresent("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.");
     }
 

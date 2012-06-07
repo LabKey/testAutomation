@@ -47,13 +47,8 @@ public class FlowNormalizationTest extends BaseFlowTest
     @Override
     protected void _doTestSteps() throws Exception
     {
-        String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
-
-        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
-        goToFlowDashboard();
-
         ImportAnalysisOptions options = new ImportAnalysisOptions(
-                containerPath,
+                getContainerPath(),
                 "/flowjoquery/miniFCS/mini-fcs.xml",
                 "/flowjoquery/miniFCS",
                 false,

@@ -337,6 +337,11 @@ public class ExtHelper
         nodeId.append('/');
         
         waitForFileGridReady(test);
+
+        // expand root tree node
+        test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
         for (int i = 0; i < parts.length; i++)
         {
             nodeId.append(parts[i]).append('/');

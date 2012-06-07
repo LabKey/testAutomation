@@ -35,14 +35,20 @@ import java.util.regex.Matcher;
  */
 public class FlowJoQueryTest extends BaseFlowTest
 {
-    String containerPath = "/" + PROJECT_NAME + "/" + getFolderName();
-
     protected void _doTestSteps() throws Exception
     {
+        verifyQueryTest();
 
-        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
-        clickLinkWithText("Flow Dashboard");
-        importAnalysis(containerPath, "/flowjoquery/Workspaces/PV1-public.xml", null, false, "FlowJoAnalysis", false, true);
+        verifyNestedBooleans();
+
+        verifyWSPImport();
+
+        verifyFilterOnImport();
+    }
+
+    protected void verifyQueryTest()
+    {
+        importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/PV1-public.xml", null, false, "FlowJoAnalysis", false, true);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.clearCustomizeViewColumns(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Name");
@@ -73,8 +79,8 @@ public class FlowJoQueryTest extends BaseFlowTest
 //        setFormElement("query.queryName", "DeviationFromMean");
 //        waitForPageToLoad();
 
-        clickLinkWithText("Flow Dashboard");
-        importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", false, "FlowJoAnalysis", true, false);
+        goToFlowDashboard();
+        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", false, "FlowJoAnalysis", true, false);
 
         int runId = -1;
         String currentURL = getCurrentRelativeURL();
@@ -115,8 +121,8 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickNavButton("Analyze selected runs");
         setFormElement("ff_analysisName", "LabKeyAnalysis");
         clickNavButton("Analyze runs");
-        waitForPipeline(containerPath);
-        clickLinkWithText("Flow Dashboard");
+        waitForPipeline(getContainerPath());
+        goToFlowDashboard();
         clickLinkWithText("LabKeyAnalysis");
         clickMenuButton("Query", "Comparison");
         waitForPageToLoad(longWaitForPage);
@@ -126,24 +132,18 @@ public class FlowJoQueryTest extends BaseFlowTest
         //setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "1", longWaitForPage);
         setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "2.5", longWaitForPage);
         assertTextPresent("No data to show");
-
-        verifyNestedBooleans();
-
-        verifyWSPImport();
-        verifyFilterOnImport();
-
     }
 
     private void verifyWSPImport()
     {
-        importAnalysis(containerPath, "/advanced/advanced-v7.6.5.wsp", "advanced/fcs", false, "Mac File", false, false);
+        importAnalysis(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", "advanced", false, "Windows File", false, true);
         assertTextPresent("931115-B02- Sample 01.fcs");
     }
 
     private void verifyNestedBooleans()
     {
         //verify workspaces with booleans-within-booleans
-        importAnalysis(containerPath, "/flowjoquery/Workspaces/boolean-sub-populations.xml", "miniFCS", true, "BooleanOfBooleanAnalysis", false, false);
+        importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/boolean-sub-populations.xml", "miniFCS", true, "BooleanOfBooleanAnalysis", false, true);
         clickLinkWithText("118795.fcs");
         sleep(2000);
         waitForElement(Locator.xpath("//table/tbody/tr/td/a/span[text()='A&B']"), defaultWaitForPage);
@@ -154,7 +154,7 @@ public class FlowJoQueryTest extends BaseFlowTest
     private void verifyFilterOnImport()
     {
         setFlowFilter(new String[] {"Name", "Keyword/Comp"}, new String[] { "startswith","eq"}, new String[] {"118", "PE CD8"});
-        importAnalysis(containerPath, "/flowjoquery/miniFCS/mini-fcs.xml", "miniFCS", true, "FilterAnalysis", false, false);
+        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", "miniFCS", true, "FilterAnalysis", false, true);
         DataRegionTable queryTable = new DataRegionTable("query", this);
         assertEquals(1, queryTable.getDataRowCount());
     }

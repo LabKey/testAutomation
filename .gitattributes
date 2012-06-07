@@ -153,6 +153,7 @@ src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
 src/org/labkey/test/tests/FileContentTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
+src/org/labkey/test/tests/FlowCopyTest.java -text
 src/org/labkey/test/tests/FlowImportTest.java -text
 src/org/labkey/test/tests/FlowJoQueryTest.java -text
 src/org/labkey/test/tests/FlowNormalizationTest.java -text
