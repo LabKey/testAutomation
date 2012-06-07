@@ -178,7 +178,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("** Testing query of vehicle schema...");
         beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
-        viewQueryData(VEHICLE_SCHEMA, "Toyotas");
+        viewQueryData(VEHICLE_SCHEMA, "Toyotas", "simpletest");
 
         assertTextPresent("Prius");
         assertTextPresent("Camry");

@@ -5771,10 +5771,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void viewQueryData(String schemaName, String queryName)
     {
+        viewQueryData(schemaName, queryName, null);
+    }
+
+    public void viewQueryData(String schemaName, String queryName, String moduleName)
+    {
         selectQuery(schemaName, queryName);
         Locator loc = Locator.xpath("//div[contains(@class, 'lk-qd-name')]/a[text()='" + schemaName + "." + queryName + "']");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
+        if (moduleName != null) // 12474
+            assertTextPresent("Defined in " + moduleName + " module");
         log("Navigating to " + href);
         beginAt(href);
     }
