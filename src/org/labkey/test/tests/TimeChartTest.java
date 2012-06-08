@@ -591,7 +591,7 @@ public class TimeChartTest extends StudyBaseTest
         if(label!=null)
         {
             setFormElement(axis + "-axis-label-textfield", label);
-            fireEvent(Locator.name(axis + "-axis-label-textfield"), SeleniumEvent.blur);
+            fireEvent(Locator.name(axis + "-axis-label-textfield"), SeleniumEvent.keyup);
         }
 
         if (rangeId!=null)
@@ -622,7 +622,7 @@ public class TimeChartTest extends StudyBaseTest
 
         if(textPresent!=null)
         {
-            waitForText(textPresent[0], 5*defaultWaitForPage);
+            waitForText(textPresent[0], WAIT_FOR_JAVASCRIPT);
             for (String text : textPresent)
                 assertTextPresent(text);
         }
@@ -1084,7 +1084,7 @@ public class TimeChartTest extends StudyBaseTest
 
     private void setChartTitle(String title)
     {
-        ExtHelper.setExtFormElementByLabel(this, "Chart Title:", title);
+        setFormElement("chart-title-textfield", title);
         fireEvent(Locator.name("chart-title-textfield"), SeleniumEvent.blur);
     }
 

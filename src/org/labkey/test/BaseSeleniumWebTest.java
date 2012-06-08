@@ -1968,7 +1968,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     public enum SeleniumEvent
-    {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload}
+    {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup}
 
     public void fireEvent(Locator loc, SeleniumEvent event)
     {
