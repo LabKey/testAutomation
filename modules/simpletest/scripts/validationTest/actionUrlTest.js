@@ -27,7 +27,8 @@ function doTest()
         errors[errors.length] = new Error("ActionURL.queryString = " + queryString);
 
     var url = LABKEY.ActionURL.buildURL(controller, action, containerPath, urlParameters);
-    if( url != "/labkey/"+controller+"/"+containerPath+"/"+action+".view?"+queryString )
+    if( url != "/labkey/" + controller + "/" + containerPath + "/" + action + ".view?" + queryString  &&
+        url != "/labkey/" + containerPath + "/" + controller + "-" + action + ".view?" + queryString)
         errors[errors.length] = new Error("ActionURL.buildUrl() = " + url);
 
     var parameters = LABKEY.ActionURL.getParameters(url);

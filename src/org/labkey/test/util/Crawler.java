@@ -262,23 +262,34 @@ public class Crawler
         public ControllerActionId(String rootRelativeURL)
         {
             rootRelativeURL = stripQueryParams(rootRelativeURL);
+            rootRelativeURL = BaseSeleniumWebTest.stripContextPath(rootRelativeURL);
+
             int actionIdx = rootRelativeURL.lastIndexOf('/');
-            /*
-            * we assume that our URL format is the following:
-            * /contextpath/controller/folders/action.view
-            */
             _action = rootRelativeURL.substring(actionIdx + 1);
+            rootRelativeURL = rootRelativeURL.substring(0, actionIdx+1);
+
             if (_action.endsWith(".view"))
                 _action = _action.substring(0, _action.length() - 5);
 
-            rootRelativeURL = BaseSeleniumWebTest.stripContextPath(rootRelativeURL);
-            int postControllerSlashIdx = rootRelativeURL.indexOf('/');
-
-            if (-1 == postControllerSlashIdx)
-                fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
-
-            _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
-            _folder = rootRelativeURL.substring(postControllerSlashIdx, rootRelativeURL.lastIndexOf('/'));
+            if (_action.contains("-"))
+            {
+                /* folders/ */
+                int dash = _action.indexOf("-");
+                _controller = _action.substring(0,dash);
+                _action = _action.substring(dash+1);
+            }
+            else
+            {
+                /* controller/folders/ */
+                int postControllerSlashIdx = rootRelativeURL.indexOf('/');
+                if (-1 == postControllerSlashIdx)
+                    fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
+                _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
+                rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
+            }
+            _folder = rootRelativeURL;
+            if (_folder.endsWith("/"))
+                _folder = _folder.substring(0,_folder.length()-1);
         }
 
         public String getAction()
