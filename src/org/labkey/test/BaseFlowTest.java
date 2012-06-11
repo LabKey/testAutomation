@@ -278,16 +278,19 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         submit();
     }
 
-    protected void setProtocolMetadata()
+    protected void setProtocolMetadata(boolean useDate)
     {
         log("** Specify ICS metadata");
         goToFlowDashboard();
         clickLinkWithText("Other settings");
         clickLinkWithText("Edit ICS Metadata");
 
-        // specify PTID and Visit columns
+        // specify PTID and Visit/Date columns
         selectOptionByText("ff_participantColumn", "Sample PTID");
-        selectOptionByText("ff_visitColumn", "Sample Visit");
+        if (useDate)
+            selectOptionByText("ff_dateColumn", "Sample Thaw Date");
+        else
+            selectOptionByText("ff_visitColumn", "Sample Visit");
 
         // specify forground-background match columns
         assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
