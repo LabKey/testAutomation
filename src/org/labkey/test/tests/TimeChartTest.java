@@ -590,8 +590,11 @@ public class TimeChartTest extends StudyBaseTest
 
         if(label!=null)
         {
+            click(Locator.css(".revert"+axis+"AxisLabel"));
+            waitForElement(Locator.css(".x4-btn-disabled.revert"+axis+"AxisLabel"), WAIT_FOR_JAVASCRIPT);
             setFormElement(axis + "-axis-label-textfield", label);
             fireEvent(Locator.name(axis + "-axis-label-textfield"), SeleniumEvent.keyup);
+            waitForElementToDisappear(Locator.css(".x4-btn-disabled.revert"+axis+"AxisLabel"), WAIT_FOR_JAVASCRIPT);
         }
 
         if (rangeId!=null)
