@@ -193,7 +193,7 @@ public class DataViewsTester
 
     private void setDataBrowseSearch(String value)
     {
-        _test.setFormElement(Locator.xpath("//div[contains(@class, 'dataset-search')]//input"), value);
+        _test.setFormElement(Locator.xpath("//table[contains(@class, 'dataset-search')]//input"), value);
     }
 
     private void collapseCategory(String category)
