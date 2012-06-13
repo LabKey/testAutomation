@@ -414,7 +414,7 @@ public class CAVDStudyTest extends StudyBaseTest
     private void setDatasetStatus(String dataset, String status)
     {
         clickEditDatasetIcon(dataset);
-        Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/..");
+        Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
         Ext4Helper.selectComboBoxItem(this, comboParent, status);
         clickNavButton("Save", 0);
 
