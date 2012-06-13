@@ -134,6 +134,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickButton("Edit Properties...");
             waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
             setFormElement("ff_name0", CUSTOM_PROPERTY);
+            setFormElement("url", "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
             addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
             clickNavButton("Save & Close");
 
@@ -177,7 +178,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Re-add upload button
             //clickButton("Admin", 0);
             //ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
-            //clickConfigTab(FileTab.toolbar);
+            //ExtHelper.clickExtTab("Toolbar and Grid Settings");
             //dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
             //             Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
             //waitForElement(Locator.xpath("(//button[contains(@class, 'iconFolderNew')])[2]"), WAIT_FOR_JAVASCRIPT);
@@ -204,6 +205,9 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForText(FILE_DESCRIPTION, WAIT_FOR_JAVASCRIPT);
             waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT);
             waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
+            assertLinkPresentWithText(LOOKUP_VALUE_2);
+            assertLinkPresentWithText(CUSTOM_PROPERTY_VALUE);
+            assertAttributeEquals(Locator.linkWithText(CUSTOM_PROPERTY_VALUE), "href", "http://labkey.test/?a="+CUSTOM_PROPERTY_VALUE+"&b="+LOOKUP_VALUE_2);
 
             log("rename file");
             String newFileName = "changedFilename.html";
@@ -258,8 +262,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertTextBefore("File uploaded", "annotations updated");
             assertTextBefore("annotations updated", "File deleted");
 
-            //Issue 13844: FileSystem log events not included in LabAuditEvents
-//            validateLabAuditTrail();
+            validateLabAuditTrail();
         }
     }
 }
