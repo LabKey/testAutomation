@@ -391,29 +391,6 @@ public class ExtHelper
         test.waitForElement(file, 60000);
     }
 
-    public static void selectComboBoxItemExt4(BaseSeleniumWebTest test, String label, String selection)
-    {
-
-        selectComboBoxItemExt4(test, Locator.xpath("//div[./label[text()='" + label + "']]/div/div"), selection);
-    }
-
-    private static void selectComboBoxItemExt4(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
-    {
-        test.clickAt(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'arrow')]"), "1,1");
-        if(test.getBrowser().startsWith(test.IE_BROWSER))      //TODO:  haven't tried this out yet
-        {
-            test.sleep(500);
-            test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
-        }
-        else
-        {
-            Locator selector = Locator.xpath("//div[./div[@role='presentation']]/div/div/ul/li[text()='" + selection + "']");
-            test.waitForElement(selector, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            test.click(selector);
-        }
-    }
-
     public static void selectComboBoxItem(BaseSeleniumWebTest test,  Locator.XPathLocator parentLocator, String selection)
     {
         test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");
