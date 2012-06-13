@@ -1121,6 +1121,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
 
         selenium.selectWindow("systemMaintenance");
+        log("Waiting for system maintenance to complete");
 
         // Page updates automatically via AJAX... keep checking (up to 10 minutes) for system maintenance complete text
         waitFor(new Checker() {
