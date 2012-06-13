@@ -250,7 +250,7 @@ public class Crawler
     protected class ControllerActionId
     {
         private String _controller;
-        private String _action;
+        private String _action = "";
         private String _folder;
 
         public ControllerActionId(String controller, String action)
@@ -322,7 +322,7 @@ public class Crawler
         @Override
         public int hashCode()
         {
-            return _action.hashCode() ^ _controller.hashCode();
+            return (null==_action?0:_action.hashCode()) ^ (null==_controller?0:_controller.hashCode());
         }
 
         @Override
