@@ -264,12 +264,24 @@ public class Crawler
             rootRelativeURL = stripQueryParams(rootRelativeURL);
             rootRelativeURL = BaseSeleniumWebTest.stripContextPath(rootRelativeURL);
 
-            int actionIdx = rootRelativeURL.lastIndexOf('/');
-            _action = rootRelativeURL.substring(actionIdx + 1);
-            rootRelativeURL = rootRelativeURL.substring(0, actionIdx+1);
+            if (rootRelativeURL.startsWith("_webdav/"))
+            {
+                _controller = "_webdav";
+                _folder = rootRelativeURL.substring("_webdav/".length());
+                return;
+            }
 
-            if (_action.endsWith(".view"))
-                _action = _action.substring(0, _action.length() - 5);
+            int actionIdx = rootRelativeURL.lastIndexOf('/');
+            String action = rootRelativeURL.substring(actionIdx + 1);
+            if (action.endsWith(".view") || action.endsWith(".api") || action.endsWith(".post"))
+            {
+                _action = action.substring(0,action.lastIndexOf("."));
+                rootRelativeURL = rootRelativeURL.substring(0, actionIdx+1);
+            }
+            else
+            {
+                _action = "";
+            }
 
             if (_action.contains("-"))
             {
@@ -391,6 +403,24 @@ public class Crawler
 
     public void crawlAllLinks(boolean inject)
     {
+        // quick unit-test
+        {
+        ControllerActionId a = new ControllerActionId("/controller/folder/action.view");
+        _test.assertEquals("controller", a.getController());
+        _test.assertEquals("folder", a.getFolder());
+        _test.assertEquals("action", a.getAction());
+        }
+        {
+        ControllerActionId b = new ControllerActionId("/folder/controller-action.view");
+        _test.assertEquals("controller", b.getController());
+        _test.assertEquals("folder", b.getFolder());
+        _test.assertEquals("action", b.getAction());
+        }
+        {
+        ControllerActionId c = new ControllerActionId("/_webdav/fred");
+        _test.assertEquals("_webdav", c.getController());
+        }
+
         _test.log("Starting crawl...");
         _test.beginAt(WebTestHelper.getContextPath() + "/");
         _test.waitForPageToLoad();

@@ -1613,6 +1613,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if ( isGuestModeTest() )
             return;
+
+        pushLocation();
         int rowCount, coveredActions, totalActions;
         Double actionCoveragePercent;
         String actionCoveragePercentString;
@@ -1631,6 +1633,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         // Download full action coverage table and add to TeamCity artifacts.
         beginAt("/admin/exportActions.view?asWebPage=true");
         publishArtifact(saveTsv(Runner.getDumpDir(), "ActionCoverage"));
+        popLocation();
     }
 
     private void writeActionStatistics(int totalActions, int coveredActions, Double actionCoveragePercent)
