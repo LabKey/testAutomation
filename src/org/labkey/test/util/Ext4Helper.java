@@ -43,7 +43,7 @@ public class Ext4Helper
         else
         {
             // wait for the dropdown to open
-            test.waitForElement(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-pickerfield-open')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            test.waitForElement(Locator.xpath(parentLocator.getPath() + "//td[contains(@class, 'x4-pickerfield-open')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
             // select the list item
             test.click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '" + selection + "')]"));

@@ -217,11 +217,11 @@ public class StudyScheduleTester
 
         _test.clickButton("Add Dataset", 0);
         _test.waitForElement(Locator.xpath("//span[text() = 'New Dataset']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.xpath("//label[text() = 'Name:']/..//input"), name);
+        _test.setFormElement(Locator.xpath("//label[text() = 'Name:']/../..//input"), name);
 
         if (category != null)
         {
-            _test.setFormElement(Locator.xpath("//label[text() = 'Category:']/..//input"), category);
+            _test.setFormElement(Locator.xpath("//label[text() = 'Category:']/../..//input"), category);
         }
 
         switch (type)
@@ -332,7 +332,7 @@ public class StudyScheduleTester
             case linkeToExisting:
                 _test.click(Locator.ext4Radio("Link to existing dataset"));
 
-                Locator.XPathLocator comboParent = Locator.xpath("//div[contains(@class, 'existing-dataset-combo')]");
+                Locator.XPathLocator comboParent = Locator.xpath("//table[contains(@class, 'existing-dataset-combo')]");
                 Ext4Helper.selectComboBoxItem(_test, comboParent, targetDataset);
 
                 _test.clickButton("Done", 0);

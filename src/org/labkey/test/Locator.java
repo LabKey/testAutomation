@@ -223,12 +223,12 @@ public class Locator
 
     public static XPathLocator ext4Checkbox(String label)
     {
-        return xpath("//input[@role = 'checkbox' and following-sibling::label[text()='" + label + "']]");
+        return xpath("//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
     }
 
     public static XPathLocator ext4Radio(String label)
     {
-        return xpath("//input[@role = 'radio' and following-sibling::label[contains(text(), '" + label + "')]]");
+        return xpath("//input[@type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");
     }
 
     public static XPathLocator navButtonDisabled(String text)

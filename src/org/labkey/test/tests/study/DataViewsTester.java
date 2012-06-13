@@ -133,7 +133,7 @@ public class DataViewsTester
         _test.log("Verify modify dataset");
         _test.click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
         ExtHelper.waitForExtDialog(_test, EDITED_DATASET);
-        _test.setFormElement(Locator.xpath("//label[text() = 'Category']/..//input"), NEW_CATEGORY);
+        _test.setFormElement(Locator.xpath("//label[text() = 'Category']/../..//input"), NEW_CATEGORY);
         _test.setFormElement(Locator.name("description"), NEW_DESCRIPTION);
         ExtHelper.clickExtButton(_test, EDITED_DATASET, "Save", 0);
         _test.waitForText(NEW_CATEGORY);

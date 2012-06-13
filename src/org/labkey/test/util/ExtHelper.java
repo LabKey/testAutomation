@@ -520,8 +520,8 @@ public class ExtHelper
 
     private static boolean isChecked(BaseSeleniumWebTest test, String label)
     {
-        String checked = test.getAttribute(Locator.ext4Checkbox(label), "aria-checked");
-        return checked.equalsIgnoreCase("true");
+        Locator checked = Locator.xpath("//table[contains(@class, 'x4-form-cb-checked')]//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
+        return test.isElementPresent(checked);
     }
 
     private static String jsString(String s)
