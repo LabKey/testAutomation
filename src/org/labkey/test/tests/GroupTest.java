@@ -322,16 +322,16 @@ public class GroupTest extends BaseSeleniumWebTest
         setText("name", projectName);
 
         if (null != folderType && !folderType.equals("None"))
-            click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input"));
+            click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
         else
-            click(Locator.xpath("//div[./label[text()='Custom']]/input"));
+            click(Locator.xpath("//td[./label[text()='Custom']]/input"));
 
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
         waitForPageToLoad();
 
         //second page of the wizard
         click(Locator.xpath("//label[contains(text(), 'Copy From Existing Project')]/../input"));
-        ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//div[@id='targetProject-bodyEl']/input"), getProjectName());
+        ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//td[@id='targetProject-inputCell']/input"), getProjectName());
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
         waitForPageToLoad();
 

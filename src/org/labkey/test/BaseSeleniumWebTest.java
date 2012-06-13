@@ -1996,9 +1996,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setText("name", projectName);
 
         if (null != folderType && !folderType.equals("None"))
-            click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input"));
+            click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
         else
-            click(Locator.xpath("//div[./label[text()='Custom']]/input"));
+            click(Locator.xpath("//td[./label[text()='Custom']]/input"));
 
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
         waitForPageToLoad();
@@ -2185,11 +2185,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
         {
-            click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input[@role='radio']"));
+            click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
             if(folderType.equals("Create From Template Folder"))
             {
                 log("create from template");
-                click(Locator.xpath("//div[./label[text()='"+folderType+"']]/input[@role='radio']"));
+                click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
                 Locator.XPathLocator l = Locator.xpath("//div[div/div[contains(text(), 'Choose Template Folder:')]]");
                 Ext4Helper.selectComboBoxItem(this, l, templateFolder);
 
@@ -2197,13 +2197,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
         }
         else {
-            click(Locator.xpath("//div[./label[text()='Custom']]/input[@role='radio']"));
+            click(Locator.xpath("//td[./label[text()='Custom']]/input[@type='button' and contains(@class, 'radio')]"));
 
 
             if (tabsToAdd != null)
             {
                 for (String tabname : tabsToAdd)
-                    waitAndClick(Locator.xpath("//div[./label[text()='"+tabname+"']]/input[@role='checkbox']"));
+                    waitAndClick(Locator.xpath("//td[./label[text()='"+tabname+"']]/input[@type='button' and contains(@class, 'checkbox')]"));
             }
         }
 
@@ -2217,7 +2217,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             //nothing needed, this is the default
         }
         else {
-            waitAndClick(Locator.xpath("//div[./label[text()='My User Only']]/input"));
+            waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
         }
 
         waitAndClick(Locator.xpath("//button[./span[text()='Finish']]")); //Leave permissions where they are
