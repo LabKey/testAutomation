@@ -16,6 +16,8 @@
 
 package org.labkey.test;
 
+import org.openqa.selenium.By;
+
 /**
  * User: Mark Igra
  * Date: Feb 8, 2007
@@ -25,7 +27,7 @@ public class Locator
 {
     private String loc;
     // XPATH fragments
-    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@style, 'left: -10000px')])";
+    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
 
 
@@ -44,6 +46,22 @@ public class Locator
         String xpath = loc.substring(loc.indexOf("=")+1);
         return xpath;
 
+    }
+
+    public By toBy()
+    {
+        if (loc.startsWith("id="))
+            return By.id(loc.substring(loc.indexOf("=")+1));
+        if (loc.startsWith("name="))
+            return By.name(loc.substring(loc.indexOf("=")+1));
+        if (loc.startsWith("xpath="))
+            return By.xpath(loc.substring(loc.indexOf("=")+1));
+        if (loc.startsWith("css="))
+            return By.cssSelector(loc.substring(loc.indexOf("=")+1));
+        if (loc.startsWith("link="))
+            return By.partialLinkText(loc.substring(loc.indexOf("=")+1));
+        else
+            return By.name(loc.substring(loc.indexOf("=")+1)); // best guess for dom/identifier. will break
     }
 
     protected void setRawLocator(String locator)
