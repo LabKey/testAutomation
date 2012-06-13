@@ -158,7 +158,7 @@ public class DataViewsTester
         {
             clickCustomizeView(entry[0]);
 
-            Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/..");
+            Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
             Ext4Helper.selectComboBoxItem(_test, comboParent, entry[1]);
 
             _test.clickNavButton("Save", 0);
