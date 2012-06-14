@@ -41,6 +41,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private static final String WIKI_PAGE4_TITLE = "New Wiki";
     private static final String WIKI_PAGE5_NAME = "Malformed";
     private static final String WIKI_PAGE5_TITLE = "Malformed JavaScript Elements Should Work";
+    private static final String WIKI_PAGE6_NAME = "Index";
+    private static final String WIKI_PAGE6_TITLE = "Indexed Wiki Page Test";
 
     private static final String DISC1_TITLE = "Let's Talk";
     private static final String DISC1_BODY = "I don't know how normal this wiki is";
@@ -53,6 +55,9 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private static final String WIKI_NAVTREE_TITLE = "NavTree";
     private static final String WIKI_TERMS_TITLE = "Terms of Use";
     private static final int MAX_AJAX_WAIT_CYCLES = 10;
+    private static final String WIKI_SEARCH_TERM = "okapi";
+    private static final String WIKI_INDEX_EDIT_CHECKBOX = "wiki-input-shouldIndex";
+    private static final String WIKI_INDEX_MANAGE_CHECKBOX = "shouldIndex";
 
     private static final String WIKI_PAGE1_CONTENT =
             "1 Title\n" +
@@ -81,6 +86,10 @@ public class WikiLongTest extends BaseSeleniumWebTest
             "    <script>\n" +
             "        var foo = \"<form>Test</form>\";\n" +
             "    </script>";
+
+    private static final String WIKI_PAGE6_CONTENT =
+            "The " + WIKI_SEARCH_TERM +
+            " was called the African unicorn by Europeans and wasn't widely known to exist until 1901.\n";
 
     private static final String NAVBAR1_CONTENT =
             "{labkey:tree|name=core.currentProject}";
@@ -508,6 +517,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText(WIKI_PAGE1_TITLE);
         assertLinkPresentWithTextCount(WIKI_PAGE2_TITLE, 1);
 
+        indexTest();
+
         //extended wiki test -- generate 2000 pages
 //        clickLinkWithText(PROJECT_NAME);
 //        clickTab("Wiki");
@@ -654,6 +665,143 @@ public class WikiLongTest extends BaseSeleniumWebTest
         selectOptionByValue("wiki-input-window-change-format-to", format);
         clickNavButton("Convert", 0);
         sleep(500);
+    }
+
+    //
+    // Verify a wiki page can be indexed and unindexed via create, edit, and manage
+    // functionality.
+    //
+    private void indexTest()
+    {
+        //
+        // verify that the default option for a new page
+        // is indexed and content on page can be found
+        //
+        log("test index option: default is indexed");
+        createIndexWiki(true);
+        searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 1, null);
+        deleteIndexWiki();
+
+        //
+        // create a new page without the index option and verify
+        // content cannot be found
+        //
+        log("test index option:  create new page unindexed");
+        createIndexWiki(false);
+        searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 0, null);
+
+        //
+        // Edit an existing page that was unindexed and turn on the index
+        //
+        log("test index option:  edit and turn on indexing for a page that was created unindexed");
+        editIndexWiki(false);
+        checkCheckbox(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
+        saveWikiPage();
+        searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 1, null);
+
+        //
+        // Edit an existing page that was indexed and turn off the index
+        //
+        log("test index option:  edit and turn off indexing for a page that was created indexed");
+        editIndexWiki(true);
+        uncheckCheckbox(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
+        saveWikiPage();
+        searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 0, null);
+
+        //
+        // manage an existing page: turn on indexing
+        //
+        log("test index option:  manage and turn on indexing for a page that is unindexed");
+        // note that this also tests that the index option persisted from the edit page is loaded correctly
+        // into the manage page
+        manageIndexWiki(false);
+        checkCheckbox(Locator.id(WIKI_INDEX_MANAGE_CHECKBOX));
+        clickNavButton("Save");
+        searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 1, null);
+
+        //
+        // manage an existing page: turn off indexing
+        //
+        log("test index option:  manage and turn off indexing for a page that is indexed");
+        manageIndexWiki(true);
+        uncheckCheckbox(Locator.id(WIKI_INDEX_MANAGE_CHECKBOX));
+        clickNavButton("Save");
+        searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 0, null);
+
+        //
+        // final sanity check: make sure the shouldIndex setting persists correctly and is correct
+        // in the edit page
+        //
+        log("test index option:  edit and turn off indexing for a page that was created indexed");
+        editIndexWiki(false);
+        clickNavButton("Cancel");
+
+        //
+        // cleanup
+        //
+        deleteIndexWiki();
+    }
+
+    //
+    // helper functions used by indexTest() above
+    //
+    private void createIndexWiki(boolean shouldIndex)
+    {
+        createNewWikiPage("RADEOX");
+        //
+        // verify that the index option is checked by default
+        //
+        assertChecked(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
+
+        setFormElement("name", WIKI_PAGE6_NAME);
+        setFormElement("title", WIKI_PAGE6_TITLE);
+        setWikiBody(WIKI_PAGE6_CONTENT);
+
+        if (!shouldIndex)
+        {
+            uncheckCheckbox(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
+        }
+
+        saveWikiPage();
+    }
+
+    private void editIndexWiki(boolean expectedShouldIndex)
+    {
+        clickTab("Wiki");
+        clickLinkWithText(WIKI_PAGE6_TITLE);
+        clickLinkWithText("Edit");
+
+        if (expectedShouldIndex)
+        {
+            assertChecked(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
+        }
+        else
+        {
+            assertNotChecked(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
+        }
+    }
+
+    private void manageIndexWiki(boolean expectedShouldIndex)
+    {
+        clickTab("Wiki");
+        clickLinkWithText(WIKI_PAGE6_TITLE);
+        clickLinkWithText("Manage");
+
+        if (expectedShouldIndex)
+        {
+            assertChecked(Locator.id(WIKI_INDEX_MANAGE_CHECKBOX));
+        }
+        else
+        {
+            assertNotChecked(Locator.id(WIKI_INDEX_MANAGE_CHECKBOX));
+        }
+    }
+
+    private void deleteIndexWiki()
+    {
+        clickLinkWithText(WIKI_PAGE6_TITLE);
+        clickLinkWithText("Edit");
+        deleteWikiPage();
     }
 
     protected void selectRenderType(String renderType)
