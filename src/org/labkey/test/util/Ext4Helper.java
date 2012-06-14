@@ -53,17 +53,36 @@ public class Ext4Helper
 
     public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
     {
-        selectComboBoxItem(test, Locator.xpath("//div[./label[text()='" + label + "']]"), selection);
+        Locator.XPathLocator loc = Locator.xpath("//div[./label[text()='" + label + "']]");
+        if (!test.isElementPresent(loc))
+        {
+            // try Ext 4.1.0 version
+            loc = Locator.xpath("//table[./tbody/tr/td/label[text()='" + label + "']]");
+        }
+
+        selectComboBoxItem(test, loc, selection);
     }
 
     public static void selectComboBoxItemById(BaseSeleniumWebTest test, String labelId, String selection)
     {
-        selectComboBoxItem(test, Locator.xpath("//div[./label[@id='" + labelId + "']]"), selection);
+        Locator.XPathLocator loc = Locator.xpath("//div[./label[@id='" + labelId + "']]");
+        if (!test.isElementPresent(loc))
+        {
+            // try Ext 4.1.0 version
+            loc = Locator.xpath("//table[./tbody/tr/td/label[@id='" + labelId + "']]");
+        }
+
+        selectComboBoxItem(test, loc, selection);
     }
 
     public static void selectRadioButton(BaseSeleniumWebTest test, String label, String selection)
     {
         Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");
+        if (!test.isElementPresent(l))
+        {
+            // try Ext 4.1.0 version
+            l = Locator.xpath("//div[./table//label[text()='" + label + "']]//label[text()='" + selection + "']");
+        }
         test.click(l);
     }
 
