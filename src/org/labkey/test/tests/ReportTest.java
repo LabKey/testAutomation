@@ -803,10 +803,10 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Views");
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
-        waitForText("Creatinine", 32, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns)
+        waitForText("Creatinine", 34, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 column headers) + 8 mice (x2 column tooltips) + 2 in hidden customize panel
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        assertTextPresent("1a.ALT AE Severity Grade", 16); // 8 mice + 8 grid field tooltips
-        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a.ALT AE Severity Grade", 17); // 8 mice + 8 grid field tooltips + 1 hidden grid row in customization panel
+        assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips + 1 hidden grid row in customization panel
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
 
@@ -849,12 +849,12 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Views");
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
-        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice
+        waitForText("Creatinine", 17, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
         waitForText("Showing 8 Results", 1, WAIT_FOR_JAVASCRIPT); // There should only be 8 results, and it should state that.
 
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        assertTextPresent("1a.ALT AE Severity Grade", 16); // 8 mice + 8 grid field tooltips
-        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a.ALT AE Severity Grade", 17); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
+        assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips  + 1 in hidden customize panel
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
@@ -868,10 +868,10 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Views");
         clickReportGridLink(PARTICIPANT_REPORT2_NAME, "view");
 
-        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips
+        waitForText("Creatinine", 17, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
         assertTextPresent(PARTICIPANT_REPORT2_NAME);
         assertTextNotPresent("1a.ALT AE Severity Grade");
-        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
         assertTextPresent("Showing 8 Results");
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
