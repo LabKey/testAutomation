@@ -481,9 +481,18 @@ public class ReportTest extends StudyBaseTest
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
     private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
     private static final File ATTACHMENT_REPORT_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test1.jpg"); // arbitrary image file
+
     private static final String ATTACHMENT_REPORT2_NAME = "Attachment Report2";
     private static final String ATTACHMENT_REPORT2_DESCRIPTION= "This attachment report points at a file on the server.";
     private static final File ATTACHMENT_REPORT2_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
+
+    private static final String ATTACHMENT_REPORT3_NAME = "Attachment Report3";
+    private static final String ATTACHMENT_REPORT3_DESCRIPTION= "This attachment report points links to an internal page.";
+    private static final String ATTACHMENT_REPORT3_URL = "/project/home/begin.view";
+
+    private static final String ATTACHMENT_REPORT4_NAME = "Attachment Report4";
+    private static final String ATTACHMENT_REPORT4_DESCRIPTION= "This attachment report points links to an external page.";
+
     private void doAttachmentReportTest()
     {
         clickLinkWithText(getProjectName());
@@ -493,7 +502,7 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Create", "Attachment Report");
         clickButton("Cancel");
 
-       if(isFileUploadAvailable())
+        if (isFileUploadAvailable())
         {
             clickMenuButton("Create", "Attachment Report");
             setFormElement("viewName", ATTACHMENT_REPORT_NAME);
@@ -506,23 +515,54 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Create", "Attachment Report");
         setFormElement("viewName", ATTACHMENT_REPORT2_NAME);
         setFormElement("description", ATTACHMENT_REPORT2_DESCRIPTION);
-        click(Locator.xpath("//input[../label[string()='Use a file on server localhost']]"));
+        click(Locator.xpath("//input[../label[string()='Full file path on server']]"));
         setFormElement("filePath", ATTACHMENT_REPORT2_FILE.toString());
         clickNavButton("Save");
 
+        clickMenuButton("Create", "Attachment Report");
+        setFormElement("viewName", ATTACHMENT_REPORT3_NAME);
+        setFormElement("description", ATTACHMENT_REPORT3_DESCRIPTION);
+        click(Locator.xpath("//input[../label[string()='Link URL']]"));
+        assertTextNotPresent("URL must be absolute");
+        setFormElement("linkUrl", "mailto:kevink@example.com");
+        assertTextPresent("URL must be absolute");
+        setFormElement("linkUrl", getContextPath() + ATTACHMENT_REPORT3_URL);
+        assertTextNotPresent("URL must be absolute");
+        clickNavButton("Save");
+
+        clickMenuButton("Create", "Attachment Report");
+        setFormElement("viewName", ATTACHMENT_REPORT4_NAME);
+        setFormElement("description", ATTACHMENT_REPORT4_DESCRIPTION);
+        click(Locator.xpath("//input[../label[string()='Link URL']]"));
+        setFormElement("linkUrl", getBaseURL() + ATTACHMENT_REPORT3_URL);
+        assertTextNotPresent("URL must be absolute");
+        clickNavButton("Save");
+
         clickLinkWithText("Clinical and Assay Data");
-        if(isFileUploadAvailable())
+        if (isFileUploadAvailable())
         {
             waitForText(ATTACHMENT_REPORT_NAME);
         }
         waitForText(ATTACHMENT_REPORT2_NAME);
 
-        if(isFileUploadAvailable())
+        if (isFileUploadAvailable())
         {
             clickReportGridLink(ATTACHMENT_REPORT_NAME, "view");
         }
         //TODO: Verify reports. Blocked: 13761: Attachment reports can't be viewed
 //        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "view");
+
+        pushLocation();
+        clickReportGridLink(ATTACHMENT_REPORT3_NAME, "view");
+        assertTrue("Expected link report to go to '" + ATTACHMENT_REPORT3_URL + "', but was '" + getCurrentRelativeURL() + "'",
+                getURL().toString().contains(ATTACHMENT_REPORT3_URL));
+        popLocation();
+
+        pushLocation();
+        clickReportGridLink(ATTACHMENT_REPORT4_NAME, "view");
+        assertTrue("Expected link report to go to '" + ATTACHMENT_REPORT3_URL + "', but was '" + getCurrentRelativeURL() + "'",
+                getURL().toString().contains(ATTACHMENT_REPORT3_URL));
+        popLocation();
     }
 
     private void saveReport(String name)
