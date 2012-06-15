@@ -29,7 +29,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         goToProjectHome();
         addWebPart("Data Pipeline");
         clickNavButton("Process and Import Data");
-        selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
+//        selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
         waitForText("Targeted MS Runs ");
         waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
 
