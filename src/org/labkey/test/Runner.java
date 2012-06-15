@@ -354,7 +354,7 @@ public class Runner extends TestSuite
             Class testClass = nameMap.get(testName.toLowerCase());
             if (testClass == null)
             {
-                System.out.println("Couldn't find test '" + testName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
+                System.err.println("Couldn't find test '" + testName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
                 Class[] sortedTests = new Class[testSet.tests.length];
                 System.arraycopy(testSet.tests, 0, sortedTests, 0, testSet.tests.length);
                 Arrays.sort(sortedTests, new Comparator<Class>(){
@@ -365,7 +365,8 @@ public class Runner extends TestSuite
                 });
 
                 for (Class c : sortedTests)
-                    System.out.println("    " + c.getSimpleName());
+                    System.err.println("    " + c.getSimpleName());
+                System.exit(1);
             }
 //            else if ((testClass instanceof PostgresOnlyTest && System.getProperty("serverType").contains("postgres")) ||
 //                    (testClass instanceof SqlserverOnlyTest && System.getProperty("serverType").contains("sqlserver")) ||
