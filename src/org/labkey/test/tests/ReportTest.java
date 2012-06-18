@@ -826,9 +826,15 @@ public class ReportTest extends StudyBaseTest
         waitForText("Creatinine", 37, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns + tooltips) + 1 Report Field list + 2 in hidden add field dialog
         assertTextPresent("1a.ALT AE Severity Grade", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
         assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
-        assertTextPresent("Showing 8 Results");
+
+        assertTextPresent("Showing a Maximum of 50 Results");
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        waitForText("Showing 8 Results");
 
         // verify form validation
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Save", 0);
         ExtHelper.waitForExtDialog(this, "Error");
         waitAndClickNavButton("OK", 0);
@@ -934,6 +940,8 @@ public class ReportTest extends StudyBaseTest
 
         clickNavButton("Select", 0);
 
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         waitForText("Showing 25 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
@@ -976,6 +984,8 @@ public class ReportTest extends StudyBaseTest
             assertTextNotPresent(ptid);
         }
 
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT3_NAME);
         clickNavButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
@@ -996,6 +1006,8 @@ public class ReportTest extends StudyBaseTest
 
         clickNavButton("Select", 0);
 
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         waitForText("Showing 116 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
@@ -1018,6 +1030,8 @@ public class ReportTest extends StudyBaseTest
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT4_NAME);
         clickNavButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
@@ -1046,7 +1060,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "2.What is your sex?", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "5. Sexual orientation", "measuresGridPanel", true);
         clickNavButton("Select", 0);
-        waitForText("Showing 24 Results", WAIT_FOR_JAVASCRIPT);
+        waitForText("Showing a Maximum of 50 Results", WAIT_FOR_JAVASCRIPT);
 
         // verify the data in the report
         waitForText("1.Date of Birth", 27, WAIT_FOR_JAVASCRIPT); // 24 mice + 1 Report Measures list + 2 in hidden add measure dialog
