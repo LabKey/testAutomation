@@ -780,6 +780,7 @@ public class ReportTest extends StudyBaseTest
     private static final String SPECIMEN_GROUP_TWO = "SPEC GROUP 2";
     private static final String[] SPEC_PTID_ONE = {"999320016"};
     private static final String[] SPEC_PTID_TWO = {"999320518"};
+    private static final String PARTICIPANT_REPORT5_NAME = "Demographic Participant Report";
     private void doParticipantReportTest()
     {
         log("Testing Participant Report");
@@ -794,7 +795,7 @@ public class ReportTest extends StudyBaseTest
         waitAndClickNavButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");                                                                            
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
         waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][18]"), WAIT_FOR_JAVASCRIPT);
         assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
@@ -883,7 +884,7 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Cancel", 0); // Verify cancel button.
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
-        
+
         // verify modified, saved report
         clickLinkWithText("Manage");
         clickLinkWithText("Manage Views");
@@ -1018,6 +1019,42 @@ public class ReportTest extends StudyBaseTest
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT4_NAME);
+        clickNavButton("Save", 0);
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+
+        //Participant report with multiple demographic fields
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Datasets");
+        clickLinkWithText("DEM-1: Demographics");
+        clickButtonContainingText("Edit Definition");
+        waitForElement(Locator.xpath("//input[@name='demographicData']"));
+        checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
+        clickNavButton("Save");
+
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Mouse Report");
+
+        // select some measures from the demographics
+        waitAndClickNavButton("Choose Measures", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "demographic");
+        pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
+
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1.Date of Birth", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "2.What is your sex?", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "5. Sexual orientation", "measuresGridPanel", true);
+        clickNavButton("Select", 0);
+        waitForText("Showing 24 Results", WAIT_FOR_JAVASCRIPT);
+
+        // verify the data in the report
+        waitForText("1.Date of Birth", 27, WAIT_FOR_JAVASCRIPT); // 24 mice + 1 Report Measures list + 2 in hidden add measure dialog
+        waitForText("2.What is your sex?", 26, WAIT_FOR_JAVASCRIPT); // 24 mice + 1 Report Measures list + 1 in hidden add measure dialog
+        waitForText("5. Sexual orientation", 26, WAIT_FOR_JAVASCRIPT); // 24 mice + 1 Report Measures list + 1 in hidden add measure dialog
+        assertTextPresentInThisOrder("1965-03-06", "Female", "heterosexual");
+
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT5_NAME);
         clickNavButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
     }
