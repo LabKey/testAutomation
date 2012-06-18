@@ -161,7 +161,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         addWebPart("Assay List");
         clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
-        checkRadioButton("providerName", "Simple");
+        checkRadioButton("providerName", "Noblis Simple");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
