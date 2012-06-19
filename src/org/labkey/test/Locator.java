@@ -395,6 +395,15 @@ public class Locator
             return xpath("//img[@src=" + xq(src) + "]");
     }
 
+    //Locator for image with src=src (if substringMatch=false
+    public static XPathLocator imageWithSrc(String src, boolean substringMatch, int index)
+    {
+        if (substringMatch)
+            return xpath("(//img[contains(@src, " + xq(src) + ")])[" + index + "]");
+        else
+            return xpath("(//img[@src=" + xq(src) + "])[" + index + "]");
+    }
+
     public static XPathLocator imageWithAltText(String altText, boolean substringMatch)
     {
         if (substringMatch)
