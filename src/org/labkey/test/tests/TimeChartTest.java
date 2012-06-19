@@ -326,8 +326,10 @@ public class TimeChartTest extends StudyBaseTest
         sleep(2000);
 
         waitForText(GROUP1_NAME + " CD4");
-        assertTextPresent(GROUP1_NAME + " CD4", 11); // 10 for the mean line chart and 1 for the legend
-        assertTextPresent(GROUP2_NAME + " CD4", 13); // 12 for the mean line chart and 1 for the legend        
+        assertTextPresent(GROUP1_NAME + " CD4", 1); // 10 for the mean line chart and 1 for the legend
+        assertTextPresent(GROUP1_NAME + ",\n Days", 10); // 10 for the mean line chart and 1 for the legend
+        assertTextPresent(GROUP2_NAME + " CD4", 1); // 12 for the mean line chart and 1 for the legend
+        assertTextPresent(GROUP2_NAME + ",\n Days", 12); // 12 for the mean line chart and 1 for the legend
 
         goToGroupingTab();
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
@@ -820,21 +822,28 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 4); // One chart per group + 1 hidden main title text field
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
-        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 11);
-        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 11);
-        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 6);
-        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 6);
+        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 20);
+        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 1);
+        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 1);
+        assertTextPresent(GROUP1_PTIDS[1]+",\n Days:", 10);
         // GROUP2
-        assertTextPresent(GROUP2_PTIDS[0]+" CD4", 8);
-        assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 8);
+        assertTextPresent(GROUP2_PTIDS[0]+" CD4", 1);
+        assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 1);
+        assertTextPresent(GROUP2_PTIDS[0]+",\n Days:", 14);
+
         // Participant in GROUP2 & GROUP3
-        assertTextPresent(GROUP2_PTIDS[1]+" CD4", 6 * 2); // includes GROUP3_PTIDS[0]
-        assertTextPresent(GROUP2_PTIDS[1]+" Lymphocytes", 6 * 2); // includes GROUP3_PTIDS[0] 
+        assertTextPresent(GROUP2_PTIDS[1]+" CD4", 2); // includes GROUP3_PTIDS[0]
+        assertTextPresent(GROUP2_PTIDS[1]+" Lymphocytes", 2); // includes GROUP3_PTIDS[0]
+        assertTextPresent(GROUP2_PTIDS[1]+",\n Days:", 10 * 2);
         // GROUP3
-        assertTextPresent(GROUP3_PTIDS[1]+" CD4", 7);
-        assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 7);
-        assertTextPresent(GROUP3_PTIDS[2]+" CD4", 6);
-        assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 6);
+        assertTextPresent(GROUP3_PTIDS[1]+" CD4", 1);
+        assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 1);
+        assertTextPresent(GROUP3_PTIDS[1]+",\n Days:", 12);
+        assertTextPresent(GROUP3_PTIDS[2]+" CD4", 1);
+        assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 1);
+        assertTextPresent(GROUP3_PTIDS[2]+",\n Days:", 10);
 
         log("Verify one line per measure per participant. 2/3 groups.");
         // uncheck group 2 (leaving group 1 and 3 checked)
@@ -844,21 +853,27 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 3); // One chart per group + 1 hidden main title text field
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
-        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 11);
-        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 11);
-        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 6);
-        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 6);
+        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 20);
+        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 1);
+        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 1);
+        assertTextPresent(GROUP1_PTIDS[1]+",\n Days:", 10);
         // GROUP2 (Deselected)
         assertTextPresent(GROUP2_PTIDS[0]+" CD4", 0);
         assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 0);
+        assertTextPresent(GROUP2_PTIDS[0]+",\n Days:", 0);
         // GROUP2 (Deselected) & GROUP3
-        assertTextPresent(GROUP3_PTIDS[0]+" CD4", 6); // no GROUP2_PTIDS[1]
-        assertTextPresent(GROUP3_PTIDS[0]+" Lymphocytes", 6); // no GROUP2_PTIDS[1]
+        assertTextPresent(GROUP3_PTIDS[0]+" CD4", 1); // no GROUP2_PTIDS[1]
+        assertTextPresent(GROUP3_PTIDS[0]+" Lymphocytes", 1); // no GROUP2_PTIDS[1]
+        assertTextPresent(GROUP3_PTIDS[0]+",\n Days:", 10); // no GROUP2_PTIDS[1]
         // GROUP3
-        assertTextPresent(GROUP3_PTIDS[1]+" CD4", 7);
-        assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 7);
-        assertTextPresent(GROUP3_PTIDS[2]+" CD4", 6);
-        assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 6);
+        assertTextPresent(GROUP3_PTIDS[1]+" CD4", 1);
+        assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 1);
+        assertTextPresent(GROUP3_PTIDS[1]+",\n Days:", 12);
+        assertTextPresent(GROUP3_PTIDS[2]+" CD4", 1);
+        assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 1);
+        assertTextPresent(GROUP3_PTIDS[2]+",\n Days:", 10);
 
         openSaveMenu();
         saveReport(false);
@@ -897,20 +912,26 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 1); // One chart per group.
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
-        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 11);
-        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 11);
+        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 20);
         assertTextPresent(GROUP1_PTIDS[1]+" CD4", 0); // Removed ptid from group
         assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 0); // Removed ptid from group
+        assertTextPresent(GROUP1_PTIDS[1]+",\n Days:", 0); // Removed ptid from group
         // GROUP2 -- Deselected
         assertTextPresent(GROUP2_PTIDS[0]+" CD4", 0);
         assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 0);
+        assertTextPresent(GROUP2_PTIDS[0]+",\n Days:", 0);
         assertTextPresent(GROUP2_PTIDS[1]+" CD4", 0);
         assertTextPresent(GROUP2_PTIDS[1]+" Lymphocytes", 0);
+        assertTextPresent(GROUP2_PTIDS[1]+",\n Days:", 0);
         // GROUP3 -- Deleted group
         assertTextPresent(GROUP3_PTIDS[1]+" CD4", 0);
         assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 0);
+        assertTextPresent(GROUP3_PTIDS[1]+",\n Days:", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" CD4", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 0);
+        assertTextPresent(GROUP3_PTIDS[2]+",\n Days:", 0);
 
         log("Verify one line per measure per participant.");
         // re-select group 2
@@ -920,20 +941,25 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 2); // One chart per group.
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
-        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 11);
-        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 11);
+        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 1);
+        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 20);
         assertTextPresent(GROUP1_PTIDS[1]+" CD4", 0); // Removed ptid from group
         assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 0); // Removed ptid from group
         // GROUP2
-        assertTextPresent(GROUP2_PTIDS[0]+" CD4", 8);
-        assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 8);
-        assertTextPresent(GROUP3_PTIDS[0]+" CD4", 6);
-        assertTextPresent(GROUP3_PTIDS[0]+" Lymphocytes", 6);
+        assertTextPresent(GROUP2_PTIDS[0]+" CD4", 1);
+        assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 1);
+        assertTextPresent(GROUP2_PTIDS[0]+",\n Days:", 14);
+        assertTextPresent(GROUP3_PTIDS[0]+" CD4", 1);
+        assertTextPresent(GROUP3_PTIDS[0]+" Lymphocytes", 1);
+        assertTextPresent(GROUP3_PTIDS[0]+",\n Days:", 10);
         // GROUP3 -- Deleted group
         assertTextPresent(GROUP3_PTIDS[1]+" CD4", 0);
         assertTextPresent(GROUP3_PTIDS[1]+" Lymphocytes", 0);
+        assertTextPresent(GROUP3_PTIDS[1]+",\n Days:", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" CD4", 0);
         assertTextPresent(GROUP3_PTIDS[2]+" Lymphocytes", 0);
+        assertTextPresent(GROUP3_PTIDS[2]+",\n Days:", 0);
 
         // uncheck group 1
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP1_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
