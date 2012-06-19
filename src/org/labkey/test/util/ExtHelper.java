@@ -362,8 +362,7 @@ public class ExtHelper
 
     public static void selectFileBrowserRoot(BaseSeleniumWebTest test)
     {
-        test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        selectFileBrowserItem(test, "/");
     }
 
     public static void waitForImportDataEnabled(BaseSeleniumWebTest test)

@@ -534,8 +534,6 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
     private void startImportIlluminaRun(String file, String importAction)
     {
         clickLinkContainingText("Import Run");
-        sleep(1000);
-        ExtHelper.selectFileBrowserRoot(this);
         ExtHelper.selectFileBrowserItem(this, file);
 
         selectImportDataAction(importAction);
