@@ -706,8 +706,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void closeInfoPage()
     {
-        clickButton("X", 0);
-        waitForElementToDisappear(Locator.button("X"), WAIT_FOR_JAVASCRIPT);
+        clickButton("Close", 0);
+        waitForElementToDisappear(Locator.button("Close"), WAIT_FOR_JAVASCRIPT);
     }
 
 /// CDS App asserts
