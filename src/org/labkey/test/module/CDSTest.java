@@ -158,7 +158,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(TOOLTIP);
 
         waitForText("Current Active Filters", CDS_WAIT);
-        waitForText("Demo Study", 4, CDS_WAIT);
+//        waitForText("Demo Study", 2, CDS_WAIT);
         assertElementNotPresent(Locator.xpath("//div[contains(text(), 'Not Actually CHAVI 001)]"));
         selectCDSGroup("All participants", false);
         waitForText("Not Actually CHAVI 001", CDS_WAIT);
@@ -183,7 +183,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         toggleExplorerBar("1A");
         assertFilterStatusPanel("SF162.LS", "SF162.LS", 6, 1, 1, 1, 20, 12, SearchBy.Antigens);
         toggleExplorerBar("1B");
-        assertFilterStatusPanel("MW965.26", "MW965.26", 6, 1, 1, 1, 20, 6, SearchBy.Antigens);
+        assertFilterStatusPanel("ZM109F.PB4", "ZM109F.PB4", 6, 1, 1, 1, 20, 6, SearchBy.Antigens);
         goToAppHome();
         click(SearchBy.Assays);
         assertFilterStatusPanel("Lab Results", "Lab Results", 23, 3, 5, 0, 0, 29, SearchBy.Assays);
@@ -229,6 +229,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectBars(LABS[1], LABS[2]);
         assertFilterStatusCounts(12, 1, 0, 2, 0);
         clickButton("use as filter", 0);
+        sleep(750);// wait for animation
         clickButton("save group", 0);
         waitForText("Selection and Active Filters");
         waitForText("Selection and Active Filters (12)");
@@ -675,7 +676,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '" + barLabel + "']/.."));
         mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '" + barLabel + "']/..//button"));
         click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
-        waitForElement(Locator.button("X"));
+        waitForElement(Locator.button("Close"));
 /*
         if(!isElementPresent(Locator.css(".savetitle")))
         {
@@ -694,7 +695,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForElement(btnLocator);
         mouseOver(btnLocator);
         click(btnLocator);
-        waitForElement(Locator.button("X"));
+        waitForElement(Locator.button("Close"));
         if(!isElementPresent(Locator.css(titleCss)))
         {
             refresh();
