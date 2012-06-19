@@ -838,6 +838,14 @@ public class ReportTest extends StudyBaseTest
         clickNavButton("Save", 0);
         ExtHelper.waitForExtDialog(this, "Error");
         waitAndClickNavButton("OK", 0);
+        log("assert text prsent in original form");
+        assertTextPresentInThisOrder("Visit", "Visit Date", "Screening");
+        assertTextPresentInThisOrder("3.5", "45", "1.9");
+
+        clickButton("Transpose", 0);
+        log("assert text tranposed");
+        assertTextPresentInThisOrder("Screening",  "2 week Post", "Visit Date");
+        assertTextPresentInThisOrder("3.5", "1.9", "45");
 
         // save the report for real
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT_NAME);
