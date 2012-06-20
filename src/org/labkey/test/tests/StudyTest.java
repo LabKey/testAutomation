@@ -23,6 +23,7 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.util.Arrays;
@@ -737,6 +738,29 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("right deltoid");
         
         verifyDemoCustomizeOptions();
+        verifyDatasetExport();
+    }
+
+    private void verifyDatasetExport()
+    {
+        pushLocation();
+        exportDataRegion("Script", "R");
+        goToAuditLog();
+        selectOptionByText("view", "Query events");
+        waitForPageToLoad();
+
+        DataRegionTable auditTable =  new DataRegionTable("audit", this);
+        String[][] columnAndValues = new String[][] {{"Created By", PasswordUtil.getUsername()},
+                {"Project", PROJECT_NAME}, {"Container", STUDY_NAME}, {"SchemaName", "study"},
+                {"QueryName", "DEM-1: Demographics"}, {"Comment", "Exported to script type r"}};
+        for(String[] columnAndValue : columnAndValues)
+        {
+            log("Checking column: "+ columnAndValue[0]);
+            assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
+        }
+        clickLinkContainingText("details");
+
+        popLocation();
     }
 
     private void verifyDemoCustomizeOptions()

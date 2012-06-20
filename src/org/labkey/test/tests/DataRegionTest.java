@@ -20,6 +20,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
+import org.seleniumhq.jetty7.util.security.Password;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -111,6 +113,29 @@ public class DataRegionTest extends BaseSeleniumWebTest
         dataRegionTest(url, INJECT_CHARS_1);
         if(!getBrowser().startsWith(IE_BROWSER)) //Issue 13174: List name blocked as cross site scripting error
             dataRegionTest(url, INJECT_CHARS_2);
+        exportLoggingTest();
+    }
+
+    private void exportLoggingTest()
+    {
+        exportDataRegion("Script", "R");
+        goToAuditLog();
+        selectOptionByText("view", "Query events");
+        waitForPageToLoad();
+
+        DataRegionTable auditTable =  new DataRegionTable("audit", this);
+        String[][] columnAndValues = new String[][] {{"Created By", PasswordUtil.getUsername()},
+                {"Project", PROJECT_NAME}, {"Container", PROJECT_NAME}, {"SchemaName", "lists"},
+                {"QueryName", LIST_NAME}, {"Comment", "Exported to script type r"}};
+        for(String[] columnAndValue : columnAndValues)
+        {
+            log("Checking column: "+ columnAndValue[0]);
+            assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
+        }
+        clickLinkContainingText("details");
+        assertTextPresent(LIST_NAME);
+
+        //To change body of created methods use File | Settings | File Templates.
     }
 
     private void createList()

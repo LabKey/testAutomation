@@ -793,6 +793,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickAdminMenuItem("Site", "Admin Console");
     }
 
+    public void goToAuditLog()
+    {
+        gotoAdminConsole();
+        clickLinkWithText("audit log");
+    }
+
     public void hideNavigationBar()
     {
         clickAndWait(Locator.xpath("//a/span[text() = 'Admin']"), 0);
@@ -2864,6 +2870,32 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Export", 0);
         ExtHelper.clickSideTab(this, "Text");
         clickNavButton("Export to Text");
+    }
+
+    /**
+     * Use UI to export data region
+     * note that Selenium/Firefox currently can't handle the dialogue that will pop up if you choose anything but script
+     * @param tab   Excel, Text, or Script
+     * @param type the specific radiobutton to choose
+     */
+    protected void exportDataRegion(String tab, String type)
+    {
+        clickNavButton("Export", 0);
+        waitForText("Script");
+        sleep(1500);
+        ExtHelper.clickSideTab(this, tab);
+        if(type!=null)
+        {
+            click(Locator.xpath("//tr[td[contains(text()," +  type + ")]]/td/input"));
+        }
+        if(tab.equals("Script"))
+        {
+            clickButtonContainingText("Create Script", 0);
+        }
+        else
+        {
+            clickButtonContainingText("Export To " + tab, 0);
+        }
     }
 
     protected void exportFolderAsZip()
