@@ -61,6 +61,7 @@ public enum TestSet
         MS2Test.class,
         MS2GZTest.class,
         LibraTest.class,
+        TargetedMSTest.class,
     }),
 
     Daily(600000, new Class[]
