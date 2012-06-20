@@ -147,10 +147,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup("Active filters", true, "Current Active Filters");
         selectCDSGroup("All participants", false);
         click(SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[0], STUDIES[0], 6, 1, 3, 2, 20, 12, SearchBy.Studies);
 
         clickButton("use as filter", 0);
-        waitForTextToDisappear("Not Actually CHAVI 001", CDS_WAIT);
+        waitForTextToDisappear(STUDIES[1], CDS_WAIT);
         assertFilterStatusCounts(6, 1, 3, 2, 20);
         goToAppHome();
 
@@ -158,24 +158,24 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(TOOLTIP);
 
         waitForText("Current Active Filters", CDS_WAIT);
-//        waitForText("Demo Study", 2, CDS_WAIT);
-        assertElementNotPresent(Locator.xpath("//div[contains(text(), 'Not Actually CHAVI 001)]"));
+//        waitForText(STUDIES[0], CDS_WAIT);
+//        assertElementNotPresent(Locator.xpath("//div[contains(text(), '" + STUDIES[1] + "')]"));
         selectCDSGroup("All participants", false);
-        waitForText("Not Actually CHAVI 001", CDS_WAIT);
+        waitForText(STUDIES[1], CDS_WAIT);
         selectCDSGroup("Active filters", true, "Current Active Filters");
         assertTextPresent("This is the set of filters");
         click(SearchBy.Studies);
-        assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[0], STUDIES[0], 6, 1, 3, 2, 20, 12, SearchBy.Studies);
         clickButton("clear filters", 0);
-        waitForText("NotRV144", CDS_WAIT);
+        waitForText(STUDIES[2], CDS_WAIT);
         goToAppHome();
-        waitForText("Not Actually CHAVI 001", CDS_WAIT);
+        waitForText(STUDIES[1], CDS_WAIT);
         // end 14902
 
         click(SearchBy.Studies);
         assertFilterStatusPanel(STUDIES[1], "Not Actually ...", 12, 1, 3, 2, 8, 12, SearchBy.Studies);
         assertTextNotPresent(TOOLTIP);
-        assertFilterStatusPanel(STUDIES[2], "NotRV144", 11, 1, 3, 2, 3, 12, SearchBy.Studies);
+        assertFilterStatusPanel(STUDIES[2], STUDIES[2], 11, 1, 3, 2, 3, 12, SearchBy.Studies);
         goToAppHome();
         click(SearchBy.Antigens);
         toggleExplorerBar("3");
@@ -268,6 +268,35 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         goToAppHome();
         selectCDSGroup("All participants", false);
         assertAllParticipantsPortalPage();
+
+        log("Verify operator filtering");
+        click(SearchBy.Studies);
+        selectBars(STUDIES[0], STUDIES[1]);
+        assertFilterStatusCounts(0, 0, 0, 0, 0);  // and
+        assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='AND']"));
+        mouseOver(Locator.xpath("//div[@class='showopselect' and text()='AND']"));
+        assertFormElementEquals(Locator.xpath("//div[@class='opselect']//select"), "INTERSECT");
+        setFormElement(Locator.xpath("//div[@class='opselect']//select"), "UNION");
+        assertFilterStatusCounts(18, 2, 4, 3, 28); // or
+        clickButton("use as filter", 0);
+        waitForTextToDisappear(STUDIES[2]);
+        assertFilterStatusCounts(18, 2, 4, 3, 28); // or
+        assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='OR']"));
+        assertFormElementEquals(Locator.xpath("//div[@class='opselect']//select"), "UNION");
+        setFormElement(Locator.xpath("//div[@class='opselect']//select"), "INTERSECT");
+        assertFilterStatusCounts(0, 0, 0, 0, 0);  // and
+        assertTextNotPresent(STUDIES[1]);
+        goToAppHome();
+        waitForText("No Matching Studies Found.", CDS_WAIT);
+        click(SearchBy.Labs);
+        waitForText(STUDIES[0], CDS_WAIT);
+        assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='AND']"));
+        assertFilterStatusCounts(0, 0, 0, 0, 0);  // and
+        clickButton("clear filters", 0);
+        waitForText(LABS[2]);
+        assertFilterStatusCounts(29, 3, 5, 3, 31);
+        assertTextPresent("All participants");
+        goToAppHome();
 
         //test more group saving
         selectCDSGroup(GROUP_NAME, true);
