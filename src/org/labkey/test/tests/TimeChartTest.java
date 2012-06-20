@@ -1098,7 +1098,7 @@ public class TimeChartTest extends StudyBaseTest
     private void openSaveMenu()
     {
         clickNavButtonByIndex("Save", 0, 0);
-        waitForText("Save Thumbnail");
+        waitForText("Viewable By");
     }
 
     private void saveReport(boolean expectReload)
