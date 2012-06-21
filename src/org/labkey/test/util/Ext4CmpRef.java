@@ -28,8 +28,8 @@ import java.util.List;
 */
 public class Ext4CmpRef
 {
-    private String _id;
-    private BaseSeleniumWebTest _test;
+    protected String _id;
+    protected BaseSeleniumWebTest _test;
 
     Ext4CmpRef(String id, BaseSeleniumWebTest test)
     {

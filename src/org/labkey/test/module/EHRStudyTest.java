@@ -37,6 +37,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,7 @@ import java.util.regex.Pattern;
 public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
 {
     // Project/folder names are hard-coded into some links in the module.
-    private static final String PROJECT_NAME = "WNPRC";
+    private static final String PROJECT_NAME = "EHR_TestProject";
     private static final String FOLDER_NAME = "EHR";
     private static final String CONTAINER_PATH = PROJECT_NAME + "/" + FOLDER_NAME;
     private static final String STUDY_ZIP = "/sampledata/study/EHR Study Anon.zip";
@@ -202,6 +203,10 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         createProject(PROJECT_NAME);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Collaboration", new String[]{"EHR", "Pipeline", "Study"});
         enableModule(PROJECT_NAME, "EHR");
+
+        String[] prop = {"/", "EHRStudyContainer", "/" + CONTAINER_PATH};
+        setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
+
         clickLinkWithText(FOLDER_NAME);
         beginAt(getBaseURL()+"/ehr/"+PROJECT_NAME+"/"+FOLDER_NAME+"/_initEHR.view");
         clickNavButton("Delete All", 0);

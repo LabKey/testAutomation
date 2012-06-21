@@ -31,6 +31,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4CmpRef;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -67,6 +68,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -2904,6 +2906,43 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickLinkWithText("Export");
         checkRadioButton("location", 1);
 
+    }
+
+    public void setModuleProperties(Map<String, List<String[]>> props)
+    {
+        goToFolderManagement();
+        log("setting module properties");
+        clickLinkWithText("Module Properties");
+        waitForText("Save Changes");
+        boolean changed = false;
+        for (String moduleName : props.keySet())
+        {
+            for (String[] array : props.get(moduleName))
+            {
+                log("setting property: " + array[1] + " for container: " + array[0] + " to value: " + array[2]);
+                String query = "field[moduleName=\"" + moduleName + "\"][containerPath=\"" + array[0] + "\"][propName=\"" + array[1] + "\"]";
+                List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, query);
+                for (Ext4CmpRef ref : headers)
+                {
+                    String val = ref.eval("this.getValue()");
+                    if(val == null || !val.equals(array[2]))
+                    {
+                        changed = true;
+                        ref.eval("this.setValue(\"" + array[2] + "\")");
+                    }
+                }
+            }
+        }
+        if (changed)
+        {
+            clickButton("Save Changes", 0);
+            waitForText("Properties saved");
+            clickButton("OK", 0);
+        }
+        else
+        {
+            log("properties were already set, no changed needed");
+        }
     }
 
     public interface Checker
