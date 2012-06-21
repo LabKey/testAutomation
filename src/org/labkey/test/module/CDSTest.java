@@ -158,8 +158,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(TOOLTIP);
 
         waitForText("Current Active Filters", CDS_WAIT);
-//        waitForText(STUDIES[0], CDS_WAIT);
-//        assertElementNotPresent(Locator.xpath("//div[contains(text(), '" + STUDIES[1] + "')]"));
         selectCDSGroup("All participants", false);
         waitForText(STUDIES[1], CDS_WAIT);
         selectCDSGroup("Active filters", true, "Current Active Filters");
@@ -296,6 +294,26 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForText(LABS[2]);
         assertFilterStatusCounts(29, 3, 5, 3, 31);
         assertTextPresent("All participants");
+        goToAppHome();
+
+        log("Verify selection messaging");
+        click(SearchBy.Assays);
+        selectBars("ADCC-Ferrari", "Luminex-Sample-LabKey");
+        assertFilterStatusCounts(0, 0, 0, 0, 0);
+        pickCDSDimension("Studies");
+        waitForText("Your selection of \"Assay\" was removed.", CDS_WAIT);
+        assertFilterStatusCounts(29, 3, 5, 3, 31);
+        click(Locator.xpath("//a[@id='usefiltermsg']"));
+        waitForTextToDisappear(STUDIES[0], CDS_WAIT);
+        assertFilterStatusCounts(0, 0, 0, 0, 0);
+        clickButton("clear filters", 0);
+        waitForText(STUDIES[2], CDS_WAIT);
+        selectBars(STUDIES[0]);
+        pickCDSDimension("Assays");
+        waitForText("Your selection of \"Study\" was removed.", CDS_WAIT);
+        click(Locator.xpath("//a[@id='ignorefiltermsg']"));
+        waitForTextToDisappear("Your selection of \"Study\" was removed.", CDS_WAIT);
+        assertFilterStatusCounts(29, 3, 5, 3, 31);
         goToAppHome();
 
         //test more group saving
@@ -626,6 +644,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         click(Locator.css(".sortDropdown"));
         waitAndClick(Locator.xpath("//span[text()='"+sortBy+"']"));
+    }
+
+    private void pickCDSDimension(String dimension)
+    {
+        click(Locator.xpath("//div[contains(@class, 'dropdown')]"));
+        waitAndClick(Locator.xpath("//span[text()='" + dimension + "']"));
     }
 
     private void selectBars(String... bars)
