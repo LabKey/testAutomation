@@ -40,6 +40,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_ELISPOT_FILE2 = getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W4.txt";
     protected final String TEST_ASSAY_ELISPOT_FILE3 = getLabKeyRoot() + "/sampledata/Elispot/Zeiss_datafile.txt";
     protected final String TEST_ASSAY_ELISPOT_FILE4 = getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W5.txt";
+    protected final String TEST_ASSAY_ELISPOT_FILE5 = getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W8.txt";
 
     private static final String PLATE_TEMPLATE_NAME = "ElispotAssayTest Template";
 
@@ -80,14 +81,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         addWebPart("Assay List");
 
         //create a new elispot template
-        clickNavButton("Manage Assays");
-        clickNavButton("Configure Plate Templates");
-        clickLinkWithText("new 96 well (8x12) ELISpot default template");
-        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
-
-        setText("templateName", PLATE_TEMPLATE_NAME);
-        clickNavButton("Save & Close");
-        assertTextPresent(PLATE_TEMPLATE_NAME);
+        createTemplate();
 
         //create a new elispot assay
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
@@ -134,10 +128,18 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         assertElispotData();
         runTransformTest();
+        doBackgroundSubtractionTest();
     }
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation)
     {
+        uploadFile(filePath, uniqueifier, finalButton, testPrepopulation, false);
+    }
+    
+    private void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground)
+    {
+        if(subtractBackground)
+            checkCheckbox("subtractBackground");
         for (int i = 0; i < 4; i++)
         {
             Locator specimenLocator = Locator.raw("specimen" + (i + 1) + "_ParticipantID");
@@ -303,6 +305,43 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         return Locator.xpath(xpath);
     }
 
+    protected void createTemplate()
+    {
+        clickNavButton("Manage Assays");
+        clickNavButton("Configure Plate Templates");
+        clickLinkWithText("new 96 well (8x12) ELISpot default template");
+        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
+
+        setText("templateName", PLATE_TEMPLATE_NAME);
+        waitAndClick(Locator.css(".gwt-Label:contains('CONTROL')"));
+
+        clickAt(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"), "1,1");
+        waitForElement(Locator.css(".x-combo-list-item:contains('" + "Background Wells" + "')"));
+        mouseDown(Locator.css(".x-combo-list-item:contains('" + "Background Wells" + "')"));
+        clickButton("Create", 0);
+        waitForElement(Locator.tagWithText("label", "Background Wells"));
+
+        //Todo: 15228: Creating multiple background well groups fails silently
+//        clickAt(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"), "1,1");
+//        waitForElement(Locator.css(".x-combo-list-item:contains('" + "Background Wells" + "')"));
+//        clickAt(Locator.css(".x-combo-list-item:contains('" + "Background Wells" + "')"), "1,1");
+//        mouseDown(Locator.xpath("/html/body"));
+//        clickButton("Create");
+        //Todo: verify error from multiple background wells.
+
+        highlightWells("CONTROL", "Background Wells", "A1", "B3");
+        highlightWells("CONTROL", "Background Wells", "C4", "D6");
+        highlightWells("CONTROL", "Background Wells", "E7", "F9");
+        highlightWells("CONTROL", "Background Wells", "G10", "H12");
+
+        Locator groupField = Locator.xpath("//input[../div[contains(@class, 'x-form-trigger-arrow')]]");
+        setFormElement(groupField, "other control group");
+        pressTab(groupField.toString());
+        clickButton("Create", 0);
+        clickNavButton("Save & Close");
+        assertTextPresent(PLATE_TEMPLATE_NAME);
+    }
+
     /**
      * Cleanup entry point.
      */
@@ -345,5 +384,137 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertTextPresent("747.7");
         assertTextPresent("Custom Elispot Column");
         assertTextPresent("transformed!");
+    }
+
+    protected void doBackgroundSubtractionTest()
+    {
+        removeTransformScript();
+        verifyBackgroundSubtractionOnExistingRun();
+        verifyBackgroundSubtractionOnNewRun();
+    }
+
+    // Unable to apply background substitution to runs imported with a transform script.
+    protected void removeTransformScript()
+    {
+        clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        click(Locator.linkWithText("manage assay design"));
+        clickLinkWithText("edit assay design");
+        waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
+        selenium.mouseClick(Locator.css("#partdelete_removeTransformScript0 img").toString());
+        clickNavButton("Save & Close");
+    }
+
+    private final static String FILE4_PLATE_SUMMARY_POST_SUBTRACTION =
+            "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n\n" +
+            "A\n1.0\n0.0\n0.0\n0.0\n1.0\n0.0\n0.0\n4.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "B\n0.0\n1.0\n0.0\n0.0\n0.0\n0.0\n0.0\n6.0\n1.0\n2.0\n0.0\n0.0\n\n" +
+            "C\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n20.0\n243.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "D\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n21.0\n264.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "E\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n277.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "F\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n3.0\n277.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "G\n6.0\n5.0\n7.0\n8.0\n4.0\n5.0\n38.0\n709.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "H\n14.0\n6.0\n6.0\n4.0\n17.0\n11.0\n49.0\n731.0\n0.0\n0.0\n0.0\n0.0";
+    protected void verifyBackgroundSubtractionOnExistingRun()
+    {
+        clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        assertTextPresent("Background Subtraction");
+        DataRegionTable runTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" Runs", this, true, true);
+        List<String> column = runTable.getColumnDataAsText("Background Subtraction");
+        for(String item : column)
+        {
+            assertEquals("Background subtraction should be disabled by default.", "false", item);
+        }
+
+        runTable.checkAllOnPage();
+        clickNavButton("Subtract Background");
+
+        waitForTextWithRefresh("COMPLETE", WAIT_FOR_PAGE);
+
+        // Check well counts for TEST_ASSAY_ELISPOT_FILE4
+        clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickLinkWithText("run details");
+        waitForElement(Locator.css("#plate-summary-div-1 table"));
+        assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
+
+        // Check that all runs have been subtracted
+        clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        column = runTable.getColumnDataAsText("Background Subtraction");
+        for(String item : column)
+        {
+            assertEquals("Background subtraction should be true for all runs.", "true", item);
+        }
+    }
+
+    private final static String FILE5_PLATE_SUMMARY_POST_SUBTRACTION =
+            "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n\n" +
+            "A\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n8.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "B\n0.0\n0.0\n0.0\n1.0\n1.0\n0.0\n0.0\n3.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "C\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n14.0\n149.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "D\n0.0\n2.0\n0.0\n0.0\n0.0\n0.0\n19.0\n195.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "E\n0.5\n0.0\n0.0\n0.5\n8.5\n0.0\n1.5\n234.5\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "F\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n266.5\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "G\n15.0\n11.0\n12.0\n12.0\n9.0\n7.0\n61.0\n680.0\n0.0\n0.0\n0.0\n0.0\n\n" +
+            "H\n6.0\n4.0\n11.0\n20.0\n26.0\n12.0\n46.0\n576.0\n0.0\n0.0\n0.0\n0.0";
+    protected void verifyBackgroundSubtractionOnNewRun()
+    {
+        clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickNavButton("Import Data");
+        clickNavButton("Next");
+
+        selectOptionByText("plateReader", "AID");
+        uploadFile(TEST_ASSAY_ELISPOT_FILE5, "E", "Save and Finish", false, true);
+        DataRegionTable runTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" Runs", this, true, true);
+        assertTextPresent("AID_0161456 W8.txt");
+        List<String> column = runTable.getColumnDataAsText("Background Subtraction");
+        for(String item : column)
+        {
+            assertEquals("Background subtraction should be true for all runs.", "true", item);
+        }
+
+        clickLinkWithText("run details");
+        waitForElement(Locator.css("#plate-summary-div-1 table"));
+        assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
+
+        DataRegionTable detailsTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" AntigenStats", this, true, true);
+        column = detailsTable.getColumnDataAsText("Background Value");
+        String[] expectedColumn = {"0.0","0.0","9.5","0.0"};
+        for(int i = 0; i < 4; i++)
+        {
+            assertEquals("Incorrect background value for " + detailsTable.getDataAsText(i, "Participant ID"), expectedColumn[i], column.get(i));
+        }
+    }
+
+    protected void highlightWell(String type, String group, String cell)
+    {
+        highlightWells(type, group, cell, cell);
+    }
+
+    protected void highlightWells(String type, String group, String startCell, String endCell)
+    {
+        Locator start = Locator.css(".Cell-"+startCell);
+        Locator end = Locator.css(".Cell-"+endCell);
+        if(group != null & !"".equals(group))
+        {
+            if(!getText(Locator.css(".gwt-TabBarItem-selected")).equals(type))
+            {
+                click(Locator.css(".gwt-Label:contains('"+type+"')"));
+                //want for switch
+            }
+            if(!isChecked(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]")))
+                click(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]"));
+            if(!getAttribute(start, "style").contains("rgb(255, 255, 255)"))
+                click(start);
+        }
+        else
+        {
+            click(Locator.css(".gwt-Label:contains('"+type+"')"));
+            //select no group in order to clear area
+        }
+        dragAndDrop(start, end);
     }
 }
