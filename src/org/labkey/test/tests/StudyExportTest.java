@@ -100,6 +100,7 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (xml formats)");
         clickNavButton("Import Study");
         clickNavButton("Import Study Using Pipeline");
+        ExtHelper.selectFileBrowserRoot(this);//TODO: Bad cookie. Marker class won't appear without this step.
         ExtHelper.selectFileBrowserItem(this, "export/");
         ExtHelper.selectAllFileBrowserFiles(this);
 
