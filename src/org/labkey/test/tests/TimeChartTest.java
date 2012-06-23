@@ -326,10 +326,10 @@ public class TimeChartTest extends StudyBaseTest
         sleep(2000);
 
         waitForText(GROUP1_NAME + " CD4");
-        assertTextPresent(GROUP1_NAME + " CD4", 1); // 10 for the mean line chart and 1 for the legend
-        assertTextPresent(GROUP1_NAME + ",\n Days", 10); // 10 for the mean line chart and 1 for the legend
-        assertTextPresent(GROUP2_NAME + " CD4", 1); // 12 for the mean line chart and 1 for the legend
-        assertTextPresent(GROUP2_NAME + ",\n Days", 12); // 12 for the mean line chart and 1 for the legend
+        assertTextPresent(GROUP1_NAME + " CD4", 2); // 1 time in chart legend + 1 time in the thumbnail preview on the save dialog
+        assertTextPresent(GROUP1_NAME + ",\n Days", 20); // 10 in the chart + 10 in the thumbnail preview on the save dialog
+        assertTextPresent(GROUP2_NAME + " CD4", 1);
+        assertTextPresent(GROUP2_NAME + ",\n Days", 12);
 
         goToGroupingTab();
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
@@ -370,12 +370,12 @@ public class TimeChartTest extends StudyBaseTest
         setChartTitle(CHART_TITLE);
         apply();
         waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 5);
+        assertTextPresent(CHART_TITLE, 6); // 5 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
 
         // re-select participant
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '249320127')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText(CHART_TITLE + ": 249320127", WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(CHART_TITLE, 6);
+        assertTextPresent(CHART_TITLE, 7); // 6 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
     }
 
     private void createChartTest()
@@ -480,7 +480,7 @@ public class TimeChartTest extends StudyBaseTest
         ExtHelper.setExtFormElementByLabel(this, "Report Description:", REPORT_DESCRIPTION);
         saveReport(true);
         waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 6);
+        assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
 
         clickNavButton("Save As", 0);
         waitForText("Report Name");
@@ -489,7 +489,7 @@ public class TimeChartTest extends StudyBaseTest
         Ext4Helper.selectRadioButton(this, "Viewable By:", "Only me");
         saveReport(true);
         waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 6);
+        assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
 
         log("Verify saved report");
         clickTab("Manage");
@@ -501,7 +501,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(REPORT_DESCRIPTION);
         clickAndWait(Locator.xpath("//a[text()='view' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
         waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(CHART_TITLE, 6);
+        assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
         pushLocation();
         pushLocation();
     }
@@ -664,13 +664,13 @@ public class TimeChartTest extends StudyBaseTest
         setChartTitle(CHART_TITLE);
         apply();
         waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 2);
+        assertTextPresent(CHART_TITLE, 3); // 2 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
         
         openSaveMenu();
         ExtHelper.setExtFormElementByLabel(this, "Report Name:", REPORT_NAME_3);
         saveReport(true);
         waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 2);
+        assertTextPresent(CHART_TITLE, 2); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
 
         clickLinkWithText(FOLDER_NAME);
         goToManageViews();
@@ -819,15 +819,15 @@ public class TimeChartTest extends StudyBaseTest
         
         log("Verify one line per measure per participant. All groups.");
         waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 4); // One chart per group + 1 hidden main title text field
+        assertTextPresent(CHART_TITLE, 5); // One chart per group + 1 hidden main title text field + 1 for chart title in thumbnail preview on save dialog
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
-        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 1);
-        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 1);
-        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 20);
-        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 1);
-        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 1);
-        assertTextPresent(GROUP1_PTIDS[1]+",\n Days:", 10);
+        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 40); // 20 in the first group chart + 20 in the thumbnail preview on the save dialog
+        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[1]+",\n Days:", 20); // 10 in the first group chart + 10 in the thumbnail preview on the save dialog
         // GROUP2
         assertTextPresent(GROUP2_PTIDS[0]+" CD4", 1);
         assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 1);
@@ -850,15 +850,15 @@ public class TimeChartTest extends StudyBaseTest
         mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP2_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
         waitForText(CHART_TITLE);
-        assertTextPresent(CHART_TITLE, 3); // One chart per group + 1 hidden main title text field
+        assertTextPresent(CHART_TITLE, 4); // One chart per group + 1 hidden main title text field + 1 for chart title in thumbnail preview on save dialog
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
-        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 1);
-        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 1);
-        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 20);
-        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 1);
-        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 1);
-        assertTextPresent(GROUP1_PTIDS[1]+",\n Days:", 10);
+        assertTextPresent(GROUP1_PTIDS[0]+" CD4", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[0]+" Lymphocytes", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[0]+",\n Days:", 40); // 20 in the first group chart + 20 in the thumbnail preview on the save dialog
+        assertTextPresent(GROUP1_PTIDS[1]+" CD4", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[1]+" Lymphocytes", 2); // one in the first group chart + 1 in legend of thumbnail preview on save dialog
+        assertTextPresent(GROUP1_PTIDS[1]+",\n Days:", 20); // 10 in the first group chart + 10 in the thumbnail preview on the save dialog
         // GROUP2 (Deselected)
         assertTextPresent(GROUP2_PTIDS[0]+" CD4", 0);
         assertTextPresent(GROUP2_PTIDS[0]+" Lymphocytes", 0);
