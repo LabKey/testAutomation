@@ -85,6 +85,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         importCDSData("Studies", new File(getSampledataPath(), "CDS/studies.tsv"));
         importCDSData("Labs", new File(getSampledataPath(), "CDS/labs.tsv"));
         importCDSData("People", new File(getSampledataPath(), "CDS/people.tsv"));
+        importCDSData("Citable", new File(getSampledataPath(), "CDS/citable.tsv"));
+        importCDSData("Citations", new File(getSampledataPath(), "CDS/citations.tsv"));
         importCDSData("AssayPublications", new File(getSampledataPath(), "CDS/assay_publications.tsv"));
 
         populateFactTable();
@@ -455,8 +457,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         log("Filter on a looked-up column");
         waitForElement(Locator.tagWithText("span", "PI1"));
-        waitForElement(Locator.tagWithText("div", "marki@labkey.com"));
-        setRawDataFilter("PI1", "mark");
+        waitForElement(Locator.tagWithText("div", "Igra M"));
+        setRawDataFilter("PI1", "Igra");
         waitForGridCount(152);
 
         log("Ensure filtering goes away when column does");
