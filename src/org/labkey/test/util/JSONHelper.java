@@ -75,6 +75,11 @@ public class JSONHelper
         JSONObject expectedJSON = (JSONObject)JSONValue.parse(expected);
         JSONObject actualJSON = (JSONObject)JSONValue.parse(actual);
 
+        if(actualJSON == null)
+        {
+            _test.fail("Unable to parse response:\n"+actual);
+        }
+
         if (compareElement(expectedJSON, actualJSON))
         {
             _test.log("matched json");
