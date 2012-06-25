@@ -571,7 +571,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertSignOutAndMyAccountPresent()
     {
-        assertElementPresent(Locator.id("userMenuPopupLink"));
         click(Locator.id("userMenuPopupLink"));
         assertTextNotPresent("Sign In");
 //        assertTextPresent("My Account");
@@ -1111,8 +1110,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void startSystemMaintenance()
     {
-        gotoAdminConsole();
-        clickLinkWithText("site settings");
+        if(!isElementPresent(Locator.linkWithText("Run system maintenance now")))
+        {
+            gotoAdminConsole();
+            clickLinkWithText("site settings");
+        }
         selenium.openWindow("", "systemMaintenance");
         clickLinkWithText("Run system maintenance now", false);
         smStart = System.currentTimeMillis();
@@ -2368,8 +2370,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             deleteProject(project);
         }
-
-
     }
 
     public void deleteProject(String project, int wait)
@@ -3217,13 +3217,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertFormElementEquals(Locator loc, String value)
     {
-        assertElementPresent(loc);
         assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
     public void assertFormElementNotEquals(Locator loc, String value)
     {
-        assertElementPresent(loc);
         assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
@@ -3246,7 +3244,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertOptionEquals(Locator loc, String value)
     {
-        assertElementPresent(loc);
         assertEquals("Option '" + loc + "' was not equal '" + value + "'", selenium.getSelectedLabel(loc.toString()), value);
     }
 
@@ -3359,7 +3356,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     /** Find a link with the exact text specified, click it, and wait for the page to load */
     public void clickLinkWithText(String text)
     {
-        assertLinkPresentWithText(text);
         clickLinkWithText(text, true);
     }
 
@@ -3367,7 +3363,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickLinkWithText(String text, int index)
     {
         Locator l = Locator.linkWithText(text, index);
-        assertElementPresent(l);
         clickAndWait(l, defaultWaitForPage);
     }
 
@@ -3394,7 +3389,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else
             l = Locator.linkWithText(text);
 
-        assertElementPresent(l);
         clickAndWait(l, millis);
     }
 
@@ -3602,7 +3596,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clickTab(String tabname)
     {
         log("Selecting tab " + tabname);
-        assertLinkPresent(getTabLinkId(tabname));
         clickLink(getTabLinkId(tabname));
     }
 
@@ -3745,8 +3738,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public int getColumnIndex(String tableName, String columnTitle)
     {
-        assertElementPresent(Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']"));
         int col = selenium.getXpathCount("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").intValue();
+        if(col == 0)
+            fail("Column '" + columnTitle + "' not found in table '" + tableName + "'");
 
         return col;
     }
@@ -6497,7 +6491,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         pushLocation();
         ensureAdminMode();
         goToAdmin();
-        assertElementPresent(Locator.id("databaseProductName"));
 
         DatabaseInfo info = new DatabaseInfo();
         info.serverURL = getText(Locator.id("databaseServerURL"));
