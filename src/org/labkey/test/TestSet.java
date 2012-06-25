@@ -131,7 +131,7 @@ public enum TestSet
         FolderTest.class,
         StudyDemoModeTest.class,
         LibraTest.class,
-        StudyReloadTest.class,
+//        StudyReloadTest.class,
         AncillaryStudyTest.class,
         FolderExportTest.class,
         GenotypingTest.class,
