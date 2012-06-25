@@ -565,7 +565,8 @@ public class ListTest extends BaseSeleniumWebTest
         clickAndWait(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/..//a[text()='view data']"));
         clickNavButton("Export", 0);
         ExtHelper.clickSideTab(this, "Text");
-        String exportUrl = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "href");
+        String exportButtonScript = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "onclick");
+        String exportUrl = exportButtonScript.substring(exportButtonScript.indexOf("window.location=") + 17, exportButtonScript.indexOf("document.getElementById") - 11);
         clickLinkWithText("View Design");
 
         log("Test deleting data");
