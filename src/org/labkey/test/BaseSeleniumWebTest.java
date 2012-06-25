@@ -28,14 +28,15 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.util.ComponentQuery;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.Ext4CmpRef;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -66,6 +67,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -2920,16 +2922,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             for (String[] array : props.get(moduleName))
             {
                 log("setting property: " + array[1] + " for container: " + array[0] + " to value: " + array[2]);
-                String query = "field[moduleName=\"" + moduleName + "\"][containerPath=\"" + array[0] + "\"][propName=\"" + array[1] + "\"]";
-                List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, query);
-                for (Ext4CmpRef ref : headers)
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("moduleName", moduleName);
+                map.put("containerPath", array[0]);
+                map.put("propName", array[1]);
+                String query = ComponentQuery.fromAttributes("field", map);
+                Ext4FieldRef ref = Ext4Helper.queryOne(this, query, Ext4FieldRef.class);
+                String val = ref.getValue();
+                if(StringUtils.isEmpty(val) || !val.equals(array[2]))
                 {
-                    String val = ref.eval("this.getValue()");
-                    if(val == null || !val.equals(array[2]))
-                    {
-                        changed = true;
-                        ref.eval("this.setValue(\"" + array[2] + "\")");
-                    }
+                    changed = true;
+                    ref.setValue(array[2]);
                 }
             }
         }

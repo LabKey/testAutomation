@@ -204,6 +204,10 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Collaboration", new String[]{"EHR", "Pipeline", "Study"});
         enableModule(PROJECT_NAME, "EHR");
 
+        //set dummy values first, to test the admin UI
+        String[] dummyProps = {"/", "EHRStudyContainer", "/fakeContainer"};
+        setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(dummyProps)));
+
         String[] prop = {"/", "EHRStudyContainer", "/" + CONTAINER_PATH};
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
 

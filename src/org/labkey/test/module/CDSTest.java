@@ -17,7 +17,7 @@ package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -501,7 +501,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void openFilterPanel (String colHeader)
     {
-        List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, "#raw-data-view grid gridcolumn");
+        List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, "#raw-data-view grid gridcolumn", Ext4CmpRef.class);
         for (Ext4CmpRef ref : headers)
         {
             String colNameStr = ref.eval("this.text");

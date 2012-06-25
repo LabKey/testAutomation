@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.util;
+package org.labkey.test.util.ext4cmp;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.util.Ext4Helper;
 
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class Ext4CmpRef
     public List<Ext4CmpRef> query(String selector)
     {
         String res = _test.getWrapper().getEval("selenium.ext4ComponentQuery('" + selector + "', '" + _id + "')");
-        return Ext4Helper.componentsFromJson(_test, res);
+        return Ext4Helper.componentsFromJson(_test, res, Ext4CmpRef.class);
     }
 
     public String eval(String expr)

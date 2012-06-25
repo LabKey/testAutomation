@@ -19,7 +19,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,33 +95,55 @@ public class Ext4Helper
         test.click(l);
     }
 
-    public static List<Ext4CmpRef> componentQuery(BaseSeleniumWebTest test, String componentSelector)
+    public static <Type extends Ext4CmpRef> List<Type> componentQuery(BaseSeleniumWebTest test, String componentSelector, Class<Type> clazz)
     {
         String res = test.getWrapper().getEval("selenium.ext4ComponentQuery('" + componentSelector + "')");
-        return componentsFromJson(test, res);
+        return componentsFromJson(test, res, clazz);
     }
 
-    public static Ext4CmpRef queryOne(BaseSeleniumWebTest test, String componentSelector)
+    public static <Type extends Ext4CmpRef> Type queryOne(BaseSeleniumWebTest test, String componentSelector, Class<Type> clazz)
     {
-        List<Ext4CmpRef> cmpRefs = componentQuery(test, componentSelector);
+        List<Type> cmpRefs = componentQuery(test, componentSelector, clazz);
         if (null == cmpRefs || cmpRefs.size() == 0)
             return null;
 
         return cmpRefs.get(0);
     }
 
-    static List<Ext4CmpRef> componentsFromJson(BaseSeleniumWebTest test, String jsonArrayStr)
+    public static <Type extends Ext4CmpRef> List<Type> componentsFromJson(BaseSeleniumWebTest test, String jsonArrayStr, Class<Type> clazz)
     {
         if (null == jsonArrayStr || "null".equals(jsonArrayStr))
             return null;
 
-        JSONArray array = (JSONArray) JSONValue.parse(jsonArrayStr);
-        List<Ext4CmpRef> ret = new ArrayList<Ext4CmpRef>(array.size());
-        for (Object o : array)
-            ret.add(new Ext4CmpRef(o.toString(), test));
-
-        return ret;
-
+        try
+        {
+            JSONArray array = (JSONArray) JSONValue.parse(jsonArrayStr);
+            List<Type> ret = new ArrayList<Type>(array.size());
+            for (Object o : array)
+            {
+                //ret.add(new Ext4CmpRef(o.toString(), test));
+                //how to create new instance of class using the above args?
+                Constructor<Type> constructor = clazz.getConstructor(String.class, BaseSeleniumWebTest.class);
+                ret.add(constructor.newInstance(o.toString(), test));
+            }
+            return ret;
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (InstantiationException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public static class Ext4SelectorChecker implements BaseSeleniumWebTest.Checker
@@ -135,7 +160,7 @@ public class Ext4Helper
         @Override
         public boolean check()
         {
-            return queryOne(_test, _selector) != null;
+            return queryOne(_test, _selector, Ext4CmpRef.class) != null;
         }
     }
 
