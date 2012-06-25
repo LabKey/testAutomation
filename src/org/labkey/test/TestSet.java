@@ -143,6 +143,7 @@ public enum TestSet
         CDSTest.class,
         ExtraKeyStudyTest.class,
         CAVDStudyTest.class,
+        SampleMindedImportTest.class,
     }),
 
     MiniTest(new Class[]
@@ -228,7 +229,8 @@ public enum TestSet
         SCHARPStudyTest.class,
         AncillaryStudyTest.class,
         CAVDStudyTest.class,
-        ExtraKeyStudyTest.class
+        ExtraKeyStudyTest.class,
+        SampleMindedImportTest.class
     }),
 
     Assays(new Class[] {
