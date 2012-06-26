@@ -61,7 +61,7 @@ public class DumbsterModule extends DefaultModule
         return false;
     }
 
-    public void startup(ModuleContext moduleContext)
+    public void doStartup(ModuleContext moduleContext)
     {
         if (AppProps.getInstance().isMailRecorderEnabled())
             DumbsterManager.get().start();
