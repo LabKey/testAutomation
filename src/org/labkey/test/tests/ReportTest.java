@@ -24,6 +24,8 @@ import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 import java.security.PrivateKey;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: klum
@@ -794,8 +796,8 @@ public class ReportTest extends StudyBaseTest
     private static final String PARTICIPANT_REPORT2_DESCRIPTION = "Another participant report created by ReportTest";
     private static final String ADD_MEASURE_TITLE = "Add Measure";
     private static final String PARTICIPANT_REPORT3_NAME = "Group Filter Report";
-    private static final String PARTICIPANT_GROUP_ONE = "TEST GROUP 1";
-    private static final String PARTICIPANT_GROUP_TWO = "TEST GROUP 2";
+    private static final String PARTICIPANT_GROUP_ONE = "TEST_GROUP_1";
+    private static final String PARTICIPANT_GROUP_TWO = "TEST_GROUP_2";
     private static final String[] PTIDS_ONE = {"999320016", "999320485", "999320518", "999320529", "999320533", "999320541",
                                                "999320557", "999320565", "999320576", "999320582", "999320590", "999320609"};
     private static final String[] PTIDS_TWO = {"999320613", "999320624", "999320638", "999320646", "999320652", "999320660",
@@ -993,9 +995,19 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 12 Results");
 
         //Check if all PTIDs of GROUP 1 are visible.
+        List<String> ptid_list2 = Arrays.asList(PTIDS_TWO);
         for(String ptid : PTIDS_ONE)
         {
             assertTextPresent(ptid);
+
+            String base = "//td//a[text()='" + ptid + "']/../../..//td[contains(text(), 'Groups:')]/following-sibling::td[contains(text(), '";
+            assertTrue(isElementPresent(Locator.xpath(base + PARTICIPANT_GROUP_ONE + "')]")));
+
+            if (ptid_list2.contains(ptid))
+            {
+                assertTrue(isElementPresent(Locator.xpath(base + PARTICIPANT_GROUP_TWO + "')]")));
+            }
+
         }
 
         //Mouse down GROUP 2
