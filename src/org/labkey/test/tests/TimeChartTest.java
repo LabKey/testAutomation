@@ -62,6 +62,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String[] VISIT_STRINGS = {"Int. Vis. %{S.1.1} .%{S.2.1}", "Grp1:F/U/Grp2:V#2", "6 week Post-V#2", "3 wk Post-V#2/V#3"};
 
     private static final String USER1 = "user1@timechart.test";
+    private static final String USER2 = "user2@timechart.test";
 
     private static final String WIKIPAGE_NAME = "VisualizationGetDataAPITest";
     private static final String[] GETDATA_API_TEST_TITLES = {
@@ -266,6 +267,8 @@ public class TimeChartTest extends StudyBaseTest
         saveTest();
 
         timeChartPermissionsTest();
+
+        pointClickFunctionTest();
 
         multiMeasureTimeChartTest();
 
@@ -1062,6 +1065,83 @@ public class TimeChartTest extends StudyBaseTest
         simpleSignIn();
     }
 
+    private void pointClickFunctionTest()
+    {
+        log("Check Time Chart Point Click Function (Developer Only)");
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        clickTab("Manage");
+        waitForText("Manage Views", WAIT_FOR_JAVASCRIPT);
+        clickLinkWithText("Manage Views");
+        waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
+        click(Locator.tagWithText("div", REPORT_NAME_1));
+        clickAndWait(Locator.xpath("//a[text()='view' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
+        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        // change to the data points are visible again
+        setAxisValue("Left", "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
+        setAxisValue("X", "xaxis_range_automatic", null, null, null, null, null, null, null);
+        waitForText("249318596,\n Days", 20, WAIT_FOR_JAVASCRIPT); // 10 in first ptid chart and 10 in save dialog thumbnail preview
+        // open the developer panel and verify that it is disabled by default
+        assertElementPresent(Locator.button("Developer"));
+        goToDeveloperTab();
+        assertElementPresent(Locator.button("Enable"));
+        assertElementNotPresent(Locator.button("Disable"));
+        // enable the feature and verify that you can switch tabs
+        clickNavButton("Enable", 0);
+        Ext4Helper.clickTabContainingText(this, "Help");
+        assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
+        Ext4Helper.clickTabContainingText(this, "Source");
+        assertTextPresent("function (data, columnMap, measureInfo, clickEvent) {");
+        // apply the default point click function
+        apply();
+        // TODO: can we test clicking on a point?
+//        clickAt(Locator.xpath("//a/circle"), "1,1");
+//        ExtHelper.waitForExtDialog(this, "Data Point Information");
+//        click(Locator.xpath("//circle"));
+//        clickAt(Locator.xpath("//circle"), "1,1");
+        // open developer panel and test JS function validation
+        goToDeveloperTab();
+        setFormElement("point-click-fn-textarea", "");
+        apply();
+        assertTextPresent("Error: the value provided does not begin with a function declaration.");
+        setFormElement("point-click-fn-textarea", "function(){");
+        apply();
+        assertTextPresent("Error parsing the function:");
+        clickNavButton("Disable", 0);
+        waitForText("Disabling this feature will delete any code that you have provided.");
+        clickNavButton("Yes", 0);
+        assertTextNotPresent("Error");
+        clickNavButton("Enable", 0);
+        // test use-case to navigate to participang page on click
+        setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
+        apply();
+        openSaveMenu();
+        saveReport(false);
+        // TODO: how do we test clicking on a data point?
+//        waitForText("Participant - 249318596");
+
+        // verify that only developers can see the button to add point click function
+        pushLocation();
+        pushLocation();
+        createUser(USER2, null);
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        setUserPermissions(USER2, "Editor");
+        // USER2 is not yet a developer, so shouldn't have permissions to this feature
+        impersonate(USER2);
+        popLocation();
+        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        assertElementNotPresent(Locator.button("Developer"));
+        stopImpersonating();
+        // give USER2 developer perms and try again
+        createSiteDeveloper(USER2);
+        impersonate(USER2);
+        popLocation();
+        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.button("Developer"));
+        stopImpersonating();
+    }
+
     // Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
     private void stdDevRegressionTest()
     {
@@ -1085,6 +1165,7 @@ public class TimeChartTest extends StudyBaseTest
     public void doCleanup()
     {
         try {deleteUser(USER1);} catch (Throwable T) {}
+        try {deleteUser(USER2);} catch (Throwable T) {}
         try {deleteProject(PROJECT_NAME);} catch (Throwable T) {}
     }
 
@@ -1133,6 +1214,12 @@ public class TimeChartTest extends StudyBaseTest
     private void goToAxisTab(String axisName)
     {
         getWrapper().getEval("window.showTimeChartAxisPanel('" + axisName + "');");
+        waitForElement(Locator.button("Apply"));
+    }
+
+    private void goToDeveloperTab()
+    {
+        clickNavButton("Developer", 0);
         waitForElement(Locator.button("Apply"));
     }
 
