@@ -64,8 +64,9 @@ public class QuantitationTest extends AbstractXTandemTest
         setFormElement("configureXml", LIBRA_INPUT_XML);
         submit();
         log("View the analysis log.");
+        // Search is submitted as AJAX, and upon success the browser is redirected to a new page. Wait for it to load
+        waitForPageToLoad();
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
-
         clickLinkWithText("Data Pipeline");
 
         String runDescription = SAMPLE_BASE_NAME + " (" + LIBRA_PROTOCOL_NAME + ")";
