@@ -80,7 +80,7 @@ public class SearchTest extends StudyTest
         SearchHelper.deleteIndex(this);
         addSearchableStudy(); // Must come first;  Creates project.
         addSearchableContainers();
-        addSearchableList();
+        //addSearchableList();   // TODO: Default setting has changed to no indexing, so disable. Will re-enable when new list indexing test is written.
         //addSearchableReports(); // Reports not currently indexed.
         addSearchableWiki();
         addSearchableIssues();
