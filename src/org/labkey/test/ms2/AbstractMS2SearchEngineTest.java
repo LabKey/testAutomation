@@ -109,9 +109,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("Quantitation mass tolerance", "Quantitation residue mass label");
         setFormElement("minPeptideProphetProb", "0");
         clickButton("Search");
-        log("View the analysis log.");
+        waitForPageToLoad();
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
-
+        log("View the analysis log.");
         clickLinkWithText("Data Pipeline");
 
         waitForPipelineJobsToComplete(1, SAMPLE_BASE_NAME + " (test2)", false);
