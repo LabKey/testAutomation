@@ -23,6 +23,7 @@ import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
+import java.security.PrivateKey;
 
 /**
  * User: klum
@@ -136,10 +137,32 @@ public class ReportTest extends StudyBaseTest
         doAttachmentReportTest();
         doLinkReportTest();
         doParticipantReportTest();
+        doThumbnailChangeTest();
 
         // additional report and security tests
         setupDatasetSecurity();
         doReportSecurity();
+    }
+
+    private void doThumbnailChangeTest()
+    {
+        clickTab("Clinical and Assay Data");
+        clickWebpartMenuItem("Data Views", false, "Customize");
+        openFirstRReport();
+
+        //set change thumbnail
+        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
+        //save
+        clickNavButtonByIndex("Save", 1, 0);
+
+        //no way to verify, unfortunately
+    }
+
+    private void openFirstRReport()
+    {
+        Locator l =Locator.xpath("//tr[td/div/div/a[text()=' Author report']]/td/div/span");
+        click(l);
+        waitForText("Share this report with all users");
     }
 
     protected void deleteReport(String reportName)
@@ -850,7 +873,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresentInThisOrder("Visit", "Visit Date", "Screening");
         assertTextPresentInThisOrder("3.5", "45", "1.9");
 
-        clickButton("Transpose", 0);
+         clickButton("Transpose", 0);
         log("assert text tranposed");
         assertTextPresentInThisOrder("Screening",  "2 week Post", "Visit Date");
         assertTextPresentInThisOrder("3.5", "1.9", "45");
