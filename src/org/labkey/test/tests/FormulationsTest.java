@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
@@ -95,6 +96,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String VIS_ASSAY_DESC = "IDRI Visual Data.";
 
     private static final String HPLC_ASSAY      = "HPLC";
+    private static final String HPLC_PIPELINE_PATH = getSampledataPath() + "\\HPLC";
     private static final String HPLC_ASSAY_DESC = "IDRI HPLC Assay Data";
 
     @Override
@@ -119,9 +121,8 @@ public class FormulationsTest extends BaseSeleniumWebTest
         uploadVisualAssayData();
         validateVisualAssayData();
 
-//        defineHPLCAssay();
-        // Test Concentrations
-        //
+        defineHPLCAssay();
+        uploadHPLCAssayData();
     }
 
 
@@ -468,8 +469,8 @@ public class FormulationsTest extends BaseSeleniumWebTest
         clickLinkWithText("Manage Assays");
         clickNavButton("New Assay Design");
 
-        assertTextPresent("Visual Formulation Time-Point Data");
-        checkRadioButton("providerName", "HLPC"); // this is a known typo
+        assertTextPresent("High performance liquid chromotography assay");
+        checkRadioButton("providerName", "HPLC");
         clickNavButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -481,14 +482,90 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         // Run Properties
         assertTextPresent("LotNumber");
+        assertTextPresent("Method");
 
         // Result Properties
-        assertTextPresent("Timepoint");
-        assertTextPresent("Temperature");
+        assertTextPresent("Dilution");
+        assertTextPresent("FilePath");
         assertTextPresent("Concentration");
+
+        // Make Runs/Results editable
+        checkCheckbox("editableRunProperties");
+        checkCheckbox("editableResultProperties");
 
         clickNavButton("Save", 0);
         waitForText("Save successful.", 10000);
+        clickNavButton("Save & Close");
+
+        // Set pipeline path
+        setPipelineRoot(HPLC_PIPELINE_PATH);
+    }
+
+    protected void uploadHPLCAssayData()
+    {
+        clickLinkWithText(PROJECT_NAME);
+
+        log("Uploading HPLC Data");
+        clickLinkWithText(HPLC_ASSAY);
+        assertTextPresent("No data to show.");
+
+        clickButton("Import Data");
+        waitForText("HPLCRun", 10000);
+
+        ExtHelper.waitForFileGridReady(this);
+        waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath("(//div[contains(@class, 'x-tree-node-expanded')])[2]"));
+
+        sleep(1000); // wait for Ext4
+        clickButton("Import HPLC", 0);
+        waitForText("Selected Subfiles", 10000);
+
+        // move files to appropriate locations for samples/standards/methods
+        selenium.getEval("" +
+            "var Ext4 = selenium.browserbot.getCurrentWindow().Ext4;" +
+            "var g1 = Ext4.ComponentQuery.query('grid#selGrid')[0];" +
+            "var g2 = Ext4.ComponentQuery.query('grid#smpGrid')[0];" +
+            "var smpRec = g1.getStore().findRecord('name', '3004837A.CSV');" +
+            "g2.getStore().add(smpRec); g1.getStore().remove(smpRec);" +
+            "" +
+            "g2 = Ext4.ComponentQuery.query('grid#stdGrid')[0];" +
+            "var stdRec = g1.getStore().findRecord('name', 'STD2.txt');" +
+            "g2.getStore().add(stdRec); g1.getStore().remove(stdRec);" +
+            "" +
+             "g2 = Ext4.ComponentQuery.query('grid#mthdGrid')[0];" +
+            "var mthdRec = g1.getStore().findRecord('name', 'QDEMUL3.M');" +
+            "g2.getStore().add(mthdRec); g1.getStore().remove(mthdRec);"
+        );
+
+        clickButton("Next", 0);
+
+        // Fill out Sample Form
+        waitForText("Preview not Available");
+        Ext4Helper.selectComboBoxItem(this, "Formulation", FORMULATION);
+        setText("Diluent", "Starch");
+        setText("Dilution", "123.45");
+        Ext4Helper.selectComboBoxItem(this, "Temperature", "5");
+        Ext4Helper.selectComboBoxItem(this, "Time", "T=0");
+
+        clickButton("Next", 0);
+
+        Ext4Helper.selectComboBoxItem(this, "Compound", "Alum");
+        setText("Concentration", "789.01");
+        setFormElement(Locator.xpath("(//input[@name='Diluent'])[2]"), "Not Starch");
+
+        clickButton("Next", 0);
+
+        // Verify Review
+        waitForText("Run Information");
+        assertTextPresent("3004837A");
+
+        clickButton("Save", 0);
+        waitForText("Save Successful");
+        clickButton("OK", 0);
+
+        waitForText("Run Information", 10000);
+        click(Locator.xpath("(//img[@class='x4-tool-close'])[1]"));
     }
 
     protected void performSearch()
