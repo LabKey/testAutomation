@@ -540,9 +540,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertNounInfoPage("ZM109F.PB4", Arrays.asList("Zambia", "Tier", "AY424138"));
 
         click(SearchBy.Studies);
-        assertNounInfoPage("Demo Study", Arrays.asList("marki@labkey.com", "kristinf@labkey.com", "Trial", "LabKey"));
-        assertNounInfoPage("Not Actually CHAVI 001", Arrays.asList("mbellew@labkey.com", "nicka@labkey.com", "Observational", "CHAVI"));
-        assertNounInfoPage("NotRV144", Arrays.asList("brittp@labkey.com", "klum@labkey.com", "Trial", "USMHRP"));
+        assertNounInfoPage("Demo Study", Arrays.asList("Igra M", "Fitzsimmons K", "Trial", "LabKey"));
+        assertNounInfoPage("Not Actually CHAVI 001", Arrays.asList("Bellew M", "Arnold N", "Observational", "CHAVI"));
+        assertNounInfoPage("NotRV144", Arrays.asList("Piehler B", "Lum K", "Trial", "USMHRP"));
 
         click(SearchBy.Labs);
         assertNounInfoPage("Arnold/Bellew Lab", Arrays.asList("Description", "PI", "Nick Arnold"));
@@ -795,15 +795,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     // Sequential calls to this should have different participant counts.
     private void assertFilterStatusPanel(String barLabel, String filteredLabel, int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount, int maxCount, SearchBy searchBy)
     {
-        Double barLen = ((double)participantCount/(double)maxCount)*100;
-        String barLenStr = ((Long)Math.round(Math.floor(barLen))).toString();
-//        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
         selectBars(barLabel);
         assertFilterStatusCounts(participantCount, studyCount, assayCount, contributorCount, antigenCount);
-//        waitForElement(Locator.xpath("//td[contains(text(), '" + searchBy + ":'"));
         waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '" + filteredLabel + "')]"), WAIT_FOR_JAVASCRIPT);
-//        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[@class='index' and contains(@style, 'width: "+barLenStr+"')]"), WAIT_FOR_JAVASCRIPT);
-//        waitForElement(Locator.xpath("//div[./span[@class='barlabel' and text() = '"+barLabel+"']]/span[contains(@class, 'index-selected') and @style and not(contains(@style, 'width: 0%;'))]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void assertFilterStatusCounts(int participantCount, int studyCount, int assayCount, int contributorCount, int antigenCount)
@@ -885,7 +879,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         // just do simple checks for the placeholder noun pages for now, layout will change so there is no use
         // investing too much automation right now.
         List<String> labels = Arrays.asList("Demo Study", "Not Actually CHAVI 001", "NotRV144",
-                "marki@labkey.com", "kristinf@labkey.com", "brittp@labkey.com",
+                "Igra M", "Fitzsimmons K", "Piehler B",
                 "LabKey", "CHAVI", "USMHRP");
         for (String label : labels)
         {

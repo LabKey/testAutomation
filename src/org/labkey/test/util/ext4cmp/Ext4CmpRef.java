@@ -32,7 +32,7 @@ public class Ext4CmpRef
     protected String _id;
     protected BaseSeleniumWebTest _test;
 
-    Ext4CmpRef(String id, BaseSeleniumWebTest test)
+    public Ext4CmpRef(String id, BaseSeleniumWebTest test)
     {
         this._id = id;
         this._test = test;
