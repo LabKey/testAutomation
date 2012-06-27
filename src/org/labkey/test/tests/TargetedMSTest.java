@@ -29,6 +29,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         goToProjectHome();
         addWebPart("Data Pipeline");
         clickNavButton("Process and Import Data");
+        sleep(1000); //see if this fixes the file import problem
         selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
         waitForText("Targeted MS Runs ");
         waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
