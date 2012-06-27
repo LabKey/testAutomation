@@ -67,6 +67,7 @@ public class QuantitationTest extends AbstractXTandemTest
         // Search is submitted as AJAX, and upon success the browser is redirected to a new page. Wait for it to load
         waitForPageToLoad();
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
+        sleep(5000); // without this sleep, some machines try to redirect back to the begin.view page after the Data Pipeline link is clicked
         clickLinkWithText("Data Pipeline");
 
         String runDescription = SAMPLE_BASE_NAME + " (" + LIBRA_PROTOCOL_NAME + ")";

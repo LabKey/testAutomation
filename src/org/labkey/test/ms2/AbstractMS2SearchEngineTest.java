@@ -112,6 +112,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         // Search is submitted as AJAX, and upon success the browser is redirected to a new page. Wait for it to load
         waitForPageToLoad();
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
+        sleep(5000); // without this sleep, some machines try to redirect back to the begin.view page after the Data Pipeline link is clicked
         log("View the analysis log.");
         clickLinkWithText("Data Pipeline");
 
