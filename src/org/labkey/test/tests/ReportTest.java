@@ -163,6 +163,7 @@ public class ReportTest extends StudyBaseTest
     private void openFirstRReport()
     {
         Locator l =Locator.xpath("//tr[td/div/div/a[text()=' Author report']]/td/div/span");
+        waitForElement(l);
         click(l);
         waitForText("Share this report with all users");
     }
