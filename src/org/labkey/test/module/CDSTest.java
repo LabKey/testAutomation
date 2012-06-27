@@ -479,6 +479,20 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("Clear Filters", 0);
         waitForGridCount(668);
 
+        log("Verify citation sources");
+        clickButton("Sources", 0);
+        waitForText("References", CDS_WAIT);
+        assertTextPresent(
+            "Demo study final NAb data",
+            "NAb Data From Igra Lab",
+            "Data extracted from LabKey lab site on Atlas",
+            "Piehler B, Eckels J"
+        );
+        clickAt(Locator.xpath("//a[@class='cite-ref']"), "1,1");
+        waitForText("Todd CA, Greene KM", CDS_WAIT);
+        clickButton("Close", 0);
+        waitForGridCount(668);
+
         goToAppHome();
 
     }
