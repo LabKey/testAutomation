@@ -76,8 +76,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     public void doTestSteps()
     {
         createProject(PROJECT_NAME, "Study");
-        importStudyFromZip(STUDY_ZIP.getPath());
         enableModule(PROJECT_NAME, "CDS");
+        importStudyFromZip(STUDY_ZIP.getPath());
+        goToProjectHome();
         addWebPart("CDS Management");
 
         importCDSData("Antigens", new File(getSampledataPath(), "CDS/antigens.tsv"));
@@ -397,10 +398,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(SearchBy.Studies);
 
         click(Locator.tagContainingText("span", "View raw data"));
-        waitForElement(Locator.css("div.sourcepanel"));
-        ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
-        ExtHelper.pickMeasure(this, "NAb", "Study Name", true);
-        clickButton("select", 0);
+        addGridColumn("NAb", "Point IC50", true, true);
+        addGridColumn("NAb", "Study Name", false, true);
 
         waitForGridCount(668);
         assertElementPresent(Locator.tagWithText("span", "Point IC50"));
@@ -421,20 +420,14 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.tagContainingText("span", "View raw data"));
         waitForGridCount(668);
 
-        clickButton("Choose Columns", 0);
-        waitForElement(Locator.css("div.sourcepanel"));
-        ExtHelper.pickMeasure(this, "Demographics", "Gender", true);
-        ExtHelper.pickMeasure(this, "Demographics", "Ethnicity", true);
-        clickButton("select", 0);
+        addGridColumn("Demographics", "Gender", true, true);
+        addGridColumn("Demographics", "Ethnicity", false, true);
 
         waitForElement(Locator.tagWithText("span", "Gender"));
         waitForElement(Locator.tagWithText("span", "Ethnicity"));
 
         log("Remove a column");
-        clickButton("Choose Columns", 0);
-        waitForElement(Locator.css("div.sourcepanel"));
-        ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
-        clickButton("select", 0);
+        addGridColumn("NAb", "Point IC50", false, true);
         waitForTextToDisappear("Point IC50");
         //But other column from same table is still there
         waitForElement(Locator.tagContainingText("span", "Study Name"));
@@ -443,10 +436,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForGridCount(246);
 
         log("Change column set and ensure still filtered");
-        clickButton("Choose Columns", 0);
-        waitForElement(Locator.css("div.sourcepanel"));
-        ExtHelper.pickMeasure(this, "NAb", "Point IC50", true);
-        clickButton("select", 0);
+        addGridColumn("NAb", "Point IC50", false, true);
         waitForElement(Locator.tagWithText("span", "Point IC50"));
         waitForGridCount(246);
 
@@ -493,8 +483,43 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("Close", 0);
         waitForGridCount(668);
 
+        log("Verify multiple citation sources");
+        addGridColumn("Physical Exam", "Weight Kg", false, true);
+        waitForElement(Locator.tagWithText("span", "Weight Kg"));
+        waitForGridCount(700);
+
+        clickButton("Sources", 0);
+        waitForText("Demo study physical exam", CDS_WAIT);
+        clickAt(Locator.xpath("//a[@class='cite-src']"), "1,1");
+        waitForText("Pulled from Atlas", CDS_WAIT);
+        assertTextPresent("Demo study data delivered");
+        clickButton("Close", 0);
+        waitForGridCount(700);
+
+        addGridColumn("Physical Exam", "Weight Kg", false, true); // removes column
+        waitForGridCount(668);
+
         goToAppHome();
 
+    }
+
+    private void addGridColumn(String source, String measure, boolean keepOpen, boolean keepSelection)
+    {
+        assertTextPresent("Data Grid"); // make sure we are looking at grid
+
+        // allow for already open measures
+        if (!isTextPresent("Add Measures"))
+        {
+            clickButton("Choose Columns", 0);
+            waitForElement(Locator.css("div.sourcepanel"));
+        }
+
+        ExtHelper.pickMeasure(this, source, measure, keepSelection);
+
+        if (!keepOpen)
+        {
+            clickButton("select", 0);
+        }
     }
 
     private void setRawDataFilter(String colName, String value)
