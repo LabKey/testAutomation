@@ -1091,14 +1091,14 @@ public class TimeChartTest extends StudyBaseTest
         Ext4Helper.clickTabContainingText(this, "Help");
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
         Ext4Helper.clickTabContainingText(this, "Source");
-        assertTextPresent("function (data, columnMap, measureInfo, clickEvent) {");
+        click(Locator.xpath("//input/../label[contains(text(), 'Toggle editor')]"));
+        sleep(1000); // wait for editor to toggle
+        assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         apply();
-        // TODO: can we test clicking on a point?
-//        clickAt(Locator.xpath("//a/circle"), "1,1");
-//        ExtHelper.waitForExtDialog(this, "Data Point Information");
-//        click(Locator.xpath("//circle"));
-//        clickAt(Locator.xpath("//circle"), "1,1");
+        // TODO: how do we test clicking on a data point?
+        //ExtHelper.waitForExtDialog(this, "Data Point Information");
+        
         // open developer panel and test JS function validation
         goToDeveloperTab();
         setFormElement("point-click-fn-textarea", "");
@@ -1118,7 +1118,8 @@ public class TimeChartTest extends StudyBaseTest
         openSaveMenu();
         saveReport(false);
         // TODO: how do we test clicking on a data point?
-//        waitForText("Participant - 249318596");
+        clickAt(Locator.xpath("//svg"), "");
+        //waitForText("Participant - 249318596");
 
         // verify that only developers can see the button to add point click function
         pushLocation();
