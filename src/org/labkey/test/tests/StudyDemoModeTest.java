@@ -38,8 +38,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         startSpecimenImport(2);
 
         // wait for study and specimens to finish loading
-        waitForPipelineJobsToComplete(1, "study import", false);
-        waitForSpecimenImport();
+        waitForPipelineJobsToComplete(2, "study import and specimens", false);
     }
 
     @Override
