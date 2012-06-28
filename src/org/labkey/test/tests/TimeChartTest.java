@@ -59,7 +59,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String[] GROUP2_PTIDS = {"249320127", "249320489"};
     private static final String[] GROUP3_PTIDS = {"249320489"/*Duplicate from group 2*/, "249320897", "249325717"};
 
-    private static final String[] VISIT_STRINGS = {"Int. Vis. %{S.1.1} .%{S.2.1}", "Grp1:F/U/Grp2:V#2", "6 week Post-V#2", "3 wk Post-V#2/V#3"};
+    private static final String[] VISIT_STRINGS = {"1 week Post-V#1", "Int. Vis. %{S.1.1} .%{S.2.1}", "Grp1:F/U/Grp2:V#2", "G1: 6wk/G2: 2wk", "6 week Post-V#2", "1 wk Post-V#2/V#3", "6 wk Post-V#2/V#3"};
 
     private static final String USER1 = "user1@timechart.test";
     private static final String USER2 = "user2@timechart.test";
@@ -314,7 +314,7 @@ public class TimeChartTest extends StudyBaseTest
 
         goToGroupingTab();
         ExtHelper.checkCheckbox(this, "Show Mean"); // select show mean
-//        ExtHelper.uncheckCheckbox(this, "Show Individual Lines"); // de-select show individual lines
+        ExtHelper.uncheckCheckbox(this, "Show Individual Lines"); // de-select show individual lines
         apply();
 
         // uncheck group 1 and 2
@@ -430,7 +430,7 @@ public class TimeChartTest extends StudyBaseTest
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and contains(@class, 'x4-item-disabled')]"));
         apply();
         waitForTextToDisappear("Days Since Contact Date");
-        waitForText("6 week Post-V#2"); // There may be intermittent failures on this line as Protovis occasionally decides it's going to render different x-axis tick marks.
+        waitForText("6 week Post-V#2"); 
         assertTextPresentInThisOrder(VISIT_STRINGS);
 
         log("Check visit data.");
@@ -446,16 +446,16 @@ public class TimeChartTest extends StudyBaseTest
             assertEquals("Display order should default to zero.", "0", str.toString());            
         }
 
-        List visits = table.getColumnDataAsText("Study APX1Abbreviated Physical Exam Mouse Visit Visit Label");
+        List visits = table.getColumnDataAsText("Visit Label");
         for(int i = 0; i < visits.size(); i++ )
         {
             String visit = visits.get(i).toString();
             visits.set(i, visit);
         }
-//        for( String str : VISIT_STRINGS ) //issue 15089
-//        {
-//            assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
-//        }
+        for( String str : VISIT_STRINGS )
+        {
+            assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
+        }
 
         clickNavButton("View Chart(s)", 0);
         waitForTextToDisappear("1 - 19 of 19");
