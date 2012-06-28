@@ -144,6 +144,7 @@ public enum TestSet
         ExtraKeyStudyTest.class,
         CAVDStudyTest.class,
         SampleMindedImportTest.class,
+        PivotQueryTest.class,
     }),
 
     MiniTest(new Class[]
@@ -268,7 +269,8 @@ public enum TestSet
         ListTest.class,
         IssuesTest.class,
         ScriptValidationTest.class,
-        FilterTest.class
+        FilterTest.class,
+        PivotQueryTest.class
     }),
 
     IDRI(new Class[] {

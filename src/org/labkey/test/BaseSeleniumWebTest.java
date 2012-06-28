@@ -5886,20 +5886,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-    protected void createQuery(String container, String name, String queryType, String sql, String xml, boolean inheritable)
+    protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
     {
-        String queryURL = "query/" + container + "/begin.view?schemaName=flow";
+        String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
         beginAt(queryURL);
-        createNewQuery(queryType);
+        createNewQuery(schemaName);
         setFormElement("ff_newQueryName", name);
         clickNavButton("Create and Edit Source");
 //        toggleSQLQueryEditor();
         setQueryEditorValue("queryText", sql);
 //        setFormElement("queryText", sql);
-        ExtHelper.clickExtTab(this, "XML Metadata");
-        setQueryEditorValue("metadataText", xml);
+        if (xml != null)
+        {
+            ExtHelper.clickExtTab(this, "XML Metadata");
+            setQueryEditorValue("metadataText", xml);
 //        toggleMetadataQueryEditor();
 //        setFormElement("metadataText", xml);
+        }
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         if (inheritable)
