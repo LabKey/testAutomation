@@ -780,7 +780,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 */
         waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
         waitForText(barLabel);
-        assertEquals("Wrong page title.", barLabel, getText(Locator.css(".savetitle")));
+        waitForElement(Locator.xpath("//div[contains(@class, 'savetitle') and text() = '" + barLabel +"']"));
     }
 
     private void viewMulti(String btnLabel, String infoLabel, String titleCss)
@@ -796,7 +796,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
             waitForElement(Locator.css(titleCss), WAIT_FOR_JAVASCRIPT);
         }
         waitForText(infoLabel);
-        assertEquals("Wrong page title.", infoLabel, getText(Locator.css(titleCss)));
+        waitForElement(Locator.xpath("//div[contains(@class, 'savetitle') and text() = '" + infoLabel +"']"));
     }
 
     private void closeInfoPage()
