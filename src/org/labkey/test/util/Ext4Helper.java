@@ -97,6 +97,7 @@ public class Ext4Helper
 
     public static <Type extends Ext4CmpRef> List<Type> componentQuery(BaseSeleniumWebTest test, String componentSelector, Class<Type> clazz)
     {
+        componentSelector = componentSelector.replaceAll("'", "\"");  //escape single quotes
         String res = test.getWrapper().getEval("selenium.ext4ComponentQuery('" + componentSelector + "')");
         return componentsFromJson(test, res, clazz);
     }
@@ -121,8 +122,6 @@ public class Ext4Helper
             List<Type> ret = new ArrayList<Type>(array.size());
             for (Object o : array)
             {
-                //ret.add(new Ext4CmpRef(o.toString(), test));
-                //how to create new instance of class using the above args?
                 Constructor<Type> constructor = clazz.getConstructor(String.class, BaseSeleniumWebTest.class);
                 ret.add(constructor.newInstance(o.toString(), test));
             }

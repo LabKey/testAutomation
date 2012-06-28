@@ -19,15 +19,19 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.ExecuteSqlCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PostgresOnlyTest;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,6 +39,7 @@ import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -57,6 +62,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 
     DataRegionTable drt = null;
     private String samples = "samples";
+    private String TEMPLATE_NAME = "GenotypingTest Saved Template";
 
     @Override
     protected String getProjectName()
@@ -144,6 +150,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
 ////        importRunAgainTest(); //bug Issue 13695
         runAnalysisTest();
         importSecondRunTest();
+        verifyIlluminaSampleSheet();
         goToProjectHome();
         importIlluminaRunTest();
         verifyIlluminaExport();
@@ -448,6 +455,106 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
         }
     }
 
+    private void verifyIlluminaSampleSheet()
+    {
+        goToProjectHome();
+        clickLinkWithText("Samples");
+        waitForPageToLoad();
+        DataRegionTable d = new DataRegionTable("query", this);
+        d.checkAllOnPage();
+        clickButton("Create Illumina Sample Sheet");
+        waitForPageToLoad();
+        waitForText("Flow Cell Id");
+        Ext4FieldRef.getForLabel(this, "Flow Cell Id").setValue("FlowCell");
+
+        String[][] fieldPairs = {
+            {"Investigator Name", "Investigator"},
+            {"Experiment Name", "Experiment"},
+            {"Project Name", "Project"},
+            {"Description", "Description"}
+        };
+
+        for (String[] a : fieldPairs)
+        {
+            Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
+        }
+
+        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        waitForText("Edit Sheet");
+        for (String[] a : fieldPairs)
+        {
+            assertEquals(a[1], Ext4FieldRef.getForLabel(this, a[0]).getValue());
+        }
+
+        clickButton("Edit Sheet", 0);
+        waitForText("Done Editing");
+        for (String[] a : fieldPairs)
+        {
+            assertTextPresent(a[0] + "," + a[1]);
+        }
+
+        //add new values
+        String prop_name = "NewProperty";
+        String prop_value = "NewValue";
+        Ext4FieldRef textarea = Ext4Helper.queryOne(this, "textarea[itemId='sourceField']", Ext4FieldRef.class);
+        String newValue = prop_name + "," + prop_value;
+        textarea.eval("this.setValue(this.getValue() + \"\\\\n" + newValue + "\")");
+        clickButton("Done Editing", 0);
+
+
+        //verify template has changed
+        Ext4Helper.clickTabContainingText(this, "General Info");
+        assertEquals("Custom", Ext4FieldRef.getForLabel(this, "Template").getValue());
+
+        //verify values persisted
+        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        waitForText("Edit Sheet");
+        assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
+
+        //save template
+        clickButton("Save As Template", 0);
+        waitForElement(Ext4Helper.ext4Window("Choose Name"));
+        Ext4FieldRef textfield = Ext4Helper.queryOne(this, "textfield", Ext4FieldRef.class);
+        textfield.setValue(TEMPLATE_NAME);
+        clickButton("OK", 0);
+        Ext4Helper.clickTabContainingText(this, "General Info");
+        assertEquals(TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
+
+        //verify samples present
+        Ext4Helper.clickTabContainingText(this, "Preview Samples");
+        waitForText("Sample_ID");
+
+        int expectRows = (11 * (45 +  1));  //11 cols, 45 rows, plus header
+        assertEquals(expectRows, selenium.getXpathCount("//td[contains(@class, 'x4-table-layout-cell')]"));
+
+        //make sure values persisted
+        refresh();
+        String url = getCurrentRelativeURL();
+        url += "&exportAsWebPage=1";
+        beginAt(url);
+
+        waitForText("Template");
+        for (String[] a : fieldPairs)
+        {
+            Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
+        }
+        Ext4FieldRef.getForLabel(this, "Template").setValue(TEMPLATE_NAME);
+        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        waitForText("Edit Sheet");
+        assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
+
+        clickButton("Download");
+
+        for (String[] a : fieldPairs)
+        {
+            assertTextPresent(a[0] + "," + a[1]);
+        }
+
+        assertTextPresent(prop_name + "," + prop_value);
+        goToHome();
+        goToProjectHome();
+    }
+
     private void assertExportButtonPresent()
     {
         String[] exportTypes = {"Excel 97", "Excel 2007", ".iqy"};
@@ -583,10 +690,20 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
                     file.delete();
             }
         }
+
+        deleteTemplateRow();
         deleteProject(getProjectName());
 
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + getRunNumber()));
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + (getRunNumber()-1)));
+    }
+
+    private void deleteTemplateRow() throws Exception
+    {
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        DeleteRowsCommand cmd = new DeleteRowsCommand("genotyping", "IlluminaTemplates");
+        cmd.addRow(Collections.singletonMap("Name", (Object) TEMPLATE_NAME));
+        SaveRowsResponse resp = cmd.execute(cn, getProjectName());
     }
 
     @Override
