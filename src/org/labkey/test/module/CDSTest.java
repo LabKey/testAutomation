@@ -499,6 +499,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         addGridColumn("Physical Exam", "Weight Kg", false, true); // removes column
         waitForGridCount(668);
 
+        // 15267
+        addGridColumn("Physical Exam", "Source", true, true);
+        addGridColumn("NAb", "Source", false, true);
+        waitForText("Demo study physical exam", CDS_WAIT);
+        waitForText("Demo study final NAb data", CDS_WAIT);
+
         goToAppHome();
 
     }
