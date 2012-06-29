@@ -874,7 +874,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("1a.ALT AE Severity Grade", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
         assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
 
-        assertTextPresent("Showing a Maximum of 50 Results");
+        assertTextPresent("Showing partial results while in edit mode.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         waitForText("Showing 8 Results");
@@ -1125,7 +1125,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "2.What is your sex?", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "5. Sexual orientation", "measuresGridPanel", true);
         clickNavButton("Select", 0);
-        waitForText("Showing a Maximum of 50 Results", WAIT_FOR_JAVASCRIPT);
+        waitForText("Showing partial results while in edit mode.", WAIT_FOR_JAVASCRIPT);
 
         // verify the data in the report
         waitForText("1.Date of Birth", 27, WAIT_FOR_JAVASCRIPT); // 24 mice + 1 Report Measures list + 2 in hidden add measure dialog
