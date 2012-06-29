@@ -212,8 +212,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // 14910
         click(SearchBy.Antigens);
-        toggleExplorerBar("1A");
-        toggleExplorerBar("1B");
         shiftSelectBars("MW965.26", "ZM197M.PB7");
         waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), 'DJ263.8')]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//div[@class='filtermember']"), 6);
