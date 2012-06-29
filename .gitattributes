@@ -78,7 +78,7 @@ modules/simpletest/views/other.html -text
 modules/simpletest/views/parameterizedQWP.html -text
 modules/simpletest/views/vehicle.html -text
 modules/simpletest/views/webpart.html -text
-modules/simpletest/web/testfile.js -text
+modules/simpletest/web/simpletest/testfile.js -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/test/BaseFlowTest.java -text

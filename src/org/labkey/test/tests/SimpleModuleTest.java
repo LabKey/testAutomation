@@ -81,11 +81,13 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         doTestViews();
         doTestWebParts();
         createList();
+        doTestModuleProperties();
         doTestQueries();
         doTestQueryViews();
         doTestReports();
         doTestParameterizedQueries();
         doTestContainerColumns();
+        doTestFilterSort();
         doTestImportTemplates();
     }
     
@@ -413,6 +415,9 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         //add Simple Module Web Part
         addWebPart("Simple Module Web Part");
         assertTextPresent("This is a web part view in the simple test module");
+
+        String value = getWrapper().getEval("window.LABKEY.moduleContext.simpletest.scriptLoaded");
+        assertEquals("Module context not being loaded propertly", "true", value);
     }
 
     private void createList()
@@ -549,6 +554,62 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("headerSearchInput")));
         assertTextPresent("Pinto");
         assertTextNotPresent("Prius");
+    }
+
+    private void doTestFilterSort() throws Exception
+    {
+        log("** Testing filtering and sorting via java API...");
+
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        log("** Select using selectRows and a view with a filter in it");
+        SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setViewName("Filter On Letter P");
+        SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
+        assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
+        assertEquals("Expected to return 3 columns, based on the saved view", 3, selectResp.getColumnModel().size());
+
+        log("** Select using selectRows and a view with a sort in it");
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setViewName("SortOnModelYear");
+        selectResp = selectCmd.execute(cn, getProjectName());
+        assertEquals("Expected first row to be 2001.", 2001, selectResp.getRows().get(0).get("ModelYear"));
+        assertEquals("Expected first row to be 2000.", 2000, selectResp.getRows().get(1).get("ModelYear"));
+        assertTrue("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name") != null);
+        assertEquals("Expected to return 6 columns, based on the default view", 6, selectResp.getColumnModel().size());
+
+    }
+
+    private void doTestModuleProperties() throws Exception
+    {
+        String prop1 = "TestProp1";
+        String prop1Value = "Prop1Value";
+        String prop2 = "TestProp2";
+
+        beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
+        addWebPart("Simple Module Web Part");
+        waitForText("This is a web part view in the simple test module");
+
+        assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+
+        Map<String, List<String[]>> props = new HashMap<String, List<String[]>>();
+        List<String[]> propList = new ArrayList<String[]>();
+        propList.add(new String[]{"/", prop1, prop1Value});
+
+        propList.add(new String[]{"/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"});
+
+        props.put("simpletest", propList);
+        setModuleProperties(props);
+
+        beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
+
+        assertEquals("Module context not set propertly", prop1Value, getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop1));
+        assertEquals("Module context not set propertly", "FolderValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+
+        goToProjectHome();
+        assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
     }
 
     protected void assertModuleDeployed(String moduleName)
