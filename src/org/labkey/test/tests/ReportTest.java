@@ -18,9 +18,12 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
 import java.io.File;
 import java.security.PrivateKey;
@@ -43,6 +46,11 @@ public class ReportTest extends StudyBaseTest
     protected static final String TEST_USER = "user1@report.test";
     private static final String TEST_GRID_VIEW = "Test Grid View";
     public static final String AUTHOR_REPORT = "Author report";
+
+    protected boolean isFileUploadTest()
+    {
+        return true;
+    }
 
     private String R_SCRIPT1(String function, String database)
     {
@@ -135,11 +143,11 @@ public class ReportTest extends StudyBaseTest
     {
         doCreateCharts();
         doCreateRReports();
-        doReportDiscussionTest();
+//        doReportDiscussionTest();
         doAttachmentReportTest();
         doLinkReportTest();
         doParticipantReportTest();
-        doThumbnailChangeTest();
+         doThumbnailChangeTest();
 
         // additional report and security tests
         setupDatasetSecurity();
@@ -153,8 +161,10 @@ public class ReportTest extends StudyBaseTest
         openFirstRReport();
 
         //set change thumbnail
-        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
-        //save
+//        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
+
+        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
+        ref.setToFile(ATTACHMENT_REPORT2_FILE.toString());
         clickNavButtonByIndex("Save", 1, 0);
 
         //no way to verify, unfortunately
@@ -528,7 +538,9 @@ public class ReportTest extends StudyBaseTest
             setFormElement("viewName", ATTACHMENT_REPORT_NAME);
             setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
             setFormElement("uploadFile", ATTACHMENT_REPORT_FILE.toString());
-            setFormElement(Locator.xpath("id('uploadFile')/div/input"), ATTACHMENT_REPORT_FILE.toString());
+
+            Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
+            ref.setToFile(ATTACHMENT_REPORT_FILE.toString());
             clickNavButton("Save");
         }
 
@@ -549,6 +561,7 @@ public class ReportTest extends StudyBaseTest
         if (isFileUploadAvailable())
         {
             clickReportGridLink(ATTACHMENT_REPORT_NAME, "view");
+            goBack();
         }
         //TODO: Verify reports. Blocked: 13761: Attachment reports can't be viewed
 //        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "view");
@@ -815,7 +828,6 @@ public class ReportTest extends StudyBaseTest
     private static final String[] SPEC_PTID_ONE = {"999320016"};
     private static final String[] SPEC_PTID_TWO = {"999320518"};
     private static final String PARTICIPANT_REPORT5_NAME = "Demographic Participant Report";
-
     private void doParticipantReportTest()
     {
         log("Testing Participant Report");
@@ -877,7 +889,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresentInThisOrder("Visit", "Visit Date", "Screening");
         assertTextPresentInThisOrder("3.5", "45", "1.9");
 
-        clickButton("Transpose", 0);
+         clickButton("Transpose", 0);
         log("assert text tranposed");
         assertTextPresentInThisOrder("Screening",  "2 week Post", "Visit Date");
         assertTextPresentInThisOrder("3.5", "1.9", "45");
@@ -1124,53 +1136,6 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT5_NAME);
         clickNavButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-
-        // Get Report Specific URL
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
-        clickReportGridLink(PARTICIPANT_REPORT5_NAME, "view");
-        waitForText("heterosexual", WAIT_FOR_JAVASCRIPT);
-
-        // Usability Testing
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
-
-        // Add Measure
-        clickNavButton("Choose Measures", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "weight");
-        pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1. Weight", "measuresGridPanel", true);
-        clickNavButton("Select", 0);
-
-        // Assert Usability Styling
-        waitForText("G1: 6wk/G2:", WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(Locator.xpath("//tr[@class='labkey-alternate-row']//td[contains(@class, 'lk-report-cell') and text() = '200']"));
-        clickButton("Transpose", 0);
-        assertElementPresent(Locator.xpath("//tr[@class='labkey-row']//td[contains(@class, 'lk-report-cell') and text() = '200']"));
-        clickButton("Transpose", 0);
-        assertElementPresent(Locator.xpath("//tr[@class='labkey-alternate-row']//td[contains(@class, 'lk-report-cell') and text() = '200']"));
-        assertElementNotPresent(Locator.xpath("//tr[@class='labkey-row']//td[contains(@class, 'lk-report-cell') and text() = '200']"));
-
-        // remove column
-        clickNavButton("Choose Measures", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "1. Weight", "measuresGridPanel", true);
-        clickNavButton("Select", 0);
-
-        clickNavButton("Cancel", 0);
-        waitForTextToDisappear("G1: 6wk/G2:", WAIT_FOR_JAVASCRIPT);
-
-        // Test print styling
-        beginAt(getURL().getFile().concat("&print=true"));
-        waitForText("heterosexual", WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("999321033", "Cohort:", "Groups:", "1968-02-28");
-        assertElementPresent(Locator.xpath("//tr[@class='labkey-alternate-row']//td[contains(@class, 'lk-report-cell') and text() = 'Screening']"));
-        assertElementNotPresent(Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and text() = 'Transform'")); // making sure buttons do not appear
-        assertElementNotPresent(Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and text() = 'Export'"));
-        goBack();
-        waitForText("heterosexual", WAIT_FOR_JAVASCRIPT);
     }
 
     private static final String DISCUSSION_BODY_1 = "Starting a discussion";
