@@ -39,6 +39,7 @@ modules/simpletest/config/module.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
+modules/simpletest/module.xml -text
 modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/queries/lists/TestQuery.sql -text
@@ -46,7 +47,10 @@ modules/simpletest/queries/study/verifyAssay.js -text
 modules/simpletest/queries/vehicle/ParamParamVehicles.sql -text
 modules/simpletest/queries/vehicle/ParameterizedVehicles.sql -text
 modules/simpletest/queries/vehicle/Toyotas.sql -text
+modules/simpletest/queries/vehicle/Vehicles/.qview.xml -text
 modules/simpletest/queries/vehicle/Vehicles/AlternateImportTemplate.qview.xml -text
+modules/simpletest/queries/vehicle/Vehicles/Filter[!!-~]On[!!-~]Letter[!!-~]P.qview.xml -text
+modules/simpletest/queries/vehicle/Vehicles/SortOnModelYear.qview.xml -text
 modules/simpletest/queries/vehicle/Vehicles/VehiclesInCurrentAndSubfolders.qview.xml -text
 modules/simpletest/queries/vehicle/colors.js -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
@@ -74,6 +78,7 @@ modules/simpletest/views/other.html -text
 modules/simpletest/views/parameterizedQWP.html -text
 modules/simpletest/views/vehicle.html -text
 modules/simpletest/views/webpart.html -text
+modules/simpletest/web/testfile.js -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/test/BaseFlowTest.java -text

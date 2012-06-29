@@ -1,0 +1,21 @@
+<module xmlns="http://labkey.org/moduleProperties/xml/">
+    <properties>
+        <propertyDescriptor name="TestProp1">
+            <canSetPerContainer>false</canSetPerContainer>
+        </propertyDescriptor>
+        <propertyDescriptor name="TestProp2">
+            <canSetPerContainer>true</canSetPerContainer>
+            <defaultValue>DefaultValue</defaultValue>
+            <editPermissions>
+                <permission>UPDATE</permission>
+            </editPermissions>
+        </propertyDescriptor>
+    </properties>
+    <clientDependencies>
+        <dependency path="/simpletest/testfile.js" />
+    </clientDependencies>
+    <requiredModuleContext>
+        <requiredModule name="simpletest" />
+        <requiredModule name="Core" />
+    </requiredModuleContext>
+</module>
