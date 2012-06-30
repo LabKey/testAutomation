@@ -23,6 +23,8 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class ElispotAssayTest extends AbstractQCAssayTest
@@ -435,9 +437,20 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText(TEST_ASSAY_ELISPOT);
-        clickLinkWithText("run details");
+        clickLinkWithText("run details", 3);
         waitForElement(Locator.css("#plate-summary-div-1 table"));
-        assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
+
+        DataRegionTable table = new DataRegionTable(TEST_ASSAY_ELISPOT+" AntigenStats", this, true, true);
+
+        Iterator<String> means = Arrays.asList("0.0", "2271111.1", "1111.1", "4444.4").iterator();
+        for (String mean : table.getColumnDataAsText("Atg1AMean"))
+            assertEquals(means.next(), mean);
+
+        Iterator<String> medians = Arrays.asList("0.0", "2376666.7", "3333.3", "6666.7").iterator();
+        for (String median : table.getColumnDataAsText("Atg1AMedian"))
+            assertEquals(medians.next(), median);
+
+        //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         // Check that all runs have been subtracted
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
@@ -478,10 +491,10 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         clickLinkWithText("run details");
         waitForElement(Locator.css("#plate-summary-div-1 table"));
-        assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
+        //assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         DataRegionTable detailsTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" AntigenStats", this, true, true);
-        column = detailsTable.getColumnDataAsText("Background Value");
+        column = detailsTable.getColumnDataAsText("BackgroundMedian");
         String[] expectedColumn = {"0.0","0.0","9.5","0.0"};
         for(int i = 0; i < 4; i++)
         {
