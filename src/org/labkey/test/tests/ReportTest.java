@@ -143,11 +143,11 @@ public class ReportTest extends StudyBaseTest
     {
         doCreateCharts();
         doCreateRReports();
-//        doReportDiscussionTest();
-        doAttachmentReportTest();
+        doReportDiscussionTest();
+        //doAttachmentReportTest();
         doLinkReportTest();
         doParticipantReportTest();
-         doThumbnailChangeTest();
+        doThumbnailChangeTest();
 
         // additional report and security tests
         setupDatasetSecurity();
