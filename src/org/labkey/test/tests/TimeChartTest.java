@@ -280,6 +280,7 @@ public class TimeChartTest extends StudyBaseTest
 
         visitBasedChartTest(); 
 
+        filteredTimeChartRegressionTest();
     }
 
     private void aggregateTimeChartTest()
@@ -407,6 +408,40 @@ public class TimeChartTest extends StudyBaseTest
         clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Cutoff Percentage (3)']]"), "1,1");
         clickNavButton("Select", 0);
         waitForText("No data found for the following measures/dimensions: RunCutoff3", WAIT_FOR_JAVASCRIPT);
+    }
+
+    /**
+     * regression for 15246 : Filtering on a column in the grid before creating time chart causes error
+     */
+    private void filteredTimeChartRegressionTest()
+    {
+        log("Test time chart from a filtered grid");
+        
+        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(FOLDER_NAME);
+        clickLinkWithText("Physical Exam");
+
+        String ptid = "249318596";
+        setFacetedFilter("Dataset", "ParticipantId", ptid);
+        assertTextPresent(ptid);
+
+        clickMenuButton("Views", "Create", "Time Chart");
+
+        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Choose a Measure", 0);
+        ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        waitForText("Physical Exam", WAIT_FOR_JAVASCRIPT);
+
+        addMeasuresPath = ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG) + "//table/tbody/tr/td";
+        clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Pulse']]"), "1,1");
+        clickNavButton("Select", 0);
+        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
+
+        openSaveMenu();
+        setFormElement("reportName", "Filtered Time Chart");
+        setFormElement("reportDescription", REPORT_DESCRIPTION);
+        saveReport(true);
     }
 
     private void visitBasedChartTest()
