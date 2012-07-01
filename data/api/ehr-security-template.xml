@@ -1,7 +1,7 @@
 <ApiTests xmlns="http://labkey.org/query/xml">
     <test name="${Role} - ${QCState}" type="post">
         <url>
-            <![CDATA[query/EHR_TestProject/saveRows.view]]></url>
+            <![CDATA[query/${ContainerPath}/saveRows.view]]></url>
         <formData>
             {"commands":
             [{
@@ -51,7 +51,7 @@
         </formData>
         <successresponse>
             {"result": [{
-                "containerPath": "/EHR_TestProject",
+                "containerPath": "/${ContainerPath}",
                 "rowsAffected": 1,
                 "schemaName": "study",
                 "queryName": "Weight",

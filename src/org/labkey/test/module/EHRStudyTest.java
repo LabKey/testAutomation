@@ -882,6 +882,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
 
         while ( (line = reader.readLine()) != null)
         {
+            line = line.replace("${ContainerPath}", CONTAINER_PATH);
             line = line.replace("${AnimalId}", MORE_ANIMAL_IDS[2]);
             line = line.replace("${QCState}", qcState.label);
             line = line.replace("${Role}", user.getRole().toString());
