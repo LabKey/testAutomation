@@ -87,6 +87,7 @@ public class SampleMindedImportTest extends BaseSeleniumWebTest
         clickNavButton("Start Import");
         waitForPipelineJobsToComplete(1, "Import specimens: SampleMindedExport.xlsx", false);
         clickTab("Specimen Data");
+        waitForElement(Locator.linkWithText("BAL"));
         assertLinkPresentWithText("BAL");
         assertLinkPresentWithText("Blood");
         clickLinkWithText("By Individual Vial");
@@ -98,11 +99,13 @@ public class SampleMindedImportTest extends BaseSeleniumWebTest
         assertTextPresent("1000001-21");
 
         clickTab("Specimen Data");
+        waitForElement(Locator.linkWithText("NewSpecimenType"));
         clickLinkWithText("NewSpecimenType");
         assertTextPresent("EARL (003)");
         assertTextPresent("REF-A Cytoplasm Beaker");
 
         clickTab("Specimen Data");
+        waitForElement(Locator.linkWithText("BAL"));
         clickLinkWithText("BAL");
         assertTextPresent("BAL Supernatant");
         assertTextPresent("FREE (007)");
