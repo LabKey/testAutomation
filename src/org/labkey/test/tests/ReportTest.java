@@ -144,7 +144,7 @@ public class ReportTest extends StudyBaseTest
         doCreateCharts();
         doCreateRReports();
         doReportDiscussionTest();
-        //doAttachmentReportTest();
+        doAttachmentReportTest();
         doLinkReportTest();
         doParticipantReportTest();
         doThumbnailChangeTest();
