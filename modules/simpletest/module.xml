@@ -15,7 +15,6 @@
         <dependency path="/simpletest/testfile.js" />
     </clientDependencies>
     <requiredModuleContext>
-        <requiredModule name="simpletest" />
         <requiredModule name="Core" />
     </requiredModuleContext>
 </module>
