@@ -17,6 +17,11 @@ package org.labkey.test.tests;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -26,11 +31,15 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static org.labkey.test.util.PasswordUtil.getUsername;
 
 /**
  * User: adam
@@ -686,10 +695,12 @@ public class StudyTest extends StudyBaseTest
         log("manage participant comments directly");
         clickMenuButton("Comments and QC", "Manage Mouse Comments");
 
+        int datasetAuditEventCount = getDatasetAuditEventCount(); //inserting a new event should increase this by 1;
         clickNavButton("Insert New");
         setFormElement("quf_MouseId", "999320812");
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Mouse Comment");
         clickNavButton("Submit");
+        verifyAuditEventAdded(datasetAuditEventCount);
 
         clickLinkWithText(getStudyLabel());
         waitForText("Blood (Whole)");
@@ -725,6 +736,45 @@ public class StudyTest extends StudyBaseTest
         assertTextNotPresent("Vial Comment");
     }
 
+    private void verifyAuditEventAdded(int previousCount)
+    {
+        log("Verify there is exactly one new DatasetAuditEvent, and it refers to the insertion of a new record");
+        SelectRowsResponse selectResp = getDatasetAuditLog();
+        List<Map<String,Object>> rows = selectResp.getRows();
+        assertEquals("Unexpected size of datasetAuditEvent log", previousCount + 1, rows.size());
+        assertEquals("A new dataset record was inserted", rows.get(rows.size()-1).get("Comment"));
+
+    }
+
+    private SelectRowsResponse getDatasetAuditLog()
+    {
+
+        SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "DatasetAuditEvent");
+
+        selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
+        selectCmd.setColumns(Arrays.asList("*"));
+        Connection cn = new Connection(getBaseURL(), getUsername(), PasswordUtil.getPassword());
+        SelectRowsResponse selectResp = null;
+        try
+        {
+            selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
+        }
+        catch (Exception e)
+        {
+            fail("Error when attempting to verify audit trail: " + e.getMessage());
+        }
+        return selectResp;
+
+    }
+
+    private int getDatasetAuditEventCount()
+    {
+        SelectRowsResponse selectResp = getDatasetAuditLog();
+        List<Map<String,Object>> rows = selectResp.getRows();
+        return rows.size();
+    }
+
     private void verifyDemographics()
     {
         clickLinkWithText(getFolderName());
@@ -750,7 +800,7 @@ public class StudyTest extends StudyBaseTest
         waitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("audit", this);
-        String[][] columnAndValues = new String[][] {{"Created By", PasswordUtil.getUsername()},
+        String[][] columnAndValues = new String[][] {{"Created By", getUsername()},
                 {"Project", PROJECT_NAME}, {"Container", STUDY_NAME}, {"SchemaName", "study"},
                 {"QueryName", "DEM-1: Demographics"}, {"Comment", "Exported to script type r"}};
         for(String[] columnAndValue : columnAndValues)
