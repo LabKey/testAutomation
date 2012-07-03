@@ -700,6 +700,7 @@ public class StudyTest extends StudyBaseTest
         setFormElement("quf_MouseId", "999320812");
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Mouse Comment");
         clickNavButton("Submit");
+        //Issue 14894: Datasets no longer audit row insertion
         verifyAuditEventAdded(datasetAuditEventCount);
 
         clickLinkWithText(getStudyLabel());
