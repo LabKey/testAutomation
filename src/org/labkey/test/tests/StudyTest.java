@@ -801,7 +801,7 @@ public class StudyTest extends StudyBaseTest
         waitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("audit", this);
-        String[][] columnAndValues = new String[][] {{"Created By", getUsername()},
+        String[][] columnAndValues = new String[][] {{"Created By", PasswordUtil.getUsername()},
                 {"Project", PROJECT_NAME}, {"Container", STUDY_NAME}, {"SchemaName", "study"},
                 {"QueryName", "DEM-1: Demographics"}, {"Comment", "Exported to script type r"}};
         for(String[] columnAndValue : columnAndValues)
