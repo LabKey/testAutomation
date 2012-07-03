@@ -179,6 +179,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusPanel(STUDIES[2], STUDIES[2], 11, 1, 3, 2, 3, 12, SearchBy.Studies);
         goToAppHome();
         click(SearchBy.Antigens);
+        sortBy("Tier", "1A");
         toggleExplorerBar("3");
         assertFilterStatusPanel("H061.14", "H061.14", 12, 1, 1, 1, 8, 12, SearchBy.Antigens);
         toggleExplorerBar("1A");
@@ -212,6 +213,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // 14910
         click(SearchBy.Antigens);
+        sortBy("Tier", "1A");
         shiftSelectBars("MW965.26", "ZM197M.PB7");
         waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), 'DJ263.8')]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//div[@class='filtermember']"), 6);
@@ -576,6 +578,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // placeholder pages
         click(SearchBy.Antigens);
+        sortBy("Tier", "1A");
         toggleExplorerBar("1A");
         assertNounInfoPage("MW965.26", Arrays.asList("Clade", "Tier", "MW965.26", "U08455"));
         assertNounInfoPage("SF162.LS", Arrays.asList("Clade", "Tier", "SF162.LS", "EU123924"));
@@ -766,7 +769,14 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void click(SearchBy by)
     {
         clickAt(Locator.xpath("//span[@class = 'label' and text() = ' "+by+"']"), "1,1");
-        waitForText("Showing number of: Participants", WAIT_FOR_JAVASCRIPT);
+        waitForText("Showing number of: Participants", CDS_WAIT);
+    }
+
+    private void sortBy(String sort, String waitValue)
+    {
+        click(Locator.xpath("//div[contains(@class, 'sortDropdown')]//span"));
+        click(Locator.xpath("//span[contains(@class, 'x4-menu-item-text') and text()='" + sort + "']"));
+        waitForText(waitValue, CDS_WAIT);
     }
 
     private void viewInfo(String barLabel)
@@ -775,13 +785,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '" + barLabel + "']/..//button"));
         click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
         waitForElement(Locator.button("Close"));
-/*
-        if(!isElementPresent(Locator.css(".savetitle")))
-        {
-            refresh();
-            waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
-        }
-*/
         waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
         waitForText(barLabel);
         waitForElement(Locator.xpath("//div[contains(@class, 'savetitle') and text() = '" + barLabel +"']"));
