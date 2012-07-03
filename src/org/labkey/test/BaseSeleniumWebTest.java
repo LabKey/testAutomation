@@ -765,7 +765,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private Boolean initialSystemMaintenanceSchedule = null; // true = daily : false = never
     protected void setSystemMaintenance(boolean enable)
     {
-        gotoAdminConsole();
+        goToAdminConsole();
         clickLinkWithText("site settings");
         if (initialSystemMaintenanceSchedule == null) initialSystemMaintenanceSchedule = getFormElement("systemMaintenanceInterval").equals("daily");
         checkRadioButton("systemMaintenanceInterval", enable ? "daily" : "never");
@@ -776,7 +776,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if (initialSystemMaintenanceSchedule != null)
         {
-            gotoAdminConsole();
+            goToAdminConsole();
             clickLinkWithText("site settings");
             checkRadioButton("systemMaintenanceInterval", initialSystemMaintenanceSchedule ? "daily" : "never");
             clickNavButton("Save");
@@ -791,14 +791,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickAdminMenuItem("Show Navigation Bar");
     }
 
-    public void gotoAdminConsole()
+    public void goToAdminConsole()
     {
         clickAdminMenuItem("Site", "Admin Console");
     }
 
     public void goToAuditLog()
     {
-        gotoAdminConsole();
+        goToAdminConsole();
         clickLinkWithText("audit log");
     }
 
@@ -826,7 +826,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
-    protected void clickAdminMenuItem(String... items)
+    private void clickAdminMenuItem(String... items)
     {
         waitForElement(Locator.xpath(ADMIN_MENU_XPATH));
         ExtHelper.clickExtMenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), items);
@@ -1113,7 +1113,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if(!isElementPresent(Locator.linkWithText("Run system maintenance now")))
         {
-            gotoAdminConsole();
+            goToAdminConsole();
             clickLinkWithText("site settings");
         }
         selenium.openWindow("", "systemMaintenance");
@@ -5082,7 +5082,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             click(Locator.id("userMenuPopupLink"));
         }
         assertTextNotPresent("Stop Impersonating");
-        gotoAdminConsole();
+        goToAdminConsole();
         selectOptionByText(Locator.id("email").toString(), fakeUser);
         clickNavButton("Impersonate");
         _impersonationStack.push(fakeUser);
@@ -6569,7 +6569,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public  String getFolderUrl()
     {
         Locator l = Locator.xpath("//td[@class='labkey-folder-title']/a");
-        return getAttribute(l,  "href");
+        return getAttribute(l, "href");
     }
 
     public Collection<String> getTabEntries() throws Exception
@@ -6622,5 +6622,4 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitForPipelineJobsToComplete(2, "Study Reload", false);
 
     }
-
 }

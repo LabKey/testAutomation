@@ -665,13 +665,13 @@ public class SecurityTest extends BaseSeleniumWebTest
         impersonate(SITE_ADMIN_USER);
         String siteAdminDisplayName = getDisplayName();
         ensureAdminMode();
-        gotoAdminConsole();
+        goToAdminConsole();
         assertTextPresent("Already impersonating; click here to change back to " + testUserDisplayName);
         deleteUser(TO_BE_DELETED_USER, true);
         stopImpersonating();
 
         ensureAdminMode();
-        gotoAdminConsole();
+        goToAdminConsole();
         clickLinkWithText("audit log");
 
         selectOptionByText("view", "User events");

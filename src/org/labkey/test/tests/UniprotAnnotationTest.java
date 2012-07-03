@@ -43,7 +43,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         log("Starting UniprotAnnotationTest");
 
         ensureAdminMode();
-        gotoAdminConsole();
+        goToAdminConsole();
         clickLinkWithText("protein databases");
         assertTextNotPresent(UNIPROT_FILENAME);
 

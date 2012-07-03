@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.labkey.experimentQuery.xml.Folder;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -28,11 +27,13 @@ import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
-import static org.labkey.test.util.ListHelper.ListColumnType.*;
 
 import java.io.File;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+
+import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
+import static org.labkey.test.util.ListHelper.ListColumnType.String;
 
 /**
  * User: ulberge
@@ -42,7 +43,6 @@ public class ListTest extends BaseSeleniumWebTest
 {
     protected final static String PROJECT_NAME = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_NAME2 = "OtherListVerifyProject";
-    private String project2_url;
     protected final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
@@ -51,8 +51,9 @@ public class ListTest extends BaseSeleniumWebTest
     protected final static String FAKE_COL1_NAME = "FakeName";
     protected final static String ALIASED_KEY_NAME = "Material";
     protected final static String HIDDEN_TEXT = "Hidden";
-    protected ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
-    protected ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
+
+    protected final ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
+    protected final ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
     protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
     protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
     protected final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
@@ -481,7 +482,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Create second project");
         createProject(PROJECT_NAME2);
 
-        project2_url = getCurrentRelativeURL();
+        String project2_url = getCurrentRelativeURL();
 
         log("Add List -- " + LIST3_NAME);
         ListHelper.createList(this, PROJECT_NAME2, LIST3_NAME, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
@@ -841,7 +842,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     ListHelper.ListColumn col(String name, ListHelper.ListColumnType type, String table)
     {
-        return col( null, name,type, table);
+        return col(null, name, type, table);
     }
 
     ListHelper.ListColumn col(String folder, String name, ListHelper.ListColumnType type, String table)

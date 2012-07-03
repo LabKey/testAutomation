@@ -141,7 +141,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void checkModuleDeployed()
     {
         log("Checking miniassay module is deployed");
-        gotoAdminConsole();
+        goToAdminConsole();
         assertTextPresent(MODULE_NAME);
     }
 

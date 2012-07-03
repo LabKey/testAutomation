@@ -94,7 +94,7 @@ public class BasicTest extends BaseSeleniumWebTest
         clickNavButton("Search");
         assertTextPresent("Found", "results");  // just make sure we get the results page
 
-        gotoAdminConsole();
+        goToAdminConsole();
 
         if (enableDevMode())
             assertTextNotPresent("Production"); // Verify that we're running in dev mode
@@ -142,7 +142,7 @@ public class BasicTest extends BaseSeleniumWebTest
         waitForSystemMaintenanceCompletion();
 
         // Verify scheduled system maintenance is disabled.
-        gotoAdminConsole();
+        goToAdminConsole();
         clickLinkWithText("running threads");
         assertTextNotPresent("SystemMaintenance");
     }

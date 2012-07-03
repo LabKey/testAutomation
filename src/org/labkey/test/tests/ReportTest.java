@@ -18,15 +18,12 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
 import java.io.File;
-import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.List;
 
@@ -781,7 +778,7 @@ public class ReportTest extends StudyBaseTest
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickNavButton("Save");
 
-        gotoAdminConsole();
+        goToAdminConsole();
         impersonate(TEST_USER);
         clickLinkWithText(getProjectName());
         clickLinkWithText("My Study");

@@ -137,7 +137,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
-        gotoAdminConsole();
+        goToAdminConsole();
         clickLinkWithText("full-text search");
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");

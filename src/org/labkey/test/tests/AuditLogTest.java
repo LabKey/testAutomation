@@ -118,7 +118,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
         {
             instance.ensureAdminMode();
 
-            instance.gotoAdminConsole();
+            instance.goToAdminConsole();
             instance.clickLinkWithText("audit log");
         }
 

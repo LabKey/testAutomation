@@ -124,7 +124,7 @@ public class RReportHelper
         // user need to be added to the site develpers group
         // createSiteDeveloper(PasswordUtil.getUsername());
 
-        test.gotoAdminConsole();
+        test.goToAdminConsole();
         test.clickLinkWithText("views and scripting");
         test.log("Check if R already is configured");
 

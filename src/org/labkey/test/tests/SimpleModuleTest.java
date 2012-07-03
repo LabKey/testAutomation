@@ -615,7 +615,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     protected void assertModuleDeployed(String moduleName)
     {
         log("Ensuring that that '" + moduleName + "' module is deployed");
-        gotoAdminConsole();
+        goToAdminConsole();
         assertTextPresent(moduleName);
     }
 

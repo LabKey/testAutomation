@@ -485,7 +485,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
     protected void purgeFiles()
     {
-        gotoAdminConsole();
+        goToAdminConsole();
         clickLinkWithText("ms1");
         if(isNavButtonPresent("Purge Deleted MS1 Data Now"))
         {

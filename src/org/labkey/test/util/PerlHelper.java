@@ -34,7 +34,7 @@ public class PerlHelper
     public static boolean ensurePerlConfig(BaseSeleniumWebTest test)
     {
 
-        test.gotoAdminConsole();
+        test.goToAdminConsole();
         test.clickLinkWithText("views and scripting");
         test.log("Check if Perl already is configured");
 
