@@ -5,11 +5,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 6/28/12
  * Time: 6:20 PM
- * To change this template use File | Settings | File Templates.
  */
 public class Ext4FileFieldRef extends Ext4CmpRef
 {

@@ -118,50 +118,27 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Admin");
 
         // AddKeywordAction
-        setFormElement(Locator.formElement("addArea", "keyword"), "Area51");
-        clickNavButton("Add Area");
-        assertTextPresent("Area51");
-        setFormElement(Locator.formElement("addArea", "keyword"), "Fremont");
-        clickNavButton("Add Area");
-        assertTextPresent("Fremont");
-        setFormElement(Locator.formElement("addArea", "keyword"), "Downtown");
-        clickNavButton("Add Area");
-        assertTextPresent("Downtown");
+        addKeywordsAndVerify("area", "Area", "Area51", "Fremont", "Downtown");
+        addKeywordsAndVerify("type", "Type", "UFO", "SPEC", "TODO", "AAA");
 
-        // AddKeywordAction
-        setFormElement(Locator.formElement("addType", "keyword"), "UFO");
-        clickNavButton("Add Type");
-        assertTextPresent("UFO");
-        setFormElement(Locator.formElement("addType", "keyword"), "SPEC");
-        clickNavButton("Add Type");
-        assertTextPresent("SPEC");
-        setFormElement(Locator.formElement("addType", "keyword"), "TODO");
-        clickNavButton("Add Type");
-        assertTextPresent("TODO");
-        setFormElement(Locator.formElement("addType", "keyword"), "AAA");
-        clickNavButton("Add Type");
-
-        assertTextPresent("AAA");
         //SetKeywordDefaultAction
         clickLinkWithText("set");
         // check that AAA is bold and [clear] link is on that row
-        assertElementContains(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[1]/b"), "AAA");
-        assertElementContains(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[2]/a[2]"), "clear");
+        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"), "AAA");
+        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "clear");
         //SetKeywordDefaultAction
         clickLinkWithText("clear");
         // check that AAA is not bold and [set] link is now on that row
-        assertElementNotPresent(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[1]/b"));
-        assertElementContains(Locator.xpath("id('formTypes')/table/tbody/tr[1]/td[2]/a[2]"), "set");
+        assertElementNotPresent(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"));
+        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "set");
         clickLinkWithText("delete");
         assertTextNotPresent("AAA");
 
         // Check that non-integer priority results in an error message
-        setFormElement(Locator.formElement("addPriority", "keyword"), "ABC");
-        clickNavButton("Add Priority");
+        addKeyword("priority", "Priority", "ABC");
         assertTextPresent("Priority must be an integer");
         assertTextNotPresent("ABC");
-        setFormElement(Locator.formElement("addPriority", "keyword"), "1.2");
-        clickNavButton("Add Priority");
+        addKeyword("priority", "Priority", "1.2");
         assertTextPresent("Priority must be an integer");
         assertTextNotPresent("1.2");
 
@@ -178,24 +155,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Update");
 
         // AddKeywordAction
-        setFormElement(Locator.formElement("addMilestone", "keyword"), "2012");
-        clickNavButton("Add Milestone");
-        assertTextPresent("2012");
-        setFormElement(Locator.formElement("addMilestone", "keyword"), "2013");
-        clickNavButton("Add Milestone");
-        assertTextPresent("2013");
-        setFormElement(Locator.formElement("addMyFirstString", "keyword"), "North");
-        clickNavButton("Add MyFirstString");
-        assertTextPresent("North");
-        setFormElement(Locator.formElement("addMyFirstString", "keyword"), "South");
-        clickNavButton("Add MyFirstString");
-        assertTextPresent("South");
-        setFormElement(Locator.formElement("addMyFifthString", "keyword"), "Cadmium");
-        clickNavButton("Add MyFifthString");
-        assertTextPresent("Cadmium");
-        setFormElement(Locator.formElement("addMyFifthString", "keyword"), "Polonium");
-        clickNavButton("Add MyFifthString");
-        assertTextPresent("Polonium");
+        addKeywordsAndVerify("milestone", "Milestone", "2012", "2013");
+        addKeywordsAndVerify("string1", "MyFirstString", "North", "South");
+        addKeywordsAndVerify("string5", "MyFifthString", "Cadmium", "Polonium");
 
         // UpdateRequiredFieldsAction
         checkCheckbox("requiredFields", "Milestone");
@@ -251,14 +213,8 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         // DetailsAction
         assertTextPresent("Issue " + issueId + ": " + ISSUE_TITLE_0);
-        assertTextPresent("Milestone");
-        assertTextPresent("MyInteger");
-        assertTextPresent("MySecondInteger");
-        assertTextPresent("MyFirstString");
+        assertTextPresent("Milestone", "MyInteger", "MySecondInteger", "MyFirstString", "MyThirdString", "MyFourthString", "MyFifthString");
         assertTextNotPresent("MySecondString");
-        assertTextPresent("MyThirdString");
-        assertTextPresent("MyFourthString");
-        assertTextPresent("MyFifthString");
         assertLinkPresentWithText("http://www.issues.test");
 
         // ListAction
@@ -331,6 +287,24 @@ public class IssuesTest extends BaseSeleniumWebTest
         // ExportTsvAction
         // PurgeAction
         // RssAction
+    }
+
+    // Add a keyword to the given field, without verifying the operation.  Need to be on the issues admin page already.
+    private void addKeyword(String fieldName, String caption, String value)
+    {
+        setFormElement(Locator.formElement("add" + fieldName, "keyword"), value);
+        clickNavButton("Add " + caption);
+    }
+
+    // Add new keyword(s) to the given field and verify they were added without error.  Need to be on the issues admin page already.
+    private void addKeywordsAndVerify(String fieldName, String caption, String... values)
+    {
+        for (String value : values)
+        {
+            addKeyword(fieldName, caption, value);
+            assertNoLabkeyErrors();
+            assertTextPresent(value);
+        }
     }
 
     private void emailTest()

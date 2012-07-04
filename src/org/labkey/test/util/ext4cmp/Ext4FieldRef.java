@@ -2,10 +2,8 @@ package org.labkey.test.util.ext4cmp;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 
 /**
- * Created by IntelliJ IDEA.
  * User: bbimber
  * Date: 6/20/12
  * Time: 12:40 PM
@@ -31,9 +29,9 @@ public class Ext4FieldRef extends Ext4CmpRef
     public String setValue(String[] vals)
     {
         String query = "this.setValue([";
-        for(String val: vals)
+        for (String val : vals)
         {
-            query+="\"" + val + "\",";
+            query += "\"" + val + "\",";
         }
         query = query.substring(0, query.length()-1) +  "])"; //cut the trailing comma off
         return eval(query);
@@ -44,5 +42,4 @@ public class Ext4FieldRef extends Ext4CmpRef
     {
         return eval("this.getValue()");
     }
-
 }
