@@ -125,9 +125,11 @@ public class WikiLongTest extends BaseSeleniumWebTest
     {
         enableEmailRecorder();
         createProject(PROJECT2_NAME);
+        enableModule(PROJECT2_NAME, "MS2");
         setPermissions(USERS_GROUP, "Editor");
         clickNavButton("Save and Finish");
         createProject(PROJECT_NAME);
+        enableModule(PROJECT_NAME, "MS2");
         createPermissionsGroup("testers");
         setPermissions("testers", "Editor");
         setPermissions(USERS_GROUP, "Editor");

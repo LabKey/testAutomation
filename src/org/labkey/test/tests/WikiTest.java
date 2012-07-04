@@ -74,6 +74,8 @@ public class WikiTest extends BaseSeleniumWebTest
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
+        enableModule(PROJECT_NAME, "MS2");
+
         goToAdminConsole();
         clickLinkWithText("full-text search");
         if (isTextPresent("pause crawler"))

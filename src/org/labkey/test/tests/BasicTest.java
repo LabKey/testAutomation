@@ -59,7 +59,8 @@ public class BasicTest extends BaseSeleniumWebTest
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
         clickNavButton("Save and Finish");
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] {"Messages", "Wiki"});
+        enableModule(PROJECT_NAME, "MS2");
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] {"Messages", "Wiki", "MS2"});
         addWebPart("Messages");
         assertLinkPresentWithText("Messages");
         addWebPart("Wiki");
