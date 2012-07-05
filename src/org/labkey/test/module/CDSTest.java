@@ -666,14 +666,16 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         click(Locator.tagWithText("span", "Plot Data"));
         ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "CD4");
+        clickButton("Plot", 0);
         ExtHelper.pickMeasure(this, "YaxisPicker", "Lab Results", "Lymphocytes");
-        clickButton("plot", 0);
+        clickButton("Plot", 0);
         waitForText(CD4_LYMPH); // svg to text
 
         clickButton(">", 0); // Choose variables button
-        ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "Hemoglobin");
         ExtHelper.pickMeasure(this, "YaxisPicker", "Lab Results", "CD4");
-        clickButton("plot", 0);
+        Locator.xpath("(//div[contains(@class, 'curselhdr')])[1]");
+        ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "Hemoglobin");
+        clickButton("Plot", 0);
         waitForText(HEMO_CD4); // svg to text
 
         //TODO: Test cancel button [BLOCKED] 15095: Measure picker cancel button doesn't reset selections
