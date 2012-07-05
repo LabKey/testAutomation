@@ -129,7 +129,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
         log("verify search settings as expected");
         goToFolderManagement();
-        clickLinkContainingText("Search");
+        clickLinkWithText("Search");
         assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
 
         log("verify folder type was overwritten on import");

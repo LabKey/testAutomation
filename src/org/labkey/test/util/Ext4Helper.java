@@ -34,9 +34,12 @@ import java.util.List;
  */
 public class Ext4Helper
 {
+
     public static void selectComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
     {
-        test.clickAt(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"), "1,1");
+        Locator l = Locator.xpath("//tbody[" + parentLocator.getPath()+"]//div[contains(@class,'arrow')]");
+        test.waitForElement(l);
+        test.clickAt(l,  "1,1");
         if(test.getBrowser().startsWith(test.IE_BROWSER))
         {
             test.sleep(500);
@@ -46,10 +49,11 @@ public class Ext4Helper
         else
         {
             // wait for the dropdown to open
-            test.waitForElement(Locator.xpath(parentLocator.getPath() + "//*[(self::td or self::div) and contains(@class, 'x4-pickerfield-open')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            Locator listItem =     Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '" + selection + "')]");
+            test.waitForElement(listItem);
 
             // select the list item
-            test.click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '" + selection + "')]"));
+            test.click(listItem);
             //test.mouseDown(Locator.xpath("/html/body"));
         }
     }

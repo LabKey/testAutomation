@@ -827,7 +827,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
-    private void clickAdminMenuItem(String... items)
+    protected void clickAdminMenuItem(String... items)
     {
         waitForElement(Locator.xpath(ADMIN_MENU_XPATH));
         ExtHelper.clickExtMenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), items);
@@ -2218,8 +2218,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             if(folderType.equals("Create From Template Folder"))
             {
                 log("create from template");
+                sleep(500); //Clicking too soon causes the dropdown menu to not populate
                 click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
-                Locator.XPathLocator l = Locator.xpath("//div[div/div[contains(text(), 'Choose Template Folder:')]]");
+                Locator.XPathLocator l = Locator.xpath("//input[@name='templateSourceId']");
                 Ext4Helper.selectComboBoxItem(this, l, templateFolder);
 
                 //TODO:  the checkboxes.  I don't need this right now so I haven't written it, but my intention is to use tabsToAdd
