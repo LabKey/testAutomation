@@ -108,6 +108,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void importCDSData(String query, File dataFile)
     {
         clickLinkWithText(PROJECT_NAME);
+        waitForTextWithRefresh("Fact Table", defaultWaitForPage*4);  //wait for study to fully load
         clickLinkWithText(query);
         ListHelper.clickImportData(this);
 
