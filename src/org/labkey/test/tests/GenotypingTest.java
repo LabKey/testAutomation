@@ -29,6 +29,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -95,19 +96,13 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
     {
         log("Import genotyping list");
         clickLinkContainingText(getProjectName());
-        clickLinkContainingText("manage lists");
-
-        clickButton("Import List Archive");
-//        sleep(500);
-        setFormElement("listZip", new File(pipelineLoc, "sequencing.lists.zip"));
-        clickButton("Import List Archive");
-
+        ListHelper.importListArchive(this, getProjectName(), new File(pipelineLoc, "sequencing.lists.zip"));
         assertTextPresent(
                 samples,
                 "mids",
                 "sequences",
                 "runs"
-            );
+        );
 
     }
 
@@ -336,7 +331,7 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
     {
         clickButton("Add Analysis");
         Locator menuLocator = Locator.xpath("//input[@name='sequencesView']/../input[2]");
-        ExtHelper.clickExtDropDownMenu(this, menuLocator,  "[default]");                       //TODO:  this should be cyno
+        ExtHelper.clickExtDropDownMenu(this, menuLocator, "[default]");                       //TODO:  this should be cyno
         clickButton("Submit");
         waitForText("COMPLETE");
         findAndSetAnalysisNumber();
