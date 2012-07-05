@@ -89,6 +89,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         importCDSData("Citable", new File(getSampledataPath(), "CDS/citable.tsv"));
         importCDSData("Citations", new File(getSampledataPath(), "CDS/citations.tsv"));
         importCDSData("AssayPublications", new File(getSampledataPath(), "CDS/assay_publications.tsv"));
+        importCDSData("Vaccines", new File(getSampledataPath(), "CDS/vaccines.tsv"));
+        importCDSData("VaccineComponents", new File(getSampledataPath(), "CDS/vaccinecomponents.tsv"));
 
         populateFactTable();
 
@@ -119,6 +121,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickLinkWithText("Populate Fact Table");
         uncheckCheckbox("dataset", "HIV Test Results");
         uncheckCheckbox("dataset", "Physical Exam");
+        uncheckCheckbox("dataset", "ParticipantVaccines");
         submit();
 
         assertLinkPresentWithText("NAb");
