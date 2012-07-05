@@ -289,21 +289,31 @@ public class IssuesTest extends BaseSeleniumWebTest
         // RssAction
     }
 
-    // Add a keyword to the given field, without verifying the operation.  Need to be on the issues admin page already.
     private void addKeyword(String fieldName, String caption, String value)
     {
-        setFormElement(Locator.formElement("add" + fieldName, "keyword"), value);
-        clickNavButton("Add " + caption);
+        addKeyword(this, fieldName, caption, value);
+    }
+
+    private void addKeywordsAndVerify(String fieldName, String caption, String... values)
+    {
+        addKeywordsAndVerify(this, fieldName, caption, values);
+    }
+
+    // Add a keyword to the given field, without verifying the operation.  Need to be on the issues admin page already.
+    private static void addKeyword(BaseSeleniumWebTest test, String fieldName, String caption, String value)
+    {
+        test.setFormElement(Locator.formElement("add" + fieldName, "keyword"), value);
+        test.clickNavButton("Add " + caption);
     }
 
     // Add new keyword(s) to the given field and verify they were added without error.  Need to be on the issues admin page already.
-    private void addKeywordsAndVerify(String fieldName, String caption, String... values)
+    public static void addKeywordsAndVerify(BaseSeleniumWebTest test, String fieldName, String caption, String... values)
     {
         for (String value : values)
         {
-            addKeyword(fieldName, caption, value);
-            assertNoLabkeyErrors();
-            assertTextPresent(value);
+            addKeyword(test, fieldName, caption, value);
+            test.assertNoLabkeyErrors();
+            test.assertTextPresent(value);
         }
     }
 

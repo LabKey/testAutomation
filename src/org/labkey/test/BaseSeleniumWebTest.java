@@ -85,6 +85,7 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.getTabLinkId;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
+import static org.labkey.test.WebTestHelper.log;
 import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
@@ -1478,8 +1479,15 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         {
             if (attempt > 0)
             {
-                log("Found " + leakCount + " in-use objects; rerunning GC.  ("
+                log("Found " + leakCount + " in-use objects; rerunning GC. ("
                         + (GC_ATTEMPT_LIMIT - attempt) + " attempt(s) remaining.)");
+
+                // If another thread (e.g., SearchService) is doing work then give it 10 seconds before trying again
+                if (isTextPresent("Warning: active thread"))
+                {
+                    log("Pausing 10 seconds to wait for active thread");
+                    sleep(10000);
+                }
             }
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))

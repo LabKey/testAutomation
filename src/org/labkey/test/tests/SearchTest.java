@@ -254,12 +254,10 @@ public class SearchTest extends StudyTest
         clickNavButton("Admin");
 
         // Add Area
-        setFormElement(Locator.formElement("addArea", "keyword"), "Area51");
-        clickNavButton("Add Area");
+        IssuesTest.addKeywordsAndVerify(this, "area", "Area", "Area51");
 
         // Add Type
-        setFormElement(Locator.formElement("addType", "keyword"), "UFO");
-        clickNavButton("Add Type");
+        IssuesTest.addKeywordsAndVerify(this, "type", "Type", "UFO");
 
         // Create new issue.
         clickNavButton("Back to Issues");
