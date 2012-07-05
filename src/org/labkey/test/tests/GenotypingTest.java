@@ -534,6 +534,8 @@ public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyT
             Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
         }
         Ext4FieldRef.getForLabel(this, "Template").setValue(TEMPLATE_NAME);
+        sleep(50);
+        assertEquals("Field value not set correctly", TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
         Ext4Helper.clickTabContainingText(this, "Preview Header");
         waitForText("Edit Sheet");
         assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
