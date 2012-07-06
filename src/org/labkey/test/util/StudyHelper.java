@@ -50,7 +50,7 @@ public class StudyHelper
         test.clickNavButton("Create", 0);
         ExtHelper.waitForExtDialog(test, "Define "+participantString+" Group");
         test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        test.setFormElement("categoryLabel", groupName);
+        test.setFormElement("groupLabel", groupName);
         if( ptids.length > 0 )
         {
             String csp = ptids[0];

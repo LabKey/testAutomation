@@ -180,7 +180,7 @@ public class StudyTest extends StudyBaseTest
     protected static final String SUBJECT_NOUN_PLURAL = "Mice";
     protected static final String PROJECT_NAME = "StudyVerifyProject";
     protected static final String STUDY_NAME = "My Study";
-    protected static final String LABEL_FIELD = "categoryLabel";
+    protected static final String LABEL_FIELD = "groupLabel";
     protected static final String ID_FIELD = "categoryIdentifiers";
 
 
@@ -463,7 +463,7 @@ public class StudyTest extends StudyBaseTest
         clickButtonContainingText("Save", 0);
 
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        assertTextPresent(listName);
+        waitForText(listName, WAIT_FOR_JAVASCRIPT);
         return idsInForm;
     }
 
