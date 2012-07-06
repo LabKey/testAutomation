@@ -85,7 +85,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         drt.getDataAsText(5, "Precursor");
         assertEquals("LTSLNVVAGSDLR", drt.getDataAsText(5, "Precursor"));
         assertEquals("heavy", drt.getDataAsText(5, "Label"));
-        assertEquals("1343.7408", drt.getDataAsText(5, "Neutral Mass"));
+        assertEquals("1343.7408", drt.getDataAsText(5, "Peptide Neutral Mass"));
         assertEquals("677.8818", drt.getDataAsText(5, "Q1 m/z"));
         assertEquals("727.3973", drt.getDataAsText(5, "Q3 m/z"));
 
