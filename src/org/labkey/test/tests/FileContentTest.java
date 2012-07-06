@@ -127,6 +127,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickLinkWithText(PROJECT_NAME);
             // Setup custom file properties
             ExtHelper.waitForFileGridReady(this);
+            ExtHelper.waitForFileAdminEnabled(this);
             clickButton("Admin", 0);
             ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
             ExtHelper.clickExtTab(this, "File Properties");
@@ -140,6 +141,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
             ExtHelper.waitForFileGridReady(this);
+            ExtHelper.waitForFileAdminEnabled(this);
             clickButton("Admin", 0);
             ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
 
@@ -150,10 +152,6 @@ public class FileContentTest extends BaseSeleniumWebTest
             ExtHelper.clickExtTab(this, "File Properties");
             checkRadioButton("fileOption", "useCustom");
 
-            //NOTE: after selenium clicked on the grid settings tab, some of the time the grid's menu bar
-            // would not render correctly.
-            sleep(300);
-
             // Modify toolbar.
             ExtHelper.clickExtTab(this, "Toolbar and Grid Settings");
             waitForText("Configure Grid columns and Toolbar");
@@ -161,6 +159,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForText("Import Data");
             waitForText("file1.xls");
             Locator folderBtn = Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconFolderNew')]");
+            waitForElement(folderBtn, WAIT_FOR_JAVASCRIPT);
             click(folderBtn);
             click(Locator.xpath("//a[./span[text()='remove']]")); // Remove upload button
             click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconUp')]"));

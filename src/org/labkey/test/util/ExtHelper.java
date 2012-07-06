@@ -370,6 +370,11 @@ public class ExtHelper
         test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    public static void waitForFileAdminEnabled(BaseSeleniumWebTest test)
+    {
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
     /**
      * Used for directory refreshes or folder changes for the file webpart grid to be ready and initialized.
      * @param test
