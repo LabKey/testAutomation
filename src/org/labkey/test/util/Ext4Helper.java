@@ -20,6 +20,7 @@ import org.json.simple.JSONValue;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +38,7 @@ public class Ext4Helper
 
     public static void selectComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
     {
-        Locator l = Locator.xpath("//tbody[" + parentLocator.getPath()+"]//div[contains(@class,'arrow')]");
+        Locator l = Locator.xpath("//tbody[" + parentLocator.getPath()+"]/tr/td/div[contains(@class,'arrow')]");
         test.waitForElement(l);
         test.clickAt(l,  "1,1");
         if(test.getBrowser().startsWith(test.IE_BROWSER))
@@ -60,14 +61,7 @@ public class Ext4Helper
 
     public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
     {
-        Locator.XPathLocator loc = Locator.xpath("//div[./label[text()='" + label + "']]");
-        if (!test.isElementPresent(loc))
-        {
-            // try Ext 4.1.0 version
-            loc = Locator.xpath("//table[./tbody/tr/td/label[text()='" + label + "']]");
-        }
-
-        selectComboBoxItem(test, loc, selection);
+       Ext4FieldRef.getForLabel(test, label).setValue(selection);
     }
 
     public static void selectComboBoxItemById(BaseSeleniumWebTest test, String labelId, String selection)

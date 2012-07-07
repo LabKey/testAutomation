@@ -415,7 +415,7 @@ public class CAVDStudyTest extends StudyBaseTest
     {
         clickEditDatasetIcon(dataset);
         Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
-        Ext4Helper.selectComboBoxItem(this, comboParent, status);
+        Ext4Helper.selectComboBoxItem(this, "Status", status);
         clickNavButton("Save", 0);
 
         // verify that the status icon appears
