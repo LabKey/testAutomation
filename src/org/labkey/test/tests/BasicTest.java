@@ -45,6 +45,10 @@ public class BasicTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        log("Test browser version");
+        String source = getHtmlSource();
+        assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 13.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
+
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
         // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
@@ -116,10 +120,6 @@ public class BasicTest extends BaseSeleniumWebTest
         popLocation();
         assertTextPresent(FOLDER_RENAME);
 
-        log("Test browser version");
-        String source = getHtmlSource();
-        assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 12.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
-
         log("Test webpart buttons");
         clickWebpartMenuItem("Messages", "Customize");      
         assertTextPresent("Customize");
@@ -148,11 +148,11 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTextNotPresent("SystemMaintenance");
     }
 
-    private boolean isBrowser(String source, String browserName, double startVersion, double endVersion)
+    private boolean isBrowser(String source, String browserNameAndSeparator, double startVersion, double endVersion)
     {
-        if (source.indexOf(browserName) != -1)
+        if (source.indexOf(browserNameAndSeparator) != -1)
         {
-            int start = source.indexOf(browserName);
+            int start = source.indexOf(browserNameAndSeparator);
             int end = source.indexOf("-->", start);
             String version = source.substring(start, end);
 
@@ -163,8 +163,8 @@ public class BasicTest extends BaseSeleniumWebTest
                 version = version.substring(0, secondDot);
             }
 
-            double versionNumber = Double.parseDouble(version.substring(browserName.length()));
-            assertTrue("The LabKey test suite requires " + browserName + " " + startVersion + " - " + endVersion, versionNumber >= startVersion && versionNumber <= endVersion);
+            double versionNumber = Double.parseDouble(version.substring(browserNameAndSeparator.length()));
+            assertTrue("The LabKey test suite requires " + browserNameAndSeparator.substring(0, browserNameAndSeparator.length() - 1) + " " + startVersion + " - " + endVersion, versionNumber >= startVersion && versionNumber <= endVersion);
             log("Browser = " + version);
             return true;
         }
