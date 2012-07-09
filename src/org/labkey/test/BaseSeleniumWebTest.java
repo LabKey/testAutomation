@@ -3873,6 +3873,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setPipelineRoot(String rootPath, boolean inherit)
     {
+        log("Set pipeline to: " + rootPath);
         goToModule("Pipeline");
         clickNavButton("Setup");
 
@@ -3887,6 +3888,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         setFormElement("pipeProjectRootPath", rootPath);
 
         submit();
+        log("Finished setting pipeline to: " + rootPath);
     }
 
     // Returns true if any status value is "ERROR"
