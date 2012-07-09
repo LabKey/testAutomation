@@ -463,7 +463,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForTextToDisappear("PI1");
         waitForGridCount(246);
 
-        setRawDataFilter("Point IC50", "Is Greater Than", "60");
+        setRawDataFilter("Point IC50", "gt", "60");
         waitForGridCount(2);
         openFilterPanel("Ethnicity");
         clickButton("Clear Filters", 0);
@@ -541,7 +541,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         openFilterPanel(colName);
         if (null != filter)
-            Ext4Helper.selectComboBoxItem(this, "Value:", filter);
+            Ext4Helper.selectComboBoxItem(this, "Value", filter);
 
         waitForElement(Locator.id("value_1"));
         setFormElement(Locator.css("#value_1 input"), value);
