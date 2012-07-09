@@ -586,13 +586,13 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("View Chart(s)", 0);
 
         goToAxisTab("X-Axis");
-        Ext4Helper.selectComboBoxItem(this, "Draw x-axis as", "Weeks");
+        Ext4Helper.selectComboBoxItemById(this, "xaxis_interval", "Weeks");
         apply();
         waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
         setAxisValue("X", null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
         goToAxisTab("X-Axis");
-        Ext4Helper.selectComboBoxItem(this, "Draw x-axis as", "Days");
+        Ext4Helper.selectComboBoxItemById(this, "xaxis_interval", "Days");
         assertEquals(X_AXIS_LABEL, getFormElement("x-axis-label-textfield")); // Label shouldn't change automatically once it has been set manually
 
         // set manual x-axis range
@@ -627,7 +627,7 @@ public class TimeChartTest extends StudyBaseTest
 
         if(scaleId!=null && scale!=null)
         {
-            Ext4Helper.selectComboBoxItemById(this, scaleId + "-labelEl", scale);        
+            Ext4Helper.selectComboBoxItemById(this, scaleId, scale);        
         }
 
         if(label!=null)
@@ -1043,7 +1043,7 @@ public class TimeChartTest extends StudyBaseTest
 //        double height = Double.parseDouble(transform.substring(transform.indexOf(" "), transform.indexOf(")") - 1));
 
         enterMeasuresPanel();
-        Ext4Helper.selectComboBoxItem(this, "Draw y-axis on", "Right");
+        Ext4Helper.selectComboBoxItemById(this, "yaxis_side", "Right");
         apply();
 
         setAxisValue("Right", "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);

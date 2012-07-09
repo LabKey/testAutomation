@@ -38,7 +38,7 @@ public class Ext4Helper
 
     public static void selectComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
     {
-        Locator l = Locator.xpath("//tbody[" + parentLocator.getPath()+"]/tr/td/div[contains(@class,'arrow')]");
+        Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
         test.waitForElement(l);
         test.clickAt(l,  "1,1");
         if(test.getBrowser().startsWith(test.IE_BROWSER))
@@ -66,13 +66,7 @@ public class Ext4Helper
 
     public static void selectComboBoxItemById(BaseSeleniumWebTest test, String labelId, String selection)
     {
-        Locator.XPathLocator loc = Locator.xpath("//div[./label[@id='" + labelId + "']]");
-        if (!test.isElementPresent(loc))
-        {
-            // try Ext 4.1.0 version
-            loc = Locator.xpath("//table[./tbody/tr/td/label[@id='" + labelId + "']]");
-        }
-
+        Locator.XPathLocator loc = Locator.xpath("//tbody[./tr/td/label[@id='" + labelId + "-labelEl']]");
         selectComboBoxItem(test, loc, selection);
     }
 

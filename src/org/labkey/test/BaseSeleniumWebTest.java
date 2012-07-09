@@ -2220,7 +2220,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 log("create from template");
                 sleep(500); //Clicking too soon causes the dropdown menu to not populate
                 click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
-                Locator.XPathLocator l = Locator.xpath("//input[@name='templateSourceId']");
+                Locator.XPathLocator l = Locator.xpath("//tr[./td/input[@name='templateSourceId']]");
                 Ext4Helper.selectComboBoxItem(this, l, templateFolder);
 
                 //TODO:  the checkboxes.  I don't need this right now so I haven't written it, but my intention is to use tabsToAdd
