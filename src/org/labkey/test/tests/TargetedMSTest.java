@@ -29,7 +29,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         goToProjectHome();
         addWebPart("Data Pipeline");
         clickNavButton("Process and Import Data");
-        sleep(10000); //pipeline browser takes forever to load in linux
+        waitForText("MRMer", 5*defaultWaitForPage);
         selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
         waitForText("Targeted MS Runs ");
         waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
