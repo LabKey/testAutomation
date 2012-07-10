@@ -680,7 +680,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("Plot", 0);
         waitForText(CD4_LYMPH); // svg to text
 
-        clickButton(">", 0); // Choose variables button
+        click(Locator.xpath("(//div[contains(@class, 'x4-btn-dropdown-small')])[2]")); // Choose variables button
         ExtHelper.pickMeasure(this, "YaxisPicker", "Lab Results", "CD4");
         Locator.xpath("(//div[contains(@class, 'curselhdr')])[1]");
         ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "Hemoglobin");
