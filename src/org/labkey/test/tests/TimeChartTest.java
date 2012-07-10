@@ -320,13 +320,13 @@ public class TimeChartTest extends StudyBaseTest
 
         // uncheck group 1 and 2
         waitForText(GROUP1_NAME);
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP1_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP2_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + GROUP1_NAME + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + GROUP2_NAME + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
         waitForText("Please select at least one group");
         // re-select group 1 and 2
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP1_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP2_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + GROUP1_NAME + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + GROUP2_NAME + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
 
         waitForText(GROUP1_NAME + " CD4");
@@ -377,7 +377,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 6); // 5 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
 
         // re-select participant
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '249320127')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '249320127')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText(CHART_TITLE + ": 249320127", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(CHART_TITLE, 7); // 6 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
     }
@@ -568,9 +568,9 @@ public class TimeChartTest extends StudyBaseTest
 
         clickNavButton("View Data", 0);
         waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT); 
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '249325717')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '249325717')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("1 - 38 of 38", WAIT_FOR_JAVASCRIPT);
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '249320127')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '249320127')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
 
         // verify column headers for date based plotting option
@@ -885,7 +885,7 @@ public class TimeChartTest extends StudyBaseTest
 
         log("Verify one line per measure per participant. 2/3 groups.");
         // uncheck group 2 (leaving group 1 and 3 checked)
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP2_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + GROUP2_NAME + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 4); // One chart per group + 1 hidden main title text field + 1 for chart title in thumbnail preview on save dialog
@@ -973,7 +973,7 @@ public class TimeChartTest extends StudyBaseTest
 
         log("Verify one line per measure per participant.");
         // re-select group 2
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP2_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + GROUP2_NAME + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 2); // One chart per group.
@@ -1000,7 +1000,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(GROUP3_PTIDS[2]+",\n Days:", 0);
 
         // uncheck group 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + GROUP1_NAME + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + GROUP1_NAME + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
         sleep(2000);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 1); // One chart per group.
