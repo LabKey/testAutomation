@@ -175,15 +175,15 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             //TODO: Re-add new folder button to test adding new button. Fails on TeamCity
             // Re-add upload button
-            clickButton("Admin", 0);
-            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
-            ExtHelper.clickExtTab(this, "Toolbar and Grid Settings");
-            dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
-                         Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
-            waitForElement(Locator.xpath("(//button[contains(@class, 'iconFolderNew')])[2]"), WAIT_FOR_JAVASCRIPT);
-            clickButton("Submit", 0);
-            waitForExtMaskToDisappear();
-            waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
+            //clickButton("Admin", 0);
+            //ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
+            //ExtHelper.clickExtTab("Toolbar and Grid Settings");
+            //dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
+            //             Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
+            //waitForElement(Locator.xpath("(//button[contains(@class, 'iconFolderNew')])[2]"), WAIT_FOR_JAVASCRIPT);
+            //clickButton("Submit", 0);
+            //waitForExtMaskToDisappear();
+            //waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             
             String filename = "InlineFile.html";
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
