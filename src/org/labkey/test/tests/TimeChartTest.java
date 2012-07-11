@@ -129,8 +129,8 @@ public class TimeChartTest extends StudyBaseTest
         {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "Viral Load Quantified (copies/ml)", "Days"},
         {"Study Lab Results Date", "CD4+ (cells/mm3)", "Visit Date", "ObsConc", "ObsConc OOR Indicator", "Days"},
         {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "ObsConc", "ObsConc OOR Indicator", "Days"},
-        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"},
-        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)", "Days"}
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc", "Days"},
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc", "Days"}
     };
 
     private static final String[][] GETDATA_API_VISITTEST_COLNAMES = {
@@ -140,8 +140,8 @@ public class TimeChartTest extends StudyBaseTest
         {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "Viral Load Quantified (copies/ml)"},
         {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "ObsConc", "ObsConc OOR Indicator"},
         {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "ObsConc", "ObsConc OOR Indicator"},
-        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"},
-        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"}
+        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc"},
+        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc"}
     };
 
     private static final double[][] GETDATA_API_TEST_DAYS = {
@@ -173,8 +173,8 @@ public class TimeChartTest extends StudyBaseTest
         "Viral Load Quantified (copies/ml)",
         "ObsConc",
         "ObsConc",
-        "IL-10 (23)",
-        "IL-10 (23)"
+        "IL-10 (23) - ObsConc",
+        "IL-10 (23) - ObsConc"
     };
 
     private static final double[][] GETDATA_API_TEST_MEASURE_VALUES = {
