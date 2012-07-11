@@ -206,6 +206,7 @@ public class AssayTest extends AbstractAssayTest
         //copied from old test
         clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
+        assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
         checkRadioButton("providerName", "General");
         clickNavButton("Next");
 
