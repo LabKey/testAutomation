@@ -277,7 +277,7 @@ public class ListTest extends BaseSeleniumWebTest
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickNavButton("Cancel");
-        clickNavButton("Show Grid");
+        clickNavButton("Back");
 
         log("Test inserting new row");
         clickNavButton("Insert New");
@@ -326,7 +326,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickNavButton("Cancel");
-        clickNavButton("Show Grid");
+        clickNavButton("Back");
         clickNavButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
@@ -346,7 +346,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickNavButton("Cancel");
-        clickNavButton("Show Grid");
+        clickNavButton("Back");
         clickNavButton("Insert New");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickNavButton("Cancel");
@@ -365,7 +365,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
         clickNavButton("Cancel");
-        clickNavButton("Show Grid");
+        clickNavButton("Back");
         clickNavButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickNavButton("Cancel");
@@ -384,7 +384,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickNavButton("Cancel");
-        clickNavButton("Show Grid");
+        clickNavButton("Back");
         clickNavButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickNavButton("Cancel");
