@@ -25,7 +25,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         createProject(getProjectName(), "Targeted MS");
-        setPipelineRoot(getSampledataPath() + "\\TargetedMS");
+        setPipelineRoot(getSampledataPath() + "/TargetedMS");
         goToProjectHome();
         addWebPart("Data Pipeline");
         clickNavButton("Process and Import Data");
