@@ -213,12 +213,12 @@ public class StudyRedesignTest extends StudyBaseTest
         addWebPart("Mouse List");
         waitForText("Filter"); // Wait for participant list to appear.
 
-        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[1]")));
-        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[2]")));
+        mouseDownGridCellCheckbox("All", 1);
+        mouseDownGridCellCheckbox("All", 2);
         waitForText("No matching Mice");
 
         //Mouse down on GROUP 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'GROUP 1')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox("GROUP 1");
         waitForText("Found 10 mice of 138.");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -228,7 +228,7 @@ public class StudyRedesignTest extends StudyBaseTest
         }
 
         //Mouse down GROUP 2
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'GROUP 2')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox("GROUP 2");
         waitForText("Found 22 mice of 138.");
         //Check that all PTIDs from GROUP 1 and GROUP 2 are present at the same time.
         for(String ptid : PTIDS)
@@ -237,7 +237,7 @@ public class StudyRedesignTest extends StudyBaseTest
         }
 
         //Mouse down on GROUP 1 to remove it.
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'GROUP 1')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox("GROUP 1");
         waitForText("Found 13 mice of 138.");
         
         //Check if all PTIDs of GROUP 2 are visible

@@ -997,12 +997,12 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 25 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
-        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[1]")));
-        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[2]")));
+        mouseDownGridCellCheckbox("All", 1);
+        mouseDownGridCellCheckbox("All", 2);
         waitForText("Showing 0 Results");
 
         //Mouse down on GROUP 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + PARTICIPANT_GROUP_ONE + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Showing 12 Results");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -1022,7 +1022,7 @@ public class ReportTest extends StudyBaseTest
         }
 
         //Mouse down GROUP 2
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + PARTICIPANT_GROUP_TWO + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_TWO);
         waitForText("Showing 25 Results");
 
         //Check that all PTIDs from GROUP 1 and GROUP 2 are present at the same time.
@@ -1032,7 +1032,7 @@ public class ReportTest extends StudyBaseTest
         }
 
         //Mouse down on GROUP 1 to remove it.
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + PARTICIPANT_GROUP_ONE + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Showing 13 Results");
         
         //Check if all PTIDs of GROUP 2 are visible
@@ -1073,21 +1073,21 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 116 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
-        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[1]")));
-        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), 'All')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[2]")));
+        mouseDownGridCellCheckbox("All", 1);
+        mouseDownGridCellCheckbox("All", 2);
         waitForText("Showing 0 Results");
 
         //Mouse down on SPEC GROUP 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + SPECIMEN_GROUP_ONE + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox(SPECIMEN_GROUP_ONE);
         waitForText("Showing 1 Results");
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + SPECIMEN_GROUP_TWO + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox(SPECIMEN_GROUP_TWO);
         waitForText("Showing 2 Results");
         //Remove SPEC GROUP 1
-        mouseDown((Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(), '" + SPECIMEN_GROUP_ONE + "')]/../..//div[contains(@class, 'x4-grid-row-checker')]")));
+        mouseDownGridCellCheckbox(SPECIMEN_GROUP_ONE);
         waitForText("Showing 1 Results");
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
         assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));

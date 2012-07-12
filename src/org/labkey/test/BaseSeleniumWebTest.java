@@ -3552,6 +3552,16 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         click(Locator.permissionsTreeNode(folderName));
     }
 
+    public void mouseDownGridCellCheckbox(String cellText)
+    {
+        mouseDownGridCellCheckbox(cellText, 1);
+    }
+
+    public void mouseDownGridCellCheckbox(String cellText, int index)
+    {
+        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + cellText + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[" + index + "]")));
+    }
+
     public void mouseOut(Locator l)
     {
         selenium.mouseOut(l.toString());
