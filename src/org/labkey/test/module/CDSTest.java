@@ -273,7 +273,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow("Assay Antigens", "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow("Assays", "No Matching Assays Found.", "0 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow("Participants", "4 races, 1 locations", "12 total participants");
+        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
 
         click("Labs");
         assertFilterStatusCounts(12,1,0,2,0);
@@ -376,7 +376,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow("Assay Antigens", "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow("Assays", "No Matching Assays Found.", "0 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow("Participants", "4 races, 1 locations", "12 total participants");
+        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
 
         click("Labs");
         assertFilterStatusCounts(12,1,0,2,0);
@@ -392,7 +392,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow("Assay Antigens", "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
         assertCDSPortalRow("Assays", "No Matching Assays Found.", "0 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow("Participants", "4 races, 1 locations", "8 total participants");
+        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 0 male", "8 total participants");
 
         click("Labs");
         assertFilterStatusCounts(8,1,0,2,0);
@@ -834,7 +834,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertCDSPortalRow("Assay Antigens", "5 clades, 5 tiers, 5 sources (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
         assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow("Labs", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
-        assertCDSPortalRow("Participants", "6 races, 3 locations", "29 total participants");
+        assertCDSPortalRow("Participants", "6 races, 3 locations, 18 female, 11 male", "29 total participants");
     }
 
     private void assertCDSPortalRow(String by, String expectedDetail, String expectedTotal)
