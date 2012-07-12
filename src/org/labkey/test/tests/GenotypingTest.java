@@ -49,7 +49,7 @@ import java.util.zip.GZIPInputStream;
  * Date: 10/22/11
  * Time: 7:14 PM
  */
-public class GenotypingTest extends BaseSeleniumWebTest implements PostgresOnlyTest
+public class GenotypingTest extends BaseSeleniumWebTest
 {
     public static final String first454importNum = "207";
     public static final String second454importNum = "208";
