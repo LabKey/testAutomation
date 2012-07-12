@@ -330,12 +330,16 @@ public class ExtHelper
     public static void selectFileBrowserItem(BaseSeleniumWebTest test, String path)
     {
         test.log("selectFileBrowserItem path: " + path);
+        
+        String[] parts = {};
+        StringBuilder nodeId = new StringBuilder();
         if (path.startsWith("/"))
             path = path.substring(1);
-        String[] parts = path.split("/");
-        StringBuilder nodeId = new StringBuilder();
-        nodeId.append('/');
-        
+        if (!path.equals(""))
+        {
+            parts = path.split("/");
+            nodeId.append('/');
+        }
         waitForFileGridReady(test);
 
         // expand root tree node

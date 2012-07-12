@@ -510,14 +510,8 @@ public class FormulationsTest extends BaseSeleniumWebTest
         assertTextPresent("No data to show.");
 
         clickButton("Import Data");
-        waitForText("HPLCRun", 10000);
+        ExtHelper.selectFileBrowserItem(this, "HPLCRun/");
 
-        ExtHelper.waitForFileGridReady(this);
-        waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-        waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath("(//div[contains(@class, 'x-tree-node-expanded')])[2]"));
-
-        sleep(1000); // wait for Ext4
         clickButton("Import HPLC", 0);
         waitForText("Selected Subfiles", 10000);
 
