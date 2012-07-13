@@ -152,7 +152,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // 14902
         click("Studies");
-        assertFilterStatusPanel(STUDIES[0], "Demo Study", 6, 1, 3, 2, 20, 12);
+        assertFilterStatusPanel(STUDIES[0], STUDIES[0], 6, 1, 3, 2, 20, 12);
 
         // Verify multi-select tooltip -- this only shows the first time
         assertTextPresent(TOOLTIP);
@@ -193,23 +193,23 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click("Assay Antigens");
         sortBy("Tier", "1A");
         toggleExplorerBar("3");
-        assertFilterStatusPanel("H061.14", "H061.14", 12, 1, 1, 1, 8, 12);
+        assertFilterStatusPanel("H061.14", "H061.14", 12, 1, 3, 2, 8, 12);
         toggleExplorerBar("1A");
-        assertFilterStatusPanel("SF162.LS", "SF162.LS", 6, 1, 1, 1, 20, 12);
+        assertFilterStatusPanel("SF162.LS", "SF162.LS", 6, 1, 3, 2, 20, 12);
         toggleExplorerBar("1B");
-        assertFilterStatusPanel("ZM109F.PB4", "ZM109F.PB4", 6, 1, 1, 1, 20, 6);
+        assertFilterStatusPanel("ZM109F.PB4", "ZM109F.PB4", 6, 1, 3, 2, 20, 6);
         goToAppHome();
         click("Assays");
-        assertFilterStatusPanel("Lab Results", "Lab Results", 23, 3, 5, 0, 0, 29);
-        assertFilterStatusPanel("ADCC-Ferrari", "ADCC-Ferrari", 12, 1, 3, 1, 4, 29);
-        assertFilterStatusPanel("Luminex-Sample-LabKey", "Luminex-Sampl...", 6, 1, 3, 1, 1, 29);
-        assertFilterStatusPanel("NAb-Sample-LabKey", "NAb-Sample-La...", 29, 3, 5, 2, 26, 29);
-        assertFilterStatusPanel("mRNA assay", "mRNA assay", 5, 1, 3, 1, 0, 0);
+        assertFilterStatusPanel("Lab Results", "Lab Results", 23, 3, 5, 3, 31, 29);
+        assertFilterStatusPanel("ADCC-Ferrari", "ADCC-Ferrari", 12, 1, 3, 2, 8, 29);
+        assertFilterStatusPanel("Luminex-Sample-LabKey", "Luminex-Sampl...", 6, 1, 3, 2, 20, 29);
+        assertFilterStatusPanel("NAb-Sample-LabKey", "NAb-Sample-La...", 29, 3, 5, 2, 31, 29);
+        assertFilterStatusPanel("mRNA assay", "mRNA assay", 5, 1, 3, 1, 3, 0);
         goToAppHome();
         click("Labs");
-        assertFilterStatusPanel(LABS[0], "Arnold/Bellew...", 6, 1, 1, 2, 1, 23);
-        assertFilterStatusPanel(LABS[1], "LabKey Lab", 23, 3, 2, 3, 26, 23);
-        assertFilterStatusPanel(LABS[2], "Piehler/Eckel...", 18, 2, 2, 2, 7, 23);
+        assertFilterStatusPanel(LABS[0], "Arnold/Bellew...", 6, 1, 3, 2, 20, 23);
+        assertFilterStatusPanel(LABS[1], "LabKey Lab", 23, 3, 5, 3, 31, 23);
+        assertFilterStatusPanel(LABS[2], "Piehler/Eckel...", 18, 2, 3, 2, 11, 23);
         goToAppHome();
         click("Participants");
         pickCDSSort("Country");
@@ -229,18 +229,18 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         shiftSelectBars("MW965.26", "ZM197M.PB7");
         waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), 'DJ263.8')]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//div[@class='filtermember']"), 6);
-        assertFilterStatusCounts(6, 1, 1, 1, 20);
+        assertFilterStatusCounts(6, 1, 3, 2, 20);
         clickButton("clear selection", 0);
         goToAppHome();
         // end 14910
 
         click("Labs");
         selectBars(LABS[0], LABS[1]);
-        assertFilterStatusCounts(6, 1, 0, 2, 0);
+        assertFilterStatusCounts(6, 1, 3, 2, 20);
         selectBars(LABS[0], LABS[2]);
         assertFilterStatusCounts(0, 0, 0, 0, 0);
         selectBars(LABS[1], LABS[2]);
-        assertFilterStatusCounts(12, 1, 0, 2, 0);
+        assertFilterStatusCounts(12, 1, 3, 2, 8);
         clickButton("use as filter", 0);
         sleep(750);// wait for animation
         clickButton("save group", 0);
@@ -252,7 +252,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("Save", 0);
         waitForTextToDisappear(LABS[0]);
         waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), '"+ GROUP_NAME +"')]"), WAIT_FOR_JAVASCRIPT);
-        assertFilterStatusCounts(12,1,0,2,0);
+        assertFilterStatusCounts(12, 1, 3, 2, 8);
         clickButton("clear filters", 0);
         waitForText(LABS[0]);
         assertFilterStatusCounts(29,3,5,3,31);
@@ -268,15 +268,15 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup(GROUP_NAME, true);
         assertTextPresent(GROUP_DESC);
 
-        waitForText("No Matching Assays Found.", WAIT_FOR_JAVASCRIPT);
+        waitForText("12 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
-        assertCDSPortalRow("Assays", "No Matching Assays Found.", "0 total");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sources (Unknown, ccPBMC, Lung)", "8 total");
+        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
 
         click("Labs");
-        assertFilterStatusCounts(12,1,0,2,0);
+        assertFilterStatusCounts(12,1,3,2,8);
 
         goToAppHome();
         selectCDSGroup("All participants", false);
@@ -373,13 +373,13 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         waitForText("12 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
-        assertCDSPortalRow("Assays", "No Matching Assays Found.", "0 total");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sources (Unknown, ccPBMC, Lung)", "8 total");
+        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
 
         click("Labs");
-        assertFilterStatusCounts(12,1,0,2,0);
+        assertFilterStatusCounts(12,1,3,2,8);
 
         // saved filter including current selection (Gender: f)
         goToAppHome();
@@ -389,13 +389,13 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         waitForText("8 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "1 clades, 1 tiers, 1 sources (Unknown)", "0 total");
-        assertCDSPortalRow("Assays", "No Matching Assays Found.", "0 total");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sources (Unknown, ccPBMC, Lung)", "8 total");
+        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 0 male", "8 total participants");
 
         click("Labs");
-        assertFilterStatusCounts(8,1,0,2,0);
+        assertFilterStatusCounts(8,1,3,2,8);
 
         // Group creation cancelled
         goToAppHome();
