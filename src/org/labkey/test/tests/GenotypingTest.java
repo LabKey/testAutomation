@@ -31,7 +31,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
 import java.io.BufferedReader;
@@ -138,7 +137,6 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         setUp2();
         goToProjectHome();
-
 
         //TODO: need to fix 454/genotyping tests
         importRunTest();
