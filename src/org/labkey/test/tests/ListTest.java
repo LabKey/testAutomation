@@ -467,7 +467,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent("No details available for this event.");
         assertTextNotPresent("Unable to find the audit history detail for this event");
 
-        clickNavButton(DETAILS_BUTTON_NAME);
+        clickNavButton("Done");
         clickLinkWithText(PROJECT_NAME, 3);
 
         log("Test single list web part");
@@ -773,7 +773,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
         
         clickNavButton("Save", 0);
-        waitAndClickNavButton(DETAILS_BUTTON_NAME);
+        waitAndClickNavButton("Done");
 
         // Verify conditional format of boolean column
         // look for cells that do not match the
@@ -1007,7 +1007,7 @@ public class ListTest extends BaseSeleniumWebTest
     {
         if (isElementPresent(Locator.navButton("Save")))
             clickSave();
-        clickNavButton(DETAILS_BUTTON_NAME);
+        clickNavButton("Done");
     }
 
     void clickImportData()
