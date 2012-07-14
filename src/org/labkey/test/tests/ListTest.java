@@ -51,6 +51,7 @@ public class ListTest extends BaseSeleniumWebTest
     protected final static String FAKE_COL1_NAME = "FakeName";
     protected final static String ALIASED_KEY_NAME = "Material";
     protected final static String HIDDEN_TEXT = "Hidden";
+    protected final static String DETAILS_BUTTON_NAME = "Show Grid";
 
     protected final ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
     protected final ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
@@ -277,7 +278,7 @@ public class ListTest extends BaseSeleniumWebTest
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickNavButton("Cancel");
-        clickNavButton("Done");
+        clickNavButton(DETAILS_BUTTON_NAME);
 
         log("Test inserting new row");
         clickNavButton("Insert New");
@@ -326,7 +327,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickNavButton("Cancel");
-        clickNavButton("Done");
+        clickNavButton(DETAILS_BUTTON_NAME);
         clickNavButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
@@ -346,7 +347,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickNavButton("Cancel");
-        clickNavButton("Done");
+        clickNavButton(DETAILS_BUTTON_NAME);
         clickNavButton("Insert New");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickNavButton("Cancel");
@@ -365,7 +366,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
         clickNavButton("Cancel");
-        clickNavButton("Done");
+        clickNavButton(DETAILS_BUTTON_NAME);
         clickNavButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickNavButton("Cancel");
@@ -384,7 +385,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickNavButton("Cancel");
-        clickNavButton("Done");
+        clickNavButton(DETAILS_BUTTON_NAME);
         clickNavButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickNavButton("Cancel");
@@ -466,7 +467,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent("No details available for this event.");
         assertTextNotPresent("Unable to find the audit history detail for this event");
 
-        clickNavButton("Done");
+        clickNavButton(DETAILS_BUTTON_NAME);
         clickLinkWithText(PROJECT_NAME, 3);
 
         log("Test single list web part");
@@ -772,7 +773,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
         
         clickNavButton("Save", 0);
-        waitAndClickNavButton("Done");
+        waitAndClickNavButton(DETAILS_BUTTON_NAME);
 
         // Verify conditional format of boolean column
         // look for cells that do not match the
@@ -1006,7 +1007,7 @@ public class ListTest extends BaseSeleniumWebTest
     {
         if (isElementPresent(Locator.navButton("Save")))
             clickSave();
-        clickNavButton("Done");
+        clickNavButton(DETAILS_BUTTON_NAME);
     }
 
     void clickImportData()
