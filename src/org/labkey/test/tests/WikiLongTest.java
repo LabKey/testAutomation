@@ -377,6 +377,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
             fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
 
         selectOptionByText("name", WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
+        sleep(500);
         clickNavButton("Submit");
         clickLinkWithText("Welcome");
         log("make sure it all got copied");
