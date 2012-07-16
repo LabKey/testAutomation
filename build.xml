@@ -262,12 +262,32 @@
     </target>
 
     <target name="deploy-test-modules" depends="stage-test-modules">
-      <copy todir="${deploy.modules.dir}">
-        <fileset dir="${staging.modules.dir}">
-          <include name="miniassay.module"/>
-          <include name="simpletest.module"/>
-        </fileset>
-      </copy>
+        <copy todir="${deploy.modules.dir}">
+          <fileset dir="${staging.modules.dir}">
+            <include name="miniassay.module"/>
+            <include name="simpletest.module"/>
+          </fileset>
+        </copy>
+
+        <!-- See if the test modules have been updated in the deployment directory (the copy will no-op
+        if the source files are older, so the timestamps won't change) than the last time we remember deploying them --> 
+        <uptodate property="testModulesDeployUpToDate" targetfile="${basedir}/testModuleDeployment.timestamp">
+            <srcfiles dir="${deploy.modules.dir}">
+                <include name="miniassay.module"/>
+                <include name="simpletest.module"/>
+            </srcfiles>
+        </uptodate>
+        <antcall target="wait-for-redeploy-if-needed" />
+    </target>
+
+    <!-- We need to wait for the server to finish its redeploy, so we do a more patient, thorough version of the wait
+    here than during our usual check if we haven't deployed new test modules -->
+    <target name="wait-for-redeploy-if-needed" unless="testModulesDeployUpToDate" depends="set-user-props">
+      <antcall target="waitfor-labkey-started" />
+      <echo message="Waiting for 10 seconds in case the server needs to redeploy the webapp" />
+      <sleep seconds="10"/>
+      <antcall target="waitfor-labkey-started" />
+        <touch file="${basedir}/testModuleDeployment.timestamp" />
     </target>
 
     <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, install-rpackages">
@@ -952,13 +972,6 @@
             <not><equals arg1="${sysprop.labkey.server}" arg2="localhost"/></not>
           </or>
       </waitfor>
-      <sleep seconds="2"/>
-      <waitfor maxwait="2" maxwaitunit="minute" checkevery="100">
-          <or>
-            <http url="${server.started.url}" />
-            <not><equals arg1="${sysprop.labkey.server}" arg2="localhost"/></not>
-          </or>
-      </waitfor>
     </target>
 
     <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started">
@@ -1110,7 +1123,15 @@
         </java>
     </target>
 
-    <target name="build-qc-validator" unless="skip.qc.build">
+    <!-- Check if the QC validators JAR needs to be rebuilt, and if so rebuild it -->
+    <target name="build-qc-validator">
+        <uptodate targetfile="${project.root}/sampledata/qc/classes" property="qc.build.uptodate">
+            <srcfiles dir="${project.root}/sampledata/qc/src" />
+        </uptodate>
+        <antcall target="build-qc-validator-if-dirty" />
+    </target>
+
+    <target name="build-qc-validator-if-dirty" unless="qc.build.uptodate">
         <delete dir="${project.root}/sampledata/qc/classes"/>
         <mkdir dir="${project.root}/sampledata/qc/classes"/>
         <javac srcdir="${project.root}/sampledata/qc/src"
@@ -1119,7 +1140,8 @@
             deprecation="${test.compile.deprecation}"
             optimize="${test.compile.optimize}"
             source="1.6"
-            classpathref="test.build.classpath">
+            classpathref="test.build.classpath"
+            includeantruntime="false" >
         </javac>
 
         <condition property="clover.class.path" value="${tomcat.home}/lib" else="">
@@ -1159,7 +1181,20 @@
         <delete failonerror="false" dir="${project.root}/sampledata/rlabkey"/>
     </target>
 
-    <target name="install-rpackages" depends="install-rlabkey, install-ruminex, install-flowWorkspace, install-flowStats">
+    <!-- Rely on our own private file that we touch every time we install R packages to see if they need to be reinstalled -->
+    <target name="install-rpackages">
+        <uptodate targetfile="${basedir}/rPackageDeployment.timestamp" property="rPackagesUpToDate">
+            <srcfiles dir="${project.root}/tools/Rpackages" />
+        </uptodate>
+        <antcall target="install-rpackages-if-dirty" />
+    </target>
+
+    <target name="install-rpackages-if-dirty" unless="rPackagesUpToDate">
+        <antcall target="install-rlabkey" />
+        <antcall target="install-ruminex" />
+        <antcall target="install-flowWorkspace" />
+        <antcall target="install-flowStats" />
+        <touch file="${basedir}/rPackageDeployment.timestamp" />
     </target>
 
     <macrodef name="check-R-package-installed">
