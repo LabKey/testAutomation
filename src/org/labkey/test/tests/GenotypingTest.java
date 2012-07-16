@@ -153,6 +153,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void importSecondRunTest()
     {
+        if(isSQL2005())
+            return;
         goToProjectHome();
         startImportRun("secondRead/reads.txt", "Import 454 Reads", second454importNum);
         waitForPipelineJobsToComplete(++pipelineJobCount, "Import reads for run 208", true);
@@ -175,7 +177,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void runAnalysisTest()
     {
 
-        if(System.getProperty("serverType", "").contains("2005"))
+        if(isSQL2005())
             return;
 //        getToRunScreen();
         sendDataToGalaxyServer();
@@ -192,6 +194,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void verifyAnalysis()
     {
+        if(isSQL2005())
+            return;
         goToProjectHome();
 
         clickLinkWithText("View Analyses");
@@ -586,6 +590,24 @@ public class GenotypingTest extends BaseSeleniumWebTest
         clickLinkWithText(first454importNum);
 
         verifySamples();
+    }
+
+
+    private boolean serverVersionChecked = false;
+    private boolean isSQL2005 = false;
+    public boolean isSQL2005()
+    {
+        log("Server type: " + System.getProperty("serverType"));
+        if(!serverVersionChecked)
+            if(System.getProperty("serverType")!=null && System.getProperty("serverType").contains("2005"))
+            {
+                isSQL2005 =  true;
+            }
+            else
+            {
+                isSQL2005 = false;
+            }
+        return isSQL2005;
     }
 
     private class OutputFilter implements FilenameFilter
