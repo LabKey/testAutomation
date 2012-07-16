@@ -544,7 +544,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         clickButton("Next", 0);
 
-        Ext4Helper.selectComboBoxItem(this, "Compound", "Alum");
+//        Ext4Helper.selectComboBoxItem(this, "Compound", "Alum");
         setText("Concentration", "789.01");
         setFormElement(Locator.xpath("(//input[@name='Diluent'])[2]"), "Not Starch");
 
