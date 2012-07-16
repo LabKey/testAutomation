@@ -175,7 +175,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void runAnalysisTest()
     {
 
-        if(System.getProperty("serverType")!=null && System.getProperty("serverType").contains("2005"))
+        if(System.getProperty("serverType", "").contains("2005"))
             return;
 //        getToRunScreen();
         sendDataToGalaxyServer();
