@@ -204,8 +204,7 @@ public class ReportTest extends StudyBaseTest
 
     protected void clickReportGridLink(String reportName, String linkText)
     {
-        clickTab("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         final Locator report = Locator.tagContainingText("div", reportName);
 
         waitForElement(report, 10000);
@@ -524,8 +523,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Attachment Report");
         clickButton("Cancel");
 
@@ -539,16 +537,21 @@ public class ReportTest extends StudyBaseTest
             Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
             ref.setToFile(ATTACHMENT_REPORT_FILE.toString());
             clickNavButton("Save");
+            // save should return back to manage views page
+            waitForText("Manage Views");
         }
 
-        clickMenuButton("Create", "Attachment Report");
+        // test creation from Data Views menu option
+        clickTab("Clinical and Assay Data");
+        clickWebpartMenuItem("Data Views", true, "Add Report", "From File");
         setFormElement("viewName", ATTACHMENT_REPORT2_NAME);
         setFormElement("description", ATTACHMENT_REPORT2_DESCRIPTION);
         click(Locator.xpath("//input[../label[string()='Full file path on server']]"));
         setFormElement("filePath", ATTACHMENT_REPORT2_FILE.toString());
         clickNavButton("Save");
+        // save should return to the Clinical and Assay Data tab
+        waitForText("Data Views");
 
-        clickLinkWithText("Clinical and Assay Data");
         if (isFileUploadAvailable())
         {
             waitForText(ATTACHMENT_REPORT_NAME);
@@ -575,8 +578,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
 
         clickMenuButton("Create", "Link Report");
         setFormElement("viewName", LINK_REPORT1_NAME);
@@ -587,15 +589,21 @@ public class ReportTest extends StudyBaseTest
         setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
         clickNavButton("Save");
+        // save should return back to manage views page
+        waitForText("Manage Views");
 
-        clickMenuButton("Create", "Link Report");
+        // test creation from menu option on Data Views webpart
+        clickTab("Clinical and Assay Data");
+        clickWebpartMenuItem("Data Views", true, "Add Report", "From Link");
         setFormElement("viewName", LINK_REPORT2_NAME);
         setFormElement("description", LINK_REPORT2_DESCRIPTION);
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
         clickNavButton("Save");
+        // save should return back to Clinical and Assay Data tab
+        waitForText("Data Views");
 
-
+        goToManageViews();
         pushLocation();
         clickReportGridLink(LINK_REPORT1_NAME, "view");
         assertTrue("Expected link report to go to '" + LINK_REPORT1_URL + "', but was '" + getCurrentRelativeURL() + "'",
@@ -647,8 +655,7 @@ public class ReportTest extends StudyBaseTest
         log("Clean up R Reports");
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickTab("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         for (String script : R_SCRIPTS)
         {
             while (isTextPresent(script))
@@ -753,9 +760,7 @@ public class ReportTest extends StudyBaseTest
 
         // create grid view
         clickLinkWithText(getFolderName());
-        clickTab("Manage");
-        waitForElement(Locator.linkWithText("Manage Views"), WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText("Manage Views");
+        goToManageViews();
 
         createReport(GRID_VIEW);
         setFormElement("label", TEST_GRID_VIEW);
@@ -831,8 +836,7 @@ public class ReportTest extends StudyBaseTest
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Mouse Report");
 
         // select some measures from a dataset
@@ -898,8 +902,7 @@ public class ReportTest extends StudyBaseTest
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // verify visiting saved report
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
         waitForText("Creatinine", 34, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 column headers) + 8 mice (x2 column tooltips) + 2 in hidden customize panel
@@ -944,8 +947,7 @@ public class ReportTest extends StudyBaseTest
 
 
         // verify modified, saved report
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
         waitForText("Creatinine", 17, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
@@ -963,8 +965,7 @@ public class ReportTest extends StudyBaseTest
 
 
         // verify modified, saved-as report
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickReportGridLink(PARTICIPANT_REPORT2_NAME, "view");
 
         waitForText("Creatinine", 17, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
@@ -979,8 +980,7 @@ public class ReportTest extends StudyBaseTest
         assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
 
         // Test group filtering
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Mouse Report");
         // select some measures from a dataset
         waitAndClickNavButton("Choose Measures", 0);
@@ -1053,8 +1053,7 @@ public class ReportTest extends StudyBaseTest
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         //Participant report with specimen fields.
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Mouse Report");
         // select some measures from a dataset
         waitAndClickNavButton("Choose Measures", 0);
@@ -1107,8 +1106,7 @@ public class ReportTest extends StudyBaseTest
         checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
         clickNavButton("Save");
 
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Mouse Report");
 
         // select some measures from the demographics

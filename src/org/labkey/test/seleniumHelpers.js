@@ -238,6 +238,11 @@ selenium.getContainerId = function () {
     return win.LABKEY.container.id;
 };
 
+selenium.getExtElementHeight = function(className, index) {
+    var ext = selenium.browserbot.getCurrentWindow().Ext4;
+    return ext.get(ext.query('.' + className)[index]).getHeight();
+}
+
 // firefox error console listener
 // http://sejq.blogspot.com/2008/12/can-selenium-detect-if-page-has.html
 // https://developer.mozilla.org/en/Console_service

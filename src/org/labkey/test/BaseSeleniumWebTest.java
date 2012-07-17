@@ -3636,6 +3636,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.mouseUpAt(to.toString(), "1," + y);
     }
 
+    public void dragAndDrop(Locator el, int xOffset, int yOffset)
+    {
+        String x = "" + (1 + xOffset);
+        String y = "" + (1 + yOffset);
+
+        selenium.mouseOver(el.toString());
+        selenium.mouseDownAt(el.toString(), "1,1");
+        selenium.mouseMoveAt(el.toString(), x + "," + y);
+        selenium.mouseUpAt(el.toString(), x + "," + y);
+    }
+
     public void clickTab(String tabname)
     {
         log("Selecting tab " + tabname);

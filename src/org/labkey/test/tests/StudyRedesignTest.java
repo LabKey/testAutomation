@@ -42,6 +42,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private static final String NEW_DESCRIPTION = "Description set in data views webpart";
     private static final String PARTICIPANT_GROUP_ONE = "GROUP 1";
     private static final String PARTICIPANT_GROUP_TWO = "GROUP 2";
+    private static final String PARTICIPANT_GROUP_THREE = "ThisIsAGroupThatHasALongNameWithoutAnySpacesInIt";
     private static final String[] PTIDS_ONE = {"999320016", "999320518", "999320529", "999320533", "999320541", "999320557",
                                                "999320565", "999320576", "999320582", "999320590"};
     private static final String[] PTIDS_TWO = {"999320004", "999320007", "999320010", "999320016", "999320018", "999320021",
@@ -77,6 +78,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
         StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
         StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_THREE, "Mouse", PTIDS[0]);
 
 //        log("Create query for data view webpart.");
 //        goToSchemaBrowser();
@@ -209,6 +211,8 @@ public class StudyRedesignTest extends StudyBaseTest
     private void participantListWebpartTest()
     {
         log("Participant List Webpart Test");
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickLinkWithText("Overview");
         addWebPart("Mouse List");
         waitForText("Filter"); // Wait for participant list to appear.
@@ -218,7 +222,7 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText("No matching Mice");
 
         //Mouse down on GROUP 1
-        mouseDownGridCellCheckbox("GROUP 1");
+        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Found 10 mice of 138.");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -228,7 +232,7 @@ public class StudyRedesignTest extends StudyBaseTest
         }
 
         //Mouse down GROUP 2
-        mouseDownGridCellCheckbox("GROUP 2");
+        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_TWO);
         waitForText("Found 22 mice of 138.");
         //Check that all PTIDs from GROUP 1 and GROUP 2 are present at the same time.
         for(String ptid : PTIDS)
@@ -237,7 +241,7 @@ public class StudyRedesignTest extends StudyBaseTest
         }
 
         //Mouse down on GROUP 1 to remove it.
-        mouseDownGridCellCheckbox("GROUP 1");
+        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Found 13 mice of 138.");
         
         //Check if all PTIDs of GROUP 2 are visible
@@ -260,6 +264,22 @@ public class StudyRedesignTest extends StudyBaseTest
         setFormElement("//div[contains(text(), 'Filter')]//input", "");
         fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
         waitForText("Found 13 mice of 138.");
+
+        // verify cohort/group panel is resizable and grid cells have the word-wrapping CSS class
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 1);
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-south')]"), 2); //twice, one for south and one for southeast
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'normalwrap-gridcell')]"), 9); // 4 cohort grid cells and 4 group grid cells
+
+        // compare the height of a non text-wrapped group grid cell to a wrapped one
+        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_THREE);
+        int group2Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 6)"));
+        int group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 7)"));
+        assertTrue("Expected " + PARTICIPANT_GROUP_THREE + " grid cell to wrap text", group3Height > group2Height);
+        // drag the east handle to the right so that the group three doesn't wrap anymore
+        dragAndDrop(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 250, 0);
+        group2Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 6)"));
+        group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 7)"));
+        assertTrue("Expected panel width to allow " + PARTICIPANT_GROUP_THREE + " grid cell on one line", group3Height == group2Height);
     }
 
     private void exportImportTest()
