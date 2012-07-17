@@ -1198,6 +1198,7 @@
 
     <target name="clean-rpackages">
         <delete failonerror="false" dir="${project.root}/sampledata/rlabkey"/>
+        <delete failonerror="false" dir="${basedir}/rPackageDeployment.timestamp"/>
     </target>
 
     <!-- Rely on our own private file that we touch every time we install R packages to see if they need to be reinstalled -->
