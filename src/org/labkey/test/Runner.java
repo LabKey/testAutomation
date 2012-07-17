@@ -368,9 +368,9 @@ public class Runner extends TestSuite
                     System.err.println("    " + c.getSimpleName());
                 System.exit(1);
             }
-//            else if ((testClass instanceof PostgresOnlyTest && System.getProperty("serverType").contains("postgres")) ||
-//                    (testClass instanceof SqlserverOnlyTest && System.getProperty("serverType").contains("sqlserver")) ||
-//                    !(System.getProperty("serverType").contains("postgres") || System.getProperty("serverType").contains("postgres")))
+//            else if ((testClass instanceof PostgresOnlyTest && System.getProperty("databaseType").contains("postgres")) ||
+//                    (testClass instanceof SqlserverOnlyTest && System.getProperty("databaseType").contains("sqlserver")) ||
+//                    !(System.getProperty("databaseType").contains("postgres") || System.getProperty("databaseType").contains("postgres")))
                 testClasses.add(testClass);
         }
 
@@ -420,8 +420,8 @@ public class Runner extends TestSuite
             if (test == null)
             {
                 Class interfaces[] = testClass.getInterfaces();
-                String databaseType = System.getProperty("serverType");
-                String databaseVersion = System.getProperty("serverVersion");
+                String databaseType = System.getProperty("databaseType");
+                String databaseVersion = System.getProperty("databaseVersion");
                 for (Class i : interfaces)
                 {
                     if (i.getName().equals(PostgresOnlyTest.class.getCanonicalName()))
