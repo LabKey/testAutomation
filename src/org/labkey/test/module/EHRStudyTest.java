@@ -112,9 +112,9 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
     }
 
     @Override
-    protected boolean isDatabaseSupported(DatabaseInfo info)
+    protected boolean isConfigurationSupported()
     {
-        return info.productName.equals("PostgreSQL");
+        return "pg".equals(getDatabaseType());
     }
        
     @Override

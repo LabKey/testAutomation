@@ -109,7 +109,10 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
 
         assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
-        //assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches")); // enable when SqlServer supports SpecimenMatches column
+        if (isGroupConcatSupported())
+            assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches"));
+        else
+            assertEquals("", table.getDataAsText(0, "SpecimenMatches"));
         assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
         assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
         assertEquals("52.11%", table.getDataAsText(0, "Recovery"));

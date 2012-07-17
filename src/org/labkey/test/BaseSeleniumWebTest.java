@@ -85,7 +85,6 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.getTabLinkId;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
-import static org.labkey.test.WebTestHelper.log;
 import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
@@ -1206,11 +1205,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     /**
-     * Override this method to skip running this test for a given database version.
-     * @param info
+     * Override this method to skip running this test for a given configuration.
      * @return true to run the test, false to skip. Empty info should return false for overrides.
      */
-    protected boolean isDatabaseSupported(DatabaseInfo info)
+    protected boolean isConfigurationSupported()
     {
         return true;
     }
@@ -1238,15 +1236,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             if ( !isGuestModeTest() )
             {
-                if(!isDatabaseSupported(new DatabaseInfo())) // skip this check if it returns true with no database info.
+                if (!isConfigurationSupported()) // skip this check if it returns true with no database info.
                 {
-                    DatabaseInfo info = getDatabaseInfo();
-                    if (!isDatabaseSupported(info))
-                    {
-                        log("** Skipping " + getClass().getSimpleName() + " test for unsupported database: " + info.productName + " " + info.productVersion);
-                        _testFailed = false;
-                        return;
-                    }
+                    log("** Skipping " + getClass().getSimpleName() + " test for unsupported configurarion");
+                    _testFailed = false;
+                    return;
                 }
             }
 
@@ -1442,6 +1436,27 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public boolean isMaintenanceDisabled()
     {
         return "never".equals(System.getProperty("systemMaintenance"));
+    }
+
+    public String getDatabaseType()
+    {
+        return System.getProperty("databaseType");
+    }
+
+    public String getDatabaseVersion()
+    {
+        return System.getProperty("databaseVersion");
+    }
+
+    public boolean isGroupConcatSupported()
+    {
+        if ("pg".equals(getDatabaseType()))
+            return true;
+
+        if ("mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion()))
+            return true;
+
+        return false;
     }
 
     public boolean isGuestModeTest()
@@ -6516,38 +6531,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction']/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = ExtHelper.getExtElementId(this, "btn_submit");
         clickAndWait(Locator.id(id));
-    }
-
-
-    public DatabaseInfo getDatabaseInfo()
-    {
-        pushLocation();
-        ensureAdminMode();
-        goToAdmin();
-
-        DatabaseInfo info = new DatabaseInfo();
-        info.serverURL = getText(Locator.id("databaseServerURL"));
-        info.productName = getText(Locator.id("databaseProductName"));
-        info.productVersion = getText(Locator.id("databaseProductVersion"));
-        info.driverName = getText(Locator.id("databaseDriverName"));
-        info.driverVersion = getText(Locator.id("databaseDriverVersion"));
-
-        popLocation();
-        return info;
-    }
-
-    public static class DatabaseInfo
-    {
-        public String serverURL, productName, productVersion, driverName, driverVersion;
-
-        public DatabaseInfo()
-        {
-            serverURL = "";
-            productName = "";
-            productVersion = "";
-            driverName = "";
-            driverVersion = "";
-        }
     }
 
     public void clickManageSubjectCategory(String subjectNoun)

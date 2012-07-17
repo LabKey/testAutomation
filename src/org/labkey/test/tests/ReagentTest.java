@@ -25,16 +25,10 @@ import org.labkey.test.util.PostgresOnlyTest;
  * Date: Sep 13, 2010
  * Time: 1:41:34 PM
  */
-public class ReagentTest extends BaseSeleniumWebTest implements PostgresOnlyTest
+public class ReagentTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "ReagentProject";
     protected static final String FOLDER_NAME = "ReagentFolder";
-
-    @Override
-    protected boolean isDatabaseSupported(DatabaseInfo info)
-    {
-        return info.productName.equals("PostgreSQL");
-    }
 
     @Override
     public String getAssociatedModuleDirectory()

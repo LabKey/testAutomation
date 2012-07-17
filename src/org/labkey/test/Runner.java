@@ -420,7 +420,8 @@ public class Runner extends TestSuite
             if (test == null)
             {
                 Class interfaces[] = testClass.getInterfaces();
-                String databaseType = System.getProperty("serverType");                
+                String databaseType = System.getProperty("serverType");
+                String databaseVersion = System.getProperty("serverVersion");
                 for (Class i : interfaces)
                 {
                     if (i.getName().equals(PostgresOnlyTest.class.getCanonicalName()))

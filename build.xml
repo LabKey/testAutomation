@@ -506,7 +506,8 @@
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
-            <sysproperty key="serverType" value="${serverType}"/>
+            <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
+            <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -516,9 +517,9 @@
         </junit>
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
         <antcall target="waitfor-tomcat-shutdown"/>
-        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${serverType}/" />
-        <mkdir dir="${test.log.output.dir}/${serverType}" />
-        <copy todir="${test.log.output.dir}/${serverType}">
+        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${databaseType}/" />
+        <mkdir dir="${test.log.output.dir}/${databaseType}" />
+        <copy todir="${test.log.output.dir}/${databaseType}">
             <fileset dir="${tomcat.home}/logs/">
                 <size value="0" units="k" when="more" />
             </fileset>
@@ -729,17 +730,18 @@
         <antcall target="sub-selenium"/>
     </target>
 
-    <target name="runsuite-tomcat-sqlserver">
-        <property name="serverType" value="sqlserver"/>
-        <antcall inheritall="true" target="runsuite-selenium-tomcat"/>
+    <target name="init_database_properties">
+        <!-- All we want are database names (loading jdbcURL and other properties now will cause problems) -->
+        <loadproperties srcfile="${project.root}/server/config.properties">
+            <filterchain>
+                <linecontains>
+                    <contains value="database"/>
+                </linecontains>
+            </filterchain>
+        </loadproperties>
     </target>
 
-    <target name="runsuite-tomcat-postgres">
-        <property name="serverType" value="postgres"/>
-        <antcall inheritall="true" target="runsuite-selenium-tomcat"/>
-    </target>
-
-    <target name="set-user-props">
+    <target name="set-user-props" depends="init_database_properties">
         <!-- Set property sysprop.test: empty string if not provided, user string otherwise -->
         <condition property="sysprop.test" value="">
             <not><isset property="test"/></not>
@@ -936,6 +938,16 @@
             <isset property="adaptiveRoot"/>
         </condition>
 
+        <!-- Set property sysprop.databaseType: "pg" or "mssql" -->
+        <condition property="sysprop.databaseType" value="${databaseType}" else="">
+            <isset property="databaseType"/>
+        </condition>
+
+        <!-- Set property sysprop.databaseVersion: db version string we use in TeamCity e.g. 9.1 or 2008 -->
+        <condition property="sysprop.databaseVersion" value="${databaseVersion}" else="">
+            <isset property="databaseVersion"/>
+        </condition>
+
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
         <condition property="sysprop.suite" value="DRT">
             <not><isset property="suite"/></not>
@@ -957,6 +969,7 @@
         <echo message="    labkey.port: ${sysprop.labkey.port}"/>
         <echo message="    target server ${sysprop.labkey.server}"/>
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
+        <echo message="    database: ${sysprop.databaseType} ${sysprop.databaseVersion}" />
         <echo message="    shuffleTests: ${sysprop.shuffleTests}" />
         <echo message="    recently failed tests first (TeamCity only): ${sysprop.testRecentlyFailed}" />
         <echo message="    test modified modules first (TeamCity only): ${sysprop.testNewAndModified}" />
@@ -1012,6 +1025,8 @@
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
+            <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
+            <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -1054,6 +1069,8 @@
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
+            <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
+            <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
 
             <formatter type="plain"/>
 
@@ -1097,6 +1114,8 @@
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
+            <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
+            <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -1105,9 +1124,9 @@
                 todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
         </junit>
         <ant inheritall="true" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
-        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${serverType}/" />
-        <mkdir dir="${test.log.output.dir}/${serverType}" />
-        <copy todir="${test.log.output.dir}/${serverType}">
+        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${databaseType}/" />
+        <mkdir dir="${test.log.output.dir}/${databaseType}" />
+        <copy todir="${test.log.output.dir}/${databaseType}">
             <fileset dir="${tomcat.home}/logs/">
                 <size value="0" units="k" when="more" />
             </fileset>

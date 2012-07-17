@@ -20,11 +20,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.RReportHelper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 1/24/12
  * Time: 1:26 PM
- * To change this template use File | Settings | File Templates.
  */
 public class FolderExportTest extends BaseSeleniumWebTest
 {
@@ -44,7 +42,8 @@ public class FolderExportTest extends BaseSeleniumWebTest
         return "FolderExportTest";
     }
 
-    protected boolean isDatabaseSupported(DatabaseInfo info)
+    @Override
+    protected boolean isConfigurationSupported()
     {
         return System.getProperty("os.name").contains("Windows");
     }
