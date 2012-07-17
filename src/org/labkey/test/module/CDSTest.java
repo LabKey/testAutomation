@@ -165,6 +165,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusPanel(STUDIES[0], STUDIES[0], 6, 1, 3, 2, 20, 12);
 
         clickButton("use as filter", 0);
+        clickButton("hide empty", 0);
         waitForTextToDisappear(STUDIES[1], CDS_WAIT);
         assertFilterStatusCounts(6, 1, 3, 2, 20);
         goToAppHome();
@@ -316,19 +317,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectBars("ADCC-Ferrari", "Luminex-Sample-LabKey");
         assertFilterStatusCounts(0, 0, 0, 0, 0);
         pickCDSDimension("Studies");
-        waitForText("Your selection of \"Assay\" was removed.", CDS_WAIT);
-        assertFilterStatusCounts(29, 3, 5, 3, 31);
-        click(Locator.xpath("//a[@id='usefiltermsg']"));
-        waitForTextToDisappear(STUDIES[0], CDS_WAIT);
         assertFilterStatusCounts(0, 0, 0, 0, 0);
         clickButton("clear filters", 0);
         waitForText(STUDIES[2], CDS_WAIT);
         selectBars(STUDIES[0]);
         pickCDSDimension("Assays");
-        waitForText("Your selection of \"Study\" was removed.", CDS_WAIT);
-        click(Locator.xpath("//a[@id='ignorefiltermsg']"));
-        waitForTextToDisappear("Your selection of \"Study\" was removed.", CDS_WAIT);
-        assertFilterStatusCounts(29, 3, 5, 3, 31);
+        assertFilterStatusCounts(6, 1, 3, 2, 20);
         goToAppHome();
 
         //test more group saving
