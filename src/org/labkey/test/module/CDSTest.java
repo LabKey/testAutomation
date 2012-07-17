@@ -258,13 +258,6 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForText(LABS[0]);
         assertFilterStatusCounts(29,3,5,3,31);
 
-        //TODO: Shouldn't be able to create unfiltered group
-//        clickButton("save group", 0);
-//        waitForText("Selection and Active Filters (29)");
-//        assertTextPresent("Only Active Filters (29)");
-//        setFormElement("groupname", "Unfiltered" + GROUP_NAME);
-//        clickButton("Save", 0);
-
         goToAppHome();
         selectCDSGroup(GROUP_NAME, true);
         assertTextPresent(GROUP_DESC);
@@ -286,28 +279,28 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         log("Verify operator filtering");
         click("Studies");
         selectBars(STUDIES[0], STUDIES[1]);
-        assertFilterStatusCounts(0, 0, 0, 0, 0);  // and
-        assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='AND']"));
-        mouseOver(Locator.xpath("//div[@class='showopselect' and text()='AND']"));
-        assertFormElementEquals(Locator.xpath("//div[@class='opselect']//select"), "INTERSECT");
-        setFormElement(Locator.xpath("//div[@class='opselect']//select"), "UNION");
-        assertFilterStatusCounts(18, 2, 4, 3, 28); // or
-        clickButton("use as filter", 0);
-        waitForTextToDisappear(STUDIES[2]);
-        assertFilterStatusCounts(18, 2, 4, 3, 28); // or
+        assertFilterStatusCounts(18, 2, 4, 3, 28);  // or
         assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='OR']"));
+        mouseOver(Locator.xpath("//div[@class='showopselect' and text()='OR']"));
         assertFormElementEquals(Locator.xpath("//div[@class='opselect']//select"), "UNION");
         setFormElement(Locator.xpath("//div[@class='opselect']//select"), "INTERSECT");
-        assertFilterStatusCounts(0, 0, 0, 0, 0);  // and
-        assertTextNotPresent(STUDIES[1]);
+        assertFilterStatusCounts(0, 0, 0, 0, 0); // and
+        clickButton("use as filter", 0);
+        waitForTextToDisappear(STUDIES[2]);
+        assertFilterStatusCounts(0, 0, 0, 0, 0); // and
+        assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='AND']"));
+        assertFormElementEquals(Locator.xpath("//div[@class='opselect']//select"), "INTERSECT");
+        setFormElement(Locator.xpath("//div[@class='opselect']//select"), "UNION");
+        assertFilterStatusCounts(18, 2, 4, 3, 28);  // or
+        assertTextPresent(STUDIES[1]);
         goToAppHome();
-        waitForText("No Matching Studies Found.", CDS_WAIT);
+        waitForText(STUDIES[1], CDS_WAIT);
         click("Labs");
         waitForText(STUDIES[0], CDS_WAIT);
-        assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='AND']"));
-        assertFilterStatusCounts(0, 0, 0, 0, 0);  // and
+        assertElementPresent(Locator.xpath("//div[@class='showopselect' and text()='OR']"));
+        assertFilterStatusCounts(18, 2, 4, 3, 28);  // and
         clickButton("clear filters", 0);
-        waitForText(LABS[2]);
+        waitForText("All participants");
         assertFilterStatusCounts(29, 3, 5, 3, 31);
         assertTextPresent("All participants");
         goToAppHome();
