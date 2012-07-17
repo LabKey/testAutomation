@@ -65,14 +65,26 @@ public class ViabilityTest extends AbstractViabilityTest
         createViabilityAssay();
         setupPipeline();
 
+
+        runUploadTest();
+        runReRunTest();
+        runResultSpecimenLookupTest();
+        runTargetStudyTest();
+        runTransformTest();
+    }
+
+    protected void runUploadTest()
+    {
         uploadViabilityRun("/sampledata/viability/small.VIA.csv", true);
-        
+
         log("** Check form field values");
         assertFormElementEquals("_pool_1604505335_0_ParticipantID", "160450533");
         assertFormElementEquals("_pool_1604505335_0_VisitID", "5.0");
         assertFormElementEquals("_pool_1604505335_0_TotalCells", "3.700E7");
         assertFormElementEquals("_pool_1604505335_0_ViableCells", "3.127E7");
         assertFormElementEquals("_pool_1604505335_0_Viability", "84.5%");
+        assertFormElementEquals("_pool_1604505335_0_Unreliable", "off");
+        assertFormElementEquals("_pool_1604505335_0_IntValue", "");
 
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
@@ -80,6 +92,10 @@ public class ViabilityTest extends AbstractViabilityTest
         addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
         addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
+
+        log("** Set Unreliable flag and IntValue");
+        checkCheckbox("_pool_1604505335_0_Unreliable", 0);
+        setFormElement("//input[@name='_pool_1604505335_0_IntValue'][1]", "300");
 
         clickNavButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
@@ -95,11 +111,12 @@ public class ViabilityTest extends AbstractViabilityTest
         setSelectedFields("/" + getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " Data", null,
                 new String[] { "Run", "ParticipantID", "VisitID", "PoolID",
                         "TotalCells", "ViableCells", "Viability", "OriginalCells", "Recovery",
-                        "SpecimenIDs", "SpecimenCount", "SpecimenMatchCount", "SpecimenMatches"});
+                        "SpecimenIDs", "SpecimenCount", "SpecimenMatchCount", "SpecimenMatches", "Unreliable", "IntValue"});
 
-        clickLinkWithText("small.VIA.csv"); // run name
+        clickLinkContainingText(".VIA.csv"); // run name (small.VIA.csv or small-XXX.VIA.csv)
         DataRegionTable table = new DataRegionTable(getAssayName() + " Data", this);
-        assertEquals("small.VIA.csv", table.getDataAsText(0, "Run"));
+        String runName = table.getDataAsText(0, "Run");
+        assertTrue(runName.contains("small") && runName.contains(".VIA.csv"));
         assertEquals("160450533", table.getDataAsText(0, "Participant ID"));
         assertEquals("5.0", table.getDataAsText(0, "Visit ID"));
         assertEquals("160450533-5", table.getDataAsText(0, "Pool ID"));
@@ -116,6 +133,8 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
         assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
         assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
+        assertEquals("true", table.getDataAsText(0, "Unreliable?"));
+        assertEquals("300", table.getDataAsText(0, "IntValue"));
 
         assertEquals("vial1", table.getDataAsText(1, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(1, "SpecimenCount"));
@@ -138,12 +157,58 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(4, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(4, "Recovery"));
-        
+
         assertEquals("", table.getDataAsText(5, "Specimen IDs"));
         assertEquals("0", table.getDataAsText(5, "SpecimenCount"));
         assertEquals("", table.getDataAsText(5, "SpecimenMatchCount"));
         assertEquals("", table.getDataAsText(5, "Recovery"));
+    }
 
+    protected void runReRunTest()
+    {
+        log("** Test Day2 re-run scenario");
+        final String runName = "re-run scenario";
+        reuploadViabilityRun("/sampledata/viability/small.VIA.csv", runName);
+
+        // Check the 'SpecimenIDs' and 'IntValue' field is copied on re-run
+        assertFormElementEquals(Locator.xpath("//input[@name='_pool_1604505335_0_SpecimenIDs']").index(0), "foobar");
+        assertFormElementEquals(Locator.xpath("//input[@name='_pool_1604505335_0_SpecimenIDs']").index(1), "vial1");
+        assertFormElementEquals(Locator.xpath("//input[@name='_pool_1604505335_0_SpecimenIDs']").index(2), "vial2");
+        assertFormElementEquals(Locator.xpath("//input[@name='_pool_1604505335_0_SpecimenIDs']").index(3), "vial3");
+        assertFormElementEquals(Locator.xpath("//input[@name='_pool_1614016435_4_SpecimenIDs']").index(0), "xyzzy");
+        assertFormElementEquals(Locator.xpath("//input[@name='_pool_1604505335_0_IntValue']"), "300");
+
+        // Check the 'Unreliable' field isn't copied on re-run
+        assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
+
+        clickNavButton("Save and Finish", 0);
+        String actualConfirmation = getConfirmationAndWait();
+        log("** Got confirmation: " + actualConfirmation);
+
+        log(".. checking re-runs are placed in the same Run Group");
+        DataRegionTable runsTable = new DataRegionTable(getAssayName() + " Runs", this);
+        assertEquals(2, runsTable.getDataRowCount());
+        String runGroupName = runsTable.getDataAsText(0, "Run Groups");
+        assertEquals(runGroupName, runsTable.getDataAsText(1, "Run Groups"));
+        runsTable.clickLink(0, "Run Groups");
+
+        // Run Group name should be "Assay Name-XXX" where XXX is the run group rowid
+        String runGroupRowId = getUrlParam(selenium.getLocation(), "rowId", true);
+        assertEquals(getAssayName() + "-" + runGroupRowId, runGroupName);
+        assertTextPresent("Re-importing any Viability run in this run group will place the new run in this same run group.");
+        runsTable = new DataRegionTable(getAssayName() + " Runs", this);
+        assertEquals(2, runsTable.getDataRowCount());
+
+        log(".. checking appropriate fields are copied in re-run");
+        clickLinkWithText(runName);
+
+        DataRegionTable dataTable = new DataRegionTable(getAssayName() + " Data", this);
+        assertEquals("", dataTable.getDataAsText(0, "Unreliable?"));
+        assertEquals("300", dataTable.getDataAsText(0, "IntValue"));
+    }
+
+    protected void runResultSpecimenLookupTest()
+    {
         log("** Checking ResultSpecimens lookups");
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=assay&query.queryName=" + getAssayName() + " ResultSpecimens");
         assertTextPresent("foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
@@ -152,16 +217,12 @@ public class ViabilityTest extends AbstractViabilityTest
                 new String[] { "ResultID", "ResultID/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits"});
         assertTextNotPresent("foobar");
         assertTextPresent("161400006.11-5", "105.78%", "20,000,000.0", "CEL");
-
-        runTargetStudyTest();
-        runTransformTest();
-
     }
 
     protected void runTransformTest()
     {
         // add the transform script to the assay
-        log("Uploading Viability Runs with a transform script");
+        log("** Uploading Viability Runs with a transform script");
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
@@ -173,16 +234,8 @@ public class ViabilityTest extends AbstractViabilityTest
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickNavButton("Save & Close");
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
-        clickLinkWithText(getAssayName());
-        clickNavButton("Import Data");
-
-        setFormElement("name", "transformed assayId");
-        File guavaFile = new File(getLabKeyRoot() + "/sampledata/viability/small.VIA.csv");
-        assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
-        setFormElement("__primaryFile__", guavaFile);
-        clickNavButton("Next", 8000);
+        final String runName = "transformed assayId";
+        uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
 
         log("** Check form field values");
         assertFormElementEquals("_pool_1604505335_0_ParticipantID", "160450533");
@@ -240,7 +293,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
         deleteField("Batch Fields", 0);
-        addField("Result Fields", 11, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
+        addField("Result Fields", 13, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
         clickNavButton("Save & Close");
 
         clickLinkWithText(getProjectName());
@@ -248,7 +301,8 @@ public class ViabilityTest extends AbstractViabilityTest
         clickLinkWithText(getAssayName());
         clickNavButton("Import Data");
 
-        uploadViabilityRun("/sampledata/viability/small.VIA.csv", false);
+        final String runName = "result-level target study";
+        uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
 
         log("** Test 'same' checkbox for TargetStudy");
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";
@@ -282,7 +336,7 @@ public class ViabilityTest extends AbstractViabilityTest
         //TODO: uncomment once Issue 10054 is resolved.
         //assertEquals(expectConfirmation, actualConfirmation);
 
-        clickLinkWithText("small-1.VIA.csv"); // run name
+        clickLinkWithText(runName);
 
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "TargetStudy", "Target Study");

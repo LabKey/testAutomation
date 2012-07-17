@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -100,6 +101,10 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
         selenium.type("//input[@id='AssayDesignerName']", getAssayName());
 
+        // Add 'Unreliable' field to Results domain
+        addField("Result Fields", 11, "Unreliable", "Unreliable?", ListHelper.ListColumnType.Boolean);
+        addField("Result Fields", 12, "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
+
         sleep(1000);
         clickNavButton("Save", 0);
         waitForText("Save successful.", 20000);
@@ -118,7 +123,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
     protected void uploadViabilityRun(String path, String runName, boolean setBatchTargetStudy)
     {
-        log("** Upload guava run");
+        log("** Upload viability run " + (runName != null ? runName : "<unnamed>"));
         clickLinkWithText(getFolderName());
         clickLinkWithText(getAssayName());
         clickNavButton("Import Data");
@@ -128,7 +133,27 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
         if (runName != null)
             setFormElement("name", runName);
-        
+
+        uploadAssayFile(path);
+    }
+
+    protected void reuploadViabilityRun(String path, String runName)
+    {
+        // we should be already viewing the assay results page
+        assertTitleContains(getAssayName() + " Results");
+        clickLinkWithText("rerun");
+
+        // No need to change batch fields (TargetStudy) for now, click Next
+        clickNavButton("Next");
+
+        if (runName != null)
+            setFormElement("name", runName);
+
+        uploadAssayFile(path);
+    }
+
+    private void uploadAssayFile(String path)
+    {
         File guavaFile = new File(getLabKeyRoot() + path);
         assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
         setFormElement("__primaryFile__", guavaFile);

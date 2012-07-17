@@ -214,6 +214,14 @@ public class DataRegionTable
         _test.clickAndWait(cell.child("a[1]"));
     }
 
+    public void clickLink(int row, String columnName)
+    {
+        int col = getColumn(columnName);
+        if (col == -1)
+            Assert.fail("Couldn't find column '" + columnName + "'");
+        clickLink(row, col);
+    }
+
     public int getColumn(String name)
     {
         name = name.replaceAll(" ", "");
