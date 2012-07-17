@@ -454,7 +454,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         openFilterPanel("Study Name");
         waitForElement(Locator.tagWithText("div", "PI1"));
-        ExtHelper.clickX4GridPanelCheckbox(this, 3, "lookupcols", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, 2, "lookupcols", true);
         clickButton("OK", 0);
 
         log("Filter on a looked-up column");
@@ -466,7 +466,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         log("Ensure filtering goes away when column does");
         openFilterPanel("Study Name");
         waitForElement(Locator.tagWithText("div", "PI1"));
-        ExtHelper.clickX4GridPanelCheckbox(this, 2, "lookupcols", false);
+        ExtHelper.clickX4GridPanelCheckbox(this, 1, "lookupcols", false);
         clickButton("OK", 0);
         waitForTextToDisappear("PI1");
         waitForGridCount(246);
