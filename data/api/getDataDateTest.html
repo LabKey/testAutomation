@@ -128,6 +128,45 @@
         }
     };
 
+    var luminexMeasureNullAllowedWithDimension2 = {
+        "time": "date",
+        "dateOptions": getDateOptions("LuminexAssay", "ParticipantVisit/VisitDate"),
+        "measure":{
+            "name":"FI",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": true
+        },
+        "dimension":{
+            "name":"AnalyteName",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
+        }
+    };    
+
+    var firstM1Measure = {
+        "time": "date",
+        "dateOptions": getDateOptions("GenericAssay", "ParticipantVisit/VisitDate"),
+        "measure":{
+            "name":"M1",
+            "queryName":"GenericAssay",
+            "schemaName":"study"
+        },
+        "dimension":null
+    };
+
+    var secondM1Measure = {
+        "time": "date",
+        "dateOptions": getDateOptions("FileBasedAssay", "ParticipantVisit/VisitDate"),
+        "measure":{
+            "name":"M1",
+            "queryName":"FileBasedAssay",
+            "schemaName":"study"
+        },
+        "dimension":null
+    };
+
     var sortArray = [
         {
             "name":"ParticipantId",
@@ -150,7 +189,9 @@
         {title: 'Two Measures - without dimension selected for second, inner join', measures: [cd4Measure, luminexMeasureNonNull]},
         {title: 'Two Measures - without dimension selected for second, outer join', measures: [cd4Measure, luminexMeasureNullAllowed]},
         {title: 'Two Measures - WITH dimension selected for second, inner join', measures: [cd4Measure, luminexMeasureNonNullWithDimension]},
-        {title: 'Two Measures - WITH dimension selected for second, outer join', measures: [cd4Measure, luminexMeasureNullAllowedWithDimension]}
+        {title: 'Two Measures - WITH dimension selected for second, outer join', measures: [cd4Measure, luminexMeasureNullAllowedWithDimension]},
+        {title: 'Three Measures - two with the same name', measures: [cd4Measure, firstM1Measure, secondM1Measure]},  // issue 15369
+        {title: 'Three Measures - two with the same dimension pivot', measures: [cd4Measure, luminexMeasureNullAllowedWithDimension, luminexMeasureNullAllowedWithDimension2]} // issue 12369
     ];
 
     var measureNames = [
@@ -161,6 +202,8 @@
         "study_LuminexAssay_ObsConc",
         "study_LuminexAssay_ObsConc",
         "IL-10 (23)::study_LuminexAssay_ObsConc_MAX",
+        "IL-10 (23)::study_LuminexAssay_ObsConc_MAX",
+        "study_GenericAssay_M1",
         "IL-10 (23)::study_LuminexAssay_ObsConc_MAX"
     ];
 

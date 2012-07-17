@@ -73,7 +73,9 @@ public class TimeChartTest extends StudyBaseTest
         "Two Measures - without dimension selected for second, inner join",
         "Two Measures - without dimension selected for second, outer join",
         "Two Measures - WITH dimension selected for second, inner join",
-        "Two Measures - WITH dimension selected for second, outer join"
+        "Two Measures - WITH dimension selected for second, outer join",
+        "Three Measures - two with the same name",
+        "Three Measures - two with the same dimension pivot"
     };
 
     private static final String[] GETDATA_API_TEST_TITLES_AGGREGATE = {
@@ -90,7 +92,7 @@ public class TimeChartTest extends StudyBaseTest
             "Two Measures - WITH dimension selected for second, inner join (date)",
             "Two Measures - WITH dimension selected for second, inner join (visit)",
             "Two Measures - WITH dimension selected for second, outer join (date)",
-            "Two Measures - WITH dimension selected for second, outer join (visit)",
+            "Two Measures - WITH dimension selected for second, outer join (visit)"
     };
 
     private static final String[] GETDATA_API_TEST_NUMROWS = {
@@ -101,6 +103,8 @@ public class TimeChartTest extends StudyBaseTest
         "1 - 75 of 75",
         "1 - 83 of 83",
         "1 - 25 of 25",
+        "1 - 33 of 33",
+        "1 - 39 of 39",
         "1 - 33 of 33"
     };
 
@@ -130,7 +134,9 @@ public class TimeChartTest extends StudyBaseTest
         {"Study Lab Results Date", "CD4+ (cells/mm3)", "Visit Date", "ObsConc", "ObsConc OOR Indicator", "Days"},
         {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "ObsConc", "ObsConc OOR Indicator", "Days"},
         {"Study Lab Results Date", "CD4+ (cells/mm3)", "Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc", "Days"},
-        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc", "Days"}
+        {"Study Lab Results Date", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc", "Days"},
+        {"Date", "CD4+ (cells/mm3)", "Visit Date", "M1", "Measure1", "Days"},
+        {"Date", "CD4+ (cells/mm3)", "Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc", "IL-10 (23) - FI", "IL-2 (3) - FI", "TNF-alpha (40) - FI", "Days"}
     };
 
     private static final String[][] GETDATA_API_VISITTEST_COLNAMES = {
@@ -141,7 +147,9 @@ public class TimeChartTest extends StudyBaseTest
         {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "ObsConc", "ObsConc OOR Indicator"},
         {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "ObsConc", "ObsConc OOR Indicator"},
         {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc"},
-        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc"}
+        {"Study Lab Results Participant Visit Sequencenum", "CD4+ (cells/mm3)", "Study Lab Results Participant Visit Visit Label", "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc"},
+        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "M1", "Measure1"},
+        {"Sequencenum", "CD4+ (cells/mm3)", "Visit Label", "Display Order", "Visit Date", "IL-10 (23) - ObsConc", "IL-2 (3) - ObsConc", "TNF-alpha (40) - ObsConc", "IL-10 (23) - FI", "IL-2 (3) - FI", "TNF-alpha (40) - FI"}
     };
 
     private static final double[][] GETDATA_API_TEST_DAYS = {
@@ -152,6 +160,8 @@ public class TimeChartTest extends StudyBaseTest
         {44.0, 44.0, 44.0, 79.0, 79.0, 79.0, 108.0, 108.0, 108.0, 190.0, 190.0, 190.0, 246.0, 246.0, 246.0,},
         {44.0, 44.0, 44.0, 79.0, 79.0, 79.0, 108.0, 108.0, 108.0, 190.0, 190.0, 190.0, 246.0, 246.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0,},
         {44.0, 79.0, 108.0, 190.0, 246.0,},
+        {44.0, 79.0, 108.0, 190.0, 246.0,},
+        {44.0, 44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0,},
         {44.0, 79.0, 108.0, 190.0, 246.0,}
     };
 
@@ -163,6 +173,8 @@ public class TimeChartTest extends StudyBaseTest
         {"Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9"},
         {"Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
         {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9"},
+        {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
+        {"Month 2", "Month 2", "Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"},
         {"Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13"}
     };
 
@@ -174,6 +186,8 @@ public class TimeChartTest extends StudyBaseTest
         "ObsConc",
         "ObsConc",
         "IL-10 (23) - ObsConc",
+        "IL-10 (23) - ObsConc",
+        "M1",
         "IL-10 (23) - ObsConc"
     };
 
@@ -185,6 +199,8 @@ public class TimeChartTest extends StudyBaseTest
         {35.87, 40.07, 52.74, 13.68, 28.35, 42.38, 2.82, 5.19, 7.99, 5.12, 6.69, 32.33, 3.09, 5.76, 12.49},
         {35.87, 40.07, 52.74, 13.68, 28.35, 42.38, 2.82, 5.19, 7.99, 5.12, 6.69, 32.33, 3.09, 5.76, 12.49},
         {40.07, 42.38, 7.99, 32.33, 12.49},
+        {40.07, 42.38, 7.99, 32.33, 12.49},
+        {520.0, 543.0},
         {40.07, 42.38, 7.99, 32.33, 12.49}
     };
     private static final String[][] GETDATA_API_COLNAMES_AGGREGATE = {
@@ -201,11 +217,7 @@ public class TimeChartTest extends StudyBaseTest
             {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
             {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
-
-
-
-
+            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"}
     };
     private static final String PER_GROUP = "One Chart Per Group";
 
