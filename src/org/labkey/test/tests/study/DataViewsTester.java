@@ -222,6 +222,8 @@ public class DataViewsTester
         _test.mouseOver(Locator.linkWithText(EDITED_DATASET));
         _test.waitForText("Type:");
         _test.assertTextNotPresent("Data Cut Date:");
+        _test.mouseOut(Locator.linkWithText(EDITED_DATASET)); // Dismiss hover box
+        _test.waitForTextToDisappear("Type:");
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         ExtHelper.checkCheckbox(_test, "Modified");
