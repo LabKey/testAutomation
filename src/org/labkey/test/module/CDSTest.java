@@ -44,7 +44,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String GROUP_NAME3 = "CDSTest_CGroup";
     private static final String GROUP_NULL = "Group creation cancelled";
     private static final String GROUP_DESC = "Intersection of " +LABS[1]+ " and " + LABS[2];
-    private static final String TOOLTIP = "Hold shift, CTRL, or CMD to select multiple";
+    private static final String TOOLTIP = "Hold Shift, CTRL, or CMD to select multiple";
     public final static int CDS_WAIT = 5000;
 
     @Override
@@ -228,8 +228,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click("Assay Antigens");
         sortBy("Tier", "1A");
         shiftSelectBars("MW965.26", "ZM197M.PB7");
-        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), 'DJ263.8')]"), WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(Locator.xpath("//div[@class='filtermember']"), 6);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), 'ZM197M.PB7')]"), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[@class='filtermember']"), 2);
         assertFilterStatusCounts(6, 1, 3, 2, 20);
         clickButton("clear selection", 0);
         goToAppHome();
@@ -661,16 +661,16 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click("Studies");
 
         click(Locator.tagWithText("span", "Plot Data"));
-        ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "CD4");
+        ExtHelper.pickMeasure(this, "xaxispicker", "Lab Results", "CD4");
         clickButton("Plot", 0);
-        ExtHelper.pickMeasure(this, "YaxisPicker", "Lab Results", "Lymphocytes");
+        ExtHelper.pickMeasure(this, "yaxispicker", "Lab Results", "Lymphocytes");
         clickButton("Plot", 0);
         waitForText(CD4_LYMPH); // svg to text
 
         click(Locator.xpath("(//div[contains(@class, 'x4-btn-dropdown-small')])[2]")); // Choose variables button
-        ExtHelper.pickMeasure(this, "YaxisPicker", "Lab Results", "CD4");
+        ExtHelper.pickMeasure(this, "yaxispicker", "Lab Results", "CD4");
         Locator.xpath("(//div[contains(@class, 'curselhdr')])[1]");
-        ExtHelper.pickMeasure(this, "XaxisPicker", "Lab Results", "Hemoglobin");
+        ExtHelper.pickMeasure(this, "xaxispicker", "Lab Results", "Hemoglobin");
         clickButton("Plot", 0);
         waitForText(HEMO_CD4); // svg to text
 
