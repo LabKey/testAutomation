@@ -2866,15 +2866,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public boolean isREngineConfigured()
     {
         // need to allow time for the server to return the engine list and the ext grid to render
-        Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
-        return waitForElement(engine, WAIT_FOR_JAVASCRIPT, false);
-//        int time = 0;
-//        while (!isElementPresent(engine) && time < WAIT_FOR_JAVASCRIPT)
-//        {
-//            sleep(100);
-//            time += 100;
-//        }
-//        return isElementPresent(engine);
+        // wait for mozilla rhino (should be automatically included for all installations)
+        waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='js']"), WAIT_FOR_JAVASCRIPT);
+
+        return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
     }
 
     public void mouseClick(String locator)
