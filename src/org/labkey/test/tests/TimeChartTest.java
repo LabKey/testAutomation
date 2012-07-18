@@ -785,11 +785,17 @@ public class TimeChartTest extends StudyBaseTest
             // check values in interval column for the first participant
             if (numbercheck!=null)
             {
+                List<String> values = table.getColumnDataAsText(columnHeaders[testIndex][columnHeaders[testIndex].length - 1]);
+                int valIndex = 0;
                 for (int i = 0; i < numbercheck[testIndex].length; i++)
                 {
+                    // skip any blank values
+                    while(values.get(valIndex) == null || values.get(valIndex).equals(""))
+                        valIndex++;                    
+
                     try
                     {
-                        double value = Double.parseDouble(table.getDataAsText(i, columnHeaders[testIndex][columnHeaders[testIndex].length - 1]));
+                        double value = Double.parseDouble(values.get(valIndex++));
                         assertEquals("Unexpected interval value for row " + i, numbercheck[testIndex][i], value);
                     }
                     catch(NumberFormatException e){}
@@ -811,9 +817,15 @@ public class TimeChartTest extends StudyBaseTest
             // check values in measure column
             if (measureValue!=null)
             {
+                List<String> values = table.getColumnDataAsText(measure[testIndex]);
+                int valIndex = 0;
                 for (int i = 0; i < measureValue[testIndex].length; i++)
                 {
-                    String text = table.getDataAsText(i, measure[testIndex]);
+                    // skip any blank values
+                    while(values.get(valIndex) == null || values.get(valIndex).equals(""))
+                        valIndex++;
+
+                    String text = values.get(valIndex++);
                     try
                     {
                         double value = Double.parseDouble(text);
