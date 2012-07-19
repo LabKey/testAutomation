@@ -57,7 +57,7 @@ public class LuminexPositivityTest extends LuminexTest
         uploadPositivityFile(assayName + " 3x Fold Change", "1", "3", false);
         String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
-        String[] negWells = new String[] {"A3", "B3", "A5", "B5", "A10", "B10"};
+        String[] negWells = new String[] {"A3", "B3", "A5", "B5", "A10", "B10", "A13", "B13"};
         checkPositivityValues("negative", negWells.length, negWells);
         checkDescriptionParsingForPositivityXLS();
 
@@ -65,7 +65,7 @@ public class LuminexPositivityTest extends LuminexTest
         uploadPositivityFile(assayName + " 5x Fold Change", "1", "5", false);
         posWells = new String[] {"A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
-        negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6", "A10", "B10"};
+        negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6", "A10", "B10", "A13", "B13"};
         checkPositivityValues("negative", negWells.length, negWells);
         checkDescriptionParsingForPositivityXLS();
 
@@ -78,7 +78,7 @@ public class LuminexPositivityTest extends LuminexTest
         uploadPositivityFile(assayName + " No Base Visit", "", "", false);
         posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
-        negWells = new String[] {"A5", "B5", "A10", "B10"};
+        negWells = new String[] {"A5", "B5", "A10", "B10", "A13", "B13"};
         checkPositivityValues("negative", negWells.length, negWells);
         checkDescriptionParsingForPositivityXLS();
     }
