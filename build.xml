@@ -133,6 +133,9 @@
         <echo message="Disable javascript error checking (firefox only):"/>
         <echo message="    -DscriptCheck=false"/>
         <echo message=""/>
+        <echo message="Disable query validation checking:"/>
+        <echo message="    -DqueryCheck=false"/>
+        <echo message=""/>
         <echo message="Randomize test order."/>
         <echo message="    -DshuffleTests=true"/>
     </target>
@@ -488,6 +491,7 @@
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
+            <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -828,6 +832,16 @@
             <isset property="scriptCheck"/>
         </condition>
 
+        <!-- Set property sysprop.queryCheck: true or false -->
+        <condition property="sysprop.queryCheck" value="true">
+            <not>
+                <isset property="queryCheck"/>
+            </not>
+        </condition>
+        <condition property="sysprop.queryCheck" value="${queryCheck}">
+            <isset property="queryCheck"/>
+        </condition>
+
         <!-- Set property sysprop.labkey.port: user provided or '8080' -->
         <condition property="sysprop.labkey.port" value="8080">
             <not>
@@ -966,6 +980,7 @@
         <echo message="    link check: ${sysprop.linkCheck}"/>
         <echo message="    memory check: ${sysprop.memCheck}"/>
         <echo message="    script check: ${sysprop.scriptCheck}"/>
+        <echo message="    query check: ${sysprop.queryCheck}"/>
         <echo message="    labkey.port: ${sysprop.labkey.port}"/>
         <echo message="    target server ${sysprop.labkey.server}"/>
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
@@ -1006,6 +1021,7 @@
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
+            <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
@@ -1055,6 +1071,7 @@
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
+            <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
@@ -1100,6 +1117,7 @@
             <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
+            <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>

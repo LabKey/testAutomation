@@ -1433,6 +1433,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return "false".equals(System.getProperty("memCheck"));
     }
 
+    public boolean skipQueryCheck()
+    {
+        return "false".equals(System.getProperty("queryCheck"));
+    }
+
     public boolean isMaintenanceDisabled()
     {
         return "never".equals(System.getProperty("systemMaintenance"));
@@ -1573,6 +1578,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected void checkQueries()
     {
+        if (skipQueryCheck())
+            return;
         if(getProjectName() != null)
         {
             clickLinkWithText(getProjectName());
