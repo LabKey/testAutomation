@@ -33,7 +33,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
     @Override
     protected String getProjectName()
     {
-        return "TargetedMS";
+        return "TargetedMS" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @Override
