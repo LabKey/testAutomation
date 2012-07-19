@@ -202,20 +202,15 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickNavButton("Import Data");
         assertTitleEquals("Data Import: /" + PROJECT_NAME);
 
-//        setFormElement("batch_name_input", batchName);
-        selenium.typeKeys(Locator.id("batch_name_input").toString(), batchName + " "); // trims the last char for some reason
-//        selenium.keyPress(Locator.id("batch_name_input").toString(), "\\13"); // enter
+        setFormElement("batch_name_input", batchName);
 
-//        setFormElement("batch_comment_input", batchName + " comments...");
-        selenium.typeKeys(Locator.id("batch_comment_input").toString(), batchName + " comment "); // trims the last char for some reason
-//        selenium.keyPress(Locator.id("batch_comment_input").toString(), "\\13"); // enter
+        setFormElement("batch_comment_input", batchName + " comments...");
 
         clickButton("Save", 0);
 
         // check name and comments stuck
         assertEquals(batchName, getFormElement("batch_name_input"));
-        // 7408 : expose batch comments column in JSON serialization
-        //assertEquals(batchName + " comments...", getFormElement("batch_comment_input"));
+        assertEquals(batchName + " comments...", getFormElement("batch_comment_input"));
 
         for (int i = 0; i < uploadedFiles.length; i++)
         {
