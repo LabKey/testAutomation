@@ -141,7 +141,7 @@ public class FlowTest extends BaseFlowTest
         assertLinkNotPresentWithImage("/flagFCSFile.gif");
         pushLocation();
         clickLinkWithText("91761.fcs");
-        //assertTextPresent(FCS_FILE_1); // "experiment name" keyword
+        assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickNavButton("edit");
         setFormElement("ff_name", "FlowTest New Name");
@@ -154,11 +154,6 @@ public class FlowTest extends BaseFlowTest
         assertLinkNotPresentWithText("91761.fcs");
         assertLinkPresentWithText("FlowTest New Name");
         assertTextPresent("FlowTest Keyword Plate Name");
-        /*
-        clickLinkWithText("changes");
-        assertTextPresent("FlowTest Keyword Plate Name");
-        assertTextPresent("FlowTest Comment");
-        assertTextPresent(oldPlateNameValue);*/
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Create a new Analysis script");
