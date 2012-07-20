@@ -267,7 +267,7 @@ public class FilterTest extends ListTest
                 //filter is case insensitive
                 {_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {TEST_DATA[5][2],TEST_DATA[5][0], TEST_DATA[5][1]}, new String[] {TEST_DATA[1][3]}},
 //                {_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {TEST_DATA[1][2]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][3]}},
-                {_listCol4.getName(), "Is Greater Than Or Equal To", "9", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}},
+                {_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}},
                 {_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1]}},
                 {_listCol4.getName(), "Is Blank", "", null, null, new String[] {}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1], TEST_DATA[1][0]}},
                 //new filters for faceted filtering
@@ -314,6 +314,7 @@ public class FilterTest extends ListTest
 
         //open filter
         runMenuItemHandler(TABLE_NAME + ":" + columnName + ":filter");
+        waitForTextToDisappear("Loading...");
         ExtHelper.clickExtTab(this, "Choose Filters");
 
         if(filter1!=null)
