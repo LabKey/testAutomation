@@ -58,12 +58,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void doCleanup() throws Exception
     {
-        try
-        {
-            deleteProject(PROJECT_NAME);
-//            ModuleUtil.deleteModule(MODULE_NAME);
-        }
-        catch (Throwable t) { }
+        try{ deleteProject(PROJECT_NAME); }catch (Throwable t) {/*ignore*/}
 
         deleteDir(getTestTempDir());
     }
@@ -75,7 +70,6 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         log("Starting ModuleAssayTest");
 
-//        deploySimpleAssayModule();
         checkModuleDeployed();
         setupProject();
 
