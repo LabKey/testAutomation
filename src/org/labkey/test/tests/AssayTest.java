@@ -325,19 +325,13 @@ public class AssayTest extends AbstractAssayTest
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
         clickNavButton("Save and Finish");
-        // reenable the following lines when we've moved to strict type checking of the incoming file.  For now, we're
-        // flexible and only error if required columns are missing.
-/*
-        assertTextPresent("Expected columns were not found: " + TEST_ASSAY_DATA_PROP_NAME + "2");
-        assertTextPresent("Unexpected columns were found: " + TEST_ASSAY_DATA_PROP_NAME + "20");
-*/
+
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
         clickNavButton("Save and Finish");
         assertTextPresent("There are errors in the uploaded data: VisitID must be of type Number (Double)");
         assertEquals(TEST_RUN1, selenium.getValue("name"));
         assertEquals(TEST_RUN1_COMMENTS, selenium.getValue("comments"));
-//        setFormElement("dataCollectorName", "textAreaDataProvider");
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
         clickNavButton("Save and Import Another Run");
@@ -402,7 +396,6 @@ public class AssayTest extends AbstractAssayTest
         log("Check out the data for all of the runs");
         clickLinkWithText("view results");
         clearAllFilters(TEST_ASSAY + " Data", "SpecimenID");
-        isTextPresent("2.0");
         assertTextPresent("7.0");
         assertTextPresent("18");
 
@@ -603,17 +596,15 @@ public class AssayTest extends AbstractAssayTest
         waitForPageToLoad();
 
         //validate timepoints:
-        //assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td[text()='AAA07XK5-05' and following-sibling::td[text()='301.0']]]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='AAA07XMC-02' and following-sibling::td[text()='301.0']]]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='AAA07XMC-04' and following-sibling::td[not(text())]]]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 90 - 95' and following-sibling::td[text()='AAA07XSF-02' and following-sibling::td[not(text())]]]")));
+        assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='AAA07XMC-02' and following-sibling::td[text()='301.0']]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='AAA07XMC-04' and following-sibling::td[not(text())]]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 90 - 95' and following-sibling::td[text()='AAA07XSF-02' and following-sibling::td[not(text())]]]"));
 
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 120 - 127' and following-sibling::td[text()='AssayTestControl1' and following-sibling::td[text()='5.0']]]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 152 - 159' and following-sibling::td[text()='AssayTestControl2' and following-sibling::td[text()='6.0']]]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td[text()='BAQ00051-09' and following-sibling::td[text()='7.0']]]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='BAQ00051-08' and following-sibling::td[text()='8.0']]]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='BAQ00051-11' and following-sibling::td[text()='9.0']]]")));
-
+        assertElementPresent(Locator.xpath("//td[text()='Day 120 - 127' and following-sibling::td[text()='AssayTestControl1' and following-sibling::td[text()='5.0']]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 152 - 159' and following-sibling::td[text()='AssayTestControl2' and following-sibling::td[text()='6.0']]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td[text()='BAQ00051-09' and following-sibling::td[text()='7.0']]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='BAQ00051-08' and following-sibling::td[text()='8.0']]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='BAQ00051-11' and following-sibling::td[text()='9.0']]]"));
         clickNavButton("Copy to Study");
 
         log("Verifying that the data was published");
