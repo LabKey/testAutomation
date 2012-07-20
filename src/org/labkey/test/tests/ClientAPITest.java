@@ -154,9 +154,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         createWiki();
 
-//        lineChartTest(); // TODO re-write lineChartTest to work with new charting API.
+        lineChartTest(); // TODO 15579: Update charting API tests
 
-//        scatterChartTest(); // TODO re-write scatterChartTest to work with new charting API.
+        scatterChartTest(); // TODO 15579: Update charting API tests
 
         createLists();
 
@@ -381,7 +381,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         selenium.click("add-record-button");
         String prevActiveCellId;
-//        sleep(500);
         // enter a new first name
         sleep(50);
         String activeCellId = getActiveEditorId();
@@ -447,7 +446,6 @@ public class ClientAPITest extends BaseSeleniumWebTest
         sleep(50);
         selenium.click("//div[contains(@class, 'x-window-dlg')]//button[text()='Delete']");
         sleep(50);
-        //selenium.click("refresh-button");
 
         int limit = 30;
         while (isTextPresent("Jane") && limit-- > 0)
