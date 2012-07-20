@@ -122,10 +122,7 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
 
     protected void doCleanup() throws Exception
     {
-        try {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Throwable t) {}
+        try{ deleteProject(PROJECT_NAME);} catch (Throwable t) {/*ignore*/}
     }
 
     public String getAssociatedModuleDirectory()
