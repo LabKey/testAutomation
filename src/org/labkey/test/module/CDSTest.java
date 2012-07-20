@@ -655,6 +655,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0CD4050100150200250300350400450Lymphocytes200400600800100012001400160018002000";
     private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD450100150200250300350400450";
     private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
+    private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Pulse123456789102030405060708090100Weight Kg23456789102030405060708090100";
     private void verifyScatterPlot()
     {
         selectCDSGroup(GROUP_NAME, true);
@@ -685,6 +686,16 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("clear filters", 0);
         waitForTextToDisappear(HEMO_CD4);
         waitForText(HEMO_CD4_UNFILTERED);
+
+        // Test log scales
+        click(Locator.xpath("(//div[contains(@class, 'x4-btn-dropdown-small')])[2]"));
+        ExtHelper.pickMeasure(this, "yaxispicker", "Physical Exam", "Weight Kg");
+        click(Locator.xpath("(//input[contains(@class, 'x4-form-radio')])[4]")); // set Y to log scale
+        Locator.xpath("(//div[contains(@class, 'curselhdr')])[1]");
+        ExtHelper.pickMeasure(this, "xaxispicker", "Physical Exam", "Pulse");
+        click(Locator.xpath("(//input[contains(@class, 'x4-form-radio')])[6]")); // set X to log scale
+        clickButton("Plot", 0);
+        waitForText(WT_PLSE_LOG);
     }
 
 /// CDS App helpers
