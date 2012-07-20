@@ -82,11 +82,6 @@ public class FileContentTest extends BaseSeleniumWebTest
         setPermissions(TEST_GROUP, "Editor");
         exitPermissionsUI();
 
-//        StudyHelper.createNestedFolders(this, PROJECT_NAME, FolderTest.WIKITEST_NAME, FolderTest.FOLDER_CREATION_FILE);
-
-                assertFalse("ERROR: Add project with special characters failed; check that tomcat's server.xml contains the following attribute " +
-                        "in its Connector element: URIEncoding=\"UTF-8\"", isTextPresent("404: page not found"));
-
         goToProjectSettings();
         clickLinkWithText("Files");
 
