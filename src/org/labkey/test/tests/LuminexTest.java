@@ -1453,7 +1453,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         beginAt(ljUrl);
         setUpGuideSet("GS Analyte (2)");
-        assertTextPresent("Standard1 Levey-Jennings Report");
+        assertTextPresent("Levey-Jennings Report: Standard1");
         assertTextNotPresent("Apply Guide Set");
         stopImpersonating();
         deleteUser(reader);
@@ -1737,7 +1737,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //verify the Levey-Jennings plot
         clickLinkWithText("graph",0);
         waitForText(" - " + isotype + " " + conjugate);
-        assertTextPresent( "Standard1 Levey-Jennings Report");
+        assertTextPresent("Levey-Jennings Report: Standard1");
     }
 
     private String getQCLink()
@@ -2044,7 +2044,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("view data");
         clickLinkContainingText("view data");
         clickLinkContainingText(titrationName);
-        waitForText(titrationName + " Levey-Jennings Report");
+        waitForText("Levey-Jennings Report: " + titrationName);
     }
 
     private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, String[] averages, String[] stdDevs,
