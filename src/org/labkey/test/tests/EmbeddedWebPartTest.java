@@ -44,8 +44,6 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
         log("Setup project and list module");
         createProject(getProjectName());
         resetTracker = new ResetTracker(this);
-//        clickLink(getProjectName());
-
     }
 
     @Override
@@ -88,7 +86,7 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
     @Override
     protected void doCleanup() throws Exception
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {/*ignore*/}
     }
 
     @Override
