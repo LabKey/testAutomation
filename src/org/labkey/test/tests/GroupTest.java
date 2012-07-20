@@ -57,7 +57,7 @@ public class GroupTest extends BaseSeleniumWebTest
         try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(COMPOUND_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(BAD_GROUP);}catch(Throwable t){/*ignore*/}
-        try{deleteGroup(CHILD_GROUP);}catch(Throwable t){}
+        try{deleteGroup(CHILD_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(API_SITE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteProject(getProjectName());}catch(Throwable t){/*ignore*/}
         try{deleteProject(getProject2Name());}catch(Throwable t){/*ignore*/}
@@ -65,9 +65,9 @@ public class GroupTest extends BaseSeleniumWebTest
 
     protected void init()
     {
-        for(int i=0; i<TEST_USERS_FOR_GROUP.length; i++)
+        for(String group : TEST_USERS_FOR_GROUP)
         {
-            createUser(TEST_USERS_FOR_GROUP[i], null);
+            createUser(group, null);
         }
 
         createProject(getProjectName(), "Collaboration");
@@ -173,7 +173,6 @@ public class GroupTest extends BaseSeleniumWebTest
         {
                 assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
         }
-//        assertTrue(groupHierarchy.contains());
 
         //confirm details link leads to right user, page
         clickLinkContainingText("details", rowIndex);
@@ -198,10 +197,10 @@ public class GroupTest extends BaseSeleniumWebTest
         clickLinkWithText(getProjectName());
         String[][] nameTitleBody = {{"Name1", "Title1", "Body1"}, {"Name2", "Title2", "Body2"}};
 
-        for(int i=0; i<nameTitleBody.length; i++)
+        for(String[] wikiValues : nameTitleBody)
         {
             createNewWikiPage();
-            setWikiValuesAndSave(nameTitleBody[i][0], nameTitleBody[i][1], nameTitleBody[i][2]);
+            setWikiValuesAndSave(wikiValues[0], wikiValues[1], wikiValues[2]);
         }
         stopImpersonating();
 
@@ -255,11 +254,11 @@ public class GroupTest extends BaseSeleniumWebTest
 
     private boolean canEditPages(String[][] nameTitleBody)
     {
-        for(int i=0; i<nameTitleBody.length; i++)
+        for(String[] wikiValues : nameTitleBody)
         {
-            waitForElement(Locator.linkContainingText(nameTitleBody[i][1]), defaultWaitForPage);
+            waitForElement(Locator.linkContainingText(wikiValues[1]), defaultWaitForPage);
             sleep(1000);
-            clickLinkWithText(nameTitleBody[i][1]);
+            clickLinkWithText(wikiValues[1]);
             if(!isTextPresent("Edit"))
                 return false;
             selenium.goBack();
@@ -269,9 +268,9 @@ public class GroupTest extends BaseSeleniumWebTest
 
     private boolean canSeePages(String[][] nameTitleBody)
     {
-        for(int i=0; i<nameTitleBody.length; i++)
+        for(String[] wikiValues : nameTitleBody)
         {
-            if(!isTextPresent(nameTitleBody[i][1]))
+            if(!isTextPresent(wikiValues[1]))
                 return false;
         }
         return true;
