@@ -363,7 +363,7 @@ public class TimeChartTest extends StudyBaseTest
     {
 
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Time Chart");
 
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
@@ -460,8 +460,7 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Create multi-measure time chart.");
         clickLinkWithText(VISIT_FOLDER_NAME);
-        clickTab("Manage");
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Choose a Measure", 0);
@@ -542,14 +541,12 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
 
         log("Verify saved report");
-        clickTab("Manage");
-        waitForText("Manage Views", WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
         assertTextPresent(REPORT_NAME_2);
         click(Locator.tagWithText("div", REPORT_NAME_1));
         assertTextPresent(REPORT_DESCRIPTION);
-        clickAndWait(Locator.xpath("//a[text()='view' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
+        clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
         waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
         assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
         pushLocation();
@@ -689,7 +686,7 @@ public class TimeChartTest extends StudyBaseTest
         log("Create multi-measure time chart.");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Choose a Measure", 0);
@@ -725,7 +722,7 @@ public class TimeChartTest extends StudyBaseTest
         clickLinkWithText(FOLDER_NAME);
         goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickLinkWithText("view");
+        clickLinkWithText("edit");
         waitForText(CHART_TITLE);
         assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
         assertTextPresent(CHART_TITLE+": Lymphocytes", 1); // Title
@@ -864,9 +861,9 @@ public class TimeChartTest extends StudyBaseTest
         StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP3_NAME, "Participant", false, GROUP3_PTIDS);
 
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickLinkWithText("view");
+        clickLinkWithText("edit");
         waitForText(CHART_TITLE);
         assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
         assertTextPresent(CHART_TITLE+": Lymphocytes", 1); // Title
@@ -966,9 +963,10 @@ public class TimeChartTest extends StudyBaseTest
         log("Verify report after modifying participant groups.");
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(REPORT_NAME_3);
-        assertTextNotPresent(GROUP3_NAME);
-
+        waitForText("Time Chart Wizard");
+        clickNavButton("Edit"); // switch to edit mode
         waitForText("One or more of the participant groups originally saved with this chart are not currently visible", WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent(GROUP3_NAME);
 
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 1); // One chart per group.
@@ -1049,9 +1047,9 @@ public class TimeChartTest extends StudyBaseTest
     {
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickLinkWithText("view");
+        clickLinkWithText("edit");
         waitForText(CHART_TITLE);
         assertTextPresent("Days Since Start Date", 1); // X-Axis label for one selected group.
         enterMeasuresPanel();
@@ -1111,6 +1109,7 @@ public class TimeChartTest extends StudyBaseTest
         impersonate(USER1);
         popLocation(); // Saved chart
         waitForText(CHART_TITLE);
+        assertElementNotPresent(Locator.button("Edit"));
         assertElementNotPresent(Locator.button("Save"));
         assertElementPresent(Locator.button("Save As"));
         clickLinkWithText(FOLDER_NAME);
@@ -1129,12 +1128,10 @@ public class TimeChartTest extends StudyBaseTest
         log("Check Time Chart Point Click Function (Developer Only)");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        clickTab("Manage");
-        waitForText("Manage Views", WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText("Manage Views");
+        goToManageViews();
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
         click(Locator.tagWithText("div", REPORT_NAME_1));
-        clickAndWait(Locator.xpath("//a[text()='view' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
+        clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
         waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
         // change to the data points are visible again
         setAxisValue("Left", "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
