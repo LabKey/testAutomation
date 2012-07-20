@@ -508,7 +508,6 @@
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
-            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
@@ -555,12 +554,15 @@
         <echo message="Server will stop after successful tests."/>
         <echo message="Or use ant stopSeleniumServer to stop manually."/>
         <echo message="Setting selenium server's PATH to: ${env.FIREFOX_HOME}:${env.PATH}" level="verbose"/>
+        <delete file="selenium.log"/>
         <java spawn="true" fork="true" classname="org.openqa.selenium.server.SeleniumServer">
             <classpath refid="test.lib.selenium.classpath" />
             <env key="PATH" path="${env.FIREFOX_HOME}:${env.PATH}"/>
             <arg value="-port" />
             <arg value="${sysprop.selenium.server.port}" />
             <arg value="-Dcaching=true"/>
+            <arg value="-log"/>
+            <arg value="selenium.log"/>
         </java>
         <echo message="Checking for Selenium Server on port ${sysprop.selenium.server.port}" />
         <waitfor maxwait="60" maxwaitunit="second" checkevery="2" checkeveryunit="second" timeoutproperty="noSeleniumServer">
@@ -718,18 +720,6 @@
 
     <target name="test-debug">
         <property name="suite" value="TEST"/>
-        <property name="debug.suspend.selenium" value="y"/>
-        <antcall target="sub-selenium"/>
-    </target>
-
-    <target name="adaptive">
-        <property name="suite" value="Adaptive"/>
-        <property name="debug.suspend.selenium" value="n"/>
-        <antcall target="sub-selenium"/>
-    </target>
-
-    <target name="adaptive-debug">
-        <property name="suite" value="Adaptive"/>
         <property name="debug.suspend.selenium" value="y"/>
         <antcall target="sub-selenium"/>
     </target>
@@ -947,11 +937,6 @@
             <isset property="devMode"/>
         </condition>
 
-        <!-- Set property sysprop.adaptiveRoot: relative path -->
-        <condition property="sysprop.adaptiveRoot" value="${adaptiveRoot}" else="">
-            <isset property="adaptiveRoot"/>
-        </condition>
-
         <!-- Set property sysprop.databaseType: "pg" or "mssql" -->
         <condition property="sysprop.databaseType" value="${databaseType}" else="">
             <isset property="databaseType"/>
@@ -1039,7 +1024,6 @@
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
-            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
@@ -1084,7 +1068,6 @@
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
-            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
@@ -1130,7 +1113,6 @@
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
             <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
             <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
-            <sysproperty key="adaptiveRoot" value="${sysprop.adaptiveRoot}"/>
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
