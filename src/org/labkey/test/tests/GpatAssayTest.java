@@ -71,6 +71,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
 
         log("Import XLS GPAT assay");
+        sleep(2000);
         ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_XLS);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
@@ -131,6 +132,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Import TSV GPAT assay");
         clickLinkWithText(PROJECT_NAME);
+        ExtHelper.waitForFileGridReady(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_TSV);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
