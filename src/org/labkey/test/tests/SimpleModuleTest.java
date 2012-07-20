@@ -169,6 +169,12 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertNotNull(priusId);
         assertNotNull(f150Id);
 
+        log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
+        clickLinkWithText("details");
+        assertTextPresent("Name");
+        assertTextPresent("Toyota");
+
         log("** Testing vehicle.Model RowId url link...");
         beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Models");
@@ -181,9 +187,14 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("** Testing query of vehicle schema...");
         beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Toyotas", "simpletest");
-
+        
         assertTextPresent("Prius");
         assertTextPresent("Camry");
+
+        log(".. generic details link should include _RowId as pk");
+        clickLinkWithText("details");
+        assertTextPresent("Name");
+        assertTextPresent("Toyota");
 
         log("** Inserting colors...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
