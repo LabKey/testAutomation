@@ -679,10 +679,11 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         DataRegionTable table = new DataRegionTable("audit", this, false);
 
-        String createdBy      = table.getDataAsText(2, 1);
-        String impersonatedBy = table.getDataAsText(2, 2);
-        String user           = table.getDataAsText(2, 3);
-        String comment        = table.getDataAsText(2, 4);
+        table.getDataAsText(2, 2);
+        String createdBy      = table.getDataAsText(2, "Created By");
+        String impersonatedBy = table.getDataAsText(2, "Impersonated By");
+        String user           = table.getDataAsText(2, "User");
+        String comment        = table.getDataAsText(2, "Comment");
 
         assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
