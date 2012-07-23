@@ -95,7 +95,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     {
         //create a new project for the security tests
         log("Creating security test project");
-        createProject(TEST_ASSAY_PRJ_SECURITY);
+        _containerHelper.createProject(TEST_ASSAY_PRJ_SECURITY, null);
 
         log("Setting up groups, users and initial permissions");
 

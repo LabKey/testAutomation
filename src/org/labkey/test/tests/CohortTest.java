@@ -52,7 +52,7 @@ public class CohortTest extends BaseSeleniumWebTest
     private void cohortTest()
     {
         log("Check advanced cohort features.");
-        createProject(PROJECT_NAME, "Study");
+        _containerHelper.createProject(PROJECT_NAME, "Study");
         importStudyFromZip(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Specimens");

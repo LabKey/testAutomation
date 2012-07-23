@@ -37,7 +37,7 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws Exception
     {
-        createProject(PROJECT_NAME, "Collaboration");
+        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         createLists();
         goToSchemaBrowser();
         selectQuery("lists", BOOKS_LIST);

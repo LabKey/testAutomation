@@ -394,7 +394,7 @@ public class Crawler
         StringTokenizer st = new StringTokenizer(relativeURL, "/");
         st.nextToken(); // controller
         String currentProject = st.nextToken();
-        for (String createdProject :_test.getCreatedProjects())
+        for (String createdProject : _test.getContainerHelper().getCreatedProjects())
         {
             if (currentProject.equals(createdProject))
                 return true;

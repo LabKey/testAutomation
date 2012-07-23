@@ -52,7 +52,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
     @Override
     public void doTestSteps()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         addWebPart("Workbooks");
 
         // Create File Workbook

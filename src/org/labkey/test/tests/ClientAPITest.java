@@ -141,8 +141,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws Exception
     {
-        createProject(OTHER_PROJECT);
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(OTHER_PROJECT, null);
+        _containerHelper.createProject(PROJECT_NAME, null);
 
         enableEmailRecorder();
 

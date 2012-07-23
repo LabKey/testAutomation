@@ -64,9 +64,9 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     protected void setUpTest()
     {
 
-        createProject(getProjectName());
+        _containerHelper.createProject(getProjectName(), null);
         checkHelpLinks(null, true, true);
-        createProject(getProjectAltertedName());
+        _containerHelper.createProject(getProjectAltertedName(), null);
         checkHelpLinks(null, true, true);
 
         goToProjectSettings(getProjectAltertedName());

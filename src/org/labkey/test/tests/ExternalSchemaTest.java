@@ -137,7 +137,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     void createProject()
     {
         log("** Create project: " + PROJECT_NAME);
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
     }
 

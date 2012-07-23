@@ -61,7 +61,7 @@ public class ScriptValidationTest extends SimpleModuleTest
     protected void doTestSteps() throws Exception
     {
         assertModuleDeployed(MODULE_NAME);
-        createProject(getProjectName());
+        _containerHelper.createProject(getProjectName(), null);
         enableModule(getProjectName(), MODULE_NAME);
         enableModule(getProjectName(), "Query");
 

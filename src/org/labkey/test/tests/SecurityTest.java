@@ -436,7 +436,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user. Click here to see this user's profile and history.");
 
         // create the project and set permissions
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup("Administrators");
         clickManageGroup("Administrators");
         setFormElement("names", ADMIN_USER_TEMPLATE);

@@ -124,11 +124,11 @@ public class WikiLongTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         enableEmailRecorder();
-        createProject(PROJECT2_NAME);
+        _containerHelper.createProject(PROJECT2_NAME, null);
         enableModule(PROJECT2_NAME, "MS2");
         setPermissions(USERS_GROUP, "Editor");
         clickNavButton("Save and Finish");
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         enableModule(PROJECT_NAME, "MS2");
         createPermissionsGroup("testers");
         setPermissions("testers", "Editor");
@@ -569,7 +569,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         saveWikiPage();
         pushLocation(); // For attempting to bypass Terms of Use (1 pop)
 
-        createProject(PROJECT3_NAME); // Public project
+        _containerHelper.createProject(PROJECT3_NAME, null); // Public project
         setSiteGroupPermissions("Guests", "Reader");
         setSiteGroupPermissions("All Site Users", "Reader");
         goToModule("Wiki");
@@ -580,7 +580,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         saveWikiPage();
         pushLocation(); // For attempting to bypass Terms of Use (2 pops)
 
-        createProject(PROJECT4_NAME);
+        _containerHelper.createProject(PROJECT4_NAME, null);
         setSiteGroupPermissions("All Site Users", "Reader");
         goToModule("Wiki");
         createNewWikiPage("RADEOX");

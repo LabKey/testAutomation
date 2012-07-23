@@ -122,7 +122,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
     protected void setupAdaptiveProject()
     {
-        createProject(PROJECT_NAME, "Adaptive Home Folder");
+        _containerHelper.createProject(PROJECT_NAME, "Adaptive Home Folder");
         enableModule(PROJECT_NAME, "Dumbster");
 
         goToModule("Dumbster");

@@ -138,7 +138,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
     private void createList()
     {
         log("Create project: " + PROJECT_NAME);
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
 
         log("Define list");
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);

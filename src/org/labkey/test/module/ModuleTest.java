@@ -35,7 +35,7 @@ public class ModuleTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         log("Test module created from moduleTemplate");
         clickLinkWithText(PROJECT_NAME);
         goToFolderManagement();

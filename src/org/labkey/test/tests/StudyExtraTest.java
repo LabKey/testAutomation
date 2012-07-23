@@ -37,7 +37,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "None", null);
 
         addWebPart("Vaccine Study Protocols");

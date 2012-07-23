@@ -46,7 +46,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
     {
 
         log("Open new project");
-        createProject(PROJECT_NAME, "Collaboration");
+        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         goToProjectSettings();
         checkRadioButton("folderDisplayMode", "IN_MENU");
         clickButtonContainingText("Save");

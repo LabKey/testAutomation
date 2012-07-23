@@ -72,7 +72,7 @@ public class SampleMindedImportTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        createProject(PROJECT_NAME, "Study");
+        _containerHelper.createProject(PROJECT_NAME, "Study");
         clickNavButton("Create Study");
         click(Locator.radioButtonByNameAndValue("simpleRepository", "true"));
         clickNavButton("Create Study");

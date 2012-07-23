@@ -149,7 +149,7 @@ public class ListTest extends BaseSeleniumWebTest
     {
 
         log("Setup project and list module");
-        createProject(projectName);
+        _containerHelper.createProject(projectName, null);
 
         log("Add list -- " + LIST_NAME);
         ListHelper.createList(this, projectName, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
@@ -481,7 +481,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("Views");
 
         log("Create second project");
-        createProject(PROJECT_NAME2);
+        _containerHelper.createProject(PROJECT_NAME2, null);
 
         String project2_url = getCurrentRelativeURL();
 

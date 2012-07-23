@@ -94,7 +94,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         log("Open new project, add group, alter permissions");
-        createProject(PROJECT_NAME, "Collaboration");
+        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         createPermissionsGroup("Administrators");
         setPermissions("Administrators", "Project Administrator");
         createPermissionsGroup("testers1");

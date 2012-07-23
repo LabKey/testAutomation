@@ -75,7 +75,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     protected void initProject()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup(TEST_GROUP);
         assertPermissionSetting(TEST_GROUP, "No Permissions");
         setPermissions(TEST_GROUP, "Editor");

@@ -64,7 +64,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
 
         assertTextPresent(UNIPROT_FILENAME);
 
-        createProject(PROJECT_NAME, "MS2");
+        _containerHelper.createProject(PROJECT_NAME, "MS2");
         clickLinkWithText(PROJECT_NAME);
         setFormElement("identifier", "Ppia");
         uncheckCheckbox("restrictProteins");

@@ -58,7 +58,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         log("creating project...");
-        createProject(PROJECT_NAME, "Study");
+        _containerHelper.createProject(PROJECT_NAME, "Study");
 
         ensureAdminMode();
         goToAdminConsole();

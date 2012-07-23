@@ -118,7 +118,7 @@ public class NabOldTest extends AbstractQCAssayTest
             return true;
         }
 
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Nab", "Study"});
 
         // click the study tab to force creation of the study table row:

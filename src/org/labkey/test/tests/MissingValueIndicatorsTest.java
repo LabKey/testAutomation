@@ -122,7 +122,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         log("Create MV project");
-        createProject(PROJECT_NAME, "Study");
+        _containerHelper.createProject(PROJECT_NAME, "Study");
         clickNavButton("Create Study");
         selectOptionByValue("securityString", "BASIC_WRITE");
         clickNavButton("Create Study");

@@ -75,7 +75,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void initializeFolder()
     {
         if (!isLinkPresentWithText(getProjectName()))
-            createProject(getProjectName());
+            _containerHelper.createProject(getProjectName(), null);
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 

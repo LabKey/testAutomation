@@ -90,7 +90,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
     {
         log("testing group audit events");
 
-        createProject(AUDIT_TEST_PROJECT);
+        _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
         createPermissionsGroup("Testers");
         assertPermissionSetting("Testers", "No Permissions");
         setPermissions("Testers", "Editor");

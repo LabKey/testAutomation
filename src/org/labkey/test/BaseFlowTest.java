@@ -173,7 +173,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             assertTextNotPresent("Please install the flowWorkspace R library");
         }
 
-        createProject(getProjectName());
+        _containerHelper.createProject(getProjectName(), null);
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
 
         setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);

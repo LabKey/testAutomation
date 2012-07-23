@@ -44,8 +44,8 @@ public class RlabkeyTest extends SimpleApiTest
     public void runUITests() throws Exception
     {
         log("Create Projects");
-        createProject(PROJECT_NAME);
-        createProject(PROJECT_NAME_2);
+        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.createProject(PROJECT_NAME_2, null);
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Lists");
        

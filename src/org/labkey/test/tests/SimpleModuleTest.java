@@ -64,7 +64,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         assertModuleDeployed(MODULE_NAME);
-        createProject(getProjectName(), FOLDER_TYPE);
+        _containerHelper.createProject(getProjectName(), FOLDER_TYPE);
         assertModuleEnabledByDefault("Portal");
         assertModuleEnabledByDefault("simpletest");
         assertModuleEnabledByDefault("Query");

@@ -57,7 +57,7 @@ public class PivotQueryTest extends BaseSeleniumWebTest
 
     protected void setupProject()
     {
-        createProject(getProjectName(), "Study");
+        _containerHelper.createProject(getProjectName(), "Study");
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
     }
 

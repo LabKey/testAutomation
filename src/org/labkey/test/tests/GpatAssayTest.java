@@ -65,7 +65,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
     @Override
     public void doTestSteps()
     {
-        createProject(PROJECT_NAME, "Assay");
+        _containerHelper.createProject(PROJECT_NAME, "Assay");
         addWebPart("Pipeline Files");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/GPAT");
         clickLinkWithText(PROJECT_NAME);

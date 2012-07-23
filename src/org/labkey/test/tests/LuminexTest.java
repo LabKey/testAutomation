@@ -149,7 +149,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         log("Testing Luminex Assay Designer");
         //create a new test project
-        createProject(TEST_ASSAY_PRJ_LUMINEX);
+        _containerHelper.createProject(TEST_ASSAY_PRJ_LUMINEX, null);
 
         //setup a pipeline for it
         setupPipeline(TEST_ASSAY_PRJ_LUMINEX);

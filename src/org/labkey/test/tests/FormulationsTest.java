@@ -128,7 +128,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
     protected void setupFormulationsProject()
     {
-        createProject(PROJECT_NAME, "IDRI Formulations Folder");
+        _containerHelper.createProject(PROJECT_NAME, "IDRI Formulations Folder");
         enableModule(PROJECT_NAME, "Dumbster");
 
         //addWebPart("Sample Sets");

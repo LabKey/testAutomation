@@ -74,7 +74,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment" });
 
         clickLinkWithText(PROJECT_NAME);

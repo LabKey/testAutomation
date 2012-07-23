@@ -48,7 +48,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         log("Starting Java client api library test...");
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         doSecurityTest();
         doQueryTest();
 

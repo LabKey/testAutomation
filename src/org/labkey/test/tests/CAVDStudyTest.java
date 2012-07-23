@@ -45,7 +45,7 @@ public class CAVDStudyTest extends StudyBaseTest
     @Override
     protected void doCreateSteps()
     {
-        createProject(PROJECT_NAME, "None");
+        _containerHelper.createProject(PROJECT_NAME, "None");
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "CAVD Study", null);
 
         // used for doVerifyCrossContainerDatasetStatus

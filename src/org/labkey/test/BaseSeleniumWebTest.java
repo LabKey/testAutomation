@@ -28,6 +28,8 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.util.APIContainerHelper;
+import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.ComponentQuery;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
@@ -105,7 +107,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     private Stack<String> _locationStack = new Stack<String>();
     private String _savedLocation = null;
     private Stack<String> _impersonationStack = new Stack<String>();
-    private List<String> _createdProjects = new ArrayList<String>();
     private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
     protected boolean _testFailed = true;
     protected boolean _testTimeout = false;
@@ -115,6 +116,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     protected int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
     protected long _startTime;
+
+    public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -214,7 +217,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      * Override if using file upload features in the test. Returning true will attempt to use
      * a version of the browser that allows file upload fields to be set. Defaults to false.
      * Use isFileUploadAvailable to see if request worked.
-     * @return
      */
     protected boolean isFileUploadTest()
     {
@@ -427,11 +429,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return links.toArray(new String[links.size()]);
     }
 
-
-    public List<String> getCreatedProjects()
-    {
-        return _createdProjects;
-    }
 
     public String getCurrentRelativeURL()
     {
@@ -1392,7 +1389,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             for (FolderIdentifier folder : _createdFolders)
                 assertLinkNotPresentWithText(folder.getFolderName());
 
-            for (String projectName : _createdProjects)
+            for (String projectName : _containerHelper.getCreatedProjects())
                 assertLinkNotPresentWithText(projectName);
             log("========= " + getClass().getSimpleName() + " cleanup complete =========");
         }
@@ -2030,41 +2027,6 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selenium.fireEvent(loc.toString(), event.toString());
     }
 
-    public void createProject(String projectName)
-    {
-        createProject(projectName, null);
-    }
-
-    public void createProject(String projectName, String folderType)
-    {
-        ensureAdminMode();
-        log("Creating project with name " + projectName);
-        if (isLinkPresentWithText(projectName))
-            fail("Cannot create project; A link with text " + projectName + " already exists.  " +
-                    "This project may already exist, or its name appears elsewhere in the UI.");
-        goToCreateProject();
-        waitForElement(Locator.name("name"), 1*WAIT_FOR_JAVASCRIPT);
-        setText("name", projectName);
-
-        if (null != folderType && !folderType.equals("None"))
-            click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
-        else
-            click(Locator.xpath("//td[./label[text()='Custom']]/input"));
-
-        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
-        waitForPageToLoad();
-
-        //second page of the wizard
-        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
-        waitForPageToLoad();
-
-        //third page of wizard
-        waitAndClick(Locator.xpath("//button[./span[text()='Finish']]"));
-        waitForPageToLoad();
-
-        _createdProjects.add(projectName);
-    }
-
     public void startCreateGlobalPermissionsGroup(String groupName, boolean failIfAlreadyExists)
     {
 
@@ -2233,6 +2195,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
      */
     public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
     {
+        log("Starting subfolder creation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        try
+        {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
         {
@@ -2282,24 +2247,23 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         goToFolderManagement();
         clickLinkWithText("Folder Type");
 
-        if (tabsToAdd != null)
-        {
-            for (String tabname : tabsToAdd)
-                checkCheckbox(Locator.checkboxByTitle(tabname));
-        }
+        for (String tabname : tabsToAdd)
+            checkCheckbox(Locator.checkboxByTitle(tabname));
 
         submit();
         if ("None".equals(folderType))
         {
-            if (tabsToAdd != null)
-            {
-                for (String tabname : tabsToAdd)
-                    assertTabPresent(tabname);
-            }
+            for (String tabname : tabsToAdd)
+                assertTabPresent(tabname);
         }
 
         // verify that there's a link to our new folder:
         assertLinkPresentWithText(child);
+        }
+        finally
+        {
+            log("Done with subfolder creation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
     }
 
     protected void deleteDir(File dir)
@@ -6641,5 +6605,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(2, "Study Reload", false);
 
+    }
+
+    public AbstractContainerHelper getContainerHelper()
+    {
+        return _containerHelper;
     }
 }

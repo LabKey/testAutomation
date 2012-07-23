@@ -45,7 +45,7 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         log("Setup project and list module");
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
 
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
 

@@ -79,7 +79,7 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
     {
         _studyDataRoot = getLabKeyRoot() + "/sampledata/study";
 
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
         clickNavButton("Create Study");

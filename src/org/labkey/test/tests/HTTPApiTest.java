@@ -70,7 +70,7 @@ public class HTTPApiTest extends SimpleApiTest
     protected void runUITests() throws Exception
     {
         log("Create Project");
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Lists");
 

@@ -58,7 +58,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws InterruptedException
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment", "Query" });
         addWebPart("Data Pipeline");
         addWebPart("Run Groups");

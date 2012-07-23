@@ -73,7 +73,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         prepareProgrammaticQC();
 
         //create a new test project
-        createProject(TEST_ASSAY_PRJ_ELISPOT);
+        _containerHelper.createProject(TEST_ASSAY_PRJ_ELISPOT, null);
 
         //setup a pipeline for it
         setupPipeline(TEST_ASSAY_PRJ_ELISPOT);

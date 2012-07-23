@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.UIContainerHelper;
 
 /**
  * User: marki
@@ -43,6 +44,13 @@ public class BasicTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        _containerHelper = new UIContainerHelper(this);
+    }
+
     protected void doTestSteps()
     {
         log("Test browser version");
@@ -58,7 +66,7 @@ public class BasicTest extends BaseSeleniumWebTest
         checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
         clickNavButton("Save");
 
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup("testers");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");

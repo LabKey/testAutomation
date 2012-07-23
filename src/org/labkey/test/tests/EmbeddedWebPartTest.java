@@ -42,7 +42,7 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
     {
         RReportHelper.ensureRConfig(this);
         log("Setup project and list module");
-        createProject(getProjectName());
+        _containerHelper.createProject(getProjectName(), null);
         resetTracker = new ResetTracker(this);
     }
 

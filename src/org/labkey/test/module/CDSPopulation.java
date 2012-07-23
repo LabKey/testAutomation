@@ -60,7 +60,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     @Override
     public void doTestSteps()
     {
-        createProject(PROJECT_NAME, "Study");
+        _containerHelper.createProject(PROJECT_NAME, "Study");
         importStudyFromZip(STUDY_ZIP.getPath());
         enableModule(PROJECT_NAME, "CDS");
 

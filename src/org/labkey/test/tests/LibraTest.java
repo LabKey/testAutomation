@@ -40,7 +40,7 @@ public class LibraTest extends MS2Test
 
     protected void configure()
     {
-        createProject(getProjectName(), "MS2");
+        _containerHelper.createProject(getProjectName(), "MS2");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe/iTRAQ/");
         clickLinkWithText(getProjectName());
 

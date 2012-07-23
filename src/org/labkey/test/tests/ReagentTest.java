@@ -60,7 +60,7 @@ public class ReagentTest extends BaseSeleniumWebTest
     public void createProject()
     {
         log("** Create Project");
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Query" });
         enableModule("reagent", false);
 

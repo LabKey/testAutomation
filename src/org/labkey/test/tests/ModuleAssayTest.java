@@ -141,7 +141,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void setupProject()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         setupPipeline(PROJECT_NAME);
         createAssayDesign();
         createSampleSet();

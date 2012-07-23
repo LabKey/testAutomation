@@ -235,7 +235,7 @@ public class TimeChartTest extends StudyBaseTest
 
     public void configureStudy()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
     }

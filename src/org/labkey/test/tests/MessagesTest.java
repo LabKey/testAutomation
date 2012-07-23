@@ -68,7 +68,7 @@ public class MessagesTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         log("Create Project");
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));

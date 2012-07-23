@@ -75,7 +75,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     {
         prepareProgrammaticQC();
 
-        createProject(TEST_PROGRAMMATIC_QC_PRJ);
+        _containerHelper.createProject(TEST_PROGRAMMATIC_QC_PRJ, null);
         setupPipeline(TEST_PROGRAMMATIC_QC_PRJ);
 
         defineQCAssay();

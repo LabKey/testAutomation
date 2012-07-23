@@ -56,7 +56,7 @@ public class FolderTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createFolders();
 
         moveFolders();

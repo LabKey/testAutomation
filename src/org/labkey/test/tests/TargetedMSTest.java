@@ -39,7 +39,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        createProject(getProjectName(), "Targeted MS");
+        _containerHelper.createProject(getProjectName(), "Targeted MS");
         setPipelineRoot(getSampledataPath() + "/TargetedMS");
         goToProjectHome();
         addWebPart("Data Pipeline");

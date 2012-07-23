@@ -34,6 +34,5 @@ public interface WebTest
     void log(String str);
     URL getURL() throws MalformedURLException;
     String[] getLinkAddresses();
-    List<String> getCreatedProjects();
     String getAssociatedModuleDirectory();
 }

@@ -104,7 +104,7 @@ public class TimelineTest extends BaseSeleniumWebTest
 
     protected void doTestSteps() throws Exception
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Timeline"});
 
         clickLinkWithText(FOLDER_NAME);

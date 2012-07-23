@@ -76,7 +76,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
 
     protected void createProjectAndFolder()
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "MS2", new String[] { });
 
         log("Setup pipeline.");

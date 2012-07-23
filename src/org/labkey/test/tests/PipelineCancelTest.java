@@ -38,7 +38,7 @@ public class PipelineCancelTest  extends BaseSeleniumWebTest
 
     public void doTestSteps()
     {
-        createProject(getProjectName(), "Study");
+        _containerHelper.createProject(getProjectName(), "Study");
         startImportStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
 
         log("Cancel import");

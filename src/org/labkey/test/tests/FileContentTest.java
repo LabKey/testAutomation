@@ -77,7 +77,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 
         SearchHelper.initialize(this);
 
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup(TEST_GROUP, TEST_USER);
         setPermissions(TEST_GROUP, "Editor");
         exitPermissionsUI();

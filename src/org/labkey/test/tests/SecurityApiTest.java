@@ -48,7 +48,7 @@ public class SecurityApiTest extends SimpleApiTest
         createUser(USER_1, null);
         createUser(USER_2, null);
 
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup(GROUP_1, USER_1);
         createPermissionsGroup(GROUP_2, USER_1, USER_2);
         setPermissions(GROUP_1, "Editor");

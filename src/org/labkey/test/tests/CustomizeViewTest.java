@@ -81,7 +81,7 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createList();
 
         log("** Show only LastName and Age");

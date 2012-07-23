@@ -70,7 +70,7 @@ public class GroupTest extends BaseSeleniumWebTest
             createUser(group, null);
         }
 
-        createProject(getProjectName(), "Collaboration");
+        _containerHelper.createProject(getProjectName(), "Collaboration");
     }
 
     @Override

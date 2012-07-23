@@ -83,7 +83,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     public void setUp2()
     {
-        createProject(getProjectName(), "Genotyping");
+        _containerHelper.createProject(getProjectName(), "Genotyping");
         setUpLists();
         configureAdmin();
         clickLinkContainingText(getProjectName());

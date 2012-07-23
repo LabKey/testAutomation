@@ -87,7 +87,7 @@ public class UserPermissionsTest extends BaseSeleniumWebTest
      */
     private void userPermissionRightsTest()
     {
-        createProject(PERM_PROJECT_NAME);
+        _containerHelper.createProject(PERM_PROJECT_NAME, null);
         createPermissionsGroup(GAMMA_EDITOR_GROUP_NAME);
         assertPermissionSetting(GAMMA_EDITOR_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_EDITOR_GROUP_NAME, "Editor");

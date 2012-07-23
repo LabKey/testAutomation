@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.UIContainerHelper;
 
 /**
  * MS1 BVT
@@ -69,13 +70,20 @@ public class MS1Test extends BaseSeleniumWebTest
         testViews(PROJ_MAIN);
     }
 
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        _containerHelper = new UIContainerHelper(this);
+    }
+
     protected void setupEnvironment()
     {
         //for now, just create a main project with standard permissions
         //in the future, we should expand this to include multiple
         //projects and a more complex security scenario to ensure that
         //users can't view MS1 data they are not supposed to see
-        createProject(PROJ_MAIN, "MS1");
+        _containerHelper.createProject(PROJ_MAIN, MS1_FOLDER_TYPE);
 
         //setup the pipeline
         setupPipeline(PROJ_MAIN, _pipelinePathMain);

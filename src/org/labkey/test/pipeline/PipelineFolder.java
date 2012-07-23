@@ -108,7 +108,7 @@ public class PipelineFolder
     public void setup()
     {
         String projectName = _test.getProjectName();
-        _test.createProject(projectName);
+        _test._containerHelper.createProject(projectName, null);
         _test.createSubfolder(projectName, projectName, _folderName, _folderType, _tabs);
 
         for (String webPartName : _webParts)

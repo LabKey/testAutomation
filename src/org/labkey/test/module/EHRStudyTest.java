@@ -200,7 +200,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
     {
         enableEmailRecorder();
 
-        createProject(PROJECT_NAME);
+        _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Collaboration", new String[]{"EHR", "Pipeline", "Study"});
         enableModule(PROJECT_NAME, "EHR");
 

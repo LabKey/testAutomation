@@ -112,7 +112,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             prepareProgrammaticQC();
 
             //create a new test project
-            createProject(TEST_ASSAY_PRJ_NAB);
+            _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);
 
             //setup a pipeline for it
             setupPipeline(TEST_ASSAY_PRJ_NAB);
