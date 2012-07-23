@@ -188,8 +188,15 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText("View Runs");
-        clickLinkWithText(first454importNum);
+        clickRunLink(first454importNum);
+    }
 
+    private void clickRunLink(String runId)
+    {
+        DataRegionTable dr = new DataRegionTable("Runs", this);
+        int rowNum = dr.getRow("runs", runId);
+        String rowId = dr.getColumnDataAsText("Run").get(rowNum);
+        clickLinkWithText(rowId);
     }
 
     private void verifyAnalysis()
@@ -367,7 +374,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         goToProjectHome();
         clickLinkWithText("View Runs");
-        clickLinkWithText(illuminaImportNum);
+        clickRunLink(illuminaImportNum);
 
         verifyIlluminaSamples();
     }
@@ -538,7 +545,11 @@ public class GenotypingTest extends BaseSeleniumWebTest
         {
             Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
         }
-        Ext4FieldRef.getForLabel(this, "Template").setValue(TEMPLATE_NAME);
+        Ext4FieldRef combo = Ext4FieldRef.getForLabel(this, "Template");
+        combo.setValue(TEMPLATE_NAME);
+
+        Integer count = Integer.parseInt(combo.eval("this.store.getCount()"));
+        assertTrue("Combo store does not have correct record number", 3 == count);
         sleep(50);
         assertEquals("Field value not set correctly", TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
         Ext4Helper.clickTabContainingText(this, "Preview Header");
@@ -587,7 +598,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         goToProjectHome();
         clickLinkWithText("View Runs");
-        clickLinkWithText(first454importNum);
+        clickRunLink(first454importNum);
 
         verifySamples();
     }
@@ -707,6 +718,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         DeleteRowsCommand cmd = new DeleteRowsCommand("genotyping", "IlluminaTemplates");
         cmd.addRow(Collections.singletonMap("Name", (Object) TEMPLATE_NAME));
         SaveRowsResponse resp = cmd.execute(cn, getProjectName());
+        log("Template rows deleted: " + resp.getRowsAffected());
     }
 
     @Override
