@@ -144,8 +144,6 @@ public class MessagesTest extends BaseSeleniumWebTest
         click(subscribeButton);
         click(Locator.tagWithText("span", "thread"));
         waitForPageToLoad();
-//        clickButton("Update");
-//        clickButton("Done");
         clickLinkWithText("unsubscribe");
         assertElementPresent(subscribeButton);
 
