@@ -253,6 +253,8 @@ public class FilterTest extends ListTest
 
     private Object[][] generateValidFilterArgsAndResponses()
     {
+        String escapedName = _listCol6.getName().replace(",", "$C");
+
         Object[][] ret = {
                 //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
                 //Issue 12197
@@ -297,10 +299,12 @@ public class FilterTest extends ListTest
     private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
             String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
     {
+        String fieldKey = EscapeUtil.fieldKeyEncodePart(columnName);
+
         log("Filtering " + columnName + " with filter type: " + filter1Type + ".  value: " + filter1.getClass());
         if(filter2Type!=null)
             log("Second filter: " + filter2Type + ".  value:" + filter2);
-        setFilter(TABLE_NAME, columnName, filter1Type, filter1, filter2Type, filter2);
+        setFilter(TABLE_NAME, fieldKey, filter1Type, filter1, filter2Type, filter2);
 
         checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
@@ -313,17 +317,17 @@ public class FilterTest extends ListTest
         clickMenuButton("Views", "default");
 
         //open filter
-        runMenuItemHandler(TABLE_NAME + ":" + columnName + ":filter");
+        runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
         waitForTextToDisappear("Loading...");
         ExtHelper.clickExtTab(this, "Choose Filters");
 
         if(filter1!=null)
         {
-            assertEquals("Filter 1 value was not populated when reopening.", getFormElement("value_1"), filter1);
+            assertEquals("Filter 1 value was not populated when reopening.", filter1, getFormElement("value_1"));
         }
 
         if(filter2!=null)
-            assertEquals("Filter 2 value was not populated when reopening.", getFormElement("value_2"), filter2);
+            assertEquals("Filter 2 value was not populated when reopening.", filter2, getFormElement("value_2"));
 
         clickButtonContainingText("CANCEL", 0);
 

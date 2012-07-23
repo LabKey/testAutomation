@@ -15,6 +15,8 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -239,4 +241,25 @@ public class EscapeUtil
         }
     }
 
+    public static String fieldKeyEncodePart(String str)
+    {
+        str = StringUtils.replace(str, "$", "$D");
+        str = StringUtils.replace(str, "/", "$S");
+        str = StringUtils.replace(str, "&", "$A");
+        str = StringUtils.replace(str, "}", "$B");
+        str = StringUtils.replace(str, "~", "$T");
+        str = StringUtils.replace(str, ",", "$C");
+        return str;
+    }
+
+    public static String fieldKeyDecodePart(String str)
+    {
+        str = StringUtils.replace(str, "$C", ",");
+        str = StringUtils.replace(str, "$T", "~");
+        str = StringUtils.replace(str, "$B", "}");
+        str = StringUtils.replace(str, "$A", "&");
+        str = StringUtils.replace(str, "$S", "/");
+        str = StringUtils.replace(str, "$D", "$");
+        return str;
+    }
 }

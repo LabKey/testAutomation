@@ -20,6 +20,7 @@ import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 
@@ -451,8 +452,7 @@ public class FlowTest extends BaseFlowTest
         log("** Verifying positivity report '" + reportName + "'");
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
 
-        // HACK: need FieldKey.encodePart() in the test module
-        String reportNameEscaped = "><$A$S%\\' \"1 positivity report";
+        String reportNameEscaped = EscapeUtil.fieldKeyEncodePart(reportName);
 
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { reportNameEscaped, "Raw P" });

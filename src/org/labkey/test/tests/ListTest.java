@@ -59,7 +59,7 @@ public class ListTest extends BaseSeleniumWebTest
     protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
     protected final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
     protected final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
-    protected final ListColumn _listCol6 = new ListColumn("AliasedColumn", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
+    protected final ListColumn _listCol6 = new ListColumn("Aliased,Column", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Light", "Mellow", "Robust", "Zany" },
@@ -424,7 +424,7 @@ public class ListTest extends BaseSeleniumWebTest
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol1.getName());
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol2.getName());
         CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol3.getName());
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol6.getName());
+        CustomizeViewsHelper.removeCustomizeViewColumn(this, EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
         CustomizeViewsHelper.applyCustomView(this, 0);
         assertAlert("You must select at least one field to display in the grid.");
         CustomizeViewsHelper.closeCustomizeViewPanel(this);
@@ -660,7 +660,9 @@ public class ListTest extends BaseSeleniumWebTest
 
 
 
-    /*                Issue 11825: Create test for "Clear Sort"
+    /*  Issue 11825: Create test for "Clear Sort"
+        Issue 15567: Can't sort DataRegion by column name that has comma
+
         sort by a parameter, than clear sort.
         Verify that reverts to original sort and the dropdown menu disappears
 
@@ -671,12 +673,14 @@ public class ListTest extends BaseSeleniumWebTest
         //make sure elements are ordered the way they should be
         assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
 
+        String encodedName = EscapeUtil.fieldKeyEncodePart(_listCol6.getName());
+
         //sort  by element and verify it worked
-        setSort("query", _listCol6.getName(), SortDirection.DESC);
+        setSort("query", encodedName, SortDirection.DESC);
         assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][2], TEST_DATA[5][1]);
 
         //remove sort and verify we return to initial state
-        clearSort("query", _listCol6.getName());
+        clearSort("query", encodedName);
         assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
     }
 
