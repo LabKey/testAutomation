@@ -127,10 +127,10 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickMenuButton("Query", "Comparison");
         waitForPageToLoad(longWaitForPage);
         assertTextNotPresent("No data to show");
-        setFilterAndWait("query", "AbsDifference", "Is Greater Than Or Equal To", "2", longWaitForPage);
+        setFilterAndWait("query", "AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
         // UNDONE: sample '118902.fcs' differs by 2.46%
-        //setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "1", longWaitForPage);
-        setFilterAndWait("query", "PercentDifference", "Is Greater Than Or Equal To", "2.5", longWaitForPage);
+        //setFilterAndWait("query", "PercentDifference", "Is Greater Than or Equal To", "1", longWaitForPage);
+        setFilterAndWait("query", "PercentDifference", "Is Greater Than or Equal To", "2.5", longWaitForPage);
         assertTextPresent("No data to show");
     }
 

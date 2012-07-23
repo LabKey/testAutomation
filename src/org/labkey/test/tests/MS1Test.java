@@ -270,7 +270,7 @@ public class MS1Test extends BaseSeleniumWebTest
         clickLinkWithText(project);
         clickLinkWithText(getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL));
 
-        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than Or Equal To", "0.90");
+        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
         setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
         clickLinkWithText("similar");
         assertFormElementEquals("mzSource", "733.4119");
@@ -321,8 +321,8 @@ public class MS1Test extends BaseSeleniumWebTest
 
         //test filtering
         log("Testing filtering...");
-        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than Or Equal To", "0.90");
-        setFilter(DATAREGION_FEATURES, "TotalIntensity", "Is Greater Than Or Equal To", "40000");
+        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
+        setFilter(DATAREGION_FEATURES, "TotalIntensity", "Is Greater Than or Equal To", "40000");
 
         //test sort
         log("Testing sort...");
@@ -412,7 +412,7 @@ public class MS1Test extends BaseSeleniumWebTest
         clickLinkWithText("peaks");
 
         //test filtering
-        setFilter(DATAREGION_PEAKS, "MZ", "Is Greater Than Or Equal To", "1500");
+        setFilter(DATAREGION_PEAKS, "MZ", "Is Greater Than or Equal To", "1500");
 
         //verify the data file info
         assertTextPresent(BASE_FILE_NAME_2 + PEAKS_XML_EXTENSION);
@@ -430,7 +430,7 @@ public class MS1Test extends BaseSeleniumWebTest
         log("Testing showFeatureDetails...");
         clickLinkWithText(project);
         clickLinkWithText(run2Title);
-        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than Or Equal To", "0.90");
+        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
         setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
         clickLinkWithText("details");
 
