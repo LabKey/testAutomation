@@ -154,9 +154,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         createWiki();
 
-        lineChartTest(); // TODO 15579: Update charting API tests
+        //lineChartTest(); // TODO 15579: Update charting API tests
 
-        scatterChartTest(); // TODO 15579: Update charting API tests
+        //scatterChartTest(); // TODO 15579: Update charting API tests
 
         createLists();
 
