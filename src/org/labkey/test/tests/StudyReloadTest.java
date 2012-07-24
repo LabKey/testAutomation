@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import java.io.File;
+
 /**
  * Created by IntelliJ IDEA.
  * User: elvan
@@ -28,9 +30,9 @@ public class StudyReloadTest extends StudyBaseTest
     protected void doCreateSteps()
     {
         initializeFolder();
-        importStudyFromZip(getSampledataPath() + "\\" + "studyreload\\original.zip" );
+        importStudyFromZip(new File(getSampledataPath(), "studyreload/original.zip").getAbsolutePath());
         reloadStudyFromZip("C:\\Users\\elvan\\Downloads\\add_column.zip");
-//        reloadStudyFromZip(getSampledataPath() + "\\" + "studyreload\\edited.zip");
+//        reloadStudyFromZip(new File(getSampledataPath(), "studyreload/edited.zip").getAbsolutePath());
     }
 
     @Override

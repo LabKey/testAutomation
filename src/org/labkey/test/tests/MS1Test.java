@@ -23,6 +23,8 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.UIContainerHelper;
 
+import java.io.File;
+
 /**
  * MS1 BVT
  * Created by IntelliJ IDEA.
@@ -57,8 +59,7 @@ public class MS1Test extends BaseSeleniumWebTest
     public static final String PIPELINE_PROCESS_AND_IMPORT_BUTTON = "Process and Import Data";
     public static final String PIPELINE_IMPORT_MS1_FEATURES_BUTTON = "Import";
 
-    private String _labkeyRoot = getLabKeyRoot().replace("\\", "/");
-    private String _pipelinePathMain = _labkeyRoot + "/sampledata/ms1/bvt";
+    private static final File _pipelinePathMain = new File(getLabKeyRoot(), "/sampledata/ms1/bvt");
 
     protected void doTestSteps()
     {
@@ -86,7 +87,7 @@ public class MS1Test extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJ_MAIN, MS1_FOLDER_TYPE);
 
         //setup the pipeline
-        setupPipeline(PROJ_MAIN, _pipelinePathMain);
+        setupPipeline(PROJ_MAIN, _pipelinePathMain.getAbsolutePath());
     }
 
     protected void setupPipeline(String project, String path)

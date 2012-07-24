@@ -19,6 +19,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.RReportHelper;
 
+import java.io.File;
+
 /**
  * User: elvan
  * Date: 1/24/12
@@ -29,7 +31,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
     String folderFromZip = "Folder 1";
     String[] webParts = {"Study Overview", "Data Pipeline", "Specimens", "Views", "Study Data Tools", "List", "Report web part"};
-    String dataDir = getSampledataPath() + "\\FolderExport";
+    File dataDir = new File(getSampledataPath(), "FolderExport");
     private String folderFromPipeplineZip = "Folder 2";
     private String folderFromTemplateZip = "Folder From Template";
     String folderZip = "Sample.folder.zip"; //"Sample.folder.zip";
@@ -82,7 +84,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
     {
 
          createSubfolder(getProjectName(), getProjectName(), folderFromPipeplineZip, "Collaboration", null);
-        setPipelineRoot(dataDir);
+        setPipelineRoot(dataDir.getAbsolutePath());
         importFolderFromPipeline( "" + fileImport);
 
 
@@ -94,7 +96,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
     {
         createSubfolder(getProjectName(), folderFromZip, null);
 
-        importFolderFromZip(dataDir + "\\" + folderZip);
+        importFolderFromZip(new File(dataDir, folderZip).getAbsolutePath());
 //        waitForPageToLoad();
         beginAt(getCurrentRelativeURL()); //work around linux issue
         waitForPipelineJobsToComplete(1, "Folder import", false);
