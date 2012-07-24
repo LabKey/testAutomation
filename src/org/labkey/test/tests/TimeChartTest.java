@@ -321,14 +321,14 @@ public class TimeChartTest extends StudyBaseTest
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS_GROUPS);
         setNumberOfCharts(PER_GROUP);
-        apply();
+        applyChanges();
 
         waitForText("Lab Results: " + GROUP1_NAME);
 
         goToGroupingTab();
         ExtHelper.checkCheckbox(this, "Show Mean"); // select show mean
         ExtHelper.uncheckCheckbox(this, "Show Individual Lines"); // de-select show individual lines
-        apply();
+        applyChanges();
 
         // uncheck group 1 and 2
         waitForText(GROUP1_NAME);
@@ -349,7 +349,7 @@ public class TimeChartTest extends StudyBaseTest
 
         goToGroupingTab();
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
-        apply();
+        applyChanges();
         waitForText("Lab Results: CD4");
 
         openSaveMenu();
@@ -378,13 +378,13 @@ public class TimeChartTest extends StudyBaseTest
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS);
         setNumberOfCharts(ONE_CHART_PER_PARTICIPANT);
-        apply();
+        applyChanges();
         waitForText("HIV Test Results: 249318596");
         assertTextPresentInThisOrder("HIV Test Results: 249318596", "HIV Test Results: 249320107", "HIV Test Results: 249320489");
 
         goToMainTitleTab();
         setChartTitle(CHART_TITLE);
-        apply();
+        applyChanges();
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 6); // 5 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
 
@@ -474,7 +474,7 @@ public class TimeChartTest extends StudyBaseTest
         Ext4Helper.selectRadioButton(this, "Chart Type:", "Visit Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and contains(@class, 'x4-item-disabled')]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and contains(@class, 'x4-item-disabled')]"));
-        apply();
+        applyChanges();
         waitForTextToDisappear("Days Since Contact Date");
         waitForText("6 week Post-V#2"); 
         assertTextPresentInThisOrder(VISIT_STRINGS);
@@ -510,7 +510,7 @@ public class TimeChartTest extends StudyBaseTest
         Ext4Helper.selectRadioButton(this, "Chart Type:", "Date Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and not(contains(@class, 'x4-item-disabled'))]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and not(contains(@class, 'x4-item-disabled'))]"));
-        apply();
+        applyChanges();
         waitForText("Days Since Contact Date");
         assertTextNotPresent(VISIT_STRINGS);
 
@@ -558,7 +558,7 @@ public class TimeChartTest extends StudyBaseTest
         log("Check visualization");
         enterMeasuresPanel();
         clickNavButton("Remove Measure", 0);
-        apply();
+        applyChanges();
         waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
         enterMeasuresPanel();
         addMeasure();
@@ -569,7 +569,7 @@ public class TimeChartTest extends StudyBaseTest
         clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Viral Load Quantified (copies/ml)']]"), "1,1");
         clickNavButton("Select", 0);
         waitForText("Viral Load Quantified (copies/ml) from HIV Test Results");
-        apply();
+        applyChanges();
         waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT); // x-axis label
         waitForText("Viral Load Quantified (copies/ml)", WAIT_FOR_JAVASCRIPT); // left-axis label
         waitForText("HIV Test Results", WAIT_FOR_JAVASCRIPT); // main title
@@ -596,7 +596,7 @@ public class TimeChartTest extends StudyBaseTest
 
         goToAxisTab("X-Axis");
         Ext4Helper.selectComboBoxItemById(this, "xaxis_interval", "Weeks");
-        apply();
+        applyChanges();
         waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
         setAxisValue("X", null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
@@ -664,7 +664,7 @@ public class TimeChartTest extends StudyBaseTest
             }
         }
 
-        apply();
+        applyChanges();
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-hide-offsets')]//label[text()='Calculate time interval(s) relative to:']"));
 
         if(textNotPresent!=null)
@@ -701,15 +701,15 @@ public class TimeChartTest extends StudyBaseTest
         clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Lymphs')]]"), "1,1");
         clickNavButton("Select", 0);
         waitForText("Lymphs (cells/mm3) from Lab Results");
-        apply();
+        applyChanges();
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS);
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
-        apply();
+        applyChanges();
         waitForText("CD4+ (cells/mm3), Lymphs (cells/mm3)"); // y-axis default label
         goToMainTitleTab();
         setChartTitle(CHART_TITLE);
-        apply();
+        applyChanges();
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 3); // 2 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
         
@@ -872,7 +872,7 @@ public class TimeChartTest extends StudyBaseTest
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS_GROUPS);
         setNumberOfCharts(PER_GROUP);
-        apply();
+        applyChanges();
         waitForText(GROUP1_NAME);
         assertLinkPresentWithText("Manage Groups");  
         
@@ -1056,9 +1056,9 @@ public class TimeChartTest extends StudyBaseTest
         addMeasure();
         clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Hemoglobin')]]"), "1,1");
         clickNavButton("Select", 0);
-        sleep(1000); // attempt fix for intermittent failure issue where apply button is clicked too quickly (selected measure properties need to be initialized)
+        sleep(1000); // attempt fix for intermittent failure issue where applyChanges button is clicked too quickly (selected measure properties need to be initialized)
         waitForText("Hemoglobin from Lab Results");
-        apply();
+        applyChanges();
         waitForText(GROUP2_PTIDS[0]+" Hemoglobin");
         //sadly, can't get data from within svg.
 //        String transform = getAttribute(Locator.xpath("//a[starts-with(@title, '"+GROUP1_PTIDS[0]+" Hemoglobin:')]/path"), "transform");
@@ -1066,7 +1066,7 @@ public class TimeChartTest extends StudyBaseTest
 
         enterMeasuresPanel();
         Ext4Helper.selectComboBoxItemById(this, "yaxis_side", "Right");
-        apply();
+        applyChanges();
 
         setAxisValue("Right", "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
         waitForText("Hemogoblins");
@@ -1151,17 +1151,17 @@ public class TimeChartTest extends StudyBaseTest
         sleep(1000); // wait for editor to toggle
         assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
-        apply();
+        applyChanges();
         // TODO: how do we test clicking on a data point?
         //ExtHelper.waitForExtDialog(this, "Data Point Information");
         
         // open developer panel and test JS function validation
         goToDeveloperTab();
         setFormElement("point-click-fn-textarea", "");
-        apply();
+        applyChanges();
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
         setFormElement("point-click-fn-textarea", "function(){");
-        apply();
+        applyChanges();
         assertTextPresent("Error parsing the function:");
         clickNavButton("Disable", 0);
         waitForText("Disabling this feature will delete any code that you have provided.");
@@ -1170,7 +1170,7 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("Enable", 0);
         // test use-case to navigate to participang page on click
         setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
-        apply();
+        applyChanges();
         openSaveMenu();
         saveReport(false);
         // TODO: how do we test clicking on a data point?
@@ -1205,14 +1205,14 @@ public class TimeChartTest extends StudyBaseTest
         log("StdDev regression check");
         enterMeasuresPanel();
         clickNavButton("Remove Measure", 0);
-        apply();
+        applyChanges();
         waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
         enterMeasuresPanel();
         addMeasure();
         clickAt(Locator.xpath(addMeasuresPath + "[div[text()='StdDev']]"), "1,1");
         clickNavButton("Select", 0); 
         waitForText("StdDev from LuminexAssay");
-        apply();
+        applyChanges();
         waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT); // x-axis label
         waitForText("StdDev", WAIT_FOR_JAVASCRIPT); // left-axis label
         waitForText("LuminexAssay", WAIT_FOR_JAVASCRIPT); // main title
@@ -1259,30 +1259,30 @@ public class TimeChartTest extends StudyBaseTest
     private void goToGroupingTab()  
     {
         clickNavButton("Grouping", 0);
-        waitForElement(Locator.button("Apply")); 
+        waitForElement(Locator.button("Cancel"));
     }
 
     private void goToMainTitleTab()
     {
         getWrapper().getEval("window.showTimeChartAxisPanel('Title');");
-        waitForElement(Locator.button("Apply"));
+        waitForElement(Locator.button("Cancel"));
     }
 
     private void goToAxisTab(String axisName)
     {
         getWrapper().getEval("window.showTimeChartAxisPanel('" + axisName + "');");
-        waitForElement(Locator.button("Apply"));
+        waitForElement(Locator.button("Cancel"));
     }
 
     private void goToDeveloperTab()
     {
         clickNavButton("Developer", 0);
-        waitForElement(Locator.button("Apply"));
+        waitForElement(Locator.button("Cancel"));
     }
 
-    private void apply()
+    private void applyChanges()
     {
-        Locator l =  Locator.button("Apply");
+        Locator l =  Locator.button("OK");
         waitForElement(l);
         click(l);
     }
