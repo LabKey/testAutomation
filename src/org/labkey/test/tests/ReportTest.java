@@ -18,12 +18,14 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -138,6 +140,7 @@ public class ReportTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
+        doBoxPlotTests();
         doCreateCharts();
         doCreateRReports();
         doReportDiscussionTest();
@@ -1175,5 +1178,167 @@ public class ReportTest extends StudyBaseTest
         waitForPageToLoad();
 
         assertTextPresent(DISCUSSION_BODY_3);
+    }
+
+    private List<String> _boxPlots = new ArrayList<String>();
+    private List<String> _boxPlotsDescriptions = new ArrayList<String>();
+    private void doBoxPlotTests()
+    {
+        doManageViewsBoxPlotTest();
+        doDataRegionBoxPlotTest();
+        doQuickChartBoxPlotTest();
+
+        log("Verify saved box plots");
+        clickTab("Clinical and Assay Data");
+        for(int i = 0; i < _boxPlots.size(); i++)
+        {
+            Locator loc = Locator.linkWithText(_boxPlots.get(i));
+            waitForElement(loc);
+            mouseOver(loc);
+            waitForText(_boxPlotsDescriptions.get(i));
+            mouseOut(loc);
+            waitForTextToDisappear(_boxPlotsDescriptions.get(i));
+        }
+    }
+
+    private static final String BOX_PLOT = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureCohortGroup 1Group 24c.Induration 1st measure";
+    private static final String BOX_PLOT_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisNot in TEST GROUP 2TEST_GROUP_2TestYAxis40.0";
+    private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
+    private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
+    private void doManageViewsBoxPlotTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Box Plot");
+
+        ExtHelper.waitForExtDialog(this, "Select Chart Query");
+        //TODO: weird timing with these combo boxes.
+        //Try once bug fixed: 15520: Box Plot - Allows selection of invalid schema/Query combination
+//        ExtHelper.selectExt4ComboBoxItem(this, "Schema", "assay");
+//        ExtHelper.selectExt4ComboBoxItem(this, "Query", "AssayList");
+//        ExtHelper.selectExt4ComboBoxItem(this, "Schema", "study");
+        ExtHelper.selectExt4ComboBoxItem(this, "Query", "RCF-1: Reactogenicity-Day 2");
+        ExtHelper.clickExtButton(this, "Select Chart Query", "Save", 0);
+        ExtHelper.waitForExtDialog(this, "Y Axis");
+        mouseDown(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
+        ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
+        waitForExtMaskToDisappear();
+
+        //Verify box plot
+        waitForText(BOX_PLOT);
+        log("Set Plot Title");
+        click(Locator.css("svg text:contains('4c.Induration 1st measure')"));
+        ExtHelper.waitForExtDialog(this, "Main Title");
+        setFormElement(Locator.name("chart-title-textfield"), "Test Title");
+        waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
+        ExtHelper.clickExtButton(this, "Main Title", "OK", 0);
+        waitForExtMaskToDisappear();
+        waitForText("Test Title");
+
+        log("Set Y Axis");
+        click(Locator.css("svg text:contains('4c.Induration 1st measure')"));
+        ExtHelper.waitForExtDialog(this, "Y Axis");
+        click(Locator.ext4Radio("log"));
+        mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
+        setFormElement(Locator.name("label"), "TestYAxis");
+        ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
+        waitForExtMaskToDisappear();
+        waitForText("TestYAxis");
+
+        log("Set X Axis");
+        click(Locator.css("svg text:contains('Cohort')"));
+        ExtHelper.waitForExtDialog(this, "X Axis");
+        click(Locator.ext4Radio("log"));
+        //TODO: Use participant category
+        mouseDown(Locator.xpath("//div[text()='TEST GROUP 2']"));
+        ExtHelper.setExtFormElementByLabel(this, "X Axis", "Label:", "TestXAxis");
+        ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
+        waitForExtMaskToDisappear();
+        waitForText("TestXAxis");
+        
+        waitForText(BOX_PLOT_2);
+
+        clickButton("Save", 0);
+        ExtHelper.waitForExtDialog(this, "Save Chart");
+        //Verify name requirement
+        ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
+        ExtHelper.waitForExtDialog(this, "Error");
+        ExtHelper.clickExtButton(this, "Error", "OK", 0);
+        waitForExtMaskToDisappear();
+
+        //Test cancel button
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", "TestReportName");
+        ExtHelper.setExtFormElementByLabel(this, "Report Description", "TestReportDescription");
+        ExtHelper.clickExtButton(this, "Save Chart", "Cancel", 0);
+        assertTextNotPresent("TestReportName");
+
+        saveBoxPlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
+    }
+
+    private static final String BOX_PLOT_3 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureCohortGroup 1Group 22.Body temperature36.537.037.538.038.539.039.540.0";
+    private static final String BOX_PLOT_NAME_DR = "DataRegionBoxPlot";
+    private static final String BOX_PLOT_DESC_DR = "This box plot was created through a data region's 'Views' menu";
+    private void doDataRegionBoxPlotTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("RCH-1: Reactogenicity-Day 1");
+        clickMenuButton("Views", "Create", "Box Plot");
+
+        ExtHelper.waitForExtDialog(this, "Y Axis");
+        mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
+        ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
+        waitForExtMaskToDisappear();
+
+        //Verify box plot
+        waitForText(BOX_PLOT_3);
+
+        saveBoxPlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
+    }
+
+    private static final String BOX_PLOT_4 = "Created with Rapha\u00ebl 2.1.0Types - DoubleCohortGroup 1Group 2Double0.020000000.040000000.060000000.080000000.0100000000.0120000000.0";
+    private static final String BOX_PLOT_NAME_QC = "QuickChartBoxPlot";
+    private static final String BOX_PLOT_DESC_QC = "This box plot was created through the 'Quick Chart' column header menu option";
+    private void doQuickChartBoxPlotTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Types");
+
+        createQuickChart("Dataset", "dbl");
+
+        //Verify box plot
+        waitForText(BOX_PLOT_4);
+
+        saveBoxPlot(BOX_PLOT_NAME_QC, BOX_PLOT_DESC_QC);
+    }
+
+    private void createQuickChart(String regionName, String columnName)
+    {
+        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
+        Locator quickChart = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":quick-chart"));
+
+        click(header);
+        waitAndClick(quickChart);
+    }
+
+    private void assertSVG(String expectedSvgText)
+    {
+        String actualSvgText = getText(Locator.css("svg"));
+        assertEquals("SVG did not look as expected", expectedSvgText, actualSvgText);
+    }
+
+    private void saveBoxPlot(String name, String description)
+    {
+        clickButton("Save", 0);
+        ExtHelper.waitForExtDialog(this, "Save Chart");
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", name);
+        ExtHelper.setExtFormElementByLabel(this, "Report Description", description);
+
+        ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
+        waitForText(name);
+        _boxPlots.add(name);
+        _boxPlotsDescriptions.add(description);
     }
 }

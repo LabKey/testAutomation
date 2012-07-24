@@ -420,6 +420,27 @@ public class ExtHelper
         selectComboBoxItem(test, Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+":']]/div/div"), selection);
     }
 
+    public static void selectExt4ComboBoxItem(BaseSeleniumWebTest test,  Locator.XPathLocator parentLocator, String selection)
+    {
+        test.clickAt(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"), "1,1");
+        if(test.getBrowser().startsWith(test.IE_BROWSER))
+        {
+            test.sleep(500);
+            test.clickAt(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"), "1,1");
+            test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
+        }
+        else
+        {
+            test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
+            test.mouseDown(Locator.xpath("/html/body"));
+        }
+    }
+
+    public static void selectExt4ComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
+    {
+        selectExt4ComboBoxItem(test, Locator.xpath("//tr["+Locator.NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
+    }
+
     public static void selectGWTComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
     {
         test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x-form-trigger-arrow')]"));
