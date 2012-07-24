@@ -322,12 +322,10 @@ public class FilterTest extends ListTest
         ExtHelper.clickExtTab(this, "Choose Filters");
 
         if(filter1!=null)
-        {
-            assertEquals("Filter 1 value was not populated when reopening.", filter1, getFormElement("value_1"));
-        }
+            waitForFormElementToEqual(Locator.name("value_1"), filter1);
 
         if(filter2!=null)
-            assertEquals("Filter 2 value was not populated when reopening.", filter2, getFormElement("value_2"));
+            waitForFormElementToEqual(Locator.name("value_2"), filter2);
 
         clickButtonContainingText("CANCEL", 0);
 

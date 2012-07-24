@@ -4457,6 +4457,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         sleep(500);
 
         // Clear selections.
+        assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
         if(!isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
             clickLinkWithText("[All]", false);
         clickLinkWithText("[All]", false);
