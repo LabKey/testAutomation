@@ -17,6 +17,8 @@ package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.JSONHelper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
@@ -24,8 +26,10 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -102,6 +106,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         verifyNounPages();
         verifyMultiNounPages();
         verifyScatterPlot();
+        verifyFeedback();
     }
 
 /// Test substeps
@@ -140,6 +145,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForText("No data to show.", CDS_WAIT);
     }
 
+    private static final String COUNTS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Participant\",\"yHierarchyIdx\":2},\"views\":{},\"filters\":[],\"selections\":[{\"phantom\":true,\"internalId\":\"ext-record-589\",\"data\":{\"hierarchy\":\"Participant.Country\",\"members\":[{\"uname\":[\"Participant.Country\",\"Thailand\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"UNION\"},\"modified\":{\"operator\":\"\"},\"events\":{},\"editing\":false,\"dirty\":true,\"id\":\"Connector.model.Filter-ext-record-589\"}],\"detail\":{},\"id\":60}";
     private void verifyCounts()
     {
         clickLinkWithText(PROJECT_NAME);
@@ -217,9 +223,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusPanel("South Africa", "South Africa", 5, 1, 1, 1, 3, 18);
         assertFilterStatusPanel("USA", "USA", 19, 3, 4, 3, 31, 19);
         assertFilterStatusPanel("Thailand", "Thailand", 5, 1, 3, 1, 3, 18);
+        addFeedback("verify counts", COUNTS_FEEDBACK_STATE);
         goToAppHome();
     }
 
+    private static final String FILTERS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Lab\"},\"views\":{},\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3026\",\"data\":{\"name\":\"CDSTest_CGroup\",\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3013\",\"data\":{\"hierarchy\":\"Lab\",\"members\":[{\"uname\":[\"Lab\",\"LabKey Lab\"]},{\"uname\":[\"Lab\",\"Piehler/Eckels Lab\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"INTERSECT\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3013\"},{\"phantom\":true,\"internalId\":\"ext-record-3014\",\"data\":{\"hierarchy\":\"Participant.Gender\",\"members\":[{\"uname\":[\"Participant.Gender\",\"f\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3014\"}],\"label\":\"\",\"participantIds\":\"\",\"description\":\"\",\"shared\":false,\"type\":\"\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.FilterGroup-ext-record-3026\"}],\"selections\":[],\"detail\":{},\"id\":150}";
     private void verifyFilters()
     {
         log("Verify multi-select");
@@ -383,12 +391,14 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         click("Labs");
         assertFilterStatusCounts(8,1,3,2,8);
+        addFeedback("verify filters", FILTERS_FEEDBACK_STATE);
 
         // Group creation cancelled
         goToAppHome();
         assertTextNotPresent(GROUP_NULL);
     }
 
+    private static final String GRID_FEEDBACK_STATE = "{\"activeView\":\"rawdata\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Study\"},\"views\":{},\"filters\":[],\"selections\":[],\"detail\":{},\"id\":74}";
     private void verifyGrid()
     {
         log("Verify Grid");
@@ -504,71 +514,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForText("Demo study physical exam", CDS_WAIT);
         waitForText("Demo study final NAb data", CDS_WAIT);
 
+        addFeedback("verify grid", GRID_FEEDBACK_STATE);
+
         goToAppHome();
 
-    }
-
-    private void addGridColumn(String source, String measure, boolean keepOpen, boolean keepSelection)
-    {
-        assertTextPresent("Data Grid"); // make sure we are looking at grid
-
-        // allow for already open measures
-        if (!isTextPresent("Add Measures"))
-        {
-            clickButton("Choose Columns", 0);
-            waitForElement(Locator.css("div.sourcepanel"));
-        }
-
-        ExtHelper.pickMeasure(this, source, measure, keepSelection);
-
-        if (!keepOpen)
-        {
-            clickButton("select", 0);
-        }
-    }
-
-    private void setRawDataFilter(String colName, String value)
-    {
-        setRawDataFilter(colName, null, value);
-    }
-
-    private void setRawDataFilter(String colName, String filter, String value)
-    {
-        openFilterPanel(colName);
-        if (null != filter)
-            Ext4Helper.selectComboBoxItem(this, "Value", filter);
-
-        waitForElement(Locator.id("value_1"));
-        setFormElement(Locator.css("#value_1 input"), value);
-        clickButton("OK", 0);
-    }
-
-    private void openFilterPanel (String colHeader)
-    {
-        List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, "#raw-data-view grid gridcolumn", Ext4CmpRef.class);
-        for (Ext4CmpRef ref : headers)
-        {
-            String colNameStr = ref.eval("this.text");
-            if (null != colNameStr && colNameStr.contains(colHeader))
-            {
-                String triggerid = ref.eval("this.triggerEl.id");
-                mouseOver(Locator.id(triggerid));
-                click(Locator.id(triggerid));
-                waitFor(new Ext4Helper.Ext4SelectorChecker(this, "rawdatafilterwin"), "No filter win", WAIT_FOR_JAVASCRIPT);
-            }
-        }
-    }
-    private void waitForGridCount(int count)
-    {
-        String displayText;
-        if (count == 0)
-            displayText = "No data to display";
-        else if (count < 100)
-            displayText = "Displaying 1 - " + count + " of " + count;
-        else
-            displayText = "Displaying 1 - 100 of " + count;
-
-        waitForElement(Locator.tagContainingText("div", displayText));
     }
 
     private void verifyNounPages()
@@ -656,6 +605,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD450100150200250300350400450";
     private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
     private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Pulse123456789102030405060708090100Weight Kg23456789102030405060708090100";
+    private static final String SCATTER_FEEDBACK_STATE = "{\"activeView\":\"scatterview\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Study\"},\"views\":{},\"filters\":[],\"selections\":[],\"detail\":{\"hierarchy\":\"\",\"value\":31,\"highlight\":\"\",\"label\":\"Antigens\",\"valueLabel\":\"\",\"multi\":true},\"id\":206}";
     private void verifyScatterPlot()
     {
         selectCDSGroup(GROUP_NAME, true);
@@ -696,9 +646,49 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.xpath("(//input[contains(@class, 'x4-form-radio')])[6]")); // set X to log scale
         clickButton("Plot", 0);
         waitForText(WT_PLSE_LOG);
+
+        addFeedback("verify scatter plot", SCATTER_FEEDBACK_STATE);
+    }
+
+    private List<String> _descriptions = new ArrayList<String>();
+    private List<String> _states = new ArrayList<String>();
+    private void verifyFeedback()
+    {
+        JSONHelper stateChecker = new JSONHelper(this, new Pattern[]{Pattern.compile("internalId", Pattern.CASE_INSENSITIVE),Pattern.compile("appVersion", Pattern.CASE_INSENSITIVE)});
+        goToHome();
+        goToProjectHome();
+        goToSchemaBrowser();
+        selectQuery("CDS", "Feedback");
+        waitAndClick(Locator.linkWithText("view data"));
+
+        waitForElement(Locator.id("dataregion_query"));
+        DataRegionTable feedbackTable = new DataRegionTable("query", this, true, true);
+        assertEquals("Unexpected number of rows", _states.size(), feedbackTable.getDataRowCount());
+
+        int row;
+        for(int i = 0; i < _states.size(); i++)
+        {
+            row = feedbackTable.getRow("Description", _descriptions.get(i));
+            stateChecker.assertEquals("", _states.get(i), feedbackTable.getDataAsText(row, "State"));
+        }
     }
 
 /// CDS App helpers
+
+    private void addFeedback(String feedback, String stateJSON)
+    {
+        String description = "Test feedback - " + feedback;
+        click(Locator.name("description"));
+        waitForElement(Locator.xpath("//textarea[@name='description' and contains(@style, 'height: 176px;')]")); //expand
+        selenium.type(Locator.name("description").toString(), description, false); // setFormElement fires events that throw off the flow.
+        clickButton("Submit", 0);
+        fireEvent(Locator.name("description"), SeleniumEvent.blur);
+        waitForElement(Locator.xpath("//textarea[@name='description' and contains(@style, 'height: 31px;')]")); //shrink
+        waitForElement(Locator.css("textarea[name='description'][placeholder='Thank you for your feedback!']"));
+
+        _descriptions.add(description);
+        _states.add(stateJSON);
+    }
 
     private void pickCDSSort(String sortBy)
     {
@@ -822,6 +812,69 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         clickButton("Close", 0);
         waitForElementToDisappear(Locator.button("Close"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void addGridColumn(String source, String measure, boolean keepOpen, boolean keepSelection)
+    {
+        assertTextPresent("Data Grid"); // make sure we are looking at grid
+
+        // allow for already open measures
+        if (!isTextPresent("Add Measures"))
+        {
+            clickButton("Choose Columns", 0);
+            waitForElement(Locator.css("div.sourcepanel"));
+        }
+
+        ExtHelper.pickMeasure(this, source, measure, keepSelection);
+
+        if (!keepOpen)
+        {
+            clickButton("select", 0);
+        }
+    }
+
+    private void setRawDataFilter(String colName, String value)
+    {
+        setRawDataFilter(colName, null, value);
+    }
+
+    private void setRawDataFilter(String colName, String filter, String value)
+    {
+        openFilterPanel(colName);
+        if (null != filter)
+            Ext4Helper.selectComboBoxItem(this, "Value", filter);
+
+        waitForElement(Locator.id("value_1"));
+        setFormElement(Locator.css("#value_1 input"), value);
+        clickButton("OK", 0);
+    }
+
+    private void openFilterPanel (String colHeader)
+    {
+        List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, "#raw-data-view grid gridcolumn", Ext4CmpRef.class);
+        for (Ext4CmpRef ref : headers)
+        {
+            String colNameStr = ref.eval("this.text");
+            if (null != colNameStr && colNameStr.contains(colHeader))
+            {
+                String triggerid = ref.eval("this.triggerEl.id");
+                mouseOver(Locator.id(triggerid));
+                click(Locator.id(triggerid));
+                waitFor(new Ext4Helper.Ext4SelectorChecker(this, "rawdatafilterwin"), "No filter win", WAIT_FOR_JAVASCRIPT);
+            }
+        }
+    }
+    private void waitForGridCount(int count)
+    {
+        String displayText;
+        if (count == 0)
+            displayText = "No data to display";
+        else if (count < 100)
+            displayText = "Displaying 1 - " + count + " of " + count;
+        else
+            displayText = "Displaying 1 - 100 of " + count;
+
+        waitForElement(Locator.tagContainingText("div", displayText));
     }
 
 /// CDS App asserts
