@@ -26,7 +26,6 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.tests.SimpleApiTest;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -49,7 +48,7 @@ import java.util.regex.Pattern;
  * Date: Mar 21, 2011
  * Time: 1:59:12 PM
  */
-public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
+public class EHRStudyTest extends SimpleApiTest
 {
     // Project/folder names are hard-coded into some links in the module.
     private static final String PROJECT_NAME = "EHR_TestProject";
@@ -111,12 +110,6 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         }
     }
 
-    @Override
-    protected boolean isConfigurationSupported()
-    {
-        return "pg".equals(getDatabaseType());
-    }
-       
     @Override
     public String getAssociatedModuleDirectory()
     {
@@ -491,7 +484,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at WNPRC");
+        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at Center");
         clickNavButton("Show Group");
         waitForText("1 - 36 of 36", WAIT_FOR_JAVASCRIPT);
 
@@ -907,7 +900,7 @@ public class EHRStudyTest extends SimpleApiTest implements PostgresOnlyTest
                          "-Colony Management", "Behavior Remarks", "Birth Records", "Housing - Active", "Housing History", "Inbreeding Coefficients", "Kinship", "Menses Calendar", "Menses Observations:Irregular Observations", "Pedigree:Offspring", /*"Pedigree Plot",*/ "Pregnancies", "TB Tests",
                          "-Pathology", "Biopsies", "Histology", "Morphologic Diagnosis", "Necropsies",
                          "-Physical Exam", "Alopecia", "Body Condition", "Dental Status", "Exams", "PE Findings", "Teeth", "Vitals",
-                         "-Today At WNPRC", "Irregular Observations", "Obs/Treatment:Obs/Treatments", "Problem List", /*"Today's History",*/ "Treatments - Morning", "Treatments - Afternoon", "Treatments - Evening", "Treatments - Master", "Unresolved Problem List", /*"Today's Blood Draws",*/
+                         "-Today At Center", "Irregular Observations", "Obs/Treatment:Obs/Treatments", "Problem List", /*"Today's History",*/ "Treatments - Morning", "Treatments - Afternoon", "Treatments - Evening", "Treatments - Master", "Unresolved Problem List", /*"Today's Blood Draws",*/
                          "-General", "Arrival/Departure:Arrivals", "Blood Draw History", "Charges", "Current Blood", "Deaths", "Demographics", "Major Events", "Notes", "Abstract:Active Assignments"};
 
         log("Check all Animal History report tabs");
