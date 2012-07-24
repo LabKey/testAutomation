@@ -191,10 +191,12 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("Prius");
         assertTextPresent("Camry");
 
-        log(".. generic details link should include _RowId as pk");
-        clickLinkWithText("details");
-        assertTextPresent("Name");
-        assertTextPresent("Toyota");
+        // Issue 15595: Generic query details links for tables and queries
+        // reenable this check once default details links are provided for queries.
+        //log(".. generic details link should include _RowId as pk");
+        //clickLinkWithText("details");
+        //assertTextPresent("Name");
+        //assertTextPresent("Toyota");
 
         log("** Inserting colors...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
