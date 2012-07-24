@@ -96,7 +96,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String VIS_ASSAY_DESC = "IDRI Visual Data.";
 
     private static final String HPLC_ASSAY      = "HPLC";
-    private static final String HPLC_PIPELINE_PATH = getSampledataPath() + "\\HPLC";
+    private static final String HPLC_PIPELINE_PATH = getSampledataPath() + "/HPLC";
     private static final String HPLC_ASSAY_DESC = "IDRI HPLC Assay Data";
 
     @Override
