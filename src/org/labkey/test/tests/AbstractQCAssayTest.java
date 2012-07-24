@@ -121,12 +121,8 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
     {
         // need to allow time for the server to return the engine list and the ext grid to render
         Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
-        int time = 0;
-        while (!isElementPresent(engine) && time < WAIT_FOR_JAVASCRIPT)
-        {
-            sleep(100);
-            time += 100;
-        }
+
+        waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='js']"), WAIT_FOR_JAVASCRIPT); //JS engine always present
         return isElementPresent(engine);
     }
 
