@@ -39,6 +39,13 @@ import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverBackedSelenium;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.internal.WrapsDriver;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -99,6 +106,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     protected DefaultSeleniumWrapper selenium;
+    protected WebDriver driver;
     private static final int DEFAULT_SELENIUM_PORT = 4444;
     private static final String DEFAULT_SELENIUM_SERVER = "localhost";
     private String _lastPageTitle = null;
@@ -182,6 +190,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         selenium = new DefaultSeleniumWrapper();
         selenium.start();
+//        driver = selenium.getWrappedDriver();
         selenium.setTimeout(Integer.toString(defaultWaitForPage));
         //Now inject our standard javascript functions...
         InputStream inputStream = BaseSeleniumWebTest.class.getResourceAsStream("seleniumHelpers.js");
@@ -2121,6 +2130,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickManageGroup(String groupName)
     {
+        ExtHelper.clickExtTab(this, "Project Groups");
         // warning Adminstrators can apper multiple times
         waitAndClick(Locator.xpath("//div[@id='groupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
         sleep(100);
@@ -2131,6 +2141,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clickManageSiteGroup(String groupName)
     {
+        ExtHelper.clickExtTab(this, "Site Groups");
         // warning Adminstrators can apper multiple times
         waitAndClick(Locator.xpath("//div[@id='siteGroupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
         sleep(100);
@@ -2361,6 +2372,20 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         // verify that we're not on an error page with a check for folder link:
         assertLinkPresentWithText(folderName);
         assertLinkPresentWithText(newParent);
+    }
+
+    public void clickProject(String project)
+    {
+        String xpath = "//tr[not(ancestor-or-self::*[contains(@style,'none')]) and following-sibling::tr[contains(@style,'none')]//a[text()='"+project+"']]//a/img[contains(@src,'plus')]";
+        List<WebElement> possibleAncestors = driver.findElements(By.xpath(xpath));
+        int depth = 0;
+        while(possibleAncestors.size() > 0 && depth < 10)
+        {
+            possibleAncestors.get(possibleAncestors.size()-1).click(); // the last one in the list is the actual ancestor.
+            possibleAncestors = driver.findElements(By.xpath(xpath));
+            depth++;
+        }
+        clickLinkWithText(project);
     }
 
     public void deleteProject(String project)
@@ -4300,6 +4325,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setFormElement(Locator element, String text, boolean suppressValueLogging)
     {
         selenium.type(element.toString(), text, suppressValueLogging);
+        fireEvent(element, SeleniumEvent.keyup);
         fireEvent(element, SeleniumEvent.blur);
     }
 
@@ -5969,10 +5995,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium
+//    public class DefaultSeleniumWrapper extends WebDriverBackedSelenium
     {
         DefaultSeleniumWrapper()
         {
             super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL() + "/");
+//            super(getBrowser().startsWith("*ie")?new InternetExplorerDriver():new FirefoxDriver(), WebTestHelper.getBaseURL() + "/");
         }
 
         private void log(String s)
