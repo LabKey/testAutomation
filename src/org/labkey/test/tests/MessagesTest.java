@@ -181,10 +181,20 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("test the search module on messages");
         clickLinkWithText(PROJECT_NAME);
         searchFor(PROJECT_NAME, "Banana", 1, MSG1_TITLE);
-        
+
+        log("test filtering of messages grid");
+        clickLinkWithText("view list");
+        setFilterAndWait("Announcements", "Title", "Equals", "foo", 0);
+        waitForPageToLoad();
+
+        assertTextNotPresent(RESP1_TITLE);
+
         schemaTest();
 
         log("test delete message works and is recognized");
+        goToProjectHome();
+        clickLinkWithText(RESP1_TITLE);
+        waitForPageToLoad();
         clickNavButton("Delete Message");
         clickNavButton("Delete");
         assertTextNotPresent(MSG1_TITLE);
