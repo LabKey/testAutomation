@@ -483,6 +483,13 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("View Data", 0);
         waitForText("1 - 19 of 19");
 
+        // verify that other toolbar buttons have been hidden
+        assertElementNotPresent(Locator.button("Export PDF"));
+        assertElementNotPresent(Locator.button("Measures"));
+        assertElementNotPresent(Locator.button("Grouping"));
+        assertElementNotPresent(Locator.button("Options"));
+        assertElementNotPresent(Locator.button("Developer"));
+
         String tableId = getAttribute(Locator.xpath("//table[starts-with(@id, 'dataregion_') and contains(@class, 'labkey-data-region')]"), "id");
         String tableName = tableId.substring(tableId.indexOf('_') + 1, tableId.length());
         DataRegionTable table = new DataRegionTable(tableName, this, false, true);
