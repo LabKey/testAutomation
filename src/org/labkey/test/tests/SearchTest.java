@@ -20,6 +20,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 /**
  * User: Trey Chadick
@@ -79,8 +81,8 @@ public class SearchTest extends StudyTest
     {
         SearchHelper.deleteIndex(this);
         addSearchableStudy(); // Must come first;  Creates project.
+        addSearchableLists();
         addSearchableContainers();
-        //addSearchableList();   // TODO: Default setting has changed to no indexing, so disable. Will re-enable when new list indexing test is written.
         //addSearchableReports(); // Reports not currently indexed.
         addSearchableWiki();
         addSearchableIssues();
@@ -92,6 +94,35 @@ public class SearchTest extends StudyTest
         }
     }
 
+    String fullySearchableList = "List1";       //index both number and text colums
+    String textOnlySearchableList = "List2";    //index text columns only
+    String metaOnlySearchable = "MetaDataSet";  //index metadata only
+    String customizedIndexingList =  "CustomIndexing";  //index one text column but not another
+    String listToDelete = "List To Delete";
+    String listIndexAsWhole = "Indexed as one doc";
+
+    private void addSearchableLists()
+    {
+        clickTab("Overview");
+        addWebPart("Lists");
+        ListHelper.importListArchive(this, FOLDER_A, new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
+
+
+        clickLinkWithText("view data", 2);
+        ListHelper.deleteList(this);
+
+        SearchHelper.enqueueSearchItem("BoarQPine", false, null);
+        SearchHelper.enqueueSearchItem("Panda", Locator.bodyLinkWithText("List " + fullySearchableList));
+        SearchHelper.enqueueSearchItem("2003-01-02", Locator.bodyLinkWithText("List " + fullySearchableList));
+//        SearchHelper.enqueueSearchItem("12345", Locator.bodyLinkWithText("List List1 - 1"));  //Issue 15419
+        SearchHelper.enqueueSearchItem("Owlbear", Locator.bodyLinkWithText("List " + textOnlySearchableList));
+        SearchHelper.enqueueSearchItem("54321", false, null);
+        SearchHelper.enqueueSearchItem(metaOnlySearchable, Locator.bodyLinkWithText("List " + metaOnlySearchable));
+        SearchHelper.enqueueSearchItem("Turtleduck", false, null); //this phrase is present in the metadata-only file
+        SearchHelper.enqueueSearchItem("Cat", Locator.bodyLinkWithText("List " + customizedIndexingList));
+        SearchHelper.enqueueSearchItem("Garfield", false, null);
+    }
+
     protected void doVerifySteps()
     {
         sleep(10000); // wait for indexer
@@ -101,11 +132,27 @@ public class SearchTest extends StudyTest
         sleep(10000); // wait for indexer
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
         moveFolder(getProjectName(), getFolderName(), FOLDER_B, false);
+        alterListsAndReSearch();
         SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
 
         verifySyntaxErrorMessages();
 
         _testDone = true;
+    }
+
+    private void alterListsAndReSearch()
+    {
+        clickLinkWithText(FOLDER_C);
+        clickLinkWithText(listIndexAsWhole);
+        HashMap<String, String> data = new HashMap<String, String>();
+        String newAnimal = "Zebra Seal";
+        data.put("Animal", newAnimal);
+        ListHelper.insertNewRow(this, data);
+        goBack();
+
+        SearchHelper.enqueueSearchItem(newAnimal, Locator.linkContainingText(listIndexAsWhole));
+//        SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
+        log("TODO");
     }
 
     public void runApiTests() throws Exception
@@ -164,17 +211,6 @@ public class SearchTest extends StudyTest
         SearchHelper.enqueueSearchItem("Urinalysis", Locator.linkContainingText("URF-1"),
                                                      Locator.linkContainingText("URF-2"),
                                                      Locator.linkContainingText("URS-1"));
-    }
-
-    private void addSearchableList()
-    {
-        clickLinkWithText(getFolderName());
-        ListHelper.importListArchive(this, getFolderName(), new File(getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
-
-        SearchHelper.enqueueSearchItem("AllTypes*", //Locator.linkWithText("List AllTypes"), // TODO: enable when stemming/wildcard issue is resolved.
-                                                    Locator.linkWithText("List AllTypesCategories"),
-                                                    Locator.linkWithText("List AllTypesCategoryGroups"),
-                                                    Locator.linkWithText("List AllTypesComments"));
     }
 
     private void addSearchableReports()

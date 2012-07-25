@@ -19,8 +19,11 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.tests.SearchTest;
 
 import java.io.File;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * User: jeckels
@@ -54,7 +57,7 @@ public class ListHelper
     // null means any error
     public static void submitImportTsv_error(BaseSeleniumWebTest test, String error)
     {
-        _submitImportTsv(test, null==error ? "" : error);     
+        _submitImportTsv(test, null == error ? "" : error);
     }
 
     private static void _submitImportTsv(BaseSeleniumWebTest test, String error)
@@ -74,6 +77,36 @@ public class ListHelper
             test.clickNavButton("OK");
             test.waitForPageToLoad();
         }
+    }
+
+    /**
+     * From the list data grid, insert a new entry into the current list
+     *
+     * @param test
+     * @param data key = the the name of the field, value = the value to enter in that field
+     */
+
+    public static void insertNewRow(BaseSeleniumWebTest test, Map<String, String> data)
+    {
+
+        test.clickNavButton("Insert New");
+        for(String key : data.keySet())
+        {
+            test.setFormElement(Locator.name("quf_" + key), data.get(key));
+        }
+        test.clickNavButton("Submit");
+        test.assertTextPresent(data.get(data.keySet().iterator().next()));  //make sure some text from the map is present
+    }
+
+    /**
+     * Starting at the grid view of a list, delete it
+     * @param test
+     */
+    public static void deleteList(BaseSeleniumWebTest test)
+    {
+        String url = test.getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
+        test.beginAt(url);
+        test.clickNavButton("OK");
     }
 
     public static class LookupInfo

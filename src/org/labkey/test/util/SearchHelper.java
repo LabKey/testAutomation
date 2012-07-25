@@ -65,34 +65,42 @@ public class SearchHelper
         for ( SearchItem item : items)
         {
             searchFor(test, item._searchTerm);
-            boolean success = true;
 
-            for( Locator loc : item._searchResults )
+            if(item._searchResults==null)
             {
-                if (!test.isElementPresent(loc))
+                test.assertTextPresent("Found 0 results");
+            }
+            else
+            {
+                boolean success = true;
+
+                for( Locator loc : item._searchResults )
                 {
-                    success = false;
-                    break;
+                    if (!test.isElementPresent(loc))
+                    {
+                        success = false;
+                        break;
+                    }
                 }
-            }
 
-            if (!success)
-            {
-                notFound.add(item);
-                continue;
-            }
+                if (!success)
+                {
+                    notFound.add(item);
+                    continue;
+                }
 
-            if ( container != null )
-            {
-                if ( test.isLinkPresentContainingText("@files") )
-                    test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
-                else
-                    test.assertLinkPresentWithText(container);
-            }
+                if ( container != null )
+                {
+                    if ( test.isLinkPresentContainingText("@files") )
+                        test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
+                    else
+                        test.assertLinkPresentWithText(container);
+                }
 
-            if ( crawlResults )
-            {
-                test.fail("Search result crawling not yet implemented");
+                if ( crawlResults )
+                {
+                    test.fail("Search result crawling not yet implemented");
+                }
             }
         }
 
@@ -159,7 +167,10 @@ public class SearchHelper
         public SearchItem(String term, boolean file, Locator... results)
         {
             _searchTerm = term;
-            _searchResults = results.clone();
+            if(results!=null)
+                _searchResults = results.clone();
+            else
+                _searchResults = null;
             _file = file;
         }
 
