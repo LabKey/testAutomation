@@ -105,7 +105,7 @@ public class ViabilityTest extends AbstractViabilityTest
         String actualConfirmation = getConfirmationAndWait();
         log("** Got confirmation: " + actualConfirmation);
 
-        //TODO: uncomment once Issue 10054 is resolved.
+        //This is a test for Issue 10054, which has been resolved as won't fix.
         //assertEquals(expectConfirmation, actualConfirmation);
 
         setSelectedFields("/" + getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " Data", null,
