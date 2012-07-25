@@ -90,7 +90,7 @@ public class ReagentTest extends BaseSeleniumWebTest
 
         log("** Filtering LabelId ComboBox by 'Alexa'");
         click(Locator.xpath("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]"));
-        selenium.typeKeys("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]", "Alexa");
+        setFormElement("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]", "Alexa");        
         Number alexaLabels = selenium.getXpathCount("//div[contains(@class, 'x-combo-list')]//b[text()='Alexa 405']/../../..//b");
         assertEquals("Expected to find 5 Alexa labels", 5, alexaLabels.intValue());
 
