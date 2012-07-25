@@ -43,7 +43,7 @@ public class ProteinRegionTable extends DataRegionTable
         // Give this a little extra time, since we have timed out here.
         int wait = _test.getDefaultWaitForPage();
         _test.setDefaultWaitForPage(wait * 2);
-        _test.setFilter("ProteinGroupsWithQuantitation", "GroupProbability", "Is Greater Than Or Equal To", Double.toString(_maxProbability));
+        _test.setFilter("ProteinGroupsWithQuantitation", "GroupProbability", "Is Greater Than or Equal To", Double.toString(_maxProbability));
         _test.setSort("ProteinGroupsWithQuantitation", "GroupNumber", SortDirection.ASC);
         _test.setDefaultWaitForPage(wait);
     }
