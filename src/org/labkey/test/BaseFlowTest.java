@@ -367,22 +367,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         goToFlowDashboard();
         clickLinkContainingText("FCS files to be imported");
         ExtHelper.selectFileBrowserItem(this, workspacePath);
-//        if (workspacePath.startsWith("/"))
-//            workspacePath = workspacePath.substring(1);
-//        String[] parts = workspacePath.split("/");
-//
-//        for (int i = 0; i < parts.length; i++)
-//        {
-//            if (i == parts.length - 1)
-//            {
-//                // workaround for import button enable/disable state bug in pipeline browser
-//                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
-//                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
-//                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
-//            }
-//            else
-//                waitAndClick(Locator.fileTreeByName(parts[i]));
-//        }
 
         selectImportDataAction("Import FlowJo Workspace");
     }
