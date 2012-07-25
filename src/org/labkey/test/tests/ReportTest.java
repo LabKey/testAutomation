@@ -1299,7 +1299,7 @@ public class ReportTest extends StudyBaseTest
 
         //Change filter and check box plot again
         clickButton("View Data", 0);
-        clearFilter("aqwp4", "RCHtempc", 0);
+        clearFilter("aqwp4", "RCHtempc");
         waitForText("40.0");
         clickButton("View Chart", 0);
         waitForText(BOX_PLOT_DR_2);
