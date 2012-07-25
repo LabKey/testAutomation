@@ -100,7 +100,7 @@ public class FilterTest extends ListTest
         assertTextNotPresent("Light", "Zany");
         assertTextPresent("Robust");
 
-        // TODO: Blocked: 14710: Switching between faceted and logical filters breaks dialog
+        // Issue 14710: Switching between faceted and logical filters breaks dialog
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         ExtHelper.clickExtTab(this, "Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
@@ -110,8 +110,22 @@ public class FilterTest extends ListTest
         ExtHelper.waitForExtDialog(this, "Confirm change");
         ExtHelper.clickExtButton(this, "Confirm change", "Yes", 0);
         ExtHelper.clickExtButton(this, "OK");
+        //the change above would result in filters being dropped.  because we did not select new filters, we expect this to return an unfiltered grid
+        assertTextPresent("Light", "Robust", "Zany");
+
+        //now repeat with a filter that should be translated
+        setUpFacetedFilter("query", "Color", "Light");
+        ExtHelper.clickExtTab(this, "Choose Filters");
+        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals One Of (e.g. \"a;b;c\")");
+        assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement("value_1"));
+
+        setFormElement("value_1", "Light;Robust");
+
+        ExtHelper.clickExtTab(this, "Choose Values"); //we should get no alerts, and Light + Robust should be checked
+        ExtHelper.clickExtButton(this, "OK");
         assertTextPresent("Light", "Robust");
-        assertLinkNotPresentWithText("Zany");
+        //assertTextNotPresent("Zany");  //NOTE: the filter message is 'Is not any of (Zany)', so this will fail.  test for '1990' instead.
+        assertTextNotPresent("1990");
 
         setFacetedFilter("query", "Color");
         assertTextPresent("Light", "Robust", "Zany");
