@@ -67,19 +67,28 @@ public class FlowTest extends BaseFlowTest
 
     protected void _doTestSteps()
     {
+        _doTestStepsSetDepth(false);
+    }
+    protected void _doTestStepsSetDepth(boolean quickTest)
+    {
         setupQuery();
 
         importFiles();
 
         analysisFilterTest();
 
-        configureSampleSetAndMetadata();
+        if(!quickTest)
+        {
+            configureSampleSetAndMetadata();
 
-        sampleSetAndMetadataTest();
+            sampleSetAndMetadataTest();
 
-        positivityReportTest();
+            positivityReportTest();
 
-        copyAnalysisScriptTest();
+            copyAnalysisScriptTest();
+
+        }
+
     }
 
     String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";

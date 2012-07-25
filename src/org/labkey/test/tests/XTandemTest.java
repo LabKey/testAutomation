@@ -16,13 +16,11 @@
 
 package org.labkey.test.tests;
 
-import org.labkey.test.ms2.AbstractMS2SearchEngineTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.ms2.AbstractXTandemTest;
 
 import java.io.File;
-import java.io.IOException;
 
 public class XTandemTest extends AbstractXTandemTest
 {
@@ -38,6 +36,12 @@ public class XTandemTest extends AbstractXTandemTest
 
     protected void doTestSteps()
     {
+        doTestStepsSetDepth(false);
+    }
+    protected void doTestStepsSetDepth(boolean isQuickTest)
+    {
+        setIsQuickTest(isQuickTest);
+
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
@@ -83,18 +87,8 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextNotPresent("K.VFHFVR.Q");
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
-        log("Test peptide details page");
-        selenium.openWindow("", "pep");
-        clickLinkWithText(PEPTIDE2, false);
-        selenium.waitForPopUp("pep", "10000");
-        selenium.selectWindow("pep");
-        assertTextPresent("gi|4689022|ribosomal_protein_");  // Check for protein
-        assertTextPresent("CAexample_mini.pep.xml - bov_sample/CAexample_mini (test2)"); // Check for run name
-        assertTextPresent("1373.4690"); // Check for mass
-        waitForText("44.0215"); // Look for b3+ ions, populated bu JavaScript
-        assertTextPresent("87.0357", "130.0499");
-        selenium.close();
-        selenium.selectWindow(null);
+        verifyPeptideDetailsPage();
+
 
         log("Test exporting");
         pushLocation();
@@ -117,24 +111,20 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextPresent("(Mass > 1000)");
 
         //Put in once bug with filters in postgres is fixed
-        //assertTextNotPresent(PEPTIDE);
+        assertTextNotPresent(PEPTIDE);
 
         setSort("MS2Compare", "Peptide", SortDirection.DESC);
         assertTextBefore(PEPTIDE5, PEPTIDE4);
 
-        log("Test PeptideCrosstab");
+
         clickLinkWithText("MS2 Dashboard");
-        click(Locator.name(".toggle"));
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
-        clickLinkWithText("Peptide");
+        verifyPeptideCrosstab();
+        verifyComparePeptides();
 
-        checkRadioButton(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE);
-        clickNavButton("Compare");
-        assertTextPresent(PEPTIDE3);
-        assertTextPresent(PEPTIDE4);
-        assertTextPresent(PEPTIDE);
+    }
 
+    private void verifyComparePeptides()
+    {
         clickLinkWithText("Setup Compare Peptides");
         clickRadioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID);
         setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.75");
@@ -170,6 +160,38 @@ public class XTandemTest extends AbstractXTandemTest
         assertTrue(!(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT)));
         assertTextNotPresent(SEARCH_FIND);
         assertTextPresent("No data to show");
+    }
+
+    private void verifyPeptideDetailsPage()
+    {
+
+        log("Test peptide details page");
+        selenium.openWindow("", "pep");
+        clickLinkWithText(PEPTIDE2, false);
+        selenium.waitForPopUp("pep", "10000");
+        selenium.selectWindow("pep");
+        assertTextPresent("gi|4689022|ribosomal_protein_");  // Check for protein
+        assertTextPresent("CAexample_mini.pep.xml - bov_sample/CAexample_mini (test2)"); // Check for run name
+        assertTextPresent("1373.4690"); // Check for mass
+        waitForText("44.0215"); // Look for b3+ ions, populated bu JavaScript
+        assertTextPresent("87.0357", "130.0499");
+        selenium.close();
+        selenium.selectWindow(null);
+    }
+
+    private void verifyPeptideCrosstab()
+    {
+        log("Test PeptideCrosstab");
+        click(Locator.name(".toggle"));
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        clickNavButton("Compare", 0);
+        clickLinkWithText("Peptide");
+
+        checkRadioButton(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE);
+        clickNavButton("Compare");
+        assertTextPresent(PEPTIDE3);
+        assertTextPresent(PEPTIDE4);
+        assertTextPresent(PEPTIDE);
     }
 
     @Override

@@ -129,6 +129,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("search");
         popLocation();
 
+        if(isQuickTest)
+            return;
+
         log("Analyze again.");
         clickLinkWithText("MS2 Dashboard");
         clickNavButton("Process and Import Data");

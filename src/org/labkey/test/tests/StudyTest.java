@@ -48,6 +48,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
  */
 public class StudyTest extends StudyBaseTest
 {
+    protected boolean quickTest = true;
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
     protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
 
@@ -113,14 +114,23 @@ public class StudyTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
+        doVerifyStepsSetDepth(false);
+    }
+
+    protected void doVerifyStepsSetDepth(boolean quickTest)
+    {
+        this.quickTest = quickTest;
         manageSubjectClassificationTest();
         emptyParticipantPickerList(); // Delete participant lists to avoid interfering with api test.
         verifyStudyAndDatasets();
-        verifyParticipantReports();
-        waitForSpecimenImport();
-        verifySpecimens();
-        verifyParticipantComments();
-        verifyPermissionsRestrictions();
+        if(!quickTest)
+        {
+            waitForSpecimenImport();
+            verifySpecimens();
+            verifyParticipantComments();
+            verifyParticipantReports();
+            verifyPermissionsRestrictions();
+        }
     }
 
     private void verifyPermissionsRestrictions()
@@ -189,56 +199,66 @@ public class StudyTest extends StudyBaseTest
      */
     protected void manageSubjectClassificationTest()
     {
-        //verify/create the right data
-        goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
 
-        //issue 12487
-        assertTextPresent("Manage " + SUBJECT_NOUN + " Groups");
+        if(!quickTest)
+        {
+            //verify/create the right data
+            goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
 
-        //nav trail check
-        assertTextNotPresent("Manage Study > ");
+            //issue 12487
+            assertTextPresent("Manage " + SUBJECT_NOUN + " Groups");
 
-        String allList = "all list12345";
-        String filteredList = "Filtered list";
+            //nav trail check
+            assertTextNotPresent("Manage Study > ");
 
-        cancelCreateClassificationList();
+            String allList = "all list12345";
+            String filteredList = "Filtered list";
 
-        String pIDs = createListWithAddAll(allList, false);
-        persistingLists.add(allList);
+            cancelCreateClassificationList();
 
-        refresh();
-        editClassificationList(allList, pIDs);
+            String pIDs = createListWithAddAll(allList, false);
+            persistingLists.add(allList);
 
-        //Issue 12485
-        createListWithAddAll(filteredList, true);
-        persistingLists.add(filteredList);
+            refresh();
+            editClassificationList(allList, pIDs);
 
-        String changedList = changeListName(filteredList);
-        persistingLists.add(changedList);
-        persistingLists.remove(filteredList);
-        deleteListTest(allList);
-        persistingLists.remove(allList);
+            //Issue 12485
+            createListWithAddAll(filteredList, true);
+            persistingLists.add(filteredList);
 
-        attemptCreateExpectError("1", "does not exist in this study.", "bad List ");
-        String id = pIDs.substring(0, pIDs.indexOf(","));
-        attemptCreateExpectError(id + ", " + id, "Duplicates are not allowed in a group", "Bad List 2");
+            String changedList = changeListName(filteredList);
+            persistingLists.add(changedList);
+            persistingLists.remove(filteredList);
+            deleteListTest(allList);
+            persistingLists.remove(allList);
+
+            attemptCreateExpectError("1", "does not exist in this study.", "bad List ");
+            String id = pIDs.substring(0, pIDs.indexOf(","));
+            attemptCreateExpectError(id + ", " + id, "Duplicates are not allowed in a group", "Bad List 2");
+        }
 
         // test creating a participant group directly from a data grid
+        waitForElement(Locator.linkContainingText(STUDY_NAME));
         clickLinkWithText(STUDY_NAME);
         clickLinkWithText("47 datasets");
         clickLinkWithText("DEM-1: Demographics");
 
-        //nav trail check
-        clickLinkContainingText("999320016");
-        assertTextPresent("Dataset: DEM-1: Demographics, All Visits >  ");
-        clickLinkContainingText("Dataset:");
 
         // verify warn on no selection
-        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
-        ExtHelper.waitForExtDialog(this, "Selection Error");
-        assertTextPresent("At least one " + SUBJECT_NOUN + " must be selected");
-        clickButtonContainingText("OK", 0);
-        waitForExtMaskToDisappear();
+        if(!isQuickTest)
+        {
+            //nav trail check
+            clickLinkContainingText("999320016");
+            assertTextPresent("Dataset: DEM-1: Demographics, All Visits >  ");
+            clickLinkContainingText("Dataset:");
+
+            ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
+            ExtHelper.waitForExtDialog(this, "Selection Error");
+            assertTextPresent("At least one " + SUBJECT_NOUN + " must be selected");
+            clickButtonContainingText("OK", 0);
+            waitForExtMaskToDisappear();
+
+        }
 
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
         for (int i=0; i < 5; i++)
@@ -255,26 +275,29 @@ public class StudyTest extends StudyBaseTest
         clickButtonContainingText("Save", 0);
         waitForExtMaskToDisappear();
 
-        // the dataregion get's ajaxed into place, wait until the new group appears in the menu
-        Locator menu = Locator.navButton(SUBJECT_NOUN + " Groups");
-        waitForElement(menu, WAIT_FOR_JAVASCRIPT);
-        Locator menuItem = Locator.menuItem("Participant Group from Grid");
-        for (int i = 0; i < 10; i++)
+        if(!quickTest)
         {
-            try{
-                click(menu);
+            // the dataregion get's ajaxed into place, wait until the new group appears in the menu
+            Locator menu = Locator.navButton(SUBJECT_NOUN + " Groups");
+            waitForElement(menu, WAIT_FOR_JAVASCRIPT);
+            Locator menuItem = Locator.menuItem("Participant Group from Grid");
+            for (int i = 0; i < 10; i++)
+            {
+                try{
+                    click(menu);
+                }
+                catch(SeleniumException e){
+                    /* Ignore. This button is unpredictable. */
+                }
+                if (isElementPresent(menuItem))
+                    break;
+                else
+                    sleep(1000);
             }
-            catch(SeleniumException e){
-                /* Ignore. This button is unpredictable. */
-            }
-            if (isElementPresent(menuItem))
-                break;
-            else
-                sleep(1000);
+            clickAndWait(menuItem);
+            for (String identifier : selectedIDs)
+                assertTextPresent(identifier);
         }
-        clickAndWait(menuItem);
-        for (String identifier : selectedIDs)
-            assertTextPresent(identifier);
     }
 
     private void verifySubjectIDsInWizard(String[] ids)
@@ -484,6 +507,7 @@ public class StudyTest extends StudyBaseTest
     private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
     {
         //else
+        sleep(1000);
         goToManageStudyPage(projectName, studyName);
         clickManageSubjectCategory(subjectNoun);
     }
@@ -495,6 +519,11 @@ public class StudyTest extends StudyBaseTest
         verifyDemographics();
         verifyVisitMapPage();
         verifyManageDatasetsPage();
+
+
+        if(quickTest)
+            return;
+
         verifyHiddenVisits();
         verifyVisitImportMapping();
         verifyCohorts();
@@ -576,56 +605,57 @@ public class StudyTest extends StudyBaseTest
         clickButton("Request Options", 0);
         assertElementPresent(Locator.tagWithText("span", "Create New Request"));
 
-        log("verify presence of create");
-        clickMenuButton("Page Size", "Show All");
-        assertTextNotPresent("DRT000XX-01");
-        assertTextPresent("GAA082NH-01");
-        clickLinkWithText("Group vials");
-        assertTextPresent("Total:");
-        assertTextPresent("466");
-
-        assertTextNotPresent("BAD");
-
-        clickLinkWithText("Show individual vials");
-        clickLinkContainingText("history");
-        // verify that we're correctly parsing frozen time, which is a date with a time portion only:
-        assertTextPresent("15:30:00");
-        assertTextPresent("2.0&nbsp;ML");
-        assertTextNotPresent("Added Comments");
-        // confirm collection location:
-        assertTextPresent("KCMC, Moshi, Tanzania");
-        // confirm historical locations:
-        assertTextPresent("Contract Lab Services, Johannesburg, South Africa");
-        assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
-
-        clickLinkWithText("Specimen Overview");
-        clickLinkWithText("By Individual Vial");
-        DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
-        table.setFilter("QualityControlFlag", "Equals", "true");
-        table.setSort("GlobalUniqueId", SortDirection.ASC);
-        assertEquals("AAA07XK5-02", table.getDataAsText(0, "Global Unique Id"));
-        assertEquals("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId", table.getDataAsText(0, "Quality Control Comments"));
-        assertEquals("", table.getDataAsText(0, "Primary Type"));
-        assertEquals("", table.getDataAsText(0, "Additive Type"));
-
-        assertEquals("ABH00LT8-01", table.getDataAsText(2, "Global Unique Id"));
-        assertEquals("Conflicts found: VolumeUnits", table.getDataAsText(2, "Quality Control Comments"));
-        assertEquals("", table.getDataAsText(2, "Volume Units"));
-
-        clickLinkContainingText("history");
-        assertTextPresent("Blood (Whole)");
-        assertTextPresent("Vaginal Swab");
-        assertTextPresent("Vial is flagged for quality control");
-        clickLinkWithText("update");
-        setFormElement("qualityControlFlag", "false");
-        setFormElement("comments", "Manually removed flag");
-        clickNavButton("Save Changes");
-        assertTextPresent("Manually removed flag");
-        assertTextPresent("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId");
-        assertTextNotPresent("Vial is flagged for quality control");
-        clickLinkWithText("return to vial view");
-        assertTextNotPresent("AAA07XK5-02");
-        assertTextPresent("KBH00S5S-01");
+        //TODO:  move this to specimen test
+//        log("verify presence of create");
+//        clickMenuButton("Page Size", "Show All");
+//        assertTextNotPresent("DRT000XX-01");
+//        assertTextPresent("GAA082NH-01");
+//        clickLinkWithText("Group vials");
+//        assertTextPresent("Total:");
+//        assertTextPresent("466");
+//
+//        assertTextNotPresent("BAD");
+//
+//        clickLinkWithText("Show individual vials");
+//        clickLinkContainingText("history");
+//        // verify that we're correctly parsing frozen time, which is a date with a time portion only:
+//        assertTextPresent("15:30:00");
+//        assertTextPresent("2.0&nbsp;ML");
+//        assertTextNotPresent("Added Comments");
+//        // confirm collection location:
+//        assertTextPresent("KCMC, Moshi, Tanzania");
+//        // confirm historical locations:
+//        assertTextPresent("Contract Lab Services, Johannesburg, South Africa");
+//        assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
+//
+//        clickLinkWithText("Specimen Overview");
+//        clickLinkWithText("By Individual Vial");
+//        DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
+//        table.setFilter("QualityControlFlag", "Equals", "true");
+//        table.setSort("GlobalUniqueId", SortDirection.ASC);
+//        assertEquals("AAA07XK5-02", table.getDataAsText(0, "Global Unique Id"));
+//        assertEquals("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId", table.getDataAsText(0, "Quality Control Comments"));
+//        assertEquals("", table.getDataAsText(0, "Primary Type"));
+//        assertEquals("", table.getDataAsText(0, "Additive Type"));
+//
+//        assertEquals("ABH00LT8-01", table.getDataAsText(2, "Global Unique Id"));
+//        assertEquals("Conflicts found: VolumeUnits", table.getDataAsText(2, "Quality Control Comments"));
+//        assertEquals("", table.getDataAsText(2, "Volume Units"));
+//
+//        clickLinkContainingText("history");
+//        assertTextPresent("Blood (Whole)");
+//        assertTextPresent("Vaginal Swab");
+//        assertTextPresent("Vial is flagged for quality control");
+//        clickLinkWithText("update");
+//        setFormElement("qualityControlFlag", "false");
+//        setFormElement("comments", "Manually removed flag");
+//        clickNavButton("Save Changes");
+//        assertTextPresent("Manually removed flag");
+//        assertTextPresent("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId");
+//        assertTextNotPresent("Vial is flagged for quality control");
+//        clickLinkWithText("return to vial view");
+//        assertTextNotPresent("AAA07XK5-02");
+//        assertTextPresent("KBH00S5S-01");
     }
 
     private void verifyParticipantComments()

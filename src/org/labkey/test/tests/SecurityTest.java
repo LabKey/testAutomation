@@ -73,23 +73,32 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
+        doTestStepsSetDetph(false);
+    }
+    protected void doTestStepsSetDetph(boolean isQuickTest)
+    {
+        this.isQuickTest = isQuickTest;
         enableEmailRecorder();
 
         displayNameTest();
         clonePermissionsTest();
         tokenAuthenticationTest();
-        impersonationTest();
-        guestTest();
-        addRemoveSiteAdminTest();
+        if(!isQuickTest)
+        {
+            impersonationTest();
+            guestTest();
+            addRemoveSiteAdminTest();
+        }
 
         log("Check welcome emails [6 new users]");
         goToModule("Dumbster");
         assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
-        cantReachAdminToolFromUserAccount(false);
-        if(!isQuickTest())
+
+        if(!isQuickTest)
         {
+            cantReachAdminToolFromUserAccount(false);
             passwordStrengthTest();
             dumbsterTest();
         }
@@ -215,8 +224,6 @@ public class SecurityTest extends BaseSeleniumWebTest
     }
 
     protected static enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
-
-    //issue 3876
 
     /**
      * Precondtions:  able to reset user's password at resetUrl, db in weak-password mode

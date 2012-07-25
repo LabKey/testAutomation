@@ -31,10 +31,10 @@ public enum TestSet
     DRT(new Class[] {
         BasicTest.class,
         JUnitTest.class,
-        SecurityTest.class,
-        FlowTest.class,
-        XTandemTest.class,
-        StudyTest.class,
+        SecurityShortTest.class,
+        FlowShortTest.class,
+        XTandemShortTest.class,
+        StudyShortTest.class,
     }),
 
     BVT(DRT, new Class[] {
@@ -131,7 +131,7 @@ public enum TestSet
         FolderTest.class,
         StudyDemoModeTest.class,
         LibraTest.class,
-//        StudyReloadTest.class,
+//        StudyReloadTest.class, //TODO:  don't checkin
         AncillaryStudyTest.class,
         FolderExportTest.class,
         GenotypingTest.class,
