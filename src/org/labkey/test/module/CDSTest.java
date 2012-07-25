@@ -227,7 +227,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         goToAppHome();
     }
 
-    private static final String FILTERS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Lab\"},\"views\":{},\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3026\",\"data\":{\"name\":\"CDSTest_CGroup\",\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3013\",\"data\":{\"hierarchy\":\"Lab\",\"members\":[{\"uname\":[\"Lab\",\"LabKey Lab\"]},{\"uname\":[\"Lab\",\"Piehler/Eckels Lab\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"INTERSECT\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3013\"},{\"phantom\":true,\"internalId\":\"ext-record-3014\",\"data\":{\"hierarchy\":\"Participant.Gender\",\"members\":[{\"uname\":[\"Participant.Gender\",\"f\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3014\"}],\"label\":\"\",\"participantIds\":\"\",\"description\":\"\",\"shared\":false,\"type\":\"\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.FilterGroup-ext-record-3026\"}],\"selections\":[],\"detail\":{},\"id\":150}";
+    private static final String FILTERS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Lab\"},\"views\":{},\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3026\",\"data\":{\"name\":\"CDSTest_CGroup\",\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3013\",\"data\":{\"hierarchy\":\"Lab\",\"members\":[{\"uname\":[\"Lab\",\"LabKey Lab\"]},{\"uname\":[\"Lab\",\"Piehler/Eckels Lab\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"INTERSECT\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3013\"},{\"phantom\":true,\"internalId\":\"ext-record-3014\",\"data\":{\"hierarchy\":\"Participant.Sex\",\"members\":[{\"uname\":[\"Participant.Sex\",\"f\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3014\"}],\"label\":\"\",\"participantIds\":\"\",\"description\":\"\",\"shared\":false,\"type\":\"\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.FilterGroup-ext-record-3026\"}],\"selections\":[],\"detail\":{},\"id\":150}";
     private void verifyFilters()
     {
         log("Verify multi-select");
@@ -272,7 +272,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         waitForText("12 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sources (Unknown, ccPBMC, Lung)", "8 total");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 total");
         assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
@@ -329,7 +329,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         //test more group saving
         selectCDSGroup(GROUP_NAME, true);
         click("Participants");
-        pickCDSSort("Gender");
+        pickCDSSort("Sex");
         selectBars("f");
 
         clickButton("save group", 0);
@@ -368,7 +368,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         waitForText("12 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sources (Unknown, ccPBMC, Lung)", "8 total");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 total");
         assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
@@ -376,15 +376,15 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click("Labs");
         assertFilterStatusCounts(12,1,3,2,8);
 
-        // saved filter including current selection (Gender: f)
+        // saved filter including current selection (Sex: f)
         goToAppHome();
         selectCDSGroup(GROUP_NAME3, true);
         assertTextNotPresent(GROUP_DESC);
-        assertTextPresent("Gender:");
+        assertTextPresent("Sex:");
 
         waitForText("8 total participants", WAIT_FOR_JAVASCRIPT);
         assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sources (Unknown, ccPBMC, Lung)", "8 total");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 total");
         assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
         assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
         assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 0 male", "8 total participants");
@@ -882,7 +882,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void assertAllParticipantsPortalPage()
     {
         assertCDSPortalRow("Studies", STUDIES[0] + ", " + STUDIES[1] + ", " + STUDIES[2], "3 total");
-        assertCDSPortalRow("Assay Antigens", "5 clades, 5 tiers, 5 sources (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
+        assertCDSPortalRow("Assay Antigens", "5 clades, 5 tiers, 5 sample types (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
         assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
         assertCDSPortalRow("Labs", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
         assertCDSPortalRow("Participants", "6 races, 3 locations, 18 female, 11 male", "29 total participants");
