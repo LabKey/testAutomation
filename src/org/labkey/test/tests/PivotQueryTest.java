@@ -102,7 +102,7 @@ public class PivotQueryTest extends BaseSeleniumWebTest
         // Issue 15299: QueryPivot/QAggregate: MV and OOR suggested columns
         assertElementContains(ConcInRange_MIN_cell, "<missing column IL-10 (23)::ConcInRange_MINOORIndicator>7.99");
 
-        // XXX: SQLServer dialect doesn't support group_concat yet: reenable the GROUP_CONCAT aggregate in LuminexPivot query when it is supported.
+        // Issue 15554: GROUP_CONCAT shouldn't blow up on unsupported platforms
         // First "ConcInRange_CONCAT" data cell
         //Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[6]");
         //String contents = selenium.getText(ConcInRange_CONCAT_cell.toString());
