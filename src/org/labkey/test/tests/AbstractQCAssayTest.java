@@ -83,8 +83,13 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             // wait until the dialog has been dismissed
             waitForElementToDisappear(Locator.id(id), WAIT_FOR_JAVASCRIPT);
 
-            if (!isEngineConfigured())
-                fail("unable to setup the java engine");
+            waitFor(new Checker()
+            {
+                public boolean check()
+                {
+                    return isEngineConfigured();
+                }
+            }, "unable to setup the java engine", WAIT_FOR_JAVASCRIPT);
         }
 
         // ensure the .netrc file exists
