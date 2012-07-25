@@ -1201,8 +1201,8 @@ public class ReportTest extends StudyBaseTest
         }
     }
 
-    private static final String BOX_PLOT = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureCohortGroup 1Group 24c.Induration 1st measure";
-    private static final String BOX_PLOT_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisNot in TEST GROUP 2TEST_GROUP_2TestYAxis40.0";
+    private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureCohortGroup 1Group 24c.Induration 1st measure";
+    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisNot in TEST GROUP 2TEST_GROUP_2TestYAxis40.0";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     private void doManageViewsBoxPlotTest()
@@ -1226,7 +1226,7 @@ public class ReportTest extends StudyBaseTest
         waitForExtMaskToDisappear();
 
         //Verify box plot
-        waitForText(BOX_PLOT);
+        waitForText(BOX_PLOT_MV_1);
         log("Set Plot Title");
         click(Locator.css("svg text:contains('4c.Induration 1st measure')"));
         ExtHelper.waitForExtDialog(this, "Main Title");
@@ -1257,7 +1257,7 @@ public class ReportTest extends StudyBaseTest
         waitForExtMaskToDisappear();
         waitForText("TestXAxis");
         
-        waitForText(BOX_PLOT_2);
+        waitForText(BOX_PLOT_MV_2);
 
         clickButton("Save", 0);
         ExtHelper.waitForExtDialog(this, "Save Chart");
@@ -1276,14 +1276,17 @@ public class ReportTest extends StudyBaseTest
         saveBoxPlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
     }
 
-    private static final String BOX_PLOT_3 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureCohortGroup 1Group 22.Body temperature36.537.037.538.038.539.039.540.0";
+    private static final String BOX_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureCohortGroup 2Group 12.Body temperature36.636.736.836.937.037.137.2";
+    private static final String BOX_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureCohortGroup 1Group 22.Body temperature36.537.037.538.038.539.039.540.0";
     private static final String BOX_PLOT_NAME_DR = "DataRegionBoxPlot";
     private static final String BOX_PLOT_DESC_DR = "This box plot was created through a data region's 'Views' menu";
+    /// Test Box Plot created from a filtered data region.
     private void doDataRegionBoxPlotTest()
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText("RCH-1: Reactogenicity-Day 1");
+        setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
         clickMenuButton("Views", "Create", "Box Plot");
 
         ExtHelper.waitForExtDialog(this, "Y Axis");
@@ -1292,12 +1295,19 @@ public class ReportTest extends StudyBaseTest
         waitForExtMaskToDisappear();
 
         //Verify box plot
-        waitForText(BOX_PLOT_3);
+        waitForText(BOX_PLOT_DR_1);
+
+        //Change filter and check box plot again
+        clickButton("View Data", 0);
+        clearFilter("aqwp4", "RCHtempc", 0);
+        waitForText("40.0");
+        clickButton("View Chart", 0);
+        waitForText(BOX_PLOT_DR_2);
 
         saveBoxPlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
     }
 
-    private static final String BOX_PLOT_4 = "Created with Rapha\u00ebl 2.1.0Types - DoubleCohortGroup 1Group 2Double0.020000000.040000000.060000000.080000000.0100000000.0120000000.0";
+    private static final String BOX_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleCohortGroup 1Group 2Double0.020000000.040000000.060000000.080000000.0100000000.0120000000.0";
     private static final String BOX_PLOT_NAME_QC = "QuickChartBoxPlot";
     private static final String BOX_PLOT_DESC_QC = "This box plot was created through the 'Quick Chart' column header menu option";
     private void doQuickChartBoxPlotTest()
@@ -1309,7 +1319,7 @@ public class ReportTest extends StudyBaseTest
         createQuickChart("Dataset", "dbl");
 
         //Verify box plot
-        waitForText(BOX_PLOT_4);
+        waitForText(BOX_PLOT_QC);
 
         saveBoxPlot(BOX_PLOT_NAME_QC, BOX_PLOT_DESC_QC);
     }
@@ -1321,6 +1331,7 @@ public class ReportTest extends StudyBaseTest
 
         click(header);
         waitAndClick(quickChart);
+        waitForPageToLoad();
     }
 
     private void assertSVG(String expectedSvgText)
