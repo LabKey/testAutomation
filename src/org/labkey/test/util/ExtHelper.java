@@ -462,6 +462,7 @@ public class ExtHelper
     {
         test.log("Selecting Ext tab " + tabname);
         Locator l = Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']");
+        test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         if(test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
             test.mouseDownAt(l,  1,1);
