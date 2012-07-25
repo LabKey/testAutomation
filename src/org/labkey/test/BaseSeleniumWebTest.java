@@ -4424,7 +4424,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         log( log );
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        String columnLabel = getText(Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header")));
+        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
+        waitForElement(header, WAIT_FOR_JAVASCRIPT);
+        String columnLabel = getText(header);
         runMenuItemHandler(id);
         ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
         waitForTextToDisappear("Loading...");
@@ -4495,10 +4497,18 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void clearFilter(String regionName, String columnName)
     {
+        clearFilter(regionName, columnName, WAIT_FOR_PAGE);
+    }
+
+    public void clearFilter(String regionName, String columnName, int waitForPageLoad)
+    {
         log("Clearing filter in " + regionName + " for " + columnName);
+        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
+        waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear-filter");
         runMenuItemHandler(id);
-        waitForPageToLoad();
+        if(waitForPageLoad > 0)
+            waitForPageToLoad(waitForPageLoad);
     }
 
     /**
