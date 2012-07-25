@@ -367,22 +367,22 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         goToFlowDashboard();
         clickLinkContainingText("FCS files to be imported");
         ExtHelper.selectFileBrowserItem(this, workspacePath);
-        if (workspacePath.startsWith("/"))
-            workspacePath = workspacePath.substring(1);
-        String[] parts = workspacePath.split("/");
-
-        for (int i = 0; i < parts.length; i++)
-        {
-            if (i == parts.length - 1)
-            {
-                // workaround for import button enable/disable state bug in pipeline browser
-                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
-                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
-                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
-            }
-            else
-                waitAndClick(Locator.fileTreeByName(parts[i]));
-        }
+//        if (workspacePath.startsWith("/"))
+//            workspacePath = workspacePath.substring(1);
+//        String[] parts = workspacePath.split("/");
+//
+//        for (int i = 0; i < parts.length; i++)
+//        {
+//            if (i == parts.length - 1)
+//            {
+//                // workaround for import button enable/disable state bug in pipeline browser
+//                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
+//                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
+//                ExtHelper.clickFileBrowserFileCheckbox(this, parts[i]);
+//            }
+//            else
+//                waitAndClick(Locator.fileTreeByName(parts[i]));
+//        }
 
         selectImportDataAction("Import FlowJo Workspace");
     }
@@ -407,13 +407,25 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         if (existingRun)
         {
-            clickRadioButtonById("previousFCSFiles");
             selectOptionByText("existingKeywordRunId", fcsPath);
+            waitFor(new Checker()
+            {
+                public boolean check()
+                {
+                    return isChecked(Locator.id("previousFCSFiles"));
+                }
+            }, "Previous FCS files radio button should be selected.", WAIT_FOR_JAVASCRIPT);
         }
         else if (fcsPath != null)
         {
-            sleep(1000); // Avoid intermittent failure (Form thinks root, '/', is selected
             ExtHelper.selectFileBrowserItem(this, fcsPath);
+            waitFor(new Checker()
+            {
+                public boolean check()
+                {
+                    return isChecked(Locator.id("browseFCSFiles"));
+                }
+            }, "Browse for FCS files radio button should be selected.", WAIT_FOR_JAVASCRIPT);
         }
         else
         {
