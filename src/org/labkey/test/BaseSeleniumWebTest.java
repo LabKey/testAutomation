@@ -149,6 +149,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected static final String PERMISSION_ERROR = "401: User does not have permission to perform this operation";
 
+
     public BaseSeleniumWebTest()
     {
 
@@ -1475,10 +1476,19 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return false;
     }
 
+    protected boolean isQuickTest = false;
+
     protected boolean isQuickTest()
     {
-        return "DRT".equals(System.getProperty("suite"));
+        return isQuickTest;//"DRT".equals(System.getProperty("suite"));
     }
+
+    protected void setIsQuickTest(boolean isQuickTest)
+    {
+        this.isQuickTest = isQuickTest;
+    }
+
+
 
     public void checkLeaksAndErrors()
     {
