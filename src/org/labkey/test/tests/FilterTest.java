@@ -101,17 +101,17 @@ public class FilterTest extends ListTest
         assertTextPresent("Robust");
 
         // TODO: Blocked: 14710: Switching between faceted and logical filters breaks dialog
-//        setUpFacetedFilter("query", "Color", "Robust", "Light");
-//        ExtHelper.clickExtTab(this, "Choose Filters");
-//        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
-//        assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
-//        ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Blank");
-//        ExtHelper.clickExtTab(this, "Choose Values");
-//        ExtHelper.waitForExtDialog(this, "Confirm change");
-//        ExtHelper.clickExtButton(this, "Confirm change", "Yes", 0);
-//        ExtHelper.clickExtButton(this, "OK");
-//        assertTextPresent("Light", "Robust");
-//        assertLinkNotPresentWithText("Zany");
+        setUpFacetedFilter("query", "Color", "Robust", "Light");
+        ExtHelper.clickExtTab(this, "Choose Filters");
+        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
+        assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
+        ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Blank");
+        ExtHelper.clickExtTab(this, "Choose Values");
+        ExtHelper.waitForExtDialog(this, "Confirm change");
+        ExtHelper.clickExtButton(this, "Confirm change", "Yes", 0);
+        ExtHelper.clickExtButton(this, "OK");
+        assertTextPresent("Light", "Robust");
+        assertLinkNotPresentWithText("Zany");
 
         setFacetedFilter("query", "Color");
         assertTextPresent("Light", "Robust", "Zany");
