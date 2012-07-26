@@ -36,8 +36,11 @@ public enum TestSet
         XTandemShortTest.class,
         StudyShortTest.class,
     }),
+    //new tests added to the DRTs should be added to BVT as well
 
-    BVT(DRT, new Class[] {
+    BVT(new Class[] {
+        BasicTest.class,
+        JUnitTest.class,
         WikiTest.class,
         ExpTest.class,
         AssayTest.class,
