@@ -1349,6 +1349,7 @@ public class ReportTest extends StudyBaseTest
 
         ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
         waitForText(name);
+        waitForExtMaskToDisappear();
         _boxPlots.add(name);
         _boxPlotsDescriptions.add(description);
     }
