@@ -51,6 +51,10 @@ public enum TestSet
         FilterTest.class,
         GroupTest.class,
         StudyRedesignTest.class,
+        SecurityTest.class,
+        FlowTest.class,
+        XTandemTest.class,
+        StudyTest.class,
     }),
 
     MS2(new Class[]
