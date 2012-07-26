@@ -118,7 +118,7 @@ public class RReportHelper
             test.fail("Unable to install the base Rlabkey package and dependencies.");
     }
 
-    public static boolean ensureRConfig(BaseSeleniumWebTest test)
+    public static boolean ensureRConfig(final BaseSeleniumWebTest test)
     {
         test.ensureAdminMode();
         // user need to be added to the site develpers group
@@ -166,34 +166,42 @@ public class RReportHelper
             {
                 for (File file : files)
                 {
-                    // add a new r engine configuration
-                    String id = ExtHelper.getExtElementId(test, "btn_addEngine");
-                    test.click(Locator.id(id));
-
-                    id = ExtHelper.getExtElementId(test, "add_rEngine");
-                    test.click(Locator.id(id));
-
-                    id = ExtHelper.getExtElementId(test, "btn_submit");
-                    test.waitForElement(Locator.id(id), 10000);
-
-                    id = ExtHelper.getExtElementId(test, "editEngine_exePath");
-                    test.setFormElement(Locator.id(id), file.getAbsolutePath());
-
-                    id = ExtHelper.getExtElementId(test, "btn_submit");
-                    test.click(Locator.id(id));
-
-                    // wait until the dialog has been dismissed
-                    int cnt = 3;
-                    while (test.isElementPresent(Locator.id(id)) && cnt > 0)
+                    if (file.isFile() )
                     {
-                        test.sleep(1000);
-                        cnt--;
-                    }
+                        // add a new r engine configuration
+                        String id = ExtHelper.getExtElementId(test, "btn_addEngine");
+                        test.click(Locator.id(id));
+    
+                        id = ExtHelper.getExtElementId(test, "add_rEngine");
+                        test.click(Locator.id(id));
 
-                    if (test.isREngineConfigured())
+                        id = ExtHelper.getExtElementId(test, "btn_submit");
+                        test.waitForElement(Locator.id(id), 10000);
+
+                        id = ExtHelper.getExtElementId(test, "editEngine_exePath");
+                        test.setFormElement(Locator.id(id), file.getAbsolutePath());
+
+                        id = ExtHelper.getExtElementId(test, "btn_submit");
+                        test.click(Locator.id(id));
+
+                        // wait until the dialog has been dismissed
+                        int cnt = 3;
+                        while (test.isElementPresent(Locator.id(id)) && cnt > 0)
+                        {
+                            test.sleep(1000);
+                            cnt--;
+                        }
+
+                        test.waitFor(new BaseSeleniumWebTest.Checker()
+                        {
+                            public boolean check()
+                            {
+                                return test.isREngineConfigured();
+                            }
+                        }, "unable to setup the R script engine", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+
                         return true;
-
-                    test.refresh();
+                    }
                 }
             }
         }
