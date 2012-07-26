@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SearchHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.HashMap;
@@ -259,20 +260,14 @@ public class SearchTest extends StudyTest
     {
         clickLinkWithText(getFolderName());
         addWebPart("Wiki");
-        createNewWikiPage("RADEOX");
-
-        setFormElement("name", WIKI_NAME);
-        setFormElement("title", WIKI_TITLE);
-        setFormElement("body", WIKI_CONTENT);
-        if (isFileUploadAvailable())
-        {
-            File file = new File(getLabKeyRoot() + "/server/module.template.properties");
-            setFormElement("formFiles[0]", file);
-        }
-        saveWikiPage();
+        WikiHelper.createWikiPage(this, "RADEOX", WIKI_NAME, WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
+        addWebPart("Wiki");
+        //Issue 9454: Don't index option for wiki page
+        WikiHelper.createWikiPage(this, "RADEOX", WIKI_NAME+"UNSEARCHABLE", WIKI_TITLE, WIKI_CONTENT, false, null);
 
 
         SearchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
+        SearchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE", false, null);
         SearchHelper.enqueueSearchItem(WIKI_TITLE, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem(WIKI_CONTENT, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem("moduleDependencies", Locator.linkWithText("\"module.template.properties\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file
