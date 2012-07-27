@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.tests.StudyManualTest;
 import org.labkey.test.util.ListHelper;
@@ -368,7 +369,9 @@ public class StudyExportTest extends StudyManualTest
         clickMenuButton("Page Size", "Show All");
         assertTextPresent("DRT000XX-01");
         clickLinkWithText("Search");
-        clickLinkWithText("Search grouped vials");
+        waitForTextToDisappear("Loading");
+        waitForText("Additive Type");
+        Ext4Helper.selectRadioButton(this, "Search Type:", "Grouped Vials");
 
 //        WARNING: Using getFormElementNameByTableCaption() is dangerous... if muliple values are returned their
 //        order is unpredictable, since they come back in keyset order.  The code below breaks under Java 6.
@@ -380,9 +383,8 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        // Hard-code the element names, since code above is unpredictable
-        selectOptionByValue("searchParams[0].value", "999320528");
-        selectOptionByValue("searchParams[1].value", "Enroll/Vacc #1");
+        Ext4Helper.selectComboBoxItem(this, "Mouse", "999320528");
+        Ext4Helper.selectComboBoxItem(this, "Visit", "201.0"); //use the raw value for: "Enroll/Vacc #1"
 
         clickNavButton("Search");
         assertTextPresent("999320528");
