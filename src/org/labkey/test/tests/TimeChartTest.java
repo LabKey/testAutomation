@@ -682,9 +682,8 @@ public class TimeChartTest extends StudyBaseTest
 
         if(textPresent!=null)
         {
-            waitForText(textPresent[0], WAIT_FOR_JAVASCRIPT);
             for (String text : textPresent)
-                assertTextPresent(text);
+                waitForText(text, WAIT_FOR_JAVASCRIPT);
         }
     }
 
