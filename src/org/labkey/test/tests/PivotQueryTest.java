@@ -98,9 +98,7 @@ public class PivotQueryTest extends BaseSeleniumWebTest
 
         // First "ConcInRange_MIN" data cell
         Locator ConcInRange_MIN_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[3]");
-        // NOTE: Remove "<missing column..." when the OOR column metadata works
-        // Issue 15299: QueryPivot/QAggregate: MV and OOR suggested columns
-        assertElementContains(ConcInRange_MIN_cell, "<missing column IL-10 (23)::ConcInRange_MINOORIndicator>7.99");
+        assertElementContains(ConcInRange_MIN_cell, "7.99");
 
         // Issue 15554: GROUP_CONCAT shouldn't blow up on unsupported platforms
         // First "ConcInRange_CONCAT" data cell
