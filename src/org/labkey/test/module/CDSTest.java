@@ -79,27 +79,13 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     @Override
     public void doTestSteps()
     {
-        _containerHelper.createProject(PROJECT_NAME, "Study");
-        enableModule(PROJECT_NAME, "CDS");
-        importStudyFromZip(STUDY_ZIP.getPath());
-        goToProjectHome();
-        addWebPart("CDS Management");
-
-        importCDSData("Antigens",          new File(getSampledataPath(), "CDS/antigens.tsv"));
-        importCDSData("Assays",            new File(getSampledataPath(), "CDS/assays.tsv"));
-        importCDSData("Studies",           new File(getSampledataPath(), "CDS/studies.tsv"));
-        importCDSData("Labs",              new File(getSampledataPath(), "CDS/labs.tsv"));
-        importCDSData("People",            new File(getSampledataPath(), "CDS/people.tsv"));
-        importCDSData("Citable",           new File(getSampledataPath(), "CDS/citable.tsv"));
-        importCDSData("Citations",         new File(getSampledataPath(), "CDS/citations.tsv"));
-        importCDSData("AssayPublications", new File(getSampledataPath(), "CDS/assay_publications.tsv"));
-        importCDSData("Vaccines",          new File(getSampledataPath(), "CDS/vaccines.tsv"));
-        importCDSData("VaccineComponents", new File(getSampledataPath(), "CDS/vaccinecomponents.tsv"));
-
+        setupProject();
+        importData();
         populateFactTable();
         verifyFactTable();
 
         selenium.windowMaximize(); // Provides more useful screenshots on failure
+
         verifyCounts();
         verifyGrid();
         verifyFilters();
@@ -111,14 +97,37 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
 /// Test substeps
 
-    private void importCDSData(String query, File dataFile)
+    private void setupProject()
+    {
+        _containerHelper.createProject(PROJECT_NAME, "Study");
+        enableModule(PROJECT_NAME, "CDS");
+        importStudyFromZip(STUDY_ZIP.getPath());
+        goToProjectHome();
+        addWebPart("CDS Management");
+    }
+
+    private void importData()
+    {
+        importCDSData("Antigens",          "antigens.tsv");
+        importCDSData("Assays",            "assays.tsv");
+        importCDSData("Studies",           "studies.tsv");
+        importCDSData("Labs",              "labs.tsv");
+        importCDSData("People",            "people.tsv");
+        importCDSData("Citable",           "citable.tsv");
+        importCDSData("Citations",         "citations.tsv");
+        importCDSData("AssayPublications", "assay_publications.tsv");
+        importCDSData("Vaccines",          "vaccines.tsv");
+        importCDSData("VaccineComponents", "vaccinecomponents.tsv");
+    }
+
+    private void importCDSData(String query, String dataFilePath)
     {
         clickLinkWithText(PROJECT_NAME);
         waitForTextWithRefresh("Fact Table", defaultWaitForPage*4);  //wait for study to fully load
         clickLinkWithText(query);
         ListHelper.clickImportData(this);
 
-        setFormElement(Locator.id("tsv3"), getFileContents(dataFile), true);
+        setFormElement(Locator.id("tsv3"), getFileContents(new File(getSampledataPath(), "CDS/"+dataFilePath)), true);
         clickButton("Submit");
     }
 
