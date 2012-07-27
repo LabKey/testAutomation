@@ -1350,6 +1350,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
         waitForText(name);
         waitForExtMaskToDisappear();
+        sleep(1000); // Takes a moment for page to not be marked as dirty
         _boxPlots.add(name);
         _boxPlotsDescriptions.add(description);
     }
