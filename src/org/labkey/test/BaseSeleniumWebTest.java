@@ -4336,7 +4336,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         selenium.type(element.toString(), text, suppressValueLogging);
         fireEvent(element, SeleniumEvent.keyup);
-        fireEvent(element, SeleniumEvent.blur);
+        // Element might disappear after keyup
+        if(isElementPresent(element))
+            fireEvent(element, SeleniumEvent.blur);
     }
 
     public void setFormElement(String element, File file)
@@ -4374,6 +4376,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearSort(String regionName, String columnName, int wait)
     {
         log("Clearing sort in " + regionName + " for " + columnName);
+        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
+        waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
         if (runMenuItemHandler(id));
             waitForPageToLoad(wait);
@@ -4382,6 +4386,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void setSort(String regionName, String columnName, SortDirection direction, int wait)
     {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
+        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
+        waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":" + direction.toString().toLowerCase());
         if (runMenuItemHandler(id))
             waitForPageToLoad(wait);
@@ -4462,7 +4468,9 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         log = log.substring(0, log.length() - 2) + "]";
         log(log);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        String columnLabel = getText(Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header")));
+        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
+        waitForElement(header, WAIT_FOR_JAVASCRIPT);
+        String columnLabel = getText(header);
         runMenuItemHandler(id);
         ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
 
@@ -4517,6 +4525,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void clearAllFilters(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
+        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
+        waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         runMenuItemHandler(id);
         clickNavButton("CLEAR ALL FILTERS");
