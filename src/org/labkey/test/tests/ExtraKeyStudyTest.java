@@ -19,11 +19,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 4/29/12
  * Time: 1:17 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ExtraKeyStudyTest extends StudyBaseTest
 {
@@ -67,8 +65,9 @@ public class ExtraKeyStudyTest extends StudyBaseTest
             Integer.parseInt("000000100001111", 2), // PVString_One
             Integer.parseInt("000000010001111", 2), // PVString_Two
 
-            Integer.parseInt("000010000001111", 2), // PVDouble_One
-            Integer.parseInt("000001000001111", 2), // PVDouble_Two
+            // PVDouble_* auto-join is currently disabled.  See Issue 14860.
+            Integer.parseInt("000000000001111", 2), // PVDouble_One
+            Integer.parseInt("000000000001111", 2), // PVDouble_Two
 
             Integer.parseInt("001000000001111", 2), // PVDate_One
             Integer.parseInt("000100000001111", 2), // PVDate_Two
