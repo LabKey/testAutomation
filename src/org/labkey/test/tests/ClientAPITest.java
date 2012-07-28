@@ -44,6 +44,17 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
+    protected static final String[] CHARTING_API_TITLES = {
+            "Line Plot - no y-scale defined",
+            "Line Plot - y-scale defined, no legend, no shape aes",
+            "Line Plot - No Layer AES, Changed Opacity",
+            "Two Axis Scatter, plot null points",
+            "Discrete X Scale Scatter No Geom Config",
+            "Discrete X Scale Scatter, Log Y",
+            "Boxplot no Geom Config",
+            "Boxplot No Outliers",
+            "Boxplot No Outliers, All Points"
+    };
 
     private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
     {
@@ -154,9 +165,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         createWiki();
 
-        //lineChartTest(); // TODO 15579: Update charting API tests
-
-        //scatterChartTest(); // TODO 15579: Update charting API tests
+        chartAPITest();
 
         createLists();
 
@@ -287,50 +296,20 @@ public class ClientAPITest extends BaseSeleniumWebTest
             fail("Test div does not contain an image:\n" + chartHtml);
     }
 
-    private void lineChartTest() throws Exception
+    private void chartAPITest() throws Exception
     {
-        setSourceFromFile("lineChartTest.js");
+        setSourceFromFile("chartingAPITest.js");
 
         //Some things we know about test 0. After this we loop through some others and just test to see if they convert
-        assertTextPresent("Test Chart");
-        assertTextPresent("Y Axis");
-        assertTextPresent("X Axis");
-        assertTextPresent("Series1");
-        assertTextPresent("Series2");
-        checkSVGConversion();
+        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
 
         String testCountStr = getFormElement(Locator.id("configCount"));
         int testCount = Integer.parseInt(testCountStr);
-        for (int currentTest = 1; currentTest < testCount; currentTest++)
+        for (int currentTest = 0; currentTest < testCount; currentTest++)
         {
-            setFormElement("config", "" + currentTest);
-            clickAndWait(Locator.input("submit"));
-            waitForDivPopulation();
+            waitForText(CHARTING_API_TITLES[currentTest], WAIT_FOR_JAVASCRIPT);
             checkSVGConversion();
-        }
-    }
-
-    private void scatterChartTest() throws Exception
-    {
-        setFormElement("config", "");
-        clickAndWait(Locator.input("submit"));
-        setSourceFromFile("scatterChartTest.js");
-
-        //Some things we know about test 0. After this we loop through some others and just test to see if they convert
-        assertTextPresent("Test Scatter Chart");
-        assertTextPresent("Left Y Axis");
-        assertTextPresent("Bottom Axis");
-        assertTextPresent("Series1");
-        assertTextPresent("Series2");
-
-        String testCountStr = getFormElement(Locator.id("configCount"));
-        int testCount = Integer.parseInt(testCountStr);
-        for (int currentTest = 1; currentTest < testCount; currentTest++)
-        {
-            setFormElement("config", "" + currentTest);
-            clickAndWait(Locator.input("submit"));
-            waitForDivPopulation();
-            checkSVGConversion();
+            click(Locator.buttonContainingText("Next"));
         }
     }
 
