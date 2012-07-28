@@ -140,6 +140,7 @@ public class ReportTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
+        doParticipantGroupCategoriesTest();
         doBoxPlotTests();
         doCreateCharts();
         doCreateRReports();
@@ -1219,6 +1220,9 @@ public class ReportTest extends StudyBaseTest
 //        ExtHelper.selectExt4ComboBoxItem(this, "Query", "AssayList");
 //        ExtHelper.selectExt4ComboBoxItem(this, "Schema", "study");
         ExtHelper.selectExt4ComboBoxItem(this, "Query", "RCF-1: Reactogenicity-Day 2");
+
+        // Todo: put better wait here
+        sleep(5000);
         ExtHelper.clickExtButton(this, "Select Chart Query", "Save", 0);
         ExtHelper.waitForExtDialog(this, "Y Axis");
         mouseDown(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
@@ -1353,5 +1357,60 @@ public class ReportTest extends StudyBaseTest
         sleep(1000); // Takes a moment for page to not be marked as dirty
         _boxPlots.add(name);
         _boxPlotsDescriptions.add(description);
+    }
+
+    private void doParticipantGroupCategoriesTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+
+        setDemographicsBit("DEM-1: Demographics", true);
+
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Mouse Groups");
+        ExtHelper.clickExtButton(this, "Create", 0);
+        ExtHelper.waitForExtDialog(this, "Define Mouse Group");
+
+        // Create category with 3 groups
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice A", "Mouse", "Cat Mice Let", true, true, "999320964,999320980,999320981,999320998");
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice B", "Mouse", "Cat Mice Let", false, true, "999321029,999321033,999320624,999320760");
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice C", "Mouse", "Cat Mice Let", false, true, "999320358,999320364,999320396");
+
+        clickLinkWithText(getFolderName());
+        setDemographicsBit("DEM-1: Demographics", false);
+
+        // Check that groups have correct number of members
+        clickLinkWithText("Mice");
+        waitForText("Filter"); // Wait for participant list to appear.
+
+        mouseDownGridCellCheckbox("All", 1);
+        mouseDownGridCellCheckbox("All", 2);
+        waitForText("No matching Mice");
+
+        mouseDownGridCellCheckbox("Mice C");
+        waitForText("Found 3 mice of 138.");
+
+        mouseDownGridCellCheckbox("Mice B");
+        waitForText("Found 7 mice of 138.");
+
+        // Test changing category and changing it back
+        clickTab("Manage");
+        clickLinkWithText("Manage Mouse Groups");
+        ExtHelper.waitForLoadingMaskToDisappear(this, 10000);
+        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Foo", true, true, null);
+        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Let", false, true, null);
+
+        // Add more participants to a group
+        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", null, false, true, "999320692,618005775");
+
+        // Check that group has correct number of participants
+        clickLinkWithText("Mice");
+        waitForText("Filter"); // Wait for participant list to appear.
+        mouseDownGridCellCheckbox("All", 1);
+        mouseDownGridCellCheckbox("All", 2);
+        waitForText("No matching Mice");
+        mouseDownGridCellCheckbox("Mice C");
+        waitForText("Found 5 mice of 138.");
+
     }
 }
