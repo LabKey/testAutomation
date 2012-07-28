@@ -127,6 +127,9 @@
         <echo message="Add javascript injection testing:"/>
         <echo message="    -DinjectCheck=true"/>
         <echo message=""/>
+        <echo message="Enable view verification:"/>
+        <echo message="    -DviewCheck=true"/>
+        <echo message=""/>
         <echo message="The leak checker is run by default for DRT and BVT tests.  To disable mem checking:"/>
         <echo message="    -DmemCheck=false"/>
         <echo message=""/>
@@ -492,6 +495,7 @@
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
+            <sysproperty key="viewCheck" value="${sysprop.viewCheck}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
             <sysproperty key="labkey.root" value="${project.root}"/>
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
@@ -832,6 +836,11 @@
             <isset property="queryCheck"/>
         </condition>
 
+        <!-- Set property sysprop.viewCheck: true or false -->
+        <condition property="sysprop.viewCheck" value="${viewCheck}" else="false">
+            <isset property="viewCheck"/>
+        </condition>
+
         <!-- Set property sysprop.labkey.port: user provided or '8080' -->
         <condition property="sysprop.labkey.port" value="8080">
             <not>
@@ -966,6 +975,7 @@
         <echo message="    memory check: ${sysprop.memCheck}"/>
         <echo message="    script check: ${sysprop.scriptCheck}"/>
         <echo message="    query check: ${sysprop.queryCheck}"/>
+        <echo message="    view check: ${sysprop.viewCheck}"/>
         <echo message="    labkey.port: ${sysprop.labkey.port}"/>
         <echo message="    target server ${sysprop.labkey.server}"/>
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
@@ -1007,6 +1017,7 @@
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
+            <sysproperty key="viewCheck" value="${sysprop.viewCheck}"/>
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
@@ -1056,6 +1067,7 @@
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
+            <sysproperty key="viewCheck" value="${sysprop.viewCheck}"/>
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
@@ -1101,6 +1113,7 @@
             <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
             <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
             <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
+            <sysproperty key="viewCheck" value="${sysprop.viewCheck}"/>
             <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
             <sysproperty key="devMode" value="${sysprop.devMode}"/>
             <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>

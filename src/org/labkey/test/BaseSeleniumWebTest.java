@@ -1276,6 +1276,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             checkQueries();
 
+            checkViews();
+
             checkLeaksAndErrors();
 
             checkActionCoverage();
@@ -1445,6 +1447,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return "false".equals(System.getProperty("queryCheck"));
     }
 
+    public boolean skipViewCheck()
+    {
+        return "false".equals(System.getProperty("viewCheck"));
+    }
+
     public boolean isMaintenanceDisabled()
     {
         return "never".equals(System.getProperty("systemMaintenance"));
@@ -1603,6 +1610,67 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 goToSchemaBrowser();
             validateQueries();
 //            validateLabAuditTrail();
+        }
+    }
+
+    protected void checkViews()
+    {
+        if (skipViewCheck())
+            return;
+
+        List<String> checked = new ArrayList<String>();
+
+        for (String projectName : _containerHelper.getCreatedProjects())
+        {
+            doViewCheck(projectName);
+            checked.add(projectName);
+        }
+        
+        for (FolderIdentifier folderId : _createdFolders)
+        {
+            String project = folderId.getProjectName();
+            String folder = folderId.getFolderName();
+            if(!checked.contains(project))
+            {
+                doViewCheck(project);
+                checked.add(project);
+            }
+            if(!checked.contains(folder))
+            {
+                clickLinkWithText(project);
+                if(isLinkPresentWithText(folder))
+                {
+                    doViewCheck(folder);
+                    checked.add(folder);
+                }
+            }
+        }
+    }
+
+    private void doViewCheck(String folder)
+    {
+        clickLinkWithText(folder);
+        try{
+            goToManageViews();
+        }
+        catch (SeleniumException e)
+        {
+            return; // No manage views option
+        }
+
+        waitForExtMaskToDisappear();
+        String viewXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
+        int viewCount = getXpathCount(Locator.xpath(viewXpath));
+        for (int i = 1; i <= viewCount; i++)
+        {
+            pushLocation();
+            String thisViewXpath = "("+viewXpath+")["+i+"]";
+            String viewName = getText(Locator.xpath(thisViewXpath + "//td[contains(@class, 'x-grid3-cell-first')]"));
+            click(Locator.xpath(thisViewXpath));
+            waitAndClick(Locator.linkWithText("view"));
+            waitForPageToLoad();
+            waitForText(viewName);
+            popLocation();
         }
     }
 
