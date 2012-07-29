@@ -206,7 +206,7 @@ public class ReportTest extends StudyBaseTest
                 }, "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
     }
 
-    protected void clickReportGridLink(String reportName, String linkText)
+    protected Locator getReportGridLink(String reportName, String linkText)
     {
         goToManageViews();
         final Locator report = Locator.tagContainingText("div", reportName);
@@ -227,6 +227,12 @@ public class ReportTest extends StudyBaseTest
             }
         }, "Unable to click the link: " + linkText + " for report: " + reportName, WAIT_FOR_JAVASCRIPT);
 
+        return link;
+    }
+
+    protected void clickReportGridLink(String reportName, String linkText)
+    {
+        Locator link = getReportGridLink(reportName, linkText);
         clickAndWait(link);
     }
 
@@ -592,6 +598,8 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("URL must be absolute");
         setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
+        assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
+        ExtHelper.uncheckCheckbox(this, "Open link report in new window?");
         clickNavButton("Save");
         // save should return back to manage views page
         waitForText("Manage Views");
@@ -603,6 +611,7 @@ public class ReportTest extends StudyBaseTest
         setFormElement("description", LINK_REPORT2_DESCRIPTION);
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
+        assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
         clickNavButton("Save");
         // save should return back to Clinical and Assay Data tab
         waitForText("Data Views");
@@ -614,11 +623,11 @@ public class ReportTest extends StudyBaseTest
                 getURL().toString().contains(LINK_REPORT1_URL));
         popLocation();
 
-        pushLocation();
-        clickReportGridLink(LINK_REPORT2_NAME, "view");
-        assertTrue("Expected link report to go to '" + LINK_REPORT1_URL + "', but was '" + getCurrentRelativeURL() + "'",
-                getURL().toString().contains(LINK_REPORT1_URL));
-        popLocation();
+        // Clicking on LINK_REPORT2_NAME "view" link will open a new browser window.
+        // To avoid opening a new browser window, let's just check that the link has the target="_blank" attribute.
+        Locator link = getReportGridLink(LINK_REPORT2_NAME, "view");
+        String target = getAttribute(link, "target");
+        assertEquals("_blank", target);
     }
 
     private void saveReport(String name)

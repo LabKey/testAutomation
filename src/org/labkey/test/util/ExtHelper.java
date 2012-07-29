@@ -548,7 +548,7 @@ public class ExtHelper
             BaseSeleniumWebTest.fail("Failed to uncheck checkbox '" + label + "'.");
     }
 
-    private static boolean isChecked(BaseSeleniumWebTest test, String label)
+    public static boolean isChecked(BaseSeleniumWebTest test, String label)
     {
         Locator checked = Locator.xpath("//table[contains(@class, 'x4-form-cb-checked')]//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
         return test.isElementPresent(checked);
