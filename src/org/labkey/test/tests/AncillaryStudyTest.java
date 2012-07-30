@@ -68,8 +68,8 @@ public class AncillaryStudyTest extends StudyBaseTest
         importStudy();
         startSpecimenImport(2);
         waitForPipelineJobsToComplete(2, "study import", false);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", PTIDS_BAD);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", true, PTIDS);
+        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", true, PTIDS_BAD);
         createAncillaryStudy();
     }
 
