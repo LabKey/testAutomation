@@ -762,7 +762,7 @@ public class ListTest extends BaseSeleniumWebTest
         ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Greater Than");
         setFormElement("value_1", "5");
         ExtHelper.clickExtButton(this, "Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox("Bold", 1);
+        checkCheckbox("Bold");
 
         // If greater than 7, strikethrough
         clickNavButton("Add Conditional Format", 0);
@@ -770,7 +770,7 @@ public class ListTest extends BaseSeleniumWebTest
         ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Greater Than");
         setFormElement("value_1", "7");
         ExtHelper.clickExtButton(this, "Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox("Strikethrough");
+        checkCheckbox("Strikethrough", 1);
 
         // Switch the order of filters so that >7 takes precedence over >5
         selenium.windowMaximize();
