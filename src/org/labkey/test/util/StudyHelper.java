@@ -133,7 +133,7 @@ public class StudyHelper
                 test.uncheckCheckbox("Shared");
             }
         }
-        test.sleep(100);
+        test.sleep(1000); // Wait for form to pick up Category
         ExtHelper.clickExtButton(test, "Define "+participantString+" Group", "Save", 0);
         test.waitForExtMaskToDisappear();
     }
