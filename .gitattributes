@@ -16,10 +16,8 @@ data/api/getDataVisitTest.html -text
 data/api/gridTest.js -text
 data/api/groupSecurityTest.html -text
 data/api/http-api.xml -text
-data/api/lineChartTest.js -text
 data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
-data/api/scatterChartTest.js -text
 data/api/security-api.xml -text
 data/api/study-api.xml -text
 data/api/timeChartPointClickTestFn.js -text
