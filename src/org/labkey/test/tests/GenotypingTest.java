@@ -528,6 +528,10 @@ public class GenotypingTest extends BaseSeleniumWebTest
         Ext4Helper.clickTabContainingText(this, "General Info");
         Assert.assertEquals(TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
 
+        //if we navigate too quickly, before the insertRows has returned, the test can get a JS error
+        //therefore we sleep
+        sleep(200);
+
         //verify samples present
         Ext4Helper.clickTabContainingText(this, "Preview Samples");
         waitForText("Sample_ID");
