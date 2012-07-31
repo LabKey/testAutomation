@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import junit.framework.Assert;
 import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -244,8 +245,8 @@ public class LabModulesTest extends BaseSeleniumWebTest
         _helper.clickNavPanelItem("DNA_Oligos:", "Browse All");
         waitForPageToLoad();
 
-        assertTrue("Sequence was not formatted properly on import", isTextPresent(sequence.toUpperCase().replaceAll(" ", "")));
-        assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
+        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(sequence.toUpperCase().replaceAll(" ", "")));
+        Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
     }
 
     private void samplesTableTest()
@@ -334,9 +335,9 @@ public class LabModulesTest extends BaseSeleniumWebTest
         _helper.clickNavPanelItem("Peptides:", "Browse All");
         waitForPageToLoad();
 
-        assertTrue("Sequence was not formatted properly on import", isTextPresent(sequence.toUpperCase().replaceAll(" ", "")));
-        assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
-        assertTrue("MW not set correctly", isTextPresent("1036.1"));
+        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(sequence.toUpperCase().replaceAll(" ", "")));
+        Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
+        Assert.assertTrue("MW not set correctly", isTextPresent("1036.1"));
     }
 
     private void searchPanelTest()
@@ -350,7 +351,7 @@ public class LabModulesTest extends BaseSeleniumWebTest
         click(Locator.ext4Button("Submit"));
         waitForPageToLoad();
         DataRegionTable table = new DataRegionTable("query", this);
-        assertTrue("Wrong number of rows found", table.getDataRowCount() == _oligosTotal);
+        Assert.assertTrue("Wrong number of rows found", table.getDataRowCount() == _oligosTotal);
 
         //TODO: test different operators
         //also verify correct options show up on drop down menus
@@ -368,9 +369,9 @@ public class LabModulesTest extends BaseSeleniumWebTest
         waitForText("Samples and Materials:");
         String msg = "Sample type missing or sample count incorrect";
 
-        assertTrue(msg, isTextPresent("DNA_Oligos" + (_oligosTotal > 0 ? " (" + _oligosTotal + ")" : "") + ":"));
-        assertTrue(msg, isTextPresent("Peptides" + (_peptideTotal > 0 ? " (" + _peptideTotal + ")" : "") + ":"));
-        assertTrue(msg, isTextPresent("Samples" + (_samplesTotal > 0 ? " (" + _samplesTotal + ")" : "") + ":"));
+        Assert.assertTrue(msg, isTextPresent("DNA_Oligos" + (_oligosTotal > 0 ? " (" + _oligosTotal + ")" : "") + ":"));
+        Assert.assertTrue(msg, isTextPresent("Peptides" + (_peptideTotal > 0 ? " (" + _peptideTotal + ")" : "") + ":"));
+        Assert.assertTrue(msg, isTextPresent("Samples" + (_samplesTotal > 0 ? " (" + _samplesTotal + ")" : "") + ":"));
     }
 
     private void queryMetadataTest()

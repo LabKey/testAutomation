@@ -1,5 +1,6 @@
 package org.labkey.test.util;
 
+import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -65,7 +66,7 @@ public class LabModuleHelper
     public void verifyNavPanelRowItemPresent(String label)
     {
         _test.log("Verifying NavPanel row present with label: " + label);
-        _test.assertTrue("Row missing: " + label, _test.isElementPresent(getNavPanelRow(label)));
+        Assert.assertTrue("Row missing: " + label, _test.isElementPresent(getNavPanelRow(label)));
     }
 
     public static Locator webpartTitle(String title)
