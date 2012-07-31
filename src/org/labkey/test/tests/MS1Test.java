@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -445,15 +446,15 @@ public class MS1Test extends BaseSeleniumWebTest
 
         assertCharts();
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
-        assertTrue(isButtonDisabled("<< Previous Feature"));
+        Assert.assertTrue(isButtonDisabled("<< Previous Feature"));
 
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
         clickNavButton("Next Feature >>");
-        assertTrue(isButtonDisabled("Next Feature >>"));
+        Assert.assertTrue(isButtonDisabled("Next Feature >>"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
         clickNavButton("<< Previous Feature");
-        assertTrue(isButtonDisabled("<< Previous Feature"));
+        Assert.assertTrue(isButtonDisabled("<< Previous Feature"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
 
         log("showFeatureDetails.view OK");
@@ -476,7 +477,7 @@ public class MS1Test extends BaseSeleniumWebTest
         String base = urlCur.substring(0, urlCur.indexOf("showFeatureDetails.view"));
 
         selenium.open(base + src.substring(src.indexOf("showChart.view?")));
-        assertTrue(200 == getResponseCode());
+        Assert.assertTrue(200 == getResponseCode());
         selenium.open(urlCur);
     }
 

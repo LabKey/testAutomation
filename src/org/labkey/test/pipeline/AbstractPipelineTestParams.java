@@ -217,7 +217,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     {
         File analysisDir = new File(rootDir, getDataPath() + File.separatorChar + getProtocolType());
         if (analysisDir.exists())
-            BaseSeleniumWebTest.fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
+            Assert.fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
     }
 
     public void clean(File rootDir) throws IOException

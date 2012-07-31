@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -230,7 +231,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             if (cpw != 0)
                 computed = sc / cpw * 1000000;
 
-            assertEquals(computed.intValue(), nsc.intValue());
+            Assert.assertEquals(computed.intValue(), nsc.intValue());
         }
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.revertUnsavedView(this);
@@ -267,11 +268,11 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         int row = 0;
         for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, "Atg1CMean"));
+            Assert.assertEquals(mean, table.getDataAsText(row++, "Atg1CMean"));
 
         row = 0;
         for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, "Atg1CMedian"));
+            Assert.assertEquals(median, table.getDataAsText(row++, "Atg1CMedian"));
 
         // verify customization of the run details view is possible
         CustomizeViewsHelper.openCustomizeViewPanel(this);
@@ -426,7 +427,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
-            assertEquals("Background subtraction should be disabled by default.", "false", item);
+            Assert.assertEquals("Background subtraction should be disabled by default.", "false", item);
         }
 
         runTable.checkAllOnPage();
@@ -444,13 +445,13 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         Iterator<String> means = Arrays.asList("0.0", "2271111.1", "1111.1", "4444.4").iterator();
         for (String mean : table.getColumnDataAsText("Atg1AMean"))
-            assertEquals(means.next(), mean);
+            Assert.assertEquals(means.next(), mean);
 
         Iterator<String> medians = Arrays.asList("0.0", "2376666.7", "3333.3", "6666.7").iterator();
         for (String median : table.getColumnDataAsText("Atg1AMedian"))
-            assertEquals(medians.next(), median);
+            Assert.assertEquals(medians.next(), median);
 
-        //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
+        //Assert.assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         // Check that all runs have been subtracted
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
@@ -458,7 +459,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
-            assertEquals("Background subtraction should be true for all runs.", "true", item);
+            Assert.assertEquals("Background subtraction should be true for all runs.", "true", item);
         }
     }
 
@@ -486,19 +487,19 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
-            assertEquals("Background subtraction should be true for all runs.", "true", item);
+            Assert.assertEquals("Background subtraction should be true for all runs.", "true", item);
         }
 
         clickLinkWithText("run details");
         waitForElement(Locator.css("#plate-summary-div-1 table"));
-        //assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
+        //Assert.assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         DataRegionTable detailsTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" AntigenStats", this, true, true);
         column = detailsTable.getColumnDataAsText("BackgroundMedian");
         String[] expectedColumn = {"0.0","0.0","9.5","0.0"};
         for(int i = 0; i < 4; i++)
         {
-            assertEquals("Incorrect background value for " + detailsTable.getDataAsText(i, "Participant ID"), expectedColumn[i], column.get(i));
+            Assert.assertEquals("Incorrect background value for " + detailsTable.getDataAsText(i, "Participant ID"), expectedColumn[i], column.get(i));
         }
     }
 

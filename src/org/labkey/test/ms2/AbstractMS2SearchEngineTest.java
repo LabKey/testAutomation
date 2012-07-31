@@ -16,6 +16,7 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -141,7 +142,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Make sure new protocol is listed.");
         waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_JAVASCRIPT);
-        assertEquals("test2", getSelectedOptionText("protocol"));
+        Assert.assertEquals("test2", getSelectedOptionText("protocol"));
 
         if (!isLinkPresentWithText("running") && isLinkPresentWithText("completed"))
             assertTextPresent("running");
@@ -216,6 +217,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("Libra config name", "Libra normalization channel");
         setFormElement("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input", "foo");
         String text = getFormElement("configureXml");
-        assertTrue(text.contains("foo"));
+        Assert.assertTrue(text.contains("foo"));
     }
 }

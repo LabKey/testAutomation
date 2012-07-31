@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -98,11 +99,11 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         waitForText("Transition List");
         DataRegionTable drt = new DataRegionTable("transitions_view", this);
         drt.getDataAsText(5, "Precursor");
-        assertEquals("LTSLNVVAGSDLR", drt.getDataAsText(5, "Precursor"));
-        assertEquals("heavy", drt.getDataAsText(5, "Label"));
-        assertEquals("1343.7408", drt.getDataAsText(5, "Peptide Neutral Mass"));
-        assertEquals("677.8818", drt.getDataAsText(5, "Q1 m/z"));
-        assertEquals("727.3973", drt.getDataAsText(5, "Q3 m/z"));
+        Assert.assertEquals("LTSLNVVAGSDLR", drt.getDataAsText(5, "Precursor"));
+        Assert.assertEquals("heavy", drt.getDataAsText(5, "Label"));
+        Assert.assertEquals("1343.7408", drt.getDataAsText(5, "Peptide Neutral Mass"));
+        Assert.assertEquals("677.8818", drt.getDataAsText(5, "Q1 m/z"));
+        Assert.assertEquals("727.3973", drt.getDataAsText(5, "Q3 m/z"));
 
         //Click down arrow next to protein name. Click "Search for other references to this protein"
 

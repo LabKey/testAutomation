@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -223,9 +224,9 @@ public class MessagesTest extends BaseSeleniumWebTest
             }
             catch (Exception e)
             {
-               fail(e.getMessage());
+               Assert.fail(e.getMessage());
             }
-            assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
+            Assert.assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
         }
     }
 }

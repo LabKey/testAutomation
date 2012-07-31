@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PerlHelper;
@@ -38,7 +39,7 @@ public class LuminexPositivityTest extends LuminexTest
     protected void ensureConfigured()
     {
         if(!PerlHelper.ensurePerlConfig(this))
-            fail("No Perl engine");
+            Assert.fail("No Perl engine");
         super.ensureConfigured();
     }
 
@@ -101,10 +102,10 @@ public class LuminexPositivityTest extends LuminexTest
         DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
         drt.ensureColumnsPresent("Description", "Specimen ID", "Participant ID", "Visit ID", "Date");
         int rowID = drt.getIndexWhereDataAppears(description, "Description");
-        assertEquals(specimenID, drt.getDataAsText(rowID, "Specimen ID"));
-        assertEquals(participantID, drt.getDataAsText(rowID, "Participant ID"));
-        assertEquals(visitID, drt.getDataAsText(rowID, "Visit ID"));
-        assertEquals(date, drt.getDataAsText(rowID, "Date"));
+        Assert.assertEquals(specimenID, drt.getDataAsText(rowID, "Specimen ID"));
+        Assert.assertEquals(participantID, drt.getDataAsText(rowID, "Participant ID"));
+        Assert.assertEquals(visitID, drt.getDataAsText(rowID, "Visit ID"));
+        Assert.assertEquals(date, drt.getDataAsText(rowID, "Date"));
     }
 
     private void checkPositivityValues(String type, int numExpected, String[] positivityWells)
@@ -121,7 +122,7 @@ public class LuminexPositivityTest extends LuminexTest
         for(String well : positivityWells)
         {
             int i = wells.indexOf(well);
-            assertEquals(type, posivitiy.get(i));
+            Assert.assertEquals(type, posivitiy.get(i));
         }
 
         //verify correctly parsed the description file into participant id, visit id, and date

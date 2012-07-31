@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
@@ -53,7 +54,7 @@ public class RlabkeyTest extends SimpleApiTest
         File listArchive = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip");
 
         if (!listArchive.exists())
-            fail("Unable to locate the list archive: " + listArchive.getName());
+            Assert.fail("Unable to locate the list archive: " + listArchive.getName());
 
         ListHelper.importListArchive(this, PROJECT_NAME, listArchive);
         // create an issues list in a project and subfolder to test ContainerFilters.
@@ -120,7 +121,7 @@ public class RlabkeyTest extends SimpleApiTest
                     String verify = test.getReponse().trim();
 
                     if (!RReportHelper.executeScript(this, sb.toString(), verify))
-                        fail("Failed executing R script for test case: " + test.getName());
+                        Assert.fail("Failed executing R script for test case: " + test.getName());
                 }
                 RReportHelper.saveReport(this, "dummy");
             }

@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.internal.seleniumemulation.IsElementPresent;
 
 import java.util.ArrayList;
 import java.util.List;

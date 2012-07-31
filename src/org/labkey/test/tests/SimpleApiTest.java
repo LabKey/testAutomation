@@ -21,6 +21,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseSeleniumWebTest;
@@ -128,7 +129,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         }
         catch (Exception e)
         {
-            fail("An unexpected error occurred: " + e.getMessage());
+            Assert.fail("An unexpected error occurred: " + e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -152,7 +153,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         if (url != null)
             testCase.setUrl(StringUtils.trim(url));
         else
-            fail("Test case did not have the required url element");
+            Assert.fail("Test case did not have the required url element");
 
         String response = element.getResponse();
         if (response != null)
@@ -199,11 +200,11 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                     _helper.assertEquals("FAILED: test " + name, expectedResponse, response);
                 }
                 else
-                    fail(String.format("FAILED: test %s failed with status code: %s", name, status));
+                    Assert.fail(String.format("FAILED: test %s failed with status code: %s", name, status));
             }
             catch (IOException e)
             {
-                fail("Test failed requesting the URL: " + e.getMessage());
+                Assert.fail("Test failed requesting the URL: " + e.getMessage());
             }
             finally
             {
@@ -228,7 +229,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         }
 
         if (isElementPresent(Locator.raw("//div[@id='lblStatus' and contains(text(), 'ERROR')]")))
-            fail("The request has failed: " + url);
+            Assert.fail("The request has failed: " + url);
 
         waitForText("Request Complete", defaultWaitForPage);
 

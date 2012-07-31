@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
@@ -319,7 +320,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("Empty script, a script must be provided.");
         if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
-                fail("There was an error running the script");
+                Assert.fail("There was an error running the script");
         assertTextPresent("Error");//("Error executing command");
 //        assertTextPresent("Error: object \"badString\" not found");
         // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
@@ -333,7 +334,7 @@ public class ReportTest extends StudyBaseTest
         log("Execute and save a script");
         if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
-                fail("There was an error running the script");
+                Assert.fail("There was an error running the script");
         log("Check that the script executed properly");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
@@ -403,7 +404,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
-                fail("There was an error running the script");
+                Assert.fail("There was an error running the script");
         clickSourceTab();
         checkCheckbox("shareReport");
         checkCheckbox("runInBackground");
@@ -457,7 +458,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!RReportHelper.executeScript(this, R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
-                fail("There was an error running the script");
+                Assert.fail("There was an error running the script");
         assertTextPresent(R_SCRIPT2_TEXT1);
         resaveReport();
         ExtHelper.waitForExtDialog(this, "Save View");
@@ -470,7 +471,7 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink(R_SCRIPTS[0], "edit");
         if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!RReportHelper.executeScript(this, R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
-                fail("There was an error running the script");
+                Assert.fail("There was an error running the script");
         resaveReport();
         waitForPageToLoad();
 
@@ -598,7 +599,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("URL must be absolute");
         setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
-        assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
+        Assert.assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
         ExtHelper.uncheckCheckbox(this, "Open link report in new window?");
         clickNavButton("Save");
         // save should return back to manage views page
@@ -611,7 +612,7 @@ public class ReportTest extends StudyBaseTest
         setFormElement("description", LINK_REPORT2_DESCRIPTION);
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
-        assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
+        Assert.assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
         clickNavButton("Save");
         // save should return back to Clinical and Assay Data tab
         waitForText("Data Views");
@@ -619,7 +620,7 @@ public class ReportTest extends StudyBaseTest
         goToManageViews();
         pushLocation();
         clickReportGridLink(LINK_REPORT1_NAME, "view");
-        assertTrue("Expected link report to go to '" + LINK_REPORT1_URL + "', but was '" + getCurrentRelativeURL() + "'",
+        Assert.assertTrue("Expected link report to go to '" + LINK_REPORT1_URL + "', but was '" + getCurrentRelativeURL() + "'",
                 getURL().toString().contains(LINK_REPORT1_URL));
         popLocation();
 
@@ -627,7 +628,7 @@ public class ReportTest extends StudyBaseTest
         // To avoid opening a new browser window, let's just check that the link has the target="_blank" attribute.
         Locator link = getReportGridLink(LINK_REPORT2_NAME, "view");
         String target = getAttribute(link, "target");
-        assertEquals("_blank", target);
+        Assert.assertEquals("_blank", target);
     }
 
     private void saveReport(String name)
@@ -674,7 +675,7 @@ public class ReportTest extends StudyBaseTest
             while (isTextPresent(script))
             {
                 click(Locator.raw("//a[contains(text(),'" + script + "')]/../../td[3]/a"));
-                assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
+                Assert.assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
                 waitForPageToLoad();
             }
             assertTextNotPresent(script);
@@ -859,7 +860,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
         waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][18]"), WAIT_FOR_JAVASCRIPT);
-        assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
 
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "2a. Creatinine", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);
@@ -879,7 +880,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "2a. Creatinine");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
         waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
-        assertEquals("Wrong number of measures visible after filtering.", 4, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Wrong number of measures visible after filtering.", 4, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
         ExtHelper.clickX4GridPanelCheckbox(this, "queryName", "CPS-1", "measuresGridPanel", true);
         clickNavButton("Select", 0);
 
@@ -974,7 +975,7 @@ public class ReportTest extends StudyBaseTest
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
-        assertEquals("Wrong report description", PARTICIPANT_REPORT_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
+        Assert.assertEquals("Wrong report description", PARTICIPANT_REPORT_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
 
 
         // verify modified, saved-as report
@@ -990,7 +991,7 @@ public class ReportTest extends StudyBaseTest
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
-        assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
+        Assert.assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, ExtHelper.getExtFormElementByLabel(this, "Report Description"));
 
         // Test group filtering
         goToManageViews();
@@ -1092,8 +1093,8 @@ public class ReportTest extends StudyBaseTest
         //Mouse down on SPEC GROUP 1
         mouseDownGridCellCheckbox(SPECIMEN_GROUP_ONE);
         waitForText("Showing 1 Results");
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
         mouseDownGridCellCheckbox(SPECIMEN_GROUP_TWO);
@@ -1101,8 +1102,8 @@ public class ReportTest extends StudyBaseTest
         //Remove SPEC GROUP 1
         mouseDownGridCellCheckbox(SPECIMEN_GROUP_ONE);
         waitForText("Showing 1 Results");
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
@@ -1350,7 +1351,7 @@ public class ReportTest extends StudyBaseTest
     private void assertSVG(String expectedSvgText)
     {
         String actualSvgText = getText(Locator.css("svg"));
-        assertEquals("SVG did not look as expected", expectedSvgText, actualSvgText);
+        Assert.assertEquals("SVG did not look as expected", expectedSvgText, actualSvgText);
     }
 
     private void saveBoxPlot(String name, String description)

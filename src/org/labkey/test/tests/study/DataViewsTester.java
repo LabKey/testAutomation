@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.study;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.StudyBaseTest;
@@ -82,11 +83,11 @@ public class DataViewsTester
         _test.assertTextNotPresent(CATEGORIES[0]);
         _test.assertTextNotPresent(CATEGORIES[1]);
         _test.assertTextNotPresent(CATEGORIES[2]);
-        _test.assertEquals("Incorrect number of dataset categories visible.", 2, _test.getXpathCount(Locator.xpath("//div[contains(@class, 'x4-grid-group-title')]"))); // Two categories contain filter text.
+        Assert.assertEquals("Incorrect number of dataset categories visible.", 2, _test.getXpathCount(Locator.xpath("//div[contains(@class, 'x4-grid-group-title')]"))); // Two categories contain filter text.
         // 10 datasets(CATEGORIES[3]) + 7 datasets(CATEGORIES[4]) - 1 hidden dataset == 16?
-        _test.assertEquals("Incorrect number of datasets after filter", 16, _test.getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Incorrect number of datasets after filter", 16, _test.getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
         collapseCategory(CATEGORIES[3]);
-        _test.assertEquals("Incorrect number of datasets after collapsing category.", 6, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Incorrect number of datasets after collapsing category.", 6, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
         _test.clickWebpartMenuItem("Data Views", false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         ExtHelper.uncheckCheckbox(_test, "datasets");
@@ -95,7 +96,7 @@ public class DataViewsTester
         setDataBrowseSearch("");
         _test.waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.assertTextPresent(WEBPART_TITLE);
-        _test.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
 
         _test.log("Verify cancel button");
         _test.clickWebpartMenuItem("Data Views", false, "Customize");
@@ -109,7 +110,7 @@ public class DataViewsTester
         _test.waitForText(REPORT_NAME); //TODO: /
         _test.assertTextNotPresent("nothing");
         _test.assertTextPresent(WEBPART_TITLE);
-        _test.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
 
         _test.log("Verify category management");
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");

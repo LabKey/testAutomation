@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import com.thoughtworks.selenium.Selenium;
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -35,7 +36,7 @@ public class ExtHelper
         if (!test.isElementPresent(menu))
             menu = Locator.navButton(menusLabel);
         if (!test.isElementPresent(menu))
-            BaseSeleniumWebTest.fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
+            Assert.fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
         clickExtMenuButton(test, wait, menu, subMenuLabels);
     }
 
@@ -99,7 +100,7 @@ public class ExtHelper
             test.sleep(500);
         }
 
-        test.fail("Failed to get element id for Ext component '" + extId + "'");
+        Assert.fail("Failed to get element id for Ext component '" + extId + "'");
         return null;
     }
 
@@ -197,7 +198,7 @@ public class ExtHelper
         else if( test.isElementPresent(Locator.xpath(ext4Dialog)) )
             return ext4Dialog;
         else
-            BaseSeleniumWebTest.fail("Unable to locate Ext dialog: '" + windowTitle + "'");
+            Assert.fail("Unable to locate Ext dialog: '" + windowTitle + "'");
         return null; // unreachable
     }
 
@@ -536,7 +537,7 @@ public class ExtHelper
         if(!isChecked(test, label))
             test.click(checkbox);
         if(!isChecked(test, label))
-            BaseSeleniumWebTest.fail("Failed to check checkbox '" + label + "'.");
+            Assert.fail("Failed to check checkbox '" + label + "'.");
     }
 
     public static void uncheckCheckbox(BaseSeleniumWebTest test, String label)
@@ -545,7 +546,7 @@ public class ExtHelper
         if(isChecked(test, label))
             test.click(checkbox);
         if(isChecked(test, label))
-            BaseSeleniumWebTest.fail("Failed to uncheck checkbox '" + label + "'.");
+            Assert.fail("Failed to uncheck checkbox '" + label + "'.");
     }
 
     public static boolean isChecked(BaseSeleniumWebTest test, String label)

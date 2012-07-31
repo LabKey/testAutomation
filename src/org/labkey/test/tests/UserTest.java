@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 
 /**
@@ -173,7 +174,7 @@ public class UserTest extends SecurityTest
         clickLinkWithText(NORMAL_USER);
         selenium.chooseOkOnNextConfirmation();
         clickButtonContainingText("Reset Password", 0);
-        assertTrue(selenium.getConfirmation().startsWith("You are about to clear the user's current password"));
+        Assert.assertTrue(selenium.getConfirmation().startsWith("You are about to clear the user's current password"));
         waitForPageToLoad();
         clickLinkWithText("Done");
         // View reset password email.
@@ -219,7 +220,7 @@ public class UserTest extends SecurityTest
         if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)))
             return;
 
-        assertFalse("Checkbox not set for element: " + fieldName, false);
+        Assert.assertFalse("Checkbox not set for element: " + fieldName, false);
     }
 
     private void navigateToUserDetails(String userName)

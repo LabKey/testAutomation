@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.EmailRecordTable;
@@ -171,7 +172,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list yet
         clickNavButton("New Issue");
         String assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
-        assertEquals(assignedToText, "");
+        Assert.assertEquals(assignedToText, "");
 
         // Add to group so user appears
         clickLinkWithText("IssuesVerifyProject");
@@ -182,9 +183,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         // InsertAction
         clickNavButton("New Issue");
         assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
-        assertEquals(assignedToText, getDisplayName());
+        Assert.assertEquals(assignedToText, getDisplayName());
         String customStringText = getText(Locator.xpath("//select[@name='string5']"));
-        assertEquals(customStringText, "Cadmium Polonium");
+        Assert.assertEquals(customStringText, "Cadmium Polonium");
         setFormElement("title", ISSUE_TITLE_0);
         selectOptionByText("type", "UFO");
         selectOptionByText("area", "Area51");
@@ -378,11 +379,11 @@ public class IssuesTest extends BaseSeleniumWebTest
         EmailMessage message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been opened and assigned to " + USER1);
 
         // Presumed to get the first message
-        assertTrue("User did not receive issue notification",      PasswordUtil.getUsername().equals(message.getTo()[0]));
-        assertTrue(USER2 + " did not receieve issue notification", USER2.equals(emailTable.getDataAsText(1, "To")));
-        assertTrue(USER1 + " did not receieve issue notification", USER1.equals(emailTable.getDataAsText(2, "To")));
+        Assert.assertTrue("User did not receive issue notification",      PasswordUtil.getUsername().equals(message.getTo()[0]));
+        Assert.assertTrue(USER2 + " did not receieve issue notification", USER2.equals(emailTable.getDataAsText(1, "To")));
+        Assert.assertTrue(USER1 + " did not receieve issue notification", USER1.equals(emailTable.getDataAsText(2, "To")));
 
-        assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
+        Assert.assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
 
         assertTextPresent("Customized template line: Cadmium", 3);
         assertTextNotPresent("This line shouldn't appear");
@@ -403,8 +404,8 @@ public class IssuesTest extends BaseSeleniumWebTest
         emailTable = new EmailRecordTable(this);
         message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been updated");
 
-        assertTrue(USER3 + " did not receieve updated issue notification", USER3.equals(message.getTo()[0]));
-        assertTrue("User did not receive updated issue notification",      PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
+        Assert.assertTrue(USER3 + " did not receieve updated issue notification", USER3.equals(message.getTo()[0]));
+        Assert.assertTrue("User did not receive updated issue notification",      PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
     }
 
     private void entryTypeNameTest()
@@ -483,7 +484,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)))
             return;
 
-        assertFalse("Checkbox not set for element: " + fieldName, false);
+        Assert.assertFalse("Checkbox not set for element: " + fieldName, false);
     }
 
     private void viewSelectedDetailsTest()
@@ -571,11 +572,11 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         // Verify the URL of ISSUE_TITLE_0 goes to PROJECT_NAME
         String href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_0), "href");
-        assertTrue("Expected issue details URL to link to project container", href.contains("/issues/" + PROJECT_NAME + "/details.view"));
+        Assert.assertTrue("Expected issue details URL to link to project container", href.contains("/issues/" + PROJECT_NAME + "/details.view"));
 
         // Verify the URL of ISSUE_TITLE_3 goes to PROJECT_NAME/SUB_FOLDER_NAME
         href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_3), "href");
-        assertTrue("Expected issue details URL to link to sub-folder container", href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view"));
+        Assert.assertTrue("Expected issue details URL to link to sub-folder container", href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view"));
     }
 
 }

@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.UIContainerHelper;
@@ -55,7 +56,7 @@ public class BasicTest extends BaseSeleniumWebTest
     {
         log("Test browser version");
         String source = getHtmlSource();
-        assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 14.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
+        Assert.assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 14.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
 
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
@@ -172,7 +173,7 @@ public class BasicTest extends BaseSeleniumWebTest
             }
 
             double versionNumber = Double.parseDouble(version.substring(browserNameAndSeparator.length()));
-            assertTrue("The LabKey test suite requires " + browserNameAndSeparator.substring(0, browserNameAndSeparator.length() - 1) + " " + startVersion + " - " + endVersion, versionNumber >= startVersion && versionNumber <= endVersion);
+            Assert.assertTrue("The LabKey test suite requires " + browserNameAndSeparator.substring(0, browserNameAndSeparator.length() - 1) + " " + startVersion + " - " + endVersion, versionNumber >= startVersion && versionNumber <= endVersion);
             log("Browser = " + version);
             return true;
         }

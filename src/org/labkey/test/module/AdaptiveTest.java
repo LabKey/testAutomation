@@ -16,6 +16,7 @@
 
 package org.labkey.test.module;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -749,7 +750,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         Locator table = Locator.xpath("(//table [@class = 'adaptive-statistics-table'])[" + tableNum + "]//tr[" + row + "]/td[" + column + "]");
         waitForElement(table, WAIT_FOR_JAVASCRIPT);
         String actual = getText(table);
-        assertEquals("Did not find expected value '" + expected + "' in \"" + tableNum + "\"." + row + "." + column + ".", expected, actual);
+        Assert.assertEquals("Did not find expected value '" + expected + "' in \"" + tableNum + "\"." + row + "." + column + ".", expected, actual);
     }
 
     private void setAnalysisPlotType(String id)
@@ -846,7 +847,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
         }
         catch ( IOException e )
         {
-            fail("_header.html not found in sample data dir: " + headerFile.getParent());
+            Assert.fail("_header.html not found in sample data dir: " + headerFile.getParent());
         }
 
         setWikiBody(header);
@@ -918,7 +919,7 @@ public class AdaptiveTest extends BaseSeleniumWebTest
 
         if ( messageRow == -1 )
         {
-            fail("Unable to locate message [" + messageSubject + "], to [" + messageTo + "], row[" + (startRow)+ ".." + maxRow + "]");
+            Assert.fail("Unable to locate message [" + messageSubject + "], to [" + messageTo + "], row[" + (startRow)+ ".." + maxRow + "]");
         }
 
         // expand message text.

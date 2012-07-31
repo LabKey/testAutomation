@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
@@ -116,7 +117,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 Maps.<String, Object>of("Name", "Honda")
         ));
         SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
-        assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
         Long fordId = null;
         Long toyotaId = null;
@@ -126,8 +127,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         {
             Long rowId = (Long)row.get("RowId");
             String name = (String)row.get("Name");
-            assertNotNull("Expected response row to have a Name column", name);
-            assertNotNull("Expected response row to have a RowId column", rowId);
+            Assert.assertNotNull("Expected response row to have a Name column", name);
+            Assert.assertNotNull("Expected response row to have a RowId column", rowId);
             if (name.equalsIgnoreCase("Ford"))
                 fordId = rowId;
             else if (name.equalsIgnoreCase("Toyota"))
@@ -135,7 +136,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
             else if (name.equalsIgnoreCase("Honda"))
                 hondaId = rowId;
         }
-        assertTrue("Expected rowids for all Manufacturers", fordId != null && toyotaId != null && hondaId != null);
+        Assert.assertTrue("Expected rowids for all Manufacturers", fordId != null && toyotaId != null && hondaId != null);
 
         log("** Inserting new Models via javas client api...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
@@ -152,7 +153,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                                         "Name", "Pinto")
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
-        assertEquals("Expected to insert 5 rows.", 5, insertResp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to insert 5 rows.", 5, insertResp.getRowsAffected().intValue());
 
         Long priusId = null;
         Long f150Id = null;
@@ -166,8 +167,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
             else if (name.equalsIgnoreCase("F150"))
                 f150Id = rowId;
         }
-        assertNotNull(priusId);
-        assertNotNull(f150Id);
+        Assert.assertNotNull(priusId);
+        Assert.assertNotNull(f150Id);
 
         log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
@@ -182,7 +183,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("Hooray!");
         String rowidStr = getText(Locator.id("model.rowid"));
         int rowid = Integer.parseInt(rowidStr);
-        assertTrue("Expected rowid on model.html page", rowid > 0);
+        Assert.assertTrue("Expected rowid on model.html page", rowid > 0);
 
         log("** Testing query of vehicle schema...");
         beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
@@ -206,7 +207,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 Maps.<String, Object>of("Name", "Blue", "Hex", "#0000FF")
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
-        assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
         log("** Inserting vechicles...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
@@ -227,7 +228,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 )
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
-        assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
 
         Long[] vehicleIds = new Long[2];
         vehicleIds[0] = (Long)(insertResp.getRows().get(0).get("RowId"));
@@ -245,29 +246,29 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         try
         {
             SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
-            fail("Expected to throw CommandException");
+            Assert.fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
-    //            assertEquals("The row is from the wrong container.", ex.getMessage());
+            Assert.assertEquals(401, ex.getStatusCode());
+    //            Assert.assertEquals("The row is from the wrong container.", ex.getMessage());
         }
 
         // Make sure that the schema isn't resolved if the module is not enabled in the container
         try
         {
             SaveRowsResponse updateRows = updateCmd.execute(cn, "Shared");
-            fail("Expected to throw CommandException");
+            Assert.fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
         {
-            assertEquals("The schema 'vehicle' does not exist.", ex.getMessage());
+            Assert.assertEquals("The schema 'vehicle' does not exist.", ex.getMessage());
         }
 
         log("** Updating vehicles...");
         SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName());
-        assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
-        assertEquals(4, ((Number)(updateRows.getRows().get(0).get("Milage"))).intValue());
+        Assert.assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
+        Assert.assertEquals(4, ((Number)(updateRows.getRows().get(0).get("Milage"))).intValue());
 
 
         log("** Testing vehicle.Vehicles details url link...");
@@ -277,7 +278,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("Hooray!");
         rowidStr = getText(Locator.id("vehicle.rowid"));
         rowid = Integer.parseInt(rowidStr);
-        assertTrue("Expected rowid on vehicle.html page", rowid > 0);
+        Assert.assertTrue("Expected rowid on vehicle.html page", rowid > 0);
 
 
         log("** Insert vehicle into subfolder...");
@@ -292,21 +293,21 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 )
         ));
         insertResp = insertCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
-        assertEquals("Expected to insert 1 row.", 1, insertResp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to insert 1 row.", 1, insertResp.getRowsAffected().intValue());
         
         log("** Select with url containerFilter");
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
-        assertEquals("Expected to select 3 rows.", 3, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Expected to select 3 rows.", 3, selectResp.getRowCount().intValue());
 
         log("** Select with customView with containerFilter");
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         selectCmd.setViewName("VehiclesInCurrentAndSubfolders");
         selectResp = selectCmd.execute(cn, getProjectName());
-        assertEquals("Expected to select 3 rows.", 3, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Expected to select 3 rows.", 3, selectResp.getRowCount().intValue());
 
         log("** Select with customView with containerFilter, override with url containerFilter");
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
@@ -314,13 +315,13 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         selectCmd.setContainerFilter(ContainerFilter.Current);
         selectCmd.setViewName("VehiclesInCurrentAndSubfolders");
         selectResp = selectCmd.execute(cn, getProjectName());
-        assertEquals("Expected to select 2 rows.", 2, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Expected to select 2 rows.", 2, selectResp.getRowCount().intValue());
 
         log("** Select with no container filter");
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         selectResp = selectCmd.execute(cn, getProjectName());
-        assertEquals("Expected to select 2 rows.", 2, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Expected to select 2 rows.", 2, selectResp.getRowCount().intValue());
 
         DeleteRowsCommand deleteCmd = new DeleteRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         deleteCmd.setRows(selectResp.getRows());
@@ -328,12 +329,12 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         {
             log("** Trying to delete Vehicles from a different container");
             SaveRowsResponse deleteResp = deleteCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
-            fail("Expected to throw CommandException");
+            Assert.fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
-//            assertEquals("The row is from the wrong container.", ex.getMessage());
+            Assert.assertEquals(401, ex.getStatusCode());
+//            Assert.assertEquals("The row is from the wrong container.", ex.getMessage());
         }
     }
 
@@ -393,7 +394,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                     deleteCmd.execute(cn, c);
                 }
                 
-                assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, "Home").getRowCount().intValue());
+                Assert.assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, "Home").getRowCount().intValue());
             }
         }
         catch (CommandException e)
@@ -430,7 +431,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextPresent("This is a web part view in the simple test module");
 
         String value = getWrapper().getEval("window.LABKEY.moduleContext.simpletest.scriptLoaded");
-        assertEquals("Module context not being loaded propertly", "true", value);
+        Assert.assertEquals("Module context not being loaded propertly", "true", value);
     }
 
     private void createList()
@@ -512,10 +513,10 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         clickButton("Import Data");
-        assertTrue("Import message not present", isTextPresent("Hello. Please read this before you import data"));
+        Assert.assertTrue("Import message not present", isTextPresent("Hello. Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");
-        assertTrue("Wrong number of templates found", getXpathCount((Locator.XPathLocator)l) == 2);
+        Assert.assertTrue("Wrong number of templates found", getXpathCount((Locator.XPathLocator)l) == 2);
     }
 
     private void doTestContainerColumns() throws Exception
@@ -530,11 +531,11 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         selectCmd.setColumns(columns);
         selectCmd.setRequiredVersion(9.1);
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
-        assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
 
         Map<String,Object> row = selectResp.getRows().get(0);
         String entityId = (String)((JSONObject)row.get("EntityId")).get("value");
-        assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((JSONObject)row.get("Path")).get("value"));
+        Assert.assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((JSONObject)row.get("Path")).get("value"));
 
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
@@ -543,8 +544,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         selectResp = selectCmd.execute(cn, getProjectName());
         JSONObject vehicleRow = (JSONObject)(selectResp.getRows().get(0)).get("container");
 
-        assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
-        assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
+        Assert.assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
+        Assert.assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
 
     }
 
@@ -564,7 +565,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         setFormElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), "P");
         clickNavButton("Submit", 0);
         waitForText("Manufacturer");
-        assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("headerSearchInput")));
+        Assert.assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("headerSearchInput")));
         assertTextPresent("Pinto");
         assertTextNotPresent("Prius");
     }
@@ -580,18 +581,18 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         selectCmd.setMaxRows(-1);
         selectCmd.setViewName("Filter On Letter P");
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
-        assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
-        assertEquals("Expected to return 3 columns, based on the saved view", 3, selectResp.getColumnModel().size());
+        Assert.assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Expected to return 3 columns, based on the saved view", 3, selectResp.getColumnModel().size());
 
         log("** Select using selectRows and a view with a sort in it");
         selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
         selectCmd.setViewName("SortOnModelYear");
         selectResp = selectCmd.execute(cn, getProjectName());
-        assertEquals("Expected first row to be 2001.", 2001, selectResp.getRows().get(0).get("ModelYear"));
-        assertEquals("Expected first row to be 2000.", 2000, selectResp.getRows().get(1).get("ModelYear"));
-        assertTrue("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name") != null);
-        assertEquals("Expected to return 6 columns, based on the default view", 6, selectResp.getColumnModel().size());
+        Assert.assertEquals("Expected first row to be 2001.", 2001, selectResp.getRows().get(0).get("ModelYear"));
+        Assert.assertEquals("Expected first row to be 2000.", 2000, selectResp.getRows().get(1).get("ModelYear"));
+        Assert.assertTrue("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name") != null);
+        Assert.assertEquals("Expected to return 6 columns, based on the default view", 6, selectResp.getColumnModel().size());
 
     }
 
@@ -605,7 +606,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         addWebPart("Simple Module Web Part");
         waitForText("This is a web part view in the simple test module");
 
-        assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
 
         Map<String, List<String[]>> props = new HashMap<String, List<String[]>>();
         List<String[]> propList = new ArrayList<String[]>();
@@ -618,11 +619,11 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
 
-        assertEquals("Module context not set propertly", prop1Value, getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop1));
-        assertEquals("Module context not set propertly", "FolderValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", prop1Value, getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop1));
+        Assert.assertEquals("Module context not set propertly", "FolderValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
 
         goToProjectHome();
-        assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
     }
 
     protected void assertModuleDeployed(String moduleName)

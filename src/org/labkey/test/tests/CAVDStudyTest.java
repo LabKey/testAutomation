@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -239,7 +240,7 @@ public class CAVDStudyTest extends StudyBaseTest
 //        clickLinkWithText("Edit");
 //
 //        waitForText("Timepoint Type");
-//        assertEquals(2, getXpathCount(Locator.xpath("//input[@type='radio'][@name='TimepointType'][@disabled]")));
+//        Assert.assertEquals(2, getXpathCount(Locator.xpath("//input[@type='radio'][@name='TimepointType'][@disabled]")));
     }
 
     private void doVerifyCrossContainerDatasetStatus()
@@ -468,7 +469,7 @@ public class CAVDStudyTest extends StudyBaseTest
             else if(isElementPresent(Locator.xpath(cellPath+"/input")))
                 setFormElement(Locator.xpath(cellPath+"/input"), values[i]);
             else
-                fail("Non input/select cell found when adding new " + type);
+                Assert.fail("Non input/select cell found when adding new " + type);
             switch(type)
             {
                 case Adjuvant:
@@ -504,7 +505,7 @@ public class CAVDStudyTest extends StudyBaseTest
             else if(isElementPresent(Locator.xpath(cellPath+"/input")))
                 setFormElement(Locator.xpath(cellPath+"/input"), values[i]);
             else
-                fail("Non input/select cell found when adding new antigen");
+                Assert.fail("Non input/select cell found when adding new antigen");
             _expectedVaccineDesignText.add(values[i]);
         }
 
@@ -572,7 +573,7 @@ public class CAVDStudyTest extends StudyBaseTest
             clickNavButton("Import");
         }
         else
-            fail("The dataset import .tsv file (plate001.tsv) does not exist");
+            Assert.fail("The dataset import .tsv file (plate001.tsv) does not exist");
     }
 
     private int revision = 1;

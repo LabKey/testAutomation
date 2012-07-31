@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -379,10 +380,10 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         goToModule("Dumbster");
         DataRegionTable record = new DataRegionTable("EmailRecord", this, false, false);
         List<String> subject = record.getColumnDataAsText("Message");
-        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
-        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));
+        Assert.assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
+        Assert.assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));
         List<String> to = record.getColumnDataAsText("To");
-        assertTrue("Incorrect message notifications.",
+        Assert.assertTrue("Incorrect message notifications.",
                 to.get(0).equals(RESPONDER) && to.get(1).equals(PasswordUtil.getUsername()) ||
                 to.get(1).equals(RESPONDER) && to.get(0).equals(PasswordUtil.getUsername()));
 

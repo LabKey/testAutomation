@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.DataRegionTable;
 
@@ -130,7 +131,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
         instance.log("searching for audit entry: " + msg);
         DataRegionTable table = new DataRegionTable("audit", instance, false);
         int i = table.getColumn(column);
-        assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
+        Assert.assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
     }
 
     public static boolean findTextInDataRegion(DataRegionTable table, int column, String txt, int rowsToSearch)

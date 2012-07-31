@@ -16,6 +16,7 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.ExtHelper;
@@ -74,7 +75,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+            Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         //cheehong:
         //  starting with v1.7, "Has Mascot server" checkbox removed
@@ -245,7 +246,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             refresh();
         }
         if (!isLinkPresentWithText("COMPLETE", 1))
-            fail("Mascot .dat import did not complete.");
+            Assert.fail("Mascot .dat import did not complete.");
 
         popLocation();
 
@@ -333,12 +334,12 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickNavButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
+        Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
         selenium.type("minimumProbability", "2.0");
         clickNavButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
+        Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
         selenium.type("identifier", "GarbageProteinName");

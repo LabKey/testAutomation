@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -330,8 +331,8 @@ public class AssayTest extends AbstractAssayTest
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
         clickNavButton("Save and Finish");
         assertTextPresent("There are errors in the uploaded data: VisitID must be of type Number (Double)");
-        assertEquals(TEST_RUN1, selenium.getValue("name"));
-        assertEquals(TEST_RUN1_COMMENTS, selenium.getValue("comments"));
+        Assert.assertEquals(TEST_RUN1, selenium.getValue("name"));
+        Assert.assertEquals(TEST_RUN1_COMMENTS, selenium.getValue("comments"));
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
         clickNavButton("Save and Import Another Run");
@@ -341,8 +342,8 @@ public class AssayTest extends AbstractAssayTest
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA4);
         clickNavButton("Save and Import Another Run");
 
-        assertEquals("", selenium.getValue("name"));
-        assertEquals("", selenium.getValue("comments"));
+        Assert.assertEquals("", selenium.getValue("name"));
+        Assert.assertEquals("", selenium.getValue("comments"));
         selenium.type("name", TEST_RUN2);
 		selenium.type("comments", TEST_RUN2_COMMENTS);
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN2_DATA1);
@@ -385,13 +386,13 @@ public class AssayTest extends AbstractAssayTest
 
         Locator.XPathLocator trueLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'true']");
         int totalTrues = getXpathCount(trueLocator);
-        assertEquals(4, totalTrues);
+        Assert.assertEquals(4, totalTrues);
 
         setFilter(TEST_ASSAY + " Data", "SpecimenID", "Starts With", "AssayTestControl");
 
         // verify that there are no trues showing for the assay match column that were filtered out
         totalTrues = getXpathCount(trueLocator);
-        assertEquals(0, totalTrues);
+        Assert.assertEquals(0, totalTrues);
 
         log("Check out the data for all of the runs");
         clickLinkWithText("view results");
@@ -403,13 +404,13 @@ public class AssayTest extends AbstractAssayTest
 
         Locator.XPathLocator falseLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'false']");
         int totalFalses = getXpathCount(falseLocator);
-        assertEquals(3, totalFalses);
+        Assert.assertEquals(3, totalFalses);
 
         setFilter(TEST_ASSAY + " Data", "SpecimenID", "Does Not Start With", "BAQ");
 
         // verify the falses have been filtered out
         totalFalses = getXpathCount(falseLocator);
-        assertEquals(0, totalFalses);
+        Assert.assertEquals(0, totalFalses);
 
         //Check to see that the bad specimen report includes the bad assay results and not the good ones
         //The report doesn't have top level UI (use a wiki) so just jump there.
@@ -628,11 +629,11 @@ public class AssayTest extends AbstractAssayTest
         clickTab("Overview");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Timepoints");
-        assertTrue(isTextPresent("Day 0 - 7"));
-        assertTrue(isTextPresent("Day 32 - 39"));
-        assertTrue(isTextPresent("Day 90 - 95"));
-        assertTrue(isTextPresent("Day 120 - 127"));
-        assertTrue(isTextPresent("Day 152 - 159"));
+        Assert.assertTrue(isTextPresent("Day 0 - 7"));
+        Assert.assertTrue(isTextPresent("Day 32 - 39"));
+        Assert.assertTrue(isTextPresent("Day 90 - 95"));
+        Assert.assertTrue(isTextPresent("Day 120 - 127"));
+        Assert.assertTrue(isTextPresent("Day 152 - 159"));
     } //publishDataToDateBasedStudy()
 
 
@@ -694,15 +695,15 @@ public class AssayTest extends AbstractAssayTest
         waitForPageToLoad();
 
         //validate timepoints:
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td[text()='AAA07XMC-02']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td[text()='AAA07XMC-04']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td[text()='AAA07XSF-02']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td[text()='AAA07XMC-02']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td[text()='AAA07XMC-04']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td[text()='AAA07XSF-02']]")));
 
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-09']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-08']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-11']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-09']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-08']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-11']]")));
 
         clickNavButton("Copy to Study");
 
@@ -727,12 +728,12 @@ public class AssayTest extends AbstractAssayTest
         clickTab("Overview");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Visits");
-        assertTrue(isTextPresent("Test Visit1"));
-        assertTrue(isTextPresent("6.0-13.0"));
-        assertTrue(isTextPresent("Test Visit2"));
-        assertTrue(isTextPresent("50.0-70.0"));
-        assertTrue(isTextPresent("Test Visit3"));
-        assertTrue(isTextPresent("302.0-303.0"));
+        Assert.assertTrue(isTextPresent("Test Visit1"));
+        Assert.assertTrue(isTextPresent("6.0-13.0"));
+        Assert.assertTrue(isTextPresent("Test Visit2"));
+        Assert.assertTrue(isTextPresent("50.0-70.0"));
+        Assert.assertTrue(isTextPresent("Test Visit3"));
+        Assert.assertTrue(isTextPresent("302.0-303.0"));
     } //publishDataToVisitBasedStudy()
 
     /**
@@ -864,10 +865,10 @@ public class AssayTest extends AbstractAssayTest
         //verify study properties (grid view)
         clickLinkWithText(TEST_ASSAY_FLDR_STUDIES);
         DataRegionTable table = new DataRegionTable("qwpStudies", this, false);
-        assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
-        assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));
-        assertEquals("Failed to set study grant.", GRANT, table.getDataAsText(0, "Grant"));
-        assertEquals("Failed to set study description.", DESCRIPTION, table.getDataAsText(0, "Description"));
+        Assert.assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
+        Assert.assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));
+        Assert.assertEquals("Failed to set study grant.", GRANT, table.getDataAsText(0, "Grant"));
+        Assert.assertEquals("Failed to set study description.", DESCRIPTION, table.getDataAsText(0, "Description"));
 
         //verify study properties (details view)
         clickWebpartMenuItem("Studies", "Customize");

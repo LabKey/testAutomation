@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
@@ -48,8 +49,8 @@ public class FlowImportTest extends BaseFlowTest
         importAnalysis(getContainerPath(), workspacePath, null, false, analysisFolder, false, true);
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         DataRegionTable table = new DataRegionTable("query", this, true);
-        assertEquals("Expected a single run", table.getDataRowCount(), 1);
-        assertEquals("Expected an Analysis run", table.getDataAsText(0, "Protocol Step"), "Analysis");
+        Assert.assertEquals("Expected a single run", table.getDataRowCount(), 1);
+        Assert.assertEquals("Expected an Analysis run", table.getDataAsText(0, "Protocol Step"), "Analysis");
 
         log("** import same FlowJo workspace again, with FCS files");
         importAnalysis_begin(getContainerPath());
@@ -57,7 +58,7 @@ public class FlowImportTest extends BaseFlowTest
         // assert analysis run doesn't show up in list of keyword runs
         assertTextNotPresent("Previously imported FCS file run");
         // assert microFCS directory is selected in the pipeline tree browser since it contains the .fcs files used by the workspace
-        //assertEquals("/flowjoquery/microFCS", getTreeSelection("tree"));
+        //Assert.assertEquals("/flowjoquery/microFCS", getTreeSelection("tree"));
         importAnalysis_FCSFiles(getContainerPath(), fcsFilePath, false);
         importAnalysis_analysisEngine(getContainerPath(), "noEngine");
         importAnalysis_analysisOptions(getContainerPath(), Arrays.asList("All Samples"), false, null, null, null);
@@ -69,11 +70,11 @@ public class FlowImportTest extends BaseFlowTest
         // assert one keyword run created, one additional analysis run created
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this, true);
-        assertEquals("Expected three runs", table.getDataRowCount(), 3);
+        Assert.assertEquals("Expected three runs", table.getDataRowCount(), 3);
         table.setSort("ProtocolStep", SortDirection.DESC);
-        assertEquals("Expected a Keywords run", table.getDataAsText(0, "Protocol Step"), "Keywords");
-        assertEquals("Expected an Analysis run", table.getDataAsText(1, "Protocol Step"), "Analysis");
-        assertEquals("Expected an Analysis run", table.getDataAsText(2, "Protocol Step"), "Analysis");
+        Assert.assertEquals("Expected a Keywords run", table.getDataAsText(0, "Protocol Step"), "Keywords");
+        Assert.assertEquals("Expected an Analysis run", table.getDataAsText(1, "Protocol Step"), "Analysis");
+        Assert.assertEquals("Expected an Analysis run", table.getDataAsText(2, "Protocol Step"), "Analysis");
 
         log("** import same FlowJo workspace again");
         importAnalysis_begin(getContainerPath());
@@ -91,7 +92,7 @@ public class FlowImportTest extends BaseFlowTest
 
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this, true);
-        assertEquals("Expected four runs", table.getDataRowCount(), 4);
+        Assert.assertEquals("Expected four runs", table.getDataRowCount(), 4);
 
     }
 }

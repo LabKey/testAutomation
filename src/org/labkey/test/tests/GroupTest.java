@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -146,19 +147,19 @@ public class GroupTest extends BaseSeleniumWebTest
         //IE displays correctly but selenium retrieves the data differently
         {
             //confirm correct perms
-            assertTrue(StringHelper.stringArraysAreEquivalent(new String[] {"Reader", "Author"},
+            Assert.assertTrue(StringHelper.stringArraysAreEquivalent(new String[] {"Reader", "Author"},
                     drt.getDataAsText(rowIndex, 2).split(",")));
         }
         else
         {
-            assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite: group2AuthorSite: group2, Site: Users".split(" "),
+            Assert.assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite: group2AuthorSite: group2, Site: Users".split(" "),
                     drt.getDataAsText(rowIndex, 2).split(" ")));
         }
 
 
         //exapnd plus  to check specific groups
         clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+1), "1,1");
-        assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite: group2AuthorSite: group2, Site: Users".split(" "),
+        Assert.assertTrue(StringHelper.stringArraysAreEquivalent("Reader, Author RoleGroup(s) ReaderSite: group2AuthorSite: group2, Site: Users".split(" "),
                 drt.getDataAsText(rowIndex, 2).split(" ")));
 
         //confirm hover over produces list of broups
@@ -171,13 +172,13 @@ public class GroupTest extends BaseSeleniumWebTest
                 "Which is assigned the Author role"};
         for(String msg : expectedMessagesInHierarchy)
         {
-                assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
+                Assert.assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
         }
 
         //confirm details link leads to right user, page
         clickLinkContainingText("details", rowIndex);
         assertTextPresent(TEST_USERS_FOR_GROUP[0]);
-        assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
+        Assert.assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
         goBack();
 
         //confirm username link leads to right user, page
@@ -239,16 +240,16 @@ public class GroupTest extends BaseSeleniumWebTest
     private void verifyAuthorPermission(String[][] nameTitleBody)
     {
         clickLinkContainingText(getProjectName());
-        assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP,canSeePages(nameTitleBody));
-        assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
+        Assert.assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP,canSeePages(nameTitleBody));
+        Assert.assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
         sleep(500);
     }
 
     private void verifyEditorPermission(String[][] nameTitleBody)
     {
         clickLinkContainingText(getProjectName());
-        assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
-        assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
+        Assert.assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
+        Assert.assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
         sleep(500);
     }
 
@@ -314,7 +315,7 @@ public class GroupTest extends BaseSeleniumWebTest
         ensureAdminMode();
         log("Creating project with name " + projectName);
         if (isLinkPresentWithText(projectName))
-            fail("Cannot create project; A link with text " + projectName + " already exists.  " +
+            Assert.fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         goToCreateProject();
         waitForElement(Locator.name("name"), 100*WAIT_FOR_JAVASCRIPT);

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -52,7 +53,7 @@ public class SearchHelper
                 test.sleep(10000);
                 notFound = verifySearchItems(notFound, test, container, crawlResults);
 
-                test.assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
+                Assert.assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
             }
         }
     }
@@ -99,7 +100,7 @@ public class SearchHelper
 
                 if ( crawlResults )
                 {
-                    test.fail("Search result crawling not yet implemented");
+                    Assert.fail("Search result crawling not yet implemented");
                 }
             }
         }

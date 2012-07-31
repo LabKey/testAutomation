@@ -23,6 +23,7 @@ package org.labkey.test.util;
  * To change this template use File | Settings | File Templates.
  */
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -65,7 +66,7 @@ public class ResetTracker
     {
         if(searchBoxEntry==null)
         {
-            test.fail("search box was not iniitalized to wait for refresh");
+            Assert.fail("search box was not iniitalized to wait for refresh");
         }
         String searchBoxContents = test.getFormElement(Locator.id(searchBoxId));
         return !searchBoxContents.equals(searchBoxEntry);
@@ -73,7 +74,7 @@ public class ResetTracker
 
     public void assertWasNotRefreshed()
     {
-        test.assertFalse("Page was unexpectedly refreshed", wasPageRefreshed());
+        Assert.assertFalse("Page was unexpectedly refreshed", wasPageRefreshed());
     }
 
 }

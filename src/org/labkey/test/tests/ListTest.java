@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -182,9 +183,9 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[3][2]);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
-        assertEquals("false", table.getDataAsText(1, _listCol3.getLabel()));
-        assertEquals("true",  table.getDataAsText(2, _listCol3.getLabel()));
+        Assert.assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
+        Assert.assertEquals("false", table.getDataAsText(1, _listCol3.getLabel()));
+        Assert.assertEquals("true",  table.getDataAsText(2, _listCol3.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
@@ -199,9 +200,9 @@ public class ListTest extends BaseSeleniumWebTest
         submit();
 
         table = new DataRegionTable("query", this);
-        assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
-        assertEquals("true",  table.getDataAsText(1, _listCol3.getLabel()));
-        assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
+        Assert.assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
+        Assert.assertEquals("true",  table.getDataAsText(1, _listCol3.getLabel()));
+        Assert.assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
@@ -286,8 +287,8 @@ public class ListTest extends BaseSeleniumWebTest
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = selenium.getHtmlSource();
-        assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
-        assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
+        Assert.assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
+        Assert.assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
         setFormElement("quf_" + _listCol1.getName(), TEST_DATA[1][3]);
         setFormElement("quf_" + _listCol2.getName(), "wrong type");
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
@@ -306,8 +307,8 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[2][3]);
         assertTextPresent(TEST_DATA[3][3]);
         table = new DataRegionTable("query", this);
-        assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
-        assertEquals("false", table.getDataAsText(3, _listCol3.getLabel()));
+        Assert.assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
+        Assert.assertEquals("false", table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
         dataregionToEditDesign();
@@ -448,7 +449,7 @@ public class ListTest extends BaseSeleniumWebTest
         setSort("qwp2", _listCol4.getName(), SortDirection.ASC);
         String source = selenium.getHtmlSource();
         int index;
-        assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
+        Assert.assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
                 source.indexOf(TEST_DATA[1][1], index) < source.indexOf(TEST_DATA[1][2], index));
 
         log("Test list history");
@@ -459,9 +460,9 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
-        assertEquals("details Links", 3, countLinksWithText("details"));
-        assertEquals("Project Links", 14 + 3, countLinksWithText(PROJECT_NAME)); // Table links + header & sidebar links
-        assertEquals("List Links", 14 + 1, countLinksWithText(LIST_NAME)); // Table links + header link
+        Assert.assertEquals("details Links", 3, countLinksWithText("details"));
+        Assert.assertEquals("Project Links", 14 + 3, countLinksWithText(PROJECT_NAME)); // Table links + header & sidebar links
+        Assert.assertEquals("List Links", 14 + 1, countLinksWithText(LIST_NAME)); // Table links + header link
         clickLinkWithText("details");
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");
@@ -555,7 +556,7 @@ public class ListTest extends BaseSeleniumWebTest
         checkCheckbox(".toggle");
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+        Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
         waitForPageToLoad();
         assertTextNotPresent(LIST2_KEY);
         assertTextNotPresent(LIST2_KEY2);
@@ -588,7 +589,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test exporting a nonexistent list returns a 404");
         selenium.open(WebTestHelper.getBaseURL() + exportUrl.substring(WebTestHelper.getContextPath().length()));
-        assertEquals("Incorrect response code", 404, getResponseCode());
+        Assert.assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME + "' in schema 'lists' doesn't exist.");
 
         clickNavButton("Folder");
@@ -995,7 +996,7 @@ public class ListTest extends BaseSeleniumWebTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_NAME) + "/echoForm.view"));
+            Assert.assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_NAME) + "/echoForm.view"));
         }        
         popLocation();
     }

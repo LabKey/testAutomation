@@ -17,6 +17,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.ms2.MS2TestBase;
@@ -67,7 +68,7 @@ public class MS2Test extends MS2TestBase
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+            Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         super.doTestSteps();
 
@@ -89,7 +90,7 @@ public class MS2Test extends MS2TestBase
             log("Waiting upload to complete");
             if (countLinksWithText("ERROR") > 0)
             {
-                fail("Job in ERROR state found in the list");
+                Assert.fail("Job in ERROR state found in the list");
             }
             sleep(1000);
             refresh();
@@ -800,7 +801,7 @@ public class MS2Test extends MS2TestBase
             log("Waiting upload to complete");
             if (countLinksWithText("ERROR") > 0)
             {
-                fail("Job in ERROR state found in the list");
+                Assert.fail("Job in ERROR state found in the list");
             }
             sleep(1000);
             refresh();
@@ -1158,8 +1159,8 @@ public class MS2Test extends MS2TestBase
 //        selenium.click("//div[@id='org.labkey.ms2.RunComparator']/table/tbody/tr[1]/td/table/tbody/tr[2]/td/table/tbody/tr[3]/td[5]/img");
 //        selenium.click("//input[@type='checkbox'][1]");
 //        clickNavButton("OK", 0);
-//        assertTrue(getText(Locator.raw("//div[@id='org.labkey.ms2.RunComparator']/table/tbody/tr[1]/td/table/tbody/tr[2]/td/table/tbody/tr[3]/td[3]/div")).compareTo("10") == 0);
-//        assertTrue(getText(Locator.raw("//div[contains(text(), 'Group #2')]/../td[2]")).compareTo("7") == 0);
+//        Assert.assertTrue(getText(Locator.raw("//div[@id='org.labkey.ms2.RunComparator']/table/tbody/tr[1]/td/table/tbody/tr[2]/td/table/tbody/tr[3]/td[3]/div")).compareTo("10") == 0);
+//        Assert.assertTrue(getText(Locator.raw("//div[contains(text(), 'Group #2')]/../td[2]")).compareTo("7") == 0);
 
 
 /*      DISABLED, as we're not shipping with query-based peptides comparison for now
@@ -1232,7 +1233,7 @@ public class MS2Test extends MS2TestBase
         selenium.waitForPopUp(windowName, "10000");
         selenium.selectWindow(windowName);
         assertElementPresent(Locator.imageWithAltText("Charge 3+ Cumulative Observed vs. Model", false));
-        assertEquals("Incorrect number of graphs", 13, getXpathCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
+        Assert.assertEquals("Incorrect number of graphs", 13, getXpathCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
         assertTextPresent("PeptideProphet Details: ms2pipe/truncated (pepXML)");
         selenium.close();
         selenium.selectWindow(null);

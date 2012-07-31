@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -106,16 +107,16 @@ public class RReportHelper
                 File rPackage = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/Rlabkey.zip");
 
                 if (!rPackage.exists())
-                    test.fail("Unable to locate the local Rlabkey package: " + rPackage.getName());
+                    Assert.fail("Unable to locate the local Rlabkey package: " + rPackage.getName());
 
                 String cmd = String.format(INSTALL_LOCAL_RLABKEY, rPackage.getAbsolutePath());
                 cmd = cmd.replaceAll("\\\\", "/");
                 if (!executeScript(test, cmd, null, true))
-                    test.fail("Unable to install the local Rlabkey package.");
+                    Assert.fail("Unable to install the local Rlabkey package.");
             }
         }
         else
-            test.fail("Unable to install the base Rlabkey package and dependencies.");
+            Assert.fail("Unable to install the base Rlabkey package and dependencies.");
     }
 
     public static boolean ensureRConfig(final BaseSeleniumWebTest test)
@@ -213,7 +214,7 @@ public class RReportHelper
             test.log("");   // Blank line helps make the following message more readable
             test.log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
         }
-        test.fail("R is not configured on this system. Failed R tests.");
+        Assert.fail("R is not configured on this system. Failed R tests.");
         return false;
     }
 

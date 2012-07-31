@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -106,7 +107,7 @@ public class ViabilityTest extends AbstractViabilityTest
         log("** Got confirmation: " + actualConfirmation);
 
         //This is a test for Issue 10054, which has been resolved as won't fix.
-        //assertEquals(expectConfirmation, actualConfirmation);
+        //Assert.assertEquals(expectConfirmation, actualConfirmation);
 
         setSelectedFields("/" + getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " Data", null,
                 new String[] { "Run", "ParticipantID", "VisitID", "PoolID",
@@ -116,52 +117,52 @@ public class ViabilityTest extends AbstractViabilityTest
         clickLinkContainingText(".VIA.csv"); // run name (small.VIA.csv or small-XXX.VIA.csv)
         DataRegionTable table = new DataRegionTable(getAssayName() + " Data", this);
         String runName = table.getDataAsText(0, "Run");
-        assertTrue(runName.contains("small") && runName.contains(".VIA.csv"));
-        assertEquals("160450533", table.getDataAsText(0, "Participant ID"));
-        assertEquals("5.0", table.getDataAsText(0, "Visit ID"));
-        assertEquals("160450533-5", table.getDataAsText(0, "Pool ID"));
-        assertEquals("3.700E7", table.getDataAsText(0, "Total Cells"));
-        assertEquals("3.127E7", table.getDataAsText(0, "Viable Cells"));
-        assertEquals("84.5%", table.getDataAsText(0, "Viability"));
-        assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
+        Assert.assertTrue(runName.contains("small") && runName.contains(".VIA.csv"));
+        Assert.assertEquals("160450533", table.getDataAsText(0, "Participant ID"));
+        Assert.assertEquals("5.0", table.getDataAsText(0, "Visit ID"));
+        Assert.assertEquals("160450533-5", table.getDataAsText(0, "Pool ID"));
+        Assert.assertEquals("3.700E7", table.getDataAsText(0, "Total Cells"));
+        Assert.assertEquals("3.127E7", table.getDataAsText(0, "Viable Cells"));
+        Assert.assertEquals("84.5%", table.getDataAsText(0, "Viability"));
+        Assert.assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
 
-        assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
+        Assert.assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
         if (isGroupConcatSupported())
-            assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches"));
+            Assert.assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches"));
         else
-            assertEquals("", table.getDataAsText(0, "SpecimenMatches"));
-        assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
-        assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
-        assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
-        assertEquals("true", table.getDataAsText(0, "Unreliable?"));
-        assertEquals("300", table.getDataAsText(0, "IntValue"));
+            Assert.assertEquals("", table.getDataAsText(0, "SpecimenMatches"));
+        Assert.assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
+        Assert.assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
+        Assert.assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
+        Assert.assertEquals("true", table.getDataAsText(0, "Unreliable?"));
+        Assert.assertEquals("300", table.getDataAsText(0, "IntValue"));
 
-        assertEquals("vial1", table.getDataAsText(1, "Specimen IDs"));
-        assertEquals("1", table.getDataAsText(1, "SpecimenCount"));
-        assertEquals("1", table.getDataAsText(1, "SpecimenMatchCount"));
-        assertEquals("115.67%", table.getDataAsText(1, "Recovery"));
+        Assert.assertEquals("vial1", table.getDataAsText(1, "Specimen IDs"));
+        Assert.assertEquals("1", table.getDataAsText(1, "SpecimenCount"));
+        Assert.assertEquals("1", table.getDataAsText(1, "SpecimenMatchCount"));
+        Assert.assertEquals("115.67%", table.getDataAsText(1, "Recovery"));
 
-        assertEquals("161400006", table.getDataAsText(2, "Participant ID"));
-        assertEquals("5.0", table.getDataAsText(2, "Visit ID"));
-        assertEquals("161400006.10-5", table.getDataAsText(2, "Pool ID"));
-        assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
-        assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
-        assertEquals("1", table.getDataAsText(2, "SpecimenMatchCount"));
-        assertEquals("105.78%", table.getDataAsText(2, "Recovery"));
+        Assert.assertEquals("161400006", table.getDataAsText(2, "Participant ID"));
+        Assert.assertEquals("5.0", table.getDataAsText(2, "Visit ID"));
+        Assert.assertEquals("161400006.10-5", table.getDataAsText(2, "Pool ID"));
+        Assert.assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
+        Assert.assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
+        Assert.assertEquals("1", table.getDataAsText(2, "SpecimenMatchCount"));
+        Assert.assertEquals("105.78%", table.getDataAsText(2, "Recovery"));
 
-        assertEquals("161400006", table.getDataAsText(3, "Participant ID"));
-        assertEquals("5.0", table.getDataAsText(3, "Visit ID"));
-        assertEquals("161400006.11-5", table.getDataAsText(3, "Pool ID"));
+        Assert.assertEquals("161400006", table.getDataAsText(3, "Participant ID"));
+        Assert.assertEquals("5.0", table.getDataAsText(3, "Visit ID"));
+        Assert.assertEquals("161400006.11-5", table.getDataAsText(3, "Pool ID"));
 
-        assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
-        assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
-        assertEquals("0", table.getDataAsText(4, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(4, "Recovery"));
+        Assert.assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
+        Assert.assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
+        Assert.assertEquals("0", table.getDataAsText(4, "SpecimenMatchCount"));
+        Assert.assertEquals("", table.getDataAsText(4, "Recovery"));
 
-        assertEquals("", table.getDataAsText(5, "Specimen IDs"));
-        assertEquals("0", table.getDataAsText(5, "SpecimenCount"));
-        assertEquals("", table.getDataAsText(5, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(5, "Recovery"));
+        Assert.assertEquals("", table.getDataAsText(5, "Specimen IDs"));
+        Assert.assertEquals("0", table.getDataAsText(5, "SpecimenCount"));
+        Assert.assertEquals("", table.getDataAsText(5, "SpecimenMatchCount"));
+        Assert.assertEquals("", table.getDataAsText(5, "Recovery"));
     }
 
     protected void runReRunTest()
@@ -187,24 +188,24 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log(".. checking re-runs are placed in the same Run Group");
         DataRegionTable runsTable = new DataRegionTable(getAssayName() + " Runs", this);
-        assertEquals(2, runsTable.getDataRowCount());
+        Assert.assertEquals(2, runsTable.getDataRowCount());
         String runGroupName = runsTable.getDataAsText(0, "Run Groups");
-        assertEquals(runGroupName, runsTable.getDataAsText(1, "Run Groups"));
+        Assert.assertEquals(runGroupName, runsTable.getDataAsText(1, "Run Groups"));
         runsTable.clickLink(0, "Run Groups");
 
         // Run Group name should be "Assay Name-XXX" where XXX is the run group rowid
         String runGroupRowId = getUrlParam(selenium.getLocation(), "rowId", true);
-        assertEquals(getAssayName() + "-" + runGroupRowId, runGroupName);
+        Assert.assertEquals(getAssayName() + "-" + runGroupRowId, runGroupName);
         assertTextPresent("Re-importing any Viability run in this run group will place the new run in this same run group.");
         runsTable = new DataRegionTable(getAssayName() + " Runs", this);
-        assertEquals(2, runsTable.getDataRowCount());
+        Assert.assertEquals(2, runsTable.getDataRowCount());
 
         log(".. checking appropriate fields are copied in re-run");
         clickLinkWithText(runName);
 
         DataRegionTable dataTable = new DataRegionTable(getAssayName() + " Data", this);
-        assertEquals("", dataTable.getDataAsText(0, "Unreliable?"));
-        assertEquals("300", dataTable.getDataAsText(0, "IntValue"));
+        Assert.assertEquals("", dataTable.getDataAsText(0, "Unreliable?"));
+        Assert.assertEquals("300", dataTable.getDataAsText(0, "IntValue"));
     }
 
     protected void runResultSpecimenLookupTest()
@@ -266,7 +267,7 @@ public class ViabilityTest extends AbstractViabilityTest
         List<String> specimenIDColumnValues = table.getColumnDataAsText("Specimen IDs");
         for (String s : specimenIDColumnValues)
         {
-            assertTrue("Specimen not Transformed", s.equals("Transformed"));
+            Assert.assertTrue("Specimen not Transformed", s.equals("Transformed"));
         }
     }
 
@@ -307,7 +308,7 @@ public class ViabilityTest extends AbstractViabilityTest
         log("** Test 'same' checkbox for TargetStudy");
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";
         selectOptionByText("_pool_1604505335_0_TargetStudy", targetStudyOptionText);
-        assertEquals("[None]", getSelectedOptionText("_pool_1594020325_1_TargetStudy"));
+        Assert.assertEquals("[None]", getSelectedOptionText("_pool_1594020325_1_TargetStudy"));
         clickCheckboxById("_pool_1604505335_0_TargetStudyCheckBox");
         assertOptionEquals("_pool_1594020325_1_TargetStudy", targetStudyOptionText);
         assertOptionEquals("_pool_161400006115_3_TargetStudy", targetStudyOptionText);
@@ -334,7 +335,7 @@ public class ViabilityTest extends AbstractViabilityTest
         log("** Got confirmation: " + actualConfirmation);
 
         //TODO: uncomment once Issue 10054 is resolved.
-        //assertEquals(expectConfirmation, actualConfirmation);
+        //Assert.assertEquals(expectConfirmation, actualConfirmation);
 
         clickLinkWithText(runName);
 
@@ -343,29 +344,29 @@ public class ViabilityTest extends AbstractViabilityTest
         CustomizeViewsHelper.saveDefaultView(this);
 
         DataRegionTable table = new DataRegionTable(getAssayName() + " Data", this);
-        assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
-        assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
-        assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
-        assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
-        assertEquals(getFolderName() + " Study", table.getDataAsText(0, "TargetStudy"));
+        Assert.assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
+        Assert.assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
+        Assert.assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
+        Assert.assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
+        Assert.assertEquals(getFolderName() + " Study", table.getDataAsText(0, "TargetStudy"));
 
-        assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
-        assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
-        assertEquals("0", table.getDataAsText(2, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(2, "Recovery"));
-        assertEquals("", table.getDataAsText(2, "TargetStudy"));
+        Assert.assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
+        Assert.assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
+        Assert.assertEquals("0", table.getDataAsText(2, "SpecimenMatchCount"));
+        Assert.assertEquals("", table.getDataAsText(2, "Recovery"));
+        Assert.assertEquals("", table.getDataAsText(2, "TargetStudy"));
 
-        assertEquals("vial3", table.getDataAsText(3, "Specimen IDs"));
-        assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
-        assertEquals("0", table.getDataAsText(3, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(3, "Recovery"));
-        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, "TargetStudy"));
+        Assert.assertEquals("vial3", table.getDataAsText(3, "Specimen IDs"));
+        Assert.assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
+        Assert.assertEquals("0", table.getDataAsText(3, "SpecimenMatchCount"));
+        Assert.assertEquals("", table.getDataAsText(3, "Recovery"));
+        Assert.assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, "TargetStudy"));
 
-        assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
-        assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
-        assertEquals("1", table.getDataAsText(4, "SpecimenMatchCount"));
-        assertEquals("88.88%", table.getDataAsText(4, "Recovery"));
-        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, "TargetStudy"));
+        Assert.assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
+        Assert.assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
+        Assert.assertEquals("1", table.getDataAsText(4, "SpecimenMatchCount"));
+        Assert.assertEquals("88.88%", table.getDataAsText(4, "Recovery"));
+        Assert.assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, "TargetStudy"));
 
         // UNDONE: participant/visit resolver test
         // UNDONE: copy-to-study

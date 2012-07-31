@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.*;
 import org.labkey.remoteapi.query.*;
@@ -71,7 +72,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         CreateUserResponse respNewUser = cmdNewUser.execute(cn, PROJECT_NAME);
 
         if (null == respNewUser.getUserId())
-            fail("New user id not returned from create user command!");
+            Assert.fail("New user id not returned from create user command!");
         int userId = respNewUser.getUserId().intValue();
 
         assertUserExists(USER_NAME);
@@ -160,24 +161,24 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         rowMap.put("Crazy", true);
         insertCmd.addRow(rowMap);
         SaveRowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
-        assertTrue(1 == saveResp.getRowsAffected().intValue());
+        Assert.assertTrue(1 == saveResp.getRowsAffected().intValue());
 
         //get new key value
         Number newKey = (Number)saveResp.getRows().get(0).get("Key");
-        assertTrue(null != newKey);
+        Assert.assertTrue(null != newKey);
         int key = newKey.intValue();
 
         //verify row was inserted and data comes back the same
         SelectRowsCommand selectCmd = new SelectRowsCommand("lists", LIST_NAME);
         SelectRowsResponse selResp = selectCmd.execute(cn, PROJECT_NAME);
-        assertTrue(1 == selResp.getRowCount().intValue());
+        Assert.assertTrue(1 == selResp.getRowCount().intValue());
         rowMap = selResp.getRows().get(0);
-        assertTrue("first to be inserted".equals(rowMap.get("FirstName")));
-        assertTrue("last to be inserted".equals(rowMap.get("LastName")));
-        assertTrue(rowMap.get("Birthdate") instanceof Date);
-        assertTrue(new Double(4.2).equals(rowMap.get("GooAmount")));
-        assertTrue(rowMap.get("Crazy") instanceof Boolean);
-        assertTrue(null == rowMap.get("Notes"));
+        Assert.assertTrue("first to be inserted".equals(rowMap.get("FirstName")));
+        Assert.assertTrue("last to be inserted".equals(rowMap.get("LastName")));
+        Assert.assertTrue(rowMap.get("Birthdate") instanceof Date);
+        Assert.assertTrue(new Double(4.2).equals(rowMap.get("GooAmount")));
+        Assert.assertTrue(rowMap.get("Crazy") instanceof Boolean);
+        Assert.assertTrue(null == rowMap.get("Notes"));
 
         //refresh the list in the browser and make sure it appears there too
         refresh();
@@ -193,14 +194,14 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         rowMap.put("gooamount", 5.5);
         updateCmd.addRow(rowMap);
         saveResp = updateCmd.execute(cn, PROJECT_NAME);
-        assertTrue(1 == saveResp.getRowsAffected().intValue());
+        Assert.assertTrue(1 == saveResp.getRowsAffected().intValue());
 
         //verify that row was updated
         selectCmd.addFilter("Key", key, Filter.Operator.EQUAL);
         selResp = selectCmd.execute(cn, PROJECT_NAME);
         rowMap = selResp.getRows().get(0);
-        assertTrue("UPDATED first name".equals(rowMap.get("FirstName")));
-        assertTrue(new Double(5.5).equals(rowMap.get("GooAmount")));
+        Assert.assertTrue("UPDATED first name".equals(rowMap.get("FirstName")));
+        Assert.assertTrue(new Double(5.5).equals(rowMap.get("GooAmount")));
 
         //verify that it's updated in the browser as well
         refresh();
@@ -216,7 +217,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
 
         //verify it was deleted
         selResp = selectCmd.execute(cn, PROJECT_NAME);
-        assertTrue(0 == selResp.getRowCount().intValue());
+        Assert.assertTrue(0 == selResp.getRowCount().intValue());
 
         //verify in browser as well
         refresh();
@@ -239,17 +240,17 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         //verify that the command we get back from the response object is a copy
         //yet has the same settings
         SelectRowsCommand cmdFromResp = (SelectRowsCommand)resp.getSourceCommand();
-        assertTrue(cmdFromResp != selCmd);
-        assertTrue(2 == cmdFromResp.getMaxRows());
-        assertTrue(9.1 == cmdFromResp.getRequiredVersion());
-        assertTrue(null != cmdFromResp.getFilters());
-        assertTrue(cmdFromResp.getFilters().size() > 0);
+        Assert.assertTrue(cmdFromResp != selCmd);
+        Assert.assertTrue(2 == cmdFromResp.getMaxRows());
+        Assert.assertTrue(9.1 == cmdFromResp.getRequiredVersion());
+        Assert.assertTrue(null != cmdFromResp.getFilters());
+        Assert.assertTrue(cmdFromResp.getFilters().size() > 0);
 
         Filter filter = cmdFromResp.getFilters().get(0);
-        assertTrue(filter != selCmd.getFilters().get(0)); //ensure the filter is a copy of the original
-        assertTrue("FirstName".equals(filter.getColumnName()));
-        assertTrue("Fred".equals(filter.getValue()));
-        assertTrue(Filter.Operator.STARTS_WITH == filter.getOperator());
+        Assert.assertTrue(filter != selCmd.getFilters().get(0)); //ensure the filter is a copy of the original
+        Assert.assertTrue("FirstName".equals(filter.getColumnName()));
+        Assert.assertTrue("Fred".equals(filter.getValue()));
+        Assert.assertTrue(Filter.Operator.STARTS_WITH == filter.getOperator());
 
         log("Completed testing the copy command to response functionality.");
     }

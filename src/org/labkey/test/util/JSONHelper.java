@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -77,7 +78,7 @@ public class JSONHelper
 
         if(actualJSON == null)
         {
-            _test.fail("Unable to parse response:\n"+actual);
+            Assert.fail("Unable to parse response:\n"+actual);
         }
 
         if (compareElement(expectedJSON, actualJSON))
@@ -90,7 +91,7 @@ public class JSONHelper
             _test.log("Actual:\n" + actual + "\n");
 
             String diff = Diff.diff(expected, actual);
-            _test.fail(msg + "\n" + diff + "\n");
+            Assert.fail(msg + "\n" + diff + "\n");
         }
     }
 
@@ -106,7 +107,7 @@ public class JSONHelper
             _test.log("Actual:\n" + actual.toJSONString() + "\n");
 
             String diff = Diff.diff(expected.toString(), actual.toString());
-            _test.fail(msg + "\n" + diff + "\n");
+            Assert.fail(msg + "\n" + diff + "\n");
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.module;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -672,7 +673,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable feedbackTable = new DataRegionTable("query", this, true, true);
-        assertEquals("Unexpected number of rows", _states.size(), feedbackTable.getDataRowCount());
+        Assert.assertEquals("Unexpected number of rows", _states.size(), feedbackTable.getDataRowCount());
 
         int row;
         for(int i = 0; i < _states.size(); i++)
@@ -900,16 +901,16 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private void assertCDSPortalRow(String by, String expectedDetail, String expectedTotal)
     {
         waitForText(" " + by, 120000);
-        assertTrue("'by "+by+"' search option is not present", isElementPresent(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
+        Assert.assertTrue("'by "+by+"' search option is not present", isElementPresent(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
                 "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]")));
         String actualDetail = getText(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
                 "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]"+
                 "/div[contains(@class, 'detailcolumn')]"));
-        assertEquals("Wrong details for search by "+by+".", expectedDetail, actualDetail);
+        Assert.assertEquals("Wrong details for search by "+by+".", expectedDetail, actualDetail);
         String actualTotal = getText(Locator.xpath("//div[starts-with(@id, 'summarydataview')]/div["+
                 "./div[contains(@class, 'bycolumn')]/span[@class = 'label' and text() = ' "+by+"']]"+
                 "/div[contains(@class, 'totalcolumn')]"));
-        assertEquals("Wrong total for search by " + by + ".", expectedTotal, actualTotal);
+        Assert.assertEquals("Wrong total for search by " + by + ".", expectedTotal, actualTotal);
     }
 
     // Sequential calls to this should have different participant counts.
@@ -950,12 +951,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
             assertElementPresent(imgLead, 1);
             assertElementPresent(imgContact, 1);
         }
-        assertEquals("Incorrect Lead Contributor", leadContributor.replace("\n", ""), getText(Locator.css(".assayInfoLeadContributor")).replace("\n", ""));
-        assertEquals("Incorrect Assay Point of Contact", pointOfContact.replace("\n", ""), getText(Locator.css(".assayInfoPointOfContact")).replace("\n", ""));
-        assertEquals("Incorrect Assay Details", details.replace("\n", ""), getText(Locator.css(".assayInfoDetails")).replace("\n", ""));
-        //assertEquals("Incorrect Description", ("Description" + pointOfContact).replace("\n", ""), getText(Locator.css(".assayInfoDescription")).replace("\n", ""));
-        assertEquals("Incorrect Assay Abstract", assayAbstract.replace("\n", ""), getText(Locator.css(".assayInfoAbstract")).replace("\n", ""));
-        assertEquals("Incorrect Related Publications", relatedPubs.replace("\n", ""), getText(Locator.css(".assayInfoRelatedPublications")).replace("\n", ""));
+        Assert.assertEquals("Incorrect Lead Contributor", leadContributor.replace("\n", ""), getText(Locator.css(".assayInfoLeadContributor")).replace("\n", ""));
+        Assert.assertEquals("Incorrect Assay Point of Contact", pointOfContact.replace("\n", ""), getText(Locator.css(".assayInfoPointOfContact")).replace("\n", ""));
+        Assert.assertEquals("Incorrect Assay Details", details.replace("\n", ""), getText(Locator.css(".assayInfoDetails")).replace("\n", ""));
+        //Assert.assertEquals("Incorrect Description", ("Description" + pointOfContact).replace("\n", ""), getText(Locator.css(".assayInfoDescription")).replace("\n", ""));
+        Assert.assertEquals("Incorrect Assay Abstract", assayAbstract.replace("\n", ""), getText(Locator.css(".assayInfoAbstract")).replace("\n", ""));
+        Assert.assertEquals("Incorrect Related Publications", relatedPubs.replace("\n", ""), getText(Locator.css(".assayInfoRelatedPublications")).replace("\n", ""));
         closeInfoPage();
     }
 

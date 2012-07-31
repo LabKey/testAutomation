@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -94,9 +95,9 @@ public class FlowJoQueryTest extends BaseFlowTest
         }
         else
         {
-            fail("Failed to match runId pattern for url: " + currentURL);
+            Assert.fail("Failed to match runId pattern for url: " + currentURL);
         }
-        assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
+        Assert.assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
 
         // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
         setFilter("query", "Name", "Equals", "118795.fcs");
@@ -156,7 +157,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         setFlowFilter(new String[] {"Name", "Keyword/Comp"}, new String[] { "startswith","eq"}, new String[] {"118", "PE CD8"});
         importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", "miniFCS", true, "FilterAnalysis", false, true);
         DataRegionTable queryTable = new DataRegionTable("query", this);
-        assertEquals(1, queryTable.getDataRowCount());
+        Assert.assertEquals(1, queryTable.getDataRowCount());
     }
 
 }

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -104,8 +105,8 @@ public class PivotQueryTest extends BaseSeleniumWebTest
         // First "ConcInRange_CONCAT" data cell
         //Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[6]");
         //String contents = selenium.getText(ConcInRange_CONCAT_cell.toString());
-        //assertNotNull("The GROUP_CONCAT cell is empty", contents);
+        //Assert.assertNotNull("The GROUP_CONCAT cell is empty", contents);
         //String[] concats = contents.split(", *");
-        //assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
+        //Assert.assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
     }
 }

@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -80,7 +81,7 @@ public class ExpTest extends BaseSeleniumWebTest
         }
 
         if (!isLinkPresentWithText("COMPLETE"))
-            fail("Import did not complete.");
+            Assert.fail("Import did not complete.");
 
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(EXPERIMENT_NAME);
@@ -150,7 +151,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Make it a lookup into our custom query
         int fieldCount = selenium.getXpathCount("//input[contains(@name, 'ff_type')]").intValue();
-        assertTrue(fieldCount > 0);
+        Assert.assertTrue(fieldCount > 0);
         ListHelper.setColumnType(this, fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
         mouseClick(Locator.name("ff_type" + (fieldCount - 1)).toString());
 

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.ms1.params;
 
+import org.junit.Assert;
 import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.BaseSeleniumWebTest;
@@ -103,7 +104,7 @@ abstract public class AbstractInspectTestParams extends AbstractPipelineTestPara
             {
                 File cacheFile = new File(cacheDir, sampleName + ext);
                 if (cacheFile.exists())
-                    BaseSeleniumWebTest.fail("Pipeline files were not cleaned up; "+ cacheFile + " still exists");
+                    Assert.fail("Pipeline files were not cleaned up; "+ cacheFile + " still exists");
             }
         }
     }

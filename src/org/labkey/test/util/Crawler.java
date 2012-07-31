@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import org.junit.Assert;
 import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
@@ -296,7 +297,7 @@ public class Crawler
                 /* controller/folders/ */
                 int postControllerSlashIdx = rootRelativeURL.indexOf('/');
                 if (-1 == postControllerSlashIdx)
-                    fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
+                    Assert.fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
                 _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
@@ -407,19 +408,19 @@ public class Crawler
         // quick unit-test
         {
         ControllerActionId a = new ControllerActionId("/controller/folder/action.view");
-        _test.assertEquals("controller", a.getController());
-        _test.assertEquals("folder", a.getFolder());
-        _test.assertEquals("action", a.getAction());
+        Assert.assertEquals("controller", a.getController());
+        Assert.assertEquals("folder", a.getFolder());
+        Assert.assertEquals("action", a.getAction());
         }
         {
         ControllerActionId b = new ControllerActionId("/folder/controller-action.view");
-        _test.assertEquals("controller", b.getController());
-        _test.assertEquals("folder", b.getFolder());
-        _test.assertEquals("action", b.getAction());
+        Assert.assertEquals("controller", b.getController());
+        Assert.assertEquals("folder", b.getFolder());
+        Assert.assertEquals("action", b.getAction());
         }
         {
         ControllerActionId c = new ControllerActionId("/_webdav/fred");
-        _test.assertEquals("_webdav", c.getController());
+        Assert.assertEquals("_webdav", c.getController());
         }
 
         _test.log("Starting crawl...");
@@ -518,7 +519,7 @@ public class Crawler
             // Check that there was no error
             int code = _test.getResponseCode();
             if (code == 404 || code == 500)
-                fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
+                Assert.fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
 
 			testInjection(urlToCheck, currentPageUrl);
             testNavTrail(urlToCheck);
@@ -538,7 +539,7 @@ public class Crawler
             return;
         String folderUrl = _test.getFolderUrl();
         if(folderUrl!=null && navTrailEntries.contains(folderUrl))
-            fail("Header url contained in nav trail");
+            Assert.fail("Header url contained in nav trail");
 
         Collection<String> tabUrls = null;
         try
@@ -547,12 +548,12 @@ public class Crawler
         }
         catch (Exception e)
         {
-            fail("Unable to combine tab urls");
+            Assert.fail("Unable to combine tab urls");
         }
         Collection intersect = BaseSeleniumWebTest.collectionIntersection(navTrailEntries,tabUrls);
         if(intersect.size()>0)
         {
-            fail("Overlap between tabs and nav trail.  Intersect at following urls: " + intersect.toString());
+            Assert.fail("Overlap between tabs and nav trail.  Intersect at following urls: " + intersect.toString());
 
         }
 
@@ -573,7 +574,7 @@ public class Crawler
             {
                 if (responseText.indexOf(word.toLowerCase()) > 0)
                 {
-                    fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
+                    Assert.fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
                 }
             }
         }
@@ -612,7 +613,7 @@ public class Crawler
                 if (msg != null)
                 {
                     String url = test.getCurrentRelativeURL();
-                    test.fail(msg + "\n" + url);
+                    Assert.fail(msg + "\n" + url);
                 }
 
                 throw se;
@@ -671,6 +672,6 @@ public class Crawler
 	protected void fail(String msg)
 	{
         _test.log(msg);
-		BaseSeleniumWebTest.fail(msg);
+		Assert.fail(msg);
 	}
 }

@@ -22,6 +22,7 @@ package org.labkey.test.tests;
  * Time: 3:58 PM
  */
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
@@ -94,7 +95,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "Color", "Robust");
         ExtHelper.clickExtTab(this, "Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals One Of (e.g. \"a;b;c\")");
-        assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement("value_1"));
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement("value_1"));
         ExtHelper.clickExtTab(this, "Choose Values");
         ExtHelper.clickExtButton(this, "OK");
         assertTextNotPresent("Light", "Zany");
@@ -104,7 +105,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         ExtHelper.clickExtTab(this, "Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
-        assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
         ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Blank");
         ExtHelper.clickExtTab(this, "Choose Values");
         ExtHelper.waitForExtDialog(this, "Confirm change");
@@ -117,7 +118,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "Color", "Light");
         ExtHelper.clickExtTab(this, "Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals One Of (e.g. \"a;b;c\")");
-        assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement("value_1"));
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement("value_1"));
 
         setFormElement("value_1", "Light;Robust");
 
@@ -148,7 +149,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "year", "1990");
         ExtHelper.clickExtTab(this, "Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals One Of (e.g. \"a;b;c\")");
-        assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement("value_1"));
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement("value_1"));
         ExtHelper.clickExtTab(this, "Choose Values");
         ExtHelper.clickExtButton(this, "OK");
         assertTextNotPresent("1980", "1970");
@@ -157,7 +158,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "year", "1990", "1980");
         ExtHelper.clickExtTab(this, "Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
-        assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement("value_1"));
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement("value_1"));
         ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Blank");
         ExtHelper.clickExtTab(this, "Choose Values");
         ExtHelper.waitForExtDialog(this, "Confirm change");

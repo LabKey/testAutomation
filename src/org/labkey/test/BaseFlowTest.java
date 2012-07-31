@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
@@ -207,17 +208,17 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             table.checkAllOnPage();
             selenium.chooseOkOnNextConfirmation();
             clickButton("Delete", 0);
-            assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+            Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
             waitForPageToLoad();
-            assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
+            Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
             // Check all DataInputs were deleted
             beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=DataInputs");
-            assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
+            Assert.assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
 
             // Check all Datas were deleted except for flow analysis scripts (FlowDataType.Script)
             beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Datas&query.LSID~doesnotcontain=Flow-AnalysisScript");
-            assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
+            Assert.assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
         }
     }
 
@@ -447,7 +448,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 if (rEngineNormalizationReference != null)
                 {
                     selectOptionByText("rEngineNormalizationReference", rEngineNormalizationReference);
-                    assertEquals(rEngineNormalizationReference, getFormElement("rEngineNormalizationReference"));
+                    Assert.assertEquals(rEngineNormalizationReference, getFormElement("rEngineNormalizationReference"));
                 }
 
                 if (rEngineNormalizationSubsets != null)
@@ -464,7 +465,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         else
         {
             if (rEngineNormalization)
-                fail("Expected to find R normalization options");
+                Assert.fail("Expected to find R normalization options");
             log("Not setting normalization options");
         }
         clickNavButton("Next");

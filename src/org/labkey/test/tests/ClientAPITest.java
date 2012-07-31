@@ -20,6 +20,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -265,7 +266,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
                 return divHtml;
             sleep(1000);
         }
-        fail("Div failed to render.");
+        Assert.fail("Div failed to render.");
         return null;
     }
 
@@ -293,7 +294,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     {
         String chartHtml = setSourceFromFile("chartTest.js");
         if (chartHtml.indexOf("<img") < 0 && chartHtml.indexOf("<IMG") < 0)
-            fail("Test div does not contain an image:\n" + chartHtml);
+            Assert.fail("Test div does not contain an image:\n" + chartHtml);
     }
 
     private void chartAPITest() throws Exception
@@ -328,9 +329,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
             method = new PostMethod(url);
             method.addParameter("svg", svgText);
             int status = httpClient.executeMethod(method);
-            assertTrue("SVG Downloaded", status == HttpStatus.SC_OK);
-            assertTrue(method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-            assertTrue(method.getResponseHeader("Content-Type").getValue().startsWith("application/pdf"));
+            Assert.assertTrue("SVG Downloaded", status == HttpStatus.SC_OK);
+            Assert.assertTrue(method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
+            Assert.assertTrue(method.getResponseHeader("Content-Type").getValue().startsWith("application/pdf"));
             method.getResponseBodyAsString();
         }
         finally
@@ -372,7 +373,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+            Assert.fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Abeson");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
@@ -382,7 +383,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+            Assert.fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "51");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
@@ -396,7 +397,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+            Assert.fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Billy");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
@@ -405,7 +406,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+            Assert.fail("Failed to advance to next edit field");
         selenium.type(Locator.id(activeCellId).toString(), "Billyson");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
@@ -414,7 +415,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+            Assert.fail("Failed to advance to next edit field");
         selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
         selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
         selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
@@ -475,7 +476,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             activeEditor = selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor;");
         }
         if(null == activeEditor)
-            fail("Could not get the id of the active editor in the grid!");
+            Assert.fail("Could not get the id of the active editor in the grid!");
 
         return selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor.field.id;");
     }
@@ -492,7 +493,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             --tries;
         }
         if(tries == 0)
-            fail("Insert or update via the Ext grid did not complete!");
+            Assert.fail("Insert or update via the Ext grid did not complete!");
 
     }
 

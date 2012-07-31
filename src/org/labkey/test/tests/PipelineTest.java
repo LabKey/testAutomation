@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.ms2.MS2PipelineFolder;
 import org.labkey.test.ms2.params.MS2EmailSuccessParams;
 import org.labkey.test.pipeline.PipelineFolder;
@@ -151,7 +152,7 @@ public class PipelineTest extends PipelineWebTestBase
                 log("** Set tools directory manually or bootstrap to fix.        **");
                 log("**************************ERROR*******************************");
                 if ( !testFailed )
-                    fail("Failed to reset pipeline tools directory.\n" + ae.getMessage());
+                    Assert.fail("Failed to reset pipeline tools directory.\n" + ae.getMessage());
                 else // Don't clobber an existing error.
                     log("Error: " + ae.getMessage());
             }
@@ -197,7 +198,7 @@ public class PipelineTest extends PipelineWebTestBase
             sleepCount++;
         }
         int count = emailTable.getDataRowCount();
-        assertTrue("Expected " + countExpect + " notification emails, found " + count,
+        Assert.assertTrue("Expected " + countExpect + " notification emails, found " + count,
                 count == countExpect);
         emailTable.clearAndRecord();
     }
@@ -215,7 +216,7 @@ public class PipelineTest extends PipelineWebTestBase
             popLocation();
 
             // Quit if a test was not valid.
-            assertTrue(tp.isValid());
+            Assert.assertTrue(tp.isValid());
         }
     }
 

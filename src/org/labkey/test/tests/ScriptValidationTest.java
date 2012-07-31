@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
@@ -83,12 +84,12 @@ public class ScriptValidationTest extends SimpleModuleTest
                 new ColorRecord("Red", "#f00"),
                 new ColorRecord("Blue", "#0f0")
         ));
-        assertEquals("Red!", inserted.get(0).name);
-        assertEquals("Blue!", inserted.get(1).name);
+        Assert.assertEquals("Red!", inserted.get(0).name);
+        Assert.assertEquals("Blue!", inserted.get(1).name);
 
         List<ColorRecord> updated = updateColors(inserted);
-        assertEquals("Red?", updated.get(0).name);
-        assertEquals("Blue?", updated.get(1).name);
+        Assert.assertEquals("Red?", updated.get(0).name);
+        Assert.assertEquals("Blue?", updated.get(1).name);
     }
 
     private void doTestValidation() throws Exception
@@ -103,11 +104,11 @@ public class ScriptValidationTest extends SimpleModuleTest
              * script validation */
             log("** Test errors: throw Error()'");
             insertColors(Arrays.asList(new ColorRecord("ShouldError", "not a hex value")));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertTrue("Expected \"color value must start with '#'\", got: \"" + e.getMessage() + "\"",
+            Assert.assertTrue("Expected \"color value must start with '#'\", got: \"" + e.getMessage() + "\"",
                     e.getMessage().contains("color value must start with '#'"));
         }
 
@@ -115,11 +116,11 @@ public class ScriptValidationTest extends SimpleModuleTest
         {
             log("** Test errors: Field='message' and test extraContext is echoed back");
             insertColors(Arrays.asList(new ColorRecord("TestFieldErrorMessage", null)), Maps.<String, Object>of("A", "a", "B", 3));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("single message", e.getMessage());
+            Assert.assertEquals("single message", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"single message\"," +
@@ -152,11 +153,11 @@ public class ScriptValidationTest extends SimpleModuleTest
         {
             log("** Test errors: Field=[array of messages]");
             insertColors(Arrays.asList(new ColorRecord("TestFieldErrorArray", null)));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("one error message", e.getMessage());
+            Assert.assertEquals("one error message", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"one error message\"," +
@@ -185,11 +186,11 @@ public class ScriptValidationTest extends SimpleModuleTest
         {
             log("** Test errors: row level error");
             insertColors(Arrays.asList(new ColorRecord("TestRowError", null)));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("boring error message", e.getMessage());
+            Assert.assertEquals("boring error message", e.getMessage());
 
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
@@ -216,11 +217,11 @@ public class ScriptValidationTest extends SimpleModuleTest
         {
             log("** Test errors: returning false");
             insertColors(Arrays.asList(new ColorRecord("TestReturnFalse", "")));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("beforeInsert validation failed", e.getMessage());
+            Assert.assertEquals("beforeInsert validation failed", e.getMessage());
 
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
@@ -251,11 +252,11 @@ public class ScriptValidationTest extends SimpleModuleTest
                     new ColorRecord("Blue", "#0f0"),
                     new ColorRecord("TestErrorInComplete", "")
             ));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("TestErrorInComplete error field two", e.getMessage());
+            Assert.assertEquals("TestErrorInComplete error field two", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"TestErrorInComplete error field two\"," +
@@ -301,11 +302,11 @@ public class ScriptValidationTest extends SimpleModuleTest
         {
             log("** Test errors: adding array of errors in complete");
             insertColors(Arrays.asList(new ColorRecord("TestFieldErrorArrayInComplete", "")));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("one error message", e.getMessage());
+            Assert.assertEquals("one error message", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"one error message\"," +
@@ -346,11 +347,11 @@ public class ScriptValidationTest extends SimpleModuleTest
         {
             log("** Test errors: script level variables, color regular expression");
             insertColors(Arrays.asList(new ColorRecord("ShouldError", "#still not a hex value")));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("color value must be of the form #abc or #aabbcc", e.getMessage());
+            Assert.assertEquals("color value must be of the form #abc or #aabbcc", e.getMessage());
         }
 
         try
@@ -359,11 +360,11 @@ public class ScriptValidationTest extends SimpleModuleTest
             ColorRecord red = selectColor("Red?").get(0);
             red.hex = "shouldn't happen";
             updateColors(Arrays.asList(red));
-            fail("Should throw an exception");
+            Assert.fail("Should throw an exception");
         }
         catch (CommandException e)
         {
-            assertEquals("once set, cannot be changed", e.getMessage());
+            Assert.assertEquals("once set, cannot be changed", e.getMessage());
         }
     }
 
@@ -375,7 +376,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         SelectRowsCommand cmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.addFilter("Name", StringUtils.join(names, ";"), Filter.Operator.IN);
         SelectRowsResponse response = cmd.execute(cn, getProjectName());
-        assertEquals("Expected to select " + names.length + " rows.", names.length, response.getRowCount().intValue());
+        Assert.assertEquals("Expected to select " + names.length + " rows.", names.length, response.getRowCount().intValue());
 
         ArrayList<ColorRecord> results = new ArrayList<ColorRecord>();
         for (Map<String, Object> map : response.getRows())
@@ -400,7 +401,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
         SaveRowsResponse response = cmd.execute(cn, getProjectName());
-        assertEquals("Expected to insert " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to insert " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
         ArrayList<ColorRecord> results = new ArrayList<ColorRecord>();
         for (Map<String, Object> map : response.getRows())
@@ -425,7 +426,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
         SaveRowsResponse response = cmd.execute(cn, getProjectName());
-        assertEquals("Expected to update " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to update " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
         ArrayList<ColorRecord> results = new ArrayList<ColorRecord>();
         for (Map<String, Object> map : response.getRows())

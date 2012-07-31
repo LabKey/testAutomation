@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
@@ -206,7 +207,7 @@ public class TimelineTest extends BaseSeleniumWebTest
                 return divHtml;
             sleep(1000);
         }
-        fail("Div failed to render.");
+        Assert.fail("Div failed to render.");
         return null;
     }
 

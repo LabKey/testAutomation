@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
@@ -128,10 +129,10 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     static void assertEquals(Row row1, Row row2)
     {
         if (row1.rowid != null)
-            assertEquals(row1.rowid, row2.rowid);
-        assertEquals(row1.intNotNull, row2.intNotNull);
-        assertEquals(row1.dateTimeNotNull, row2.dateTimeNotNull);
-        assertEquals(row1.text, row2.text);
+            Assert.assertEquals(row1.rowid, row2.rowid);
+        Assert.assertEquals(row1.intNotNull, row2.intNotNull);
+        Assert.assertEquals(row1.dateTimeNotNull, row2.dateTimeNotNull);
+        Assert.assertEquals(row1.text, row2.text);
     }
 
     void createProject()
@@ -220,11 +221,11 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         try
         {
             SaveRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
-            fail("Expected to throw CommandException");
+            Assert.fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
         {
-            assertEquals(401,ex.getStatusCode());
+            Assert.assertEquals(401,ex.getStatusCode());
         }
 
     }
@@ -269,7 +270,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         
         Row[] selected = selectViaJavaApi(containerPath, cn, pks);
         for (int i = 0; i < inserted.length; i++)
-            assertEquals(inserted[i], selected[i]);
+            Assert.assertEquals(inserted[i], selected[i]);
         
         Row[] updated = new Row[] { Row(pks[0], "AA", 30), Row(pks[1], "BB", 40) };
         updateViaJavaApi(containerPath, cn, updated);
@@ -279,26 +280,26 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             log("** Try to update via api from a different container");
             Row[] updateFail = new Row[] { Row(pks[0], "Should not update", 300) };
             updateViaJavaApi(PROJECT_NAME, cn, updateFail);
-            fail("expected exception when trying to update from another container");
+            Assert.fail("expected exception when trying to update from another container");
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
-//            assertEquals("The row is from the wrong container.", ex.getMessage());
-//            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
+            Assert.assertEquals(401, ex.getStatusCode());
+//            Assert.assertEquals("The row is from the wrong container.", ex.getMessage());
+//            Assert.assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
         
         try
         {
             log("** Try to delete via api from a different container");
             deleteViaJavaApi(PROJECT_NAME, cn, pks);
-            fail("expected exception when trying to delete from another container");
+            Assert.fail("expected exception when trying to delete from another container");
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
-//            assertEquals("The row is from the wrong container.", ex.getMessage());
-//            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
+            Assert.assertEquals(401, ex.getStatusCode());
+//            Assert.assertEquals("The row is from the wrong container.", ex.getMessage());
+//            Assert.assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
         
         deleteViaJavaApi(containerPath, cn, pks);
@@ -312,13 +313,13 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             cmd.addRow(row.toMap());
         
         SaveRowsResponse resp = cmd.execute(cn, containerPath);
-        assertEquals("Expected to insert " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to insert " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
         
         int[] pks = new int[rows.length];
         for (int i = 0; i < rows.length; i++)
         {
             Map<String, Object> row = resp.getRows().get(i);
-            assertTrue(row.containsKey("rowid"));
+            Assert.assertTrue(row.containsKey("rowid"));
             pks[i] = ((Number)row.get("rowid")).intValue();
         }
         
@@ -331,14 +332,14 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         SelectRowsCommand cmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         cmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
         SelectRowsResponse resp = cmd.execute(cn, containerPath);
-        assertEquals("Expected to select " + pks.length + " rows", pks.length, resp.getRowCount().intValue());
+        Assert.assertEquals("Expected to select " + pks.length + " rows", pks.length, resp.getRowCount().intValue());
 
         List<Row> rows = new ArrayList<Row>(pks.length);
         for (int i = 0; i < pks.length; i++)
         {
             Map<String, Object> row = resp.getRows().get(i);
             Integer rowid = (Integer)row.get("RowId");
-            assertEquals("Expected requested rowid and selected rowid to be the same", rowid.intValue(), pks[i]);
+            Assert.assertEquals("Expected requested rowid and selected rowid to be the same", rowid.intValue(), pks[i]);
             
             String text = (String)row.get("Text");
             int intNotNull = ((Number)row.get("IntNotNull")).intValue();
@@ -356,14 +357,14 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         for (Row row : rows)
             cmd.addRow(row.toMap());
         SaveRowsResponse resp = cmd.execute(cn, containerPath);
-        assertEquals("Expected to update " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to update " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
 
         Row[] updated = new Row[rows.length];
         for (int i = 0; i < rows.length; i++)
         {
             Map<String, Object> row = resp.getRows().get(i);
             updated[i] = Row.fromMap(row);
-            assertEquals(rows[i], updated[i]);
+            Assert.assertEquals(rows[i], updated[i]);
         }
         return updated;
     }
@@ -376,12 +377,12 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             cmd.addRow(Collections.singletonMap("RowId", (Object) pk));
         
         SaveRowsResponse resp = cmd.execute(cn, containerPath);
-        assertEquals("Expected to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
+        Assert.assertEquals("Expected to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
         
         SelectRowsCommand selectCmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         selectCmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
         SelectRowsResponse selectResp = selectCmd.execute(cn, containerPath);
-        assertEquals("Expected to select 0 rows", 0, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Expected to select 0 rows", 0, selectResp.getRowCount().intValue());
     }
 
     String join(String sep, int... pks)
@@ -420,14 +421,14 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         DataRegionTable table = new DataRegionTable("query", this);
         table.setSort("RowId", SortDirection.DESC);
 
-        assertEquals("Expected 'Text' column to contain '" + text + "' for newly inserted row",
+        Assert.assertEquals("Expected 'Text' column to contain '" + text + "' for newly inserted row",
                 text, table.getDataAsText(0, table.getColumn("Text")));
-        assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for newly inserted row",
+        Assert.assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for newly inserted row",
                 String.valueOf(intNotNull), table.getDataAsText(0, table.getColumn("IntNotNull")));
 
         // get newly inserted pk
         String rowidStr = table.getDataAsText(0, table.getColumn("RowId"));
-        assertTrue("Expected to find the RowId for the new row instead of '" + rowidStr + "'",
+        Assert.assertTrue("Expected to find the RowId for the new row instead of '" + rowidStr + "'",
                 rowidStr != null && !rowidStr.equals(""));
         return Integer.parseInt(rowidStr);
     }
@@ -457,11 +458,11 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
         DataRegionTable table = new DataRegionTable("query", this);
         int row = table.getRow(String.valueOf(pk));
-        assertTrue("Expected to find row with pk='" + pk + "'", row > -1);
+        Assert.assertTrue("Expected to find row with pk='" + pk + "'", row > -1);
         
-        assertEquals("Expected 'Text' column to contain '" + text + "' for updated row",
+        Assert.assertEquals("Expected 'Text' column to contain '" + text + "' for updated row",
                 text, table.getDataAsText(row, table.getColumn("Text")));
-        assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for updated row",
+        Assert.assertEquals("Expected 'IntNotNull' column to contain '" + intNotNull + "' for updated row",
                 String.valueOf(intNotNull), table.getDataAsText(row, table.getColumn("IntNotNull")));
     }
 
@@ -477,7 +478,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
+        Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
         waitForPageToLoad();
     }
 
@@ -496,6 +497,6 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
         DataRegionTable table = new DataRegionTable("query", this);
         for (int aPk : pk)
-            assertEquals("Expected row '" + aPk + "' to be deleted.", -1, table.getRow(String.valueOf(aPk)));
+            Assert.assertEquals("Expected row '" + aPk + "' to be deleted.", -1, table.getRow(String.valueOf(aPk)));
     }
 }

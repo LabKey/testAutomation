@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -50,7 +51,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
         {
             String curMessage = _test.getText(_loc);
             if (null == curMessage)
-                fail("Can't get message in locator " + _loc.toString());
+                Assert.fail("Can't get message in locator " + _loc.toString());
             return (curMessage.startsWith(_waitForMessage));
         }
     }
@@ -104,7 +105,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
         {
             if (countLinksWithText("ERROR") > 0)
             {
-                fail("Job in ERROR state found in the list");
+                Assert.fail("Job in ERROR state found in the list");
             }
 
             log("Waiting for study to finish loading...");

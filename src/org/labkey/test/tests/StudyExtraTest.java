@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -66,7 +67,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         selenium.answerOnNextPrompt("New Gene");
         selenium.select("//table[@id='AntigenGrid3']/tbody/tr[2]/td[2]/select", "label=<Add New>");
-        assertEquals("Enter new value.", selenium.getPrompt());
+        Assert.assertEquals("Enter new value.", selenium.getPrompt());
         selenium.select("//table[@id='AntigenGrid3']/tbody/tr[2]/td[3]/select", "label=Clade C");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[3]/input", "1");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[3]/input", "2");
@@ -177,13 +178,13 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		assertTextPresent("VerifySnapshot");
         clickLinkWithText("Query Schema Browser");
         selectSchema("VerifySnapshot");
-		assertTrue(isQueryPresent("VerifySnapshot", "List1", 3000) || isQueryPresent("VerifySnapshot", "list1"));
+		Assert.assertTrue(isQueryPresent("VerifySnapshot", "List1", 3000) || isQueryPresent("VerifySnapshot", "list1"));
         if (isQueryPresent("VerifySnapshot", "Subjects"))
             viewQueryData("VerifySnapshot", "Subjects");
         else if (isQueryPresent("VerifySnapshot", "subjects"))
             viewQueryData("VerifySnapshot", "subjects");
         else
-            fail("Missing subjects table");
+            Assert.fail("Missing subjects table");
         assertTextPresent("Vaccine2");
 
        */
@@ -226,7 +227,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         else if (isQueryPresent("VerifySnapshot", "testassay1"))
             viewQueryData("VerifySnapshot", "testassay1");
         else
-            fail("TestAssay1 table not present");
+            Assert.fail("TestAssay1 table not present");
 */
 
         clickLinkWithText(STUDY_FOLDER + " Study");

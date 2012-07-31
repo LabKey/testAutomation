@@ -413,7 +413,7 @@ public class TimeChartTest extends StudyBaseTest
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_DIALOG, "text", "nab");
         sleep(500);
         // Count search results (11 in study's NAb assay)
-        assertEquals("", 11, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG)+"//div[contains(@class, 'x4-grid-view')]/table/tbody/tr"))-1);
+        Assert.assertEquals("", 11, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG)+"//div[contains(@class, 'x4-grid-view')]/table/tbody/tr"))-1);
 
         log("Check for appropriate message for measure with no data.");
         addMeasuresPath = ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG) + "//table/tbody/tr/td";
@@ -496,7 +496,7 @@ public class TimeChartTest extends StudyBaseTest
         List displayOrders = table.getColumnDataAsText("Study APX1Abbreviated Physical Exam Mouse Visit Visit Display Order");
         for (Object str : displayOrders)
         {
-            assertEquals("Display order should default to zero.", "0", str.toString());            
+            Assert.assertEquals("Display order should default to zero.", "0", str.toString());
         }
 
         List visits = table.getColumnDataAsText("Visit Label");
@@ -507,7 +507,7 @@ public class TimeChartTest extends StudyBaseTest
         }
         for( String str : VISIT_STRINGS )
         {
-            assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
+            Assert.assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
         }
 
         clickNavButton("View Chart(s)", 0);
@@ -572,7 +572,7 @@ public class TimeChartTest extends StudyBaseTest
 
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_DIALOG, "text", "viral");
         sleep(500);
-        assertEquals("", 1, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG)+"//div[contains(@class, 'x4-grid-view')]/table/tbody/tr"))-1);
+        Assert.assertEquals("", 1, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG)+"//div[contains(@class, 'x4-grid-view')]/table/tbody/tr"))-1);
         clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Viral Load Quantified (copies/ml)']]"), "1,1");
         clickNavButton("Select", 0);
         waitForText("Viral Load Quantified (copies/ml) from HIV Test Results");
@@ -609,7 +609,7 @@ public class TimeChartTest extends StudyBaseTest
 
         goToAxisTab("X-Axis");
         Ext4Helper.selectComboBoxItemById(this, "xaxis_interval", "Days");
-        assertEquals(X_AXIS_LABEL, getFormElement("x-axis-label-textfield")); // Label shouldn't change automatically once it has been set manually
+        Assert.assertEquals(X_AXIS_LABEL, getFormElement("x-axis-label-textfield")); // Label shouldn't change automatically once it has been set manually
 
         // set manual x-axis range
         setAxisValue("X", "xaxis_range_manual", "15", "40", null, null, null, new String[] {"15", "20", "25", "30", "35", "40"}, null);
@@ -662,12 +662,12 @@ public class TimeChartTest extends StudyBaseTest
             {
                 Locator minInput = Locator.name(axis + "axis_rangemin");
                 setFormElement(minInput, lowerBound);
-                assertEquals(lowerBound, getFormElement(minInput));
+                Assert.assertEquals(lowerBound, getFormElement(minInput));
                 sleep(500);
 
                 Locator maxInput = Locator.name(axis + "axis_rangemax");
                 setFormElement(maxInput, upperBound);
-                assertEquals(upperBound, getFormElement(maxInput));
+                Assert.assertEquals(upperBound, getFormElement(maxInput));
             }
         }
 
@@ -799,7 +799,7 @@ public class TimeChartTest extends StudyBaseTest
                     try
                     {
                         double value = Double.parseDouble(values.get(valIndex++));
-                        assertEquals("Unexpected interval value for row " + i, numbercheck[testIndex][i], value);
+                        Assert.assertEquals("Unexpected interval value for row " + i, numbercheck[testIndex][i], value);
                     }
                     catch(NumberFormatException e){}
                 }
@@ -814,7 +814,7 @@ public class TimeChartTest extends StudyBaseTest
                         colIndex = table.getColumn("Visit Label");     
 
                     String colData = table.getDataAsText(i, colIndex);
-                    assertEquals(stringCheck[testIndex][i], colData);
+                    Assert.assertEquals(stringCheck[testIndex][i], colData);
                 }
             }
             // check values in measure column
@@ -832,15 +832,15 @@ public class TimeChartTest extends StudyBaseTest
                     try
                     {
                         double value = Double.parseDouble(text);
-                        assertEquals("Unexpected measure value", measureValue[testIndex][i], value);
+                        Assert.assertEquals("Unexpected measure value", measureValue[testIndex][i], value);
                     }
                     catch (NumberFormatException e)
                     {
-//                        fail("NFE parsing measure " + measure[testIndex] + ": " + text);
+//                        Assert.fail("NFE parsing measure " + measure[testIndex] + ": " + text);
                     }
                     catch (NullPointerException e)
                     {
-                        fail("NPE parsing measure " + measure[testIndex] + ": " + text);
+                        Assert.fail("NPE parsing measure " + measure[testIndex] + ": " + text);
                     }
                 }
             }
@@ -1083,7 +1083,7 @@ public class TimeChartTest extends StudyBaseTest
 
 //        String newTransform = getAttribute(Locator.xpath("//a[starts-with(@title, '"+GROUP1_PTIDS[0]+" Hemoglobin:')]/path"), "transform");
 //        double newHeight = Double.parseDouble(transform.substring(newTransform.indexOf(" "), newTransform.indexOf(")") - 1));
-//        assertTrue("Hemoglobin not graphed relative to right axis.", newHeight < height);        
+//        Assert.assertTrue("Hemoglobin not graphed relative to right axis.", newHeight < height);
 
         setAxisValue("Right", "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
         assertTextNotPresent("13");
@@ -1155,7 +1155,7 @@ public class TimeChartTest extends StudyBaseTest
         Ext4Helper.clickTabContainingText(this, "Source");
         click(Locator.xpath("//input/../label[contains(text(), 'Toggle editor')]"));
         sleep(1000); // wait for editor to toggle
-        assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
+        Assert.assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         applyChanges();
         // TODO: how do we test clicking on a data point?

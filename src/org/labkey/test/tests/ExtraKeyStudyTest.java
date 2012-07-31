@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 
@@ -108,14 +109,14 @@ public class ExtraKeyStudyTest extends StudyBaseTest
         CustomizeViewsHelper.openCustomizeViewPanel(this);
 
         // Participant columns should be visible, old "Participant/DataSet" lookup should be hidden.
-        assertTrue("PandaId/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaId/PandaId"));
-        assertTrue("PandaId/DataSet lookup should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaId/DataSet"));
+        Assert.assertTrue("PandaId/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaId/PandaId"));
+        Assert.assertTrue("PandaId/DataSet lookup should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaId/DataSet"));
 
         // ParticipantVisit columns should be visible, old "Paricipant Visit/<dataset>" lookups should be hidden.
-        assertTrue("Panda Visit/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/PandaId"));
-        assertTrue("Panda Visit/Visit should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/Visit"));
-        assertTrue("Panda Visit/PV_One should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_One"));
-        assertTrue("Panda Visit/PV_Two should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_Two"));
+        Assert.assertTrue("Panda Visit/PandaId should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/PandaId"));
+        Assert.assertTrue("Panda Visit/Visit should be visible", CustomizeViewsHelper.isColumnVisible(this, "PandaVisit/Visit"));
+        Assert.assertTrue("Panda Visit/PV_One should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_One"));
+        Assert.assertTrue("Panda Visit/PV_Two should not be visible", CustomizeViewsHelper.isColumnHidden(this, "PandaVisit/PV_Two"));
 
         // DataSets auto-join lookups
         for (int j = 0; j < datasets.length; j++)
@@ -124,7 +125,7 @@ public class ExtraKeyStudyTest extends StudyBaseTest
             boolean visible = isBitSet(visibility, j);
             String lookup = "DataSets/" + otherDataset;
             log("** Checking " + lookup + " is " + (visible ? "" : "not ") + "visible from " + datasetName);
-            assertEquals("Expected " + lookup + " to be " + (visible ? "" : "not ") + "visible from " + datasetName,
+            Assert.assertEquals("Expected " + lookup + " to be " + (visible ? "" : "not ") + "visible from " + datasetName,
                     visible, CustomizeViewsHelper.isColumnVisible(this, lookup));
         }
 

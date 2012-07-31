@@ -19,10 +19,13 @@ package org.labkey.test;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.After;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -101,7 +104,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
  * Date: Feb 7, 2007
  * Time: 5:31:38 PM
  */
-public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable, WebTest
+public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 {
     public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
@@ -186,7 +189,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     protected abstract String getProjectName();
 
-    @Override
+    @Before
     public void setUp() throws Exception
     {
         selenium = new DefaultSeleniumWrapper();
@@ -349,7 +352,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (IOException e)
         {
-            fail(e.getMessage());
+            Assert.fail(e.getMessage());
         }
         finally
         {
@@ -359,7 +362,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     }
 
 
-    @Override
+    @After
     public void tearDown() throws Exception
     {
         if (this.enableScriptCheck())
@@ -452,7 +455,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
 
         String baseURL = WebTestHelper.getBaseURL();
-        assertTrue("Expected URL to begin with " + baseURL + ", but found " + urlString, urlString.indexOf(baseURL) == 0);
+        Assert.assertTrue("Expected URL to begin with " + baseURL + ", but found " + urlString, urlString.indexOf(baseURL) == 0);
         return urlString.substring(baseURL.length());
     }
 
@@ -469,7 +472,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void popLocation(int millis)
     {
         String location = _locationStack.pop();
-        assertNotNull("Cannot pop without a push.", location);
+        Assert.assertNotNull("Cannot pop without a push.", location);
         beginAt(location, millis);
     }
 
@@ -485,7 +488,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void recallLocation(int wait)
     {
-        assertNotNull("Cannot recall without saving first.", _savedLocation);
+        Assert.assertNotNull("Cannot recall without saving first.", _savedLocation);
         beginAt(_savedLocation, wait);
     }
 
@@ -539,7 +542,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (IOException e)
         {
-            fail("Unable to ensure credentials: " + e.getMessage());
+            Assert.fail("Unable to ensure credentials: " + e.getMessage());
         }
         waitForStartup();
         log("Signing in");
@@ -570,7 +573,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             clickLinkWithText("Sign In");
 
             if (isTextPresent("Type in your email address and password"))
-                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                Assert.fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
         }
 
         assertSignOutAndMyAccountPresent();
@@ -587,7 +590,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void signIn(String email, String password, boolean failOnError)
     {
         if ( !isLinkPresentWithText("Sign In") )
-            fail("You need to be logged out to log in.  Please log out to log in.");
+            Assert.fail("You need to be logged out to log in.  Please log out to log in.");
 
         clickLinkWithText("Sign In");
 
@@ -596,7 +599,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if ( failOnError )
         {
             if ( isTextPresent("Type in your email address and password") )
-                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                Assert.fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
 
             assertSignOutAndMyAccountPresent();
         }
@@ -758,8 +761,8 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             clickNavButton("Save");
 
-            if ( oldStrength != null ) assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))));
-            if ( oldExpiration != null ) assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement("expiration")));
+            if ( oldStrength != null ) Assert.assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))));
+            if ( oldExpiration != null ) Assert.assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement("expiration")));
 
             // Back to default.
             oldStrength = null;
@@ -950,7 +953,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         if (!hitFirstPage)
         {
-            fail("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
+            Assert.fail("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
         }
         log("Server is running.");
     }
@@ -1028,7 +1031,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                         Thread.sleep(2000);
                         waitMs -= 2000;
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
-                            fail("A startup failure occurred.");
+                            Assert.fail("A startup failure occurred.");
                     }
                     catch (InterruptedException e)
                     {
@@ -1041,7 +1044,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 }
 
                 if (waitMs <= 0)
-                    fail("Script runner took more than 10 minutes to complete.");
+                    Assert.fail("Script runner took more than 10 minutes to complete.");
 
                 if (isNavButtonPresent("Next"))
                 {
@@ -1130,7 +1133,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void waitForSystemMaintenanceCompletion()
     {
-        assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
+        Assert.assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
         long elapsed = System.currentTimeMillis() - smStart;
 
         // Ensure that at least 5 seconds has passed since system maintenance was started
@@ -1220,6 +1223,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         return true;
     }
 
+    @Test
     public void testSteps() throws Exception
     {
         try{ resumeJsErrorChecker(); }// Make sure js error checker didn't get stuck paused by a failure in the crawler.
@@ -1534,7 +1538,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
-                fail("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
+                Assert.fail("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
             leakCount = getImageWithAltTextCount("expand/collapse");
         }
 
@@ -1548,7 +1552,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             {
                 leakCRC = crc.getValue();
                 dumpHeap();
-                fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
+                Assert.fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
             }
 
             log("Found " + leakCount + " in-use objects.  They appear to be from a previous test.");
@@ -1565,7 +1569,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             return;
         beginAt("/admin/showErrorsSinceMark.view");
 
-       assertTrue("There were errors during the test run", isPageEmpty());
+       Assert.assertTrue("There were errors during the test run", isPageEmpty());
        log("No new errors found.");
        goToHome();         // Don't leave on an empty page
    }
@@ -1590,7 +1594,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             text = text.trim();
         }
 
-        assertTrue("Expected " + count + " errors during this run", StringUtils.countMatches(text, "ERROR") == count);
+        Assert.assertTrue("Expected " + count + " errors during this run", StringUtils.countMatches(text, "ERROR") == count);
         log("Found " + count + " expected errors.");
 
         // Clear the errors to prevent the test from failing.
@@ -1695,11 +1699,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
             catch (IOException e)
             {
-               fail("Unable to retrieve query: " + query);
+               Assert.fail("Unable to retrieve query: " + query);
             }
             catch (CommandException e)
             {
-               fail("Unable to retrieve query: " + query);
+               Assert.fail("Unable to retrieve query: " + query);
             }
             log(query + " row count: " + rowCount);
             auditEventRowCount += rowCount;
@@ -1722,11 +1726,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (IOException e)
         {
-           fail("Unable to retrieve query: " + query);
+           Assert.fail("Unable to retrieve query: " + query);
         }
         catch (CommandException e)
         {
-           fail("Unable to retrieve query: " + query);
+           Assert.fail("Unable to retrieve query: " + query);
         }
         try
         {
@@ -1735,13 +1739,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (IOException e)
         {
-               fail("Unable to retrieve query: LabAuditEvents");
+               Assert.fail("Unable to retrieve query: LabAuditEvents");
         }
         catch (CommandException e)
         {
-               fail("Unable to retrieve query: LabAuditEvents");
+               Assert.fail("Unable to retrieve query: LabAuditEvents");
         }
-        assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, selectResp.getRowCount().intValue());
+        Assert.assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, selectResp.getRowCount().intValue());
     }
 
     private void checkActionCoverage()
@@ -2067,12 +2071,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertConfirmation(String msg)
     {
-        assertEquals(msg, selenium.getConfirmation());
+        Assert.assertEquals(msg, selenium.getConfirmation());
     }
 
     public void assertAlert(String msg)
     {
-        assertEquals(msg, selenium.getAlert());
+        Assert.assertEquals(msg, selenium.getAlert());
     }
 
     public void dismissAlerts()
@@ -2103,7 +2107,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertExtMsgBox(String title, String text)
     {
         String actual = ExtHelper.getExtMsgBoxText(this, title);
-        assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.indexOf(text) != -1);
+        Assert.assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.indexOf(text) != -1);
     }
 
     public enum SeleniumEvent
@@ -2122,7 +2126,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if(isElementPresent(Locator.tagWithText("div", groupName)))
         {
             if(failIfAlreadyExists)
-                fail("Group already exists");
+                Assert.fail("Group already exists");
             else
                 return;
         }
@@ -2252,7 +2256,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         ensureAdminMode();
         if (isLinkPresentWithText(child))
-            fail("Cannot create folder; A link with text " + child + " already exists.  " +
+            Assert.fail("Cannot create folder; A link with text " + child + " already exists.  " +
                     "This folder may already exist, or the name appears elsewhere in the UI.");
         assertLinkNotPresentWithText(child);
         log("Creating subfolder " + child + " under project " + parent);
@@ -2515,7 +2519,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             }
         }
         if (!isLinkPresentWithText(project)) log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
-        else fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
+        else Assert.fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
 
         // verify that we're not on an error page with a check for a project link:
         assertLinkNotPresentWithText(project);
@@ -2594,13 +2598,13 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTitleEquals(String match)
     {
-        assertEquals("Wrong page title", match, selenium.getTitle());
+        Assert.assertEquals("Wrong page title", match, selenium.getTitle());
     }
 
     public void assertTitleContains(String match)
     {
         String title = selenium.getTitle();
-        assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
+        Assert.assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
     }
 
     public boolean isFormPresent(String form)
@@ -2614,7 +2618,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertFormPresent(String form)
     {
-        assertTrue("Form '" + form + "' was not present", isFormPresent(form));
+        Assert.assertTrue("Form '" + form + "' was not present", isFormPresent(form));
     }
 
     public void assertNoLabkeyErrors()
@@ -2625,7 +2629,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertLabkeyErrorPresent()
     {
-        assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
+        Assert.assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
             isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
 
     }
@@ -2654,7 +2658,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         for (String text : texts)
         {
             text = text.replace("&nbsp;", " ");
-            assertTrue("Text '" + text + "' was not present", isTextPresent(text));
+            Assert.assertTrue("Text '" + text + "' was not present", isTextPresent(text));
         }
     }
 
@@ -2667,7 +2671,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         for (String text : texts)
         {
             String _text = text.replace("&nbsp;", " ");
-            assertTrue("Text '" + text + "' was not present", isTextPresent(_text));
+            Assert.assertTrue("Text '" + text + "' was not present", isTextPresent(_text));
         }
     }
 
@@ -2740,10 +2744,10 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 if (count == 0)
                     log("Your browser is probably out of date");
                 else
-                    assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+                    Assert.assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
             }
             else
-                assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+                Assert.assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
         }
     }
 
@@ -2769,7 +2773,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         for(String text : texts)
         {
             text = text.replace("&nbsp;", " ");
-            assertFalse("Text '" + text + "' was present", isTextPresent(text));
+            Assert.assertFalse("Text '" + text + "' was present", isTextPresent(text));
 
         }
     }
@@ -2782,7 +2786,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
     {
-       assertTrue(textToCheck+" is not at that place in the table", textToCheck.compareTo(getTextInTable(dataRegion, row, column))==0);
+       Assert.assertTrue(textToCheck+" is not at that place in the table", textToCheck.compareTo(getTextInTable(dataRegion, row, column))==0);
     }
 
     /**
@@ -2823,7 +2827,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertTextPresentInThisOrder(String... text)
     {
         String success = isPresentInThisOrder(text);
-        assertTrue(success, success==null);
+        Assert.assertTrue(success, success==null);
     }
 
     public void assertTextBefore(String text1, String text2)
@@ -2834,7 +2838,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitForPageToLoad(int millis)
     {
         if( selenium.isAlertPresent() )
-            fail("ERROR: Unexpected alert.\n" + selenium.getAlert());
+            Assert.fail("ERROR: Unexpected alert.\n" + selenium.getAlert());
         else
         {
             _testTimeout = true;
@@ -2876,7 +2880,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void waitFor(Checker checker, String failMessage, int wait)
     {
         if (!doesElementAppear(checker, wait))
-            fail(failMessage + " ["+wait+"ms]");
+            Assert.fail(failMessage + " ["+wait+"ms]");
     }
 
     public void waitForExtMaskToDisappear()
@@ -3111,7 +3115,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         if(!doesElementAppear(checker, wait))
             if(failIfNotFound)
-                fail(failMessage);
+                Assert.fail(failMessage);
             else
                 return false;
         return true;
@@ -3186,7 +3190,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 sleep(1000);
             refresh();
         }
-        fail(text + " did not appear");
+        Assert.fail(text + " did not appear");
     }
     public void waitForText(final String text, int wait)
     {
@@ -3235,7 +3239,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         Locator l = findButton(buttonName);
 
-        assertTrue("Button with name '" + buttonName + "' not found", null != l);
+        Assert.assertTrue("Button with name '" + buttonName + "' not found", null != l);
 
         selenium.click(l.toString());
         waitForPageToLoad();
@@ -3266,21 +3270,21 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertElementPresent(Locator loc)
     {
-        assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
+        Assert.assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
     }
 
     public void assertElementPresent(Locator.XPathLocator loc, int amount)
     {
-        assertEquals("Xpath '" + loc.getPath() + "' not present expected number of times.", amount, getXpathCount(loc));
+        Assert.assertEquals("Xpath '" + loc.getPath() + "' not present expected number of times.", amount, getXpathCount(loc));
     }
 
     public void assertElementContains(Locator loc, String text)
     {
         String elemText = selenium.getText(loc.toString());
         if(elemText == null)
-            fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
+            Assert.fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
         if(!elemText.contains(text))
-            fail("The element at location '" + loc.toString() + "' contains '" + elemText + "'; expected '" + text + "'.");
+            Assert.fail("The element at location '" + loc.toString() + "' contains '" + elemText + "'; expected '" + text + "'.");
     }
 
     public boolean elementContains(Locator loc, String text)
@@ -3319,12 +3323,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertFormElementEquals(Locator loc, String value)
     {
-        assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, selenium.getValue(loc.toString()));
+        Assert.assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
     public void assertFormElementNotEquals(Locator loc, String value)
     {
-        assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
+        Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
 
@@ -3335,7 +3339,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertFormElementPresent(String elementName)
     {
-        assertTrue("Form element '" + elementName + "' was not present", isFormElementPresent(elementName));
+        Assert.assertTrue("Form element '" + elementName + "' was not present", isFormElementPresent(elementName));
     }
 
 
@@ -3346,7 +3350,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertOptionEquals(Locator loc, String value)
     {
-        assertEquals("Option '" + loc + "' was not equal '" + value + "'", selenium.getSelectedLabel(loc.toString()), value);
+        Assert.assertEquals("Option '" + loc + "' was not equal '" + value + "'", selenium.getSelectedLabel(loc.toString()), value);
     }
 
     public String getSelectedOptionText(Locator loc)
@@ -3366,7 +3370,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertElementNotPresent(String errorMsg, Locator loc)
     {
-        assertFalse(errorMsg, isElementPresent(loc));
+        Assert.assertFalse(errorMsg, isElementPresent(loc));
     }
 
     public void assertElementNotPresent(Locator loc)
@@ -3376,7 +3380,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertElementNotVisible(Locator loc)
     {
-        assertFalse("Element was visible in page: " + loc, selenium.isVisible(loc.toString()));
+        Assert.assertFalse("Element was visible in page: " + loc, selenium.isVisible(loc.toString()));
     }
 
     public boolean isLinkPresent(String linkId)
@@ -3386,12 +3390,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertLinkPresent(String linkId)
     {
-        assertTrue("Link with id '" + linkId + "' was not present", isLinkPresent(linkId));
+        Assert.assertTrue("Link with id '" + linkId + "' was not present", isLinkPresent(linkId));
     }
 
     public void assertLinkNotPresent(String linkId)
     {
-        assertFalse("Link with id '" + linkId + "' was present", isLinkPresent(linkId));
+        Assert.assertFalse("Link with id '" + linkId + "' was present", isLinkPresent(linkId));
     }
 
     public boolean isLinkPresentWithText(String text)
@@ -3420,17 +3424,17 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertLinkPresentContainingText(String text)
     {
-        assertTrue("Could not find link containing text '" + text + "'", isLinkPresentContainingText(text));
+        Assert.assertTrue("Could not find link containing text '" + text + "'", isLinkPresentContainingText(text));
     }
 
     public void assertLinkPresentWithText(String text)
     {
-        assertTrue("Could not find link with text '" + text + "'", isLinkPresentWithText(text));
+        Assert.assertTrue("Could not find link with text '" + text + "'", isLinkPresentWithText(text));
     }
 
     public void assertLinkNotPresentWithText(String text)
     {
-        assertFalse("Found a link with text '" + text + "'", isLinkPresentWithText(text));
+        Assert.assertFalse("Found a link with text '" + text + "'", isLinkPresentWithText(text));
     }
 
     public void assertAtUserUserLacksPermissionPage()
@@ -3447,12 +3451,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertLinkPresentWithTitle(String title)
     {
-        assertTrue("Could not find link with title '" + title + "'", isLinkPresentWithTitle(title));
+        Assert.assertTrue("Could not find link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
     public void assertLinkNotPresentWithTitle(String title)
     {
-        assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
+        Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
     /** Find a link with the exact text specified, click it, and wait for the page to load */
@@ -3531,7 +3535,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertLinkPresentWithTextCount(String text, int count)
     {
-        assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
+        Assert.assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
     public boolean isLinkPresentWithImage(String imageName)
@@ -3541,12 +3545,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertLinkPresentWithImage(String imageName)
     {
-        assertTrue("Link with image '" + imageName + "' was not present", isLinkPresentWithImage(imageName));
+        Assert.assertTrue("Link with image '" + imageName + "' was not present", isLinkPresentWithImage(imageName));
     }
 
     public void assertLinkNotPresentWithImage(String imageName)
     {
-        assertFalse("Link with image '" + imageName + "' was present", isLinkPresentWithImage(imageName));
+        Assert.assertFalse("Link with image '" + imageName + "' was present", isLinkPresentWithImage(imageName));
     }
 
     public void clickLinkWithImage(String image)
@@ -3734,7 +3738,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         Locator l = Locator.tagWithAttribute("img", "alt", altText);
         boolean present = isElementPresent(l);
         if (!present)
-            fail("Unable to find image with altText " + altText);
+            Assert.fail("Unable to find image with altText " + altText);
         clickAndWait(l, millis);
     }
 
@@ -3763,12 +3767,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertImagePresentWithSrc(String src)
     {
-        assertTrue(isImagePresentWithSrc(src));
+        Assert.assertTrue(isImagePresentWithSrc(src));
     }
 
     public void assertImagePresentWithSrc(String src, boolean substringMatch)
     {
-        assertTrue(isImagePresentWithSrc(src, substringMatch));
+        Assert.assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
 
     public String getTableCellText(String tableId, int row, int column)
@@ -3798,7 +3802,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTableCellTextEquals(String tableName, int row, int column, String value)
     {
-        assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
+        Assert.assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
     }
 
     public void assertTableCellTextEquals(String tableName, int row, String columnTitle, String value)
@@ -3812,7 +3816,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         for (String str : strs)
         {
-            assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\'", cellText.contains(str));
+            Assert.assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\'", cellText.contains(str));
         }
     }
 
@@ -3827,7 +3831,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         for (String str : strs)
         {
-            assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
+            Assert.assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
         }
     }
 
@@ -3853,7 +3857,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertTableCellsEqual(String tableNameA, int rowA, int columnA, String tableNameB, int rowB, int columnB)
     {
-        assertTrue("Table cells not equal: " + tableNameA + "." + String.valueOf(rowA) + "." + String.valueOf(columnA) + " & " + tableNameB + "." + String.valueOf(rowB) + "." + String.valueOf(columnB), areTableCellsEqual(tableNameA, rowA, columnA, tableNameB, rowB, columnB));
+        Assert.assertTrue("Table cells not equal: " + tableNameA + "." + String.valueOf(rowA) + "." + String.valueOf(columnA) + " & " + tableNameB + "." + String.valueOf(rowB) + "." + String.valueOf(columnB), areTableCellsEqual(tableNameA, rowA, columnA, tableNameB, rowB, columnB));
     }
 
     /*
@@ -3863,7 +3867,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         int col = selenium.getXpathCount("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").intValue();
         if(col == 0)
-            fail("Column '" + columnTitle + "' not found in table '" + tableName + "'");
+            Assert.fail("Column '" + columnTitle + "' not found in table '" + tableName + "'");
 
         return col;
     }
@@ -4127,7 +4131,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertImageMapAreaPresent(String imageMapName, String areaTitle)
     {
-        assertTrue("Image map '" + imageMapName + "' did not have an area title of '" + areaTitle + "'", isImageMapAreaPresent(imageMapName, areaTitle));
+        Assert.assertTrue("Image map '" + imageMapName + "' did not have an area title of '" + areaTitle + "'", isImageMapAreaPresent(imageMapName, areaTitle));
     }
 
     public void assertTabPresent(String tabText)
@@ -4161,7 +4165,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (buttonLocator != null)
             clickAndWait(buttonLocator, wait);
         else
-            fail("No button found with text \"" + text + "\" at index " + index);
+            Assert.fail("No button found with text \"" + text + "\" at index " + index);
     }
 
     private Locator.XPathLocator getButtonLocator(String text, int index)
@@ -4252,7 +4256,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
         else
-            fail("No button found with text \"" + text + "\"");
+            Assert.fail("No button found with text \"" + text + "\"");
     }
 
 
@@ -4262,7 +4266,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (buttonLocator != null)
             clickAtAndWait(buttonLocator, coord, waitMillis);
         else
-            fail("No button found with text \"" + text + "\"");
+            Assert.fail("No button found with text \"" + text + "\"");
     }
 
     public void clickButtonContainingText(String text)
@@ -4276,7 +4280,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMills);
         else
-            fail("No button found with text \"" + text + "\"");
+            Assert.fail("No button found with text \"" + text + "\"");
     }
 
     public void clickButtonContainingText(String buttonText, String textShouldAppearAfterLoading)
@@ -4411,7 +4415,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void setFormElement(String element, File file)
     {
-        assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
+        Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
         setFormElement(Locator.raw(element), file.getAbsolutePath());
     }
 
@@ -4545,7 +4549,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         sleep(500);
 
         // Clear selections.
-        assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
+        Assert.assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
         if(!isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
             clickLinkWithText("[All]", false);
         clickLinkWithText("[All]", false);
@@ -4703,22 +4707,22 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertNavButtonPresent(String buttonText)
     {
-        assertTrue("Nav button '" + buttonText + "' was not present", isNavButtonPresent(buttonText));
+        Assert.assertTrue("Nav button '" + buttonText + "' was not present", isNavButtonPresent(buttonText));
     }
 
     public void assertNavButtonNotPresent(String buttonText)
     {
-        assertFalse("Nav button '" + buttonText + "' was present", isNavButtonPresent(buttonText));
+        Assert.assertFalse("Nav button '" + buttonText + "' was present", isNavButtonPresent(buttonText));
     }
 
     public void assertMenuButtonPresent(String buttonText)
     {
-        assertTrue("Nav button '" + buttonText + "' was not present", isMenuButtonPresent(buttonText));
+        Assert.assertTrue("Nav button '" + buttonText + "' was not present", isMenuButtonPresent(buttonText));
     }
 
     public void assertMenuButtonNotPresent(String buttonText)
     {
-        assertFalse("Menu button '" + buttonText + "' was present", isMenuButtonPresent(buttonText));
+        Assert.assertFalse("Menu button '" + buttonText + "' was present", isMenuButtonPresent(buttonText));
     }
 
     /**
@@ -4888,7 +4892,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isChecked(checkBoxLocator))
             click(checkBoxLocator);
         logJavascriptAlerts();
-        assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
+        Assert.assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
     }
 
     public void checkRadioButton(String name, int index)
@@ -4908,7 +4912,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertRadioButtonSelected(Locator radioButtonLocator)
     {
-        assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
+        Assert.assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
     }
 
     public void checkCheckbox(String name, int index)
@@ -4942,12 +4946,12 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
     public void assertChecked(Locator checkBoxLocator)
     {
-        assertTrue("Checkbox not checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
+        Assert.assertTrue("Checkbox not checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
     }
 
     public void assertNotChecked(Locator checkBoxLocator)
     {
-        assertFalse("Checkbox checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
+        Assert.assertFalse("Checkbox checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
     }
 
     public boolean isChecked(Locator checkBoxLocator)
@@ -5008,7 +5012,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (1==0)
         {
             log("Checking permission setting for group " + groupName + " equals " + permissionSetting);
-            assertEquals("Permission for '" + groupName + "' was not '" + permissionSetting + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
+            Assert.assertEquals("Permission for '" + groupName + "' was not '" + permissionSetting + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
         }
         else
         {
@@ -5023,7 +5027,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             log("Checking permission setting for group " + groupName + " equals " + role);
             waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             assertElementPresent(Locator.permissionButton(groupName,role));
-            //assertEquals("'" + groupName + "' is not in role '" + role + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
+            //Assert.assertEquals("'" + groupName + "' is not in role '" + role + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
         }
     }
 
@@ -5039,7 +5043,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (!isChecked(inherited))
             click(inherited);
         waitForElement(Locator.permissionRendered(), defaultWaitForPage);
-        assertTrue("Failed to check inherit permissions checkbox.", isChecked(inherited));
+        Assert.assertTrue("Failed to check inherit permissions checkbox.", isChecked(inherited));
     }
 
 
@@ -5050,7 +5054,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         if (isChecked(inherited))
             click(inherited);
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        assertFalse(isChecked(inherited));
+        Assert.assertFalse(isChecked(inherited));
     }
 
     public void savePermissions()
@@ -5094,7 +5098,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             String role = toRole(permissionString);
             if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
             {
-                fail("call removePermission()");
+                Assert.fail("call removePermission()");
                 return;
             }
             log("Setting permissions for group " + userOrGroupName + " to " + role);
@@ -5234,11 +5238,11 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         String fakeUser = _impersonationStack.pop();
         log("Ending impersonation");
-        assertEquals(fakeUser, getDisplayName());
+        Assert.assertEquals(fakeUser, getDisplayName());
         clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
         goToHome();
-        assertFalse(fakeUser.equals(getDisplayName()));
+        Assert.assertFalse(fakeUser.equals(getDisplayName()));
     }
 
     public void projectImpersonate(String fakeUser)
@@ -5296,7 +5300,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Add Users");
 
         if (verifySuccess)
-            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
+            Assert.assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
     }
 
     public void createUserAndNotify(String userName, String cloneUserName)
@@ -5319,7 +5323,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         clickNavButton("Add Users");
 
         if (verifySuccess)
-            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
+            Assert.assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
     }
 
     public void createSiteDeveloper(String userEmail)
@@ -5394,7 +5398,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
 
         if (failIfNotFound)
-            assertTrue(userEmail + " was not present", isPresent);
+            Assert.assertTrue(userEmail + " was not present", isPresent);
 
         if (isPresent)
         {
@@ -5437,14 +5441,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("asserting that group " + groupName + " exists in project " + projectName + "...");
         if (!doesGroupExist(groupName, projectName))
-            fail("group " + groupName + " does not exist in project " + projectName);
+            Assert.fail("group " + groupName + " does not exist in project " + projectName);
     }
 
     public void assertGroupDoesNotExist(String groupName, String projectName)
     {
         log("asserting that group " + groupName + " exists in project " + projectName + "...");
         if (doesGroupExist(groupName, projectName))
-            fail("group " + groupName + " exists in project " + projectName);
+            Assert.fail("group " + groupName + " exists in project " + projectName);
     }
 
     public boolean isUserInGroup(String email, String groupName, String projectName)
@@ -5464,14 +5468,14 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         log("asserting that user " + email + " is in group " + projectName + "/" + groupName + "...");
         if (!isUserInGroup(email, groupName, projectName))
-            fail("user " + email + " was not in group " + projectName + "/" + groupName);
+            Assert.fail("user " + email + " was not in group " + projectName + "/" + groupName);
     }
 
     public void assertUserNotInGroup(String email, String groupName, String projectName)
     {
         log("asserting that user " + email + " is not in group " + projectName + "/" + groupName + "...");
         if (isUserInGroup(email, groupName, projectName))
-            fail("user " + email + " was found in group " + projectName + "/" + groupName);
+            Assert.fail("user " + email + " was found in group " + projectName + "/" + groupName);
     }
 
     /**
@@ -5570,7 +5574,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         else if(isTextPresent("Pages"))
             clickWebpartMenuItem("Pages", "New");
         else
-            fail("Could not find a link on the current page to create a new wiki page." +
+            Assert.fail("Could not find a link on the current page to create a new wiki page." +
                     " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
                     " before calling this method.");
 
@@ -5640,7 +5644,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     {
         if (!isTextPresent(wikiName))
         {
-            fail("Could not find the Wiki '" + wikiName + "'. Please create the Wiki before attempting to set the source.");
+            Assert.fail("Could not find the Wiki '" + wikiName + "'. Please create the Wiki before attempting to set the source.");
         }
         clickWebpartMenuItem(wikiName, "Edit");
 
@@ -5801,7 +5805,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         }
         catch (IOException e)
         {
-            fail(e.getMessage());
+            Assert.fail(e.getMessage());
             return null;
         }
         finally
@@ -5860,31 +5864,31 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
     public void assertAttributeEquals(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
-        assertEquals("Expected attribute '" + locator + "@" + attributeName + "' value to be '" + value + "', but was '" + actual + "' instead.", value, actual);
+        Assert.assertEquals("Expected attribute '" + locator + "@" + attributeName + "' value to be '" + value + "', but was '" + actual + "' instead.", value, actual);
     }
 
     public void assertAttributeContains(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
-        assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to contain '" + value + "', but was '" + actual + "' instead.", actual != null && actual.contains(value));
+        Assert.assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to contain '" + value + "', but was '" + actual + "' instead.", actual != null && actual.contains(value));
     }
 
     public void assertAttributeNotContains(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
-        assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
+        Assert.assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
     }
 
     public void assertSetsEqual(String firstSet, String secondSet, String delimiterRegEx)
     {
         String[] firstArray = firstSet.split(delimiterRegEx);
         String[] secondArray = secondSet.split(delimiterRegEx);
-        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
+        Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
         Set<String> firstHash= new HashSet<String>();
         Collections.addAll(firstHash, firstArray);
         Set<String> secondHash= new HashSet<String>();
         Collections.addAll(secondHash, secondArray);
-        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
+        Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
     }
 
 
@@ -6022,7 +6026,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         selectSchema(schemaName);
         String url = selenium.getEval("selenium.browserbot.getCurrentWindow()._browser.getCreateQueryUrl('" + schemaName + "')");
         if (null == url || url.length() == 0)
-            fail("Could not get the URL for creating a new query in schema " + schemaName);
+            Assert.fail("Could not get the URL for creating a new query in schema " + schemaName);
         beginAt(url);
     }
 
@@ -6068,7 +6072,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         //test for success
         if (!isElementPresent(Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok')]")))
         {
-            fail("Some queries did not pass validation. See error log for more details.");
+            Assert.fail("Some queries did not pass validation. See error log for more details.");
         }
     }
 
@@ -6513,7 +6517,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
             for (File copiedArchive : _copiedArchives)
                 if (!copiedArchive.delete())
-                    fail("Couldn't delete copied specimen archive: " + copiedArchive.getAbsolutePath());
+                    Assert.fail("Couldn't delete copied specimen archive: " + copiedArchive.getAbsolutePath());
         }
     }
 
@@ -6525,7 +6529,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
         List<String> statusValues = getPipelineStatusValues();
 
         // Short circuit in case we already have too many COMPLETE jobs
-        assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(statusValues) <= completeJobsExpected);
+        Assert.assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(statusValues) <= completeJobsExpected);
 
         startTimer();
 
@@ -6541,7 +6545,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
 
         if (!expectError)
             assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(statusValues));
+        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(statusValues));
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
@@ -6556,7 +6560,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
             refresh();
             statusValues = getPipelineStatusValues();
         }
-        assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedbCount(statusValues));
+        Assert.assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedbCount(statusValues));
     }
 
     // Note: unverified
@@ -6569,7 +6573,7 @@ public abstract class BaseSeleniumWebTest extends TestCase implements Cleanable,
                 return;
 
         //else
-        fail("Running pipeline jobs were found.  Timeout:" + wait);
+        Assert.fail("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
     protected void toggleMetadataQueryEditor()

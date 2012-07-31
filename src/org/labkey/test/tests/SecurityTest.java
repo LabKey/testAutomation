@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -92,7 +93,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         log("Check welcome emails [6 new users]");
         goToModule("Dumbster");
-        assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
+        Assert.assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
 
@@ -269,7 +270,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         switch (changeType)
         {
             case CHANGE_PASSWORD:
-                fail("unsupported use of change password type");
+                Assert.fail("unsupported use of change password type");
                 break;
             case RESET_PASSWORD:
                 setFormElement("password", passwords[0]);
@@ -378,7 +379,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         checkCheckbox("delete", NORMAL_USER);
         selenium.chooseOkOnNextConfirmation();
         clickNavButton("Update Group Membership");
-        assertEquals(selenium.getConfirmation(), "Permanently remove selected users from this group?");
+        Assert.assertEquals(selenium.getConfirmation(), "Permanently remove selected users from this group?");
         assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         clickLinkWithText(PROJECT_NAME);
     }
@@ -492,7 +493,7 @@ public class SecurityTest extends BaseSeleniumWebTest
             assertLinkPresentWithTextCount(groupName, expectedCount);
             return;
         }
-        fail("Unable to verify group membership of cloned user privileges");
+        Assert.fail("Unable to verify group membership of cloned user privileges");
     }
 
     protected void tokenAuthenticationTest()
@@ -511,7 +512,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        Assert.assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
 
         Map<String, String> params = getUrlParameters();
         String email = params.get("labkeyEmail");
@@ -526,14 +527,14 @@ public class SecurityTest extends BaseSeleniumWebTest
         {
             emailName = email;
         }
-        assertTrue(emailName.equals(userName));
+        Assert.assertTrue(emailName.equals(userName));
         String token = params.get("labkeyToken");
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 32783);
 
         beginAt(baseUrl + "invalidateToken.view?labkeyToken=" + token + "&returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        Assert.assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
         // Should fail now
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
@@ -542,11 +543,11 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        Assert.assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
 
         params = getUrlParameters();
         email = params.get("labkeyEmail");
-        assertTrue(email.equals(NORMAL_USER));
+        Assert.assertTrue(email.equals(NORMAL_USER));
         token = params.get("labkeyToken");
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 15);
@@ -562,14 +563,14 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void assertFailureAuthenticationToken(String xml)
     {
-        assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
+        Assert.assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
     }
 
 
     protected void assertSuccessAuthenticationToken(String xml, String token, String email, int permissions)
     {
         String correct = "<TokenAuthentication success=\"true\" token=\"" + token + "\" email=\"" + email + "\" permissions=\"" + permissions + "\"/>";
-        assertTrue(xml.startsWith(correct));
+        Assert.assertTrue(xml.startsWith(correct));
     }
 
 
@@ -598,7 +599,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         {
             log("Failure attempting to retrieve " + relativeUrl);
             log(e.getMessage());
-            fail();
+            Assert.fail();
             return null;
         }
         finally
@@ -630,7 +631,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         catch (URISyntaxException e)
         {
             log(e.getMessage());
-            fail();
+            Assert.fail();
         }
 
         Map<String, String> map = new HashMap<String, String>();
@@ -692,8 +693,8 @@ public class SecurityTest extends BaseSeleniumWebTest
         String user           = table.getDataAsText(2, "User");
         String comment        = table.getDataAsText(2, "Comment");
 
-        assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
-        assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
+        Assert.assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
+        Assert.assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
     }
 
     protected void passwordStrengthTest()

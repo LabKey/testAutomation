@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -48,7 +49,7 @@ public class ListExportTest extends ListTest
         exportList();
         sleep(1000);
         File[] fileAfterDownload =  getFilesWithNameInDlDir(downloadDirectory, filter);
-        assertEquals(fileCount+1, fileAfterDownload.length);
+        Assert.assertEquals(fileCount+1, fileAfterDownload.length);
 
         File exportedFile = fileAfterDownload[fileAfterDownload.length-1];
         exportedFile.deleteOnExit();

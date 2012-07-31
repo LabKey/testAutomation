@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.PostgresOnlyTest;
@@ -92,7 +93,7 @@ public class ReagentTest extends BaseSeleniumWebTest
         click(Locator.xpath("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]"));
         setFormElement("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]", "Alexa");        
         Number alexaLabels = selenium.getXpathCount("//div[contains(@class, 'x-combo-list')]//b[text()='Alexa 405']/../../..//b");
-        assertEquals("Expected to find 5 Alexa labels", 5, alexaLabels.intValue());
+        Assert.assertEquals("Expected to find 5 Alexa labels", 5, alexaLabels.intValue());
 
         pressDownArrow("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]");
         pressDownArrow("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]");

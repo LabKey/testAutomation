@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.RReportHelper;
@@ -131,11 +132,11 @@ public class FolderExportTest extends BaseSeleniumWebTest
         log("verify search settings as expected");
         goToFolderManagement();
         clickLinkWithText("Search");
-        assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
+        Assert.assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
 
         log("verify folder type was overwritten on import");
         clickLinkContainingText("Folder Type");
-        assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
+        Assert.assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -92,7 +93,7 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        fail("Not implemented");
+        Assert.fail("Not implemented");
         return null;
     }
 }

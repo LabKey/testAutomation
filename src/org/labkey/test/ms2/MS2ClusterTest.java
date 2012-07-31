@@ -16,6 +16,7 @@
 package org.labkey.test.ms2;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.pipeline.PipelineFolder;
 import org.labkey.test.pipeline.PipelineTestParams;
@@ -136,7 +137,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
 
         for (PipelineTestParams tp : listValidated)
         {
-            assertTrue("Tests failed.  Consult the log.", tp.isValid());
+            Assert.assertTrue("Tests failed.  Consult the log.", tp.isValid());
         }
     }
 
@@ -180,7 +181,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
                     }
                     catch (IOException e)
                     {
-                        assertTrue("Failed to copy search results '" + fileTandem + "'.", false);
+                        Assert.assertTrue("Failed to copy search results '" + fileTandem + "'.", false);
                     }
                 }
             }

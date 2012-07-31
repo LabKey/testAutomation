@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import junit.framework.Assert;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.Runner;
 import org.labkey.test.BaseSeleniumWebTest;
@@ -203,12 +204,12 @@ public class JUnitTest extends TestSuite
                 else
                 {
                     log("remote junit failed: " + _remoteClass);
-                    fail("remote junit failed: " + _remoteClass + "\n" + dump(response));
+                    Assert.fail("remote junit failed: " + _remoteClass + "\n" + dump(response));
                 }
             }
             catch (IOException ioe)
             {
-                fail("failed to run remote junit: " + ioe.getMessage());
+                Assert.fail("failed to run remote junit: " + ioe.getMessage());
             }
             finally
             {

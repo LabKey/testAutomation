@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
@@ -198,7 +199,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickMenuButton("Views", "Edit Snapshot");
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickNavButton("Save");
-        assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
+        Assert.assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
         clickNavButton("Update Snapshot", 0);
         getConfirmationAndWait();
         waitForText("Dataset: Custom Query Snapshot", 10000);

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -57,8 +58,8 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
         if(projectName!=null)
             clickLinkWithText(projectName);
         click(helpMenuLink);
-        assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
-        assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
+        Assert.assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
+        Assert.assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
     }
 
     protected void setUpTest()

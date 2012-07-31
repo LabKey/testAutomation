@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -312,7 +313,7 @@ public class StudyTest extends StudyBaseTest
 
         // validate...
         if (!identifiers.containsAll(Arrays.asList(ids)))
-            fail("The Participant Group wizard did not contain the subject IDs : " + ids);
+            Assert.fail("The Participant Group wizard did not contain the subject IDs : " + ids);
     }
 
     /** verify that we can change a list's name
@@ -417,7 +418,7 @@ public class StudyTest extends StudyBaseTest
         log("pids after edit: " + pidsAfterEdit);
 
 
-        assertEquals(newPids, pidsAfterEdit );
+        Assert.assertEquals(newPids, pidsAfterEdit );
 
         clickButtonContainingText("Cancel", 0);
     }
@@ -501,7 +502,7 @@ public class StudyTest extends StudyBaseTest
         //assert same size
         int columnCount = idsInColumn.size()-2; //the first entry in column count is the name
         int formCount = idsInForm.length() - idsInForm.replace(",", "").length() - 1; //number of commas + 1 = number of entries
-        assertEquals(columnCount, formCount);
+        Assert.assertEquals(columnCount, formCount);
     }
 
     private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
@@ -633,14 +634,14 @@ public class StudyTest extends StudyBaseTest
 //        DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
 //        table.setFilter("QualityControlFlag", "Equals", "true");
 //        table.setSort("GlobalUniqueId", SortDirection.ASC);
-//        assertEquals("AAA07XK5-02", table.getDataAsText(0, "Global Unique Id"));
-//        assertEquals("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId", table.getDataAsText(0, "Quality Control Comments"));
-//        assertEquals("", table.getDataAsText(0, "Primary Type"));
-//        assertEquals("", table.getDataAsText(0, "Additive Type"));
+//        Assert.assertEquals("AAA07XK5-02", table.getDataAsText(0, "Global Unique Id"));
+//        Assert.assertEquals("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId", table.getDataAsText(0, "Quality Control Comments"));
+//        Assert.assertEquals("", table.getDataAsText(0, "Primary Type"));
+//        Assert.assertEquals("", table.getDataAsText(0, "Additive Type"));
 //
-//        assertEquals("ABH00LT8-01", table.getDataAsText(2, "Global Unique Id"));
-//        assertEquals("Conflicts found: VolumeUnits", table.getDataAsText(2, "Quality Control Comments"));
-//        assertEquals("", table.getDataAsText(2, "Volume Units"));
+//        Assert.assertEquals("ABH00LT8-01", table.getDataAsText(2, "Global Unique Id"));
+//        Assert.assertEquals("Conflicts found: VolumeUnits", table.getDataAsText(2, "Quality Control Comments"));
+//        Assert.assertEquals("", table.getDataAsText(2, "Volume Units"));
 //
 //        clickLinkContainingText("history");
 //        assertTextPresent("Blood (Whole)");
@@ -772,8 +773,8 @@ public class StudyTest extends StudyBaseTest
         log("Verify there is exactly one new DatasetAuditEvent, and it refers to the insertion of a new record");
         SelectRowsResponse selectResp = getDatasetAuditLog();
         List<Map<String,Object>> rows = selectResp.getRows();
-        assertEquals("Unexpected size of datasetAuditEvent log", previousCount + 1, rows.size());
-        assertEquals("A new dataset record was inserted", rows.get(rows.size()-1).get("Comment"));
+        Assert.assertEquals("Unexpected size of datasetAuditEvent log", previousCount + 1, rows.size());
+        Assert.assertEquals("A new dataset record was inserted", rows.get(rows.size()-1).get("Comment"));
 
     }
 
@@ -793,7 +794,7 @@ public class StudyTest extends StudyBaseTest
         }
         catch (Exception e)
         {
-            fail("Error when attempting to verify audit trail: " + e.getMessage());
+            Assert.fail("Error when attempting to verify audit trail: " + e.getMessage());
         }
         return selectResp;
 
@@ -837,7 +838,7 @@ public class StudyTest extends StudyBaseTest
         for(String[] columnAndValue : columnAndValues)
         {
             log("Checking column: "+ columnAndValue[0]);
-            assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
+            Assert.assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
         }
         clickLinkContainingText("details");
 
@@ -849,7 +850,7 @@ public class StudyTest extends StudyBaseTest
         log("verify demographic data set not present");
         clickLinkContainingText(DEMOGRAPHICS_TITLE);
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        assertFalse(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
+        Assert.assertFalse(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
     }
 
     protected void verifyVisitMapPage()
@@ -916,7 +917,7 @@ public class StudyTest extends StudyBaseTest
         log("verify ");
         clickButtonContainingText("View Data");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
-        assertTrue(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
+        Assert.assertTrue(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
     }
 
     private void verifyHiddenVisits()
@@ -939,13 +940,13 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("Visit Import Mapping");
         assertTableRowsEqual("customMapping", 2, VISIT_IMPORT_MAPPING.replace("SequenceNum", "Sequence Number Mapping"));
 
-        assertEquals("Incorrect number of gray cells", 60, countTableCells(null, true));
-        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 1, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false));
-        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 18, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true));
-        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", false));
-        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", true));
-        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
-        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", true));
+        Assert.assertEquals("Incorrect number of gray cells", 60, countTableCells(null, true));
+        Assert.assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 1, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false));
+        Assert.assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 18, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true));
+        Assert.assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", false));
+        Assert.assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", true));
+        Assert.assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
+        Assert.assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         // Replace custom visit mapping and verify
         String replaceMapping = "Name\tSequenceNum\nBarBar\t4839\nFoofoo\t9732";
@@ -956,13 +957,13 @@ public class StudyTest extends StudyBaseTest
         assertTextNotPresent("Cycle 10");
         assertTextNotPresent("All Done");
 
-        assertEquals("Incorrect number of gray cells", 54, countTableCells(null, true));
-        assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 1, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false));
-        assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 18, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true));
-        assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", false));
-        assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", 0, countTableCells("Soc Imp Log #%{S.3.2}", true));
-        assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
-        assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
+        Assert.assertEquals("Incorrect number of gray cells", 54, countTableCells(null, true));
+        Assert.assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 1, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false));
+        Assert.assertEquals("Incorrect number of gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 18, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", true));
+        Assert.assertEquals("Incorrect number of non-gray \"Soc Imp Log #%{S.3.2}\" cells", 1, countTableCells("Soc Imp Log #%{S.3.2}", false));
+        Assert.assertEquals("Incorrect number of gray \"Soc Imp Log #%{S.3.2}\" cells", 0, countTableCells("Soc Imp Log #%{S.3.2}", true));
+        Assert.assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
+        Assert.assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         clickLinkWithText(getFolderName());
         clickLinkWithText("47 datasets");
@@ -971,7 +972,7 @@ public class StudyTest extends StudyBaseTest
 
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
         List<String> sequenceNums = table.getColumnDataAsText("Sequence Num");
-        assertEquals("Incorrect number of rows in Types dataset", 48, sequenceNums.size());
+        Assert.assertEquals("Incorrect number of rows in Types dataset", 48, sequenceNums.size());
 
         int sn101 = 0;
         int sn201 = 0;
@@ -984,11 +985,11 @@ public class StudyTest extends StudyBaseTest
             else if (seqNum.startsWith("201.0"))
                 sn201++;
             else
-                fail("Unexpected sequence number: " + seqNum);
+                Assert.fail("Unexpected sequence number: " + seqNum);
         }
 
-        assertEquals("Incorrect count for sequence number 101.0", 24, sn101);
-        assertEquals("Incorrect count for sequence number 201.0", 24, sn201);
+        Assert.assertEquals("Incorrect count for sequence number 101.0", 24, sn101);
+        Assert.assertEquals("Incorrect count for sequence number 201.0", 24, sn201);
     }
 
     // Either param can be null

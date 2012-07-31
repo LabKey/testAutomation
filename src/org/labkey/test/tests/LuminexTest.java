@@ -296,7 +296,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_LUM);
 
         clickNavButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
+        Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
         clickNavButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
@@ -309,7 +309,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // Upload another run using a thaw list pasted in as a TSV
         clickNavButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
+        Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
         setFormElement("participantVisitResolver", "Lookup");
         setFormElement("ThawListType", "Text");
         setFormElement("ThawListTextArea", "Index\tSpecimenID\tParticipantID\tVisitID\n" +
@@ -320,17 +320,17 @@ public class LuminexTest extends AbstractQCAssayTest
         clickNavButton("Next");
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
         clickNavButton("Next", 60000);
-        assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
-        assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
+        Assert.assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
+        Assert.assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
         clickNavButton("Save and Finish");
 
         // Upload another run using a thaw list that pointed at the list we uploaded earlier
         clickNavButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
-        assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
-        assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));
-        assertEquals("on", selenium.getValue("//input[@name='ThawListType' and @value='Text']"));
-        assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
+        Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
+        Assert.assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
+        Assert.assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));
+        Assert.assertEquals("on", selenium.getValue("//input[@name='ThawListType' and @value='Text']"));
+        Assert.assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
         checkRadioButton("ThawListType", "List");
         waitForElement(Locator.id("button_Choose list..."), WAIT_FOR_JAVASCRIPT);
         clickNavButton("Choose list...", 0);
@@ -341,8 +341,8 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
         clickNavButton("Next", 60000);
-        assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
-        assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
+        Assert.assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
+        Assert.assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
         clickNavButton("Save and Finish");
 
         log("Check that upload worked");
@@ -415,18 +415,18 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // check that both the raw and summary data were uploaded together
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
-        assertEquals("Unexpected number of data rows for both raw and summary data", 108, table.getDataRowCount());
+        Assert.assertEquals("Unexpected number of data rows for both raw and summary data", 108, table.getDataRowCount());
         // check the number of rows of summary data
         table.setFilter("Summary", "Equals", "true");
-        assertEquals("Unexpected number of data rows for summary data", 36, table.getDataRowCount());
+        Assert.assertEquals("Unexpected number of data rows for summary data", 36, table.getDataRowCount());
         table.clearFilter("Summary");
         // check the number of rows of raw data
         table.setFilter("Summary", "Equals", "false");
-        assertEquals("Unexpected number of data rows for raw data", 72, table.getDataRowCount());
+        Assert.assertEquals("Unexpected number of data rows for raw data", 72, table.getDataRowCount());
         table.clearFilter("Summary");
         // check the row count at the analyte level
         table.setFilter("Analyte", "Equals", "Analyte1");
-        assertEquals("Unexpected number of data rows for Analyte1", 36, table.getDataRowCount());
+        Assert.assertEquals("Unexpected number of data rows for Analyte1", 36, table.getDataRowCount());
 
         // check the StdDev and % CV for a few samples
         checkStdDevAndCV("Analyte1", "S10", 3, "0.35", "9.43%");
@@ -439,11 +439,11 @@ public class LuminexTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
         table.setFilter("Analyte", "Equals", analyte);
         table.setFilter("Type", "Equals", type);
-        assertEquals("Unexpected number of data rows for " + analyte + "/" + type, rowCount, table.getDataRowCount());
+        Assert.assertEquals("Unexpected number of data rows for " + analyte + "/" + type, rowCount, table.getDataRowCount());
         for (int i = 0; i < rowCount; i++)  
         {
-            assertEquals("Wrong StdDev", stddev, table.getDataAsText(i, "StdDev"));
-            assertEquals("Wrong %CV", cv, table.getDataAsText(i, "CV"));
+            Assert.assertEquals("Wrong StdDev", stddev, table.getDataAsText(i, "StdDev"));
+            Assert.assertEquals("Wrong %CV", cv, table.getDataAsText(i, "CV"));
         }
         table.clearFilter("Type");
         table.clearFilter("Analyte");
@@ -490,9 +490,9 @@ public class LuminexTest extends AbstractQCAssayTest
             if(formula.get(i).equals(rum4))
             {
                 //ec50=populated=inflectionPoint
-                assertEquals(ec50.get(i), inflectionPoint.get(i));
+                Assert.assertEquals(ec50.get(i), inflectionPoint.get(i));
                 //auc=unpopulated
-                assertEquals("", auc.get(i));
+                Assert.assertEquals("", auc.get(i));
             }
             else if(formula.get(i).equals(rum5))
             {
@@ -501,18 +501,18 @@ public class LuminexTest extends AbstractQCAssayTest
                     rum5ec50count++;
 
                 // auc should not be populated
-                assertEquals("", auc.get(i));
+                Assert.assertEquals("", auc.get(i));
             }
             else if(formula.get(i).equals(trapezoidal))
             {
                 //ec50 should not be populated
-                assertEquals("", ec50.get(i));
+                Assert.assertEquals("", ec50.get(i));
                 //auc=populated (for all non-blank analytes)
                 if (!analyte.get(i).startsWith("Blank"))
-                    assertTrue( "AUC was unpopulated for row " + i, auc.get(i).length()>0);
+                    Assert.assertTrue( "AUC was unpopulated for row " + i, auc.get(i).length()>0);
             }
         }
-        assertEquals("Unexpected number of Five Parameter EC50 values (expected 11 of 19).", 11, rum5ec50count);
+        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected 11 of 19).", 11, rum5ec50count);
 
         // check that the 5PL parameters are within the expected ranges (note: exact values can change based on R 32-bit vs R 64-bit)
         Double[] FiveParameterEC50mins = {32211.66, 44975.52, 110.72, 32.29, 32.46, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
@@ -520,13 +520,13 @@ public class LuminexTest extends AbstractQCAssayTest
         table.setFilter("CurveType", "Equals", "Five Parameter");
         table.setFilter("EC50", "Is Not Blank", "");
         ec50 = table.getColumnDataAsText("EC50");
-        assertEquals("Unexpected number of Five Parameter EC50 values (expected 11)", 11, ec50.size());
+        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected 11)", 11, ec50.size());
         for (int i = 0; i < ec50.size(); i++)
         {
             Double val = Double.parseDouble(ec50.get(i));
             Double min = FiveParameterEC50mins[i];
             Double max = FiveParameterEC50maxs[i];
-            assertTrue("Unexpected 5PL EC50 value for " + table.getDataAsText(i, "Analyte"), min <= val && val <= max);
+            Assert.assertTrue("Unexpected 5PL EC50 value for " + table.getDataAsText(i, "Analyte"), min <= val && val <= max);
         }
         table.clearFilter("EC50");
         table.clearFilter("CurveType");
@@ -542,14 +542,14 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // expect one 4PL curve fit failure (for Standard1 - ENV6 (97))
         table.setFilter("CurveType", "Equals", "Four Parameter");
-        assertEquals("Expected one Four Parameter curve fit failure flag", 1, table.getDataRowCount());
+        Assert.assertEquals("Expected one Four Parameter curve fit failure flag", 1, table.getDataRowCount());
         List<String> values = table.getColumnDataAsText("Analyte");
-        assertTrue("Unexpected analyte for Four Parameter curve fit failure", values.size() == 1 && values.get(0).equals("ENV6 (97)"));
+        Assert.assertTrue("Unexpected analyte for Four Parameter curve fit failure", values.size() == 1 && values.get(0).equals("ENV6 (97)"));
         table.clearFilter("CurveType");
 
         // expect ten 5PL curve fit failures
         table.setFilter("CurveType", "Equals", "Five Parameter");
-        assertEquals("Expected ten Five Parameter curve fit failure flags", 10, table.getDataRowCount());
+        Assert.assertEquals("Expected ten Five Parameter curve fit failure flags", 10, table.getDataRowCount());
         table.clearFilter("CurveType");
 
         table.clearFilter("FailureFlag");
@@ -665,13 +665,13 @@ public class LuminexTest extends AbstractQCAssayTest
 
             if(matchesWell(description, type, well) && analytes.contains(analyte))
             {
-                assertEquals(expectedComment,comment);
+                Assert.assertEquals(expectedComment,comment);
             }
 
             if(expectedComment.equals(comment))
             {
-                assertTrue(matchesWell(description, type, well));
-                assertTrue(analytes.contains(analyte));
+                Assert.assertTrue(matchesWell(description, type, well));
+                Assert.assertTrue(analytes.contains(analyte));
             }
         }
     }
@@ -764,7 +764,7 @@ public class LuminexTest extends AbstractQCAssayTest
         if(b)
             ExtHelper.prevClickFileBrowserFileCheckbox(this, analyte);
         else
-            fail("not supported at this time");
+            Assert.fail("not supported at this time");
     }
 
     private String excludedWellDescription = "Sample 2";
@@ -852,11 +852,11 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
         // the same curve fits
-        assertTrue("BioPlex curve fit for ENV6 (97) in plate 1, 2, or 3",
+        Assert.assertTrue("BioPlex curve fit for ENV6 (97) in plate 1, 2, or 3",
                 isTextPresent("FI = 0.465914 + (1.5417E+006 - 0.465914) / ((1 + (Conc / 122.733)^-0.173373))^7.64039") ||
                 isTextPresent("FI = 0.582906 + (167.081 - 0.582906) / ((1 + (Conc / 0.531813)^-5.30023))^0.1"));
-        assertTrue("BioPlex FitProb for ENV6 (97) in plate 1, 2, or 3", isTextPresent("0.9667") || isTextPresent("0.4790"));
-        assertTrue("BioPlex ResVar for ENV6 (97) in plate 1, 2, 3", isTextPresent("0.1895") || isTextPresent("0.8266"));
+        Assert.assertTrue("BioPlex FitProb for ENV6 (97) in plate 1, 2, or 3", isTextPresent("0.9667") || isTextPresent("0.4790"));
+        Assert.assertTrue("BioPlex ResVar for ENV6 (97) in plate 1, 2, 3", isTextPresent("0.1895") || isTextPresent("0.8266"));
 
         compareColumnValuesAgainstExpected("Analyte", "Standard", analytesAndStandardsConfig);
 
@@ -868,8 +868,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
         // the same curve fits
-        assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("0.465914") || isTextPresent("0.582906"));
-        assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("7.64039") || isTextPresent("0.1"));
+        Assert.assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("0.465914") || isTextPresent("0.582906"));
+        Assert.assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("7.64039") || isTextPresent("0.1"));
     }
 
     private void compareColumnValuesAgainstExpected(String column1, String column2, Map<String, Set<String>> column1toColumn2)
@@ -909,7 +909,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void assertStandardsMatchExpected(String column1Val, String column2Val, Map<String, Set<String>> colum1toColumn2Map)
     {
 //        if(analyte.equals("Analyte"))//header
-//            assertEquals(actualStandards, "Exclusion Comment");
+//            Assert.assertEquals(actualStandards, "Exclusion Comment");
 //        else
 //        {
             String[] splitCol2Val = column2Val.split(",");
@@ -919,12 +919,12 @@ public class LuminexTest extends AbstractQCAssayTest
             log("Column2: " + column2Val);
             if(expectedCol2Vals!=null)
             {
-                assertEquals(splitCol2Val.length, expectedCol2Vals.size());
+                Assert.assertEquals(splitCol2Val.length, expectedCol2Vals.size());
 
                 for(String s: splitCol2Val)
                 {
                     s = s.trim();
-                    assertTrue("Expected " + expectedCol2Vals + " to contain" + s, expectedCol2Vals.contains(s));
+                    Assert.assertTrue("Expected " + expectedCol2Vals + " to contain" + s, expectedCol2Vals.contains(s));
                 }
             }
 //        }
@@ -1123,7 +1123,7 @@ public class LuminexTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
         for(int i = 1; i <= 40; i++)
         {
-            assertEquals("Transformed", table.getDataAsText(i, "Description"));
+            Assert.assertEquals("Transformed", table.getDataAsText(i, "Description"));
         }
     }
 
@@ -1189,8 +1189,8 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the transform script and ruminex versions are as expected
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
-        assertEquals("Unexpected Transform Script Version number", "4.0.20120509", table.getDataAsText(0, "Transform Script Version"));
-        assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
+        Assert.assertEquals("Unexpected Transform Script Version number", "4.0.20120509", table.getDataAsText(0, "Transform Script Version"));
+        Assert.assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
 
         // verify that the lot number value are as expected
         clickLinkWithText("r script transformed assayId");
@@ -1210,7 +1210,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // check values in the fi-bkgd-blank column
         for(int i = 0; i < RTRANS_FIBKGDBLANK_VALUES.length; i++)
         {
-            assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
+            Assert.assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
         }
         clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
         setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl", "Is Not Blank");
@@ -1218,7 +1218,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // check values in the est log conc 5pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_5PL.length; i++)
         {
-            assertEquals(RTRANS_ESTLOGCONC_VALUES_5PL[i], table.getDataAsText(i, "Est Log Conc Rumi 5 PL"));
+            Assert.assertEquals(RTRANS_ESTLOGCONC_VALUES_5PL[i], table.getDataAsText(i, "Est Log Conc Rumi 5 PL"));
         }
         clearFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl");
         setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_4pl", "Is Not Blank");
@@ -1226,7 +1226,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // check values in the est log conc 4pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_4PL.length; i++)
         {
-            assertEquals(RTRANS_ESTLOGCONC_VALUES_4PL[i], table.getDataAsText(i, "Est Log Conc Rumi 4 PL"));
+            Assert.assertEquals(RTRANS_ESTLOGCONC_VALUES_4PL[i], table.getDataAsText(i, "Est Log Conc Rumi 4 PL"));
         }
         clearFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_4pl");
         clearFilter(TEST_ASSAY_LUM + " Data", "Type");
@@ -1487,7 +1487,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goBack();
         refresh();
         ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
-        assertEquals("AUC, EC50-4, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));  
+        Assert.assertEquals("AUC, EC50-4, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 QC Flag for GS Analyte (2) that was inserted in the previous step is removed
@@ -1495,7 +1495,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goBack();
         refresh();
         ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
-        assertEquals("AUC, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
+        Assert.assertEquals("AUC, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //4. For GS Analyte (2), apply the non-current guide set to plate 5a
         //	- QC Flags added for EC50 and HMFI
@@ -1528,7 +1528,7 @@ public class LuminexTest extends AbstractQCAssayTest
         int aucCount = getXpathCount(aucLink);
         createGuideSet("GS Analyte (2)", false);
         editGuideSet(new String[]{"allRunsRow_1"}, "Guide set includes plate 5", true);
-        assertEquals("Wrong count for AUC flag links", aucCount-1, (getXpathCount(aucLink)));
+        Assert.assertEquals("Wrong count for AUC flag links", aucCount-1, (getXpathCount(aucLink)));
 
         //7. Switch to GS Analyte (1), and edit the current guide set to include plate 3
         //	- the QC Flag for plate 3 (the run included) and the other plates (4, 5, and 5a) are all removed as all values are within the guide set ranges
@@ -1563,7 +1563,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void assertEC505PLQCFlagsPresent(int count)
     {
-        assertEquals("Unexpected QC Flag Highlight Present", count,
+        Assert.assertEquals("Unexpected QC Flag Highlight Present", count,
                     getXpathCount(Locator.xpath("//div[contains(@style,'red')]")));
         assertElementPresent(Locator.xpath("//a[contains(text(),'EC50-5')]"), count);
         for(String flag : new String[] {"AUC", "HMFI", "EC50-4", "PCV"})
@@ -1619,7 +1619,7 @@ public class LuminexTest extends AbstractQCAssayTest
         String[] flags = getColumnValues(TEST_ASSAY_LUM + " Runs", "QC Flags").get(0).toArray(new String[] {});
         for(int i=0; i<flags.length; i++)
         {
-            assertEquals(expectedFlags[i], flags[i]);
+            Assert.assertEquals(expectedFlags[i], flags[i]);
         }
         verifyQCFlagLink();
     }
@@ -1722,7 +1722,7 @@ public class LuminexTest extends AbstractQCAssayTest
         List<String> fourParamFlag = drt.getColumnDataAsText("Four Parameter Curve Fit Failure Flag");
         for(String flag: fourParamFlag)
         {
-            assertEquals("", flag);
+            Assert.assertEquals("", flag);
         }
 
         List<String> fiveParamFlag = drt.getColumnDataAsText("Five Parameter Curve Fit Failure Flag");
@@ -1730,7 +1730,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         for(int i=0; i<fiveParamData.size(); i++)
         {
-            assertTrue("Row " + i + " was flagged as 5PL failure but had EC50 data", ((fiveParamFlag.get(i).length() == 0) ^ (fiveParamData.get(i).length() == 0)));
+            Assert.assertTrue("Row " + i + " was flagged as 5PL failure but had EC50 data", ((fiveParamFlag.get(i).length() == 0) ^ (fiveParamData.get(i).length() == 0)));
         }
 
 
@@ -1880,7 +1880,7 @@ public class LuminexTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable("query", this);
         table.setFilter("GuideSet/Created", "Is Not Blank", "");
         // check that the table contains one row that reads "No data to show."
-        assertEquals("Expected no guide set assignments", 0, table.getDataRowCount());
+        Assert.assertEquals("Expected no guide set assignments", 0, table.getDataRowCount());
         table.clearFilter("GuideSet/Created");
     }
 
@@ -1901,7 +1901,7 @@ public class LuminexTest extends AbstractQCAssayTest
         for (String analyte : analytes)
         {
             table.setFilter("GuideSet/RowId", "Equals", guideSetIds.get(analyte).toString());
-            assertEquals("Expected guide set to be assigned to " + expectedRunCount + " records", expectedRunCount, table.getDataRowCount());
+            Assert.assertEquals("Expected guide set to be assigned to " + expectedRunCount + " records", expectedRunCount, table.getDataRowCount());
             table.clearFilter("GuideSet/RowId");
         }
 
@@ -2064,9 +2064,9 @@ public class LuminexTest extends AbstractQCAssayTest
             // verify the row count, average, and standard deviation for the specified curve type's values
             table.setFilter("GuideSetId/RowId", "Equals", guideSetIds.get(analytes[i]).toString());
             table.setFilter("CurveType", "Equals", curveType);
-            assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[i]).toString(), rowCounts[i], Integer.parseInt(table.getDataAsText(0, "Run Count")));
-            assertEquals("Unexpected average for guide set " + guideSetIds.get(analytes[i]).toString(), averages[i],table.getDataAsText(0, averageColName));
-            assertEquals("Unexpected stddev for guide set " + guideSetIds.get(analytes[i]).toString(), stdDevs[i], table.getDataAsText(0, stdDevColName));
+            Assert.assertEquals("Unexpected row count for guide set " + guideSetIds.get(analytes[i]).toString(), rowCounts[i], Integer.parseInt(table.getDataAsText(0, "Run Count")));
+            Assert.assertEquals("Unexpected average for guide set " + guideSetIds.get(analytes[i]).toString(), averages[i],table.getDataAsText(0, averageColName));
+            Assert.assertEquals("Unexpected stddev for guide set " + guideSetIds.get(analytes[i]).toString(), stdDevs[i], table.getDataAsText(0, stdDevColName));
             table.clearFilter("CurveType");
             table.clearFilter("GuideSetId/RowId");
         }
@@ -2176,7 +2176,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("baseVisit", baseVisit);
         setFormElement("positivityFoldChange", foldChange);
         File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
-        assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
+        Assert.assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
         setFormElement("__primaryFile__", positivityData);
         clickNavButton("Next");
         clickNavButton("Save and Finish");

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.tests.study.StudyScheduleTester;
@@ -172,7 +173,7 @@ public class StudyRedesignTest extends StudyBaseTest
         clickLinkWithText("Change Properties");
 
         int dsCount = getXpathCount(Locator.xpath("//input[@name='extraData']"));
-        assertEquals("Unexpected number of Datasets.", 47, dsCount);
+        Assert.assertEquals("Unexpected number of Datasets.", 47, dsCount);
         int i;
         for (i = 0; i < dsCount; i++)
         {
@@ -274,12 +275,12 @@ public class StudyRedesignTest extends StudyBaseTest
         mouseDownGridCellCheckbox(PARTICIPANT_GROUP_THREE);
         int group2Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 6)"));
         int group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 7)"));
-        assertTrue("Expected " + PARTICIPANT_GROUP_THREE + " grid cell to wrap text", group3Height > group2Height);
+        Assert.assertTrue("Expected " + PARTICIPANT_GROUP_THREE + " grid cell to wrap text", group3Height > group2Height);
         // drag the east handle to the right so that the group three doesn't wrap anymore
         dragAndDrop(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 250, 0);
         group2Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 6)"));
         group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 7)"));
-        assertTrue("Expected panel width to allow " + PARTICIPANT_GROUP_THREE + " grid cell on one line", group3Height == group2Height);
+        Assert.assertTrue("Expected panel width to allow " + PARTICIPANT_GROUP_THREE + " grid cell on one line", group3Height == group2Height);
     }
 
     private void exportImportTest()

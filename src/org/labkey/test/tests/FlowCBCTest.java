@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -118,31 +119,31 @@ public class FlowCBCTest extends BaseFlowTest
         clickNavButton("Copy to Study");
 
         assertTitleContains("Dataset: Flow");
-        assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
+        Assert.assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
         assertTextPresent(PTID1, "2006-03-17"); // ptid and date entered in copy verify page
         assertTextPresent(PTID2, "2006-03-29"); // ptid and date from sample-set.tsv
         String href = getAttribute(Locator.linkWithText(PTID2), "href");
-        assertTrue("Expected PTID link to go to STUDY_FOLDER container: " + href, href.contains("/" + STUDY_FOLDER));
+        Assert.assertTrue("Expected PTID link to go to STUDY_FOLDER container: " + href, href.contains("/" + STUDY_FOLDER));
         href = getAttribute(Locator.linkWithText("microFCS.xml"), "href");
-        assertTrue("Expected Run link to go to flow container: " + href, href.contains("/" + getFolderName()));
+        Assert.assertTrue("Expected Run link to go to flow container: " + href, href.contains("/" + getFolderName()));
         href = getAttribute(Locator.linkWithText("AutoComp"), "href");
-        assertTrue("Expected Compensation Matrix link to go to flow container: " + href, href.contains("/" + getFolderName()));
+        Assert.assertTrue("Expected Compensation Matrix link to go to flow container: " + href, href.contains("/" + getFolderName()));
 
         // verify graph img is displayed (no error) and the src attribute goes to the flow container
         assertTextNotPresent("Error generating graph");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        Assert.assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         pushLocation();
         clickNavButton("View Source Assay");
         assertTitleContains("Flow Runs:");
-        assertTrue("Expected source assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
+        Assert.assertTrue("Expected source assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
         popLocation();
 
         pushLocation();
         clickLinkWithText("assay");
         assertTitleContains("FCSAnalysis");
-        assertTrue("Expected assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
+        Assert.assertTrue("Expected assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
         popLocation();
     }
 

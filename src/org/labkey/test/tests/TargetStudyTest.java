@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -84,7 +85,7 @@ public class TargetStudyTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         _study1ContainerId = getContainerId("/project/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/begin.view");
         log("** Study 1 container ID = " + _study1ContainerId);
-        assertNotNull(_study1ContainerId);
+        Assert.assertNotNull(_study1ContainerId);
 
         uploadRuns();
         copyToStudy();
@@ -190,22 +191,22 @@ public class TargetStudyTest extends AbstractAssayTest
         assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3);
 
         DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
-        assertEquals(_study1Label, table.getDataAsText(0, "Target Study"));
-        assertEquals(_study1Label, table.getDataAsText(1, "Target Study"));
-        assertEquals(_study1Label, table.getDataAsText(2, "Target Study"));
+        Assert.assertEquals(_study1Label, table.getDataAsText(0, "Target Study"));
+        Assert.assertEquals(_study1Label, table.getDataAsText(1, "Target Study"));
+        Assert.assertEquals(_study1Label, table.getDataAsText(2, "Target Study"));
         //BUGBUG: target study renders as "" instead of "[None]"
-        //assertEquals("[None]", table.getDataAsText(3, "Target Study"));
-        assertEquals("", table.getDataAsText(3, "Target Study"));
-        assertEquals(_study2Label, table.getDataAsText(4, "Target Study"));
-        assertEquals(_study3Label, table.getDataAsText(5, "Target Study"));
+        //Assert.assertEquals("[None]", table.getDataAsText(3, "Target Study"));
+        Assert.assertEquals("", table.getDataAsText(3, "Target Study"));
+        Assert.assertEquals(_study2Label, table.getDataAsText(4, "Target Study"));
+        Assert.assertEquals(_study3Label, table.getDataAsText(5, "Target Study"));
 
         log("** Check SpecimenID resolved the PTID in the study");
-        assertEquals("999320812", table.getDataAsText(0, "Participant ID"));
-        assertEquals("999320396", table.getDataAsText(1, "Participant ID"));
-        assertEquals("999320396", table.getDataAsText(2, "Participant ID"));
-        assertEquals("", table.getDataAsText(3, "Participant ID"));
-        assertEquals("999320706", table.getDataAsText(4, "Participant ID"));
-        assertEquals("", table.getDataAsText(5, "Participant ID"));
+        Assert.assertEquals("999320812", table.getDataAsText(0, "Participant ID"));
+        Assert.assertEquals("999320396", table.getDataAsText(1, "Participant ID"));
+        Assert.assertEquals("999320396", table.getDataAsText(2, "Participant ID"));
+        Assert.assertEquals("", table.getDataAsText(3, "Participant ID"));
+        Assert.assertEquals("999320706", table.getDataAsText(4, "Participant ID"));
+        Assert.assertEquals("", table.getDataAsText(5, "Participant ID"));
     }
 
     protected void copyToStudy()
@@ -244,17 +245,17 @@ public class TargetStudyTest extends AbstractAssayTest
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/dataset.view?datasetId=5001");
         DataRegionTable dataset = new DataRegionTable("Dataset", this);
-        assertEquals(3, dataset.getDataRowCount());
-        assertEquals("999320396", dataset.getDataAsText(0, "Participant ID"));
-        assertEquals("999320396", dataset.getDataAsText(1, "Participant ID"));
-        assertEquals("999320812", dataset.getDataAsText(2, "Participant ID"));
+        Assert.assertEquals(3, dataset.getDataRowCount());
+        Assert.assertEquals("999320396", dataset.getDataAsText(0, "Participant ID"));
+        Assert.assertEquals("999320396", dataset.getDataAsText(1, "Participant ID"));
+        Assert.assertEquals("999320812", dataset.getDataAsText(2, "Participant ID"));
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/dataset.view?datasetId=5001");
-        assertEquals(1, dataset.getDataRowCount());
-        assertEquals("999320706", dataset.getDataAsText(0, "Participant ID"));
+        Assert.assertEquals(1, dataset.getDataRowCount());
+        Assert.assertEquals("999320706", dataset.getDataAsText(0, "Participant ID"));
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + "/dataset.view?datasetId=5001");
-        assertEquals(404, getResponseCode());
+        Assert.assertEquals(404, getResponseCode());
     }
 
 }

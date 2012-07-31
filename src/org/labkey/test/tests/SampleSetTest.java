@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -348,6 +349,6 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
         DataRegionTable drt = new DataRegionTable("Material", this);
 
-        assertEquals(attachment.getName(), drt.getDataAsText(index, "File Attachment"));
+        Assert.assertEquals(attachment.getName(), drt.getDataAsText(index, "File Attachment"));
     }
 }

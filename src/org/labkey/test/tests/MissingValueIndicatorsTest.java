@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
@@ -239,7 +240,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         checkCheckbox(".toggle");
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
+        Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
         waitForPageToLoad();
     }
 
@@ -504,7 +505,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         checkCheckbox(".toggle");
         selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        assertEquals("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?", selenium.getConfirmation());
+        Assert.assertEquals("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?", selenium.getConfirmation());
         waitForPageToLoad();
     }
 

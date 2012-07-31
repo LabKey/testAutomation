@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
@@ -245,7 +246,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void assertSelectOption(String name, int i, String expected)
     {
-        assertEquals(selenium.getSelectedValue(Locator.tagWithName("select", name).index(i).toString()), expected);
+        Assert.assertEquals(selenium.getSelectedValue(Locator.tagWithName("select", name).index(i).toString()), expected);
     }
 
     protected void goToManageStudyPage(String projectName, String studyName)

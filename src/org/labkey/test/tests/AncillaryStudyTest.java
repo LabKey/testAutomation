@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -88,7 +89,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Protocol Document']"), WAIT_FOR_JAVASCRIPT);
         setFormElement("studyName", getFolderName());
         setFormElement("studyDescription", STUDY_DESCRIPTION);
-        assertTrue(PROTOCOL_DOC.exists());
+        Assert.assertTrue(PROTOCOL_DOC.exists());
         setFormElement("protocolDoc", PROTOCOL_DOC);
         clickNavButton("Change", 0);
         selenium.doubleClick(Locator.xpath(ExtHelper.getExtDialogXPath("Create Ancillary Study") + "//span[string() = '"+PROJECT_NAME+"']").toString());
@@ -103,7 +104,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         log("Check participant group.");
         Locator.XPathLocator ptidLocator = Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[@class='testParticipantGroups']/text()");
         waitForElement(ptidLocator, WAIT_FOR_JAVASCRIPT);
-        assertEquals("Did not find expected number of participants", PTIDS.length, getXpathCount(ptidLocator));
+        Assert.assertEquals("Did not find expected number of participants", PTIDS.length, getXpathCount(ptidLocator));
         for (String ptid : PTIDS)
         {
             assertElementPresent(Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[@class='testParticipantGroups' and text() = '" + ptid + "']"));
@@ -230,7 +231,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
         waitForPageToLoad();
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
-        assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
+        Assert.assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
         assertTextPresent(SEQ_NUMBER + ".0");
         table.getColumnDataAsText("Sequence Num");
 
@@ -253,7 +254,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
         waitForPageToLoad();
         table = new DataRegionTable("Dataset", this, true, true);
-        assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
+        Assert.assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
         assertTextPresent(SEQ_NUMBER2 + ".0");
         assertTextNotPresent(SEQ_NUMBER + ".0");
 
@@ -276,7 +277,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
         waitForPageToLoad();
         table = new DataRegionTable("Dataset", this, true, true);
-        assertEquals("Dataset does not reflect changes in source study.", 20, table.getDataRowCount());
+        Assert.assertEquals("Dataset does not reflect changes in source study.", 20, table.getDataRowCount());
         assertTextNotPresent(SEQ_NUMBER + ".0", SEQ_NUMBER2 + ".0");
     }
 
@@ -335,12 +336,12 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText("Specimen Data");
         clickLinkWithText("By Vial Group");
         DataRegionTable table = new DataRegionTable("SpecimenSummary", this, false, true);
-        assertEquals("Did not find expected number of specimens.", specimenCount, table.getDataRowCount() - 1); // n specimens + 1 total row
-        assertEquals("Incorrect total vial count.", String.valueOf(vialCount), table.getDataAsText(specimenCount, "Vial Count"));
+        Assert.assertEquals("Did not find expected number of specimens.", specimenCount, table.getDataRowCount() - 1); // n specimens + 1 total row
+        Assert.assertEquals("Incorrect total vial count.", String.valueOf(vialCount), table.getDataAsText(specimenCount, "Vial Count"));
         clickLinkWithText("Specimen Data");
         clickLinkWithText("By Individual Vial");
         table = new DataRegionTable("SpecimenDetail", this, false, true);
-        assertEquals("Did not find expected number of vials.", vialCount, table.getDataRowCount() - 1); // m vials + 1 total row
+        Assert.assertEquals("Did not find expected number of vials.", vialCount, table.getDataRowCount() - 1); // m vials + 1 total row
 
         log("Verify that Ancillary study doesn't support requests.");
         clickLinkWithText("Manage");

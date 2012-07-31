@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -129,7 +130,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         for(String[] columnAndValue : columnAndValues)
         {
             log("Checking column: "+ columnAndValue[0]);
-            assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
+            Assert.assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
         }
         clickLinkContainingText("details");
         assertTextPresent(LIST_NAME);
@@ -164,9 +165,9 @@ public class DataRegionTest extends BaseSeleniumWebTest
         beginAt(url.getFile());
 
         table = new DataRegionTable(dataRegionName, this, true, true);
-        assertEquals(TOTAL_ROWS, table.getDataRowCount());
-        assertEquals("aqua", table.getDataAsText(0, 3));
-        assertEquals("#FFFF00", table.getDataAsText(15, 4));
+        Assert.assertEquals(TOTAL_ROWS, table.getDataRowCount());
+        Assert.assertEquals("aqua", table.getDataAsText(0, 3));
+        Assert.assertEquals("#FFFF00", table.getDataAsText(15, 4));
 
         assertMenuButtonPresent("Page Size");
         assertLinkNotPresentWithTitle(PREV_LINK);
@@ -184,13 +185,13 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("Show Unselected");
         assertLinkPresentWithText("Show All");
         assertTextPresent("1 - 3 of 16");
-        assertEquals(3, table.getDataRowCount());
+        Assert.assertEquals(3, table.getDataRowCount());
 
         log("Test 5 per page");
         table.setMaxRows(5);
         assertTextPresent("1 - 5 of 16");
-        assertEquals(5, table.getDataRowCount());
-        assertEquals("aqua", table.getDataAsText(0, 3));
+        Assert.assertEquals(5, table.getDataRowCount());
+        Assert.assertEquals("aqua", table.getDataAsText(0, 3));
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
         assertLinkPresentWithTitle(NEXT_LINK);
@@ -199,8 +200,8 @@ public class DataRegionTest extends BaseSeleniumWebTest
         log("Next Page");
         table.pageNext();
         assertTextPresent("6 - 10 of 16");
-        assertEquals(5, table.getDataRowCount());
-        assertEquals("grey", table.getDataAsText(0, 3));
+        Assert.assertEquals(5, table.getDataRowCount());
+        Assert.assertEquals("grey", table.getDataAsText(0, 3));
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkPresentWithTitle(PREV_LINK);
         assertLinkPresentWithTitle(NEXT_LINK);
@@ -209,8 +210,8 @@ public class DataRegionTest extends BaseSeleniumWebTest
         log("Last Page");
         table.pageLast();
         assertTextPresent("16 - 16 of 16");
-        assertEquals(1, table.getDataRowCount());
-        assertEquals("yellow", table.getDataAsText(0, 3));
+        Assert.assertEquals(1, table.getDataRowCount());
+        Assert.assertEquals("yellow", table.getDataAsText(0, 3));
         assertLinkPresentWithTitle(FIRST_LINK);
         assertLinkPresentWithTitle(PREV_LINK);
         assertLinkNotPresentWithTitle(NEXT_LINK);
@@ -219,8 +220,8 @@ public class DataRegionTest extends BaseSeleniumWebTest
         log("Previous Page");
         table.pagePrev();
         assertTextPresent("11 - 15 of 16");
-        assertEquals(5, table.getDataRowCount());
-        assertEquals("purple", table.getDataAsText(0, 3));
+        Assert.assertEquals(5, table.getDataRowCount());
+        Assert.assertEquals("purple", table.getDataAsText(0, 3));
         assertLinkPresentWithTitle(FIRST_LINK);
         assertLinkPresentWithTitle(PREV_LINK);
         assertLinkPresentWithTitle(NEXT_LINK);
@@ -229,7 +230,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
         assertTextPresent("1 - 5 of 15");
-        assertEquals("black", table.getDataAsText(0, 3));
+        Assert.assertEquals("black", table.getDataAsText(0, 3));
 
         log("Show Selected");
         table.checkAllOnPage();
@@ -238,7 +239,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertTextPresent("Selected 5 of 15 rows.");
         clickNavButton("Page Size", 0);
         clickLinkWithText("Show Selected");
-        assertEquals(5, table.getDataRowCount());
+        Assert.assertEquals(5, table.getDataRowCount());
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
         assertLinkNotPresentWithTitle(NEXT_LINK);
@@ -247,7 +248,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         log("Show All");
         clickNavButton("Page Size", 0);
         clickLinkWithText("Show All");
-        assertEquals(15, table.getDataRowCount());
+        Assert.assertEquals(15, table.getDataRowCount());
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
         assertLinkNotPresentWithTitle(NEXT_LINK);

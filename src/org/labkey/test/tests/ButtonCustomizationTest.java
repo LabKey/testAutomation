@@ -271,7 +271,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
     @Override
     protected void doCleanup() throws Exception
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {/*ignore*/}
     }
 
     @Override

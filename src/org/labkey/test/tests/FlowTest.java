@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -277,11 +278,11 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Analyze some runs");
         selectOptionByText("ff_targetExperimentId", "<create new>");
         waitForPageToLoad();
-        assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        Assert.assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
         selectOptionByText("ff_targetExperimentId", "FlowExperiment2");
         waitForPageToLoad();
 
-        assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        Assert.assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
         waitForPageToLoad();
 
@@ -472,8 +473,8 @@ public class FlowTest extends BaseFlowTest
         CustomizeViewsHelper.saveCustomView(this);
 
         DataRegionTable table = new DataRegionTable("query", this, false);
-        assertEquals(4, table.getDataRowCount());
-        assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
+        Assert.assertEquals(4, table.getDataRowCount());
+        Assert.assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
     }
 
     private void deleteReport(String reportName)
