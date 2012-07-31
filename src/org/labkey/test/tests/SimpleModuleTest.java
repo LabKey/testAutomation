@@ -19,6 +19,7 @@ import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.Maps;
@@ -488,6 +489,16 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         //custom view has a sort by age descending
         assertTextBefore("Adam", "Josh");
+
+        //Issue 11307: Inconsistencies saving session view over file-based view
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, "CreatedBy");
+        CustomizeViewsHelper.applyCustomView(this);
+        assertTextPresent("is unsaved");
+        assertTextPresent("Created By");
+        CustomizeViewsHelper.saveUnsavedViewGridClosed(this, null);
+        waitForText("Crazy People Copy");
+
     }
 
     private void doTestReports()

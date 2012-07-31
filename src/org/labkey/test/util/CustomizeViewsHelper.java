@@ -99,6 +99,30 @@ public class CustomizeViewsHelper
         test.clickNavButton("Yes");
     }
 
+    /**
+     * This helper is meant to be used when you have customized a view and chosen "view grid" rather than save,
+     * but would now like to save.
+     * @param test
+     * @param name Name you would like to save the view under.  Null = current (if using default or already saved view)
+     */
+    public static void saveUnsavedViewGridClosed(BaseSeleniumWebTest test, String name)
+    {
+        test.click(Locator.tagContainingText("span", "Save"));
+        test.waitForText("Save Custom View");
+
+        if(name!=null)
+        {
+              test.click(Locator.tagContainingText("label", "Named"));
+        }
+
+        test.clickNavButton("Save");
+    }
+
+    public static void revertUnsavedViewGridClosed(BaseSeleniumWebTest test)
+    {
+        test.click(Locator.tagContainingText("span", "Revert"));
+    }
+
     public static void revertUnsavedView(BaseSeleniumWebTest test)
     {
         test.clickNavButton("Revert");

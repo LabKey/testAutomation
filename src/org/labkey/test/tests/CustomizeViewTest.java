@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,6 +84,9 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createList();
+
+        saveAfterApplyingView(null, "CreatedBy", "Created By");
+        saveAfterApplyingView("New View", "ModifiedBy", "Modified By");
 
         log("** Show only LastName and Age");
         setColumns(LAST_NAME_COLUMN, "Age");
@@ -148,8 +152,9 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.saveCustomView(this, "Saved-" + INJECT_CHARS_1);
 
-        // TODO: pin, unpin, move columns/filters/sort, remove single filter clause, save named view, revert, click "Revert|Edit|Save" links,
+        // TODO: pin, unpin, move columns/filters/sort, remove single filter clause
         saveFilterTest();
+//        saveFilter
 
 
         log("** Test HTML/JavaScript escaping");
@@ -163,6 +168,28 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
                 return null;
             }
         }, null);
+    }
+
+    //Issue 13099: Unable to save custom view after applying view
+    private void saveAfterApplyingView(String name, String newColumnLabel, String newColumnDisplayName)
+    {
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, newColumnLabel);
+        CustomizeViewsHelper.applyCustomView(this);
+        assertTextPresent(newColumnDisplayName);
+        assertTextPresent("unsaved");
+
+        CustomizeViewsHelper.revertUnsavedViewGridClosed(this);
+        waitForPageToLoad();
+        assertTextNotPresent(newColumnDisplayName);
+
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewColumn(this, newColumnLabel);
+        CustomizeViewsHelper.applyCustomView(this);
+        CustomizeViewsHelper.saveUnsavedViewGridClosed(this, name);
+        assertTextNotPresent("unsaved");
+        assertTextPresent(newColumnDisplayName);
+//        assertTextPresent(PasswordUtil.getUsername(),8);
     }
 
     //Issue 12577: Save link in view/filter bar doesn't work
