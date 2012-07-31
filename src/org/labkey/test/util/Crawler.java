@@ -148,7 +148,7 @@ public class Crawler
     private void saveCrawlStats(BaseSeleniumWebTest test, int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
     {
         String testName = test.toString();
-        testName = testName.substring(testName.lastIndexOf('.') + 1, testName.lastIndexOf(')'));
+        testName = testName.substring(testName.lastIndexOf('.') + 1, testName.lastIndexOf('@'));
         _crawlStats.put(testName, new CrawlStats(maxDepth, newPages, uniqueActions, crawlTestLength));
     }
 
