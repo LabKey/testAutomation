@@ -152,6 +152,7 @@ public enum TestSet
         CAVDStudyTest.class,
         SampleMindedImportTest.class,
         PivotQueryTest.class,
+        LabModulesTest.class
     }),
 
     MiniTest(new Class[]
