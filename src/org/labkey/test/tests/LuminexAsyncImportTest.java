@@ -29,6 +29,13 @@ import java.util.Calendar;
  */
 public class LuminexAsyncImportTest extends LuminexTest
 {
+    @Override
+    protected void ensureConfigured()
+    {
+        setUseXarImport(true);
+        super.ensureConfigured();
+    }
+
     protected void runUITests()
     {
         clickCheckbox("backgroundUpload");
@@ -39,8 +46,8 @@ public class LuminexAsyncImportTest extends LuminexTest
         // test successful background upload
         importRunForTestLuminexConfig(TEST_ASSAY_LUM_FILE5, Calendar.getInstance(), 0);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
-        waitForPipelineJobsToComplete(1, "Assay upload", false);
-        clickLinkWithText("COMPLETE");
+        waitForPipelineJobsToFinish(2);
+        clickLinkWithText("COMPLETE", 0);
         assertTextNotPresent("ERROR"); //Issue 14082
         assertTextPresent("Starting assay upload", "Finished assay upload");
         clickButton("Data"); // data button links to the run results
@@ -49,7 +56,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         // test background upload failure
         uploadPositivityFile("No Fold Change", "1", "", true);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
-        waitForPipelineJobsToFinish(2);
+        waitForPipelineJobsToFinish(3);
         clickLinkWithText("ERROR");
         assertTextPresent("An error occurred when running the script (exit code: 1).", 3);
         assertTextPresent("output lines omitted, see full output in log for details]", 2);

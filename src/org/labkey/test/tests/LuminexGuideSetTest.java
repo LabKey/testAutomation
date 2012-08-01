@@ -22,6 +22,13 @@ package org.labkey.test.tests;
  */
 public class LuminexGuideSetTest  extends LuminexTest
 {
+    @Override
+    protected void ensureConfigured()
+    {
+        setUseXarImport(true);
+        super.ensureConfigured();
+    }
+
     protected void runUITests()
     {
         runGuideSetTest();

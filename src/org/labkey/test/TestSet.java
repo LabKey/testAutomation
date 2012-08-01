@@ -158,9 +158,9 @@ public enum TestSet
     MiniTest(new Class[]
     {
         LuminexUploadAndCopyTest.class,
+        LuminexJavaTransformTest.class,
         LuminexExcludableWellsTest.class,
         LuminexMultipleCurvesTest.class,
-        LuminexJavaTransformTest.class,
         LuminexRTransformTest.class,
         LuminexEC50Test.class,
         LuminexGuideSetTest.class,

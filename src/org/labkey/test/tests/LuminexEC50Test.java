@@ -24,6 +24,13 @@ package org.labkey.test.tests;
  */
 public class LuminexEC50Test  extends LuminexTest
 {
+    @Override
+    protected void ensureConfigured()
+    {
+        setUseXarImport(true);
+        super.ensureConfigured();
+    }
+
     //TODO:  set up and LuminexTest and everything
     protected void runUITests()
     {

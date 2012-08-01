@@ -40,6 +40,8 @@ public class LuminexPositivityTest extends LuminexTest
     {
         if(!PerlHelper.ensurePerlConfig(this))
             Assert.fail("No Perl engine");
+
+        setUseXarImport(true);
         super.ensureConfigured();
     }
 

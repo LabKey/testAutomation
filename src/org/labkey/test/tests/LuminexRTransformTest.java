@@ -26,6 +26,13 @@ import java.nio.channels.IllegalBlockingModeException;
  */
 public class LuminexRTransformTest extends LuminexTest
 {
+    @Override
+    protected void ensureConfigured()
+    {
+        setUseXarImport(true);
+        super.ensureConfigured();
+    }
+    
     public void runUITests()
     {
         runRTransformTest();

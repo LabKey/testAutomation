@@ -43,10 +43,15 @@ import java.util.Set;
  */
 public class LuminexTest extends AbstractQCAssayTest
 {
+    private boolean _useXarImport = false;
+
     private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
     protected static final String TEST_ASSAY_LUM =  "&TestAssayLuminex" + TRICKY_CHARACTERS_NO_QUOTES;
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
+
+    protected static final String TEST_ASSAY_XAR_NAME = "TestLuminexAssay";
+    protected final File TEST_ASSAY_XAR_FILE = new File(getLabKeyRoot() + "/sampledata/Luminex/" + TEST_ASSAY_XAR_NAME + ".xar");
 
     protected static final String TEST_ASSAY_LUM_ANALYTE_PROP_NAME = "testAssayAnalyteProp";
     protected static final int TEST_ASSAY_LUM_ANALYTE_PROP_ADD = 5;
@@ -108,6 +113,10 @@ public class LuminexTest extends AbstractQCAssayTest
         return "server/modules/luminex";
     }
 
+    public void setUseXarImport(boolean useXarImport)
+    {
+        _useXarImport = useXarImport;
+    }
 
     @Override
     protected String getProjectName()
@@ -167,80 +176,102 @@ public class LuminexTest extends AbstractQCAssayTest
         //create a new luminex assay
         clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
-        checkRadioButton("providerName", "Luminex");
-        clickNavButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+        if (_useXarImport)
+        {
+            // import the assay design from the XAR file
+            clickLinkWithText("upload the XAR file directly");
+            setFormElement("uploadFile", TEST_ASSAY_XAR_FILE);
+            click(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
+            waitForPageToLoad();
+            waitForPipelineJobsToComplete(1, "Uploaded file - " + TEST_ASSAY_XAR_NAME + ".xar", false);
+            // since we want to test special characters in the assay name, copy the assay design to rename
+            goToManageAssays();
+            clickLinkWithText(TEST_ASSAY_XAR_NAME);
+            ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a[text() = 'manage assay design']"), "copy assay design");
+            clickNavButton("Copy to Current Folder", WAIT_FOR_PAGE);
+            waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+            selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
+            selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
+            saveAssay();
+        }
+        else
+        {
+            checkRadioButton("providerName", "Luminex");
+            clickNavButton("Next");
 
-        log("Setting up Luminex assay");
-        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
-        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
+            waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-        // add batch properties for transform and Ruminex version numbers
-        addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
-        addField("Batch Fields", 6, "TransformVersion", "Transform Script Version", ListColumnType.String);
-        addField("Batch Fields", 7, "RuminexVersion", "Ruminex Version", ListColumnType.String);
+            log("Setting up Luminex assay");
+            selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
+            selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
 
-        // add run properties for designation of which field to use for curve fit calc in transform
-        addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
-        addField("Run Fields", 9, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
-        addField("Run Fields", 10, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
-        addField("Run Fields", 11, "CurveFitLogTransform", "Curve Fit Log Transform", ListColumnType.Boolean);
+            // add batch properties for transform and Ruminex version numbers
+            addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
+            addField("Batch Fields", 6, "TransformVersion", "Transform Script Version", ListColumnType.String);
+            addField("Batch Fields", 7, "RuminexVersion", "Ruminex Version", ListColumnType.String);
 
-        // add run properties for use with the Guide Set test
-        addField("Run Fields", 12, "NotebookNo", "Notebook Number", ListColumnType.String);
-        addField("Run Fields", 13, "AssayType", "Assay Type", ListColumnType.String);
-        addField("Run Fields", 14, "ExpPerformer", "Experiment Performer", ListColumnType.String);
+            // add run properties for designation of which field to use for curve fit calc in transform
+            addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
+            addField("Run Fields", 9, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
+            addField("Run Fields", 10, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
+            addField("Run Fields", 11, "CurveFitLogTransform", "Curve Fit Log Transform", ListColumnType.Boolean);
 
-        // add run properties for use with Calculating Positivity
-        addField("Run Fields", 15, "CalculatePositivity", "Calculate Positivity", ListColumnType.Boolean);
-        addField("Run Fields", 16, "BaseVisit", "Baseline Visit", ListColumnType.Double);
-        addField("Run Fields", 17, "PositivityFoldChange", "Positivity Fold Change", ListColumnType.Integer);
+            // add run properties for use with the Guide Set test
+            addField("Run Fields", 12, "NotebookNo", "Notebook Number", ListColumnType.String);
+            addField("Run Fields", 13, "AssayType", "Assay Type", ListColumnType.String);
+            addField("Run Fields", 14, "ExpPerformer", "Experiment Performer", ListColumnType.String);
 
-        // add analyte property for tracking lot number
-        addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
+            // add run properties for use with Calculating Positivity
+            addField("Run Fields", 15, "CalculatePositivity", "Calculate Positivity", ListColumnType.Boolean);
+            addField("Run Fields", 16, "BaseVisit", "Baseline Visit", ListColumnType.Double);
+            addField("Run Fields", 17, "PositivityFoldChange", "Positivity Fold Change", ListColumnType.Integer);
 
-        // add the data properties for the calculated columns
-        addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
-        addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
-        addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
-        addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);
-        addField("Data Fields", 4, "SE_5pl", "SE Rumi 5 PL", ListColumnType.Double);
-        addField("Data Fields", 5, "EstLogConc_4pl", "Est Log Conc Rumi 4 PL", ListColumnType.Double);
-        addField("Data Fields", 6, "EstConc_4pl", "Est Conc Rumi 4 PL", ListColumnType.Double);
-        addField("Data Fields", 7, "SE_4pl", "SE Rumi 4 PL", ListColumnType.Double);
-        addField("Data Fields", 8, "Slope_4pl", "Slope_4pl", ListColumnType.Double);
-        addField("Data Fields", 9, "Lower_4pl", "Lower_4pl", ListColumnType.Double);
-        addField("Data Fields", 10, "Upper_4pl", "Upper_4pl", ListColumnType.Double);
-        addField("Data Fields", 11, "Inflection_4pl", "Inflection_4pl", ListColumnType.Double);
-        addField("Data Fields", 12, "Slope_5pl", "Slope_5pl", ListColumnType.Double);
-        addField("Data Fields", 13, "Lower_5pl", "Lower_5pl", ListColumnType.Double);
-        addField("Data Fields", 14, "Upper_5pl", "Upper_5pl", ListColumnType.Double);
-        addField("Data Fields", 15, "Inflection_5pl", "Inflection_5pl", ListColumnType.Double);
-        addField("Data Fields", 16, "Asymmetry_5pl", "Asymmetry_5pl", ListColumnType.Double);
-        addField("Data Fields", 17, "Positivity", "Positivity", ListColumnType.String);
+            // add analyte property for tracking lot number
+            addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
+
+            // add the data properties for the calculated columns
+            addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
+            addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
+            addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
+            addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);
+            addField("Data Fields", 4, "SE_5pl", "SE Rumi 5 PL", ListColumnType.Double);
+            addField("Data Fields", 5, "EstLogConc_4pl", "Est Log Conc Rumi 4 PL", ListColumnType.Double);
+            addField("Data Fields", 6, "EstConc_4pl", "Est Conc Rumi 4 PL", ListColumnType.Double);
+            addField("Data Fields", 7, "SE_4pl", "SE Rumi 4 PL", ListColumnType.Double);
+            addField("Data Fields", 8, "Slope_4pl", "Slope_4pl", ListColumnType.Double);
+            addField("Data Fields", 9, "Lower_4pl", "Lower_4pl", ListColumnType.Double);
+            addField("Data Fields", 10, "Upper_4pl", "Upper_4pl", ListColumnType.Double);
+            addField("Data Fields", 11, "Inflection_4pl", "Inflection_4pl", ListColumnType.Double);
+            addField("Data Fields", 12, "Slope_5pl", "Slope_5pl", ListColumnType.Double);
+            addField("Data Fields", 13, "Lower_5pl", "Lower_5pl", ListColumnType.Double);
+            addField("Data Fields", 14, "Upper_5pl", "Upper_5pl", ListColumnType.Double);
+            addField("Data Fields", 15, "Inflection_5pl", "Inflection_5pl", ListColumnType.Double);
+            addField("Data Fields", 16, "Asymmetry_5pl", "Asymmetry_5pl", ListColumnType.Double);
+            addField("Data Fields", 17, "Positivity", "Positivity", ListColumnType.String);
 
 
-        // set format to two decimal place for easier testing later
-        setFormat("Data Fields", 0, "0.0");
-        setFormat("Data Fields", 2, "0.0");
-        setFormat("Data Fields", 3, "0.0");
-        setFormat("Data Fields", 4, "0.0");
-        setFormat("Data Fields", 5, "0.0");
-        setFormat("Data Fields", 6, "0.0");
-        setFormat("Data Fields", 7, "0.0");
-        setFormat("Data Fields", 8, "0.0");
-        setFormat("Data Fields", 9, "0.0");
-        setFormat("Data Fields", 10, "0.0");
-        setFormat("Data Fields", 11, "0.0");
-        setFormat("Data Fields", 12, "0.0");
-        setFormat("Data Fields", 13, "0.0");
-        setFormat("Data Fields", 14, "0.0");
-        setFormat("Data Fields", 15, "0.0");
-        setFormat("Data Fields", 16, "0.0");
+            // set format to two decimal place for easier testing later
+            setFormat("Data Fields", 0, "0.0");
+            setFormat("Data Fields", 2, "0.0");
+            setFormat("Data Fields", 3, "0.0");
+            setFormat("Data Fields", 4, "0.0");
+            setFormat("Data Fields", 5, "0.0");
+            setFormat("Data Fields", 6, "0.0");
+            setFormat("Data Fields", 7, "0.0");
+            setFormat("Data Fields", 8, "0.0");
+            setFormat("Data Fields", 9, "0.0");
+            setFormat("Data Fields", 10, "0.0");
+            setFormat("Data Fields", 11, "0.0");
+            setFormat("Data Fields", 12, "0.0");
+            setFormat("Data Fields", 13, "0.0");
+            setFormat("Data Fields", 14, "0.0");
+            setFormat("Data Fields", 15, "0.0");
+            setFormat("Data Fields", 16, "0.0");
 
-        sleep(1000);
-        saveAssay();
+            sleep(1000);
+            saveAssay();
+        }
 
         configStatus = Configured.CONFIGURED;
     }

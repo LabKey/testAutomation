@@ -24,6 +24,13 @@ package org.labkey.test.tests;
  */
 public class LuminexMultipleCurvesTest extends LuminexTest
 {
+    @Override
+    protected void ensureConfigured()
+    {
+        setUseXarImport(true);
+        super.ensureConfigured();
+    }
+
     public void runUITests()
     {
         runMultipleCurveTest();
