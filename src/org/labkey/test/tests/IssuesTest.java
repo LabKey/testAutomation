@@ -559,6 +559,14 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(SUB_FOLDER_NAME);
 
+        //Issue 15550: Better tests for view details, admin, and email preferences
+        for(String button : new String[] {"Admin", "Email Preferences"})
+        {
+            Locator l = Locator.xpath("//span/a[span[text()='" + button + "']]");
+            Assert.assertTrue(getAttribute(l,  "href").contains(PROJECT_NAME + "/" + SUB_FOLDER_NAME));
+
+        }
+
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_3);
         selectOptionByText("assignedTo", getDisplayName());
