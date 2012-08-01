@@ -74,11 +74,12 @@ public class StudyHelper
         }
         if ( shared != null )
         {
-            if( shared.booleanValue() && !test.isChecked(Locator.checkboxByName("Shared")))
+            test.sleep(100);
+            if( shared )
             {
                 test.checkCheckbox("Shared");
             }
-            else if (!shared.booleanValue() && test.isChecked(Locator.checkboxByName("Shared")))
+            else
             {
                 test.uncheckCheckbox("Shared");
             }
@@ -102,7 +103,6 @@ public class StudyHelper
 
         test.clickNavButton("Edit Selected", 0);
         ExtHelper.waitForExtDialog(test, "Define " + participantString + " Group");
-//        test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         if( newPtids != null && newPtids.length > 0 )
         {
@@ -124,16 +124,17 @@ public class StudyHelper
         }
         if ( shared != null )
         {
-            if( shared.booleanValue() && !test.isChecked(Locator.checkboxByName("Shared")))
+            test.sleep(100);
+            if( shared )
             {
                 test.checkCheckbox("Shared");
             }
-            else if (!shared.booleanValue() && test.isChecked(Locator.checkboxByName("Shared")))
+            else
             {
                 test.uncheckCheckbox("Shared");
             }
         }
-        test.sleep(1000); // Wait for form to pick up Category
+
         ExtHelper.clickExtButton(test, "Define "+participantString+" Group", "Save", 0);
         test.waitForExtMaskToDisappear();
     }
