@@ -1158,9 +1158,9 @@ public class TimeChartTest extends StudyBaseTest
         Assert.assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         applyChanges();
-        // TODO: how do we test clicking on a data point?
-        //ExtHelper.waitForExtDialog(this, "Data Point Information");
-        
+        click(Locator.css("svg a circle"));
+        ExtHelper.waitForExtDialog(this, "Data Point Information");
+        ExtHelper.clickExtButton(this, "OK", 0);
         // open developer panel and test JS function validation
         goToDeveloperTab();
         setFormElement("point-click-fn-textarea", "");
@@ -1170,22 +1170,25 @@ public class TimeChartTest extends StudyBaseTest
         applyChanges();
         assertTextPresent("Error parsing the function:");
         clickNavButton("Disable", 0);
-        waitForText("Disabling this feature will delete any code that you have provided.");
-        clickNavButton("Yes", 0);
+        ExtHelper.waitForExtDialog(this, "Confirmation...");
+        ExtHelper.clickExtButton(this, "Confirmation...", "Yes", 0);
         assertTextNotPresent("Error");
         clickNavButton("Enable", 0);
         // test use-case to navigate to participang page on click
-        setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
+        String function = getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
+        // TODO: 
+        function = function.substring(function.indexOf("function")); // Strip leading comment
+        setFormElement("point-click-fn-textarea", function);
         applyChanges();
         openSaveMenu();
         saveReport(false);
-        // TODO: how do we test clicking on a data point?
-        clickAt(Locator.xpath("//svg"), "");
-        //waitForText("Participant - 249318596");
+        pushLocation(); // for impersonation test
+        pushLocation(); // for impersonation test
+        
+        clickAndWait(Locator.css("svg a circle"));
+        waitForText("Participant - 249318596");
 
         // verify that only developers can see the button to add point click function
-        pushLocation();
-        pushLocation();
         createUser(USER2, null);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
