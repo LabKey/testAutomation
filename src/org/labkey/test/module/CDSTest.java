@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 {
     private static final String PROJECT_NAME = "CDSTest Project";
-    private static final File STUDY_ZIP = new File(getSampledataPath(), "CDS/Dataspace.folder.zip");
+    private static final File FOLDER_ZIP = new File(getSampledataPath(), "CDS/Dataspace.folder.zip");
     private static final String STUDIES[] = {"Demo Study", "Not Actually CHAVI 001", "NotRV144"};
     private static final String LABS[] = {"Arnold/Bellew Lab", "LabKey Lab", "Piehler/Eckels Lab"};
     private static final String GROUP_NAME = "CDSTest_AGroup";
@@ -102,7 +102,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
         enableModule(PROJECT_NAME, "CDS");
-        importStudyFromZip(STUDY_ZIP.getPath());
+        importFolderFromZip(FOLDER_ZIP.getPath());
         goToProjectHome();
         addWebPart("CDS Management");
     }
@@ -689,12 +689,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         String description = "Test feedback - " + feedback;
         click(Locator.name("description"));
-        waitForElement(Locator.xpath("//textarea[@name='description' and contains(@style, 'height: 176px;')]")); //expand
+        waitForElement(Locator.xpath("//textarea[@name='description']")); //expand
         selenium.type(Locator.name("description").toString(), description, false); // setFormElement fires events that throw off the flow.
         clickButton("Submit", 0);
         fireEvent(Locator.name("description"), SeleniumEvent.blur);
-        waitForElement(Locator.xpath("//textarea[@name='description' and contains(@style, 'height: 31px;')]")); //shrink
-        waitForElement(Locator.css("textarea[name='description'][placeholder='Thank you for your feedback!']"));
+        waitForElement(Locator.xpath("//textarea[@name='description' and contains(@class, 'x4-form-empty-field')]")); //shrink
 
         _descriptions.add(description);
         _states.add(stateJSON);

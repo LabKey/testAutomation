@@ -496,16 +496,28 @@ var loadVis = function(){
     });
 };
 
-LABKEY.requiresExt4Sandbox();
+var loadPatches = function(){
+    LABKEY.requiresScript(LABKEY.extJsRoot_41 + "/ext-patches.js", true);
+    LABKEY.Utils.onTrue({
+        testCallback: function(){
+            return Ext4.USE_NATIVE_JSON === true;
+        },
+        successCallback: function(){
+            loadVis();
+        },
+        errorCallback: doError
+    });
+};
 
-//Lots of async script loading. Make sure everything is loaded before starting
+LABKEY.requiresScript(LABKEY.extJsRoot_41 + "/ext-all-sandbox-debug.js", true);
+
 LABKEY.Utils.onTrue({
     testCallback:function() {
         return ('Ext4' in window) &&  Ext4.isReady;
     },
-    //Calling createGraph directly causes errors to get swallowed by onTrue. We defer one more time
     successCallback:function () {
-        loadVis.defer(500);
+//        loadPatches.defer(250);
+        loadPatches();
     },
     errorCallback:doError
 });

@@ -1048,7 +1048,7 @@ public class ReportTest extends StudyBaseTest
         //Mouse down on GROUP 1 to remove it.
         mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Showing 13 Results");
-        
+
         //Check if all PTIDs of GROUP 2 are visible
         for(String ptid : PTIDS_TWO)
         {
@@ -1213,7 +1213,7 @@ public class ReportTest extends StudyBaseTest
     }
 
     private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureCohortGroup 1Group 24c.Induration 1st measure";
-    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisNot in TEST GROUP 2TEST_GROUP_2TestYAxis40.0";
+    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AMice BMice CNot in Cat Mice LetTestYAxis40.0";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     private void doManageViewsBoxPlotTest()
@@ -1264,13 +1264,12 @@ public class ReportTest extends StudyBaseTest
         click(Locator.css("svg text:contains('Cohort')"));
         ExtHelper.waitForExtDialog(this, "X Axis");
         click(Locator.ext4Radio("log"));
-        //TODO: Use participant category
-        mouseDown(Locator.xpath("//div[text()='TEST GROUP 2']"));
+        mouseDown(Locator.xpath("//div[text()='Cat Mice Let']"));
         ExtHelper.setExtFormElementByLabel(this, "X Axis", "Label:", "TestXAxis");
         ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
         waitForExtMaskToDisappear();
         waitForText("TestXAxis");
-        
+
         waitForText(BOX_PLOT_MV_2);
 
         clickButton("Save", 0);
@@ -1382,9 +1381,9 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.waitForExtDialog(this, "Define Mouse Group");
 
         // Create category with 3 groups
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice A", "Mouse", "Cat Mice Let", true, true, "999320964,999320980,999320981,999320998");
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice B", "Mouse", "Cat Mice Let", false, true, "999321029,999321033,999320624,999320760");
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice C", "Mouse", "Cat Mice Let", false, true, "999320358,999320364,999320396");
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice A", "Mouse", "Cat Mice Let", true, true, "999320016,999320518,999320529,999320557");
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice B", "Mouse", "Cat Mice Let", false, true, "999320565,999320576,999320582,999320609");
+        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), "Mice C", "Mouse", "Cat Mice Let", false, true, "999320613,999320671,999320687");
 
         clickLinkWithText(getFolderName());
         setDemographicsBit("DEM-1: Demographics", false);
@@ -1408,10 +1407,12 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Mouse Groups");
         ExtHelper.waitForLoadingMaskToDisappear(this, 10000);
         StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Foo", true, true, null);
+        waitForText("Cat Mice Foo");
         StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Let", false, true, null);
+        waitForTextToDisappear("Cat Mice Foo");
 
         // Add more participants to a group
-        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", null, false, true, "999320692,618005775");
+        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", null, false, true, "999320703,999320719");
 
         // Check that group has correct number of participants
         clickLinkWithText("Mice");

@@ -78,7 +78,7 @@ public class ExtHelper
     {
         test.getWrapper().getEval("selenium.selectFolderManagementItem('" + path + "', " + keepExisting +");");
     }
-    
+
     public static void setQueryEditorValue(BaseSeleniumWebTest test, String id, String value)
     {
         String script = "selenium.setEditAreaValue(" + jsString(id) + ", " + jsString(value) + ");";
@@ -284,7 +284,7 @@ public class ExtHelper
         pickMeasure(test, source, measure, false);
     }
 
-    //Pick measure from one of multiple split panel measure pickers   
+    //Pick measure from one of multiple split panel measure pickers
     public static void pickMeasure(BaseSeleniumWebTest test, String panelCls, String source, String measure, boolean keepSelection)
     {
         test.waitForElement(Locator.css("."+panelCls+" .sourcepanel tr:contains('"+source+"')"));
@@ -331,7 +331,7 @@ public class ExtHelper
     public static void selectFileBrowserItem(BaseSeleniumWebTest test, String path)
     {
         test.log("selectFileBrowserItem path: " + path);
-        
+
         String[] parts = {};
         StringBuilder nodeId = new StringBuilder();
         if (path.startsWith("/"))
@@ -351,7 +351,7 @@ public class ExtHelper
         {
             nodeId.append(parts[i]).append('/');
 
-            if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory 
+            if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
             {
                 // select last item: click on tree node name
                 clickFileBrowserFileCheckbox(test, parts[i]);
@@ -525,10 +525,8 @@ public class ExtHelper
         test.log("Clicking Ext button with caption: " + caption);
         Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(test, windowTitle):"")+"//button[(contains(@class, 'x-btn-text') and text()='" + caption + "') or (@role='button' and ./span[text()='" + caption + "'])]["+index+"]");
         test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        if (wait > 0)
-            test.clickAndWait(loc, wait);
-        else
-            test.click(loc);
+        test.mouseDown(loc);
+        test.clickAndWait(loc, wait);
     }
 
     public static void checkCheckbox(BaseSeleniumWebTest test, String label)
