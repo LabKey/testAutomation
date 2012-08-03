@@ -33,19 +33,29 @@ public class APIContainerHelper extends AbstractContainerHelper
     @Override
     public void doCreateProject(String projectName, String folderType)
     {
-        _test.log("Creating project with name via API " + projectName);
+        doCreateFolder(projectName, "/", folderType);
+    }
+
+    public final void createSubfolder(String parent, String folderName, String folderType)
+    {
+       doCreateFolder(folderName,  "/" + parent, folderType);
+    }
+
+    public void doCreateFolder(String folderName, String path, String folderType)
+    {
+        _test.log("Creating project with name via API " + folderName);
         Connection connection = new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        CreateContainerCommand command = new CreateContainerCommand(projectName);
+        CreateContainerCommand command = new CreateContainerCommand(folderName);
         command.setFolderType(folderType);
         try
         {
-            command.execute(connection, "/");
+            command.execute(connection, path);
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
         }
-        _test.goToHome();
-        _test.clickLinkWithText(projectName);
+
+        _test.beginAt("/project" + path + "/" + folderName +  "/begin.view?");
     }
 }

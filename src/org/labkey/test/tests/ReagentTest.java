@@ -62,7 +62,7 @@ public class ReagentTest extends BaseSeleniumWebTest
     {
         log("** Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Query" });
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
         enableModule("reagent", false);
 
         addWebPart("Query");

@@ -41,7 +41,11 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _createdProjects.add(projectName);
     }
 
+    public abstract void createSubfolder(String parent, String folderName, String folderType);
+
+
     protected abstract void doCreateProject(String projectName, String folderType);
+    protected abstract void doCreateFolder(String projectName, String folderType, String path);
 
     public List<String> getCreatedProjects()
     {

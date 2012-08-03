@@ -158,7 +158,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         enableEmailRecorder();
 
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
 
         createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
 

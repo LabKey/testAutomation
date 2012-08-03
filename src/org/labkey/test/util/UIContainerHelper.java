@@ -31,6 +31,12 @@ public class UIContainerHelper extends AbstractContainerHelper
     }
 
     @Override
+    public void createSubfolder(String project, String child, String foldertype)
+    {
+        _test.createSubfolder(project, project, child, foldertype, null);
+    }
+
+    @Override
     protected void doCreateProject(String projectName, String folderType)
     {
         _test.log("Creating project with name " + projectName);
@@ -58,5 +64,12 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.waitAndClick(Locator.xpath("//button[./span[text()='Finish']]"));
         _test.waitForPageToLoad();
         
+    }
+
+    @Override //TODO :  this will be necessary for full interconversion between UIcontainer and APIContainer,
+    //but at the moment it's unnecessary, and complicated because the two don't have the same capabilities.
+    protected void doCreateFolder(String projectName, String folderType, String path)
+    {
+//        _test.createSubfolder();
     }
 }
