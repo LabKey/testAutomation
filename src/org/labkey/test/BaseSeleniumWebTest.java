@@ -44,11 +44,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.internal.WrapsDriver;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -5341,7 +5337,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void deleteUser(String userEmail)
     {
-        deleteUser(userEmail, false);
+        deleteUsers(false, userEmail);
     }
 
     public void deleteGroup(String groupName)
@@ -5381,31 +5377,49 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ExtHelper.waitForExtDialog(this, groupName + " Information");
     }
 
-    public void deleteUser(String userEmail, boolean failIfNotFound)
+    public void deleteUsers(boolean failIfNotFound, String... userEmails)
     {
+        int checked = 0;
+        List<String> displayNames = new ArrayList<String>();
         ensureAdminMode();
         goToSiteUsers();
-        String userXPath = "//a[text()=\"details\"]/../../td[text()=\"" + userEmail + "\"]";
 
-        boolean isPresent = isElementPresent(new Locator(userXPath));
+        if(isLinkPresentWithText("include inactive users"))
+            clickLinkWithText("include inactive users");
 
-        // If we didn't find the user and we have more than one page, then show all pages and try again
-        if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
+        DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
+
+        for(String userEmail : userEmails)
         {
-            clickNavButton("Page Size", 0);
-            clickLinkWithText("Show All");
-            isPresent = isElementPresent(new Locator(userXPath));
+            String userXPath = "//a[text()='details']/../../td[text()='" + userEmail + "']";
+            int row = usersTable.getRow("Email", userEmail);
+
+            boolean isPresent = row != -1;
+
+            // If we didn't find the user and we have more than one page, then show all pages and try again
+            if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
+            {
+                clickNavButton("Page Size", 0);
+                clickLinkWithText("Show All");
+                row = usersTable.getRow("Email", userEmail);
+                isPresent = row != -1;
+            }
+
+            if (failIfNotFound)
+                Assert.assertTrue(userEmail + " was not present", isPresent);
+
+            if (isPresent)
+            {
+                usersTable.checkCheckbox(row);
+                checked++;
+                displayNames.add(usersTable.getDataAsText(row, "Display Name"));
+            }
         }
 
-        if (failIfNotFound)
-            Assert.assertTrue(userEmail + " was not present", isPresent);
-
-        if (isPresent)
+        if(checked > 0)
         {
-            checkCheckbox(new Locator(userXPath + "/../td[1]/input"));
             clickNavButton("Delete");
-            //TODO:  this causes test failures when displayName !=userEmail.  Need a long term fix
-//            assertTextPresent(userEmail);
+            assertTextPresent(displayNames);
             assertTextPresent("permanently delete");
             clickNavButton("Permanently Delete");
         }

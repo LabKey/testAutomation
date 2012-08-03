@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,12 +48,13 @@ public class UserTest extends SecurityTest
 
     protected void doTestSteps()
     {
-        super.doTestSteps();
+        super.doTestStepsSetDetph(true);
 
-        siteUsersTest();
-        requiredFieldsTest();
-        simplePasswordResetTest();
-        changeUserEmailTest();
+//        siteUsersTest();
+//        requiredFieldsTest();
+//        simplePasswordResetTest();
+//        changeUserEmailTest();
+        deactivatedUserTest();
     }
 
 
@@ -94,7 +96,7 @@ public class UserTest extends SecurityTest
         //get appropriate user
         String userEmail = getEmailChangeableUser();
         String newUserEmail = NORMAL_USER2_ALTERNATE;
-        deleteUser(newUserEmail, false);
+        deleteUser(newUserEmail);
 
         //change their email address
         changeUserEmail(userEmail, newUserEmail);
@@ -111,9 +113,29 @@ public class UserTest extends SecurityTest
 
         simpleSignIn();
 
-        deleteUser(newUserEmail, false);
+        deleteUser(newUserEmail);
     }
 
+    private void deactivatedUserTest()
+    {
+        goToSiteUsers();
+        DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
+        int row = usersTable.getRow("Display Name", NORMAL_USER);
+        String userId = usersTable.getDataAsText(row, "User Id");
+        String adminUserId = usersTable.getDataAsText(usersTable.getRow("Display Name", PROJECT_ADMIN_USER), "User Id"); 
+        usersTable.checkCheckbox(row);
+        clickButton("Deactivate");
+        clickButton("Deactivate");
+
+        log("Deactivated users shouldn't show up in issues 'Assign To' list");
+        clickLinkWithText(getProjectName());
+        goToModule("Issues");
+        clickLinkWithText("New Issue");
+        assertElementNotPresent(Locator.css("#assignedTo option[value="+userId+"]"));
+        assertTextNotPresent(NORMAL_USER);
+        assertElementPresent(Locator.css("#assignedTo option[value="+adminUserId+"]"));
+        assertTextPresent(PROJECT_ADMIN_USER);
+    }
 
     /**if user NORMAL_USER2 does not exist, create them,
      * give them password TEST_PASSWORD, and sign them in.
@@ -122,7 +144,7 @@ public class UserTest extends SecurityTest
     private String getEmailChangeableUser()
     {
 
-        deleteUser(NORMAL_USER2_ALTERNATE, false);
+        deleteUser(NORMAL_USER2_ALTERNATE);
         createUserAndNotify(NORMAL_USER2, NORMAL_USER);
         clickLinkContainingText("Home");
         setInitialPassword(NORMAL_USER2, TEST_PASSWORD);

@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -32,7 +31,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -99,7 +97,7 @@ public class StudyTest extends StudyBaseTest
     protected void doCleanup() throws Exception //child class cleanup method throws Exception
     {
         try{emptyParticipantPickerList();}catch(Throwable t){ /* Ignore */ }
-        deleteUser(authorUser, false);
+        deleteUser(authorUser);
         super.doCleanup();
     }
 

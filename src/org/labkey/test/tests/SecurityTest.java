@@ -64,12 +64,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
 
-        deleteUser(ADMIN_USER_TEMPLATE);
-        deleteUser(NORMAL_USER_TEMPLATE);
-        deleteUser(PROJECT_ADMIN_USER);
-        deleteUser(NORMAL_USER);
-        deleteUser(TO_BE_DELETED_USER);
-        deleteUser(SITE_ADMIN_USER);
+        deleteUsers(false, ADMIN_USER_TEMPLATE,NORMAL_USER_TEMPLATE,PROJECT_ADMIN_USER,NORMAL_USER,TO_BE_DELETED_USER,SITE_ADMIN_USER);
     }
 
     protected void doTestSteps()
@@ -675,7 +670,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         ensureAdminMode();
         goToAdminConsole();
         assertTextPresent("Already impersonating; click here to change back to " + testUserDisplayName);
-        deleteUser(TO_BE_DELETED_USER, true);
+        deleteUsers(true);
         stopImpersonating();
 
         ensureAdminMode();

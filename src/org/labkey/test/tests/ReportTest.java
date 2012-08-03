@@ -108,9 +108,7 @@ public class ReportTest extends StudyBaseTest
     @Override
     protected void doCleanup() throws Exception
     {
-        deleteUser(TEST_USER);
-        deleteUser(R_USER);
-        deleteUser(AUTHOR_USER, false);
+        deleteUsers(false, TEST_USER, R_USER, AUTHOR_USER);
         super.doCleanup();
     }
 
