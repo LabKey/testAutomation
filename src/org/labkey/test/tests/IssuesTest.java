@@ -275,9 +275,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText("Issues Summary");
 
         emailTest();//todo: move down
-//        requiredFieldsTest();
-//        viewSelectedDetailsTest();
-//        entryTypeNameTest();
+        requiredFieldsTest();
+        viewSelectedDetailsTest();
+        entryTypeNameTest();
 
         // Test issues grid with issues in a sub-folder
         subFolderIssuesTest();
