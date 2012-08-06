@@ -23,6 +23,7 @@ import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.EmailRecordTable.EmailMessage;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
+import java.util.List;
 
 /**
  * User: tamram
@@ -274,7 +275,6 @@ public class IssuesTest extends BaseSeleniumWebTest
         // back to grid view
         clickLinkWithText("Issues Summary");
 
-        emailTest();//todo: move down
         requiredFieldsTest();
         viewSelectedDetailsTest();
         entryTypeNameTest();
@@ -282,6 +282,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         // Test issues grid with issues in a sub-folder
         subFolderIssuesTest();
 
+        emailTest();//todo: move down
 
         // UNDONE test these actions
         // CompleteUserAction
@@ -379,9 +380,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         EmailMessage message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been opened and assigned to " + USER1);
 
         // Presumed to get the first message
-        Assert.assertTrue("User did not receive issue notification",      PasswordUtil.getUsername().equals(message.getTo()[0]));
-        Assert.assertTrue(USER2 + " did not receieve issue notification", USER2.equals(emailTable.getDataAsText(1, "To")));
-        Assert.assertTrue(USER1 + " did not receieve issue notification", USER1.equals(emailTable.getDataAsText(2, "To")));
+        List<String> recipients = emailTable.getColumnDataAsText("To");
+        Assert.assertTrue("User did not receive issue notification",      recipients.contains(PasswordUtil.getUsername()));
+        Assert.assertTrue(USER2 + " did not receieve issue notification", recipients.contains(USER2));
+        Assert.assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
 
         Assert.assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
 
@@ -414,13 +416,13 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Admin");
         setFormElement(Locator.formElement("entryTypeNames", "entrySingularName"), "Ticket");
         setFormElement(Locator.formElement("entryTypeNames", "entryPluralName"), "Tickets");
-        clickNavButton("Update Entry Type Names");
+        clickNavButton("Update");
 
         assertFormElementEquals("entrySingularName", "Ticket");
         assertFormElementEquals("entryPluralName", "Tickets");
 
         assertTextPresent("Tickets Admin Page");
-        clickLinkWithText("Tickets List");
+        clickLinkWithText("Back to Tickets");
 
         assertTextPresent("Tickets List");
         assertTextNotPresent("Issues List");
@@ -432,7 +434,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickNavButton("Admin");
         setFormElement(Locator.formElement("entryTypeNames", "entrySingularName"), "Issue");
         setFormElement(Locator.formElement("entryTypeNames", "entryPluralName"), "Issues");
-        clickNavButton("Update Entry Type Names");
+        clickNavButton("Update");
     }
 
     private void requiredFieldsTest()
