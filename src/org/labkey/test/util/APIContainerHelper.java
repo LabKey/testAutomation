@@ -56,6 +56,6 @@ public class APIContainerHelper extends AbstractContainerHelper
             throw new RuntimeException(e);
         }
 
-        _test.beginAt("/project" + path + "/" + folderName +  "/begin.view?");
+        _test.beginAt("/project" + path.replace("#", "%23") + "/" + folderName.replace("#", "%23") +  "/begin.view?");
     }
 }
