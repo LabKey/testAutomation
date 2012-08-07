@@ -131,9 +131,6 @@ public class FormulationsTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT_NAME, "IDRI Formulations");
         enableModule(PROJECT_NAME, "Dumbster");
 
-        //addWebPart("Sample Sets");
-        //addWebPart("Lists");
-
         // Sample Sets should already exist
         assertLinkPresentWithText(COMPOUNDS_NAME);
         assertLinkPresentWithText(RAWMATERIALS_SET_NAME);

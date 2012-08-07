@@ -247,7 +247,7 @@ public class ListTest extends BaseSeleniumWebTest
         selectOptionByText("ff_titleColumn", "Desc");
         clickDone();
 
-        clickLinkWithText("view data");
+        clickLinkWithText(LIST_NAME);
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
         assertTextPresent(TEST_DATA[3][2]);
@@ -565,7 +565,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Get URL to test exporting deleted list.");
         clickTab("List");
-        clickAndWait(Locator.raw("//td[contains(text(), '" + LIST_NAME + "')]/..//a[text()='view data']"));
+        clickLinkWithText(LIST_NAME);
         clickNavButton("Export", 0);
         ExtHelper.clickSideTab(this, "Text");
         String exportButtonScript = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "onclick");
@@ -578,7 +578,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME);
-        clickLinkWithText("view data");
+        clickLinkWithText(LIST2_NAME);
         pushLocation();
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         assertElementNotPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST_KEY_NAME + "']"));
