@@ -305,7 +305,7 @@ public class CAVDStudyTest extends StudyBaseTest
         assertLinkPresentWithText(study3name);
         for (String datasetName : DATASETS.values())
         {
-            assertTextPresent(datasetName, 2);
+            assertElementPresent(Locator.xpath("//td[text()='"+datasetName+"']"), 2);
         }
         // verify that there are no status icons to start
         for (String[] status : statuses)
