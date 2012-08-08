@@ -112,16 +112,16 @@ public class SearchTest extends StudyTest
         clickLinkWithText("view data", 2);
         ListHelper.deleteList(this);
 
-        SearchHelper.enqueueSearchItem("BoarQPine", false, null);
+        SearchHelper.enqueueSearchItem("BoarQPine", false);
         SearchHelper.enqueueSearchItem("Panda", Locator.bodyLinkWithText("List " + fullySearchableList));
         SearchHelper.enqueueSearchItem("2003-01-02", Locator.bodyLinkWithText("List " + fullySearchableList));
 //        SearchHelper.enqueueSearchItem("12345", Locator.bodyLinkWithText("List List1 - 1"));  //Issue 15419
         SearchHelper.enqueueSearchItem("Owlbear", Locator.bodyLinkWithText("List " + textOnlySearchableList));
-        SearchHelper.enqueueSearchItem("54321", false, null);
+        SearchHelper.enqueueSearchItem("54321", false);
         SearchHelper.enqueueSearchItem(metaOnlySearchable, Locator.bodyLinkWithText("List " + metaOnlySearchable));
-        SearchHelper.enqueueSearchItem("Turtleduck", false, null); //this phrase is present in the metadata-only file
+        SearchHelper.enqueueSearchItem("Turtleduck", false); //this phrase is present in the metadata-only file
         SearchHelper.enqueueSearchItem("Cat", Locator.bodyLinkWithText("List " + customizedIndexingList));
-        SearchHelper.enqueueSearchItem("Garfield", false, null);
+        SearchHelper.enqueueSearchItem("Garfield", false);
     }
 
     protected void doVerifySteps()
@@ -267,7 +267,7 @@ public class SearchTest extends StudyTest
 
 
         SearchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
-        SearchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE", false, null);
+        SearchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE", false);
         SearchHelper.enqueueSearchItem(WIKI_TITLE, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem(WIKI_CONTENT, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem("moduleDependencies", Locator.linkWithText("\"module.template.properties\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file

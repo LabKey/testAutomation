@@ -1404,9 +1404,9 @@ public class ReportTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Manage Mouse Groups");
         ExtHelper.waitForLoadingMaskToDisappear(this, 10000);
-        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Foo", true, true, null);
+        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Foo", true, true);
         waitForText("Cat Mice Foo");
-        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Let", false, true, null);
+        StudyHelper.editCustomParticipantGroup(this, "Mice C", "Mouse", "Cat Mice Let", false, true);
         waitForTextToDisappear("Cat Mice Foo");
 
         // Add more participants to a group
