@@ -616,7 +616,7 @@ public class TimeChartTest extends StudyBaseTest
 
         log("Test Y-Axis");
         setAxisValue("Left", "leftaxis_range_manual", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {Y_AXIS_LABEL}, new String[] {"500000","200000"});
-        setAxisValue("Left", "leftaxis_range_manual", "10000", "1000000", null, "leftaxis_scale", "Log", new String[] {"100000", "900000"}, null );
+        setAxisValue("Left", "leftaxis_range_manual", "10000", "1000000", null, "leftaxis_scale", "Log", new String[] {"100000"}, null );
     }
 
     /**
