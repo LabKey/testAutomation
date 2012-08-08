@@ -152,7 +152,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         clickNavButton("Done");
-        clickLinkWithText("view data");
+        clickLinkWithText(LIST_NAME);
         assertNavButtonNotPresent(METADATA_OVERRIDE_BUTTON);
         clickNavButton("Insert New");
         setFormElement("quf_name", "Seattle");
