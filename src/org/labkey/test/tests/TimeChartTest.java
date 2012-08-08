@@ -1176,8 +1176,6 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("Enable", 0);
         // test use-case to navigate to participang page on click
         String function = getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
-        // TODO: 15679: Time chart point click script can't start with a comment
-        function = function.substring(function.indexOf("function")); // Strip leading comment
         setFormElement("point-click-fn-textarea", function);
         applyChanges();
         openSaveMenu();
