@@ -58,6 +58,7 @@ public enum TestSet
         FlowTest.class,
         XTandemTest.class,
         StudyTest.class,
+        WebDavTest.class
     }),
 
     MS2(new Class[]
