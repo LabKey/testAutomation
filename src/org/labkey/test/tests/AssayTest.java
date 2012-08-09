@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
@@ -139,6 +140,18 @@ public class AssayTest extends AbstractAssayTest
         editAssay();
         viewCrossFolderData();
         verifyStudyList();
+        verifyWebdavTree();
+    }
+
+    //Issue 12203: Incorrect files are visible from pipeline directory
+    private void verifyWebdavTree()
+    {
+        beginAt("_webdav");
+        ExtHelper.selectFileBrowserItem(this, TEST_ASSAY_PRJ_SECURITY + "/Studies/Study 1");
+        assertTextPresent("@pipeline", 2);
+        Locator.XPathLocator l = Locator.xpath("//span[text()='@pipeline']");
+        assertElementPresent(l,  1);
+
     }
 
     private void editResults()
