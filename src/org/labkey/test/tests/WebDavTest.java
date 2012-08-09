@@ -76,6 +76,16 @@ public class WebDavTest extends BaseSeleniumWebTest
         names = _listNames(sardine,testURL);
         Assert.assertEquals(1, names.size());
         Assert.assertFalse(names.contains("testfile1"));
+
+        try
+        {
+            sardine.list(testURL + "nonexistant/");
+            Assert.fail("Expected 404");
+        }
+        catch (IOException x)
+        {
+            Assert.assertTrue(x.toString().contains("404"));
+        }
     }
 
 
