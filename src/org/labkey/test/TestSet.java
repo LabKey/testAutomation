@@ -134,6 +134,7 @@ public enum TestSet
         TargetedMSTest.class,
         TimeChartTest.class,
         EHRStudyTest.class,
+        EHRApiTest.class,
         GpatAssayTest.class,
         FolderTest.class,
         StudyDemoModeTest.class,

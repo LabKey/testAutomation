@@ -7,7 +7,6 @@ data/api/assayTest.js -text
 data/api/chartTest.js -text
 data/api/chartingAPITest.js -text
 data/api/domainTest.js -text
-data/api/ehr-security-template.xml -text
 data/api/extIntegrationTest.html -text
 data/api/folderTest.html -text
 data/api/getDataAggregateTest.html -text
@@ -94,6 +93,7 @@ src/org/labkey/test/module/AdaptiveTest.java -text
 src/org/labkey/test/module/AdaptiveVisualizationPerf.java -text
 src/org/labkey/test/module/CDSPopulation.java -text
 src/org/labkey/test/module/CDSTest.java -text
+src/org/labkey/test/module/EHRApiTest.java -text
 src/org/labkey/test/module/EHRStudyTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
@@ -256,6 +256,7 @@ src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/CustomizeViewsHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/Diff.java -text
+src/org/labkey/test/util/EHRTestHelper.java -text
 src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/EscapeUtil.java -text

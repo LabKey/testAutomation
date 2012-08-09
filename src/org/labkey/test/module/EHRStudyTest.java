@@ -25,6 +25,7 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.tests.SimpleApiTest;
+import org.labkey.test.util.EHRTestHelper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -56,33 +57,35 @@ public class EHRStudyTest extends SimpleApiTest
     private static final String FOLDER_NAME = "EHR";
     private static final String CONTAINER_PATH = PROJECT_NAME + "/" + FOLDER_NAME;
     private static final String STUDY_ZIP = "/sampledata/study/EHR Study Anon.zip";
-    private static final String SCRIPT_TEMPLATE = "/server/test/data/api/ehr-security-template.xml";
 
     //note: changed by BNB
-    private static final String PROJECT_ID = "640991"; // project with one participant
-    private static final String DUMMY_PROTOCOL = "g00000"; // need a protocol to create table entry
-    private static final String PROJECT_MEMBER_ID = "test2312318"; // PROJECT_ID's single participant
-    private static final String ROOM_ID = "6824778"; // room of PROJECT_MEMBER_ID
-    private static final String CAGE_ID = "4434662"; // cage of PROJECT_MEMBER_ID
+    protected static final String PROJECT_ID = "640991"; // project with one participant
+    protected static final String DUMMY_PROTOCOL = "dummyprotocol"; // need a protocol to create table entry
+    protected static final String PROJECT_MEMBER_ID = "test2312318"; // PROJECT_ID's single participant
+    protected static final String ROOM_ID = "6824778"; // room of PROJECT_MEMBER_ID
+    protected static final String CAGE_ID = "4434662"; // cage of PROJECT_MEMBER_ID
 
-    private static final String AREA_ID = "A1/AB190"; // arbitrary area
-    private static final String PROTOCOL_PROJECT_ID = "795644"; // Project with exactly 3 members
-    private static final String PROTOCOL_ID = "g00101";
-    private static final String[] PROTOCOL_MEMBER_IDS = {"test3997535", "test4551032", "test5904521"}; //{"test2008446", "test3804589", "test4551032", "test5904521", "test6390238"}; // Protocol members, sorted ASC alphabetically
-    private static final String[] MORE_ANIMAL_IDS = {"test1020148","test1099252","test1112911","test727088","test4564246"}; // Some more, distinct, Ids
-    private static final String DEAD_ANIMAL_ID = "test9118022";
-    private static final EHRUser DATA_ADMIN = new EHRUser("admin@ehrstudy.test", "EHR Administrators", EHRRole.DATA_ADMIN);
-    private static final EHRUser REQUESTER = new EHRUser("requester@ehrstudy.test", "EHR Requestors", EHRRole.REQUESTER);
-    private static final EHRUser BASIC_SUBMITTER = new EHRUser("basicsubmitter@ehrstudy.test", "EHR Basic Submitters", EHRRole.BASIC_SUBMITTER);
-    private static final EHRUser FULL_SUBMITTER = new EHRUser("fullsubmitter@ehrstudy.test", "EHR Full Submitters", EHRRole.FULL_SUBMITTER);
-    private static final String TASK_TITLE = "Test weight task";
-    private static final String MPR_TASK_TITLE = "Test MPR task";
+    protected static final String AREA_ID = "A1/AB190"; // arbitrary area
+    protected static final String PROTOCOL_PROJECT_ID = "795644"; // Project with exactly 3 members
+    protected static final String PROTOCOL_ID = "protocol101";
+    protected static final String[] PROTOCOL_MEMBER_IDS = {"test3997535", "test4551032", "test5904521"}; //{"test2008446", "test3804589", "test4551032", "test5904521", "test6390238"}; // Protocol members, sorted ASC alphabetically
+    protected static final String[] MORE_ANIMAL_IDS = {"test1020148","test1099252","test1112911","test727088","test4564246"}; // Some more, distinct, Ids
+    protected static final String DEAD_ANIMAL_ID = "test9118022";
+    protected static final EHRUser DATA_ADMIN = new EHRUser("admin@ehrstudy.test", "EHR Administrators", EHRRole.DATA_ADMIN);
+    protected static final EHRUser REQUESTER = new EHRUser("requester@ehrstudy.test", "EHR Requestors", EHRRole.REQUESTER);
+    protected  static final EHRUser BASIC_SUBMITTER = new EHRUser("basicsubmitter@ehrstudy.test", "EHR Basic Submitters", EHRRole.BASIC_SUBMITTER);
+    protected  static final EHRUser FULL_SUBMITTER = new EHRUser("fullsubmitter@ehrstudy.test", "EHR Full Submitters", EHRRole.FULL_SUBMITTER);
+    protected  static final EHRUser REQUEST_ADMIN = new EHRUser("request_admin@ehrstudy.test", "EHR Request Admins", EHRRole.REQUEST_ADMIN);
+    protected  static final EHRUser FULL_UPDATER = new EHRUser("full_updater@ehrstudy.test", "EHR Full Updaters", EHRRole.FULL_UPDATER);
+    protected  static final String TASK_TITLE = "Test weight task";
+    protected  static final String MPR_TASK_TITLE = "Test MPR task";
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    protected  static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     //xpath fragment
     public static final String VISIBLE = "not(ancestor-or-self::*[contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display')])";
 
-    private static class EHRUser
+    private EHRTestHelper _helper = new EHRTestHelper(this);
+    public static class EHRUser
     {
         private final String _userId;
         private final String _groupName;
@@ -134,6 +137,8 @@ public class EHRStudyTest extends SimpleApiTest
     @Override
     public void validateQueries()
     {
+        //NOTE: the queries are also validated as part of study import
+        //also, validation takes place on the project root, while the EHR and required datasets are loaded into a subfolder
         log("Skipping query validation.");
     }
 
@@ -173,6 +178,8 @@ public class EHRStudyTest extends SimpleApiTest
         try{deleteUser(DATA_ADMIN.getUser());}catch(Throwable T){}
         try{deleteUser(REQUESTER.getUser());}catch(Throwable T){}
         try{deleteUser(BASIC_SUBMITTER.getUser());}catch(Throwable T){}
+        try{deleteUser(REQUEST_ADMIN.getUser());}catch(Throwable T){}
+        try{deleteUser(FULL_UPDATER.getUser());}catch(Throwable T){}
         try{deleteUser(FULL_SUBMITTER.getUser());}catch(Throwable T){}
     }
 
@@ -186,8 +193,7 @@ public class EHRStudyTest extends SimpleApiTest
         animalHistoryTest();
         quickSearchTest();
         weightDataEntryTest();
-        //mprDataEntryTest(); // TODO: Blocked: Can't fill out form, SNOMED list is empty
-        /* super.runApiTests() */
+        mprDataEntryTest();
     }
 
     private void initProject()
@@ -199,18 +205,25 @@ public class EHRStudyTest extends SimpleApiTest
         enableModule(PROJECT_NAME, "EHR");
 
         //set dummy values first, to test the admin UI
-        String[] dummyProps = {"/", "EHRStudyContainer", "/fakeContainer"};
+        String[] dummyProps = {"/" +  PROJECT_NAME, "EHRStudyContainer", "/fakeContainer"};
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(dummyProps)));
 
-        String[] prop = {"/", "EHRStudyContainer", "/" + CONTAINER_PATH};
+        String[] prop = {"/" + PROJECT_NAME, "EHRStudyContainer", "/" + CONTAINER_PATH};
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
 
         clickLinkWithText(FOLDER_NAME);
-        beginAt(getBaseURL()+"/ehr/"+PROJECT_NAME+"/"+FOLDER_NAME+"/_initEHR.view");
+        beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/_initEHR.view");
         clickNavButton("Delete All", 0);
         waitForText("Delete Complete", 120000);
         clickNavButton("Populate All", 0);
         waitForText("Populate Complete", 120000);
+
+        //these tables do not have a container field, so are deleted when the test project is deleted
+        clickNavButton("Delete Data From SNOMED Subsets", 0);
+        waitForText("Delete Complete", 120000);
+        clickNavButton("Populate SNOMED Subsets Table", 0);
+        waitForText("Populate Complete", 120000);
+
         goToModule("Study");
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
         try
@@ -232,12 +245,6 @@ public class EHRStudyTest extends SimpleApiTest
         removeWebPart("Messages");
         addWebPart("EHR Datasets");
 
-        // TODO: Menu Bar causing permission dialog to appear when impersonating/stopping impersonation
-        // TODO: Should use menu bar to access Animal History, Quick Search, and Data Entry pages.
-        //log("Setup EHR Menu Bar.");
-        //clickAdminMenuItem("Manage Project", "Project Settings");
-        //clickLinkWithText("Menu Bar");
-        //clickLinkWithText("Turn On Custom Menus");
         addWebPart("Electronic Health Record");
         addWebPart("Quick Search");
     }
@@ -316,10 +323,12 @@ public class EHRStudyTest extends SimpleApiTest
 
         //crawlReportTabs(); // TOO SLOW. TODO: Enable when performance is better.
 
+        //NOTE: rendering the entire colony is slow, so instead of abstract we load a simpler report
         log("Verify Entire colony history");
         checkRadioButton("selector", "renderColony");
-        refreshAnimalHistoryReport();
-        dataRegionName = getDataRegionName("Abstract");
+        ExtHelper.clickExtTab(this, "Demographics");
+        waitForText("Rhesus"); //a proxy for the loading of the dataRegion
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Demographics");
         Assert.assertEquals("Did not find the expected number of Animals", 44, getDataRegionRowCount(dataRegionName));
 
         log("Verify location based history");
@@ -327,7 +336,7 @@ public class EHRStudyTest extends SimpleApiTest
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='areaField']/.."), AREA_ID);
         setFormElement("roomField", ROOM_ID);
         setFormElement("cageField", CAGE_ID);
-        refreshAnimalHistoryReport();
+        ExtHelper.clickExtTab(this, "Abstract");
         // No results expected due to anonymized cage info.
         waitForText("No records found", WAIT_FOR_JAVASCRIPT);
 
@@ -351,7 +360,7 @@ public class EHRStudyTest extends SimpleApiTest
 
         // Check protocol search results.
         refreshAnimalHistoryReport();
-        dataRegionName = getDataRegionName("Abstract");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length, getDataRegionRowCount(dataRegionName));
         assertLinkPresentWithText(PROTOCOL_MEMBER_IDS[0]);
 
@@ -359,16 +368,15 @@ public class EHRStudyTest extends SimpleApiTest
         waitAndClick(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"));
         waitForElementToDisappear(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
-        dataRegionName = getDataRegionName("Abstract");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length - 1, getDataRegionRowCount(dataRegionName));
-        assertTextNotPresent(PROTOCOL_MEMBER_IDS[0]);
 
         // Re-add animal.
         setFormElement("subjectBox",  PROTOCOL_MEMBER_IDS[0]);
         clickNavButton("  Append -->", 0);
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
-        dataRegionName = getDataRegionName("Abstract");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         waitForText(PROTOCOL_MEMBER_IDS[0]);
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length, getDataRegionRowCount(dataRegionName));
 
@@ -378,7 +386,7 @@ public class EHRStudyTest extends SimpleApiTest
         assertAlert("No records selected");
 
         log("Return Distinct Values");
-        dataRegionName = getDataRegionName("Weight");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Weight");
         checkAllOnPage(dataRegionName);
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
         ExtHelper.waitForExtDialog(this, "Return Distinct Values");
@@ -428,7 +436,7 @@ public class EHRStudyTest extends SimpleApiTest
         assertAlert("No records selected");
 
         log("Jump to Other Dataset - two selection");
-        dataRegionName = getDataRegionName("Abstract");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         checkDataRegionCheckbox(dataRegionName, 0); // PROTOCOL_MEMBER_IDS[0]
         checkDataRegionCheckbox(dataRegionName, 2); // PROTOCOL_MEMBER_IDS[2]
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
@@ -446,7 +454,7 @@ public class EHRStudyTest extends SimpleApiTest
         setFormElement("subjectBox", PROTOCOL_MEMBER_IDS[2]);
         clickNavButton("  Append -->", 0);
         refreshAnimalHistoryReport();
-        dataRegionName = getDataRegionName("Abstract");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
         assertTextPresent(PROTOCOL_MEMBER_IDS[0], PROTOCOL_MEMBER_IDS[2]);
 
@@ -454,7 +462,7 @@ public class EHRStudyTest extends SimpleApiTest
         setFormElement("subjectBox",  MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
         clickNavButton("  Replace -->", 0);
         refreshAnimalHistoryReport();
-        dataRegionName = getDataRegionName("Abstract");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 5, getDataRegionRowCount(dataRegionName));
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[2]);
@@ -514,7 +522,7 @@ public class EHRStudyTest extends SimpleApiTest
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
     }
 
-    private void setupEhrPermissions()
+    protected void setupEhrPermissions()
     {
         clickLinkWithText(PROJECT_NAME);
         createUserAndNotify(DATA_ADMIN.getUser(), "");
@@ -525,10 +533,17 @@ public class EHRStudyTest extends SimpleApiTest
         clickLinkWithText(PROJECT_NAME);
         createUserAndNotify(FULL_SUBMITTER.getUser(), "");
         clickLinkWithText(PROJECT_NAME);
+        createUserAndNotify(FULL_UPDATER.getUser(), "");
+        clickLinkWithText(PROJECT_NAME);
+        createUserAndNotify(REQUEST_ADMIN.getUser(), "");
+        clickLinkWithText(PROJECT_NAME);
+
         setInitialPassword(DATA_ADMIN.getUser(), PasswordUtil.getPassword());
         setInitialPassword(REQUESTER.getUser(), PasswordUtil.getPassword());
         setInitialPassword(BASIC_SUBMITTER.getUser(), PasswordUtil.getPassword());
         setInitialPassword(FULL_SUBMITTER.getUser(), PasswordUtil.getPassword());
+        setInitialPassword(FULL_UPDATER.getUser(), PasswordUtil.getPassword());
+        setInitialPassword(REQUEST_ADMIN.getUser(), PasswordUtil.getPassword());
 
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
@@ -537,6 +552,8 @@ public class EHRStudyTest extends SimpleApiTest
         createPermissionsGroup(REQUESTER.getGroup(), REQUESTER.getUser());
         createPermissionsGroup(BASIC_SUBMITTER.getGroup(), BASIC_SUBMITTER.getUser());
         createPermissionsGroup(FULL_SUBMITTER.getGroup(), FULL_SUBMITTER.getUser());
+        createPermissionsGroup(FULL_UPDATER.getGroup(), FULL_UPDATER.getUser());
+        createPermissionsGroup(REQUEST_ADMIN.getGroup(), REQUEST_ADMIN.getUser());
         popLocation();
         enterPermissionsUI();
         uncheckInheritedPermissions();
@@ -544,43 +561,41 @@ public class EHRStudyTest extends SimpleApiTest
         setPermissions(REQUESTER.getGroup(), "Editor");
         setPermissions(BASIC_SUBMITTER.getGroup(), "Editor");
         setPermissions(FULL_SUBMITTER.getGroup(), "Editor");
+        setPermissions(FULL_UPDATER.getGroup(), "Editor");
+        setPermissions(REQUEST_ADMIN.getGroup(), "Editor");
         savePermissions();
         ExtHelper.clickExtTab(this, "Study Security");
         waitAndClickNavButton("Study Security");
 
-        checkRadioButton(getRadioButtonLocator(DATA_ADMIN.getGroup(), "READOWN"));
-        checkRadioButton(getRadioButtonLocator(REQUESTER.getGroup(), "READOWN"));
-        checkRadioButton(getRadioButtonLocator(BASIC_SUBMITTER.getGroup(), "READOWN"));
-        checkRadioButton(getRadioButtonLocator(FULL_SUBMITTER.getGroup(), "READOWN"));
+        checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(DATA_ADMIN.getGroup(), "READOWN"));
+        checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(REQUESTER.getGroup(), "READOWN"));
+        checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(BASIC_SUBMITTER.getGroup(), "READOWN"));
+        checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(FULL_SUBMITTER.getGroup(), "READOWN"));
+        checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(FULL_UPDATER.getGroup(), "READOWN"));
+        checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(REQUEST_ADMIN.getGroup(), "READOWN"));
         clickAndWait(Locator.id("groupUpdateButton"));
 
         //"set all to..." combo-boxes don't work through selenium.
         log("Set per-dataset permissions individually");
-        setPDP(DATA_ADMIN);
-        setPDP(BASIC_SUBMITTER);
-        setPDP(FULL_SUBMITTER);
-        setPDP(REQUESTER);
+        _helper.setPDP(DATA_ADMIN);
+        _helper.setPDP(BASIC_SUBMITTER);
+        _helper.setPDP(FULL_SUBMITTER);
+        _helper.setPDP(FULL_UPDATER);
+        _helper.setPDP(REQUESTER);
+        _helper.setPDP(REQUEST_ADMIN);
 
         waitFor(new Checker(){
             public boolean check(){
                 return "EHR Data Admin".equals(getSelectedOptionText(Locator.name("dataset.1061", 0))) &&
                        "EHR Basic Submitter".equals(getSelectedOptionText(Locator.name("dataset.1061", 1))) &&
                        "EHR Full Submitter".equals(getSelectedOptionText(Locator.name("dataset.1061", 2))) &&
-                       "EHR Requestor".equals(getSelectedOptionText(Locator.name("dataset.1061", 3)));
+                       "EHR Full Updater".equals(getSelectedOptionText(Locator.name("dataset.1061", 3))) &&
+                       "EHR Request Admin".equals(getSelectedOptionText(Locator.name("dataset.1061", 4))) &&
+                       "EHR Requestor".equals(getSelectedOptionText(Locator.name("dataset.1061", 5)));
             }
         }, "Per-dataset permission not set", WAIT_FOR_JAVASCRIPT);
 
         clickNavButton("Save");
-    }
-
-    private void setPDP(EHRUser user)
-    {
-        int col = selenium.getXpathCount("//table[@id='datasetSecurityFormTable']//th[.='"+user.getGroup()+"']/preceding-sibling::*").intValue() + 1;
-        int rowCt = getTableRowCount("datasetSecurityFormTable");
-        for (int i = 3; i <= rowCt; i++) // xpath indexing is 1 based
-        {
-            selectOptionByText(Locator.xpath("//table[@id='datasetSecurityFormTable']/tbody/tr["+i+"]/td["+col+"]//select"), user.getRole().toString());
-        }
     }
 
     private void weightDataEntryTest()
@@ -625,9 +640,9 @@ public class EHRStudyTest extends SimpleApiTest
         waitForText(MORE_ANIMAL_IDS[3], WAIT_FOR_JAVASCRIPT);
         waitForText(MORE_ANIMAL_IDS[4], WAIT_FOR_JAVASCRIPT);
 
-        selectRecord("weight", MORE_ANIMAL_IDS[0], true);
-        selectRecord("weight", MORE_ANIMAL_IDS[1], true);
-        selectRecord("weight", MORE_ANIMAL_IDS[2], true);
+        _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[0], true);
+        _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[1], true);
+        _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[2], true);
         clickNavButton("Delete Selected", 0);
         ExtHelper.waitForExtDialog(this, "Confirm");
         ExtHelper.clickExtButton(this, "Yes", 0);
@@ -636,7 +651,7 @@ public class EHRStudyTest extends SimpleApiTest
         waitForElementToDisappear(Locator.tagWithText("div", MORE_ANIMAL_IDS[1]), WAIT_FOR_JAVASCRIPT);
 
         //TODO: Test duplicate record
-        selectRecord("weight", MORE_ANIMAL_IDS[4], true);
+        _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[4], true);
         clickButton("Duplicate Selected", 0);
         ExtHelper.waitForExtDialog(this, "Duplicate Records");
         ExtHelper.clickExtButton(this, "Duplicate Records", "Submit", 0);
@@ -668,17 +683,17 @@ public class EHRStudyTest extends SimpleApiTest
         beginAt(href); // Clicking link opens in another window.
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
         waitForTextToDisappear("Loading...", WAIT_FOR_JAVASCRIPT);
-        selectRecord("weight", MORE_ANIMAL_IDS[4], false);
+        _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[4], false);
         waitForElement(Locator.linkWithText(MORE_ANIMAL_IDS[4]), WAIT_FOR_JAVASCRIPT);
         clickButton("Delete Selected", 0); // Delete duplicate record. It has served its purpose.
         ExtHelper.waitForExtDialog(this, "Confirm");
         ExtHelper.clickExtButton(this, "Yes", 0);
         waitForText("No Animal Selected", WAIT_FOR_JAVASCRIPT);
-        selectRecord("weight", PROJECT_MEMBER_ID, false);
+        _helper.selectDataEntryRecord("weight", PROJECT_MEMBER_ID, false);
         ExtHelper.setExtFormElementByLabel(this, "Weight (kg):", "3.333");
-        selectRecord("weight", MORE_ANIMAL_IDS[3], false);
+        _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[3], false);
         ExtHelper.setExtFormElementByLabel(this, "Weight (kg):", "4.444");
-        selectRecord("weight", MORE_ANIMAL_IDS[4], false);
+        _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[4], false);
         ExtHelper.setExtFormElementByLabel(this, "Weight (kg):", "5.555");
 
         clickButton("Submit for Review", 0);
@@ -777,14 +792,14 @@ public class EHRStudyTest extends SimpleApiTest
         waitForElement(Locator.name("Id"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID + " (" + PROTOCOL_ID + ")\u00A0");
+        ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID + " (" + DUMMY_PROTOCOL + ")\u00A0");
         ExtHelper.selectComboBoxItem(this, "Type", "Physical Exam\u00A0");
         setFormElement("remark", "Bonjour");
         setFormElement("performedby", BASIC_SUBMITTER.getUser());
 
         log("Add treatments record.");
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-        clickVisibleButton("Add Record");
+        _helper.clickVisibleButton("Add Record");
         setFormElement(Locator.xpath("//div[./div/span[text()='Treatments & Procedures']]//input[@name='enddate']/..//input[contains(@id, 'date')]"), DATE_FORMAT.format(new Date()));
         ExtHelper.selectComboBoxItem(this, "Code", "Antibiotic");
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='code']/.."), "amoxicillin (c-54620)\u00a0");
@@ -795,35 +810,10 @@ public class EHRStudyTest extends SimpleApiTest
         setFormElement("dosage", "2");
         click(Locator.xpath("//img["+VISIBLE+" and contains(@class, 'x-form-search-trigger')]"));
         waitForElement(Locator.xpath("//div[@class='x-form-invalid-msg']"), WAIT_FOR_JAVASCRIPT);
-        setMPRField("Treatments", "remark", "Yum");
-        setMPRField("Treatments", "performedby", BASIC_SUBMITTER.getUser());
+        _helper.setDataEntryField("Treatments & Procedures", "remark", "Yum");
 
         //TODO: Test more procedures.
-//        log("Add blood draw record.");
-//        ExtHelper.clickExtTab(this, "Blood Draws");
-//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-blood_draws-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-//        clickVisibleButton("Add Record");
-//
-//        log("Add recovery observation");
-//        ExtHelper.clickExtTab(this, "Recovery Observations");
-//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-clinical_observations-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-//        clickVisibleButton("Add Record");
-//
-//        log("Add procedure code");
-//        ExtHelper.clickExtTab(this, "Procedure Codes");
-//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-procedure_codes-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-//        clickVisibleButton("Add Record");
-//
-//        log("Add housing record.");
-//        ExtHelper.clickExtTab(this, "Housing Moves/Restraint");
-//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-housing-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-//        clickVisibleButton("Add Record");
-//
-//        log("Add weight record.");
-//        ExtHelper.clickExtTab(this, "Weight");
-//        waitForElement(Locator.xpath("//*["+VISIBLE+" and contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-//        clickVisibleButton("Add Record");
-//
+
 //        log("Add charge");
 //        ExtHelper.clickExtTab(this, "Charges");
 //        waitForElement(Locator.xpath("/*//*["+VISIBLE+" and not(contains(@class, 'x-hide-display')) and contains(@class,'ehr-charges-records-grid')]"), WAIT_FOR_JAVASCRIPT);
@@ -832,64 +822,6 @@ public class EHRStudyTest extends SimpleApiTest
         clickNavButton("Save & Close");
 
         stopImpersonating();
-    }
-
-    private void setMPRField(String tabName, String fieldName, String value)
-    {
-        setFormElement(Locator.xpath("//div[./div/span[text()='"+tabName+"']]//*[(self::input or self::textarea) and @name='"+fieldName+"']"), value);
-        fireEvent(Locator.xpath("//div[./div/span[text()='"+tabName+"']]//*[(self::input or self::textarea) and @name='"+fieldName+"']"), SeleniumEvent.blur);
-    }
-
-    @Override
-    public void runApiTests() throws Exception
-    {
-        testUserAgainstAllStates(DATA_ADMIN);
-        // TODO: Fix. Connection drops on expected failures.
-        //testUserAgainstAllStates(REQUESTER);
-        //testUserAgainstAllStates(BASIC_SUBMITTER);
-        //testUserAgainstAllStates(FULL_SUBMITTER);
-    }
-
-    private void testUserAgainstAllStates(EHRUser user) throws Exception
-    {
-        File[] scriptFiles = new File[EHRQCState.values().length];
-
-        int i = 0;
-        for(EHRQCState qcState : EHRQCState.values())
-        {
-            scriptFiles[i++] = prepareScript(user, qcState);
-        }
-
-        super.runApiTests(scriptFiles, user.getUser(), PasswordUtil.getPassword(), true);
-    }
-
-    private File prepareScript(EHRUser user, EHRQCState qcState) throws java.io.IOException
-    {
-        File preparedFile = new File(System.getProperty("java.io.tmpdir"), "ehr-"+user.getRole()+"-"+qcState.label.replace(":", "_")+"-insert.xml");
-
-        BufferedReader reader = new BufferedReader(new FileReader(getLabKeyRoot() + SCRIPT_TEMPLATE));
-        BufferedWriter writer = new BufferedWriter(new FileWriter(preparedFile));
-
-        String line;
-        boolean permitted = successExpected(user.getRole(), qcState);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-        while ( (line = reader.readLine()) != null)
-        {
-            line = line.replace("${ContainerPath}", CONTAINER_PATH);
-            line = line.replace("${AnimalId}", MORE_ANIMAL_IDS[2]);
-            line = line.replace("${QCState}", qcState.label);
-            line = line.replace("${Role}", user.getRole().toString());
-            Calendar now = Calendar.getInstance();
-            now.add(Calendar.MINUTE, 1); // avoid creating records "in the past"
-            line = line.replace("${Date}", dateFormat.format(now.getTime()));
-            line = line.replace(permitted ? "successresponse>" : "failresponse>", "response>");
-
-            writer.write(line + "\n");
-        }
-
-        writer.close();
-        return preparedFile;
     }
 
     private void crawlReportTabs()
@@ -916,12 +848,12 @@ public class EHRStudyTest extends SimpleApiTest
                 if(tab.contains(":"))
                 {
                     ExtHelper.clickExtTab(this, tab.split(":")[0]);
-                    getDataRegionName(tab.split(":")[1]);
+                    _helper.getAnimalHistoryDataRegionName(tab.split(":")[1]);
                 }
                 else
                 {
                     ExtHelper.clickExtTab(this, tab);
-                    getDataRegionName(tab);
+                    _helper.getAnimalHistoryDataRegionName(tab);
                 }
             }
         }
@@ -933,54 +865,7 @@ public class EHRStudyTest extends SimpleApiTest
         waitForPageToLoad();
     }
 
-    private boolean successExpected(EHRRole role, EHRQCState qcState)
-    {
-        // Expand to other request types once we start testing them. Insert only for now.
-        return allowedActions.contains(new Permission(role, qcState, "insert"));
-    }
-
-    private static final ArrayList<Permission> allowedActions = new ArrayList<Permission>()
-    {
-        {
-            // Data Admin - Users with this role are permitted to make any edits to datasets
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.ABNORMAL, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.COMPLETED, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.DELETE_REQUESTED, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.IN_PROGRESS, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.REQUEST_APPROVED, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.REQUEST_COMPLETE, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.REQUEST_DENIED, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.REQUEST_PENDING, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.REVIEW_REQUIRED, "insert"));
-            add(new Permission(EHRRole.DATA_ADMIN, EHRQCState.SCHEDULED, "insert"));
-
-            // Requester - Users with this role are permitted to submit requests, but not approve them
-            add(new Permission(EHRRole.REQUESTER, EHRQCState.REQUEST_PENDING, "insert"));
-
-            // Full Submitter - Users with this role are permitted to submit and approve records.  They cannot modify public data.
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.ABNORMAL, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.COMPLETED, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.DELETE_REQUESTED, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.IN_PROGRESS, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.REQUEST_APPROVED, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.REQUEST_COMPLETE, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.REQUEST_DENIED, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.REQUEST_PENDING, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.REVIEW_REQUIRED, "insert"));
-            add(new Permission(EHRRole.FULL_SUBMITTER, EHRQCState.SCHEDULED, "insert"));
-
-            // Basic Submitter - Users with this role are permitted to submit and edit non-public records, but cannot alter public ones
-            add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.IN_PROGRESS, "insert"));
-            add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.REVIEW_REQUIRED, "insert"));
-            add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.REQUEST_PENDING, "insert"));
-            add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.DELETE_REQUESTED, "insert"));
-            add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.REQUEST_DENIED, "insert"));
-            add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.REQUEST_COMPLETE, "insert"));
-            add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.SCHEDULED, "insert"));
-        }
-    };
-
-    private static class Permission 
+    public static class Permission
     {
         EHRRole role;
         EHRQCState qcState;
@@ -1002,12 +887,14 @@ public class EHRStudyTest extends SimpleApiTest
         }
     }
 
-    private static enum EHRRole
+    public static enum EHRRole
     {
         DATA_ADMIN ("EHR Data Admin"),
         REQUESTER ("EHR Requestor"),
         BASIC_SUBMITTER ("EHR Basic Submitter"),
-        FULL_SUBMITTER ("EHR Full Submitter");
+        FULL_SUBMITTER ("EHR Full Submitter"),
+        FULL_UPDATER ("EHR Full Updater"),
+        REQUEST_ADMIN ("EHR Request Admin");
         private final String name;
         private EHRRole (String name)
         {this.name = name;}
@@ -1015,7 +902,7 @@ public class EHRStudyTest extends SimpleApiTest
         {return name;}
     }
 
-    private static enum EHRQCState
+    public static enum EHRQCState
     {
         ABNORMAL("Abnormal", "Value is abnormal", true, false, false),
         COMPLETED("Completed", "Data has been approved for public release", true, false, false),
@@ -1045,7 +932,7 @@ public class EHRStudyTest extends SimpleApiTest
         }
     }
 
-    private void defineQCStates()
+    protected void defineQCStates()
     {
         log("Define QC states for EHR study");
         clickLinkWithText(PROJECT_NAME);
@@ -1063,30 +950,5 @@ public class EHRStudyTest extends SimpleApiTest
 
         setFormElement("showPrivateDataByDefault", "true");
         clickNavButton("Done");
-    }
-
-    private Locator getRadioButtonLocator(String groupName, String setting)
-    {
-        //not sure why the radios are in TH elements, but they are...
-        return Locator.xpath("//form[@id='groupUpdateForm']/table/tbody/tr/td[text()='"
-                + groupName + "']/../th/input[@value='" + setting + "']");
-    }
-
-    private String getDataRegionName(String title)
-    {
-        // Specific to the EHR Animal History page.
-        waitForElement(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), WAIT_FOR_JAVASCRIPT * 3);
-        return getAttribute(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), "id").substring(11);
-    }
-
-    private void selectRecord(String query, String Id, boolean keepExisting)
-    {
-        getWrapper().getEval("selenium.selectExtGridItem('Id','" + Id + "', -1, 'ehr-" + query + "-records-grid', "+keepExisting+");");
-        if(!keepExisting)waitForElement(Locator.xpath("//div[@id='Id']/a[text()='"+Id+"']"), WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void clickVisibleButton(String text)
-    {
-        click(Locator.xpath("//button[text()='"+text+"' and "+VISIBLE+" and not(contains(@class, 'x-hide-display'))]"));
     }
 }
