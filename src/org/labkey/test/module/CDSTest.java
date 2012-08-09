@@ -68,22 +68,22 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     public void doCleanup()
     {
         // Delete any containers and users created by the test.
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Exception e)
-        {
-        }
+//        try
+//        {
+//            deleteProject(PROJECT_NAME);
+//        }
+//        catch (Exception e)
+//        {
+//        }
     }
 
     @Override
     public void doTestSteps()
     {
-        setupProject();
-        importData();
-        populateFactTable();
-        verifyFactTable();
+//        setupProject();
+//        importData();
+//        populateFactTable();
+//        verifyFactTable();
 
         selenium.windowMaximize(); // Provides more useful screenshots on failure
 
@@ -614,7 +614,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0CD4050100150200250300350400450Lymphocytes200400600800100012001400160018002000";
     private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD450100150200250300350400450";
     private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
-    private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Pulse123456789102030405060708090100Weight Kg23456789102030405060708090100";
+    private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Pulse110100Weight Kg10100";
     private static final String SCATTER_FEEDBACK_STATE = "{\"activeView\":\"scatterview\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Study\"},\"views\":{},\"filters\":[],\"selections\":[],\"detail\":{\"hierarchy\":\"\",\"value\":31,\"highlight\":\"\",\"label\":\"Antigens\",\"valueLabel\":\"\",\"multi\":true},\"id\":206}";
     private void verifyScatterPlot()
     {
