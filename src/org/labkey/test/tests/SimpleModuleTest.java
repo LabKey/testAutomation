@@ -71,7 +71,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertModuleEnabledByDefault("simpletest");
         assertModuleEnabledByDefault("Query");
 
-        createSubfolder(getProjectName(), FOLDER_NAME, null);
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, null);
 
         // Modules enabled in file based folder definition
         //enableModule(getProjectName(), MODULE_NAME);

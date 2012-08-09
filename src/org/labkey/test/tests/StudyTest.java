@@ -603,58 +603,6 @@ public class StudyTest extends StudyBaseTest
         log("verify presence of \"create new request\" button");
         clickButton("Request Options", 0);
         assertElementPresent(Locator.tagWithText("span", "Create New Request"));
-
-        //TODO:  move this to specimen test
-//        log("verify presence of create");
-//        clickMenuButton("Page Size", "Show All");
-//        assertTextNotPresent("DRT000XX-01");
-//        assertTextPresent("GAA082NH-01");
-//        clickLinkWithText("Group vials");
-//        assertTextPresent("Total:");
-//        assertTextPresent("466");
-//
-//        assertTextNotPresent("BAD");
-//
-//        clickLinkWithText("Show individual vials");
-//        clickLinkContainingText("history");
-//        // verify that we're correctly parsing frozen time, which is a date with a time portion only:
-//        assertTextPresent("15:30:00");
-//        assertTextPresent("2.0&nbsp;ML");
-//        assertTextNotPresent("Added Comments");
-//        // confirm collection location:
-//        assertTextPresent("KCMC, Moshi, Tanzania");
-//        // confirm historical locations:
-//        assertTextPresent("Contract Lab Services, Johannesburg, South Africa");
-//        assertTextPresent("Aurum Health KOSH Lab, Orkney, South Africa");
-//
-//        clickLinkWithText("Specimen Overview");
-//        clickLinkWithText("By Individual Vial");
-//        DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
-//        table.setFilter("QualityControlFlag", "Equals", "true");
-//        table.setSort("GlobalUniqueId", SortDirection.ASC);
-//        Assert.assertEquals("AAA07XK5-02", table.getDataAsText(0, "Global Unique Id"));
-//        Assert.assertEquals("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId", table.getDataAsText(0, "Quality Control Comments"));
-//        Assert.assertEquals("", table.getDataAsText(0, "Primary Type"));
-//        Assert.assertEquals("", table.getDataAsText(0, "Additive Type"));
-//
-//        Assert.assertEquals("ABH00LT8-01", table.getDataAsText(2, "Global Unique Id"));
-//        Assert.assertEquals("Conflicts found: VolumeUnits", table.getDataAsText(2, "Quality Control Comments"));
-//        Assert.assertEquals("", table.getDataAsText(2, "Volume Units"));
-//
-//        clickLinkContainingText("history");
-//        assertTextPresent("Blood (Whole)");
-//        assertTextPresent("Vaginal Swab");
-//        assertTextPresent("Vial is flagged for quality control");
-//        clickLinkWithText("update");
-//        setFormElement("qualityControlFlag", "false");
-//        setFormElement("comments", "Manually removed flag");
-//        clickNavButton("Save Changes");
-//        assertTextPresent("Manually removed flag");
-//        assertTextPresent("Conflicts found: AdditiveTypeId, DerivativeTypeId, PrimaryTypeId");
-//        assertTextNotPresent("Vial is flagged for quality control");
-//        clickLinkWithText("return to vial view");
-//        assertTextNotPresent("AAA07XK5-02");
-//        assertTextPresent("KBH00S5S-01");
     }
 
     private void verifyParticipantComments()

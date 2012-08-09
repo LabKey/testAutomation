@@ -120,13 +120,13 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // create a study so we can test copy-to-study later:
             clickLinkWithText(TEST_ASSAY_PRJ_NAB);
-            createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
+            _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
             addWebPart("Study Overview");
             clickNavButton("Create Study");
             clickNavButton("Create Study");
 
             //add the Assay List web part so we can create a new nab assay
-            createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
+            _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
             clickLinkWithText(TEST_ASSAY_PRJ_NAB);
             addWebPart("Assay List");
 

@@ -90,7 +90,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         addWebPart("Search");
         assertTextPresent("Open");
 
-        createSubfolder(PROJECT_NAME, SUB_FOLDER_NAME, null);
+        _containerHelper.createSubfolder(PROJECT_NAME, SUB_FOLDER_NAME, null);
         addWebPart("Issues List");
 
         enableEmailRecorder();

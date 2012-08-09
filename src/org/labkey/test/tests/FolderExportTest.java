@@ -95,7 +95,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
     private void verifyImportFromZip()
     {
-        createSubfolder(getProjectName(), folderFromZip, null);
+        _containerHelper.createSubfolder(getProjectName(), folderFromZip, null);
 
         importFolderFromZip(new File(dataDir, folderZip).getAbsolutePath());
 //        waitForPageToLoad();
