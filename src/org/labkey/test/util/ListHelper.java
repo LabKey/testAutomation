@@ -117,13 +117,13 @@ public class ListHelper
 
         public LookupInfo(String folder, String schema, String table)
         {
-            _folder = (folder == "" ? null : folder);
+            _folder = (folder.equals("") ? null : folder);
             //container must exactly match an item in the dropdown
             if(_folder != null && !_folder.startsWith("/"))
                 _folder = "/" + _folder;
 
-            _schema = (schema == "" ? null : schema);
-            _table = (table == "" ? null : table);
+            _schema = (schema.equals("") ? null : schema);
+            _table = (table.equals("") ? null : table);
         }
 
         public String getFolder()
