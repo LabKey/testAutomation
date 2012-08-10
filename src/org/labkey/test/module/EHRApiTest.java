@@ -89,27 +89,27 @@ public class EHRApiTest extends EHRStudyTest
     @Override
     public void doCleanup()
     {
-//        long startTime = System.currentTimeMillis();
-//        try {deleteProject(PROJECT_NAME);} catch (Throwable t) { /*ignore*/ }
-//        if(isTextPresent(PROJECT_NAME))
-//        {
-//            log("Wait extra long for folder to finish deleting.");
-//            while (isTextPresent(PROJECT_NAME) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
-//            {
-//                sleep(5000);
-//                refresh();
-//            }
-//            if (!isTextPresent(PROJECT_NAME)) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
-//            else Assert.fail("Test Project not finished deleting after 5 minutes");
-//        }
-//        goToHome();
-//
-//        try{deleteUser(DATA_ADMIN.getUser());}catch(Throwable T){}
-//        try{deleteUser(REQUESTER.getUser());}catch(Throwable T){}
-//        try{deleteUser(BASIC_SUBMITTER.getUser());}catch(Throwable T){}
-//        try{deleteUser(REQUEST_ADMIN.getUser());}catch(Throwable T){}
-//        try{deleteUser(FULL_UPDATER.getUser());}catch(Throwable T){}
-//        try{deleteUser(FULL_SUBMITTER.getUser());}catch(Throwable T){}
+        long startTime = System.currentTimeMillis();
+        try {deleteProject(PROJECT_NAME);} catch (Throwable t) { /*ignore*/ }
+        if(isTextPresent(PROJECT_NAME))
+        {
+            log("Wait extra long for folder to finish deleting.");
+            while (isTextPresent(PROJECT_NAME) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
+            {
+                sleep(5000);
+                refresh();
+            }
+            if (!isTextPresent(PROJECT_NAME)) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
+            else Assert.fail("Test Project not finished deleting after 5 minutes");
+        }
+        goToHome();
+
+        try{deleteUser(DATA_ADMIN.getUser());}catch(Throwable T){}
+        try{deleteUser(REQUESTER.getUser());}catch(Throwable T){}
+        try{deleteUser(BASIC_SUBMITTER.getUser());}catch(Throwable T){}
+        try{deleteUser(REQUEST_ADMIN.getUser());}catch(Throwable T){}
+        try{deleteUser(FULL_UPDATER.getUser());}catch(Throwable T){}
+        try{deleteUser(FULL_SUBMITTER.getUser());}catch(Throwable T){}
     }
 
     protected void initProject()
