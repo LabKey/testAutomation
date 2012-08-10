@@ -295,14 +295,6 @@ public enum TestSet
             NabMigrationTest.class
     }),
 
-    Adaptive(new Class[]{
-        AdaptiveTest.class
-    }),
-
-    AdaptivePerf(new Class[]{
-            AdaptiveVisualizationPerf.class
-    }),
-
     EHR(new Class[]{
             EHRStudyTest.class
     }),
