@@ -329,7 +329,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
             method = new PostMethod(url);
             method.addParameter("svg", svgText);
             int status = httpClient.executeMethod(method);
-            Assert.assertTrue("SVG Downloaded", status == HttpStatus.SC_OK);
+            Assert.assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
             Assert.assertTrue(method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
             Assert.assertTrue(method.getResponseHeader("Content-Type").getValue().startsWith("application/pdf"));
             method.getResponseBodyAsString();
