@@ -711,17 +711,21 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitAndClick(Locator.xpath("//span[text()='" + dimension + "']"));
     }
 
-    private void selectBars(String... bars)
+    private void selectBarsHelper(boolean isShift, String...bars)
     {
         String subselect = bars[0];
         if (subselect.length() > 10)
             subselect = subselect.substring(0, 9);
         sleep(1000);
         waitAndClick(Locator.xpath("//span[@class='barlabel' and text() = '" + bars[0] + "']"));
-        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
+        sleep(1000);
+        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"), CDS_WAIT);
         if(bars.length > 1)
         {
-            selenium.controlKeyDown();
+            if (isShift)
+                selenium.shiftKeyDown();
+            else
+                selenium.controlKeyDown();
             for(int i = 1; i < bars.length; i++)
             {
                 click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[i]+"']"));
@@ -730,31 +734,21 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                     subselect = subselect.substring(0, 9);
                 waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
             }
-            selenium.controlKeyUp();
+            if (isShift)
+                selenium.shiftKeyUp();
+            else
+                selenium.controlKeyUp();
         }
+    }
+
+    private void selectBars(String... bars)
+    {
+        selectBarsHelper(false, bars);
     }
 
     private void shiftSelectBars(String... bars)
     {
-        String subselect = bars[0];
-        if (subselect.length() > 10)
-            subselect = subselect.substring(0, 9);
-        sleep(1000);
-        waitAndClick(Locator.xpath("//span[@class='barlabel' and text() = '" + bars[0] + "']"));
-        waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
-        if(bars.length > 1)
-        {
-            selenium.shiftKeyDown();
-            for(int i = 1; i < bars.length; i++)
-            {
-                click(Locator.xpath("//span[@class='barlabel' and text() = '"+bars[i]+"']"));
-                subselect = bars[i];
-                if (subselect.length() > 10)
-                    subselect = subselect.substring(0, 9);
-                waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"));
-            }
-            selenium.shiftKeyUp();
-        }
+        selectBarsHelper(true, bars);
     }
 
     private void selectCDSGroup(String group, boolean titleShown)

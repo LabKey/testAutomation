@@ -48,7 +48,11 @@ public class AuditLogTest extends BaseSeleniumWebTest
         return AUDIT_TEST_PROJECT;
     }
 
+    @Override
     protected void checkQueries(){} // Skip.  Project is deleted as part of test
+
+    @Override
+    protected void checkViews(){} // Skip.  Project is deleted as part of test
 
     protected void doCleanup() throws Exception
     {

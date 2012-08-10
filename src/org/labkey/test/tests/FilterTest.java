@@ -94,7 +94,8 @@ public class FilterTest extends ListTest
 
         setUpFacetedFilter("query", "Color", "Robust");
         ExtHelper.clickExtTab(this, "Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals One Of (e.g. \"a;b;c\")");
+        //NOTE: the filter will optimize this to EQUALS, since there is 1 value
+        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement("value_1"));
         ExtHelper.clickExtTab(this, "Choose Values");
         ExtHelper.clickExtButton(this, "OK");
@@ -117,7 +118,7 @@ public class FilterTest extends ListTest
         //now repeat with a filter that should be translated
         setUpFacetedFilter("query", "Color", "Light");
         ExtHelper.clickExtTab(this, "Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals One Of (e.g. \"a;b;c\")");
+        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement("value_1"));
 
         setFormElement("value_1", "Light;Robust");
@@ -148,7 +149,7 @@ public class FilterTest extends ListTest
 
         setUpFacetedFilter("query", "year", "1990");
         ExtHelper.clickExtTab(this, "Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals One Of (e.g. \"a;b;c\")");
+        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement("value_1"));
         ExtHelper.clickExtTab(this, "Choose Values");
         ExtHelper.clickExtButton(this, "OK");
