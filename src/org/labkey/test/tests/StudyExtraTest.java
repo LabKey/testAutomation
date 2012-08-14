@@ -35,6 +35,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
     protected static final String FOLDER_NAME = "My Folder";
     protected static final String TEST_RUN1 = "FirstRun";
     private static final String STUDY_FOLDER = "VaccineStudy";
+    private static final String LIST_NAME = "List1";
 
     protected void doTestSteps()
     {
@@ -144,7 +145,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         clickNavButton("Create New List");
         waitForElement(Locator.id("ff_name"), defaultWaitForPage);
-		setFormElement("ff_name", "List1");
+		setFormElement("ff_name", LIST_NAME);
 		clickNavButton("Create List", 0);
         waitForElement(Locator.navButton("Add Field"),30000);
         clickNavButton("Add Field", 0);
@@ -152,7 +153,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickNavButton("Save", 0);
         waitForElement(Locator.navButton("Done"), 30000);
         clickNavButton("Done");
-        clickLinkWithText("view data");
+        clickLinkWithText(LIST_NAME);
         clickNavButton("Insert New");
         //
 		selenium.type("firstInputField", "1");
@@ -178,7 +179,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		assertTextPresent("VerifySnapshot");
         clickLinkWithText("Query Schema Browser");
         selectSchema("VerifySnapshot");
-		Assert.assertTrue(isQueryPresent("VerifySnapshot", "List1", 3000) || isQueryPresent("VerifySnapshot", "list1"));
+		Assert.assertTrue(isQueryPresent("VerifySnapshot", LIST_NAME, 3000) || isQueryPresent("VerifySnapshot", LIST_NAME));
         if (isQueryPresent("VerifySnapshot", "Subjects"))
             viewQueryData("VerifySnapshot", "Subjects");
         else if (isQueryPresent("VerifySnapshot", "subjects"))
