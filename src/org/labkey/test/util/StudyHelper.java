@@ -103,6 +103,7 @@ public class StudyHelper
 
         test.clickNavButton("Edit Selected", 0);
         ExtHelper.waitForExtDialog(test, "Define " + participantString + " Group");
+        test.waitForElement(Locator.css(".doneLoadingTestMarker"));
 
         if( newPtids != null && newPtids.length > 0 )
         {
