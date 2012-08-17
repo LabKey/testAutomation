@@ -112,7 +112,9 @@ var testFunctions = [
     {
         var peopleRowset = testResults[0].rows;
         peopleRowset[0].Age = -1;
+        peopleRowset[0].Key = null;
         peopleRowset[1].Age = -1;
+        peopleRowset[1].Key = null;
         testResults[testResults.length] = LABKEY.Query.saveRows({
             commands:[
                 {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[0]]},
@@ -129,8 +131,11 @@ var testFunctions = [
     {
         var peopleRowset = testResults[0].rows;
         peopleRowset[3].Age = 101;
+        peopleRowset[3].Key = null;
         peopleRowset[5].Age = 101;
+        peopleRowset[5].Key = null;
         peopleRowset[6].Age = -1;
+        peopleRowset[6].Key = null;
         testResults[testResults.length] = LABKEY.Query.saveRows({
             commands:[
                 {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[3]]},
