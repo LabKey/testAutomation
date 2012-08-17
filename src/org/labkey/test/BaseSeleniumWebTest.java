@@ -3028,6 +3028,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 map.put("moduleName", moduleName);
                 map.put("containerPath", array[0]);
                 map.put("propName", array[1]);
+                waitForText(array[1]); //wait for the property name to appear
                 String query = ComponentQuery.fromAttributes("field", map);
                 Ext4FieldRef ref = Ext4Helper.queryOne(this, query, Ext4FieldRef.class);
                 String val = ref.getValue();

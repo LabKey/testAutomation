@@ -1,6 +1,5 @@
 package org.labkey.test.module;
 
-import com.sun.jna.platform.win32.Guid;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -8,28 +7,19 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.util.PasswordUtil;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,6 +70,7 @@ public class EHRApiTest extends EHRStudyTest
         defineQCStates();
         setupEhrPermissions();
         goToProjectHome();
+        createTestSubjects();
 
         doSecurityTest();
         doTriggerScriptTest();
@@ -117,8 +108,8 @@ public class EHRApiTest extends EHRStudyTest
         //TODO: maybe just inherit from parent?
         enableEmailRecorder();
 
-        _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Collaboration", new String[]{"EHR", "Pipeline", "Study"});
+        _containerHelper.createProject(PROJECT_NAME, "EHR");
+        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "EHR", new String[]{"EHR", "Pipeline", "Study"});
         enableModule(PROJECT_NAME, "EHR");
 
         clickLinkWithText(FOLDER_NAME);
@@ -147,16 +138,17 @@ public class EHRApiTest extends EHRStudyTest
         testUserAgainstAllStates(FULL_SUBMITTER);
         testUserAgainstAllStates(FULL_UPDATER);
         testUserAgainstAllStates(REQUEST_ADMIN);
+        goToProjectHome();  //NOTE: this is designed to force the test to sign in, assuming our session was timed out from all the API tests
+        signIn();
         resetErrors(); //note: inserting records without permission will log errors by design.  the UI should prevent this from happening, so we want to be aware if it does occur
     }
 
     private void doTriggerScriptTest() throws Exception
     {
         _saveRowsTimes = new ArrayList<Long>();
-        createTestSubjects();
-
         weightValidationTest();
 
+        //TODO: other tables
 
         calculateAverage();
     }
@@ -458,6 +450,8 @@ public class EHRApiTest extends EHRStudyTest
 
         //test insert
         Object[][] insertData = {weightData1};
+        insertData[0][Arrays.asList(weightFields).indexOf(FIELD_OBJECTID)] = null;
+        insertData[0][Arrays.asList(weightFields).indexOf(FIELD_LSID)] = null;
         JSONObject insertCommand = prepareInsertCommand("study", "Weight", FIELD_LSID, weightFields, insertData);
 
         for (EHRQCState qc : EHRQCState.values())
@@ -477,6 +471,7 @@ public class EHRApiTest extends EHRStudyTest
             UUID objectId = UUID.randomUUID();
             Object[][] originalData = {weightData1};
             originalData[0][Arrays.asList(weightFields).indexOf(FIELD_QCSTATELABEL)] = originalQc.label;
+            extraContext.put("targetQC", originalQc.label);
             originalData[0][Arrays.asList(weightFields).indexOf(FIELD_OBJECTID)] = objectId.toString();
             JSONObject initialInsertCommand = prepareInsertCommand("study", "Weight", FIELD_LSID, weightFields, originalData);
             log("Inserting initial record for update test, with initial QCState of: " + originalQc.label);
@@ -492,12 +487,14 @@ public class EHRApiTest extends EHRStudyTest
                 log("Testing role: " + user.getRole().name() + " with update from QCState " + originalQc.label + " to: " + qc.label);
                 originalData[0][Arrays.asList(weightFields).indexOf(FIELD_QCSTATELABEL)] = qc.label;
                 JSONObject updateCommand = prepareUpdateCommand("study", "Weight", FIELD_LSID, weightFields, originalData);
+                extraContext.put("targetQC", qc.label);
                 doSaveRows(user, Collections.singletonList(updateCommand), extraContext, successExpected);
 
                 if (successExpected)
                 {
                     log("Resetting QCState of record to: " + originalQc.label);
                     originalData[0][Arrays.asList(weightFields).indexOf(FIELD_QCSTATELABEL)] = originalQc.label;
+                    extraContext.put("targetQC", originalQc.label);
                     updateCommand = prepareUpdateCommand("study", "Weight", FIELD_LSID, weightFields, originalData);
                     doSaveRows(DATA_ADMIN, Collections.singletonList(updateCommand), extraContext, true);
                 }
@@ -608,7 +605,8 @@ public class EHRApiTest extends EHRStudyTest
             HttpClient client = WebTestHelper.getHttpClient(requestUrl, user.getUser(), PasswordUtil.getPassword());
             int status = client.executeMethod(method);
             long stop = System.currentTimeMillis();
-            _saveRowsTimes.add(stop - start);
+            if (_saveRowsTimes != null)
+                _saveRowsTimes.add(stop - start);
 
             log("Expect success: " + expectSuccess + ", actual: " + (HttpStatus.SC_OK == status));
 
@@ -691,6 +689,9 @@ public class EHRApiTest extends EHRStudyTest
                         {
                             JSONObject subError = subErrors.getJSONObject(j);
                             String msg = subError.getString("message");
+                            if(!subError.has("field"))
+                                throw new RuntimeException(msg);
+
                             String field = subError.getString("field");
 
                             List<String> list = ret.get(field);
@@ -705,7 +706,7 @@ public class EHRApiTest extends EHRStudyTest
             }
 
             //append errors from extraContext
-            if (o.has("extraContext"))
+            if (o.has("extraContext") && o.getJSONObject("extraContext").has("skippedErrors"))
             {
                 JSONObject errors = o.getJSONObject("extraContext").getJSONObject("skippedErrors");
                 Iterator keys = errors.keys();
