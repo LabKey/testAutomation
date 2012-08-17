@@ -117,8 +117,7 @@ public class Runner extends TestSuite
         }
         catch(IOException e)
         {
-            System.out.println("Error writing " + file.getAbsolutePath());
-            System.exit(1);
+            throw new RuntimeException(e);
         }
         finally
         {
@@ -368,10 +367,7 @@ public class Runner extends TestSuite
                     System.err.println("    " + c.getSimpleName());
                 System.exit(1);
             }
-//            else if ((testClass instanceof PostgresOnlyTest && System.getProperty("databaseType").contains("postgres")) ||
-//                    (testClass instanceof SqlserverOnlyTest && System.getProperty("databaseType").contains("sqlserver")) ||
-//                    !(System.getProperty("databaseType").contains("postgres") || System.getProperty("databaseType").contains("postgres")))
-                testClasses.add(testClass);
+            testClasses.add(testClass);
         }
 
         return testClasses;
@@ -832,8 +828,7 @@ public class Runner extends TestSuite
 
                     if (!testDir.exists())
                     {
-                        System.out.println("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
-                        System.exit(1);
+                        throw new RuntimeException("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
                     }
 
                     tm.put(directory, testClass);
