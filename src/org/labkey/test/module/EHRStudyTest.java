@@ -200,9 +200,8 @@ public class EHRStudyTest extends SimpleApiTest
     {
         enableEmailRecorder();
 
-        _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Collaboration", new String[]{"EHR", "Pipeline", "Study"});
-        enableModule(PROJECT_NAME, "EHR");
+        _containerHelper.createProject(PROJECT_NAME, "EHR");
+        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "EHR", null);
 
         //set dummy values first, to test the admin UI
         String[] dummyProps = {"/" +  PROJECT_NAME, "EHRStudyContainer", "/fakeContainer"};
@@ -240,12 +239,7 @@ public class EHRStudyTest extends SimpleApiTest
         log("Remove all webparts");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-//        clickWebpartMenuItem("Pages", false, "Layout", "Remove From Page");
-        removeWebPart("Wiki");
-        removeWebPart("Messages");
-        addWebPart("EHR Datasets");
 
-        addWebPart("Electronic Health Record");
         addWebPart("Quick Search");
     }
 
@@ -789,7 +783,7 @@ public class EHRStudyTest extends SimpleApiTest
 
         // Wait for page to fully render.
         waitForText("Treatments", WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.name("Id"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("Id"), WAIT_FOR_PAGE);
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID + " (" + DUMMY_PROTOCOL + ")\u00A0");
