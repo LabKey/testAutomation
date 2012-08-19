@@ -2065,6 +2065,30 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return confirmation;
     }
 
+    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
+    public void assertEquals(Object expected, Object actual)
+    {
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
+    public void assertEquals(String message, Object expected, Object actual)
+    {
+        Assert.assertEquals(message, expected, actual);
+    }
+
+    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
+    public void assertNotSame(Object expected, Object actual)
+    {
+        Assert.assertNotSame(expected, actual);
+    }
+
+    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
+    public void assertTrue(String message, boolean condition)
+    {
+        Assert.assertTrue(message, condition);
+    }
+
     public void assertConfirmation(String msg)
     {
         Assert.assertEquals(msg, selenium.getConfirmation());
@@ -6757,4 +6781,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         return _containerHelper;
     }
+
+    //hopefully we'll come up with a better solution soon
+    public void waitForSaveAssay()
+    {
+        sleep(5000);
+    }
+
+
 }

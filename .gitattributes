@@ -145,6 +145,7 @@ src/org/labkey/test/tests/ButtonCustomizationTest.java -text
 src/org/labkey/test/tests/CAVDStudyTest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
 src/org/labkey/test/tests/CohortTest.java -text
+src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
 src/org/labkey/test/tests/DataRegionTest.java -text
@@ -226,6 +227,7 @@ src/org/labkey/test/tests/StudyDemoModeTest.java -text
 src/org/labkey/test/tests/StudyExportTest.java -text
 src/org/labkey/test/tests/StudyExtraTest.java -text
 src/org/labkey/test/tests/StudyManualTest.java -text
+src/org/labkey/test/tests/StudyProtectedExportTest.java -text
 src/org/labkey/test/tests/StudyRedesignTest.java -text
 src/org/labkey/test/tests/StudyReloadTest.java -text
 src/org/labkey/test/tests/StudySecurityTest.java -text

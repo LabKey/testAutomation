@@ -149,6 +149,18 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void exportStudy(boolean useXmlFormat, boolean zipFile)
     {
+        exportStudy(useXmlFormat, zipFile, true);
+    }
+
+    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected)
+    {
+
+        exportStudy(useXmlFormat, zipFile, exportProtected, false);
+    }
+
+
+    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected, boolean useAlternateIDs)
+    {
         clickLinkWithText(getStudyLabel());
         clickTab("Manage");
         clickNavButton("Export Study");
@@ -158,6 +170,10 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
         checkRadioButton("format", useXmlFormat ? "new" : "old");
         checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
+        if(!exportProtected)
+            checkCheckbox("removeProtected");
+        if(useAlternateIDs)
+            checkCheckbox("alternateIds");
         clickNavButton("Export");
     }
 

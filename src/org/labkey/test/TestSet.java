@@ -147,6 +147,7 @@ public enum TestSet
         MissingValueIndicatorsTest.class,
         PipelineCancelTest.class,
         StudyExportTest.class,
+        StudyProtectedExportTest.class,
         ViabilityTest.class,
         ProjectSettingsTest.class,
         CDSTest.class,
