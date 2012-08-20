@@ -93,7 +93,10 @@ public class SearchHelper
                 if ( container != null )
                 {
                     if ( test.isLinkPresentContainingText("@files") )
-                        test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
+                        if(container.contains("@files"))
+                            test.assertLinkPresentWithText(container);
+                        else
+                            test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
                     else
                         test.assertLinkPresentWithText(container);
                 }

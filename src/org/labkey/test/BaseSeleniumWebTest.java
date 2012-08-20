@@ -118,7 +118,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected boolean _testFailed = true;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 60000;
-    protected int defaultWaitForPage = WAIT_FOR_PAGE;
+    public int defaultWaitForPage = WAIT_FOR_PAGE;
     public final static int WAIT_FOR_JAVASCRIPT = 20000;
     protected int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
@@ -1928,6 +1928,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return null;
     }
 
+    public void windowMaximize()
+    {
+        selenium.windowMaximize();
+    }
+
     public File dumpFullScreen(File dir, String baseName)
     {
         File screenFile = new File(dir, baseName + "Fullscreen.png");
@@ -2413,24 +2418,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         // verify that we're not on an error page with a check for a project link:
         assertLinkPresentWithText(project);
         assertLinkNotPresentWithText(folderName);
-    }
-
-    /**
-     * from the file management page, select a file and rename it
-     *
-     * @param oldFilename the name of the file to select
-     * @param newFilename the new file name
-     */
-    public void renameFile(String oldFilename, String newFilename)
-    {
-        Locator l = Locator.xpath("//div[text()='" + oldFilename + "']");
-        clickAt(l, "1,1");
-        click(Locator.css("button.iconRename"));
-
-        waitForDraggableMask();
-        ExtHelper.setExtFormElementByLabel(this, "Filename:", newFilename);
-        Locator btnLocator = Locator.extButton("Rename");
-        click(btnLocator);
     }
 
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
@@ -4276,6 +4263,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Locator.XPathLocator buttonLocator = getButtonLocator(text);
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
+        else if(waitMillis==WAIT_FOR_EXT_MASK_TO_APPEAR)
+            waitForExtMask();
+
+        else if(waitMillis==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
+            waitForExtMaskToDisappear();
         else
             Assert.fail("No button found with text \"" + text + "\"");
     }

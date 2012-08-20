@@ -23,6 +23,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PipelineHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
@@ -78,6 +79,8 @@ public class FileContentTest extends BaseSeleniumWebTest
 
         SearchHelper.initialize(this);
 
+        PipelineHelper pipelineHelper = new PipelineHelper(this);
+
         _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup(TEST_GROUP, TEST_USER);
         setPermissions(TEST_GROUP, "Editor");
@@ -124,8 +127,11 @@ public class FileContentTest extends BaseSeleniumWebTest
             // Setup custom file properties
             ExtHelper.waitForFileGridReady(this);
             ExtHelper.waitForFileAdminEnabled(this);
-            clickButton("Admin", 0);
-            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
+            pipelineHelper.goToAdminMenu();
+            // Setup custom file actions
+            uncheckCheckbox("importAction");
+
+
             ExtHelper.clickExtTab(this, "File Properties");
             checkRadioButton("fileOption", "useCustom");
             clickButton("Edit Properties...");
@@ -138,11 +144,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
             ExtHelper.waitForFileGridReady(this);
             ExtHelper.waitForFileAdminEnabled(this);
-            clickButton("Admin", 0);
-            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
-
-            // Setup custom file actions
-            uncheckCheckbox("importAction");
+            pipelineHelper.goToAdminMenu();
 
             // enable custom file properties.
             ExtHelper.clickExtTab(this, "File Properties");
@@ -169,46 +171,35 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             assertElementPresent(Locator.xpath("//button[text()='Parent Folder']"));
 
+
             //TODO: Re-add new folder button to test adding new button. Fails on TeamCity
             // Re-add upload button
-            //clickButton("Admin", 0);
-            //ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
-            //ExtHelper.clickExtTab("Toolbar and Grid Settings");
-            //dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
-            //             Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
-            //waitForElement(Locator.xpath("(//button[contains(@class, 'iconFolderNew')])[2]"), WAIT_FOR_JAVASCRIPT);
-            //clickButton("Submit", 0);
-            //waitForExtMaskToDisappear();
-            //waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
+//            clickButton("Admin", 0);
+//            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
+//            clickButton("Submit", 0);
+            pipelineHelper.addCreateFolderButton();
+            waitForExtMaskToDisappear();
+            waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             
             String filename = "InlineFile.html";
             String sampleRoot = getLabKeyRoot() + "/sampledata/security";
             File f = new File(sampleRoot, filename);
-            setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), f.toString());
-            ExtHelper.setExtFormElementByLabel(this, "Description:", FILE_DESCRIPTION);
-            clickButton("Upload", 0);
-            waitForExtMaskToDisappear();
-            ExtHelper.waitForExtDialog(this, "Extended File Properties", WAIT_FOR_JAVASCRIPT);
-            setFormElement(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE);
-            click(Locator.xpath("//img[../../../label/span[contains(text(),'"+COLUMN_NAME+":')] ]"));
-            waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"), WAIT_FOR_JAVASCRIPT);
-            click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text() = '"+LOOKUP_VALUE_2+"']"));
-            clickButton("Done", 0);
-            waitForExtMaskToDisappear();
-            
-            waitForText(filename, WAIT_FOR_JAVASCRIPT);
-            waitForText(FILE_DESCRIPTION, WAIT_FOR_JAVASCRIPT);
-            waitForText(CUSTOM_PROPERTY_VALUE, WAIT_FOR_JAVASCRIPT);
-            waitForText(LOOKUP_VALUE_2, WAIT_FOR_JAVASCRIPT);
+            pipelineHelper.uploadFile(f, FILE_DESCRIPTION, CUSTOM_PROPERTY_VALUE, LOOKUP_VALUE_2);
+
             assertLinkPresentWithText(LOOKUP_VALUE_2);
             assertLinkPresentWithText(CUSTOM_PROPERTY_VALUE);
             assertAttributeEquals(Locator.linkWithText(CUSTOM_PROPERTY_VALUE), "href", "http://labkey.test/?a="+CUSTOM_PROPERTY_VALUE+"&b="+LOOKUP_VALUE_2);
 
             log("rename file");
             String newFileName = "changedFilename.html";
-            renameFile(filename, newFileName);
-            waitForText(newFileName);
+            pipelineHelper.renameFile(filename, newFileName);
             filename = newFileName;
+
+            log("move file");
+            String folderName = "Test folder";
+            pipelineHelper.createFolder(folderName);
+            pipelineHelper.moveFile(newFileName, folderName);
+
 
 
             // Check custom actions as non-administrator.
@@ -221,7 +212,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             signOut();
 
             // Test that renderAs can be observed through a login
-            beginAt("files/" + EscapeUtil.encode(PROJECT_NAME) + "/" + filename + "?renderAs=INLINE");
+            beginAt("files/" + EscapeUtil.encode(PROJECT_NAME)+"/%40files/" + EscapeUtil.encode(folderName) + "/" + filename + "?renderAs=INLINE");
             assertTitleEquals("Sign In");
 
             log("Test renderAs through login and ensure that page is rendered inside of server UI");
@@ -236,11 +227,11 @@ public class FileContentTest extends BaseSeleniumWebTest
             SearchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename));
             SearchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(filename));
 
-            SearchHelper.verifySearchResults(this, "/" + PROJECT_NAME, false);
+            SearchHelper.verifySearchResults(this, "/" + PROJECT_NAME + "/@files/" + folderName, false);
 
             // Delete file.
             clickLinkWithText(PROJECT_NAME);
-            ExtHelper.selectFileBrowserItem(this, filename);
+            ExtHelper.selectFileBrowserItem(this, folderName + "/" + filename);
             click(Locator.css("button.iconDelete"));
             clickButton("Yes", 0);
             waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);
