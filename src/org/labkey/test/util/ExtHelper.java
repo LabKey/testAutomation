@@ -122,6 +122,24 @@ public class ExtHelper
         }, "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
     }
 
+    public static void waitForExtDialogToDisappear(final BaseSeleniumWebTest test, String title)
+    {
+        waitForExtDialogToDisappear(test, title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static void waitForExtDialogToDisappear(final BaseSeleniumWebTest test, String title, int timeout)
+    {
+        final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
+
+        test.waitFor(new BaseSeleniumWebTest.Checker()
+        {
+            public boolean check()
+            {
+                return !test.isElementPresent(locator);
+            }
+        }, "Ext Dialog with title '" + title + "' was still present after " + timeout + "ms", timeout);
+    }
+
     public static String getExtMsgBoxText(BaseSeleniumWebTest test, String title)
     {
         return getExtMsgBoxText(test, title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
