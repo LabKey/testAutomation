@@ -601,6 +601,87 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                         "Target Area: Adaptive: humoral and B-cell",
                 "This tested antibodies.",
                 "Vaccinology: precisely tuned antibodies nab HIV.");
+
+        goToAppHome();
+        click("Vaccine Types");
+        assertVaccineTypeInfoPage("VRC-HIVADV014-00-VP",
+                        "Description\n" +
+                        "Inserts\n" +
+                        "The recombinant adenoviral vector product VRC-HIVADV014-00-VP (Ad5) is a replication deficient, combination vaccine containing a mixture of 4 recombinant serotype 5 adenoviral vectors, each expressing 1 of the 4 HIV antigens gp140(A), gp140(B)dv12, gp140(C) and GagPol(B) driven by the cytomegalovirus (CMV) immediate-early promoter. The GV11 adenoviral backbone was chosen to reduce the risk of replication-competent adenovirus (RCA) generation during clinical production. The GV11 backbone contains deletions of 2 essential regions, E1 and E4, as well as a partial E3 deletion that render the vaccine product replication deficient. The generation of RCA would require 2 independent recombination events in a single adenovirus genome, predicted to be an extremely rare event. The AdGV (HIV).11D vectors contain HIV-1 antigen open reading frame (ORF) expression cassettes inserted to replace the deleted adenovirus E1 gene region. The other deleted adenovirus regions have been replaced with a transcriptionally inert spacer element (T1S1) that enhances production of the adenoviral vectors. The 293-ORF6 cell line used to propagate these E1, E4 and partial E3 deleted vectors was developed at GenVec, Inc. These cells were constructed by stably transforming 293 cells (which are of human embryonic kidney origin) with an inducible E4-ORF6 expression cassette. This enables the cells to efficiently complement the E1-, E4-, and partial E3-deleted adenoviral vectors, provide increased transgene capacity and greatly reduce the potential to generate replication-competent adenovirus. The multiclade adenoviral vector vaccine product, VRC-HIVADV014-00-VP, will be a 3:1:1:1 ratio of the adenoviral vectors that encode for HIV-1 Gag/Pol polyprotein from clade B and HIV-1 Env glycoproteins from clades A, B, and C, respectively.\n" +
+                        "Note: The VRC DNA-HIV vaccine (VRC-HIVDNA009-00-VP) and VRC Ad5-HIV vaccine (VRC-HIVADV014-00-VP) contain largely matched HIV gene inserts. Gag Pol Nef Env A, B, and C\n" +
+                        "Production\n" +
+                        "Toxicity Studies\n" +
+                        "VRC-HIVADV014-00-VP is manufactured by GenVec Incorporated (Gaithersburg, MD) at a contract maufacturer, Molecular Medicine (San Diego, CA). The vaccine is supplied as a 1x1010 PU/mL solution in a 3 mL sterile glass vial containing 1.2 mls of a clear, colorless, sterile, isotonic solution. Although the vial label notes a storage temperature of -10° to -25° C, the product may be stored at temperatures as low as -30° C.\n" +
+                        "None.\n" +
+                        "Previous Trials\n" +
+                        "None.");
+        assertVaccineTypeInfoPage("VRC-HIVDNA016-00-VP",
+                        "Description\n" +
+                        "Inserts\n" +
+                        "VRC-HIVDNA-016-00-VP is composed of six DNA plasmids in equal concentrations that encode Gag, Pol, and Nef from clade B (strains HXB2, NL4-3, NY5/BRU) and the HIV-1 Env glycoproteins from clade A (strain 92rw020), clade B (strains HXB2/BaL), and clade C (strain 97ZA012).\n" +
+                        "None.\n" +
+                        "Production\n" +
+                        "Toxicity Studies\n" +
+                        "VRC-HIVDNA016-00-VP is manufactured by Vical Incorporated (San Diego, CA). The product is formulated in phosphate buffered saline (PBS), pH 7.2. The vaccine is provided as a 4 mg/mL solution in 2 mL single use glass vials containing 1.2 mL of a clear, colorless, sterile, isotonic solution. The product must be stored frozen (at -20° C or colder). Vials should not be refrozen after thawing.\n" +
+                        "None.\n" +
+                        "Previous Trials\n" +
+                        "None.");
+
+        goToAppHome();
+        click("Vaccine Components");
+        assertVaccineComponentInfoPage("gp140",
+                "GenBank: U08794\n" +
+                "Isolate \n" +
+                "92RW020Clade \n" +
+                "ARegion \n" +
+                "envDescription\n" +
+                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region;GenBank: K03455 and M68893\n" +
+                "Isolate \n" +
+                "HXB2 and BaLClade \n" +
+                "BRegion \n" +
+                "envDescription\n" +
+                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; V1 and V2 regions deleted; V3 is from BaL (M68893)GenBank: AF286227\n" +
+                "Isolate \n" +
+                "97ZA012Clade \n" +
+                "CRegion \n" +
+                "envDescription\n" +
+                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region;");
+        assertVaccineComponentInfoPage("gp145",
+                "GenBank: U08794\n" +
+                "Isolate \n" +
+                "92RW020Clade \n" +
+                "ARegion \n" +
+                "envDescription\n" +
+                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5736GenBank: K03455\n" +
+                "Isolate \n" +
+                "HXB2 and BaLClade \n" +
+                "BRegion \n" +
+                "envDescription\n" +
+                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5737GenBank: AF286227\n" +
+                "Isolate \n" +
+                "97ZA012Clade \n" +
+                "CRegion \n" +
+                "envDescription\n" +
+                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5738");
+        assertVaccineComponentInfoPage("gag",
+                "GenBank: K03455\n" +
+                "Isolate \n" +
+                "HXB2Clade \n" +
+                "BRegion \n" +
+                "gagDescription\n" +
+                "complete gag regionGenBank: \n" +
+                "Isolate \n" +
+                "LAIClade \n" +
+                "ARegion \n" +
+                "gagDescription\n" +
+                "gag region from LAI");
+        assertVaccineComponentInfoPage("gag/pol",
+                "GenBank: K03455 and M19921\n" +
+                "Isolate \n" +
+                "HXB2 (gag) NL4-3 (pol)Clade \n" +
+                "BRegion \n" +
+                "gag/polDescription\n" +
+                "fusion gag/pol polyprotein consisting of gag from HXB2 and pol from NL4-3; Carboxy terminus of gag deleted to allow read through into pol without frameshift; other deletions introduced to prevent proteolytic processing of pol and to reduce potential for functional enzymatic activity");
     }
 
     private void verifyMultiNounPages()
@@ -786,9 +867,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void viewInfo(String barLabel)
     {
-        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '" + barLabel + "']/.."));
-        mouseOver(Locator.xpath("//span[@class='barlabel' and text() = '" + barLabel + "']/..//button"));
-        click(Locator.xpath("//span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
+        mouseOver(Locator.xpath("//div[contains(@class, 'small')]/span[@class='barlabel' and text() = '" + barLabel + "']/.."));
+        mouseOver(Locator.xpath("//div[contains(@class, 'small')]/span[@class='barlabel' and text() = '" + barLabel + "']/..//button"));
+        click(Locator.xpath("//div[contains(@class, 'small')]/span[@class='barlabel' and text() = '"+barLabel+"']/..//button"));
         waitForElement(Locator.button("Close"));
         waitForElement(Locator.css(".savetitle"), WAIT_FOR_JAVASCRIPT);
         waitForText(barLabel);
@@ -950,6 +1031,20 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         //Assert.assertEquals("Incorrect Description", ("Description" + pointOfContact).replace("\n", ""), getText(Locator.css(".assayInfoDescription")).replace("\n", ""));
         Assert.assertEquals("Incorrect Assay Abstract", assayAbstract.replace("\n", ""), getText(Locator.css(".assayInfoAbstract")).replace("\n", ""));
         Assert.assertEquals("Incorrect Related Publications", relatedPubs.replace("\n", ""), getText(Locator.css(".assayInfoRelatedPublications")).replace("\n", ""));
+        closeInfoPage();
+    }
+
+    private void assertVaccineTypeInfoPage(String vaccineType, String vaccineInfo)
+    {
+        viewInfo(vaccineType);
+        assertElementContains(Locator.css(".vaccine-single-body"), vaccineInfo);
+        closeInfoPage();
+    }
+
+    private void assertVaccineComponentInfoPage(String vaccineComponent, String conponentInfo)
+    {
+        viewInfo(vaccineComponent);
+        assertElementContains(Locator.css(".component-single-body"), conponentInfo);
         closeInfoPage();
     }
 
