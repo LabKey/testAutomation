@@ -208,7 +208,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertFilterStatusPanel(STUDIES[2], STUDIES[2], 11, 1, 3, 2, 3, 12);
         goToAppHome();
         click("Assay Antigens");
-        sortBy("Tier", "1A");
+        pickCDSSort("Tier", "1A");
         toggleExplorerBar("3");
         assertFilterStatusPanel("H061.14", "H061.14", 12, 1, 3, 2, 8, 12);
         toggleExplorerBar("1A");
@@ -244,7 +244,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // 14910
         click("Assay Antigens");
-        sortBy("Tier", "1A");
+        pickCDSSort("Tier", "1A");
         shiftSelectBars("MW965.26", "ZM197M.PB7");
         waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(), 'ZM197M.PB7')]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//div[@class='filtermember']"), 2);
@@ -536,23 +536,26 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // placeholder pages
         click("Assay Antigens");
-        sortBy("Tier", "1A");
+        pickCDSSort("Tier", "1A");
         toggleExplorerBar("1A");
         assertNounInfoPage("MW965.26", Arrays.asList("Clade", "Tier", "MW965.26", "U08455"));
         assertNounInfoPage("SF162.LS", Arrays.asList("Clade", "Tier", "SF162.LS", "EU123924"));
         toggleExplorerBar("1B");
         assertNounInfoPage("ZM109F.PB4", Arrays.asList("Zambia", "Tier", "AY424138"));
 
+        goToAppHome();
         click("Studies");
         assertNounInfoPage("Demo Study", Arrays.asList("Igra M", "Fitzsimmons K", "Trial", "LabKey"));
         assertNounInfoPage("Not Actually CHAVI 001", Arrays.asList("Bellew M", "Arnold N", "Observational", "CHAVI"));
         assertNounInfoPage("NotRV144", Arrays.asList("Piehler B", "Lum K", "Trial", "USMHRP"));
 
+        goToAppHome();
         click("Labs");
         assertNounInfoPage("Arnold/Bellew Lab", Arrays.asList("Description", "PI", "Nick Arnold"));
         assertNounInfoPage("LabKey Lab", Arrays.asList("Description", "PI", "Mark Igra"));
         assertNounInfoPage("Piehler/Eckels Lab", Arrays.asList("Description", "PI", "Britt Piehler"));
 
+        goToAppHome();
         click("Assays");
 
         // check placeholders
@@ -605,13 +608,13 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         goToAppHome();
         click("Vaccine Types");
         assertVaccineTypeInfoPage("VRC-HIVADV014-00-VP",
-                        "Description\n" +
+                "Description\n" +
                         "Inserts\n" +
                         "The recombinant adenoviral vector product VRC-HIVADV014-00-VP (Ad5) is a replication deficient, combination vaccine containing a mixture of 4 recombinant serotype 5 adenoviral vectors, each expressing 1 of the 4 HIV antigens gp140(A), gp140(B)dv12, gp140(C) and GagPol(B) driven by the cytomegalovirus (CMV) immediate-early promoter. The GV11 adenoviral backbone was chosen to reduce the risk of replication-competent adenovirus (RCA) generation during clinical production. The GV11 backbone contains deletions of 2 essential regions, E1 and E4, as well as a partial E3 deletion that render the vaccine product replication deficient. The generation of RCA would require 2 independent recombination events in a single adenovirus genome, predicted to be an extremely rare event. The AdGV (HIV).11D vectors contain HIV-1 antigen open reading frame (ORF) expression cassettes inserted to replace the deleted adenovirus E1 gene region. The other deleted adenovirus regions have been replaced with a transcriptionally inert spacer element (T1S1) that enhances production of the adenoviral vectors. The 293-ORF6 cell line used to propagate these E1, E4 and partial E3 deleted vectors was developed at GenVec, Inc. These cells were constructed by stably transforming 293 cells (which are of human embryonic kidney origin) with an inducible E4-ORF6 expression cassette. This enables the cells to efficiently complement the E1-, E4-, and partial E3-deleted adenoviral vectors, provide increased transgene capacity and greatly reduce the potential to generate replication-competent adenovirus. The multiclade adenoviral vector vaccine product, VRC-HIVADV014-00-VP, will be a 3:1:1:1 ratio of the adenoviral vectors that encode for HIV-1 Gag/Pol polyprotein from clade B and HIV-1 Env glycoproteins from clades A, B, and C, respectively.\n" +
                         "Note: The VRC DNA-HIV vaccine (VRC-HIVDNA009-00-VP) and VRC Ad5-HIV vaccine (VRC-HIVADV014-00-VP) contain largely matched HIV gene inserts. Gag Pol Nef Env A, B, and C\n" +
                         "Production\n" +
                         "Toxicity Studies\n" +
-                        "VRC-HIVADV014-00-VP is manufactured by GenVec Incorporated (Gaithersburg, MD) at a contract maufacturer, Molecular Medicine (San Diego, CA). The vaccine is supplied as a 1x1010 PU/mL solution in a 3 mL sterile glass vial containing 1.2 mls of a clear, colorless, sterile, isotonic solution. Although the vial label notes a storage temperature of -10° to -25° C, the product may be stored at temperatures as low as -30° C.\n" +
+                        "VRC-HIVADV014-00-VP is manufactured by GenVec Incorporated (Gaithersburg, MD) at a contract maufacturer, Molecular Medicine (San Diego, CA). The vaccine is supplied as a 1x1010 PU/mL solution in a 3 mL sterile glass vial containing 1.2 mls of a clear, colorless, sterile, isotonic solution. Although the vial label notes a storage temperature of -10\u00B0 to -25\u00B0 C, the product may be stored at temperatures as low as -30\u00B0 C.\n" +
                         "None.\n" +
                         "Previous Trials\n" +
                         "None.");
@@ -622,7 +625,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                         "None.\n" +
                         "Production\n" +
                         "Toxicity Studies\n" +
-                        "VRC-HIVDNA016-00-VP is manufactured by Vical Incorporated (San Diego, CA). The product is formulated in phosphate buffered saline (PBS), pH 7.2. The vaccine is provided as a 4 mg/mL solution in 2 mL single use glass vials containing 1.2 mL of a clear, colorless, sterile, isotonic solution. The product must be stored frozen (at -20° C or colder). Vials should not be refrozen after thawing.\n" +
+                        "VRC-HIVDNA016-00-VP is manufactured by Vical Incorporated (San Diego, CA). The product is formulated in phosphate buffered saline (PBS), pH 7.2. The vaccine is provided as a 4 mg/mL solution in 2 mL single use glass vials containing 1.2 mL of a clear, colorless, sterile, isotonic solution. The product must be stored frozen (at -20\u00B0 C or colder). Vials should not be refrozen after thawing.\n" +
                         "None.\n" +
                         "Previous Trials\n" +
                         "None.");
@@ -686,6 +689,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void verifyMultiNounPages()
     {
+        goToAppHome();
         click("Assays");
         assertMultiAssayInfoPage();
         assertMultiStudyInfoPage();
@@ -699,6 +703,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String SCATTER_FEEDBACK_STATE = "{\"activeView\":\"scatterview\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Study\"},\"views\":{},\"filters\":[],\"selections\":[],\"detail\":{\"hierarchy\":\"\",\"value\":31,\"highlight\":\"\",\"label\":\"Antigens\",\"valueLabel\":\"\",\"multi\":true},\"id\":206}";
     private void verifyScatterPlot()
     {
+        goToAppHome();
         selectCDSGroup(GROUP_NAME, true);
         click("Studies");
 
@@ -772,6 +777,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.name("description"));
         waitForElement(Locator.xpath("//textarea[@name='description']")); //expand
         selenium.type(Locator.name("description").toString(), description, false); // setFormElement fires events that throw off the flow.
+        waitForText("Submit");
         clickButton("Submit", 0);
         fireEvent(Locator.name("description"), SeleniumEvent.blur);
         waitForElement(Locator.xpath("//textarea[@name='description' and contains(@class, 'x4-form-empty-field')]")); //shrink
@@ -784,6 +790,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         click(Locator.css(".sortDropdown"));
         waitAndClick(Locator.xpath("//span[text()='"+sortBy+"']"));
+    }
+
+    private void pickCDSSort(String sort, String waitValue)
+    {
+        pickCDSSort(sort);
+        waitForText(waitValue, CDS_WAIT);
     }
 
     private void pickCDSDimension(String dimension)
@@ -846,23 +858,19 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
             waitForElementToDisappear(Locator.xpath("//div[@class='title' and "+Locator.NOT_HIDDEN+"]"), WAIT_FOR_JAVASCRIPT);
     }
 
+    private final Locator HOME_HEADER = Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]/h2/br");
     private void goToAppHome()
     {
         clickAt(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]"), "1,1");
-        waitForElement(Locator.xpath("//div[contains(@class, 'connectorheader')]//div[contains(@class, 'logo')]/h2/br"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(HOME_HEADER, WAIT_FOR_JAVASCRIPT);
     }
 
     private void click(String by)
     {
+        if (!isElementPresent(HOME_HEADER))
+            goToAppHome();
         clickAt(Locator.xpath("//span[@class = 'label' and text() = ' "+by+"']"), "1,1");
         waitForText("Showing number of: Participants", CDS_WAIT);
-    }
-
-    private void sortBy(String sort, String waitValue)
-    {
-        click(Locator.xpath("//div[contains(@class, 'sortDropdown')]//span"));
-        click(Locator.xpath("//span[contains(@class, 'x4-menu-item-text') and text()='" + sort + "']"));
-        waitForText(waitValue, CDS_WAIT);
     }
 
     private void viewInfo(String barLabel)
