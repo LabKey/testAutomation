@@ -177,7 +177,12 @@ public class FileContentTest extends BaseSeleniumWebTest
 //            clickButton("Admin", 0);
 //            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
 //            clickButton("Submit", 0);
+//
+            windowMaximize();
+            pipelineHelper.goToConfigureButtonsTab();
+            pipelineHelper.removeButton("Import Data");
             pipelineHelper.addCreateFolderButton();
+            pipelineHelper.commitPipelineAdminChanges();
             waitForExtMaskToDisappear();
             waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             

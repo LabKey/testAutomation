@@ -53,13 +53,28 @@ public class PipelineHelper
         _test.waitForText(folderName);
     }
 
+    public void goToConfigureTab()
+    {
+
+    }
     public void addCreateFolderButton()
     {
-        _test.windowMaximize();
-        goToConfigureButtonsTab();
         _test.dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
                          Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
         _test.waitForElement(Locator.xpath("(//button[contains(@class, 'iconFolderNew')])[2]"), _test.defaultWaitForPage);
+    }
+
+    //TODO
+    //won't work for adding and then removing something
+    public void removeButton(String name)
+    {
+            _test.click(Locator.xpath("(" + Locator.buttonContainingText(name).toXpath() + ")[3]"));
+            _test.click(Locator.tagContainingText("span", "remove"));
+    }
+
+    public void commitPipelineAdminChanges()
+    {
+
         _test.clickButton("Submit", 0);
     }
 
