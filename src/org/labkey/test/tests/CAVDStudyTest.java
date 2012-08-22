@@ -185,6 +185,7 @@ public class CAVDStudyTest extends StudyBaseTest
         clickButton("Edit Assay List", 0);
         waitForElement(Locator.xpath("//div[@class='Caption'][text()='Define Assay']"));
         clickButton("Add", 0);
+        waitForFormElementToEqual(Locator.name("assayName"), "New Assay1");
         setFormElement("assayName", "CAVDTestAssay");
         setFormElement("assayDescription", "This Assay created by CAVD Study Test");
         setFormElement("assayLabs", "CAVDLab1\nCAVDLab2");
