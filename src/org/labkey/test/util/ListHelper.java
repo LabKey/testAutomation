@@ -414,8 +414,10 @@ public class ListHelper
                     test.setFormElement(Locator.tagWithName("input","lookupContainer"), lookup.getFolder());
                 }
 
+                test.fireEvent(Locator.tagWithName("input", "schema"), BaseSeleniumWebTest.SeleniumEvent.blur);
                 test.setFormElement(Locator.tagWithName("input","schema"), lookup.getSchema());
 
+                test.fireEvent(Locator.tagWithName("input", "table"), BaseSeleniumWebTest.SeleniumEvent.blur);
                 test.setFormElement(Locator.tagWithName("input","table"), lookup.getTable());
             }
 
