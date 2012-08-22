@@ -21,14 +21,8 @@ import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.UIContainerHelper;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +30,9 @@ import java.util.List;
 public class WebDavTest extends BaseSeleniumWebTest
 {
     final String PROJECT_NAME="WebDavTest";
+    final String TEXT = "Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\n"+
+    "Now we are engaged in a great civil war, testing whether that nation, or any nation, so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.\n"+
+    "But, in a larger sense, we can not dedicate, we can not consecrate, we can not hallow this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us—that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion—that we here highly resolve that these dead shall not have died in vain—that this nation, under God, shall have a new birth of freedom—and that government of the people, by the people, for the people, shall not perish from the earth.";
 
     @Override
     protected String getProjectName()
@@ -52,10 +49,14 @@ public class WebDavTest extends BaseSeleniumWebTest
 
         // including context Path
         String baseURL = getBaseURL();
+        String waitForIdle = baseURL + "/search-waitForIdle.view";
         String testDirectory = "/_webdav/" + getProjectName() + "/@files/";
         String testURL = baseURL + testDirectory;
-        beginAt(testDirectory + "?listing=html");
 
+        // make sure the indexer isn't really busy
+        beginAt(waitForIdle);
+
+        beginAt(testDirectory + "?listing=html");
         assertTextNotPresent("testfile1");
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
@@ -63,19 +64,34 @@ public class WebDavTest extends BaseSeleniumWebTest
         Assert.assertEquals(1, names.size());
         Assert.assertFalse(names.contains("testfile1"));
 
-        sardine.put(testURL + "testfile1", new byte[] {0x4D});
+        sardine.put(testURL + "testfile1.txt", TEXT.getBytes());
         refresh();
-        assertTextPresent("testfile1");
+        assertTextPresent("testfile1.txt");
         names = _listNames(sardine,testURL);
         Assert.assertEquals(2, names.size());
-        Assert.assertTrue(names.contains("testfile1"));
+        Assert.assertTrue(names.contains("testfile1.txt"));
 
-        sardine.delete(testURL + "testfile1");
+        // TODO test search
+
+        for (int retry=0 ; retry<3 ; retry++)
+        {
+            try
+            {
+                // give search indexer time to index and release lock
+                sleep(100);
+                sardine.delete(testURL + "testfile1.txt");
+                break;
+            }
+            catch (IOException x)
+            {
+            }
+        }
+
         refresh();
-        assertTextNotPresent("testfile1");
+        assertTextNotPresent("testfile1.txt");
         names = _listNames(sardine,testURL);
         Assert.assertEquals(1, names.size());
-        Assert.assertFalse(names.contains("testfile1"));
+        Assert.assertFalse(names.contains("testfile1.txt"));
 
         try
         {
