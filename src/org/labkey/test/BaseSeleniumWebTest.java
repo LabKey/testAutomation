@@ -2455,6 +2455,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         else
             uncheckCheckbox("addAlias");
         // Select Target
+        waitForExt4FolderTreeNode(newParent, 10000);
         selectFolderTreeItem(newParent);
         // move:
         clickNavButton("Confirm Move");
@@ -3069,7 +3070,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForExt4FolderTreeNode(String nodeText, int wait)
     {
-        final Locator locator = new Locator("//td[contains(@class, 'x-tree-node-current')]/div[text()=" + Locator.xq(nodeText) + "]");
+        final Locator locator = new Locator("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
         String failMessage = "Ext 4 Tree Node with locator " + locator + " did not appear.";
         waitFor(new Checker()
         {
