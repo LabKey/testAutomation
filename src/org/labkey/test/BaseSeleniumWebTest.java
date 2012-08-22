@@ -2094,6 +2094,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue(message, condition);
     }
 
+    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
+    public void assertTrue(boolean condition)
+    {
+        Assert.assertTrue(condition);
+    }
+
     public void assertConfirmation(String msg)
     {
         Assert.assertEquals(msg, selenium.getConfirmation());

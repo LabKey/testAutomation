@@ -79,11 +79,11 @@ public class FlowCBCTest extends BaseFlowTest
     void initializeStudyFolder()
     {
         log("** Initialize Study Folder");
-        createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", null);
+        createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[] { "Study", "Letvin", "Flow" });
         clickNavButton("Create Study");
         // use date-based study
         click(Locator.xpath("(//input[@name='timepointType'])[1]"));
-        setFormElement(Locator.xpath("//input[@name='startDate']"), "2006-03-01");
+        setFormElement(Locator.xpath("//input[@name='startDate']"), "2012-03-01");
         clickNavButton("Create Study");
 
         clickLinkWithText("Manage Timepoints");
@@ -103,35 +103,34 @@ public class FlowCBCTest extends BaseFlowTest
 
     private void copyFlowResultsToStudy()
     {
-        importAnalysis(getContainerPath(), "/flowjoquery/microFCS/microFCS.xml", "/flowjoquery/microFCS", false, "Copy Test", false, true);
-        uploadSampleDescriptions("/sampledata/flow/flowjoquery/miniFCS/sample-set.tsv", new String[] { "File" }, new String[] { "Name" });
-        setProtocolMetadata(true);
+        importExternalAnalysis(getContainerPath(), "/analysis.zip");
+        setProtocolMetadata("Keyword SAMPLE ID", "Keyword $DATE", null, false);
 
-        // Copy the sample wells (Non-comp) to the STUDY_FOLDER
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses&query.FCSFile%2FKeyword%2FComp~in=Non-comp");
+        // Copy the sample wells to the STUDY_FOLDER
+        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         clickCheckbox(".toggle");
         clickButton("Copy to Study");
         selectOptionByText("targetStudy", "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Next");
         assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
-        setFormElement(Locator.name("participantId", 0), PTID1);
-        setFormElement(Locator.name("date", 0), "2006-03-17");
+        setFormElement(Locator.name("date", 0), "2012-03-17");
+        setFormElement(Locator.name("participantId", 1), PTID1);
         clickNavButton("Copy to Study");
 
         assertTitleContains("Dataset: Flow");
         Assert.assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
-        assertTextPresent(PTID1, "2006-03-17"); // ptid and date entered in copy verify page
-        assertTextPresent(PTID2, "2006-03-29"); // ptid and date from sample-set.tsv
+        assertTextPresent(PTID1, "2012-03-17"); // PTID entered in copy verify page and DATE from FCS keywords
+        assertTextPresent(PTID2, "2012-06-20"); // PTID from FCS keyword and DATE entered in copy verify page
         String href = getAttribute(Locator.linkWithText(PTID2), "href");
         Assert.assertTrue("Expected PTID link to go to STUDY_FOLDER container: " + href, href.contains("/" + STUDY_FOLDER));
-        href = getAttribute(Locator.linkWithText("microFCS.xml"), "href");
+        href = getAttribute(Locator.linkWithText("analysis"), "href");
         Assert.assertTrue("Expected Run link to go to flow container: " + href, href.contains("/" + getFolderName()));
-        href = getAttribute(Locator.linkWithText("AutoComp"), "href");
+        href = getAttribute(Locator.linkWithText("06-20-12 mem naive"), "href");
         Assert.assertTrue("Expected Compensation Matrix link to go to flow container: " + href, href.contains("/" + getFolderName()));
 
         // verify graph img is displayed (no error) and the src attribute goes to the flow container
         assertTextNotPresent("Error generating graph");
-        href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
+        href = getAttribute(Locator.xpath("//img[@title='(FSC-H:SSC-H)']"), "src");
         Assert.assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         pushLocation();
@@ -172,13 +171,31 @@ public class FlowCBCTest extends BaseFlowTest
         setFormElement(Locator.name("participantId", 0), PTID1);
         setFormElement(Locator.name("participantId", 1), PTID2);
         // Note that dates are not on the same day, but within the default timespan size
-        setFormElement(Locator.name("date", 0), "2006-03-18");
-        setFormElement(Locator.name("date", 1), "2006-04-01");
+        setFormElement(Locator.name("date", 0), "2012-06-19");
+        setFormElement(Locator.name("date", 1), "2012-03-18");
         clickNavButton("Copy to Study");
     }
 
     private void verifyQuery()
     {
-        // UNDONE
+        log("** Verify mem naive query");
+        beginAt("/query/" + getProjectName() + "/" + STUDY_FOLDER + "/executeQuery.view?schemaName=study&query.queryName=mem%20naive%20CBCFlow&query.sort=ParticipantId");
+        DataRegionTable table = new DataRegionTable("query", this, false, true);
+        assertEquals("Expected one row", 1, table.getDataRowCount());
+        assertEquals(PTID1, table.getDataAsText(0, "Participant ID"));
+        assertEquals("Week 16", table.getDataAsText(0, "Visit"));
+        assertEquals("2880.0", table.getDataAsText(0, "Total Lymph"));
+        assertEquals("78.6%", table.getDataAsText(0, "CD3+ Percent"));
+        assertEquals("2263.18", table.getDataAsText(0, "CD3+ Lymph"));
+
+        log("** Verify 8a/p11c/4/3 query");
+        beginAt("/query/" + getProjectName() + "/" + STUDY_FOLDER + "/executeQuery.view?schemaName=study&query.queryName=8a%2Fp11c%2F4%2F3%20CBCFlow&query.sort=ParticipantId");
+        table = new DataRegionTable("query", this, false, true);
+        assertEquals("Expected one row", 1, table.getDataRowCount());
+        assertEquals(PTID2, table.getDataAsText(0, "Participant ID"));
+        assertEquals("Week 3", table.getDataAsText(0, "Visit"));
+        assertEquals("3080.0", table.getDataAsText(0, "Total Lymph"));
+        assertEquals("87.0%", table.getDataAsText(0, "CD3+ Percent"));
+        assertEquals("2680.09", table.getDataAsText(0, "CD3+ Lymph"));
     }
 }

@@ -15,6 +15,8 @@ import java.util.Map;
 public class StudyProtectedExportTest extends StudyExportTest
 {
     int pipelineJobCount = 1;
+    private String idPreface = "PREFACE";
+    private int idLength = 7;
 
     @Override
     protected void doCreateSteps()
@@ -22,6 +24,8 @@ public class StudyProtectedExportTest extends StudyExportTest
         createStudyManually();
 
         Map<String, String> originalFirstMouseStats = getFirstMouseStats();
+        setParticipantIdPreface(idPreface, idLength);
+        
         setUpTrickyExport();
         exportStudy(true, true, false, true);
 
@@ -30,6 +34,8 @@ public class StudyProtectedExportTest extends StudyExportTest
         goToDatasetWithProtectedColum();
         assertTextNotPresent(protectedColumnLabel);
         Map<String, String> alteredFirstMouseStats = getFirstMouseStats();
+        assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
+        assertEquals(idPreface.length() + idLength,  alteredFirstMouseStats.get("Mouse Id").length());
         verifyStatsDoNotMatch(originalFirstMouseStats, alteredFirstMouseStats);
         verifyParticipantGroups(originalFirstMouseStats.get("Mouse Id"), alteredFirstMouseStats.get("Mouse Id"));
 
@@ -39,6 +45,22 @@ public class StudyProtectedExportTest extends StudyExportTest
         Map reimportedFirstMouseStats = getFirstMouseStats();
         verifyStatsMatch(alteredFirstMouseStats, reimportedFirstMouseStats);
 
+    }
+
+    private void setParticipantIdPreface(String idPreface, int idLength)
+    {
+        clickTab("Manage");
+        clickLinkContainingText("Manage Alternate");
+        ExtHelper.setExtFormElementByLabel(this, "Prefix", idPreface);
+        setFormElement("numberOfDigits", "" + idLength);
+        clickButton("Change Alternate IDs", 0);
+        waitForText("If you have published this study before ");
+        clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        waitForText("Changing Alternate IDs is complete");
+        clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+
+        //set preface
+        //set digits
     }
 
     private void verifyParticipantGroups(String originalID, String newID)

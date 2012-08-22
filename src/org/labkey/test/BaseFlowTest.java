@@ -279,7 +279,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         submit();
     }
 
-    protected void setProtocolMetadata(boolean useDate)
+    protected void setProtocolMetadata(String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
     {
         log("** Specify ICS metadata");
         goToFlowDashboard();
@@ -287,21 +287,34 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickLinkWithText("Edit ICS Metadata");
 
         // specify PTID and Visit/Date columns
-        selectOptionByText("ff_participantColumn", "Sample PTID");
-        if (useDate)
-            selectOptionByText("ff_dateColumn", "Sample Thaw Date");
-        else
-            selectOptionByText("ff_visitColumn", "Sample Visit");
+        selectOptionByText("ff_participantColumn", participantColumn);
+        if (dateColumn != null)
+            selectOptionByText("ff_dateColumn", dateColumn);
+        if (visitColumn != null)
+            selectOptionByText("ff_visitColumn", visitColumn);
 
-        // specify forground-background match columns
-        assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
-        selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
+        if (setBackground)
+        {
+            // specify forground-background match columns
+            assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
+            selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
 
-        // specify background values
-        selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
-        assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
-        setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
+            // specify background values
+            selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
+            assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
+            setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
+        }
+
         submit();
+    }
+
+    protected void importExternalAnalysis(String containerPath, String analysisZipPath)
+    {
+        goToFlowDashboard();
+        clickLinkContainingText("FCS files to be imported");
+        selectPipelineFileAndImportAction(analysisZipPath, "Import External Analysis");
+
+        waitForPipeline(containerPath);
     }
 
     protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, boolean existingKeywordRun, String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)
