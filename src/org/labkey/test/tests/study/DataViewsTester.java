@@ -121,8 +121,8 @@ public class DataViewsTester
         _test.waitAndClick(Locator.xpath("//img[@data-qtip='Delete']"));
         ExtHelper.waitForExtDialog(_test, "Delete Category");
         _test.clickNavButton("OK", 0);
-        _test.clickNavButton("New Category", 0);
         ExtHelper.waitForExtDialogToDisappear(_test, "Delete Category");
+        _test.clickNavButton("New Category", 0);
         _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[5]"), "testcategory"); // TODO: need a better xpath
         _test.clickNavButton("Done", 0);
         _test.clickNavButton("Save", 0);
