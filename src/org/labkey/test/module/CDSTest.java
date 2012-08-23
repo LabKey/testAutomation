@@ -608,7 +608,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 "Vaccinology: precisely tuned antibodies nab HIV.");
 
         goToAppHome();
-        click("Vaccine Types");
+        click("Regimen Components");
         assertVaccineTypeInfoPage("VRC-HIVADV014-00-VP",
                 "Description\n" +
                         "Inserts\n" +
@@ -633,7 +633,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                         "None.");
 
         goToAppHome();
-        click("Vaccine Components");
+        click("Vaccine Immunogen");
         assertVaccineComponentInfoPage("gp140",
                 "GenBank: U08794\n" +
                 "Isolate \n" +
