@@ -2461,7 +2461,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         else
             uncheckCheckbox("addAlias");
         // Select Target
-        waitForExt4FolderTreeNode(newParent, 10000);
+        waitForElement(Locator.permissionsTreeNode(newParent), 10000);
         selectFolderTreeItem(newParent);
         // move:
         clickNavButton("Confirm Move");
