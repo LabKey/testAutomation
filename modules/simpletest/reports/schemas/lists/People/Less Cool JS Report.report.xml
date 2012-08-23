@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor xmlns="http://labkey.org/query/xml">
+    <label>Want To Be Cool</label>
+    <category>Category From XML</category>
+    <description>Showing how to be less cool!</description>
+    <hidden>false</hidden>
+    <reportType>
+        <JavaScript>
+            <dependencies>
+                <dependency path="Ext4"/>
+            </dependencies>
+        </JavaScript>
+    </reportType>
+</ReportDescriptor>
