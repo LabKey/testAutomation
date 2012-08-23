@@ -268,10 +268,11 @@ public class LabModulesTest extends BaseSeleniumWebTest
         Ext4Helper.selectComboBoxItem(this, "Molecule Type", "vRNA");
 
         assertElementNotPresent(Ext4Helper.invalidField());
+        fireEvent(Locator.name("samplename"), SeleniumEvent.blur);
         clickButton("Submit", 0);
 
         //test error conditions in trigger script
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Must enter either a location or freezer");
         clickButton("OK", 0);
         waitForElement(Ext4Helper.invalidField());
