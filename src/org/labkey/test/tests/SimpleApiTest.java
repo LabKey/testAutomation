@@ -194,13 +194,13 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
                 HttpClient client = username == null ? WebTestHelper.getHttpClient(requestUrl) : WebTestHelper.getHttpClient(requestUrl, username, password);
 
                 int status = client.executeMethod(method);
+                String response = method.getResponseBodyAsString();
                 if (status == HttpStatus.SC_OK || acceptErrors)
                 {
-                    String response = method.getResponseBodyAsString();
                     _helper.assertEquals("FAILED: test " + name, expectedResponse, response);
                 }
                 else
-                    Assert.fail(String.format("FAILED: test %s failed with status code: %s", name, status));
+                    Assert.fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, response != null ? "\n" + response : ""));
             }
             catch (IOException e)
             {
