@@ -402,6 +402,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void importAnalysis_FCSFiles(String containerPath, String fcsPath, boolean existingRun)
     {
+        sleep(100); // Avoid race condition for form
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         if (existingRun)
         {
