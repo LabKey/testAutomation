@@ -969,7 +969,7 @@ public class TimeChartTest extends StudyBaseTest
         log("Verify report after modifying participant groups.");
         clickLinkWithText(FOLDER_NAME);
         clickLinkWithText(REPORT_NAME_3);
-        waitForText("Time Chart Wizard");
+        waitForText(REPORT_NAME_3);
         waitAndClickNavButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         waitForText("One or more of the participant groups originally saved with this chart are not currently visible", WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent(GROUP3_NAME);
