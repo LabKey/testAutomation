@@ -237,7 +237,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         goToAppHome();
     }
 
-    private static final String FILTERS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Lab\"},\"views\":{},\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3026\",\"data\":{\"name\":\"CDSTest_CGroup\",\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3013\",\"data\":{\"hierarchy\":\"Lab\",\"members\":[{\"uname\":[\"Lab\",\"LabKey Lab\"]},{\"uname\":[\"Lab\",\"Piehler/Eckels Lab\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"INTERSECT\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3013\"},{\"phantom\":true,\"internalId\":\"ext-record-3014\",\"data\":{\"hierarchy\":\"Participant.Sex\",\"members\":[{\"uname\":[\"Participant.Sex\",\"f\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3014\"}],\"label\":\"\",\"participantIds\":\"\",\"description\":\"\",\"shared\":false,\"type\":\"\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.FilterGroup-ext-record-3026\"}],\"selections\":[],\"detail\":{},\"id\":150}";
+    private static final String FILTERS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Lab\"},\"views\":{},\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3453\",\"data\":{\"name\":\"CDSTest_CGroup\",\"filters\":[{\"phantom\":true,\"internalId\":\"ext-record-3440\",\"data\":{\"hierarchy\":\"Lab\",\"members\":[{\"uname\":[\"Lab\",\"LabKey Lab\"]},{\"uname\":[\"Lab\",\"Piehler/Eckels Lab\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"INTERSECT\",\"isGrid\":false,\"gridFilter\":\"\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3440\"},{\"phantom\":true,\"internalId\":\"ext-record-3441\",\"data\":{\"hierarchy\":\"Participant.Sex\",\"members\":[{\"uname\":[\"Participant.Sex\",\"f\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"UNION\",\"isGrid\":false,\"gridFilter\":\"\",\"groupLabel\":\"CDSTest_CGroup\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.Filter-ext-record-3441\"}],\"label\":\"\",\"participantIds\":\"\",\"description\":\"\",\"shared\":false,\"type\":\"\"},\"modified\":{},\"events\":{},\"editing\":false,\"dirty\":false,\"id\":\"Connector.model.FilterGroup-ext-record-3453\"}],\"selections\":[],\"detail\":{},\"id\":164}";
     private void verifyFilters()
     {
         log("Verify multi-select");
@@ -521,6 +521,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         // 15267
         addGridColumn("Physical Exam", "Source", true, true);
         addGridColumn("NAb", "Source", false, true);
+        waitForGridCount(700);
+        setRawDataFilter("Source", "Demo"); // Hopefully get text on page
         waitForText("Demo study physical exam", CDS_WAIT);
         waitForText("Demo study final NAb data", CDS_WAIT);
 
@@ -777,6 +779,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.name("description"));
         waitForElement(Locator.xpath("//textarea[@name='description']")); //expand
         selenium.type(Locator.name("description").toString(), description, false); // setFormElement fires events that throw off the flow.
+        if (findButton("Thank You!") != null)
+            fireEvent(findButton("Thank You!"), SeleniumEvent.mouseout);
         waitForText("Submit");
         clickButton("Submit", 0);
         fireEvent(Locator.name("description"), SeleniumEvent.blur);
