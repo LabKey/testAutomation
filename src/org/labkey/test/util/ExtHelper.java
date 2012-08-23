@@ -254,6 +254,7 @@ public class ExtHelper
     {
         test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);
         test.waitForElement(locateBrowserFileName(fileName), 60000);
+        test.sleep(100); // Avoid race condition for file selection.
         test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
     }
 

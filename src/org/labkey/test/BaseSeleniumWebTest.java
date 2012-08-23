@@ -6677,7 +6677,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         clickNavButton("Import Data", 0);
 
-        waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction']/../label[text()=" + Locator.xq(actionName) + "]"));
+        waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = ExtHelper.getExtElementId(this, "btn_submit");
         clickAndWait(Locator.id(id));
     }
