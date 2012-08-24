@@ -923,6 +923,21 @@ public class MS2Test extends MS2TestBase
             assertTextPresent("K.GSDSLSDGPACKR.S");
             assertTextPresent("K.EYYLLHKPPKTISSTK.D");
 
+            // verify the bulk protein coverage map export
+            pushLocation();
+            addUrlParameter("exportAsWebPage=true");
+            clickNavButton("Export Protein Coverage");
+            assertTextPresentInThisOrder("22001886", "Q963B6", "R10A_SPOFR", "29827410", "NP_822044.1",
+                    "17508693", "NP_492384.1", "27716987", "XP_233992.1");
+            assertTextPresent("(SeqId = 1008)", 2);
+            assertTextPresent("(SeqId = 5)", 1);
+            assertTextPresent("57 Total qualifying peptides in run", 56); // two peptides have the same search engine protein
+            assertTextPresent("57 Distinct qualifying peptides in run", 56); // two peptides have the same search engine protein
+            assertTextPresent("59 Total qualifying peptides in run", 59);
+            assertTextPresent("59 Distinct qualifying peptides in run", 59);
+            assertTextPresent("peptide-marker", 117);
+            popLocation();
+
             clickLinkWithText("Setup Compare Peptides");
             click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
             setFormElement(Locator.input("peptideProphetProbability"), "0.9");
@@ -932,6 +947,21 @@ public class MS2Test extends MS2TestBase
             assertTextNotPresent("K.GSDSLSDGPACKR.S");
             assertTextPresent("K.EYYLLHKPPKTISSTK.D");
 
+            // verify the bulk protein coverage map export for the peptideProphet probability filter
+            pushLocation();
+            addUrlParameter("exportAsWebPage=true");
+            clickNavButton("Export Protein Coverage");
+            assertTextPresentInThisOrder("4689022", "CAA80880.2", "18311790", "NP_558457.1",
+                    "15828808", "NP_326168.1", "34849400", "AAP58899.1");
+            assertTextNotPresent("BAB39767.1"); // for peptide K.GSDSLSDGPACKR.S
+            assertTextPresent("(SeqId = 330)", 1);
+            assertTextPresent("(SeqId = 2758)", 1);
+            assertTextPresent("2 Total qualifying peptides in run", 4);
+            assertTextPresent("2 Distinct qualifying peptides in run", 4);
+            assertTextPresent("peptide-marker", 4);
+            assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
+            popLocation();
+
             clickLinkWithText("Setup Compare Peptides");
             setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
             clickNavButton("Compare");
@@ -939,6 +969,22 @@ public class MS2Test extends MS2TestBase
             assertTextNotPresent("K.EEEESDEDMGFG.-");
             assertTextNotPresent("K.GSDSLSDGPACKR.S");
             assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+            // verify the bulk protein coverage map export for peptideProphet filter with target protein
+            pushLocation();
+            addUrlParameter("exportAsWebPage=true");
+            clickNavButton("Export Protein Coverage");
+            assertTextPresentInThisOrder("18311790", "NP_558457.1");
+            assertTextNotPresent("CAA80880.2"); // for peptide K.EEEESDEDMGFG.-
+            assertTextPresent("(PeptideProphet &gt;= 0.9) AND (SeqId = 2446)", 1);
+            assertTextPresent("Peptide Counts:", 1);
+            assertTextPresent("1 Total peptide matching sequence", 1);
+            assertTextPresent("1 Distinct peptide matching sequence", 1);
+            assertTextPresent("2 Total qualifying peptides in run", 1);
+            assertTextPresent("2 Distinct qualifying peptides in run", 1);
+            assertTextPresent("peptide-marker", 1);
+            assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
+            popLocation();            
 
             clickLinkWithText("Setup Compare Peptides");
             setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
@@ -950,6 +996,19 @@ public class MS2Test extends MS2TestBase
             assertTextNotPresent("K.EEEESDEDMGFG.-");
             assertTextNotPresent("K.GSDSLSDGPACKR.S");
             assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+            // verify the bulk protein coverage map export for target protein
+            pushLocation();
+            addUrlParameter("exportAsWebPage=true");
+            clickNavButton("Export Protein Coverage");
+            assertTextPresentInThisOrder("15645924", "NP_208103.1", "15612296", "NP_223949.1");
+            assertTextPresent("Peptide Counts:", 2);
+            assertTextPresent("2 Total peptides matching sequence", 2);
+            assertTextPresent("2 Distinct peptides matching sequence", 2);
+            assertTextPresent("59 Total qualifying peptides in run", 2);
+            assertTextPresent("59 Distinct qualifying peptides in run", 2);
+            assertTextPresent("peptide-marker", 2);
+            popLocation();
 
             clickLinkWithText("MS2 Dashboard");
         }
