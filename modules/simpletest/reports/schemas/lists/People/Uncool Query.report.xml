@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor xmlns="http://labkey.org/query/xml">
+    <label>UnCool Query</label>
+    <description>The uncool query</description>
+    <hidden>false</hidden>
+    <reportType>
+        <Query>
+            <schemaName>lists</schemaName>
+            <queryName>People</queryName>
+        </Query>
+    </reportType>
+</ReportDescriptor>
