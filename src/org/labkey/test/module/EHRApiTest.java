@@ -26,6 +26,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -41,6 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -66,8 +72,9 @@ public class EHRApiTest extends EHRStudyTest
     private Object[] weightData1 = {"TestSubject1", DATE_SUBSTITUTION, null, null, "12", EHRQCState.IN_PROGRESS.label, null, null, "_recordID"};
     private List<Long> _saveRowsTimes;
     private SimpleDateFormat _tf = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+    private Random _randomGenerator = new Random();
 
-    private static String[] SUBJECTS = {"rh0000", "cy999", "r12345"};
+    private static String[] SUBJECTS = {"rh0000", "cy999", "r12345", "r00000"};
     private static String[] ROOMS = {"Room1", "Room2", "Room3"};
     private static String[] CAGES = {"1", "2", "3"};
     private static Integer[] PROJECTS = {12345, 123456, 1234567};
@@ -162,8 +169,29 @@ public class EHRApiTest extends EHRStudyTest
     {
         _saveRowsTimes = new ArrayList<Long>();
         weightValidationTest();
-
-        //TODO: other tables
+        arrivalDepartureTest();
+        assignmentTest();
+        birthTest();
+        bloodTest();
+        chargesTest();
+        clinicalRemarksTest();
+        clinicalObservationsTest();
+        clinpathRunsTest();
+        deathsTest();
+        demographicsTest();
+        drugTest();
+        housingTest();
+        irregularObsTest();
+        mensesTest();
+        necropsyTest();
+        pregnanciesTest();
+        prenatalDeathsTest();
+        problemListTest();
+        surgeryTest();
+        tbTestsTest();
+        treatmentOrdersTest();
+        cageObservationsTest();
+        cageTest();
 
         calculateAverage();
     }
@@ -172,11 +200,7 @@ public class EHRApiTest extends EHRStudyTest
     {
         try
         {
-            JSONObject extraContext = new JSONObject();
-            extraContext.put("errorThreshold", "ERROR");
-            extraContext.put("skipIdFormatCheck", true);
-            extraContext.put("allowAnyId", true);
-            extraContext.put("targetQC", "Completed");
+            JSONObject extraContext = getExtraContext();
 
             //insert into demographics
             log("Creating test subjects");
@@ -223,10 +247,6 @@ public class EHRApiTest extends EHRStudyTest
             insertCommand = prepareInsertCommand("study", "Housing", FIELD_LSID, fields, data);
             doSaveRows(DATA_ADMIN, Collections.singletonList(insertCommand), extraContext, true);
         }
-        catch (JSONException e)
-        {
-            throw new RuntimeException(e);
-        }
         catch (ParseException e)
         {
             throw new RuntimeException(e);
@@ -258,13 +278,87 @@ public class EHRApiTest extends EHRStudyTest
         expected = new HashMap<String, List<String>>();
         expected.put("weight", Collections.singletonList("Weight drop of >10%. Last weight 12 kg"));
         testValidationMessage("study", "weight", weightFields, data, expected);
+
+        //TODO: test error threshold
     }
 
-    private void arrivalTest()
+    private void arrivalDepartureTest()
     {
-        //TODO
-        //arrival: verify cascade insert into demographics, housing
+        try
+        {
+            //TODO: test update of calculated status field w/ multiple IDs being inserted
 
+            String subject = SUBJECTS[3] + _randomGenerator.nextInt(100);
+
+            //insert into arrival should cascade insert into demographics + housing
+            String[] arrivalFields = {"Id", "date", FIELD_QCSTATELABEL, FIELD_OBJECTID, FIELD_LSID, "_recordid",
+                "birth", "initialRoom", "initialCage", "dam", "sire", "gender", "species"};
+            Object[][] data = new Object[][]{
+                {subject, new Date(), EHRQCState.COMPLETED.label, null, null, "recordID",
+                DATE_SUBSTITUTION, ROOMS[0], CAGES[0], "dam", "sire", "m", "Rhesus"}
+            };
+            doSaveRows(DATA_ADMIN, Collections.singletonList(prepareInsertCommand("study", "arrival", FIELD_LSID, arrivalFields, data)), getExtraContext(), true);
+
+            //verify demographics record created with correct field values
+            SelectRowsCommand cmd = new SelectRowsCommand("study", "demographics");
+            cmd.setFilters(Collections.singletonList(new Filter("Id", subject)));
+            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            SelectRowsResponse resp = cmd.execute(cn, CONTAINER_PATH);
+            Assert.assertEquals("Id not inserted into demographics", 1, resp.getRowCount().intValue());
+            Map<String, Object> row = resp.getRows().get(0);
+            Assert.assertEquals("Dam not set", "dam", row.get("dam"));
+            Assert.assertEquals("Sire not set", "sire", row.get("sire"));
+            Assert.assertEquals("Status not correct", "Alive", row.get("calculated_status"));
+
+            //verify cascade insert into housing
+            cmd = new SelectRowsCommand("study", "housing");
+            cmd.setFilters(Collections.singletonList(new Filter("Id", subject)));
+            resp = cmd.execute(cn, CONTAINER_PATH);
+            Assert.assertEquals("Id not inserted into housing", 1, resp.getRowCount().intValue());
+            row = resp.getRows().get(0);
+            Assert.assertEquals("Room not set", ROOMS[0], row.get("room"));
+            Assert.assertEquals("Cage not set", CAGES[0], row.get("cage"));
+
+            //enter a departure
+            String[] departureFields = {"Id", "date", FIELD_QCSTATELABEL, FIELD_OBJECTID, FIELD_LSID, "_recordid", "destination"};
+            data = new Object[][]{
+                {subject, new Date(), EHRQCState.COMPLETED.label, null, null, "recordID", "destination"}
+            };
+            doSaveRows(DATA_ADMIN, Collections.singletonList(prepareInsertCommand("study", "departure", FIELD_LSID, departureFields, data)), getExtraContext(), true);
+
+            //verify demographics record created with correct field values
+            cmd = new SelectRowsCommand("study", "demographics");
+            cmd.setFilters(Collections.singletonList(new Filter("Id", subject)));
+            resp = cmd.execute(cn, CONTAINER_PATH);
+            row = resp.getRows().get(0);
+            Assert.assertEquals("Status not correct", "Shipped", row.get("calculated_status"));
+
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private JSONObject getExtraContext()
+    {
+        try
+        {
+            JSONObject extraContext = new JSONObject();
+            extraContext.put("errorThreshold", "ERROR");
+            extraContext.put("skipIdFormatCheck", true);
+            extraContext.put("allowAnyId", true);
+            extraContext.put("targetQC", "Completed");
+            return extraContext;
+        }
+        catch (JSONException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     private void assignmentTest()
@@ -322,11 +416,6 @@ public class EHRApiTest extends EHRStudyTest
     private void demographicsTest()
     {
         //update status field
-    }
-
-    private void departureTest()
-    {
-        //update status
     }
 
     private void drugTest()
@@ -404,10 +493,6 @@ public class EHRApiTest extends EHRStudyTest
     {
         //verify padding of digits
     }
-
-
-
-
 
     private void testValidationMessage(String schemaName, String queryName, String[] fields, Object[][] data, Map<String, List<String>> expectedErrors)
     {
