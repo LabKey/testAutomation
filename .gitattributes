@@ -37,6 +37,7 @@ modules/simpletest/config/module.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
+modules/simpletest/folderTypes/customTabbedFolder.folderType.xml -text
 modules/simpletest/module.xml -text
 modules/simpletest/queries/lists/People.js -text
 modules/simpletest/queries/lists/People/Crazy[!!-~]People.qview.xml -text

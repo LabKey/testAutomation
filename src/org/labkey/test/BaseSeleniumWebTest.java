@@ -3741,6 +3741,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickLink(getTabLinkId(tabname));
     }
 
+    public void verifyTabSelected(String caption)
+    {
+        Assert.assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
+    }
+
     public void clickImageWithTitle(String title, int mills)
     {
         Locator l = Locator.tagWithAttribute("img", "title", title);

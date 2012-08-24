@@ -19,6 +19,8 @@ import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
+import java.net.URISyntaxException;
+
 /**
  * Created by IntelliJ IDEA.
  * User: bbimber
@@ -87,5 +89,28 @@ public class LabModuleHelper
     public static Locator webpartTitle(String title)
     {
         return Locator.xpath("//span[contains(@class, 'labkey-wp-title-text') and text() = '" + title + "']");
+    }
+
+    public String createWorkbook(String workbookTitle, String workbookDescription)
+    {
+        _test.clickTab("Workbooks");
+        _test.clickButton("Create New Workbook", 0);
+        _test.waitForElement(Ext4Helper.ext4Window("Create Workbook"));
+        _test.setText("title", workbookTitle);
+        _test.setText("description", workbookDescription);
+        _test.clickButton("Submit");
+        _test.waitForPageToLoad();
+
+        try
+        {
+            String path = _test.getURL().toURI().getPath();
+            path = path.replaceAll(".*/workbook-", "");
+            path = path.replaceAll("/begin.view", "");
+            return path;
+        }
+        catch (URISyntaxException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

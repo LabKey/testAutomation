@@ -47,6 +47,7 @@ import java.util.Date;
 public class SimpleModuleTest extends BaseSeleniumWebTest
 {
     public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml
+    public static final String TABBED_FOLDER_TYPE = "My XML-defined Tabbed Folder Type";
     public static final String MODULE_NAME = "simpletest";
     public static final String FOLDER_NAME = "subfolder";
     public static final String VEHICLE_SCHEMA = "vehicle";
@@ -71,11 +72,17 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertModuleEnabledByDefault("simpletest");
         assertModuleEnabledByDefault("Query");
 
-        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, null);
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, TABBED_FOLDER_TYPE);
+        assertModuleEnabledByDefault("Portal");
+        assertModuleEnabledByDefault("simpletest");
+        assertModuleEnabledByDefault("Query");
+        assertModuleEnabledByDefault("Study");
 
         // Modules enabled in file based folder definition
         //enableModule(getProjectName(), MODULE_NAME);
         //enableModule(getProjectName(), "Query");
+
+        doTestTabbedFolder();
 
         clickLinkWithText(getProjectName());
         doTestCustomFolder();
@@ -635,6 +642,54 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         goToProjectHome();
         Assert.assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+    }
+
+    private void doTestTabbedFolder()
+    {
+        clickLinkWithText((FOLDER_NAME));
+        waitForPageToLoad();
+
+        //it should start on tab 2
+        verifyTabSelected("Tab 2");
+        log("verifying webparts present in correct order");
+        assertTextPresentInThisOrder("A customized web part", "Experiment Runs", "Assay List");
+
+        //verify Tab 1
+        clickTab("Tab 1");
+        waitForPageToLoad();
+        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List");
+        addWebPart("Messages");
+
+        clickTab("Tab 2");
+        waitForPageToLoad();
+
+        //verify added webpart is persisted
+        clickTab("Tab 1");
+        waitForPageToLoad();
+        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List", "Messages");
+
+        //there is a selector for the assay controller and tab2
+        clickLinkWithText("New Assay Design");
+        waitForPageToLoad();
+        verifyTabSelected("Tab 2");
+
+        //this is a controller selector
+        beginAt("/query/" + getProjectName() + "/" + FOLDER_NAME + "/begin.view?");
+        waitForPageToLoad();
+        verifyTabSelected("Tab 1");
+
+        //this is a view selector
+        beginAt("/pipeline-status/" + getProjectName() + "/" + FOLDER_NAME + "/showList.view?");
+        waitForPageToLoad();
+        verifyTabSelected("Tab 2");
+
+        //this is a regex selector
+        clickLinkWithText((FOLDER_NAME));
+        waitForPageToLoad();
+        addWebPart("Sample Sets");
+        clickLinkWithText("Import Sample Set");
+        waitForPageToLoad();
+        verifyTabSelected("Tab 1");
     }
 
     protected void assertModuleDeployed(String moduleName)
