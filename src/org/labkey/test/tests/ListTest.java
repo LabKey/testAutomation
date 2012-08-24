@@ -42,9 +42,9 @@ import static org.labkey.test.util.ListHelper.ListColumnType.String;
  */
 public class ListTest extends BaseSeleniumWebTest
 {
-    protected final static String PROJECT_NAME = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    private final static String PROJECT_NAME2 = "OtherListVerifyProject";
-    protected final static String LIST_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
+    protected final static String PROJECT_VERIFY = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private final static String PROJECT_OTHER = "OtherListVerifyProject";
+    protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
@@ -72,22 +72,26 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String LIST_ROW1 = TEST_DATA[0][0] + "\t" + TEST_DATA[1][0] + "\t" + TEST_DATA[2][0] + "\t" + CONVERTED_MONTHS[0];
     private final static String LIST_ROW2 = TEST_DATA[0][1] + "\t" + TEST_DATA[1][1] + "\t" + TEST_DATA[2][1] + "\t" + CONVERTED_MONTHS[1];
     private final static String LIST_ROW3 = TEST_DATA[0][2] + "\t" + TEST_DATA[1][2] + "\t" + TEST_DATA[2][2] + "\t" + CONVERTED_MONTHS[2];
-    private final String LIST_DATA = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME +
-            "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\n" + LIST_ROW1 + "\n" + LIST_ROW2 + "\n" + LIST_ROW3;
+    private final String LIST_DATA =
+            LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\n" +
+            LIST_ROW1 + "\n" +
+            LIST_ROW2 + "\n" +
+            LIST_ROW3;
     private final String LIST_DATA2 =
-            LIST_KEY_NAME2 + "\t" + _listCol4.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listCol5.getName() + "\n" +
-            TEST_DATA[0][0] + "\t" + TEST_DATA[4][0] + "\t" + TEST_DATA[5][0] + "\t" + HIDDEN_TEXT + "\n" +
-            TEST_DATA[0][1] + "\t" + TEST_DATA[4][1] + "\t" + TEST_DATA[5][1] + "\t" + HIDDEN_TEXT + "\n" +
-            TEST_DATA[0][2] + "\t" + TEST_DATA[4][2] + "\t" + TEST_DATA[5][2] + "\t" + HIDDEN_TEXT;
-    private final String TEST_FAIL2 = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol2.getName() + "\n" +
-            LIST_ROW1 + "\t" + "String";
+            LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol3.getName() + "\t" + _listCol2.getName() + "\t" + _listCol4.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listCol5.getName() + "\n" +
+            LIST_ROW1 + "\t" + TEST_DATA[4][0] + "\t" + TEST_DATA[5][0] + "\t" + HIDDEN_TEXT + "\n" +
+            LIST_ROW2 + "\t" + TEST_DATA[4][1] + "\t" + TEST_DATA[5][1] + "\t" + HIDDEN_TEXT + "\n" +
+            LIST_ROW3 + "\t" + TEST_DATA[4][2] + "\t" + TEST_DATA[5][2] + "\t" + HIDDEN_TEXT;
     private final static String TEST_FAIL = "testfail";
+    private final static String TEST_FAIL2 = "testfail\n2\n";
+    private final String TEST_FAIL3 = LIST_KEY_NAME2 + "\t" + FAKE_COL1_NAME + "\t" + _listCol2.getName() + "\n" +
+            LIST_ROW1 + "\t" + "String";
     private final static String TEST_VIEW = "list_view";
-    private final static String LIST2_NAME = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
+    private final static String LIST2_NAME_CARS = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
     protected final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 
-    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME));
+    protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME_COLORS));
     private final static String LIST2_KEY = "Car1";
     private final static String LIST2_FOREIGN_KEY = "Blue";
     private final static String LIST2_KEY2 = "Car2";
@@ -97,18 +101,21 @@ public class ListTest extends BaseSeleniumWebTest
     private final static String LIST2_FOREIGN_KEY3 = "Red";
     private final static String LIST2_KEY4 = "Car4";
     private final static String LIST2_FOREIGN_KEY4 = "Brown";
-    private final static String LIST3_NAME = "Owners";
+    private final static String LIST3_NAME_OWNERS = "Owners";
     private final static ListHelper.ListColumnType LIST3_KEY_TYPE = ListHelper.ListColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
     private final ListColumn _list3Col2 = new ListColumn("Wealth", "Wealth", ListHelper.ListColumnType.String, "");
-    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_NAME2, "lists", LIST3_NAME));
+    protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS));
     private final static String LIST3_COL2 = "Rich";
-    private final String LIST2_DATA = LIST2_KEY_NAME + "\t" + _list2Col1.getName()  + "\t" + LIST3_KEY_NAME
-            + "\n" + LIST2_KEY + "\t" + LIST2_FOREIGN_KEY + "\n" + LIST2_KEY2  + "\t" + LIST2_FOREIGN_KEY2 + "\t" +
-            LIST2_FOREIGN_KEY_OUTSIDE + "\n" + LIST2_KEY3  + "\t" + LIST2_FOREIGN_KEY3 + "\n" + LIST2_KEY4  + "\t" +
-            LIST2_FOREIGN_KEY4;
-    private final String LIST3_DATA = LIST3_KEY_NAME + "\t" + _list3Col2.getName() + "\n" + LIST2_FOREIGN_KEY_OUTSIDE + "\t" +
-            LIST3_COL2;
+    private final String LIST2_DATA =
+            LIST2_KEY_NAME + "\t" + _list2Col1.getName()  + "\t" + LIST3_KEY_NAME + "\n" +
+            LIST2_KEY + "\t" + LIST2_FOREIGN_KEY + "\n" +
+            LIST2_KEY2  + "\t" + LIST2_FOREIGN_KEY2 + "\t" + LIST2_FOREIGN_KEY_OUTSIDE + "\n" +
+            LIST2_KEY3  + "\t" + LIST2_FOREIGN_KEY3 + "\n" +
+            LIST2_KEY4  + "\t" + LIST2_FOREIGN_KEY4;
+    private final String LIST3_DATA =
+            LIST3_KEY_NAME + "\t" + _list3Col2.getName() + "\n" +
+            LIST2_FOREIGN_KEY_OUTSIDE + "\t" + LIST3_COL2;
     public static final String LIST_AUDIT_EVENT = "List events";
 
     private final String EXCEL_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.xls";
@@ -123,13 +130,13 @@ public class ListTest extends BaseSeleniumWebTest
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return PROJECT_VERIFY;
     }
 
     protected void doCleanup()
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT_NAME2); } catch (Throwable t) {}
+        try {deleteProject(PROJECT_VERIFY); } catch (Throwable t) {}
+        try {deleteProject(PROJECT_OTHER); } catch (Throwable t) {}
     }
 
     @Override
@@ -140,7 +147,14 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void setUpListFinish()
     {
-        log("Add data to existing rows");
+        // delete existing rows
+        log("Test deleting rows");
+        checkCheckbox(".toggle");
+        selenium.chooseOkOnNextConfirmation();
+        clickButton("Delete", 0);
+        Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+        waitForPageToLoad();
+        // load test data
         clickImportData();
         setFormElement("text", LIST_DATA2);
         submitImportTsv();
@@ -152,8 +166,8 @@ public class ListTest extends BaseSeleniumWebTest
         log("Setup project and list module");
         _containerHelper.createProject(projectName, null);
 
-        log("Add list -- " + LIST_NAME);
-        ListHelper.createList(this, projectName, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
+        log("Add list -- " + LIST_NAME_COLORS);
+        ListHelper.createList(this, projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
         clickEditDesign();
@@ -166,13 +180,20 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(LIST_DESCRIPTION);
 
         log("Test upload data");
+
         clickImportData();
         submitImportTsv("Form contains no data");
+
         setFormElement("text", TEST_FAIL);
-        submitImportTsv("could not be matched to a field");
-        assertTextPresent(TEST_FAIL);
+        submitImportTsv("No rows were inserted.");
+//        assertTextPresent(TEST_FAIL);
+
         setFormElement("text", TEST_FAIL2);
-        submitImportTsv("must be of type");
+        submitImportTsv("Data does not contain required field: Color");
+//        assertTextPresent(TEST_FAIL2);
+
+        setFormElement("text", TEST_FAIL3);
+        submitImportTsv("Could not convert");
         setFormElement("text", LIST_DATA);
         submitImportTsv();
 
@@ -183,26 +204,28 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[3][2]);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        Assert.assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
-        Assert.assertEquals("false", table.getDataAsText(1, _listCol3.getLabel()));
-        Assert.assertEquals("true",  table.getDataAsText(2, _listCol3.getLabel()));
+        Assert.assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
+        Assert.assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
+        Assert.assertEquals(TEST_DATA[2][2],  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
+        Assert.assertEquals(1,table.getRow(TEST_DATA[0][1]));
         clickLinkWithText("edit", 1);
         setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox("quf_JewelTone");
         submit();
         // Third row (Red)
+        Assert.assertEquals(2,table.getRow(TEST_DATA[0][2]));
         clickLinkWithText("edit", 2);
         setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox("quf_JewelTone");
         submit();
 
         table = new DataRegionTable("query", this);
-        Assert.assertEquals("true",  table.getDataAsText(0, _listCol3.getLabel()));
-        Assert.assertEquals("true",  table.getDataAsText(1, _listCol3.getLabel()));
-        Assert.assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
+        Assert.assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
+        Assert.assertEquals("true", table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
+        Assert.assertEquals("false",  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
@@ -247,7 +270,7 @@ public class ListTest extends BaseSeleniumWebTest
         selectOptionByText("ff_titleColumn", "Desc");
         clickDone();
 
-        clickLinkWithText(LIST_NAME);
+        clickLinkWithText(LIST_NAME_COLORS);
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
         assertTextPresent(TEST_DATA[3][2]);
@@ -307,8 +330,9 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(TEST_DATA[2][3]);
         assertTextPresent(TEST_DATA[3][3]);
         table = new DataRegionTable("query", this);
-        Assert.assertEquals("false", table.getDataAsText(2, _listCol3.getLabel()));
-        Assert.assertEquals("false", table.getDataAsText(3, _listCol3.getLabel()));
+        Assert.assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
+        Assert.assertEquals(3,table.getRow(TEST_DATA[0][3]));
+        Assert.assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
         dataregionToEditDesign();
@@ -394,7 +418,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void doTestSteps()
     {
-        setUpList(PROJECT_NAME);
+        setUpList(PROJECT_VERIFY);
 
         log("Test Sort and Filter in Data View");
         setSort("query", _listCol1.getName(), SortDirection.ASC);
@@ -460,16 +484,16 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
-        Assert.assertEquals("details Links", 3, countLinksWithText("details"));
-        Assert.assertEquals("Project Links", 14 + 3, countLinksWithText(PROJECT_NAME)); // Table links + header & sidebar links
-        Assert.assertEquals("List Links", 14 + 1, countLinksWithText(LIST_NAME)); // Table links + header link
+        Assert.assertEquals("details Links", 6, countLinksWithText("details"));
+        Assert.assertEquals("Project Links", 17 + 3, countLinksWithText(PROJECT_VERIFY)); // Table links + header & sidebar links
+        Assert.assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
         clickLinkWithText("details");
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");
         assertTextNotPresent("Unable to find the audit history detail for this event");
 
         clickNavButton("Done");
-        clickLinkWithText(PROJECT_NAME, 3);
+        clickLinkWithText(PROJECT_VERIFY, 3);
 
         log("Test single list web part");
         addWebPart("List - Single");
@@ -482,23 +506,23 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("Views");
 
         log("Create second project");
-        _containerHelper.createProject(PROJECT_NAME2, null);
+        _containerHelper.createProject(PROJECT_OTHER, null);
 
         String project2_url = getCurrentRelativeURL();
 
-        log("Add List -- " + LIST3_NAME);
-        ListHelper.createList(this, PROJECT_NAME2, LIST3_NAME, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
+        log("Add List -- " + LIST3_NAME_OWNERS);
+        ListHelper.createList(this, PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
         assertTextPresent("<AUTO> (Owner)");
 
         log("Upload data to second list");
-        ListHelper.uploadData(this, PROJECT_NAME2, LIST3_NAME, LIST3_DATA);
+        ListHelper.uploadData(this, PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_DATA);
 
         log("Navigate back to first project");
-        log("Add list -- " + LIST2_NAME);
-        ListHelper.createList(this, PROJECT_NAME, LIST2_NAME, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, _list3Col1);
+        log("Add list -- " + LIST2_NAME_CARS);
+        ListHelper.createList(this, PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, _list3Col1);
 
         log("Upload data to second list");
-        ListHelper.uploadData(this, PROJECT_NAME, LIST2_NAME, LIST2_DATA);
+        ListHelper.uploadData(this, PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_DATA);
 
         log("Check that upload worked");
         assertTextPresent(LIST2_KEY);
@@ -565,7 +589,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Get URL to test exporting deleted list.");
         clickTab("List");
-        clickLinkWithText(LIST_NAME);
+        clickLinkWithText(LIST_NAME_COLORS);
         clickNavButton("Export", 0);
         ExtHelper.clickSideTab(this, "Text");
         String exportButtonScript = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "onclick");
@@ -577,23 +601,23 @@ public class ListTest extends BaseSeleniumWebTest
         clickNavButton("OK");
 
         log("Test that deletion happened");
-        assertTextNotPresent(LIST_NAME);
-        clickLinkWithText(LIST2_NAME);
+        assertTextNotPresent(LIST_NAME_COLORS);
+        clickLinkWithText(LIST2_NAME_CARS);
         pushLocation();
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         assertElementNotPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST_KEY_NAME + "']"));
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
         popLocation();
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(PROJECT_VERIFY);
         assertTextPresent("query not found");
 
         log("Test exporting a nonexistent list returns a 404");
         selenium.open(WebTestHelper.getBaseURL() + exportUrl.substring(WebTestHelper.getContextPath().length()));
         Assert.assertEquals("Incorrect response code", 404, getResponseCode());
-        assertTextPresent("Query '" + LIST_NAME + "' in schema 'lists' doesn't exist.");
+        assertTextPresent("Query '" + LIST_NAME_COLORS + "' in schema 'lists' doesn't exist.");
 
         clickNavButton("Folder");
-        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain " +LIST_NAME + " was deleted", 5);
+        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain " + LIST_NAME_COLORS + " was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
 
@@ -609,7 +633,7 @@ public class ListTest extends BaseSeleniumWebTest
     {
         //create list with look up A
         String lookupColumn = "lookup";
-        ListHelper.createList(this, PROJECT_NAME2, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_NAME, lookupColumn, Integer, "A" ));
+        ListHelper.createList(this, PROJECT_OTHER, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
         clickImportData();
         setListImportAsTestDataField(lookupColumn + "\n1");
 
@@ -630,7 +654,7 @@ public class ListTest extends BaseSeleniumWebTest
     private void filterTest()
     {
         log("Filter Test");
-        clickLinkWithText(PROJECT_NAME);
+        clickLinkWithText(PROJECT_VERIFY);
         addWebPart("Query");
         selectOptionByText("schemaName", "lists");
         selenium.click("document.frmCustomize.selectQuery[1]");
@@ -655,7 +679,7 @@ public class ListTest extends BaseSeleniumWebTest
         setFilter("qwp3", _listCol4.getName(), "Is Less Than", "10");
         assertTextPresent(TEST_DATA[1][0], 1);
 
-        clickLinkContainingText(LIST_NAME);
+        clickLinkContainingText(LIST_NAME_COLORS);
     }
 
 
@@ -692,7 +716,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Infer from excel file, then import data");
         File excelFile = new File(EXCEL_DATA_FILE);
-        ListHelper.createListFromFile(this, PROJECT_NAME, "Fruits from Excel", excelFile);
+        ListHelper.createListFromFile(this, PROJECT_VERIFY, "Fruits from Excel", excelFile);
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
 
@@ -715,7 +739,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(TSV_LIST_NAME);*/
 
         log("Infer from a tsv file, then import data");
-        ListHelper.createListFromFile(this, PROJECT_NAME, TSV_LIST_NAME, tsvFile);
+        ListHelper.createListFromFile(this, PROJECT_VERIFY, TSV_LIST_NAME, tsvFile);
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
         log("Verify correct types are inferred from file");
@@ -817,7 +841,7 @@ public class ListTest extends BaseSeleniumWebTest
     private void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
-        ListHelper.createList(this, PROJECT_NAME, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
+        ListHelper.createList(this, PROJECT_VERIFY, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
         clickEditDesign();
         setColumnName(1,"FooFoo");
@@ -932,7 +956,7 @@ public class ListTest extends BaseSeleniumWebTest
     void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
     {
         log("Add List -- " + name);
-        ListHelper.createList(this, PROJECT_NAME, name, cols.get(0).getType(), cols.get(0).getName(),
+        ListHelper.createList(this, PROJECT_VERIFY, name, cols.get(0).getType(), cols.get(0).getName(),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
         clickEditDesign();
         selectOptionByText("ff_titleColumn", cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
@@ -962,7 +986,7 @@ public class ListTest extends BaseSeleniumWebTest
             createList("B", Bcolumns, Bdata);
             createList("A", Acolumns, Adata);
 
-            beginAt("/query/" + EscapeUtil.encode(PROJECT_NAME) + "/executeQuery.view?schemaName=lists&query.queryName=A");
+            beginAt("/query/" + EscapeUtil.encode(PROJECT_VERIFY) + "/executeQuery.view?schemaName=lists&query.queryName=A");
 
             pushLocation();
             {
@@ -994,7 +1018,7 @@ public class ListTest extends BaseSeleniumWebTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            Assert.assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_NAME) + "/echoForm.view"));
+            Assert.assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_VERIFY) + "/echoForm.view"));
         }
         popLocation();
     }
