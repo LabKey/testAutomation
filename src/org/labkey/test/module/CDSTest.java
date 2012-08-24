@@ -633,7 +633,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                         "None.");
 
         goToAppHome();
-        click("Vaccine Immunogen");
+        click("Vaccine Immunogens");
         assertVaccineComponentInfoPage("gp140",
                 "GenBank: U08794\n" +
                 "Isolate \n" +
