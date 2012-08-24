@@ -512,6 +512,12 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     {
         RReportHelper.ensureRConfig(this);
 
+        log("Testing module-based JS reports...");
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(LIST_NAME);
+        clickMenuButton("Views", "Want To Be Cool");
+        waitForText("Less cool than expected.", WAIT_FOR_JAVASCRIPT);
+
         log("Testing module-based reports...");
         clickLinkWithText(getProjectName());
         clickLinkWithText(LIST_NAME);
