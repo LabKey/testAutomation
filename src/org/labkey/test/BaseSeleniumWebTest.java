@@ -1004,7 +1004,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             if (performingUpgrade)
             {
-                verifyUpgradeRedirect(upgradeText);
+                verifyNoRedirect(upgradeText);
 
                 // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
                 signOut();
@@ -1086,7 +1086,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         String initialText = "Welcome! We see that this is your first time logging in.";
 
-        // These should NOT redirect to the upgrade page
+        // These requests should redirect to the initial user page
         beginAt("/login/resetPassword.view");
         assertTextPresent(initialText);
         beginAt("/admin/maintenance.view");
@@ -1094,13 +1094,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
 
-    private void verifyUpgradeRedirect(String buttonText)
+    private void verifyNoRedirect(String upgradeText)
     {
-        // These should NOT redirect to the upgrade page
+        // These requests should NOT redirect to the upgrade page
+        // Use a new window because the primary upgrade window seems to interfere with this test, #15853
+        selenium.openWindow("", "noRedirect");
+        selenium.selectWindow("noRedirect");
         beginAt("/login/resetPassword.view");
-        assertTextNotPresent(buttonText);
+        assertTextNotPresent(upgradeText);
         beginAt("/admin/maintenance.view");
-        assertTextNotPresent(buttonText);
+        assertTextNotPresent(upgradeText);
+        selenium.close();
+        selenium.selectWindow(null);
     }
 
 
