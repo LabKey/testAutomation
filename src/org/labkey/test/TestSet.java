@@ -58,6 +58,7 @@ public enum TestSet
         FlowTest.class,
         XTandemTest.class,
         StudyTest.class,
+        SystemMaintenanceTest.class,
         WebDavTest.class
     }),
 

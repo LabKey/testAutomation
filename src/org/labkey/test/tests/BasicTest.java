@@ -59,13 +59,13 @@ public class BasicTest extends BaseSeleniumWebTest
         Assert.assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 14.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
 
         // Disable scheduled system maintenance
-        setSystemMaintenance(false);
-        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
-        startSystemMaintenance();
+//        setSystemMaintenance(false);
+//        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
+//        startSystemMaintenance();
 
-        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
-        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
-        clickNavButton("Save");
+//        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
+//        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
+//        clickNavButton("Save");
 
         _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup("testers");
@@ -149,12 +149,12 @@ public class BasicTest extends BaseSeleniumWebTest
         assertElementNotPresent(searchLocator);
 
         // Now that the test is done, ensure that system maintenance is complete...
-        waitForSystemMaintenanceCompletion();
-
-        // Verify scheduled system maintenance is disabled.
-        goToAdminConsole();
-        clickLinkWithText("running threads");
-        assertTextNotPresent("SystemMaintenance");
+//        waitForSystemMaintenanceCompletion();
+//
+//        // Verify scheduled system maintenance is disabled.
+//        goToAdminConsole();
+//        clickLinkWithText("running threads");
+//        assertTextNotPresent("SystemMaintenance");
     }
 
     private boolean isBrowser(String source, String browserNameAndSeparator, double startVersion, double endVersion)
