@@ -21,7 +21,7 @@ package org.labkey.test.tests;
  * Date: 8/7/11
  * Time: 3:58 PM
  */
-
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -29,6 +29,8 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
+
+import java.util.Arrays;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
@@ -55,10 +57,44 @@ public class FilterTest extends ListTest
         waitForPageToLoad();
     }
 
+
+    void setUpList()
+    {
+        StringBuilder testDataFull = new StringBuilder();
+        testDataFull.append(StringUtils.join(Arrays.asList(LIST_KEY_NAME2, _listCol1.getName(), _listCol2.getName(), _listCol3.getName(), _listCol4.getName(), _listCol6.getName()), "\t"));
+        testDataFull.append("\n");
+        for (int i=0 ; i<TEST_DATA[0].length ; i++)
+        {
+            testDataFull.append(StringUtils.join(Arrays.asList(
+                    TEST_DATA[0][i],
+                    TEST_DATA[1][i],
+                    CONVERTED_MONTHS[i],
+                    TEST_DATA[2][i],
+                    TEST_DATA[4][i],
+                    (i==TEST_DATA[0].length-1) ? "" : TEST_DATA[5][i] // NOTE make last row blank
+                    ),"\t"));
+            testDataFull.append("\n");
+        }
+
+        log("Setup project and list module");
+        _containerHelper.createProject(PROJECT_NAME, null);
+        log("Add list -- " + LIST_NAME_COLORS);
+        ListHelper.createList(this, PROJECT_NAME, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
+        log("Set title field of 'Colors' to 'Desc'");
+        clickEditDesign();
+        selectOptionByText("ff_titleColumn", "Desc");
+        clickDone();
+        clickLinkWithText(LIST_NAME_COLORS);
+        clickImportData();
+        setFormElement("text", testDataFull.toString());
+        submitImportTsv();
+    }
+
+
     public void doTestSteps()
     {
         RReportHelper.ensureRConfig(this);
-        setUpList(PROJECT_NAME);
+        setUpList();
         CustomizeViewsHelper.createRView(this, null, R_VIEW);
         filterTest();
         facetedFilterTest();
@@ -177,9 +213,9 @@ public class FilterTest extends ListTest
     {
         log("Filter Test");
 
-        invalidFiltersGenerateCorrectErrorTest();
-
         validFiltersGenerateCorrectResultsTest();
+
+        invalidFiltersGenerateCorrectErrorTest();
 
         filterCancelButtonWorksTest();
     }
@@ -274,14 +310,14 @@ public class FilterTest extends ListTest
         Object[][] ret = {
                 //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
                 //Issue 12197
-                {_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", "7;9", null, null, new String[] {TEST_DATA[1][3],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][0]}},
+                {_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}},
                 {_listCol1.getName(), "Equals", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}},
                 {_listCol1.getName(), "Starts With", "Z", null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][2]}},
                 {_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]}},
                 //can't check for the absence of thing you're excluding, since it will be present in the filter text
                 {_listCol1.getName(), "Does Not Equal", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}, new String[] {TEST_DATA[5][0]}},
-                {_listCol3.getName(), "Equals", "true", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}},
-                {_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}},
+                {_listCol3.getName(), "Equals", "true", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}},
+                {_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}},
                 //filter is case insensitive
                 {_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {TEST_DATA[5][2],TEST_DATA[5][0], TEST_DATA[5][1]}, new String[] {TEST_DATA[1][3]}},
 //                {_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {TEST_DATA[1][2]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][3]}},
@@ -293,8 +329,6 @@ public class FilterTest extends ListTest
                 {_listCol1.getName(), "Does Not Contain Any Of (e.g. \"a;b;c\")", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][2]}, new String[] {TEST_DATA[0][1] , TEST_DATA[0][3]}},
                 {_listCol6.getName(), "Is Blank", "", null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}},
                 {_listCol6.getName(), "Is Not Blank", "", null, null, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]}}
-
-
         };
 
         return ret;
