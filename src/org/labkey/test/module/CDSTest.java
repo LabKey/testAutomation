@@ -68,22 +68,22 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     public void doCleanup()
     {
         // Delete any containers and users created by the test.
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Exception e)
-        {
-        }
+//        try
+//        {
+//            deleteProject(PROJECT_NAME);
+//        }
+//        catch (Exception e)
+//        {
+//        }
     }
 
     @Override
     public void doTestSteps()
     {
-        setupProject();
-        importData();
-        populateFactTable();
-        verifyFactTable();
+//        setupProject();
+//        importData();
+//        populateFactTable();
+//        verifyFactTable();
 
         selenium.windowMaximize(); // Provides more useful screenshots on failure
 
@@ -527,6 +527,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForText("Demo study final NAb data", CDS_WAIT);
 
         addFeedback("verify grid", GRID_FEEDBACK_STATE);
+        openFilterPanel("Source");
+        clickButton("Clear Filters", 0);
 
         goToAppHome();
 
