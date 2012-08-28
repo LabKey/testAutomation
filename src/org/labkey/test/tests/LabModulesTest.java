@@ -192,7 +192,7 @@ public class LabModulesTest extends BaseSeleniumWebTest
         assertElementPresent(_helper.webpartTitle("Experiment Runs"));
 
         //we expect insert from within the workbook to go straight to the import page (unlike the top-level folder, which gives a dialog)
-        click(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']"));
+        waitAndClick(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']"));
         for (String s : getSampleItems())
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(s));
