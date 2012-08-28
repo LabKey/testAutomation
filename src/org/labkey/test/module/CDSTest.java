@@ -280,12 +280,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup(GROUP_NAME, true);
         assertTextPresent(GROUP_DESC);
 
-        waitForText("12 total participants", WAIT_FOR_JAVASCRIPT);
-        assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 total");
-        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
-        assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
+        waitForText("12 participants", WAIT_FOR_JAVASCRIPT);
+        assertCDSPortalRow("Studies", STUDIES[1], "1 studies");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 antigens");
+        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 assays");
+        assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 labs");
+        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 participants");
 
         click("Labs");
         assertFilterStatusCounts(12,1,3,2,8);
@@ -376,12 +376,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup(GROUP_NAME2, true);
         assertTextNotPresent(GROUP_DESC);
 
-        waitForText("12 total participants", WAIT_FOR_JAVASCRIPT);
-        assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 total");
-        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
-        assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 total participants");
+        waitForText("12 participants", WAIT_FOR_JAVASCRIPT);
+        assertCDSPortalRow("Studies", STUDIES[1], "1 studies");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 antigens");
+        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 assays");
+        assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 labs");
+        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 4 male", "12 participants");
 
         click("Labs");
         assertFilterStatusCounts(12,1,3,2,8);
@@ -392,12 +392,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextNotPresent(GROUP_DESC);
         assertTextPresent("Sex:");
 
-        waitForText("8 total participants", WAIT_FOR_JAVASCRIPT);
-        assertCDSPortalRow("Studies", STUDIES[1], "1 total");
-        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 total");
-        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 total");
-        assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 total labs");
-        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 0 male", "8 total participants");
+        waitForText("8 participants", WAIT_FOR_JAVASCRIPT);
+        assertCDSPortalRow("Studies", STUDIES[1], "1 studies");
+        assertCDSPortalRow("Assay Antigens", "3 clades, 3 tiers, 3 sample types (Unknown, ccPBMC, Lung)", "8 antigens");
+        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, NAb-Sample-LabKey", "3 assays");
+        assertCDSPortalRow("Labs", "LabKey Lab, Piehler/Eckels Lab", "2 labs");
+        assertCDSPortalRow("Participants", "4 races, 1 locations, 8 female, 0 male", "8 participants");
 
         click("Labs");
         assertFilterStatusCounts(8,1,3,2,8);
@@ -423,7 +423,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForGridCount(668);
         assertElementPresent(Locator.tagWithText("span", "Point IC50"));
         assertElementPresent(Locator.tagWithText("span", "Study Name"));
-        click(Locator.tagWithText("span", "Explore Categories"));
+        click(Locator.tagWithText("span", "Explore"));
         waitForText("Demo Study");
         selectBars("Demo Study");
         clickButton("use as filter", 0);
@@ -433,7 +433,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         //Check to see if grid is properly filtering based on explorer filter
         click(Locator.tagWithText("span", "View raw data"));
         waitForGridCount(437);
-        click(Locator.tagWithText("span", "Explore Categories"));
+        click(Locator.tagWithText("span", "Explore"));
         clickButton("clear filters", 0);
         waitForElement(Locator.tagWithText("span", "NotRV144"));
         click(Locator.tagContainingText("span", "View raw data"));
@@ -727,7 +727,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         //TODO: Test cancel button [BLOCKED] 15095: Measure picker cancel button doesn't reset selections
 
-        click(Locator.tagWithText("span", "Explore Categories"));
+        click(Locator.tagWithText("span", "Explore"));
         waitForTextToDisappear(HEMO_CD4);
 
         click(Locator.tagWithText("span", "Plot Data"));
@@ -979,11 +979,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void assertAllParticipantsPortalPage()
     {
-        assertCDSPortalRow("Studies", STUDIES[0] + ", " + STUDIES[1] + ", " + STUDIES[2], "3 total");
-        assertCDSPortalRow("Assay Antigens", "5 clades, 5 tiers, 5 sample types (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 total");
-        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 total");
-        assertCDSPortalRow("Labs", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 total labs");
-        assertCDSPortalRow("Participants", "6 races, 3 locations, 18 female, 11 male", "29 total participants");
+        assertCDSPortalRow("Studies", STUDIES[0] + ", " + STUDIES[1] + ", " + STUDIES[2], "3 studies");
+        assertCDSPortalRow("Assay Antigens", "5 clades, 5 tiers, 5 sample types (Unknown, ccPBMC, Lung, Plasma, ucPBMC)", "31 antigens");
+        assertCDSPortalRow("Assays", "Lab Results, ADCC-Ferrari, Luminex-Sample-LabKey, NAb-Sample-LabKey, mRNA assay", "5 assays");
+        assertCDSPortalRow("Labs", "Arnold/Bellew Lab, LabKey Lab, Piehler/Eckels Lab", "3 labs");
+        assertCDSPortalRow("Participants", "6 races, 3 locations, 18 female, 11 male", "29 participants");
     }
 
     private void assertCDSPortalRow(String by, String expectedDetail, String expectedTotal)
@@ -1014,7 +1014,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForElement(Locator.xpath("//div[@class='highlight-value' and text()='" + participantCount + "']"), WAIT_FOR_JAVASCRIPT);
         waitForText(studyCount+(studyCount!=1?" Studies":" Study"));
         waitForText(assayCount+(assayCount!=1?" Assays":" Assay"));
-        waitForText(contributorCount!=1?" Contributors":" Contributor");
+        waitForText(contributorCount!=1?" Labs":" Lab");
         waitForText(antigenCount + (antigenCount != 1 ? " Antigens" : " Antigen"));
     }
 
