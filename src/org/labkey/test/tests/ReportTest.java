@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.StudyHelper;
@@ -38,6 +39,7 @@ public class ReportTest extends StudyBaseTest
 {
     protected static final String GRID_VIEW = "create_gridView";
     protected static final String R_VIEW = "create_rView";
+    protected static final String QUERY_VIEW = "create_query_report";
     private final static String DATA_SET = "DEM-1: Demographics";
     private final static String DATA_BASE_PREFIX = "DEM";
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
@@ -140,6 +142,7 @@ public class ReportTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         doParticipantGroupCategoriesTest();
+        doQueryReportTests();
         doBoxPlotTests();
         doCreateCharts();
         doCreateRReports();
@@ -1421,5 +1424,79 @@ public class ReportTest extends StudyBaseTest
         mouseDownGridCellCheckbox("Mice C");
         waitForText("Found 5 mice of 138.");
 
+    }
+
+    private static final String QUERY_REPORT_NAME = "First Test Query Report";
+    private static final String QUERY_REPORT_DESCRIPTION = "Description for the first query report.";
+    private static final String QUERY_REPORT_SCHEMA_NAME = "study";
+    private static final String QUERY_REPORT_QUERY_NAME = "Mouse";
+
+    private static final String QUERY_REPORT_NAME_2 = "Second Test Query Report";
+    private static final String QUERY_REPORT_DESCRIPTION_2 = "Description for the first query report.";
+    private static final String QUERY_REPORT_SCHEMA_NAME_2 = "study";
+    private static final String QUERY_REPORT_QUERY_NAME_2 = "AE-1:(VTN) AE Log";
+    private static final String QUERY_REPORT_VIEW_NAME_2 = "Limited PTIDS";
+    private static final String[] PTIDS_FOR_CUSTOM_VIEW = {"999320533", "999320541", "999320529", "999320518"};
+
+
+
+    private void doQueryReportTests()
+    {
+        log("Create a query report.");
+
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        goToManageViews();
+
+        createReport(QUERY_VIEW);
+
+        setFormElement("viewName", QUERY_REPORT_NAME);
+        setFormElement("description", QUERY_REPORT_DESCRIPTION);
+        Ext4Helper.selectComboBoxItem(this, "Schema", QUERY_REPORT_SCHEMA_NAME);
+        waitForTextToDisappear("loading..."); // Ext4Helper.waitForMaskToDisappear(this) doesn't seem to work.
+        Ext4Helper.selectComboBoxItem(this, "Query", QUERY_REPORT_QUERY_NAME);
+        waitForTextToDisappear("loading...");
+        setFormElement("selectedQueryName", QUERY_REPORT_QUERY_NAME);
+
+        clickNavButton("Save");
+        waitForText("Manage Views");
+        waitForText(QUERY_REPORT_NAME);
+
+        clickReportGridLink(QUERY_REPORT_NAME, "view");
+        assertTextPresent(QUERY_REPORT_NAME);
+        assertTextPresent("1 - 138 of 138");
+        goBack();
+
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+
+        clickLinkWithText("AE-1:(VTN) AE Log");
+        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        CustomizeViewsHelper.addCustomizeViewFilter(this, "MouseId", "Mouse Id", "Equals One Of", "999320533;999320541;999320529;999320518");
+        CustomizeViewsHelper.saveCustomView(this, QUERY_REPORT_VIEW_NAME_2);
+
+        // TODO: Uncomment below when Issue 15908 is resolved.
+//        goToManageViews();
+//
+//        createReport(QUERY_VIEW);
+//
+//        setFormElement("viewName", QUERY_REPORT_NAME_2);
+//        setFormElement("description", QUERY_REPORT_DESCRIPTION_2);
+//        Ext4Helper.selectComboBoxItem(this, "Schema", QUERY_REPORT_SCHEMA_NAME_2);
+//        waitForTextToDisappear("loading...");
+//        Ext4Helper.selectComboBoxItem(this, "Query", QUERY_REPORT_QUERY_NAME_2);
+//        waitForTextToDisappear("loading...");
+//        Ext4Helper.selectComboBoxItem(this, "View", QUERY_REPORT_VIEW_NAME_2);
+//
+//        clickNavButton("Save");
+//        waitForText("Manage Views");
+//        waitForText(QUERY_REPORT_NAME_2);
+//
+//        clickReportGridLink(QUERY_REPORT_NAME_2, "view");
+//        assertTextPresent(QUERY_REPORT_NAME_2);
+//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[0], 3);
+//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[1], 1);
+//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[2], 3);
+//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[3], 3);
     }
 }
