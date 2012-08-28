@@ -927,10 +927,10 @@ public class MS2Test extends MS2TestBase
             pushLocation();
             addUrlParameter("exportAsWebPage=true");
             clickNavButton("Export Protein Coverage");
-            assertTextPresentInThisOrder("22001886", "Q963B6", "R10A_SPOFR", "29827410", "NP_822044.1",
-                    "17508693", "NP_492384.1", "27716987", "XP_233992.1");
-            assertTextPresent("(SeqId = 1008)", 2);
-            assertTextPresent("(SeqId = 5)", 1);
+            assertTextPresentInThisOrder("22001886", "Q963B6");
+            assertTextPresentInThisOrder("29827410", "NP_822044.1");
+            assertTextPresentInThisOrder("17508693", "NP_492384.1");
+            assertTextPresentInThisOrder("27716987", "XP_233992.1");
             assertTextPresent("57 Total qualifying peptides in run", 56); // two peptides have the same search engine protein
             assertTextPresent("57 Distinct qualifying peptides in run", 56); // two peptides have the same search engine protein
             assertTextPresent("59 Total qualifying peptides in run", 59);
@@ -951,11 +951,11 @@ public class MS2Test extends MS2TestBase
             pushLocation();
             addUrlParameter("exportAsWebPage=true");
             clickNavButton("Export Protein Coverage");
-            assertTextPresentInThisOrder("4689022", "CAA80880.2", "18311790", "NP_558457.1",
-                    "15828808", "NP_326168.1", "34849400", "AAP58899.1");
+            assertTextPresentInThisOrder("4689022", "CAA80880.2");
+            assertTextPresentInThisOrder("18311790", "NP_558457.1");
+            assertTextPresentInThisOrder("15828808", "NP_326168.1");
+            assertTextPresentInThisOrder("34849400", "AAP58899.1");
             assertTextNotPresent("BAB39767.1"); // for peptide K.GSDSLSDGPACKR.S
-            assertTextPresent("(SeqId = 330)", 1);
-            assertTextPresent("(SeqId = 2758)", 1);
             assertTextPresent("2 Total qualifying peptides in run", 4);
             assertTextPresent("2 Distinct qualifying peptides in run", 4);
             assertTextPresent("peptide-marker", 4);
@@ -976,7 +976,7 @@ public class MS2Test extends MS2TestBase
             clickNavButton("Export Protein Coverage");
             assertTextPresentInThisOrder("18311790", "NP_558457.1");
             assertTextNotPresent("CAA80880.2"); // for peptide K.EEEESDEDMGFG.-
-            assertTextPresent("(PeptideProphet &gt;= 0.9) AND (SeqId = 2446)", 1);
+            assertTextPresent("(PeptideProphet &gt;= 0.9) AND (SeqId = ", 1);
             assertTextPresent("Peptide Counts:", 1);
             assertTextPresent("1 Total peptide matching sequence", 1);
             assertTextPresent("1 Distinct peptide matching sequence", 1);
@@ -1001,7 +1001,8 @@ public class MS2Test extends MS2TestBase
             pushLocation();
             addUrlParameter("exportAsWebPage=true");
             clickNavButton("Export Protein Coverage");
-            assertTextPresentInThisOrder("15645924", "NP_208103.1", "15612296", "NP_223949.1");
+            assertTextPresentInThisOrder("15645924", "NP_208103.1");
+            assertTextPresentInThisOrder("15612296", "NP_223949.1");
             assertTextPresent("Peptide Counts:", 2);
             assertTextPresent("2 Total peptides matching sequence", 2);
             assertTextPresent("2 Distinct peptides matching sequence", 2);
