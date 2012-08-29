@@ -28,7 +28,6 @@ import java.util.List;
  * User: klum
  * Date: Mar 9, 2010
  * Time: 3:44:04 PM
- * To change this template use File | Settings | File Templates.
  */
 public class RlabkeyTest extends SimpleApiTest
 {
@@ -120,6 +119,7 @@ public class RlabkeyTest extends SimpleApiTest
                     sb.append(test.getUrl().trim().replaceAll("%baseUrl%", WebTestHelper.getBaseURL()));
                     String verify = test.getReponse().trim();
 
+                    log("exceute test: " + test.getName());
                     if (!RReportHelper.executeScript(this, sb.toString(), verify))
                         Assert.fail("Failed executing R script for test case: " + test.getName());
                 }
