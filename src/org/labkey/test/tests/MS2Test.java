@@ -931,6 +931,8 @@ public class MS2Test extends MS2TestBase
             assertTextPresentInThisOrder("29827410", "NP_822044.1");
             assertTextPresentInThisOrder("17508693", "NP_492384.1");
             assertTextPresentInThisOrder("27716987", "XP_233992.1");
+            assertTextPresent("(search engine matches)");
+            assertTextNotPresent("(all matching peptides)");
             assertTextPresent("57 Total qualifying peptides in run", 56); // two peptides have the same search engine protein
             assertTextPresent("57 Distinct qualifying peptides in run", 56); // two peptides have the same search engine protein
             assertTextPresent("59 Total qualifying peptides in run", 59);
@@ -956,6 +958,8 @@ public class MS2Test extends MS2TestBase
             assertTextPresentInThisOrder("15828808", "NP_326168.1");
             assertTextPresentInThisOrder("34849400", "AAP58899.1");
             assertTextNotPresent("BAB39767.1"); // for peptide K.GSDSLSDGPACKR.S
+            assertTextPresent("(search engine matches)");
+            assertTextNotPresent("(all matching peptides)");
             assertTextPresent("2 Total qualifying peptides in run", 4);
             assertTextPresent("2 Distinct qualifying peptides in run", 4);
             assertTextPresent("peptide-marker", 4);
@@ -976,12 +980,16 @@ public class MS2Test extends MS2TestBase
             clickNavButton("Export Protein Coverage");
             assertTextPresentInThisOrder("18311790", "NP_558457.1");
             assertTextNotPresent("CAA80880.2"); // for peptide K.EEEESDEDMGFG.-
-            assertTextPresent("(PeptideProphet &gt;= 0.9) AND (SeqId = ", 1);
-            assertTextPresent("Peptide Counts:", 1);
+            assertTextPresent("(all matching peptides)");
+            assertTextNotPresent("(search engine matches)");
+            assertTextPresent("(PeptideProphet &gt;= 0.9) AND (Matches sequence of ", 2);
+            assertTextPresent("Peptide Counts:", 2);
             assertTextPresent("1 Total peptide matching sequence", 1);
             assertTextPresent("1 Distinct peptide matching sequence", 1);
-            assertTextPresent("2 Total qualifying peptides in run", 1);
-            assertTextPresent("2 Distinct qualifying peptides in run", 1);
+            assertTextPresent("0 Total peptides matching sequence", 1);
+            assertTextPresent("0 Distinct peptides matching sequence", 1);
+            assertTextPresent("2 Total qualifying peptides in run", 2);
+            assertTextPresent("2 Distinct qualifying peptides in run", 2);
             assertTextPresent("peptide-marker", 1);
             assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
             popLocation();            
@@ -1002,12 +1010,19 @@ public class MS2Test extends MS2TestBase
             addUrlParameter("exportAsWebPage=true");
             clickNavButton("Export Protein Coverage");
             assertTextPresentInThisOrder("15645924", "NP_208103.1");
-            assertTextPresentInThisOrder("15612296", "NP_223949.1");
+            assertTextPresent("NP_208103.1", 4);
+            assertTextNotPresent("15612296", "NP_223949.1");
+            assertTextPresent("(all matching peptides)");
+            assertTextNotPresent("(search engine matches)");
             assertTextPresent("Peptide Counts:", 2);
-            assertTextPresent("2 Total peptides matching sequence", 2);
-            assertTextPresent("2 Distinct peptides matching sequence", 2);
-            assertTextPresent("59 Total qualifying peptides in run", 2);
-            assertTextPresent("59 Distinct qualifying peptides in run", 2);
+            assertTextPresent("0 Total peptides matching sequence", 1);
+            assertTextPresent("0 Distinct peptides matching sequence", 1);
+            assertTextPresent("57 Total qualifying peptides in run", 1);
+            assertTextPresent("57 Distinct qualifying peptides in run", 1);
+            assertTextPresent("2 Total peptides matching sequence", 1);
+            assertTextPresent("2 Distinct peptides matching sequence", 1);
+            assertTextPresent("59 Total qualifying peptides in run", 1);
+            assertTextPresent("59 Distinct qualifying peptides in run", 1);
             assertTextPresent("peptide-marker", 2);
             popLocation();
 
