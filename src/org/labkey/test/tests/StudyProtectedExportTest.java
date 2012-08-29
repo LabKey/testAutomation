@@ -19,6 +19,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         setParticipantIdPreface(idPreface, idLength);
         
         setUpTrickyExport();
-        exportStudy(true, true, false, true);
+        exportStudy(true, true, false, true, Collections.singleton("Specimens"));
 
         deleteStudy(getStudyLabel());
         importAlteredStudy();

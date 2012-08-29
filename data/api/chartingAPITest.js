@@ -489,7 +489,7 @@ var loadVis = function(){
     LABKEY.requiresVisualization();
     LABKEY.Utils.onTrue({
         testCallback: function(){
-            return LABKEY.vis && LABKEY.vis.Geom && LABKEY.vis.Layer && LABKEY.vis.Plot;
+            return LABKEY.vis && LABKEY.vis.Geom && LABKEY.vis.Stat && LABKEY.vis.Layer && LABKEY.vis.Plot;
         },
         successCallback: function(){beginTest.defer(100)},
         errorCallback: doError

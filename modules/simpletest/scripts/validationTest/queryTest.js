@@ -85,7 +85,7 @@ var testFunctions = [
 
     function() //testResults[8]
     {
-        testResults[testResults.length] = LABKEY.Query.executeSql({schemaName: 'lists', sort: 'Age', sql: 'select People.age from People'});
+        testResults[testResults.length] = LABKEY.Query.executeSql({schemaName: 'lists', sort: 'Age', sql: 'select People.age from People', saveInSession: true});
         executeNext();
     },
 
@@ -217,6 +217,11 @@ var testFunctions = [
             html += 'SUCCESS: executeSql returned 7 rows<br>';
         else
             html += 'FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';
+
+        if (testResults[8].queryName && testResults[8].queryName.indexOf('lists-temp') > -1)
+            html += 'SUCCESS: executeSql returned a session-based query<br>';
+        else
+            html += 'FAILURE: executeSql returned \'' + testResults[8].queryName + '\'. Was expecting a session-based query to be returned.';
 
         if (testResults[8].rows[1].age < testResults[8].rows[2].age)
             html += 'SUCCESS: executeSql returned properly sorted<br>';

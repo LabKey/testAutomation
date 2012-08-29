@@ -958,7 +958,7 @@ public class StudyTest extends StudyBaseTest
         return getXpathCount(Locator.xpath(path));
     }
 
-    private void verifyCohorts()
+    protected void verifyCohorts()
     {
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Study Navigator");

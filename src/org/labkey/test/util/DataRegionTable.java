@@ -203,15 +203,42 @@ public class DataRegionTable
         return rows;
     }
 
+    public Locator.XPathLocator detailsXpath(int row)
+    {
+        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + _headerRows + 1) + "]/td[contains(@class, 'labkey-details')]");
+    }
+
+    public Locator.XPathLocator detailsLink(int row)
+    {
+        Locator.XPathLocator cell = detailsXpath(row);
+        return cell.child("a[1]");
+    }
+
+    public Locator.XPathLocator updateXpath(int row)
+    {
+        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + _headerRows + 1) + "]/td[contains(@class, 'labkey-update')]");
+    }
+
+    public Locator.XPathLocator updateLink(int row)
+    {
+        Locator.XPathLocator cell = updateXpath(row);
+        return cell.child("a[1]");
+    }
+
     public Locator.XPathLocator xpath(int row, int col)
     {
         return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row+_headerRows+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
     }
 
-    public void clickLink(int row, int col)
+    public Locator.XPathLocator link(int row, int col)
     {
         Locator.XPathLocator cell = xpath(row, col);
-        _test.clickAndWait(cell.child("a[1]"));
+        return cell.child("a[1]");
+    }
+
+    public void clickLink(int row, int col)
+    {
+        _test.clickAndWait(link(row, col));
     }
 
     public void clickLink(int row, String columnName)
@@ -348,6 +375,49 @@ public class DataRegionTable
         if (col == -1)
             return null;
         return getDataAsText(row, col);
+    }
+
+    public String getDetailsHref(int row)
+    {
+        Locator l = detailsLink(row);
+        return _test.getAttribute(l, "href");
+    }
+
+    public String getUpdateHref(int row)
+    {
+        Locator l = updateLink(row);
+        return _test.getAttribute(l, "href");
+    }
+
+    public String getHref(int row, int column)
+    {
+        // headerRows and selector offsets are applied in link() locator
+        return _getHref(row, column);
+    }
+
+    private String _getHref(int row, int column)
+    {
+        Locator l = link(row, column);
+        return _test.getAttribute(l, "href");
+    }
+
+    public String getHref(int row, String columnName)
+    {
+        int col = getColumn(columnName);
+        if (col == -1)
+            return null;
+        return getHref(row, col);
+    }
+
+    public String getHref(String pk, String columnName)
+    {
+        int row = getRow(pk);
+        if (row == -1)
+            return null;
+        int col = getColumn(columnName);
+        if (col == -1)
+            return null;
+        return getHref(row, col);
     }
 
     public void setSort(String columnName, SortDirection direction)

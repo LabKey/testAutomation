@@ -71,7 +71,7 @@ var testFunctions = [
 
     function() //testResults[8]
     {
-        LABKEY.Query.executeSql({schemaName: 'lists', sort: 'Age', sql: 'select People.age from People', successCallback: successHandler, errorCallback: failureHandler});
+        LABKEY.Query.executeSql({schemaName: 'lists', sort: 'Age', sql: 'select People.age from People', saveInSession: true, successCallback: successHandler, errorCallback: failureHandler});
     },
 
     function() //testResults[9]
@@ -204,6 +204,11 @@ var testFunctions = [
             html += 'SUCCESS: executeSql returned properly sorted<br>';
         else
             html += 'FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '<br>';
+
+        if (testResults[8].queryName && testResults[8].queryName.indexOf('lists-temp') > -1)
+            html += 'SUCCESS: executeSql returned a session-based query<br>';
+        else
+            html += 'FAILURE: executeSql returned \'' + testResults[8].queryName + '\'. Was expecting a session-based query to be returned.';
 
         if (testResults[9].rowCount == 7)
             html += 'SUCCESS: cross-folder executeSql succeeded<br>';

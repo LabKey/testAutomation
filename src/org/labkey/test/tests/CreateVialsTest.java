@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 
+import java.util.Arrays;
+
 /**
  * User: kevink
  * Date: Feb 23, 2011
@@ -72,6 +74,15 @@ public class CreateVialsTest extends AbstractViabilityTest
         catch(Throwable T) {}
 
         deleteDir(getTestTempDir());
+    }
+
+    @Override
+    protected void cleanUp()
+    {
+        // Disable the Letvin module so the study queries don't cause the query validation to fail.
+        disableModules(Arrays.asList("Letvin"));
+
+        super.cleanUp();
     }
 
     @Override
@@ -291,7 +302,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         // UNDONE: assert first row has no specimen match
         clickButton("Copy to Study");
         assertTextPresent("B02");
-        
+
     }
 
 }

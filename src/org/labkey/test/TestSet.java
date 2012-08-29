@@ -149,6 +149,7 @@ public enum TestSet
         PipelineCancelTest.class,
         StudyExportTest.class,
         StudyProtectedExportTest.class,
+        StudyCohortExportTest.class,
         ViabilityTest.class,
         ProjectSettingsTest.class,
         CDSTest.class,
@@ -231,6 +232,7 @@ public enum TestSet
     Study(new Class[] {
         StudyTest.class,
         StudyExportTest.class,
+        StudyCohortExportTest.class,
         StudyManualTest.class,
         StudyExtraTest.class,
         CohortTest.class,

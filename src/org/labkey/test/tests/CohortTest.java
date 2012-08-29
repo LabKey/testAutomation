@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import java.io.File;
 
 /**
@@ -42,6 +43,15 @@ public class CohortTest extends BaseSeleniumWebTest
     private static final String UNASSIGNED_1 = "Unassigned1";
     private static final String XPATH_COHORT_ASSIGNMENT_TABLE = "//table[@id='participant-cohort-assignments']";
     private static final String COHORT_TABLE = "Cohort Table";
+    private static final String COHORT_ALL = "All";
+    private static final String COHORT_NEGATIVE = "Negative";
+    private static final String COHORT_POSITIVE = "Positive";
+    private static final String COHORT_NOCOHORT = "Not in any cohort";
+    private static final String[] PTIDS_ALL = {INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4, UNASSIGNED_1};
+    private static final String[] PTIDS_POSITIVE = {INFECTED_1, INFECTED_2, INFECTED_3};
+    private static final String[] PTIDS_NEGATIVE = {INFECTED_4};
+    private static final String[] PTIDS_NOCOHORT = {UNASSIGNED_1};
+    private static final String[] PTIDS_POSITIVE_NOCOHORT = {INFECTED_1, INFECTED_2, INFECTED_3, UNASSIGNED_1};
 
     @Override
     protected void doTestSteps() throws Exception
@@ -293,7 +303,148 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 3, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 4, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 5, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
+        // The enrolledCohortTest assumes the following state:
+        // Negative cohort {Infected4}
+        // Positive cohort {Infected1, Infected2, Infected3}
+        // Not in any cohort {Unassigned1}
+        enrolledCohortTest();
+    }
 
+    //
+    // test enrolled and unenrolled cohort functionality for cohorts
+    //
+    private void enrolledCohortTest()
+    {
+        log("Check enrolled/unenrolled cohort features.");
+        DataRegionTable table = getCohortDataRegionTable(PROJECT_NAME);
+
+        // verify that we have an 'enrolled' column and both cohorts are
+        // true by default
+        log("Check that cohorts are enrolled by default.");
+        verifyCohortStatus(table, "positive", true);
+        verifyCohortStatus(table, "negative", true);
+
+        // verify we can roundtrip enrolled status
+        // unenroll the "postiive" cohort and check
+        log("Check that enrolled bit is roundtripped successfully.");
+        changeCohortStatus(table, "positive", false);
+        verifyCohortStatus(table, "positive", false);
+
+        // start with everyone enrolled again
+        changeCohortStatus(table, "positive", true);
+        refreshParticipantList();
+
+        // the rules for when we display the "enrolled" keyword are as follows:
+        // 1.  if there are no unenrolled cohorts, then never show enrolled text
+        // 2.  if unenrolled cohorts exist and all selected cohorts are enrolled then use the enrolled text to describe them
+        // 3.  if unenrolled cohorts exist and all selected cohorts are unenrolled, do not use enrolled text
+        // 4.  if unenrolled cohorts exist and selected cohorts include both enrolled and unenrolled cohorts, then do not show the enrolled text
+        // note:  participants that don't belong to any cohort are enrolled
+
+        log("verify enrolled text: all cohorts are enrolled");
+        // rule #1:  no unenrolled cohorts exist so do not expect the enrolled text.
+        verifyParticipantList(PTIDS_ALL, false);
+
+        // unenroll all cohorts
+        table = getCohortDataRegionTable(PROJECT_NAME);
+        changeCohortStatus(table, "positive", false);
+        changeCohortStatus(table, "negative", false);
+        refreshParticipantList();
+
+        log("verify enrolled text: all cohorts are unenrolled");
+        // rule #2:  we expect the "enrolled" text since we've selected the 'not in any cohort' group by default
+        verifyParticipantList(PTIDS_NOCOHORT, true);
+        // rule #3:  since "all" includes both enrolled and unenrolled cohorts, don't show the enrolled text
+        verifyCohortSelection(null, COHORT_ALL, PTIDS_ALL, false, "Found 5 participants of 5.");
+
+        // rule #3: Negative cohort is not enrolled, so don't show enrolled text
+        verifyCohortSelection(COHORT_ALL, COHORT_NEGATIVE, PTIDS_NEGATIVE, false, "Found 1 participant of 5.");
+
+        // rule #3: Positive cohort is not enrolled, so don't show enrolled text
+        verifyCohortSelection(COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, false, "Found 3 participants of 5.");
+
+        // rule #2: "not in any cohort" is enrolled so show text
+        verifyCohortSelection(COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+
+        // test both enrolled and unenrolled cohorts
+        table = getCohortDataRegionTable(PROJECT_NAME);
+        changeCohortStatus(table, "positive", true);
+        changeCohortStatus(table, "negative", false);
+        refreshParticipantList();
+
+        log("verify enrolled text: Positive cohort enrolled; negative cohort unenrolled");
+        // rule #2, showing enrolled cohorts (positive and not in any cohort)
+        verifyParticipantList(PTIDS_POSITIVE_NOCOHORT, true);
+
+        // rule #4, don't show enrolled text since we have a mix of enrolled and unenrolled
+        verifyCohortSelection(null, COHORT_ALL, PTIDS_ALL, false, "Found 5 participants of 5.");
+
+        // rule #3, don't show enrolled text since we only have unenrolled cohorots
+        verifyCohortSelection(COHORT_ALL, COHORT_NEGATIVE, PTIDS_NEGATIVE, false, "Found 1 participant of 5.");
+
+        // rule #2, only showing enrolled cohorts
+        verifyCohortSelection(COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, true, "Found 3 enrolled participants of 5.");
+
+        // rule #2, only showing enrolled cohorts
+        verifyCohortSelection(COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+    }
+
+    private void verifyCohortSelection(String previousCohort, String nextCohort, String[] expectedParticipants, boolean expectEnrolledText, String waitText)
+    {
+        if (previousCohort != null)
+        {
+            mouseDownGridCellCheckbox(previousCohort);
+        }
+        mouseDownGridCellCheckbox(nextCohort);
+        waitForText(waitText);
+        verifyParticipantList(expectedParticipants, expectEnrolledText);
+    }
+
+    private boolean isPartipantInGroup(String ptid, String[] ptidGroup)
+    {
+        for (String id : ptidGroup)
+        {
+            if ( 0 == ptid.compareToIgnoreCase(id))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void refreshParticipantList()
+    {
+        clickTab("Participants");
+        waitForText("Filter"); // Wait for participant list to appear.
+    }
+
+    private void verifyParticipantList(String[] ptids, boolean expectEnrolledText)
+    {
+        // we should not see the "enrolled" text if no participants are unenrolled
+        if (!expectEnrolledText)
+        {
+            assertTextNotPresent("enrolled");
+        }
+        else
+        {
+            assertTextPresent("enrolled");
+        }
+
+        // make sure everyone in the group is there
+        for(String ptid : ptids)
+        {
+            assertTextPresent(ptid);
+        }
+
+        // make sure everyone not in the group is not there
+        for (String ptid : PTIDS_ALL)
+        {
+            if (!isPartipantInGroup(ptid, ptids))
+            {
+                assertTextNotPresent(ptid);
+            }
+        }
     }
 
     @Override

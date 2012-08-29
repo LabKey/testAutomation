@@ -614,6 +614,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertElementContains(loc, "SUCCESS: Bad insert generated exception: Data does not contain required field: LastName");
         assertElementContains(loc, "SUCCESS: Bad query generated exception: Failed to convert property value of type");
         assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
+        assertElementContains(loc, "SUCCESS: executeSql returned a session-based query");
         assertElementContains(loc, "SUCCESS: cross-folder executeSql succeeded");
         assertElementContains(loc, "SUCCESS: cross-project executeSql succeeded");
         clearTestPage("Query portion of test page complete");

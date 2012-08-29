@@ -44,7 +44,7 @@ public class StudyExportTest extends StudyManualTest
     private static final String DATE_FORMAT = "dd/mm hh:mma";
     private static final String NUMBER_FORMAT = "00.00";
     private static final String MODIFIED_PARTICIPANT = "999321033";
-    private static final String GROUP_2 = "Group 2";
+    protected static final String GROUP_2 = "Group 2"; // protected so that CohortStudyExportTest can use it
     private static final String COLUMN_DESC = "Test Column Description";
     private static final String MODIFIED_VISIT = "Cycle 2";
 
@@ -82,7 +82,7 @@ public class StudyExportTest extends StudyManualTest
         setDemographicsDescription();
         createCustomAssays();
         setFormatStrings();
-        setManualCohorts();
+        doCohortCreateSteps();
         modifyVisits();
         importCustomVisitMapping();
         changeDatasetOrder("16");
@@ -112,6 +112,11 @@ public class StudyExportTest extends StudyManualTest
 
         // TODO: Move this earlier (after legacy format import) once issue 10074 is resolved. 
         setDemographicsBit();
+    }
+
+    protected void doCohortCreateSteps()
+    {
+        setManualCohorts();
     }
 
     @Override

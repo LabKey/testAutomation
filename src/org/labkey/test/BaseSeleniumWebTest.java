@@ -3841,7 +3841,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         for (String str : strs)
         {
-            Assert.assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\'", cellText.contains(str));
+            Assert.assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\' (actual value is " + cellText + ")", cellText.contains(str));
         }
     }
 
@@ -5678,6 +5678,70 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
+     * Used by CohortTest and StudyCohortExportTest
+     * Returns the data region for the the cohort table to enable setting
+     * or verifying the enrolled status of the cohort
+     */
+    public DataRegionTable getCohortDataRegionTable(String projectName)
+    {
+        clickLinkWithText(projectName);
+        clickTab("Manage");
+        clickLinkWithText("Manage Cohorts");
+        return new DataRegionTable("Cohort", this);
+    }
+
+    /**
+     * Used by CohortTest and StudyCohortExportTest
+     * Verifies the enrolled status of a cohort
+     */
+    public void verifyCohortStatus(DataRegionTable table, String cohort, boolean  enrolled)
+    {
+        int row = getCohortRow(table, cohort);
+        String s = table.getDataAsText(row, "Enrolled");
+        assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
+    }
+
+    /**
+     * Used by CohortTest and StudyCohortExportTest
+     * Retrieves the row for the cohort matching the label passed in
+     */
+    public int getCohortRow(DataRegionTable cohortTable, String cohort)
+    {
+        int row;
+        for (row = 0; row < cohortTable.getDataRowCount(); row++)
+        {
+            String s = cohortTable.getDataAsText(row, "Label");
+            if (0 == s.compareToIgnoreCase(cohort))
+            {
+                break;
+            }
+        }
+        return row;
+    }
+
+    /**
+     * Used by CohortTest and StudyCohortExportTest
+     * Changes the enrolled status of the passed in cohort name
+     */
+    public void changeCohortStatus(DataRegionTable cohortTable, String cohort, boolean enroll)
+    {
+        int row = getCohortRow(cohortTable, cohort);
+        // if the row does not exist then most likely the cohort passed in is incorrect
+        cohortTable.clickLink(row, 1);
+
+        if (!enroll)
+        {
+            uncheckCheckbox("quf_enrolled");
+        }
+        else
+        {
+            checkCheckbox("quf_enrolled");
+        }
+
+        clickButton("Submit");
+    }
+
+    /**
      * Given a file name sets the wikiName page contents to a file in server/test/data/api
      * @param fileName file will be found in server/test/data/api
      * @param wikiName Name of the wiki where the source should be placed
@@ -5734,6 +5798,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickNavButton("Update Folder");
     }
 
+    public void disableModules(List<String> moduleNames)
+    {
+        goToFolderManagement();
+        clickLinkWithText("Folder Type");
+        for (String moduleName : moduleNames)
+        {
+            uncheckCheckbox(Locator.checkboxByTitle(moduleName));
+        }
+        clickNavButton("Update Folder");
+    }
 
     public void goToProjectHome()
     {

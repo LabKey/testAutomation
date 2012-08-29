@@ -15,12 +15,24 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PasswordUtil;
+
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ContainerContextTest extends BaseSeleniumWebTest
 {
@@ -63,13 +75,17 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         doTestListLookupURL();
         doTestIssue15610();
         doTestIssue15751();
+        doTestSimpleModuleTables();
     }
 
     protected void doSetup() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
+        enableModule(getProjectName(), "Laboratory");
+        addWebPart("Workbooks");
+
         createSubfolder(getProjectName(), SUB_FOLDER_A, new String[] {"List", "Study", "ViscStudies"});
-        createSubfolder(getProjectName(), SUB_FOLDER_B, new String[] {"List", "Study", "ViscStudies"});
+        createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies"});
     }
 
     protected void doTestListLookupURL()
@@ -239,4 +255,138 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         waitForText("COMPLETE", WAIT_FOR_PAGE);
     }
 
+    protected void doTestSimpleModuleTables() throws Exception
+    {
+        log("** Inserting data into labratory.samples table...");
+        int max = 3;
+
+        String[] workbookIds = new String[3];
+        String[] sampleIds = new String[3];
+        String[] parentSampleIds = new String[3];
+        Map<String, String> sampleIdToWorkbookId = new HashMap<String, String>();
+        for (int i = 0; i < max; i++)
+        {
+            String workbookName = "Workbook" + i;
+            String id = createWorkbook(workbookName, "Description");
+            workbookIds[i] = id;
+            parentSampleIds[i] = i > 0 ? sampleIds[i-1] : null;
+            sampleIds[i] = insertLabSample(id, String.valueOf(i), parentSampleIds[i]);
+            sampleIdToWorkbookId.put(sampleIds[i], workbookIds[i]);
+        }
+
+        log("** Checking containers on lookup URLs...");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=samples&query.sort=RowId");
+        waitForPageToLoad();
+        DataRegionTable dr = new DataRegionTable("query", this);
+
+        for (int i = 0; i < max; i++)
+        {
+            String workbookContainer = EscapeUtil.encode(getProjectName()) + "/workbook-" + workbookIds[i];
+
+            // update link
+            String href = dr.getUpdateHref(i);
+            log("  [edit] column href = " + href);
+            Assert.assertTrue("Expected [edit] link to go to " + workbookContainer + " container, got href=" + href,
+                    href.contains("/query/" + workbookContainer + "/manageRecord.view?"));
+
+            // details link
+            href = dr.getDetailsHref(i);
+            log("  [details] column href = " + href);
+            Assert.assertTrue("Expected [details] link to go to " + workbookContainer + " container, got href=" + href,
+                    href.contains("/query/" + workbookContainer + "/recordDetails.view?"));
+
+            // sample ID link
+            href = dr.getHref(i, "Sample Id");
+            log("  Sample Id column href = " + href);
+            String expectedHref = "/query/" + workbookContainer + "/recordDetails.view?schemaName=laboratory&query.queryName=Samples&keyField=rowid&key=" + sampleIds[i];
+            Assert.assertTrue("Expected Sample Id column URL to go to " + expectedHref + ", got href=" + href,
+                    href.contains(expectedHref));
+
+            // parent sample ID link (table has a container so URL should go to lookup's container)
+            if (parentSampleIds[i] != null)
+            {
+                String parentSampleWorkbookId = sampleIdToWorkbookId.get(parentSampleIds[i]);
+                String parentSampleContainer = EscapeUtil.encode(getProjectName()) + "/workbook-" + parentSampleWorkbookId;
+                expectedHref = "/query/" + parentSampleContainer + "/recordDetails.view?schemaName=laboratory&query.queryName=Samples&keyField=rowid&key=" + parentSampleIds[i];
+
+                href = dr.getHref(i, "Parent Sample");
+                log("  Parent Sample column href = " + href);
+                Assert.assertTrue("Expected parent sample column URL to go to " + expectedHref + ", got href=" + href,
+                        href.contains(expectedHref));
+            }
+
+            // sample source lookup (table has no container so URL should go to current container)
+            href = dr.getHref(i, "Sample Source");
+            log("  Sample Source column href = " + href);
+            Assert.assertTrue("Expected sample source column URL to go to " + getProjectName() + " container, got href=" + href,
+                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_source"));
+
+            // sample type lookup (table has no container so URL should go to current container)
+            href = dr.getHref(i, "Sample Type");
+            log("  Sample Type column href = " + href);
+            Assert.assertTrue("Expected sample type column URL to go to " + getProjectName() + " container, got href=" + href,
+                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type"));
+
+            // container column
+            href = dr.getHref(i, "Folder");
+            log("  Folder column href = " + href);
+            Assert.assertTrue("Expected container column to go to " + workbookContainer + " container, got href=" + href,
+                    href.contains("/project/" + workbookContainer + "/begin.view?"));
+
+            log("");
+        }
+
+        log("** Checked containers on lookup URLs.");
+    }
+
+    private String insertLabSample(String workbookId, String suffix, String parentSampleId)
+    {
+        try
+        {
+            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+            InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "samples");
+            Map<String,Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("samplename", "Sample" + suffix);
+            rowMap.put("freezer", "Freezer" + suffix);
+            rowMap.put("sampletype", "DNA");
+            rowMap.put("samplesource", "PBMC");
+            if (parentSampleId != null)
+                rowMap.put("parentsample", parentSampleId);
+
+            insertCmd.addRow(rowMap);
+            SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/workbook-" + workbookId);
+            Map<String, Object> row = response.getRows().get(0);
+            Long rowId = (Long)row.get("RowId");
+            return rowId.toString();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // TODO: Use LabModuleHelper.createWorkbook() after merging to trunk
+    public String createWorkbook(String workbookTitle, String workbookDescription)
+    {
+        goToProjectHome();
+        clickButton("Create New Workbook", 0);
+        waitForElement(Ext4Helper.ext4Window("Create Workbook"));
+        setText("title", workbookTitle);
+        setText("description", workbookDescription);
+        clickButton("Submit");
+        waitForPageToLoad();
+
+        try
+        {
+            String path = getURL().toURI().getPath();
+            path = path.replaceAll(".*/workbook-", "");
+            path = path.replaceAll("/begin.view", "");
+            return path;
+        }
+        catch (URISyntaxException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 }

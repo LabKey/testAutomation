@@ -23,6 +23,8 @@ import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Collections;
+import java.util.Set;
 
 /*
 * User: adam
@@ -155,11 +157,11 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected)
     {
 
-        exportStudy(useXmlFormat, zipFile, exportProtected, false);
+        exportStudy(useXmlFormat, zipFile, exportProtected, false, Collections.<String>emptySet());
     }
 
 
-    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected, boolean useAlternateIDs)
+    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected, boolean useAlternateIDs, Set<String> uncheckObjects)
     {
         clickLinkWithText(getStudyLabel());
         clickTab("Manage");
@@ -168,6 +170,8 @@ public abstract class StudyBaseTest extends SimpleApiTest
         assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
         // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
 
+        for (String uncheckObject : uncheckObjects)
+            uncheckCheckbox("types", uncheckObject);
         checkRadioButton("format", useXmlFormat ? "new" : "old");
         checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
         if(!exportProtected)

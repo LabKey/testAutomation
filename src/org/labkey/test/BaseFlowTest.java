@@ -208,7 +208,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             table.checkAllOnPage();
             selenium.chooseOkOnNextConfirmation();
             clickButton("Delete", 0);
-            Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+            Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row");
             waitForPageToLoad();
             Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
