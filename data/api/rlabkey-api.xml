@@ -214,7 +214,7 @@
                 DisplayName Text Field Integer Field Double Field
                 Inserted with plus (+) sign <NA> NA NA
                 DateTime Field Boolean Field Long Text Field Attachment Required Text
-                <NA> NA <NA> <NA> Required
+                <NA> FALSE <NA> <NA> Required
                 Required Integer Category Lookup
                 0 <NA>
             ]]>            
