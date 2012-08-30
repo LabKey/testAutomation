@@ -56,7 +56,7 @@ public class BasicTest extends BaseSeleniumWebTest
     {
         log("Test browser version");
         String source = getHtmlSource();
-        Assert.assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 14.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
+        Assert.assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 15.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
 
         // Disable scheduled system maintenance
 //        setSystemMaintenance(false);
