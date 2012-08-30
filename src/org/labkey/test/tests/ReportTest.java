@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
@@ -29,7 +30,9 @@ import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: klum
@@ -1475,28 +1478,41 @@ public class ReportTest extends StudyBaseTest
         CustomizeViewsHelper.addCustomizeViewFilter(this, "MouseId", "Mouse Id", "Equals One Of", "999320533;999320541;999320529;999320518");
         CustomizeViewsHelper.saveCustomView(this, QUERY_REPORT_VIEW_NAME_2);
 
-        // TODO: Uncomment below when Issue 15908 is resolved.
-//        goToManageViews();
-//
-//        createReport(QUERY_VIEW);
-//
-//        setFormElement("viewName", QUERY_REPORT_NAME_2);
-//        setFormElement("description", QUERY_REPORT_DESCRIPTION_2);
-//        Ext4Helper.selectComboBoxItem(this, "Schema", QUERY_REPORT_SCHEMA_NAME_2);
-//        waitForTextToDisappear("loading...");
-//        Ext4Helper.selectComboBoxItem(this, "Query", QUERY_REPORT_QUERY_NAME_2);
-//        waitForTextToDisappear("loading...");
-//        Ext4Helper.selectComboBoxItem(this, "View", QUERY_REPORT_VIEW_NAME_2);
-//
-//        clickNavButton("Save");
-//        waitForText("Manage Views");
-//        waitForText(QUERY_REPORT_NAME_2);
-//
-//        clickReportGridLink(QUERY_REPORT_NAME_2, "view");
-//        assertTextPresent(QUERY_REPORT_NAME_2);
-//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[0], 3);
-//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[1], 1);
-//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[2], 3);
-//        assertTextPresent(PTIDS_FOR_CUSTOM_VIEW[3], 3);
+        goToManageViews();
+
+        createReport(QUERY_VIEW);
+
+        setFormElement("viewName", QUERY_REPORT_NAME_2);
+        setFormElement("description", QUERY_REPORT_DESCRIPTION_2);
+        Ext4Helper.selectComboBoxItem(this, "Schema", QUERY_REPORT_SCHEMA_NAME_2);
+        waitForTextToDisappear("loading...");
+        Ext4Helper.selectComboBoxItem(this, "Query", QUERY_REPORT_QUERY_NAME_2);
+        waitForTextToDisappear("loading...");
+        Ext4Helper.selectComboBoxItem(this, "View", QUERY_REPORT_VIEW_NAME_2);
+
+        clickNavButton("Save");
+        waitForText("Manage Views");
+        waitForText(QUERY_REPORT_NAME_2);
+
+        clickReportGridLink(QUERY_REPORT_NAME_2, "view");
+        assertTextPresent(QUERY_REPORT_NAME_2);
+
+        DataRegionTable table = new DataRegionTable("query", this);
+
+        Map<String, Integer> counts = new HashMap<String, Integer>();
+        for (String value : table.getColumnDataAsText("MouseId"))
+        {
+            if (!counts.containsKey(value))
+                counts.put(value, 1);
+            else
+            {
+                int count = counts.get(value);
+                counts.put(value, count + 1);
+            }
+        }
+        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[0]) == 3);
+        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[1]) == 1);
+        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[2]) == 3);
+        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[3]) == 3);
     }
 }
