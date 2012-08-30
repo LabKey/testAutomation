@@ -15,6 +15,7 @@ data/api/getDataVisitTest.html -text
 data/api/gridTest.js -text
 data/api/groupSecurityTest.html -text
 data/api/http-api.xml -text
+data/api/jsReportTest.html -text
 data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
 data/api/security-api.xml -text
@@ -56,6 +57,7 @@ modules/simpletest/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Repo
 modules/simpletest/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Report.report.xml -text
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/reports/schemas/lists/People/Uncool[!!-~]Query.report.xml -text
+modules/simpletest/reports/schemas/schemaFolderReport.r -text
 modules/simpletest/schemas/dbscripts/postgresql/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-1.00.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-11.30-12.10.sql -text
@@ -81,6 +83,7 @@ modules/simpletest/views/parameterizedQWP.html -text
 modules/simpletest/views/vehicle.html -text
 modules/simpletest/views/webpart.html -text
 modules/simpletest/web/simpletest/testfile.js -text
+modules/simpletest/web/simpletest/testfile2.js -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/test/BaseFlowTest.java -text

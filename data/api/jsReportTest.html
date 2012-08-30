@@ -1,0 +1,38 @@
+<div id="rreporttest"></div>
+<div id="jsreporttest"></div>
+<script type="text/javascript">
+
+    (function(){
+
+        // Create a R-based module report.
+        var rPartConfig = {
+            reportId : 'module:simpletest/schemaFolderReport.r',
+            title : 'Schema Folder Report'
+        };
+
+        var rPart = new LABKEY.WebPart({
+            frame : 'none',
+            partConfig : rPartConfig,
+            partName : 'Report',
+            renderTo : 'rreporttest',
+            success : function() {
+
+                // Create a JS-based module report.
+                var jsPartConfig = {
+                    title : 'JS Module Report',
+                    reportId : 'module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js'
+                };
+
+                var jsPart = new LABKEY.WebPart({
+                    partConfig : jsPartConfig,
+                    partName : 'Report',
+                    renderTo : 'jsreporttest'
+                });
+                jsPart.render();
+
+            }
+        });
+        rPart.render();
+
+    })();
+</script>

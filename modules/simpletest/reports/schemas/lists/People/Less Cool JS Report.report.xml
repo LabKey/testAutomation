@@ -8,6 +8,7 @@
         <JavaScript>
             <dependencies>
                 <dependency path="Ext4"/>
+                <dependency path="simpletest/testfile2.js"/>
             </dependencies>
         </JavaScript>
     </reportType>

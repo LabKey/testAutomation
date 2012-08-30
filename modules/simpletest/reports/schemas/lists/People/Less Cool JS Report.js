@@ -8,7 +8,7 @@ console.log('Preparing to be cool...');
 function render(queryConfig, div) {
     Ext4.onReady(function() {
         console.log('ready...');
-        div.innerHTML = 'Less cool than expected.';
+        testfile2(div, 'Less cool than expected.');
     });
-    console.log('render called.');
+    console.log('render called!');
 }

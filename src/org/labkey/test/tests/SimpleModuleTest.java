@@ -516,10 +516,28 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(LIST_NAME);
         clickMenuButton("Views", "Want To Be Cool");
-        waitForText("Less cool than expected.", WAIT_FOR_JAVASCRIPT);
+        waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
+
+        clickLinkWithText(getProjectName());
+        addWebPart("Report");
+        setFormElement("title", "Report Tester Part");
+        selectOptionByValue("reportId", "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
+        clickButton("Submit");
+        waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
+
+        String WikiName = "JS Report Wiki";
+        addWebPart("Wiki");
+        createNewWikiPage("HTML");
+        setFormElement("name", WikiName);
+        setFormElement("title", WikiName);
+        setWikiBody("placeholder text");
+        saveWikiPage();
+        setSourceFromFile("jsReportTest.html", WikiName);
+        waitForText("Console output", WAIT_FOR_JAVASCRIPT);
+        waitForText("Less cool than expected. Loaded dependent scripts.", 2, WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("JS Module Report");
 
         log("Testing module-based reports...");
-        clickLinkWithText(getProjectName());
         clickLinkWithText(LIST_NAME);
         clickMenuButton("Views", "Super Cool R Report");
         waitForText("Console output", WAIT_FOR_JAVASCRIPT);
