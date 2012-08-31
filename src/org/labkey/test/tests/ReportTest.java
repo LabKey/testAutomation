@@ -1467,7 +1467,7 @@ public class ReportTest extends StudyBaseTest
 
         clickReportGridLink(QUERY_REPORT_NAME, "view");
         assertTextPresent(QUERY_REPORT_NAME);
-        assertTextPresent("1 - 138 of 138");
+        waitForText("1 - 100 of 138");
         goBack();
 
         clickLinkWithText(getProjectName());
@@ -1494,10 +1494,15 @@ public class ReportTest extends StudyBaseTest
         waitForText("Manage Views");
         waitForText(QUERY_REPORT_NAME_2);
 
-        clickReportGridLink(QUERY_REPORT_NAME_2, "view");
-        assertTextPresent(QUERY_REPORT_NAME_2);
+        String datasetName = "AE-1:(VTN) AE Log";
 
-        DataRegionTable table = new DataRegionTable("query", this);
+        clickTab("Clinical and Assay Data");
+        waitForText(datasetName);
+        clickLinkWithText(datasetName);
+
+        clickMenuButton("Views", QUERY_REPORT_NAME_2);
+
+        DataRegionTable table = new DataRegionTable("Dataset", this);
 
         Map<String, Integer> counts = new HashMap<String, Integer>();
         for (String value : table.getColumnDataAsText("MouseId"))
