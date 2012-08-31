@@ -42,12 +42,10 @@ import java.util.Random;
  */
 public class LabModulesTest extends BaseSeleniumWebTest
 {
-    private String pipelineLoc =  getLabKeyRoot() + "/sampledata/sequence";
-    private LabModuleHelper _helper = new LabModuleHelper(this);
+    protected LabModuleHelper _helper = new LabModuleHelper(this);
     private int _oligosTotal = 0;
     private int _samplesTotal = 0;
     private int _peptideTotal = 0;
-    private final Random _random = new Random();
 
     @Override
     protected String getProjectName()
@@ -393,7 +391,7 @@ public class LabModulesTest extends BaseSeleniumWebTest
         waitForPageToLoad();
         waitForElement(Locator.xpath("//input[contains(@class, 'x4-form-text')]"));
         setText("samplename", "Sample" + suffix);
-        setText("freezer", "freezer_" + _random.nextInt(1000));
+        setText("freezer", "freezer_" + _helper.getRandomInt());
 
         Ext4Helper.selectComboBoxItem(this, "Sample Type", "DNA");
         Ext4Helper.selectComboBoxItem(this, "Sample Source", "Blood");

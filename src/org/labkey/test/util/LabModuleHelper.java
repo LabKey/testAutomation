@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 import java.net.URISyntaxException;
+import java.util.Random;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,6 +31,7 @@ import java.net.URISyntaxException;
 public class LabModuleHelper
 {
     private BaseSeleniumWebTest _test;
+    private final Random _random = new Random();
 
     public LabModuleHelper(BaseSeleniumWebTest test)
     {
@@ -112,5 +114,15 @@ public class LabModuleHelper
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public void clickSpanContaining(String text)
+    {
+        _test.click(Locator.xpath("//span[contains(text(), '" + text + "')]"));
+    }
+
+    public int getRandomInt()
+    {
+        return _random.nextInt(1000);
     }
 }

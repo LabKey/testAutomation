@@ -1989,12 +1989,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public File saveTsv(File dir, String baseName)
     {
+        return saveFile(dir, baseName + ".tsv");
+    }
+
+    public File saveFile(File dir, String fileName)
+    {
+        return saveFile(dir, fileName, selenium.getBodyText());
+    }
+
+    public File saveFile(File dir, String fileName, String contents)
+    {
         FileWriter writer = null;
         try
         {
-            File tsvFile = new File(dir, baseName + ".tsv");
+            File tsvFile = new File(dir, fileName);
             writer = new FileWriter(tsvFile);
-            writer.write(selenium.getBodyText());
+            writer.write(contents);
             return tsvFile;
         }
         catch (IOException e)

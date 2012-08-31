@@ -137,6 +137,7 @@ public enum TestSet
         TimeChartTest.class,
         EHRStudyTest.class,
         EHRApiTest.class,
+        ComplianceTrainingTest.class,
         GpatAssayTest.class,
         FolderTest.class,
         StudyDemoModeTest.class,
@@ -158,6 +159,7 @@ public enum TestSet
         SampleMindedImportTest.class,
         PivotQueryTest.class,
         LabModulesTest.class
+        //SequenceTest.class
     }),
 
     MiniTest(new Class[]
