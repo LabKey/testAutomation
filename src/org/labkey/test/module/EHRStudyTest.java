@@ -217,10 +217,15 @@ public class EHRStudyTest extends SimpleApiTest
         clickNavButton("Populate All", 0);
         waitForText("Populate Complete", 120000);
 
-        //these tables do not have a container field, so are deleted when the test project is deleted
+        //these tables do not have a container field, so are not deleted when the test project is deleted
         clickNavButton("Delete Data From SNOMED Subsets", 0);
         waitForText("Delete Complete", 120000);
         clickNavButton("Populate SNOMED Subsets Table", 0);
+        waitForText("Populate Complete", 120000);
+
+        clickNavButton("Delete Data From SNOMED", 0);
+        waitForText("Delete Complete", 120000);
+        clickNavButton("Populate SNOMED Table", 0);
         waitForText("Populate Complete", 120000);
 
         goToModule("Study");
@@ -613,6 +618,8 @@ public class EHRStudyTest extends SimpleApiTest
         log("Add blank weight entries");
         clickButton("Add Record", 0);
         waitForElement(Locator.xpath("//input[@name='Id' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
+        // Form input doesn't seem to be enabled yet, so wait
+        try { Thread.sleep(500); } catch (InterruptedException e) {}
         ExtHelper.setExtFormElementByLabel(this, "Id:", "noSuchAnimal");
         waitForText("Id not found", WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByLabel(this, "Id:", DEAD_ANIMAL_ID);
