@@ -884,7 +884,7 @@ public class EHRStudyTest extends SimpleApiTest
         clickLinkWithText(FOLDER_NAME);
         waitAndClick(Locator.linkWithText("Browse All Datasets"));
         waitForPageToLoad();
-        waitAndClick(Locator.xpath("//a[contains(@href, 'queryName=Weight') and text() = 'Browse All']"));
+        waitAndClick(LabModuleHelper.getNavPanelItem("Weight:", "Browse All"));
         waitForPageToLoad();
 
         setFilter("query", "date", "Equals", DATE_FORMAT.format(new Date()));
