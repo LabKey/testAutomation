@@ -499,14 +499,23 @@ public class LuminexTest extends AbstractQCAssayTest
 
         waitForText("3.45399");
         
-        checkEC50data();
-        checkCurveFitFailureFlag();
+        checkEC50dataAndFailureFlag();
     }
 
-    private void checkEC50data()
+    private void checkEC50dataAndFailureFlag()
     {
         // expect to already be viewing CurveFit query
         assertTextPresent(TEST_ASSAY_LUM + " CurveFit");
+
+        // quick check to see if we are using 32-bit or 64-bit R
+        log("Checking R 32-bit vs 64-bit");
+        pushLocation();
+        clickMenuButton("Views", "Create", "R View");
+        boolean is64bit = RReportHelper.executeScript(this, "print(.Machine$sizeof.pointer)", "[1] 8", true);
+        RReportHelper.saveReport(this, "dummy");
+        popLocation();
+        waitForText(TEST_ASSAY_LUM + " CurveFit");
+
         DataRegionTable table = new DataRegionTable("query", this);
         List<String> analyte = table.getColumnDataAsText("Analyte");
         List<String> formula = table.getColumnDataAsText("Curve Type");
@@ -543,32 +552,32 @@ public class LuminexTest extends AbstractQCAssayTest
                     Assert.assertTrue( "AUC was unpopulated for row " + i, auc.get(i).length()>0);
             }
         }
-        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected 11 of 19).", 11, rum5ec50count);
+        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected " + (is64bit ? 10 : 11) + " of 19).", is64bit ? 10 : 11, rum5ec50count);
 
         // check that the 5PL parameters are within the expected ranges (note: exact values can change based on R 32-bit vs R 64-bit)
-        Double[] FiveParameterEC50mins = {32211.66, 44975.52, 110.72, 32.29, 32.46, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
-        Double[] FiveParameterEC50maxs = {32211.67, 45012.09, 112.85, 32.48, 35.80, 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
+        Double[] FiveParameter32bitEC50mins = {32211.66, 44975.52, 110.72, 32.29, 32.46, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
+        Double[] FiveParameter64bitEC50mins = {32211.66, 44975.52, 110.72, 32.29, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
+        Double[] FiveParameter32bitEC50maxs = {32211.67, 45012.09, 112.85, 32.48, 35.80, 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
+        Double[] FiveParameter64bitEC50maxs = {32211.67, 45012.09, 112.85, 32.48, 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
         table.setFilter("CurveType", "Equals", "Five Parameter");
         table.setFilter("EC50", "Is Not Blank", "");
         ec50 = table.getColumnDataAsText("EC50");
-        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected 11)", 11, ec50.size());
+        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected " + (is64bit ? FiveParameter64bitEC50maxs.length : FiveParameter32bitEC50maxs.length) + ")",
+                (is64bit ? FiveParameter64bitEC50maxs.length : FiveParameter32bitEC50maxs.length), ec50.size());
         for (int i = 0; i < ec50.size(); i++)
         {
             Double val = Double.parseDouble(ec50.get(i));
-            Double min = FiveParameterEC50mins[i];
-            Double max = FiveParameterEC50maxs[i];
+            Double min = is64bit ? FiveParameter64bitEC50mins[i] : FiveParameter32bitEC50mins[i];
+            Double max = is64bit ? FiveParameter64bitEC50maxs[i] : FiveParameter32bitEC50maxs[i];
             Assert.assertTrue("Unexpected 5PL EC50 value for " + table.getDataAsText(i, "Analyte"), min <= val && val <= max);
         }
         table.clearFilter("EC50");
         table.clearFilter("CurveType");
-    }
 
-    private void checkCurveFitFailureFlag()
-    {
         // expect to already be viewing CurveFit query
         assertTextPresent(TEST_ASSAY_LUM + " CurveFit");
 
-        DataRegionTable table = new DataRegionTable("query", this);
+        table = new DataRegionTable("query", this);
         table.setFilter("FailureFlag", "Equals", "true");
 
         // expect one 4PL curve fit failure (for Standard1 - ENV6 (97))
@@ -578,9 +587,9 @@ public class LuminexTest extends AbstractQCAssayTest
         Assert.assertTrue("Unexpected analyte for Four Parameter curve fit failure", values.size() == 1 && values.get(0).equals("ENV6 (97)"));
         table.clearFilter("CurveType");
 
-        // expect ten 5PL curve fit failures
+        // expect ten (32-bit) or 11 (64-bit) 5PL curve fit failures
         table.setFilter("CurveType", "Equals", "Five Parameter");
-        Assert.assertEquals("Expected ten Five Parameter curve fit failure flags", 10, table.getDataRowCount());
+        Assert.assertEquals("Unexpected number of Five Parameter curve fit failure flags", is64bit ? 11 : 10, table.getDataRowCount());
         table.clearFilter("CurveType");
 
         table.clearFilter("FailureFlag");
