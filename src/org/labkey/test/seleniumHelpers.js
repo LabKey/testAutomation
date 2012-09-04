@@ -85,6 +85,12 @@ selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, ke
         var grid = ext.getCmp(el.id);
         if (grid)
         {
+            if (idx == -2)
+            {
+                grid.getSelectionModel().selectAll(false);
+                return;
+            }
+
             if (idx == -1)
                 idx = grid.getStore().find(columnName, columnVal);
 

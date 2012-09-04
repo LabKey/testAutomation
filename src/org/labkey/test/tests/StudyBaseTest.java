@@ -156,12 +156,11 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected)
     {
-
-        exportStudy(useXmlFormat, zipFile, exportProtected, false, Collections.<String>emptySet());
+        exportStudy(useXmlFormat, zipFile, exportProtected, false, false, Collections.<String>emptySet());
     }
 
-
-    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected, boolean useAlternateIDs, Set<String> uncheckObjects)
+    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected,
+                               boolean useAlternateIDs, boolean useAlternateDates, Set<String> uncheckObjects)
     {
         clickLinkWithText(getStudyLabel());
         clickTab("Manage");
@@ -178,6 +177,8 @@ public abstract class StudyBaseTest extends SimpleApiTest
             checkCheckbox("removeProtected");
         if(useAlternateIDs)
             checkCheckbox("alternateIds");
+        if(useAlternateDates)
+            checkCheckbox("shiftDates");
         clickNavButton("Export");
     }
 

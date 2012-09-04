@@ -18,6 +18,8 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExtHelper;
+
 import java.io.File;
 
 /**
@@ -303,6 +305,7 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 3, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 4, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 5, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
+
         // The enrolledCohortTest assumes the following state:
         // Negative cohort {Infected4}
         // Positive cohort {Infected1, Infected2, Infected3}
@@ -323,6 +326,11 @@ public class CohortTest extends BaseSeleniumWebTest
         log("Check that cohorts are enrolled by default.");
         verifyCohortStatus(table, "positive", true);
         verifyCohortStatus(table, "negative", true);
+
+        // issue 15948: verify that a new cohort has the enrolled bit set
+        log("Verify a new cohort has enrolled checked.");
+        verifyNewCohort();
+        table = getCohortDataRegionTable(PROJECT_NAME);
 
         // verify we can roundtrip enrolled status
         // unenroll the "postiive" cohort and check
@@ -345,6 +353,10 @@ public class CohortTest extends BaseSeleniumWebTest
         // rule #1:  no unenrolled cohorts exist so do not expect the enrolled text.
         verifyParticipantList(PTIDS_ALL, false);
 
+        // All cohorts are enrolled... should not see "Enrolled" filter item
+        verifyDatasetEnrolledCohortFilter("Test Results", false, 16, 0);
+        verifySpecimenEnrolledCohortFilter("By Individual Vial", false, 20, 0);
+
         // unenroll all cohorts
         table = getCohortDataRegionTable(PROJECT_NAME);
         changeCohortStatus(table, "positive", false);
@@ -365,6 +377,10 @@ public class CohortTest extends BaseSeleniumWebTest
 
         // rule #2: "not in any cohort" is enrolled so show text
         verifyCohortSelection(COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+
+        // All cohorts are unenrolled... should not see "Enrolled" filter item
+        verifyDatasetEnrolledCohortFilter("Test Results", false, 16, 0);
+        verifySpecimenEnrolledCohortFilter("By Individual Vial", false, 20, 0);
 
         // test both enrolled and unenrolled cohorts
         table = getCohortDataRegionTable(PROJECT_NAME);
@@ -387,6 +403,110 @@ public class CohortTest extends BaseSeleniumWebTest
 
         // rule #2, only showing enrolled cohorts
         verifyCohortSelection(COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+
+        verifyDatasetEnrolledCohortFilter("Test Results", true, 16, 12);
+        verifySpecimenEnrolledCohortFilter("By Individual Vial", true, 20, 16);
+
+        // Verify "Enrolled" filtering with advanced cohorts
+        log("Check enrolled filtering with advanced cohorts");
+        clickTab("Manage");
+        clickLinkWithText("Manage Cohorts");
+        clickRadioButtonById("advancedCohorts");
+        selenium.getConfirmation();
+        waitForPageToLoad();
+
+        verifyDatasetEnrolledCohortFilterAdvanced("Test Results", 16, 0, 12, 6);
+        verifySpecimenEnrolledCohortFilterAdvanced("By Individual Vial", 20, 4, 16, 10);
+    }
+
+    private void verifyDatasetEnrolledCohortFilter(String datasetName, boolean enrolledMenu, int allRowCount, int enrolledRowCount)
+    {
+        DataRegionTable table = verifyUnfilteredDataset(datasetName, allRowCount);
+
+        if (enrolledMenu)
+        {
+            clickMenuButton("Participant Groups", "Enrolled");
+            assertTextPresent("Current cohort is enrolled or unassigned");
+            assertEquals(enrolledRowCount, table.getDataRowCount());
+        }
+        else
+        {
+            assertFalse("Enrolled menu should not be present", ExtHelper.isExtMenuPresent(this, "Participant Groups", "Enrolled"));
+        }
+    }
+
+    private void verifyDatasetEnrolledCohortFilterAdvanced(String datasetName, int allRowCount, int initialRowCount, int currentRowCount, int dataCollectionRowCount)
+    {
+        DataRegionTable table = verifyUnfilteredDataset(datasetName, allRowCount);
+
+        clickMenuButton("Participant Groups", "Enrolled", "Initial cohort");
+        assertTextPresent("Initial cohort is enrolled or unassigned");
+        assertEquals(initialRowCount, table.getDataRowCount());
+
+        clickMenuButton("Participant Groups", "Enrolled", "Current cohort");
+        assertTextPresent("Current cohort is enrolled or unassigned");
+        assertEquals(currentRowCount, table.getDataRowCount());
+
+        clickMenuButton("Participant Groups", "Enrolled", "Cohort as of data collection");
+        assertTextPresent("Cohort as of data collection is enrolled or unassigned");
+        assertEquals(dataCollectionRowCount, table.getDataRowCount());
+    }
+
+    private DataRegionTable verifyUnfilteredDataset(String datasetName, int allRowCount)
+    {
+        clickTab("Overview");
+        clickLinkWithText("2 datasets");
+        clickLinkWithText(datasetName);
+
+        assertTextNotPresent("Current cohort is enrolled or unassigned");
+
+        DataRegionTable table = new DataRegionTable("Dataset", this);
+        assertEquals(allRowCount, table.getDataRowCount());
+
+        return table;
+    }
+
+    private void verifySpecimenEnrolledCohortFilter(String specimenLink, boolean enrolledMenu, int allRowCount, int enrolledRowCount)
+    {
+        verifyUnfilteredSpecimens(specimenLink, allRowCount);
+
+        if (enrolledMenu)
+        {
+            clickMenuButton("Participant Groups", "Enrolled");
+            assertTextPresent("Count: " + enrolledRowCount);
+        }
+        else
+        {
+            assertFalse("Enrolled menu should not be present", ExtHelper.isExtMenuPresent(this, "Participant Groups", "Enrolled"));
+        }
+    }
+
+    private void verifySpecimenEnrolledCohortFilterAdvanced(String specimenLink, int allRowCount, int initialRowCount, int currentRowCount, int dataCollectionRowCount)
+    {
+        verifyUnfilteredSpecimens(specimenLink, allRowCount);
+
+        clickMenuButton("Participant Groups", "Enrolled", "Initial cohort");
+        assertTextPresent("Count: " + initialRowCount);
+
+        clickMenuButton("Participant Groups", "Enrolled", "Current cohort");
+        assertTextPresent("Count: " + currentRowCount);
+
+        clickMenuButton("Participant Groups", "Enrolled", "Cohort as of data collection");
+        assertTextPresent("Count: " + dataCollectionRowCount);
+    }
+
+    private void verifyUnfilteredSpecimens(String specimenLink, int allRowCount)
+    {
+        clickTab("Specimen Data");
+        clickLinkWithText(specimenLink);
+
+        assertTextPresent("Count: " + allRowCount);
+    }
+
+    private void verifyNewCohort()
+    {
+        clickButton("Insert New");
+        assertChecked(Locator.checkboxByName("quf_enrolled"));
     }
 
     private void verifyCohortSelection(String previousCohort, String nextCohort, String[] expectedParticipants, boolean expectEnrolledText, String waitText)
@@ -416,7 +536,7 @@ public class CohortTest extends BaseSeleniumWebTest
     private void refreshParticipantList()
     {
         clickTab("Participants");
-        waitForText("Filter"); // Wait for participant list to appear.
+        waitForTextToDisappear("Loading..."); // Wait for status to appear.
     }
 
     private void verifyParticipantList(String[] ptids, boolean expectEnrolledText)

@@ -2115,6 +2115,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue(condition);
     }
 
+    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
+    public void assertFalse(String message, boolean condition)
+    {
+        Assert.assertFalse(message, condition);
+    }
+
     public void assertConfirmation(String msg)
     {
         Assert.assertEquals(msg, selenium.getConfirmation());
@@ -4459,6 +4465,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         setFormElement(Locator.raw(element), file.getAbsolutePath());
     }
 
+    public void setFormElement(Locator loc, File file)
+    {
+        assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
+        setFormElement(loc, file.getAbsolutePath());
+    }
+
     public void setFormElement(Locator element, String text)
     {
         setFormElement(element.toString(), text);
@@ -5697,7 +5709,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickLinkWithText(projectName);
         clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
-        return new DataRegionTable("Cohort", this);
+        return new DataRegionTable("Cohort", this, false);
     }
 
     /**
@@ -5737,7 +5749,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         int row = getCohortRow(cohortTable, cohort);
         // if the row does not exist then most likely the cohort passed in is incorrect
-        cohortTable.clickLink(row, 1);
+        cohortTable.clickLink(row, 0);
 
         if (!enroll)
         {

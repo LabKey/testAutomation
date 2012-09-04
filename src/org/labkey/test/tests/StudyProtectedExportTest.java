@@ -31,7 +31,7 @@ import java.util.Map;
 public class StudyProtectedExportTest extends StudyExportTest
 {
     int pipelineJobCount = 1;
-    private String idPreface = "PREFACE";
+    private String idPreface = "P!@#$%^&*(";
     private int idLength = 7;
 
     @Override
@@ -43,7 +43,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         setParticipantIdPreface(idPreface, idLength);
         
         setUpTrickyExport();
-        exportStudy(true, true, false, true, Collections.singleton("Specimens"));
+        exportStudy(true, true, false, true, true, Collections.singleton("Specimens"));
 
         deleteStudy(getStudyLabel());
         importAlteredStudy();
@@ -52,6 +52,12 @@ public class StudyProtectedExportTest extends StudyExportTest
         Map<String, String> alteredFirstMouseStats = getFirstMouseStats();
         assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
         assertEquals(idPreface.length() + idLength,  alteredFirstMouseStats.get("Mouse Id").length());
+        DataRegionTable drt = new DataRegionTable( "Dataset", this);
+        /* DOB doesn't change because it's a text field, not a true date.
+           since it's the most unique thing on the page, we can use it to see a specific user and verify that
+           the date fields did change
+         */
+        assertNotSame("2005-01-01", drt.getDataAsText(drt.getRow("1.Date of Birth", "1965-03-06"), "Contact Date"));
         verifyStatsDoNotMatch(originalFirstMouseStats, alteredFirstMouseStats);
         verifyParticipantGroups(originalFirstMouseStats.get("Mouse Id"), alteredFirstMouseStats.get("Mouse Id"));
 
@@ -63,7 +69,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
     }
 
-    private void setParticipantIdPreface(String idPreface, int idLength)
+    protected void setParticipantIdPreface(String idPreface, int idLength)
     {
         clickTab("Manage");
         clickLinkContainingText("Manage Alternate");
@@ -74,9 +80,6 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         waitForText("Changing Alternate IDs is complete");
         clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-
-        //set preface
-        //set digits
     }
 
     private void verifyParticipantGroups(String originalID, String newID)
@@ -192,7 +195,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         checkCheckbox("protected");
     }
 
-    String[] defaultStatsToCollect = {"Mouse Id", "1.Date of Birth"};
+    String[] defaultStatsToCollect = {"Mouse Id", "Contact Date"};
     //ID, DOB
     public Map<String, String> getFirstMouseStats()
     {

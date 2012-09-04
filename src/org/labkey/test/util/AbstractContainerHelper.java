@@ -51,4 +51,10 @@ public abstract class AbstractContainerHelper extends AbstractHelper
     {
         return _createdProjects;
     }
+
+    // Projects might be created by other means
+    public void addCreatedProject(String projectName)
+    {
+        _createdProjects.add(projectName);
+    }
 }

@@ -71,7 +71,22 @@ public class CustomizeViewsHelper
      */
     public static void saveCustomView(BaseSeleniumWebTest test, String name)
     {
+        saveCustomView(test, name, false);
+    }
+
+    /**
+     * Save a custom view
+     * @param test test
+     * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
+     * @param shared if false the report will not be shared, otherwise will mark the view as shared.
+     */
+    public static void saveCustomView(BaseSeleniumWebTest test, String name, boolean shared)
+    {
         test.clickNavButton("Save", 0);
+        
+        if(shared)
+            test.checkCheckbox("saveCustomView_shared");
+
         if (name != null)
         {
             if ("".equals(name))
@@ -575,10 +590,24 @@ public class CustomizeViewsHelper
      *      or at least first element on page)
      * post-conditions:  grid has R view of name name
      * @param test
-     * @param view   string to enter in view box (null for default)
+     * @param view   string to enter in view box (null for default) - Unimplemented
      * @param name name to give new R view
      */
     public static void createRView(BaseSeleniumWebTest test, String view, String name)
+    {
+        createRView(test, view, name, false);
+    }
+
+    /**
+     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
+     *      or at least first element on page)
+     * post-conditions:  grid has R view of name name
+     * @param test
+     * @param view   string to enter in view box (null for default) - Unimplemented
+     * @param name name to give new R view
+     * @param shareView should this view be available to all users
+     */
+    public static void createRView(BaseSeleniumWebTest test, String view, String name, boolean shareView)
     {
         test.waitForText(("Views"));
         test.clickMenuButtonAndContinue("Views", "Create", "R View");
@@ -586,6 +615,11 @@ public class CustomizeViewsHelper
 
         if(view!=null)
             Assert.fail("Unimplemented");
+
+        if (shareView)
+        {
+            test.checkCheckbox("shareReport");
+        }
 
         test.clickButton("Save", 0);
 

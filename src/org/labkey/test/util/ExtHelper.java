@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import com.thoughtworks.selenium.Selenium;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -58,6 +57,27 @@ public class ExtHelper
             test.clickAndWait(itemLocator);
         else
             test.click(itemLocator);
+    }
+
+    // Tests for the presence of the last specified submenu. Main menu item plus intervening submenus must exist.
+    public static boolean isExtMenuPresent(BaseSeleniumWebTest test, String menuLabel, String ... subMenuLabels)
+    {
+        Locator menu = Locator.extButton(menuLabel);
+        if (!test.isElementPresent(menu))
+            menu = Locator.navButton(menuLabel);
+        if (!test.isElementPresent(menu))
+            Assert.fail("No Ext or LabKey menu for label '" + menuLabel + "' found");
+        test.click(menu);
+
+        for (int i = 0; i < subMenuLabels.length - 1; i++)
+        {
+            Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
+            test.waitForElement(parentLocator, 1000);
+            test.mouseOver(parentLocator);
+        }
+
+        Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
+        return test.isElementPresent(itemLocator);
     }
 
     public static void clickExtDropDownMenu(BaseSeleniumWebTest test, String menuId, String value)

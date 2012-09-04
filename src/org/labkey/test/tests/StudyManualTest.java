@@ -118,6 +118,8 @@ public class StudyManualTest extends StudyTest
             clickNavButton("Delete log");
         selectImportDataAction("Import Datasets");
         clickNavButton("Start Import");
+        waitForPipelineJobsToComplete(1, "study import", false);
+
     }
 
 

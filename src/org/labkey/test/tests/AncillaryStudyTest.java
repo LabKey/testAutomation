@@ -52,7 +52,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return "server/modules/...";
+        return "server/modules/study";
     }
 
     @Override

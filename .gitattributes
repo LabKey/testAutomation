@@ -237,6 +237,7 @@ src/org/labkey/test/tests/StudyExportTest.java -text
 src/org/labkey/test/tests/StudyExtraTest.java -text
 src/org/labkey/test/tests/StudyManualTest.java -text
 src/org/labkey/test/tests/StudyProtectedExportTest.java -text
+src/org/labkey/test/tests/StudyPublishTest.java -text
 src/org/labkey/test/tests/StudyRedesignTest.java -text
 src/org/labkey/test/tests/StudyReloadTest.java -text
 src/org/labkey/test/tests/StudySecurityTest.java -text

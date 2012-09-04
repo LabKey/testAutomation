@@ -154,6 +154,20 @@ public class SearchHelper
         }
     }
 
+    public static void searchForSubjects(BaseSeleniumWebTest test, String searchTerm)
+    {
+        test.log("Searching for subject: '" + searchTerm + "'.");
+        if (!test.isElementPresent(Locator.id("query")) )
+            test.goToModule("Search");
+        if (test.getAttribute(Locator.id("adv-search-btn"), "src").contains("plus"))
+            test.click(Locator.id("adv-search-btn"));
+
+        test.checkCheckbox("category", 2);
+
+        test.setFormElement(Locator.id("query"), searchTerm);
+        test.clickNavButton("Search");
+    }
+
     public static void deleteIndex ( BaseSeleniumWebTest test )
     {
         test.ensureAdminMode();
