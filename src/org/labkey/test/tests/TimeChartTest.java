@@ -704,6 +704,7 @@ public class TimeChartTest extends StudyBaseTest
         clickNavButton("Select", 0);
         enterMeasuresPanel();
         addMeasure();
+        waitForElement(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Lymphs')]]"));
         clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Lymphs')]]"), "1,1");
         clickNavButton("Select", 0);
         waitForText("Lymphs (cells/mm3) from Lab Results");
