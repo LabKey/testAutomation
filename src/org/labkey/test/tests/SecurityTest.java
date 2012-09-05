@@ -306,7 +306,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         goToHome();
         ensureSignedOut();
 
-        clickLinkContainingText("Sign In");
+        clickLinkWithText("Sign In");
         clickLinkContainingText("Forgot your password?");
         setText("email", username);
         clickButtonContainingText("Submit", 0);
