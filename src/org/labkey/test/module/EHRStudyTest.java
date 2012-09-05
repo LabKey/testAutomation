@@ -942,7 +942,7 @@ public class EHRStudyTest extends SimpleApiTest
 
         // Wait for page to fully render.
         waitForText("Treatments", WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.name("Id"), WAIT_FOR_PAGE*2);
+        waitForElement(Locator.name("Id"), WAIT_FOR_PAGE);
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID + " (" + DUMMY_PROTOCOL + ")\u00A0");
