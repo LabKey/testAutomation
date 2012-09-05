@@ -1080,8 +1080,8 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
         pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
 
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):Vial Count", "measuresGridPanel", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):Available Count", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):VialCount", "measuresGridPanel", true);
+        ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):AvailableCount", "measuresGridPanel", true);
 
         clickNavButton("Select", 0);
 
@@ -1149,6 +1149,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT5_NAME);
         clickNavButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
     }
 
     private static final String DISCUSSION_BODY_1 = "Starting a discussion";
