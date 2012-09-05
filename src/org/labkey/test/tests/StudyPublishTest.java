@@ -327,7 +327,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             goToModule("List");
             assertTextPresent(lists);
-            assertEquals("Unexpected number of lists", lists.length, getXpathCount(Locator.xpath("id('lists')//tr")) - 1);
+            assertEquals("Unexpected number of lists", lists.length, getXpathCount(Locator.xpath("id('lists')//tr")));
             for (String list : lists)
             {
                 pushLocation();
