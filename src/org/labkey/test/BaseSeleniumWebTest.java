@@ -154,12 +154,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     }
 
-    public static int getSeleniumServerPort() {
+    public static int getSeleniumServerPort()
+    {
         String portString = System.getProperty("selenium.server.port", "" + DEFAULT_SELENIUM_PORT);
         return Integer.parseInt(portString);
     }
 
-    public static String getSeleniumServer() {
+    public static String getSeleniumServer()
+    {
         return System.getProperty("selenium.server", DEFAULT_SELENIUM_SERVER);
     }
 
