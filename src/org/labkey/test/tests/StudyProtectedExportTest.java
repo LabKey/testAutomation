@@ -89,6 +89,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         assertTextPresent(newID);
 
         assertTextPresent("All", "Group 1", "Group 2", "Not in any cohort");
+        clickAt(Locator.tagContainingText("div", "All"), "2,2");
         clickAt(Locator.tagContainingText("div", "Not in any cohort"), "2,2");
         waitForText("No matching Mice");
 
