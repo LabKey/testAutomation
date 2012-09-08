@@ -16,7 +16,11 @@
 
 package org.labkey.test;
 
-import org.labkey.test.module.*;
+import org.labkey.test.module.CDSPopulation;
+import org.labkey.test.module.CDSTest;
+import org.labkey.test.module.EHRApiTest;
+import org.labkey.test.module.EHRStudyTest;
+import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.QuantitationTest;
@@ -159,7 +163,7 @@ public enum TestSet
         SampleMindedImportTest.class,
         PivotQueryTest.class,
         LabModulesTest.class,
-        //SequenceTest.class
+        SequenceTest.class,
         StudyPublishTest.class
     }),
 

@@ -31,7 +31,7 @@ import java.util.Random;
 public class LabModuleHelper
 {
     private BaseSeleniumWebTest _test;
-    private final Random _random = new Random();
+    private final Random _random = new Random(System.currentTimeMillis());
 
     public LabModuleHelper(BaseSeleniumWebTest test)
     {
@@ -68,7 +68,7 @@ public class LabModuleHelper
     {
         Locator l = getNavPanelItem(label, itemText);
         _test.waitForElement(l);
-        _test.click(l);
+        _test.waitAndClick(l);
     }
 
     public static Locator getNavPanelRow(String label)
@@ -123,6 +123,18 @@ public class LabModuleHelper
 
     public int getRandomInt()
     {
-        return _random.nextInt(1000);
+        return _random.nextInt(10000);
+    }
+
+    public String getNameForQueryWebpart(String title)
+    {
+        Locator l = Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='" + title + "' or starts-with(text(), '" + title + ":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]");
+        _test.waitForElement(l, _test.WAIT_FOR_JAVASCRIPT * 3);
+        return _test.getAttribute(l, "id").substring(11);
+    }
+
+    public DataRegionTable getDrForQueryWebpart(String title)
+    {
+        return new DataRegionTable(getNameForQueryWebpart(title), _test);
     }
 }

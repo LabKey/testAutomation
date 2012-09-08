@@ -52,6 +52,10 @@ public class Ext4FieldRef extends Ext4CmpRef
         return eval(query);
     }
 
+    public String setChecked(Boolean checked)
+    {
+        return eval("this.setValue(" + checked + ")");
+    }
 
     public String getValue()
     {
