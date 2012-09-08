@@ -228,7 +228,7 @@ public class Locator
 
     public static XPathLocator ext4Radio(String label)
     {
-        return xpath("//input[@type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");
+        return xpath("//input["+ NOT_HIDDEN +" and @type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");
     }
 
     public static XPathLocator navButtonDisabled(String text)

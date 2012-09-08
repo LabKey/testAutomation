@@ -6,6 +6,7 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.StudyHelper;
 
@@ -101,6 +102,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
     @Override
     protected void doCreateSteps()
     {
+        // fail fast if R is not configured
+        RReportHelper.ensureRConfig(this);
+
         importStudy();
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(++_pipelineJobs, "study import", false);
@@ -427,7 +431,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Wizard page 6 : Views
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
         waitForElement(Locator.css(".studyWizardViewList"));
-        //assertTextNotPresent(R_VIEW_UNSHARED); //TODO: 15963: Hidden views visible in publish study wizard
+        assertTextNotPresent(R_VIEW_UNSHARED);
         for (String view : views)
         {
             getWrapper().getEval("selenium.selectExtGridItem('name', '" + view + "', -1, 'studyWizardViewList', true)");

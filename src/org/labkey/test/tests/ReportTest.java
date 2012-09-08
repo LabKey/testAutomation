@@ -145,6 +145,7 @@ public class ReportTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         doParticipantGroupCategoriesTest();
+        doScatterPlotTests();
         doQueryReportTests();
         doBoxPlotTests();
         doCreateCharts();
@@ -1352,6 +1353,174 @@ public class ReportTest extends StudyBaseTest
         waitForPageToLoad();
     }
 
+    private List<String> _scatterPlots = new ArrayList<String>();
+    private List<String> _scatterPlotsDescriptions = new ArrayList<String>();
+    private void doScatterPlotTests()
+    {
+        doManageViewsScatterPlotTest();
+        doDataRegionScatterPlotTest();
+        doQuickChartScatterPlotTest();
+
+        log("Verify saved scatter plots");
+        clickTab("Clinical and Assay Data");
+        for(int i = 0; i < _scatterPlots.size(); i++)
+        {
+            Locator loc = Locator.linkWithText(_scatterPlots.get(i));
+            waitForElement(loc);
+            mouseOver(loc);
+            waitForText(_scatterPlotsDescriptions.get(i));
+            mouseOut(loc);
+            waitForTextToDisappear(_scatterPlotsDescriptions.get(i));
+        }
+    }
+
+    private static final String SCATTER_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200";
+    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AnullMice BMice CTestYAxis";
+    private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
+    private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
+    private void doManageViewsScatterPlotTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Manage Views");
+        clickMenuButton("Create", "Scatter Plot");
+
+        ExtHelper.waitForExtDialog(this, "Select Chart Query");
+        //TODO: weird timing with these combo scatteres.
+        //Try once bug fixed: 15520: Scatter Plot - Allows selection of invalid schema/Query combination
+//        ExtHelper.selectExt4ComboScatterItem(this, "Schema", "assay");
+//        ExtHelper.selectExt4ComboScatterItem(this, "Query", "AssayList");
+//        ExtHelper.selectExt4ComboScatterItem(this, "Schema", "study");
+        ExtHelper.selectExt4ComboBoxItem(this, "Query", "APX-1: Abbreviated Physical Exam");
+
+        // Todo: put better wait here
+        sleep(5000);
+        ExtHelper.clickExtButton(this, "Select Chart Query", "Save", 0);
+        ExtHelper.waitForExtDialog(this, "Y Axis");
+        mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Y Axis") + "//div[text()='1. Weight']"));
+        ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
+        ExtHelper.waitForExtDialog(this, "X Axis");
+        mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "X Axis") + "//div[text()='4. Pulse']"));
+        ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+
+        //Verify scatter plot
+        waitForText(SCATTER_PLOT_MV_1);
+
+        log("Set Plot Title");
+        click(Locator.css("svg text:contains('APX-1: Abbreviated Physical Exam')"));
+        ExtHelper.waitForExtDialog(this, "Main Title");
+        setFormElement(Locator.name("chart-title-textfield"), "Test Title");
+        waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
+        ExtHelper.clickExtButton(this, "Main Title", "OK", 0);
+        waitForExtMaskToDisappear();
+        waitForText("Test Title");
+
+        log("Set Y Axis");
+        click(Locator.css("svg text:contains('1. Weight')"));
+        ExtHelper.waitForExtDialog(this, "Y Axis");
+        click(Locator.ext4Radio("log"));
+        mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Y Axis") + "//div[text()='2. Body Temp']"));
+        setFormElement(Locator.name("label"), "TestYAxis");
+        ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
+        waitForExtMaskToDisappear();
+        waitForText("TestYAxis");
+
+        log("Set X Axis");
+        click(Locator.css("svg text:contains('4. Pulse')"));
+        ExtHelper.waitForExtDialog(this, "X Axis");
+        click(Locator.ext4Radio("log"));
+        mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "X Axis") + "//div[text()='Cat Mice Let']"));
+        ExtHelper.setExtFormElementByLabel(this, "X Axis", "Label:", "TestXAxis");
+        ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
+        waitForExtMaskToDisappear();
+        waitForText("TestXAxis");
+
+        waitForText(SCATTER_PLOT_MV_2);
+
+        clickButton("Save", 0);
+        ExtHelper.waitForExtDialog(this, "Save Chart");
+        //Verify name requirement
+        ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
+        ExtHelper.waitForExtDialog(this, "Error");
+        ExtHelper.clickExtButton(this, "Error", "OK", 0);
+        waitForExtMaskToDisappear();
+
+        //Test cancel button
+        ExtHelper.setExtFormElementByLabel(this, "Report Name", "TestReportName");
+        ExtHelper.setExtFormElementByLabel(this, "Report Description", "TestReportDescription");
+        ExtHelper.clickExtButton(this, "Save Chart", "Cancel", 0);
+        assertTextNotPresent("TestReportName");
+
+        saveScatterPlot(SCATTER_PLOT_NAME_MV, SCATTER_PLOT_DESC_MV);
+    }
+
+    private static final String SCATTER_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse606570758085901. Weight50556065707580859095100105110";
+    private static final String SCATTER_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200";
+    private static final String SCATTER_PLOT_NAME_DR = "DataRegionScatterPlot";
+    private static final String SCATTER_PLOT_DESC_DR = "This scatter plot was created through a data region's 'Views' menu";
+    /// Test Scatter Plot created from a filtered data region.
+    private void doDataRegionScatterPlotTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("APX-1: Abbreviated Physical Exam");
+        setFilter("Dataset", "APXpulse", "Is Less Than", "100");
+        clickMenuButton("Views", "Create", "Scatter Plot");
+
+        ExtHelper.waitForExtDialog(this, "Y Axis");
+        mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Y Axis") + "//div[text()='1. Weight']"));
+        ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
+        ExtHelper.waitForExtDialog(this, "X Axis");
+        mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "X Axis") + "//div[text()='4. Pulse']"));
+        ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
+        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+
+        //Verify scatter plot
+        waitForText(SCATTER_PLOT_DR_1);
+
+        //Change filter and check scatter plot again
+        clickButton("View Data", 0);
+        clearFilter("aqwp4", "APXpulse", 0);
+        waitForText("36.0"); // Body temp for filtered out row
+        clickButton("View Chart", 0);
+        waitForText(SCATTER_PLOT_DR_2);
+
+        log("Verify point stying");
+
+        clickButton("Options", 0);
+
+        saveScatterPlot(SCATTER_PLOT_NAME_DR, SCATTER_PLOT_DESC_DR);
+    }
+
+    private static final String SCATTER_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleInteger0.0200000.0400000.0600000.0800000.01000000.01200000.0Double10000000.020000000.030000000.040000000.050000000.060000000.070000000.080000000.090000000.0100000000.0110000000.0120000000.0";
+    private static final String SCATTER_PLOT_NAME_QC = "QuickChartScatterPlot";
+    private static final String SCATTER_PLOT_DESC_QC = "This scatter plot was created through the 'Quick Chart' column header menu option";
+    private void doQuickChartScatterPlotTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText("Types");
+
+        createQuickChart("Dataset", "dbl");
+
+        log("Set X Axis");
+        waitAndClick(Locator.css("svg text:contains('Cohort')"));
+        ExtHelper.waitForExtDialog(this, "X Axis");
+        mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "X Axis") + "//div[text()='Integer']"));
+        ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
+        waitForExtMaskToDisappear();
+
+        clickButton("Options", 0);
+        ExtHelper.waitForExtDialog(this, "Plot Options", WAIT_FOR_JAVASCRIPT);
+        ExtHelper.selectExt4ComboBoxItem(this, "Plot Type", "Scatter Plot");
+        ExtHelper.clickExtButton(this, "Plot Options", "OK", 0);
+
+        waitForText(SCATTER_PLOT_QC);
+
+        saveScatterPlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
+    }
+
     private void assertSVG(String expectedSvgText)
     {
         String actualSvgText = getText(Locator.css("svg"));
@@ -1359,6 +1528,20 @@ public class ReportTest extends StudyBaseTest
     }
 
     private void saveBoxPlot(String name, String description)
+    {
+        savePlot(name, description);
+        _boxPlots.add(name);
+        _boxPlotsDescriptions.add(description);
+    }
+
+    private void saveScatterPlot(String name, String description)
+    {
+        savePlot(name, description);
+        _scatterPlots.add(name);
+        _scatterPlotsDescriptions.add(description);
+    }
+
+    private void savePlot(String name, String description)
     {
         clickButton("Save", 0);
         ExtHelper.waitForExtDialog(this, "Save Chart");
@@ -1369,8 +1552,6 @@ public class ReportTest extends StudyBaseTest
         waitForText(name);
         waitForExtMaskToDisappear();
         sleep(1000); // Takes a moment for page to not be marked as dirty
-        _boxPlots.add(name);
-        _boxPlotsDescriptions.add(description);
     }
 
     private void doParticipantGroupCategoriesTest()

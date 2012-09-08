@@ -121,6 +121,7 @@ public class Crawler
             new ControllerActionId("study", "deleteDatasetReport"),
             new ControllerActionId("study", "deleteDataset"),
             new ControllerActionId("study", "importStudyFromPipeline"),
+            new ControllerActionId("study", "protocolDocumentDownload"),
             new ControllerActionId("study-reports", "deleteReports"),
             new ControllerActionId("study-reports", "deleteReport"),
             new ControllerActionId("study-reports", "deleteCustomQuery"),
