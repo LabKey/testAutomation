@@ -97,40 +97,54 @@ var testFunctions = [
 // Test QUERY.saveRows (transacted)
     function() //testResults[11]
     {
-        var peopleRowset = testResults[0].rows;
-        peopleRowset[0].Age = -1;
-        peopleRowset[1].Age = -1;
-        LABKEY.Query.saveRows({
-            commands:[
-                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[0]]},
-                {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[1]]},
-                {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[2]]},
-                {schemaName:schemaName, queryName:'noSuchQuery', command:'insert', rows:[peopleRowset[0]]}
-            ],
-            successCallback: successHandler,
-            errorCallback: failureHandler
-        });
+        try
+        {
+            var peopleRowset = testResults[0].rows;
+            peopleRowset[0].Age = -1;
+            peopleRowset[1].Age = -1;
+            LABKEY.Query.saveRows({
+                commands:[
+                    {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[0]]},
+                    {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[1]]},
+                    {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[2]]},
+                    {schemaName:schemaName, queryName:'noSuchQuery', command:'insert', rows:[peopleRowset[0]]}
+                ],
+                successCallback: successHandler,
+                errorCallback: failureHandler
+            });
+        }
+        catch (err)
+        {
+            failureHandler(err, null, null);
+        }
     },
 
 // Test QUERY.saveRows (not transacted)
     function() //testResults[12]
     {
-        var peopleRowset = testResults[0].rows;
-        peopleRowset[3].Age = 101;
-        peopleRowset[5].Age = 101;
-        peopleRowset[6].Age = -1;
-        LABKEY.Query.saveRows({
-            commands:[
-                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[3]]},
-                {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[5]]},
-                {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[6]]},
-                {schemaName:'noSuchSchema', queryName:queryName, command:'insert', rows:[peopleRowset[6]]},
-                {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[6]]}
-            ],
-            successCallback: successHandler,
-            errorCallback: failureHandler,
-            transacted: false
-        });
+        try
+        {
+            var peopleRowset = testResults[0].rows;
+            peopleRowset[3].Age = 101;
+            peopleRowset[5].Age = 101;
+            peopleRowset[6].Age = -1;
+            LABKEY.Query.saveRows({
+                commands:[
+                    {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[3]]},
+                    {schemaName:schemaName, queryName:queryName, command:'update', rows:[peopleRowset[5]]},
+                    {schemaName:schemaName, queryName:queryName, command:'delete', rows:[peopleRowset[6]]},
+                    {schemaName:'noSuchSchema', queryName:queryName, command:'insert', rows:[peopleRowset[6]]},
+                    {schemaName:schemaName, queryName:queryName, command:'insert', rows:[peopleRowset[6]]}
+                ],
+                successCallback: successHandler,
+                errorCallback: failureHandler,
+                transacted: false
+            });
+        }
+        catch (err)
+        {
+            failureHandler(err, null, null);
+        }
     },
 
 // Verify QUERY.saveRows operations
@@ -155,98 +169,98 @@ var testFunctions = [
     function()
     {
         var html = '';
-        if (testResults[0].rowCount == 7)
-            html += 'SUCCESS: Select 1 returned 7 rows<br>';
+        if (testResults[0].rowCount !== undefined && testResults[0].rowCount == 7)
+            html += '0)SUCCESS: Select 1 returned 7 rows<br>';
         else
-            html += 'FAILURE: Select 1 returned ' + testResults[0].rowCount + ' rows, expected 7.  Error value = ' + testResults[0].exception + '<br>';
+            html += '0)FAILURE: Select 1 returned ' + testResults[0].rowCount + ' rows, expected 7.  Error value = ' + testResults[0].exception + '<br>';
 
-        if (testResults[1].rowCount == 1)
-            html += 'SUCCESS: Select 2 returned 1 rows<br>';
+        if (testResults[1].rowCount !== undefined && testResults[1].rowCount == 1)
+            html += '1)SUCCESS: Select 2 returned 1 rows<br>';
         else
-            html += 'FAILURE: Select 2 returned ' + testResults[1].rowCount + ' rows, expected 1.  Error value = ' + testResults[1].exception + '<br>';
+            html += '1)FAILURE: Select 2 returned ' + testResults[1].rowCount + ' rows, expected 1.  Error value = ' + testResults[1].exception + '<br>';
 
-        if (testResults[2].exception)
-            html += 'SUCCESS: Bad update generated exception: ' + testResults[2].exception + '<br>';
+        if (testResults[2].exception !== undefined && testResults[2].exception)
+            html += '2)SUCCESS: Bad update generated exception: ' + testResults[2].exception + '<br>';
         else
-            html += 'FAILURE: Bad update did not generate expected exception.<br>';
+            html += '2)FAILURE: Bad update did not generate expected exception.<br>';
 
-        if (testResults[3].rowsAffected == 1)
-            html += 'SUCCESS: Update affected 1 rows<br>';
+        if (testResults[3].rowsAffected !== undefined && testResults[3].rowsAffected == 1)
+            html += '3)SUCCESS: Update affected 1 rows<br>';
         else
-            html += 'FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '<br>';
+            html += '3)FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '<br>';
 
-        if (testResults[4].rowsAffected == 1)
-            html += 'SUCCESS: Delete affected 1 rows<br>';
+        if (testResults[4].rowsAffected !== undefined && testResults[4].rowsAffected == 1)
+            html += '4)SUCCESS: Delete affected 1 rows<br>';
         else
-            html += 'FAILURE: Delete affected ' + testResults[4].rowCount + ' rows, expected 1.  Error value = ' + testResults[4].exception + '<br>';
+            html += '4)FAILURE: Delete affected ' + testResults[4].rowCount + ' rows, expected 1.  Error value = ' + testResults[4].exception + '<br>';
 
-        if (testResults[5].rowsAffected == 1)
-            html += 'SUCCESS: Insert created 1 rows<br>';
+        if (testResults[5].rowsAffected!== undefined && testResults[5].rowsAffected == 1)
+            html += '5)SUCCESS: Insert created 1 rows<br>';
         else
-            html += 'FAILURE: Insert created ' + testResults[5].rowCount + ' rows, expected 1.  Error value = ' + testResults[5].exception + '<br>';
+            html += '5)FAILURE: Insert created ' + testResults[5].rowCount + ' rows, expected 1.  Error value = ' + testResults[5].exception + '<br>';
 
-        if (testResults[6].exception)
-            html += 'SUCCESS: Bad insert generated exception: ' + testResults[6].exception + '<br>';
+        if (testResults[6].exception !== undefined && testResults[6].exception)
+            html += '6)SUCCESS: Bad insert generated exception: ' + testResults[6].exception + '<br>';
         else
-            html += 'FAILURE: Bad insert did not generate expected exception.<br>';
+            html += '6)FAILURE: Bad insert did not generate expected exception.<br>';
 
-        if (testResults[7].exception)
-            html += 'SUCCESS: Bad query generated exception: ' + testResults[7].exception + '<br>';
+        if (testResults[7].exception !== undefined && testResults[7].exception)
+            html += '7)SUCCESS: Bad query generated exception: ' + testResults[7].exception + '<br>';
         else
-            html += 'FAILURE: Bad query did not generate expected exception.<br>';
+            html += '7)FAILURE: Bad query did not generate expected exception.<br>';
 
-        if (testResults[8].rowCount == 7)
-            html += 'SUCCESS: executeSql returned 7 rows<br>';
+        if (testResults[8].rowCount !== undefined && testResults[8].rowCount == 7)
+            html += '8a)SUCCESS: executeSql returned 7 rows<br>';
         else
-            html += 'FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';
+            html += '8a)FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';
 
-        if (testResults[8].rows[1].age < testResults[8].rows[2].age)
-            html += 'SUCCESS: executeSql returned properly sorted<br>';
+        if (testResults[8].rows !== undefined && testResults[8].rows.length >= 3 && testResults[8].rows[1].age < testResults[8].rows[2].age)
+            html += '8b)SUCCESS: executeSql returned properly sorted<br>';
         else
-            html += 'FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '<br>';
+            html += '8b)FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '<br>';
 
         if (testResults[8].queryName && testResults[8].queryName.indexOf('lists-temp') > -1)
-            html += 'SUCCESS: executeSql returned a session-based query<br>';
+            html += '8c)SUCCESS: executeSql returned a session-based query<br>';
         else
-            html += 'FAILURE: executeSql returned \'' + testResults[8].queryName + '\'. Was expecting a session-based query to be returned.';
+            html += '8c)FAILURE: executeSql returned \'' + testResults[8].queryName + '\'. Was expecting a session-based query to be returned.';
 
-        if (testResults[9].rowCount == 7)
-            html += 'SUCCESS: cross-folder executeSql succeeded<br>';
+        if (testResults[9].rowCount !== undefined && testResults[9].rowCount == 7)
+            html += '9)SUCCESS: cross-folder executeSql succeeded<br>';
         else
-            html += 'FAILURE: executeSql returned ' + testResults[9].rowCount + ' rows, expected 7.  Error value = ' + testResults[9].exception + '<br>';
+            html += '9)FAILURE: executeSql returned ' + testResults[9].rowCount + ' rows, expected 7.  Error value = ' + testResults[9].exception + '<br>';
 
-        if (testResults[10].rowCount == 7)
-            html += 'SUCCESS: cross-project executeSql succeeded<br>';
+        if (testResults[10].rowCount !== undefined && testResults[10].rowCount == 7)
+            html += '10)SUCCESS: cross-project executeSql succeeded<br>';
         else
-            html += 'FAILURE: executeSql returned ' + testResults[10].rowCount + ' rows, expected 7.  Error value = ' + testResults[10].exception + '<br>';
+            html += '10)FAILURE: executeSql returned ' + testResults[10].rowCount + ' rows, expected 7.  Error value = ' + testResults[10].exception + '<br>';
 
         if (testResults[11].exception)
-            html += 'SUCCESS: Bad saveRows exception: ' + testResults[11].exception + '<br>';
+            html += '11)SUCCESS: Bad saveRows exception: ' + testResults[11].exception + '<br>';
         else
-            html += 'FAILURE: Bad saveRows did not generate an exception.<br>';
+            html += '11)FAILURE: Bad saveRows did not generate an exception.<br>';
 
         if (testResults[12].exception)
-            html += 'SUCCESS: Bad saveRows exception: ' + testResults[12].exception + '<br>';
+            html += '12)SUCCESS: Bad saveRows exception: ' + testResults[12].exception + '<br>';
         else
-            html += 'FAILURE: Bad saveRows did not generate an exception.<br>';
+            html += '12)FAILURE: Bad saveRows did not generate an exception.<br>';
 
-        if (testResults[13].rowCount == 3)
-            html += 'SUCCESS: Non-transacted bad saveRows modified rows.<br>';
+        if (testResults[13].rowCount !== undefined && testResults[13].rowCount == 3)
+            html += '13)SUCCESS: Non-transacted bad saveRows modified rows.<br>';
         else
-            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[13].rowCount + ' rows, expected 3.  Error value = ' + testResults[13].exception + '<br>';
+            html += '13)FAILURE: Non-transacted bad saveRows returned ' + testResults[13].rowCount + ' rows, expected 3.  Error value = ' + testResults[13].exception + '<br>';
 
-        if (testResults[14].rowCount == 0)
-            html += 'SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';
+        if (testResults[14].rowCount !== undefined && testResults[14].rowCount == 0)
+            html += '14)SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';
         else
-            html += 'FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';
+            html += '14)FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';
 
         if (testResults[15].exception)
-            if (testResults[15].exceptionClass == "org.labkey.api.query.QueryParseException")
-                html += 'SUCCESS: Bad query exception: ' + testResults[15].exceptionClass + '<br>';
+            if (testResults[11].exceptionClass !== undefined && testResults[15].exceptionClass == "org.labkey.api.query.QueryParseException")
+                html += '15)SUCCESS: Bad query exception: ' + testResults[15].exceptionClass + '<br>';
             else
-                html += 'FAILURE: Bad query generated wrong exception: ' + testResults[15].exceptionClass + '<br>';
+                html += '15)FAILURE: Bad query generated wrong exception: ' + testResults[15].exceptionClass + '<br>';
         else
-            html += 'FAILURE: Bad query did not generate an exception.<br>';
+            html += '15)FAILURE: Bad query did not generate an exception.<br>';
 
         document.getElementById('testDiv').innerHTML = html;
     }
