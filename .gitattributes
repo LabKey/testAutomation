@@ -264,6 +264,7 @@ src/org/labkey/test/tests/study/StudyScheduleTester.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
 src/org/labkey/test/util/AbstractContainerHelper.java -text
 src/org/labkey/test/util/AbstractHelper.java -text
+src/org/labkey/test/util/AdvancedSqlTest.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/CustomizeViewsHelper.java -text

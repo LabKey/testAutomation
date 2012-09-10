@@ -23,6 +23,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.SimpleApiTest;
+import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EHRTestHelper;
 import org.labkey.test.util.ExtHelper;
@@ -44,7 +45,7 @@ import java.util.regex.Pattern;
  * Date: Mar 21, 2011
  * Time: 1:59:12 PM
  */
-public class EHRStudyTest extends SimpleApiTest
+public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 {
     // Project/folder names are hard-coded into some links in the module.
     private static final String PROJECT_NAME = "EHR_TestProject";

@@ -19,6 +19,7 @@ import junit.framework.Assert;
 import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
@@ -40,7 +41,7 @@ import java.util.Random;
  * Contains a series of tests designed to test the UI in the laboratory module.
  * Also contains considerable coverage of Ext4 components and the client API
  */
-public class LabModulesTest extends BaseSeleniumWebTest
+public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     private int _oligosTotal = 0;

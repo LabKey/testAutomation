@@ -32,6 +32,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
@@ -55,7 +56,7 @@ import java.util.UUID;
  * Date: 8/6/12
  * Time: 6:05 PM
  */
-public class EHRApiTest extends EHRStudyTest
+public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
 {
     private static final String PROJECT_NAME = "EHR_TestProject";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String FOLDER_NAME = "EHR";

@@ -10,6 +10,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
@@ -27,7 +28,7 @@ import java.util.Map;
  * Date: 8/24/12
  * Time: 7:02 AM
  */
-public class ComplianceTrainingTest extends BaseSeleniumWebTest
+public class ComplianceTrainingTest extends BaseSeleniumWebTest implements AdvancedSqlTest
 {
     private String listZIP =  getLabKeyRoot() + "/server/customModules/EHR_ComplianceDB/tools/SOP_Lists.zip";
 

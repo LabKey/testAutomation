@@ -32,6 +32,7 @@ import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
+import org.labkey.test.util.AdvancedSqlTest;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -425,7 +426,7 @@ public class Runner extends TestSuite
                         if(databaseType != null && !("postgres".equals(databaseType) || "pg".equals(databaseType)))
                         {
                             illegalTest = true;
-                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
                         }
                         break;
                     }
@@ -434,7 +435,16 @@ public class Runner extends TestSuite
                         if(databaseType != null && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType)))
                         {
                             illegalTest = true;
-                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType);
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                        }
+                        break;
+                    }
+                    if (i.getName().equals(AdvancedSqlTest.class.getCanonicalName()))
+                    {
+                        if(databaseType != null && "2005".equals(databaseVersion))
+                        {
+                            illegalTest = true;
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
                         }
                         break;
                     }
