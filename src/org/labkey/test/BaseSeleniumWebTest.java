@@ -31,6 +31,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.ComponentQuery;
@@ -1688,7 +1689,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         selectCmd.setColumns(Arrays.asList("*"));
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = getDefaultConnection();
         SelectRowsResponse selectResp = null;
 
         for(String query : new String[] {"ExperimentAuditEvent", "SampleSetAuditEvent", "ContainerAuditEvent"})
@@ -1749,6 +1750,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                Assert.fail("Unable to retrieve query: LabAuditEvents");
         }
         Assert.assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, selectResp.getRowCount().intValue());
+    }
+
+    protected Connection getDefaultConnection()
+    {
+        return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
     private void checkActionCoverage()
@@ -5339,22 +5345,41 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void createUser(String userName, String cloneUserName, boolean verifySuccess)
     {
-        goToHome();
-        ensureAdminMode();
-        goToSiteUsers();
-        clickNavButton("Add Users");
-
-        setFormElement("newUsers", userName);
-        uncheckCheckbox("sendMail");
-        if (cloneUserName != null)
+        if(cloneUserName == null)
         {
-            checkCheckbox("cloneUserCheck");
-            setFormElement("cloneUser", cloneUserName);
+            CreateUserCommand command = new CreateUserCommand(userName);
+            Connection connection = getDefaultConnection();
+            try
+            {
+                command.execute(connection, "");
+            }
+            catch (Exception e)
+            {
+                if(verifySuccess)
+                    Assert.fail("Error while creating user: " + e.getMessage());
+            }
         }
-        clickNavButton("Add Users");
+        else
+        {
+            goToHome();
+            ensureAdminMode();
+            goToSiteUsers();
+            clickNavButton("Add Users");
 
-        if (verifySuccess)
-            Assert.assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
+            setFormElement("newUsers", userName);
+            uncheckCheckbox("sendMail");
+            if (cloneUserName != null)
+            {
+                checkCheckbox("cloneUserCheck");
+                setFormElement("cloneUser", cloneUserName);
+            }
+            clickNavButton("Add Users");
+
+            if (verifySuccess)
+                Assert.assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
+
+        }
+
     }
 
     public void createUserAndNotify(String userName, String cloneUserName)
