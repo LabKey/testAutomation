@@ -181,7 +181,7 @@ public class StudyTest extends StudyBaseTest
         ExtHelper.setExtFormElementByLabel(this, "Report Description", reportDescription);
         clickButton("Save", 0);
         waitForText(reportName);
-        assertTextPresent(reportName, 2);
+        assertTextPresent(reportName, 4); // 2 for the report, 2 for FooterMenu notations
 
     }
 
