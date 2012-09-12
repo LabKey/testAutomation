@@ -269,6 +269,7 @@ if (browserVersion.isFirefox) {
                     msg.message.indexOf("ext-all-sandbox.js") == -1 && // Ignore error that's junking up the weekly
                     msg.message.indexOf("ext-all-sandbox-dev.js") == -1 && // Ignore error that's junking up the weekly
                     msg.message.indexOf("XULElement.selectedIndex") == -1 && // Ignore known Firefox Issue
+                    msg.message.indexOf("Failed to decode base64 string!") == -1 && // Firefox issue
                     msg.message.indexOf("xulrunner-1.9.0.14/components/FeedProcessor.js") == -1) // Firefox problem
                 {
                     LOG.error("JsErrorChecker: " + msg.message);
