@@ -540,7 +540,7 @@ public class SequenceTest extends LabModulesTest
         waitForElement(Ext4Helper.ext4Window("Choose Adapters"));
         waitForText("Choose Adapter Group");
         Ext4FieldRef.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
-        clickButton("Submit", 0);
+        waitAndClick(Locator.ext4Button("Submit"));
 
         waitForText(rocheAdapters[0][0]);
         waitForText(rocheAdapters[1][0]);
