@@ -122,8 +122,10 @@ public class DataViewsTester
         ExtHelper.waitForExtDialog(_test, "Delete Category");
         _test.clickNavButton("OK", 0);
         ExtHelper.waitForExtDialogToDisappear(_test, "Delete Category");
+        _test.waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.clickNavButton("New Category", 0);
-        _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[5]"), "testcategory"); // TODO: need a better xpath
+        _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"));
+        _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"), "testcategory");
         _test.clickNavButton("Done", 0);
         _test.clickNavButton("Save", 0);
         _test.waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
