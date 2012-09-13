@@ -190,6 +190,23 @@ public class Ext4Helper
         return Locator.xpath("//input[contains(@class, 'x4-form-field') and contains(@class, 'x4-form-invalid-field')]");
     }
 
+    public static void clickExt4MenuButton(BaseSeleniumWebTest test, boolean wait, Locator menu, String ... subMenuLabels)
+    {
+        test.click(menu);
+        for (int i = 0; i < subMenuLabels.length - 1; i++)
+        {
+            Locator parentLocator = ext4MenuItem(subMenuLabels[i]);
+            test.waitForElement(parentLocator, 1000);
+            test.mouseOver(parentLocator);
+        }
+        Locator itemLocator = ext4MenuItem(subMenuLabels[subMenuLabels.length - 1]);
+        test.waitForElement(itemLocator, 1000);
+        if (wait)
+            test.clickAndWait(itemLocator);
+        else
+            test.click(itemLocator);
+    }
+
     public static void clickExt4MenuItem(BaseSeleniumWebTest test, String text)
     {
         test.click(ext4MenuItem(text));
