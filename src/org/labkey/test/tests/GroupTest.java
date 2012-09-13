@@ -216,15 +216,14 @@ public class GroupTest extends BaseSeleniumWebTest
         stopImpersonatingGroup();
 
 
-        Locator unavailableEditorChoice = Locator.xpath("//li[contains(@class,'disabled')]//span[text()='Editor']");
+        Locator unavailableEditorChoice = Locator.xpath("//div[contains(@class, 'x4-menu-item-disabled')]//a//span[text()='Editor']");
         impersonateRole("Author");
-        clickUserMenuItem(false, "Impersonate", "Role", "Author");
         assertElementNotPresent(unavailableEditorChoice);
         verifyAuthorPermission(nameTitleBody);
         impersonateRole("Editor");
-        clickUserMenuItem(false, "Impersonate", "Role", "Author");
-        assertElementPresent(unavailableEditorChoice);
-        assertElementPresent(Locator.xpath("//li[contains(@class,'disabled')]//span[text()='Author']"));
+        clickUserMenuItem(false, true, "Impersonate", "Role", "Editor");
+        waitForElement(unavailableEditorChoice);
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-menu-item-disabled')]//a//span[text()='Author']"));
         verifyEditorPermission(nameTitleBody);
         stopImpersonatingRole();
 
