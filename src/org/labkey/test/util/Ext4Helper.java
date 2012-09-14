@@ -182,7 +182,7 @@ public class Ext4Helper
 
     private static Locator getExtMask()
     {
-        return Locator.xpath("//div[contains(@class, 'ext4-mask')]");
+        return Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-mask')]");
     }
 
     public static Locator invalidField()
