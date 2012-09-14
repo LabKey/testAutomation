@@ -198,7 +198,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         }
         Ext4Helper.clickExt4MenuItem(this, "DNA_Oligos");
         waitForPageToLoad();
-        waitForElement(Locator.xpath("//input[contains(@class, 'x4-form-text')]"));
+        waitForElement(Locator.name("name"));
 
         setText("name", "TestPrimer20");
         setText("sequence", "ATGATGATGGGGG");
