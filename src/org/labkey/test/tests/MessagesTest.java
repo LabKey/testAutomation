@@ -129,7 +129,7 @@ public class MessagesTest extends BaseSeleniumWebTest
             clickLinkWithText("remove", false);
             waitForText("This cannot be undone");
             clickButton("OK", 0);
-            waitForTextToDisappear("remove");
+            waitForTextToDisappear("common.properties");
             assertTextNotPresent("common.properties");
         }
         submit();
