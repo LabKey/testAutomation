@@ -22,7 +22,6 @@ import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 /**
  * User: Trey Chadick
@@ -38,6 +37,7 @@ public class SearchTest extends StudyTest
     private static final String FOLDER_C = "Folder Cherry"; // Folder rename name.
     private static final String GROUP_NAME = "Test Group";
     private static final String USER1 = "user1@search.test";
+    private static final String USER1_DISPLAY_NAME = "user1";
 
     private static final String WIKI_NAME = "Brie";
     private static final String WIKI_TITLE = "Roquefort";
@@ -298,7 +298,7 @@ public class SearchTest extends StudyTest
         selectOptionByText("area", "Area51");
         selectOptionByText("priority", "1");
         setFormElement("comment", ISSUE_BODY);
-        selectOptionByText("assignedTo", USER1);
+        selectOptionByText("assignedTo", USER1_DISPLAY_NAME);
         if (isFileUploadAvailable())
         {
             clickLinkWithText("Attach a file", false);
@@ -309,7 +309,7 @@ public class SearchTest extends StudyTest
 
         SearchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
         SearchHelper.enqueueSearchItem(ISSUE_BODY, Locator.linkContainingText(ISSUE_TITLE));
-        SearchHelper.enqueueSearchItem(USER1, Locator.linkContainingText(ISSUE_TITLE));
+        SearchHelper.enqueueSearchItem(USER1_DISPLAY_NAME, Locator.linkContainingText(ISSUE_TITLE));
         SearchHelper.enqueueSearchItem("Area51", Locator.linkContainingText(ISSUE_TITLE));
         SearchHelper.enqueueSearchItem("UFO", Locator.linkContainingText(ISSUE_TITLE));
         //SearchHelper.enqueueSearchItem("Override", Locator.linkWithText("\"common.properties\" attached to issue \"" + ISSUE_TITLE + "\"")); // some text from attached file
