@@ -173,18 +173,10 @@ public class LuminexTest extends AbstractQCAssayTest
         //add the Assay List web part so we can create a new luminex assay
         addWebPart("Assay List");
 
-        //create a new luminex assay
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
-
         if (_useXarImport)
         {
             // import the assay design from the XAR file
-            clickLinkWithText("upload the XAR file directly");
-            setFormElement("uploadFile", TEST_ASSAY_XAR_FILE);
-            click(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
-            waitForPageToLoad();
-            waitForPipelineJobsToComplete(1, "Uploaded file - " + TEST_ASSAY_XAR_NAME + ".xar", false);
+            uploadXarFileAsAssayDesign(TEST_ASSAY_XAR_FILE, 1, "foo");
             // since we want to test special characters in the assay name, copy the assay design to rename
             goToManageAssays();
             clickLinkWithText(TEST_ASSAY_XAR_NAME);
@@ -197,6 +189,10 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         else
         {
+            //create a new luminex assay
+            clickNavButton("Manage Assays");
+            clickNavButton("New Assay Design");
+
             checkRadioButton("providerName", "Luminex");
             clickNavButton("Next");
 
@@ -304,14 +300,15 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected void runUploadAndCopyTest()
     {
-        ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListColumnType.String, "Participant ID");
-        ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListColumnType.Double, "Visit id");
-        ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListColumnType.String, "Index", participantCol, visitCol);
-        ListHelper.uploadData(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, "Index\tParticipantID\tVisitID\n" +
-                "1\tListParticipant1\t1001.1\n" +
-                "2\tListParticipant2\t1001.2\n" +
-                "3\tListParticipant3\t1001.3\n" +
-                "4\tListParticipant4\t1001.4");
+        ListHelper.importListArchive(this, getProjectName(), new File(getSampledataPath() + "\\Luminex\\UploadAndCopy.lists.zip"));
+//        ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListColumnType.String, "Participant ID");
+//        ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListColumnType.Double, "Visit id");
+//        ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListColumnType.String, "Index", participantCol, visitCol);
+//        ListHelper.uploadData(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, "Index\tParticipantID\tVisitID\n" +
+//                "1\tListParticipant1\t1001.1\n" +
+//                "2\tListParticipant2\t1001.2\n" +
+//                "3\tListParticipant3\t1001.3\n" +
+//                "4\tListParticipant4\t1001.4");
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
 
         clickLinkWithText("Assay List");
@@ -1541,7 +1538,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //	- QC Flags added for EC50 and HMFI
         goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
-        String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
+        String newQcFlags = "EC50-4, HMFI, EC50-5, AUC";
         assertTextNotPresent(newQcFlags);
         applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
         //assert ec50 and HMFI red text present

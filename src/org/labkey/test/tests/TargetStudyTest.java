@@ -131,30 +131,37 @@ public class TargetStudyTest extends AbstractAssayTest
         setFormElement("Label", _study3Label);
         clickNavButton("Submit");
     }
+
+    public boolean isFileUploadTest()
+    {
+        return true;
+    }
     protected void setupAssay()
     {
-        log("** Define GPAT Assay");
+
+//        log("** Define GPAT Assay");
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         if (!isLinkPresentWithText("Assay List"))
             addWebPart("Assay List");
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
-        checkRadioButton("providerName", "General");
-        clickNavButton("Next");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
-        sleep(1000);
-
-        // Remove ParticipantVisitResolver and TargetStudy from the Batch domain
-        deleteField("Batch Fields", 0);
-        deleteField("Batch Fields", 0);
-
-        // Add TargetStudy to the end of the default list of Results domain
-        addField("Data Fields", 4, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
-
-        clickNavButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        uploadXarFileAsAssayDesign(getSampledataPath() + "\\TargetStudy\\Assay.xar", 1, "Assay.xar");
+//        clickNavButton("Manage Assays");
+//        clickNavButton("New Assay Design");
+//        checkRadioButton("providerName", "General");
+//        clickNavButton("Next");
+//        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+//
+//        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
+//        sleep(1000);
+//
+//        // Remove ParticipantVisitResolver and TargetStudy from the Batch domain
+//        deleteField("Batch Fields", 0);
+//        deleteField("Batch Fields", 0);
+//
+//        // Add TargetStudy to the end of the default list of Results domain
+//        addField("Data Fields", 4, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
+//
+//        clickNavButton("Save", 0);
+//        waitForText("Save successful.", 20000);
 
     }
 

@@ -18,6 +18,8 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
+import java.io.File;
+
 /**
  * Created by IntelliJ IDEA.
  * User: marki
@@ -42,6 +44,10 @@ public class MenuBarTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
+    public boolean isFileUploadTest()
+    {
+        return true;
+    }
     protected void doTestSteps()
     {
 
@@ -99,14 +105,14 @@ public class MenuBarTest extends BaseSeleniumWebTest
         mouseOver(Locator.menuBarItem("Assays"));
         waitForElement(Locator.navButton("Manage Assays"), 3000);
 
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
-        checkRadioButton("providerName", "General");
-        clickNavButton("Next");
-        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("AssayDesignerName"), "Test Assay");
-        clickNavButton("Save", 0);
-        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
+
+        uploadXarFileAsAssayDesign(getSampledataPath() + "\\menubar\\Test Assay.xar", 1, "Test Assay.xar");
+//        checkRadioButton("providerName", "General");
+//        clickNavButton("Next");
+//        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
+//        setFormElement(Locator.id("AssayDesignerName"), "Test Assay");
+//        clickNavButton("Save", 0);
+//        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
         clickLinkWithText(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");
@@ -114,8 +120,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         waitForText("Test Assay", WAIT_FOR_JAVASCRIPT);
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
-        clickNavButton("Create Study");
-        clickNavButton("Create Study");
+        createDefaultStudy();
 
         clickLinkWithText(PROJECT_NAME);
 

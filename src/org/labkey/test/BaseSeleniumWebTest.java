@@ -32,8 +32,11 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.security.CreateUserCommand;
+import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.test.util.APIContainerHelper;
+import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractContainerHelper;
+import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.ComponentQuery;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
@@ -42,6 +45,8 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -121,11 +126,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public final static int WAIT_FOR_PAGE = 60000;
     public int defaultWaitForPage = WAIT_FOR_PAGE;
     public final static int WAIT_FOR_JAVASCRIPT = 20000;
-    protected int longWaitForPage = defaultWaitForPage * 5;
+    public int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
     protected long _startTime;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
+    public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -261,6 +267,31 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             setFormElement("pipelineToolsDirectory", defaultToolsDirectory.toString());
             clickNavButton("Save");
         }
+    }
+
+    protected void uploadXarFileAsAssayDesign(String path, int pipelineCount, String name)
+    {
+        uploadXarFileAsAssayDesign(new File(path), pipelineCount, name);
+    }
+
+    /**
+     * Upload a xar file as an assay configuration
+     * Preconditions:  on a page with an assay web part
+     * @param file   file to upload
+     * @param pipelineCount  expected count of succesful pipeline jobs including thise one
+     * @param name  name of assay file (rest of path removed)
+     */
+    protected void uploadXarFileAsAssayDesign(File file, int pipelineCount, String name)
+    {
+        //create a new luminex assay
+        clickNavButton("Manage Assays");
+        clickNavButton("New Assay Design");
+
+        clickLinkWithText("upload the XAR file directly");
+        setFormElement(Locator.name("uploadFile"), file);
+        click(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
+        waitForPageToLoad();
+        waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + name, false);
     }
 
     public String getBrowserType()
@@ -913,6 +944,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickAdminMenuItem("Site", "Create Project");
     }
 
+
+    protected void createDefaultStudy()
+    {
+        clickNavButton("Create Study");
+        clickNavButton("Create Study");
+    }
+
+
     private void waitForStartup()
     {
         boolean hitFirstPage = false;
@@ -1161,6 +1200,37 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.close();
         selenium.selectWindow(null);
     }
+
+    //This is for the split test, I don't want to wait until that's complete to be able to check in other changes in this file
+//    public void waitForSystemMaintenanceCompletion()
+//    {
+//        beginAt("/admin/showPrimaryLog.view?");
+//        String log = selenium.getBodyText();
+//
+//        int startIndex =log.lastIndexOf("=== Starting SystemMaintenanceStartTest (1 of 1) ===");
+//        if(!( startIndex > log.lastIndexOf("=== Completed SystemMaintenanceStartTest  ===")))
+//        {
+//            fail("Last SystemMaintenanceStartTest has not finished");
+//        }
+//
+//
+//       for(String msg : new String[] {"System maintenance complete", "Search Service Maintenance complete",
+//               "Report Service Maintenance complete", "MS1 Data File Purge Task complete",
+//               "Database maintenance complete", "Purge unused participants complete", "External schema reload complete"})
+//       {
+//            if(!( startIndex < log.lastIndexOf(msg)))
+//            {
+//                fail("\"" + msg + "\" did not appear" );
+//            }
+//       }
+//        goBack();
+//    }
+//
+//    protected void fail(String msg)
+//    {
+//        goBack(); //don't want to fail on the log file, it will create huge artifacts
+//        Assert.fail(msg);
+//    }
 
     public void populateLastPageInfo()
     {
@@ -1752,7 +1822,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, selectResp.getRowCount().intValue());
     }
 
-    protected Connection getDefaultConnection()
+    public Connection getDefaultConnection()
     {
         return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
@@ -2528,44 +2598,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void deleteProject(String project, int wait)
     {
-        log("Deleting project " + project);
-        if(!isTextPresent(project))
-            goToHome();
-        clickLinkWithText(project);
-        //Delete even if terms of use is required
-        if (isElementPresent(Locator.name("approvedTermsOfUse")))
-        {
-            clickCheckbox("approvedTermsOfUse");
-            clickNavButton("Agree");
-        }
-        ensureAdminMode();
-        goToFolderManagement();
-        waitForExt4FolderTreeNode(project, 10000);
-        clickNavButton("Delete");
-        // in case there are sub-folders
-        if (isNavButtonPresent("Delete All Folders"))
-        {
-            clickNavButton("Delete All Folders");
-        }
-        long startTime = System.currentTimeMillis();
-        // confirm delete:
-        log("Starting delete of project '" + project + "'...");
-        clickNavButton("Delete", longWaitForPage);
-
-        if(isLinkPresentWithText(project))
-        {
-            log("Wait extra long for folder to finish deleting.");
-            while (isLinkPresentWithText(project) && System.currentTimeMillis() - startTime < wait)
-            {
-                sleep(5000);
-                refresh();
-            }
-        }
-        if (!isLinkPresentWithText(project)) log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
-        else Assert.fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
-
-        // verify that we're not on an error page with a check for a project link:
-        assertLinkNotPresentWithText(project);
+        _containerHelper.deleteProject(project, true, wait);
     }
 
     public void enableEmailRecorder()
@@ -5136,7 +5169,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void setUserPermissions(String userName, String permissionString)
     {
+        log(new Date().toString());
         _setPermissions(userName, permissionString, "pUser");
+
+        log(new Date().toString());
     }
 
     public void _setPermissions(String userOrGroupName, String permissionString, String className)
@@ -5357,37 +5393,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         if(cloneUserName == null)
         {
-            CreateUserCommand command = new CreateUserCommand(userName);
-            Connection connection = getDefaultConnection();
-            try
-            {
-                command.execute(connection, "");
-            }
-            catch (Exception e)
-            {
-                if(verifySuccess)
-                    Assert.fail("Error while creating user: " + e.getMessage());
-            }
+            _userHelper.createUser(userName, verifySuccess);
         }
         else
         {
-            goToHome();
-            ensureAdminMode();
-            goToSiteUsers();
-            clickNavButton("Add Users");
-
-            setFormElement("newUsers", userName);
-            uncheckCheckbox("sendMail");
-            if (cloneUserName != null)
-            {
-                checkCheckbox("cloneUserCheck");
-                setFormElement("cloneUser", cloneUserName);
-            }
-            clickNavButton("Add Users");
-
-            if (verifySuccess)
-                Assert.assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
-
+            Assert.fail("cloneUserName support has been removed"); //not in use, so was not implemented in new user
+            //helpers
         }
 
     }
@@ -5686,6 +5697,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                     " before calling this method.");
 
         convertWikiFormat(format);
+    }
+
+
+
+    //TODO
+    protected void importSpecimen(String file)
+    {
+        ExtHelper.selectFileBrowserItem(this, file);
+        selectImportDataActionNoWaitForGrid("Import Specimen Data");
+        clickNavButton("Start Import");
     }
 
     //must already be on wiki page
@@ -6590,7 +6611,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             log("Set cursor position for " + locator + " to " + position);
             super.setCursorPosition(locator, position);
         }
+
     }
+
 
     // This class makes it easier to start a specimen import early in a test and wait for completion later.
     public class SpecimenImporter
@@ -6810,6 +6833,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectImportDataActionNoWaitForGrid(actionName);
     }
 
+    //TODO
+    public void importSpecimenData(String file, int pipelineJobs)
+    {
+        selectPipelineFileAndImportAction(file, "Import Specimen Data");
+        clickNavButton("Start Import");
+        waitForPipelineJobsToFinish(pipelineJobs);
+    }
+
     public void selectPipelineFileAndImportAction(String file, String actionName)
     {
         ExtHelper.selectFileBrowserItem(this, file);
@@ -6923,6 +6954,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         return _containerHelper;
     }
+
+    public void setContainerHelper(AbstractContainerHelper containerHelper)
+    {
+        _containerHelper = containerHelper;
+    }
+
 
     //hopefully we'll come up with a better solution soon
     public void waitForSaveAssay()

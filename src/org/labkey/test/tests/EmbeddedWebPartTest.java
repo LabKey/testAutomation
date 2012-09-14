@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
+import org.labkey.test.util.UIContainerHelper;
 
 /**
  * User: elvan
@@ -37,6 +38,11 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    public EmbeddedWebPartTest()
+    {
+        setContainerHelper(new UIContainerHelper(this));
     }
 
     public void configure()

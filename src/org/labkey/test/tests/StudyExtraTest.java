@@ -302,6 +302,11 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath() + "'");
     } //setupPipeline
 
+
+    public boolean isFileUploadTest()
+    {
+        return true;
+    }
     /**
      * Defines an test assay at the project level for the security-related tests
      */
@@ -313,28 +318,30 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(projectName);
         addWebPart("Assay List");
 
+        uploadXarFileAsAssayDesign(getSampledataPath() + "\\studyExtra\\TestAssay1.xar", 1, "TestAssay1.xar");
+        goToProjectHome();
         //copied from old test
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
-        checkRadioButton("providerName", "General");
-        clickNavButton("Next");
-
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
-        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
-
-        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
-        {
-            selenium.click(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
-            ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-            ListHelper.setColumnLabel( this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-            ListHelper.setColumnType(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-        }
-
-        sleep(1000);
-        clickNavButton("Save", 0);
-        waitForText("Save successful.", 20000);
+//        clickNavButton("Manage Assays");
+//        clickNavButton("New Assay Design");
+//        checkRadioButton("providerName", "General");
+//        clickNavButton("Next");
+//
+//        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+//
+//        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
+//        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
+//
+//        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
+//        {
+//            selenium.click(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
+//            ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+//            ListHelper.setColumnLabel( this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+//            ListHelper.setColumnType(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+//        }
+//
+//        sleep(1000);
+//        clickNavButton("Save", 0);
+//        waitForText("Save successful.", 20000);
 
     } //defineAssay()
 

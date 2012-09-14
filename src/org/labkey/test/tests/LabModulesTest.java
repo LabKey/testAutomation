@@ -23,6 +23,7 @@ import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
+import org.labkey.test.util.UIContainerHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -52,6 +53,11 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
     protected String getProjectName()
     {
         return "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES; //INJECT_CHARS_1;
+    }
+
+    public LabModulesTest()
+    {
+        setContainerHelper(new UIContainerHelper(this));
     }
 
     @Override

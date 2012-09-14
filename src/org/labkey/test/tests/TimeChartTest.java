@@ -17,10 +17,13 @@ package org.labkey.test.tests;
 
 import junit.framework.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.util.APIContainerHelper;
+import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 import java.util.List;
@@ -191,6 +194,7 @@ public class TimeChartTest extends StudyBaseTest
         "IL-10 (23) - ObsConc"
     };
 
+
     private static final double[][] GETDATA_API_TEST_MEASURE_VALUES = {
         {543.0, 520.0, 420.0, 185.0, 261.0, 308.0, 177.0, 144.0, 167.0, 154.0},
         {14.5, 16.0, 12.2, 15.5, 13.9, 13.7, 12.9, 11.1, 13.2, 16.1},
@@ -225,6 +229,11 @@ public class TimeChartTest extends StudyBaseTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";
+    }
+
+    public TimeChartTest()
+    {
+        setContainerHelper(new UIContainerHelper(this));
     }
 
     @Override
@@ -1304,4 +1313,5 @@ public class TimeChartTest extends StudyBaseTest
     {
         Ext4Helper.selectRadioButton(this, "Number of Charts:", selection);
     }
+
 }

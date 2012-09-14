@@ -15,9 +15,14 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateContainerCommand;
+import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.test.BaseSeleniumWebTest;
+
+import java.io.IOException;
 
 /**
  * User: jeckels
@@ -57,5 +62,27 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
 
         _test.beginAt("/project" + path.replace("#", "%23") + "/" + folderName.replace("#", "%23") +  "/begin.view?");
+    }
+
+    @Override
+    //wait is irrelevant for the API version
+    public void deleteProject(String projectName, boolean failIfNotFound, int wait)
+    {
+        DeleteContainerCommand dcc = new DeleteContainerCommand();
+        try
+        {
+            dcc.execute(_test.getDefaultConnection(), "/" + projectName);
+        }
+        catch (CommandException e)
+        {
+            if(e.getMessage().contains("Not Found") && failIfNotFound)
+                Assert.fail("Project not found");
+            else
+                Assert.fail(e.getMessage());
+        }
+        catch (IOException e)
+        {
+            Assert.fail(e.getMessage());
+        }
     }
 }

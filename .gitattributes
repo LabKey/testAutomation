@@ -262,8 +262,10 @@ src/org/labkey/test/tests/XTandemTest.java -text
 src/org/labkey/test/tests/study/DataViewsTester.java -text
 src/org/labkey/test/tests/study/StudyScheduleTester.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
+src/org/labkey/test/util/APIUserHelper.java -text
 src/org/labkey/test/util/AbstractContainerHelper.java -text
 src/org/labkey/test/util/AbstractHelper.java -text
+src/org/labkey/test/util/AbstractUserHelper.java -text
 src/org/labkey/test/util/AdvancedSqlTest.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
@@ -297,6 +299,7 @@ src/org/labkey/test/util/StopSelenium.java -text
 src/org/labkey/test/util/StringHelper.java -text
 src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text
+src/org/labkey/test/util/UIUserHelper.java -text
 src/org/labkey/test/util/WikiHelper.java -text
 src/org/labkey/test/util/ext4cmp/Ext4CmpRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRef.java -text

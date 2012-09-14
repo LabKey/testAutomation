@@ -98,6 +98,12 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         catch (Throwable t) {}
     }
 
+
+    public boolean isFileUploadTest()
+    {
+        return true;
+    }
+
     private void defineQCAssay()
     {
         log("Defining a QC test assay at the project level");
@@ -105,28 +111,30 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
         addWebPart("Assay List");
 
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
-        checkRadioButton("providerName", "General");
-        clickNavButton("Next");
-
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
-
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
-
-        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
-        {
-            addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-        }
-        sleep(1000);
-        clickNavButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        uploadXarFileAsAssayDesign(getSampledataPath() + "\\ProgrammaticQC\\QC Assay.xar", 1, "QC Assay.xar");
+//        clickNavButton("Manage Assays");
+//        clickNavButton("New Assay Design");
+//        checkRadioButton("providerName", "General");
+//        clickNavButton("Next");
+//
+//        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+//
+//        selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
+//
+//        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
+//
+//        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
+//        {
+//            addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+//        }
+//        sleep(1000);
+//        clickNavButton("Save", 0);
+//        waitForText("Save successful.", 20000);
 
         // create the list for the qc log
-        ListHelper.createList(this, TEST_PROGRAMMATIC_QC_PRJ, "QC Log", ListHelper.ListColumnType.AutoInteger, "Key", _listCol1, _listCol2,
-                _listCol3, _listCol4, _listCol5, _listCol6);
+//        ListHelper.createList(this, TEST_PROGRAMMATIC_QC_PRJ, "QC Log", ListHelper.ListColumnType.AutoInteger, "Key", _listCol1, _listCol2,
+//                _listCol3, _listCol4, _listCol5, _listCol6);
+        ListHelper.importListArchive(this, getProjectName(), new File(getSampledataPath() + "\\ProgrammaticQC\\Programmatic QC.lists.zip"));
     }
 
     private void defineTransformAssay(String assayName, boolean addQCScript)

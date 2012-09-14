@@ -329,7 +329,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         log("Test notification emails");
 
         addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
-        createUser(USER2, "", false);
+        createUser(USER2, null, false);
 
         clickLinkWithText(PROJECT_NAME);
         goToModule("Dumbster");

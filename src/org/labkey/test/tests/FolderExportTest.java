@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 
@@ -38,6 +39,10 @@ public class FolderExportTest extends BaseSeleniumWebTest
     String folderZip = "Sample.folder.zip"; //"Sample.folder.zip";
 
 
+    public FolderExportTest()
+    {
+        setContainerHelper(new UIContainerHelper(this));
+    }
 
     @Override
     protected String getProjectName()
@@ -138,6 +143,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
         clickLinkContainingText("Folder Type");
         Assert.assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
     }
+
 
     @Override
     protected void doCleanup() throws Exception
