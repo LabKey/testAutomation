@@ -119,7 +119,7 @@ public class SearchTest extends StudyTest
         SearchHelper.enqueueSearchItem("Owlbear", Locator.bodyLinkWithText("List " + textOnlySearchableList));
         SearchHelper.enqueueSearchItem("54321", null);
         SearchHelper.enqueueSearchItem(metaOnlySearchable, Locator.bodyLinkWithText("List " + metaOnlySearchable));
-        SearchHelper.enqueueSearchItem("Turtleduck", null); //this phrase is present in the metadata-only file
+        SearchHelper.enqueueSearchItem("Turtleduck", Locator.bodyLinkWithText("List " + metaOnlySearchable)); //this phrase is present in the metadata-only file
         SearchHelper.enqueueSearchItem("Cat", Locator.bodyLinkWithText("List " + customizedIndexingList));
         SearchHelper.enqueueSearchItem("Garfield", null);
     }
