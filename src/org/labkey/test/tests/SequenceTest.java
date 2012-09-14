@@ -99,7 +99,6 @@ public class SequenceTest extends LabModulesTest
         setText("text", getIlluminaNames());
 
         click(Locator.ext4Button("Upload"));
-        Ext4Helper.waitForMaskToDisappear(this);
         waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Success!");
         clickButton("OK");
