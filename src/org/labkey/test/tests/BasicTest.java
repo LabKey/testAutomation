@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.UIContainerHelper;
 
 /**
@@ -82,7 +83,7 @@ public class BasicTest extends BaseSeleniumWebTest
         addWebPart("Wiki Table of Contents");
         // move messages below wiki:
         clickLinkWithImage("/_images/partdown.png", 0);
-        waitForExtMaskToDisappear(30000);
+        Ext4Helper.waitForMaskToDisappear(this, 30000);
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
         refresh();
@@ -91,7 +92,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         // remove wiki by clicking the first delete link:
         clickLinkWithImage("/_images/partdelete.png", 0);
-        waitForExtMaskToDisappear(30000);
+        Ext4Helper.waitForMaskToDisappear(this, 30000);
         assertTextNotPresent(WIKI_WEBPART_TEXT);
 
         refresh();
@@ -134,7 +135,7 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTextPresent("Customize");
         clickNavButton("Cancel");
         clickLinkWithImage(getContextPath() + "/_images/partdown.png", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
         assertTextBefore("No data to show", "No messages");
         
         refresh();
@@ -142,7 +143,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         final Locator searchLocator = Locator.raw("//tr[th[@title='Search']]//a/img[@title='Remove From Page']");
         clickAndWait(searchLocator, 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
         assertElementNotPresent(searchLocator);
         refresh();
         // verify that web part is gone, even after a refresh:
