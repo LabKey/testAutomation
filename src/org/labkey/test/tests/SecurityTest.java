@@ -337,7 +337,8 @@ public class SecurityTest extends BaseSeleniumWebTest
     {
         String newPassword = password +"1";
         goToSiteUsers();
-        clickLinkContainingText(username);
+        String displayName = displayNameFromEmail(username);
+        clickLinkWithText(displayName);
         clickButtonContainingText("Reset Password", 0);
         getConfirmationAndWait();
         clickNavButton("Done");
@@ -689,8 +690,11 @@ public class SecurityTest extends BaseSeleniumWebTest
         String comment        = table.getDataAsText(2, "Comment");
 
         Assert.assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
-        Assert.assertEquals("Incorrect log entry for deleted user", createdBy + impersonatedBy + user + comment, siteAdminDisplayName + testUserDisplayName + user + deletedUserDisplayName + " was deleted from the system");
+        Assert.assertEquals("Incorrect log entry for deleted user",
+                siteAdminDisplayName + '|' + testUserDisplayName + '|' + user + '|' + TO_BE_DELETED_USER + " was deleted from the system",
+                createdBy + '|' + impersonatedBy + '|' + user + '|' + comment);
     }
+
 
     protected void passwordStrengthTest()
     {

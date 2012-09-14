@@ -5298,11 +5298,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         String fakeUser = _impersonationStack.pop();
         log("Ending impersonation");
-        Assert.assertEquals(fakeUser, getDisplayName());
+        String fakeDisplayName = displayNameFromEmail(fakeUser);
+        Assert.assertTrue("expected user=" +fakeDisplayName, fakeDisplayName.equalsIgnoreCase(getDisplayName()));
         clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
         goToHome();
-        Assert.assertFalse(fakeUser.equals(getDisplayName()));
+        Assert.assertFalse("expected user!=" +fakeDisplayName, fakeDisplayName.equalsIgnoreCase(getDisplayName()));
     }
 
     public void projectImpersonate(String fakeUser)
@@ -5319,6 +5320,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectOptionByText(Locator.id("email").toString(), fakeUser);
         clickNavButton("Impersonate");
         _impersonationStack.push(fakeUser);
+    }
+
+    // assumes there are not collisions in the database causing unique numbers to be appended
+    public String displayNameFromEmail(String email)
+    {
+        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
+        display = display.replace('_', ' ');
+        display = display.replace('.', ' ');
+        return display.trim();
     }
 
     /** create a user with the specified permissions for the specified project
