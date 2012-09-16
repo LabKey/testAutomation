@@ -369,7 +369,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText("Issues Summary");
         clickNavButton("New Issue");
         setFormElement("title", ISSUE_TITLE_2);
-        selectOptionByText("assignedTo", USER1);
+        selectOptionByText("assignedTo", displayNameFromEmail(USER1));
         selectOptionByText("priority", "4");
         selectOptionByText("milestone", "2012");
         setFormElement("notifyList", USER2);
@@ -382,7 +382,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         pushLocation();
 
         EmailRecordTable emailTable = new EmailRecordTable(this);
-        EmailMessage message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been opened and assigned to " + USER1);
+        EmailMessage message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been opened and assigned to " + displayNameFromEmail(USER1));
 
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
@@ -411,8 +411,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         emailTable = new EmailRecordTable(this);
         message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been updated");
 
-        Assert.assertTrue(USER3 + " did not receieve updated issue notification", USER3.equals(message.getTo()[0]));
-        Assert.assertTrue("User did not receive updated issue notification",      PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
+        Assert.assertTrue(USER3 + " did not receieve updated issue notification" + message.getTo()[0],
+                USER3.equals(emailTable.getDataAsText(0, "To")) || USER3.equals(emailTable.getDataAsText(1, "To")));
+        Assert.assertTrue("User did not receive updated issue notification",
+                PasswordUtil.getUsername().equals(emailTable.getDataAsText(0, "To")) || PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
     }
 
     private void entryTypeNameTest()

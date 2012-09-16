@@ -120,9 +120,9 @@ public class UserTest extends SecurityTest
     {
         goToSiteUsers();
         DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
-        int row = usersTable.getRow("Display Name", NORMAL_USER);
+        int row = usersTable.getRow("Email", NORMAL_USER);
         String userId = usersTable.getDataAsText(row, "User Id");
-        String adminUserId = usersTable.getDataAsText(usersTable.getRow("Display Name", PROJECT_ADMIN_USER), "User Id"); 
+        String adminUserId = usersTable.getDataAsText(usersTable.getRow("Email", PROJECT_ADMIN_USER), "User Id");
         usersTable.checkCheckbox(row);
         clickButton("Deactivate");
         clickButton("Deactivate");

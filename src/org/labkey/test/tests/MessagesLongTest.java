@@ -248,12 +248,12 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         uncheckCheckbox("expires");
         checkCheckbox("assignedTo");
         uncheckCheckbox("formatPicker");
-        selectOptionByText("defaultAssignedTo", USER1);
+        selectOptionByText("defaultAssignedTo", displayNameFromEmail(USER1));
         clickNavButton("Save");
 
         log("Check if status and expires work");
         clickNavButton("New");
-        assertTextPresent(USER1);
+        assertTextPresent(displayNameFromEmail(USER1));
         clickNavButton("Cancel");
         clickLinkWithText(MSG2_TITLE);
         clickNavButton("Respond");
@@ -300,11 +300,11 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent("This user doesn't have permission");
         setFormElement("emailList", USER1);
-        selectOptionByText("assignedTo", USER3);
+        selectOptionByText("assignedTo", displayNameFromEmail(USER3));
         submit();
         clickLinkWithText("view message or respond");
         assertTextPresent("Members: "+USER1);
-        assertTextPresent("Assigned To: "+USER3);
+        assertTextPresent("Assigned To: "+ displayNameFromEmail(USER3));
         impersonate(USER1);
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent(MSG3_TITLE);
