@@ -28,7 +28,6 @@ import org.labkey.test.util.UIContainerHelper;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by IntelliJ IDEA.
@@ -205,6 +204,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         Ext4Helper.clickExt4MenuItem(this, "DNA_Oligos");
         waitForPageToLoad();
         waitForElement(Locator.name("name"));
+        waitForElement(Locator.name("purification"));
 
         setText("name", "TestPrimer20");
         setText("sequence", "ATGATGATGGGGG");
@@ -226,7 +226,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("DNA_Oligos:", "Import Data");
-        waitForElement(Locator.xpath("//input[contains(@class, 'x4-form-text')]"));
+        waitForElement(Locator.name("purification"));
 
         setText("name", "TestPrimer1");
         setText("sequence", "ABCDQ");
@@ -247,12 +247,11 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         setText("text", "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\tABCDEFG");
         click(Locator.ext4Button("Upload"));
 
-        Ext4Helper.waitForMaskToDisappear(this);
-        waitForText("There were errors in the upload:");
-
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent(errorMsg);
         clickButton("OK", 0);
+
+        waitForText("There were errors in the upload:");
 
         assertTextPresent("Row 2:");
         assertTextPresent(errorMsg);
@@ -264,7 +263,6 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
         //TODO: import more data
 
-        Ext4Helper.waitForMaskToDisappear(this);
         waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Success! 2 rows inserted.");
         clickButton("OK");
@@ -284,7 +282,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Samples:", "Import Data");
-        waitForElement(Locator.xpath("//input[contains(@class, 'x4-form-text')]"));
+        waitForElement(Locator.name("samplespecies"));
 
         setText("samplename", "SampleName");
         setText("samplespecies", "Species");
@@ -396,7 +394,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         click(locator);
         Ext4Helper.clickExt4MenuItem(this, "Samples");
         waitForPageToLoad();
-        waitForElement(Locator.xpath("//input[contains(@class, 'x4-form-text')]"));
+        waitForElement(Locator.name("freezer"));
         setText("samplename", "Sample" + suffix);
         setText("freezer", "freezer_" + _helper.getRandomInt());
 
@@ -443,7 +441,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Peptides:", "Import Data");
-        waitForElement(Locator.xpath("//input[contains(@class, 'x4-form-text')]"));
+        waitForElement(Locator.name("sequence"));
 
         String sequence = "Sv LFpT LLF";
         String name = "Peptide 1"; //spaces should get replaced with '_' on import
@@ -484,6 +482,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _helper.clickNavPanelItem("DNA_Oligos:", "Search");
         waitForPageToLoad();
         waitForTextToDisappear("Loading...");
+        waitForElement(Locator.name("name"));
         sleep(50);
         setText("name", "TestPrimer");
         click(Locator.ext4Button("Submit"));
