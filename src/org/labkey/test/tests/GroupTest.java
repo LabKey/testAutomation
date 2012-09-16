@@ -29,7 +29,7 @@ import org.labkey.test.util.StringHelper;
  */
 public class GroupTest extends BaseSeleniumWebTest
 {
-    protected static final String[] TEST_USERS_FOR_GROUP = {"user1@group1.group.test", "user2@group1.group.test", "user3@group2.group.test"};
+    protected static final String[] TEST_USERS_FOR_GROUP = {"user1_grouptest@group1.group.test", "user2_grouptest@group1.group.test", "user3_grouptest@group2.group.test"};
     protected static final String SIMPLE_GROUP = "group1";
     protected static final String COMPOUND_GROUP = "group2";
     protected static final String BAD_GROUP = "group3";
@@ -141,7 +141,7 @@ public class GroupTest extends BaseSeleniumWebTest
         int userColumn = 1;
         int accessColumn = 2;
 
-        int rowIndex = drt.getRow(userColumn, TEST_USERS_FOR_GROUP[0]);
+        int rowIndex = drt.getRow(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0]));
 
         if(getBrowser().startsWith(FIREFOX_BROWSER))
         //IE displays correctly but selenium retrieves the data differently
@@ -165,12 +165,13 @@ public class GroupTest extends BaseSeleniumWebTest
         //confirm hover over produces list of broups
         Locator groupSpecification = Locator.tagContainingText("span","Site: group2");
         String groupHierarchy = getAttribute(groupSpecification, "ext:qtip");
-        String[] expectedMessagesInHierarchy = new String[] {"user1@group1.group.test is a member of <strong>group1</strong>",
+        String[] expectedMessagesInHierarchy = new String[] {
+                displayNameFromEmail(TEST_USERS_FOR_GROUP[0]) + " is a member of <strong>group1</strong>",
                 "Which is a member of <strong>group2</strong><BR/>",
                 "Which is assigned the Author role",
-                "user1@group1.group.test is a member of <strong>group2</strong>",
+                displayNameFromEmail(TEST_USERS_FOR_GROUP[0]) + " is a member of <strong>group2</strong>",
                 "Which is assigned the Author role"};
-        for(String msg : expectedMessagesInHierarchy)
+        for (String msg : expectedMessagesInHierarchy)
         {
                 Assert.assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
         }
@@ -182,7 +183,7 @@ public class GroupTest extends BaseSeleniumWebTest
         goBack();
 
         //confirm username link leads to right user, page
-        clickLinkContainingText(TEST_USERS_FOR_GROUP[0]);
+        clickLinkWithText(displayNameFromEmail(TEST_USERS_FOR_GROUP[0]));
         assertTextPresent("User Access Details: "  + TEST_USERS_FOR_GROUP[0]);
         goBack();
 
@@ -354,7 +355,7 @@ public class GroupTest extends BaseSeleniumWebTest
     {
 
         impersonate(user);
-        assertLinkPresentWithText(folder);
+        assertLinkPresentWithText(displayNameFromEmail(user));
         stopImpersonating();
     }
 
