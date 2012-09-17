@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 
@@ -38,6 +39,10 @@ public class WikiTest extends BaseSeleniumWebTest
                     "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
                     "queryName='Sequences', allowChooseQuery='true', allowChooseView='true')}</b>\n";
 
+    public WikiTest()
+    {
+        setContainerHelper(new UIContainerHelper(this));
+    }
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/wiki";
