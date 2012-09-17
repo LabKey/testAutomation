@@ -98,7 +98,7 @@ public class SequenceTest extends LabModulesTest
 
         setText("text", getIlluminaNames());
 
-        click(Locator.ext4Button("Upload"));
+        waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Success!");
         clickButton("OK");
@@ -410,7 +410,7 @@ public class SequenceTest extends LabModulesTest
         Assert.assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
         Assert.assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
 
-        clickButton("Cancel", 0);
+        waitAndClick(Locator.ext4Button("Cancel"));
 
         validateFastqDownload(url);
 
