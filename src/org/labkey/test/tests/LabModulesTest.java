@@ -248,7 +248,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         click(Locator.ext4Button("Upload"));
 
         waitForElement(Ext4Helper.ext4Window("Error"));
-        assertTextPresent(errorMsg);
+        waitForText(errorMsg);
         clickButton("OK", 0);
 
         waitForText("There were errors in the upload:");
