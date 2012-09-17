@@ -283,6 +283,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     protected void uploadXarFileAsAssayDesign(File file, int pipelineCount, String name)
     {
+        Assert.assertTrue("XAR file does not exist: " + file.toString(), file.exists());
         //create a new luminex assay
         clickNavButton("Manage Assays");
         clickNavButton("New Assay Design");
