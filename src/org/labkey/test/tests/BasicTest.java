@@ -60,7 +60,7 @@ public class BasicTest extends BaseSeleniumWebTest
         Assert.assertTrue("Unsupported browser", isBrowser(source, "Firefox/", 2.0, 15.0) || isBrowser(source, "MSIE ", 7.0, 8.0));
 
         // Disable scheduled system maintenance
-//        setSystemMaintenance(false);
+        setSystemMaintenance(false);
 //        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
 //        startSystemMaintenance();
 
