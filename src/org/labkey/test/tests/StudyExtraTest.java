@@ -318,7 +318,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(projectName);
         addWebPart("Assay List");
 
-        uploadXarFileAsAssayDesign(getSampledataPath() + "\\studyExtra\\TestAssay1.xar", 1, "TestAssay1.xar");
+        uploadXarFileAsAssayDesign(getSampledataPath() + "/studyextra/TestAssay1.xar", 1, "TestAssay1.xar");
         goToProjectHome();
         //copied from old test
 //        clickNavButton("Manage Assays");
