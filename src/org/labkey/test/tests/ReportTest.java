@@ -1481,7 +1481,7 @@ public class ReportTest extends StudyBaseTest
 
         //Change filter and check scatter plot again
         clickButton("View Data", 0);
-        clearFilter("aqwp4", "APXpulse", 0);
+        clearFilter("aqwp3", "APXpulse", 0);
         waitForText("36.0"); // Body temp for filtered out row
         clickButton("View Chart", 0);
         waitForText(SCATTER_PLOT_DR_2);
