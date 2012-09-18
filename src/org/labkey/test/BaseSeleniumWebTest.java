@@ -2967,7 +2967,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForExtMaskToDisappear(int wait)
     {
-        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'display: block')]"), wait);
+        waitForElementToDisappear(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and (contains(@class, 'ext-el-mask') or contains(@class, 'x4-mask'))]"), wait);
     }
 
     public void waitForExtMask()
@@ -2977,7 +2977,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForExtMask(int wait)
     {
-        waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'display: block')]"), wait);
+        waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and (contains(@class, 'ext-el-mask') or contains(@class, 'x4-mask'))]"), wait);
     }
 
     //like wait for ExtMask, but waits for a draggable mask (for example, the file rename mask)
@@ -5362,11 +5362,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     // assumes there are not collisions in the database causing unique numbers to be appended
     public String displayNameFromEmail(String email)
     {
-        return email;
-//        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
-//        display = display.replace('_', ' ');
-//        display = display.replace('.', ' ');
-//        return display.trim();
+        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
+        display = display.replace('_', ' ');
+        display = display.replace('.', ' ');
+        return display.trim();
     }
 
     /** create a user with the specified permissions for the specified project
