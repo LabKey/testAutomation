@@ -86,6 +86,7 @@ modules/simpletest/web/simpletest/testfile.js -text
 modules/simpletest/web/simpletest/testfile2.js -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
+src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseSeleniumWebTest.java -text
 src/org/labkey/test/Cleanable.java -text
@@ -261,8 +262,10 @@ src/org/labkey/test/tests/XTandemShortTest.java -text
 src/org/labkey/test/tests/XTandemTest.java -text
 src/org/labkey/test/tests/study/DataViewsTester.java -text
 src/org/labkey/test/tests/study/StudyScheduleTester.java -text
+src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
 src/org/labkey/test/util/APIUserHelper.java -text
+src/org/labkey/test/util/AbstractAssayHelper.java -text
 src/org/labkey/test/util/AbstractContainerHelper.java -text
 src/org/labkey/test/util/AbstractHelper.java -text
 src/org/labkey/test/util/AbstractUserHelper.java -text
@@ -298,6 +301,7 @@ src/org/labkey/test/util/SqlserverOnlyTest.java -text
 src/org/labkey/test/util/StopSelenium.java -text
 src/org/labkey/test/util/StringHelper.java -text
 src/org/labkey/test/util/StudyHelper.java -text
+src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text
 src/org/labkey/test/util/UIUserHelper.java -text
 src/org/labkey/test/util/WikiHelper.java -text

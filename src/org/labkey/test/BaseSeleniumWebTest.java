@@ -33,8 +33,10 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
+import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.APIUserHelper;
+import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.ComponentQuery;
@@ -132,6 +134,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
+    public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -267,32 +270,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             setFormElement("pipelineToolsDirectory", defaultToolsDirectory.toString());
             clickNavButton("Save");
         }
-    }
-
-    protected void uploadXarFileAsAssayDesign(String path, int pipelineCount, String name)
-    {
-        uploadXarFileAsAssayDesign(new File(path), pipelineCount, name);
-    }
-
-    /**
-     * Upload a xar file as an assay configuration
-     * Preconditions:  on a page with an assay web part
-     * @param file   file to upload
-     * @param pipelineCount  expected count of succesful pipeline jobs including thise one
-     * @param name  name of assay file (rest of path removed)
-     */
-    protected void uploadXarFileAsAssayDesign(File file, int pipelineCount, String name)
-    {
-        Assert.assertTrue("XAR file does not exist: " + file.toString(), file.exists());
-        //create a new luminex assay
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
-
-        clickLinkWithText("upload the XAR file directly");
-        setFormElement(Locator.name("uploadFile"), file);
-        click(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
-        waitForPageToLoad();
-        waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + name, false);
     }
 
     public String getBrowserType()
@@ -6728,7 +6705,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
 
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
-    protected void waitForPipelineJobsToComplete(int completeJobsExpected, String description, boolean expectError)
+    public void waitForPipelineJobsToComplete(int completeJobsExpected, String description, boolean expectError)
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
         List<String> statusValues = getPipelineStatusValues();
