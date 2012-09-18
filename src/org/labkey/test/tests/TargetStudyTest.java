@@ -143,7 +143,7 @@ public class TargetStudyTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
         if (!isLinkPresentWithText("Assay List"))
             addWebPart("Assay List");
-        uploadXarFileAsAssayDesign(getSampledataPath() + "\\TargetStudy\\Assay.xar", 1, "Assay.xar");
+        uploadXarFileAsAssayDesign(getSampledataPath() + "/TargetStudy/Assay.xar", 1, "Assay.xar");
 //        clickNavButton("Manage Assays");
 //        clickNavButton("New Assay Design");
 //        checkRadioButton("providerName", "General");

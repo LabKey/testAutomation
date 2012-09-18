@@ -111,7 +111,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
         addWebPart("Assay List");
 
-        uploadXarFileAsAssayDesign(getSampledataPath() + "\\ProgrammaticQC\\QC Assay.xar", 1, "QC Assay.xar");
+        uploadXarFileAsAssayDesign(getSampledataPath() + "/ProgrammaticQC/QC Assay.xar", 1, "QC Assay.xar");
 //        clickNavButton("Manage Assays");
 //        clickNavButton("New Assay Design");
 //        checkRadioButton("providerName", "General");

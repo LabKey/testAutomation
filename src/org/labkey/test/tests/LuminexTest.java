@@ -17,8 +17,11 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.APIAssayHelper;
+import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
@@ -27,6 +30,7 @@ import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -1330,7 +1334,21 @@ public class LuminexTest extends AbstractQCAssayTest
         boolean displayingRowId = false;
         for (int i = 0; i < 2; i++)
         {
-            importRunForTestLuminexConfig(files[i], testDate, i);
+                               //TODO
+            AbstractAssayHelper assayHelper = new APIAssayHelper(this);
+            try
+            {
+                assayHelper.importAssay("&TestAssayLuminex></% 1", files[i].getAbsolutePath(), getProjectName());
+            }
+            catch (CommandException e)
+            {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+//            importRunForTestLuminexConfig(files[i], testDate, i);
 
             displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
         }

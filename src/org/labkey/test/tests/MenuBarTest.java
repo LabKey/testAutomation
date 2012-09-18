@@ -106,7 +106,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         waitForElement(Locator.navButton("Manage Assays"), 3000);
 
 
-        uploadXarFileAsAssayDesign(getSampledataPath() + "\\menubar\\Test Assay.xar", 1, "Test Assay.xar");
+        uploadXarFileAsAssayDesign(getSampledataPath() + "/menubar/Test Assay.xar", 1, "Test Assay.xar");
 //        checkRadioButton("providerName", "General");
 //        clickNavButton("Next");
 //        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
