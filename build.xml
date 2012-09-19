@@ -1488,6 +1488,7 @@
 
         <touch file="${skipfish.src.dir}/${skipfish.wordlist}"/>
         <exec executable="${skipfish.src.dir}\skipfish.exe" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="windows" errorproperty="skipfish.failed">
+            <arg value="-u"/>
             <arg value="-o"/>
             <arg value="${skipfish.results.dir}"/>
             <arg value="-S"/>
@@ -1501,6 +1502,7 @@
             <arg value="${server.url}"/>
         </exec>
         <exec executable="${skipfish.src.dir}/skipfish" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="unix" errorproperty="skipfish.failed">
+            <arg value="-u"/>
             <arg value="-o"/>
             <arg value="${skipfish.results.dir}"/>
             <arg value="-S"/>
