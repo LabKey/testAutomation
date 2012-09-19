@@ -5339,10 +5339,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     // assumes there are not collisions in the database causing unique numbers to be appended
     public String displayNameFromEmail(String email)
     {
-        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
-        display = display.replace('_', ' ');
-        display = display.replace('.', ' ');
-        return display.trim();
+        return email;
+//        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
+//        display = display.replace('_', ' ');
+//        display = display.replace('.', ' ');
+//        return display.trim();
     }
 
     /** create a user with the specified permissions for the specified project
