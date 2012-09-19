@@ -1450,5 +1450,94 @@
          </zip>
     </target>
 
-</project>
+    <condition property="skipfish.src.dir" value="${teamcity.agent.home.dir}/plugins/skipfish">
+        <available file="${teamcity.agent.home.dir}/plugins/skipfish"/>
+    </condition>
 
+    <condition property="skipfish.built" value="true">
+        <or>
+            <available file="${skipfish.src.dir}/skipfish"/>
+            <available file="${skipfish.src.dir}/skipfish.exe"/>
+        </or>
+    </condition>
+
+    <target name="skipfish_scan" depends="skipfish_make">
+        <condition property="skipfish.wordlist" else="new_dict.wl">
+            <isset property="skipfish.wordlist"/>
+        </condition>
+
+        <condition property="skipfish.supplemental.wordlist" else="minimal.wl">
+            <isset property="skipfish.supplemental.wordlist"/>
+        </condition>
+
+        <condition property="labkey.port" else="8080">
+            <isset property="labkey.port"/>
+        </condition>
+
+        <condition property="labkey.server" else="http://localhost">
+            <isset property="labkey.server"/>
+        </condition>
+
+        <condition property="skipfish.results.dir" else="${skipfish.src.dir}/results">
+            <isset property="skipfish.results.dir"/>
+        </condition>
+
+        <property name="server.url" value="${labkey.server}:${labkey.port}"/>
+
+        <delete dir="${skipfish.results.dir}"/>
+
+        <touch file="${skipfish.src.dir}/${skipfish.wordlist}"/>
+        <exec executable="${skipfish.src.dir}\skipfish.exe" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="windows" errorproperty="skipfish.failed">
+            <arg value="-o"/>
+            <arg value=".\results"/>
+            <arg value="-S"/>
+            <arg value=".\dictionaries\${skipfish.supplemental.wordlist}"/>
+            <arg value="-W"/>
+            <arg value="${skipfish.wordlist}"/>
+            <arg value="-X"/>
+            <arg value="/logout.view"/>
+            <arg value="-k"/>
+            <arg value="30"/>
+            <arg value="${server.url}"/>
+        </exec>
+        <exec executable="${skipfish.src.dir}/skipfish" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="unix" errorproperty="skipfish.failed">
+            <arg value="-o"/>
+            <arg value="./results"/>
+            <arg value="-S"/>
+            <arg value="./dictionaries/${skipfish.supplemental.wordlist}"/>
+            <arg value="-W"/>
+            <arg value="${skipfish.wordlist}"/>
+            <arg value="-X"/>
+            <arg value="/logout.view"/>
+            <arg value="-k"/>
+            <arg value="30"/>
+            <arg value="${server.url}"/>
+        </exec>
+    </target>
+
+    <target name="skipfish_make" unless="skipfish.built">
+        <exec executable="${cygwin.bin}\make" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="windows" errorproperty="skipfish.failed"/>
+        <exec executable="make" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="unix" errorproperty="skipfish.failed"/>
+    </target>
+
+    <target name="skipfish_clean">
+        <exec executable="${cygwin.bin}\make" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="windows" errorproperty="skipfish.failed">
+            <arg value="clean"/>
+        </exec>
+        <exec executable="make" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="unix" errorproperty="skipfish.failed">
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="skipfish_teamcity" description="Fire up tomcat and run skipfish">
+        <ant target="start_tomcat_cc" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
+        <antcall target="skipfish_scan"/>
+        <ant target="stop_tomcat" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
+        <antcall target="skipfish_fail"/>
+    </target>
+
+    <target name="skipfish_fail" if="skipfish.failed">
+        <echo message="Skipfish FAILED"/>
+    </target>
+
+</project>
