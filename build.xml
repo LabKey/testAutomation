@@ -1489,7 +1489,7 @@
         <touch file="${skipfish.src.dir}/${skipfish.wordlist}"/>
         <exec executable="${skipfish.src.dir}\skipfish.exe" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="windows" errorproperty="skipfish.failed">
             <arg value="-o"/>
-            <arg value=".\results"/>
+            <arg value="${skipfish.results.dir}"/>
             <arg value="-S"/>
             <arg value=".\dictionaries\${skipfish.supplemental.wordlist}"/>
             <arg value="-W"/>
@@ -1502,7 +1502,7 @@
         </exec>
         <exec executable="${skipfish.src.dir}/skipfish" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="unix" errorproperty="skipfish.failed">
             <arg value="-o"/>
-            <arg value="./results"/>
+            <arg value="${skipfish.results.dir}"/>
             <arg value="-S"/>
             <arg value="./dictionaries/${skipfish.supplemental.wordlist}"/>
             <arg value="-W"/>
