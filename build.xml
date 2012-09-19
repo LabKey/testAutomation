@@ -1479,11 +1479,11 @@
             <isset property="skipfish.supplemental.wordlist"/>
         </condition>
 
-        <condition property="labkey.port" else="8080">
+        <condition property="sysprop.labkey.port" else="8080">
             <isset property="labkey.port"/>
         </condition>
 
-        <condition property="labkey.server" else="http://localhost">
+        <condition property="sysprop.labkey.server" else="http://localhost">
             <isset property="labkey.server"/>
         </condition>
 
@@ -1495,7 +1495,11 @@
             <isset property="skipfish.timeout"/>
         </condition>
 
-        <property name="server.url" value="${labkey.server}:${labkey.port}/${labkey.contextpath}"/>
+        <condition property="cygwin.bin" value="${env.CYGWIN_HOME}\bin" else="C:\cygwin\bin">
+            <isset property="env.CYGWIN_HOME"/>
+        </condition>
+
+        <property name="server.url" value="${sysprop.labkey.server}:${sysprop.labkey.port}/${labkey.contextpath}"/>
 
     </target>
 
@@ -1549,6 +1553,7 @@
 
     <target name="skipfish_teamcity" description="Fire up tomcat and run skipfish" depends="skipfish_init">
         <ant target="start_tomcat_cc" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
+        <antcall target="waitfor-labkey-started"/>
         <antcall target="skipfish_scan"/>
         <ant target="stop_tomcat" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
 
