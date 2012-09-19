@@ -131,7 +131,6 @@ public class PipelineHelper
             _test.setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), file.toString());
             ExtHelper.setExtFormElementByLabel(_test, "Description:", description);
             _test.clickButton("Upload", 0);
-            _test.waitForExtMaskToDisappear();
             ExtHelper.waitForExtDialog(_test, "Extended File Properties", _test.WAIT_FOR_JAVASCRIPT);
             _test.setFormElement(CUSTOM_PROPERTY, customProperty);
             ExtHelper.selectComboBoxItem(_test, "LookupColumn",lookupColumn);
