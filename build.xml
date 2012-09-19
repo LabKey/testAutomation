@@ -1487,7 +1487,7 @@
             <isset property="labkey.server"/>
         </condition>
 
-        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}" else="labkey">
+        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}" else="/labkey">
             <isset property="labkey.contextpath"/>
         </condition>
 
@@ -1499,7 +1499,7 @@
             <isset property="env.CYGWIN_HOME"/>
         </condition>
 
-        <property name="server.url" value="${sysprop.labkey.server}:${sysprop.labkey.port}/${sysprop.labkey.contextpath}"/>
+        <property name="server.url" value="${sysprop.labkey.server}:${sysprop.labkey.port}${sysprop.labkey.contextpath}"/>
 
     </target>
 
