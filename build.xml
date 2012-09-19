@@ -1487,11 +1487,15 @@
             <isset property="labkey.server"/>
         </condition>
 
+        <condition property="labkey.contextpath" else="labkey">
+            <isset property="labkey.contextpath"/>
+        </condition>
+
         <condition property="skipfish.timeout" else="30">
             <isset property="skipfish.timeout"/>
         </condition>
 
-        <property name="server.url" value="${labkey.server}:${labkey.port}"/>
+        <property name="server.url" value="${labkey.server}:${labkey.port}/${labkey.contextpath}"/>
 
     </target>
 
