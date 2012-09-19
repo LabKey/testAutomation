@@ -1482,6 +1482,10 @@
             <isset property="skipfish.results.dir"/>
         </condition>
 
+        <condition property="skipfish.timeout" else="30">
+            <isset property="skipfish.timeout"/>
+        </condition>
+
         <property name="server.url" value="${labkey.server}:${labkey.port}"/>
 
         <delete dir="${skipfish.results.dir}"/>
@@ -1498,7 +1502,7 @@
             <arg value="-X"/>
             <arg value="/logout.view"/>
             <arg value="-k"/>
-            <arg value="30"/>
+            <arg value="${skipfish.timeout}"/>
             <arg value="${server.url}"/>
         </exec>
         <exec executable="${skipfish.src.dir}/skipfish" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="unix" errorproperty="skipfish.failed">
@@ -1512,7 +1516,7 @@
             <arg value="-X"/>
             <arg value="/logout.view"/>
             <arg value="-k"/>
-            <arg value="30"/>
+            <arg value="${skipfish.timeout}"/>
             <arg value="${server.url}"/>
         </exec>
     </target>
