@@ -1482,6 +1482,10 @@
             <isset property="skipfish.results.dir"/>
         </condition>
 
+        <condition property="skipfish.report.dir" else="${skipfish.src.dir}">
+            <isset property="skipfish.report.dir"/>
+        </condition>
+
         <condition property="skipfish.timeout" else="30">
             <isset property="skipfish.timeout"/>
         </condition>
@@ -1489,6 +1493,7 @@
         <property name="server.url" value="${labkey.server}:${labkey.port}"/>
 
         <delete dir="${skipfish.results.dir}"/>
+        <delete file="${skipfish.report.dir}/skipfish.zip"/>
 
         <touch file="${skipfish.src.dir}/${skipfish.wordlist}"/>
         <exec executable="${skipfish.src.dir}\skipfish.exe" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="windows" errorproperty="skipfish.failed">
@@ -1540,6 +1545,10 @@
         <antcall target="skipfish_scan"/>
         <ant target="stop_tomcat" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
         <antcall target="skipfish_fail"/>
+
+        <zip destfile="${skipfish.report.dir}/skipfish.zip" update="true" >
+            <zipfileset dir="${skipfish.results.dir}"/>
+        </zip>
     </target>
 
     <target name="skipfish_fail" if="skipfish.failed">
