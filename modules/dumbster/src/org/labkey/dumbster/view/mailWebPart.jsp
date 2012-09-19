@@ -127,6 +127,21 @@ function toggleRecorder(checkbox)
             boolean sawHtml = false;
             boolean inHtml = false;
             boolean inMessageBody = false;
+
+            StringBuilder headers = new StringBuilder();
+            Iterator i = m.getHeaderNames();
+
+            while (i.hasNext())
+            {
+                String header = (String)i.next();
+                headers.append(h(header));
+                headers.append(": ");
+                headers.append(h(m.getHeaderValue(header)));
+                headers.append("<br/>\n");
+                if (header.equals("Content-Type") && m.getHeaderValue(header).indexOf("text/html") == 0)
+                    sawHtml = true;
+            }
+
             for (String line : lines)
             {
                 if (line.indexOf("Content-Type: text/html") == 0)
@@ -147,17 +162,6 @@ function toggleRecorder(checkbox)
                     inMessageBody = true;
             }
 
-            StringBuilder headers = new StringBuilder();
-            Iterator i = m.getHeaderNames();
-
-            while (i.hasNext())
-            {
-                String header = (String)i.next();
-                headers.append(h(header));
-                headers.append(": ");
-                headers.append(h(m.getHeaderValue(header)));
-                headers.append("<br/>\n");
-            }
 %>
             <td><%=h(m.getHeaderValue("To"))%></td>
             <td><%=h(m.getHeaderValue("From"))%></td>
