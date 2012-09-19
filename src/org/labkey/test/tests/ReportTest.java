@@ -1444,7 +1444,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
         ExtHelper.waitForExtDialog(this, "Error");
         ExtHelper.clickExtButton(this, "Error", "OK", 0);
-        waitForExtMaskToDisappear();
+        ExtHelper.waitForExt3MaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
         //Test cancel button
         ExtHelper.setExtFormElementByLabel(this, "Report Name", "TestReportName");
