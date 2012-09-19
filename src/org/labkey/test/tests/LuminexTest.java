@@ -1348,7 +1348,7 @@ public class LuminexTest extends AbstractQCAssayTest
             {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-//            importRunForTestLuminexConfig(files[i], testDate, i);
+            importRunForTestLuminexConfig(files[i], testDate, i);
 
             displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
         }
@@ -1556,7 +1556,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //	- QC Flags added for EC50 and HMFI
         goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
-        String newQcFlags = "EC50-4, HMFI, EC50-5, AUC";
+        String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
         assertTextNotPresent(newQcFlags);
         applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
         //assert ec50 and HMFI red text present
