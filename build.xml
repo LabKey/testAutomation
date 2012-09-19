@@ -1344,7 +1344,7 @@
             <fileset dir="${project.root}/tools/Rpackages" includes="flowStats*.tar.gz"/>
         </copy>
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowStats.tar.gz" />
+            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowStats.tar.gz" />
         </exec>
     </target>
 
@@ -1353,7 +1353,7 @@
             <fileset dir="${project.root}/tools/Rpackages" includes="flowStats*.zip"/>
         </copy>
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowStats.zip" />
+            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowStats.zip" />
         </exec>
     </target>
 
@@ -1377,7 +1377,7 @@
             <fileset dir="${project.root}/tools/Rpackages" includes="flowWorkspace*.tar.gz"/>
         </copy>
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowWorkspace.tar.gz" />
+            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowWorkspace.tar.gz" />
         </exec>
     </target>
 
@@ -1386,7 +1386,7 @@
             <fileset dir="${project.root}/tools/Rpackages" includes="flowWorkspace*.zip"/>
         </copy>
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowWorkspace.zip" />
+            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowWorkspace.zip" />
         </exec>
     </target>
 

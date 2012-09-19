@@ -447,7 +447,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         clickButton("Next", 0);
 
-        // Wizard page 8 : Publish Options
+        // Wizard page 8 : Specimens
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
+        clickButton("Next", 0);
+
+        // Wizard page 9 : Publish Options
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         if (!removeProtected) uncheckCheckbox(Locator.name("removeProtected"));
         if (!shiftDates) uncheckCheckbox(Locator.name("shiftDates"));
@@ -503,7 +507,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             clickButton("OK", 0);
         }
 
-        mouseDown(Locator.tagWithText("div", "All"));
+        mouseDown(Locator.tagWithText("b", "Mice"));
         sleep(1000);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT); // Make sure charts are rendered
 

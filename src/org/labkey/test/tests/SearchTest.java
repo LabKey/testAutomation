@@ -36,8 +36,8 @@ public class SearchTest extends StudyTest
     private static final String FOLDER_B = "Folder Banana"; // Folder move destination
     private static final String FOLDER_C = "Folder Cherry"; // Folder rename name.
     private static final String GROUP_NAME = "Test Group";
-    private static final String USER1 = "user1@search.test";
-    private static final String USER1_DISPLAY_NAME = "user1";
+    private static final String USER1 = "user1_searchtest@search.test";
+    private static final String USER1_DISPLAY_NAME = displayNameFromEmail(USER1);
 
     private static final String WIKI_NAME = "Brie";
     private static final String WIKI_TITLE = "Roquefort";

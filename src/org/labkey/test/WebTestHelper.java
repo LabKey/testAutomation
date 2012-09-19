@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpException;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
@@ -208,6 +209,18 @@ public class WebTestHelper
         //send basic auth header on first request
         client.getParams().setAuthenticationPreemptive(true);
         return client;
+    }
+
+    public static int getHttpGetResponse(String url) throws HttpException, IOException
+    {
+        return getHttpGetResponse(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public static int getHttpGetResponse(String url, String username, String password) throws HttpException, IOException
+    {
+        HttpClient client = getHttpClient(url, username, password);
+        GetMethod method = new GetMethod(url);
+        return client.executeMethod(method);
     }
 
     public static class FolderIdentifier

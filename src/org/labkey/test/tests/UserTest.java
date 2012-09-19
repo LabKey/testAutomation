@@ -42,7 +42,7 @@ public class UserTest extends SecurityTest
     //users for change e-mail tests.  Both included at top level so they can be included in the clean up.
     // only one should exist at any one time, but by deleting both we ensure that nothing persists even if
     // the test fails
-    protected static final String NORMAL_USER2 = "user2@security.test";
+    protected static final String NORMAL_USER2 = "user2_securitytest@security.test";
     protected static final String NORMAL_USER2_ALTERNATE = "not-user2@security.test";
 
 
@@ -193,7 +193,7 @@ public class UserTest extends SecurityTest
         enableEmailRecorder();
 
         goToSiteUsers();
-        clickLinkWithText(NORMAL_USER);
+        clickLinkWithText(displayNameFromEmail(NORMAL_USER));
         selenium.chooseOkOnNextConfirmation();
         clickButtonContainingText("Reset Password", 0);
         Assert.assertTrue(selenium.getConfirmation().startsWith("You are about to clear the user's current password"));

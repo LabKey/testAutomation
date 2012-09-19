@@ -699,7 +699,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
 
         goToSiteUsers();
-        clickLinkContainingText(userEmail);
+        clickLinkContainingText(displayNameFromEmail(userEmail));
 
         clickNavButton("Change Email");
 
@@ -3702,7 +3702,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void mouseDownGridCellCheckbox(String cellText, int index)
     {
-        mouseDown((Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + cellText + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[" + index + "]")));
+        mouseDown(mouseDownGridCellLocator(cellText, index));
+    }
+
+    public Locator mouseDownGridCellLocator(String cellText, int index)
+    {
+        return Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + cellText + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[" + index + "]");
     }
 
     public void mouseOut(Locator l)
@@ -5312,12 +5317,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         String fakeUser = _impersonationStack.pop();
         log("Ending impersonation");
-        String fakeDisplayName = displayNameFromEmail(fakeUser);
-        Assert.assertTrue("expected user=" +fakeDisplayName, fakeDisplayName.equalsIgnoreCase(getDisplayName()));
+        Assert.assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
         clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
         goToHome();
-        Assert.assertFalse("expected user!=" +fakeDisplayName, fakeDisplayName.equalsIgnoreCase(getDisplayName()));
+        Assert.assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }
 
     public void projectImpersonate(String fakeUser)
@@ -5336,15 +5340,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         _impersonationStack.push(fakeUser);
     }
 
+
     // assumes there are not collisions in the database causing unique numbers to be appended
-    public String displayNameFromEmail(String email)
+    public static String displayNameFromEmail(String email)
     {
-        return email;
-//        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
-//        display = display.replace('_', ' ');
-//        display = display.replace('.', ' ');
-//        return display.trim();
+        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
+        display = display.replace('_', ' ');
+        display = display.replace('.', ' ');
+        return display.trim();
     }
+
 
     /** create a user with the specified permissions for the specified project
      *

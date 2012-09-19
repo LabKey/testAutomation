@@ -45,7 +45,6 @@ public class CohortTest extends BaseSeleniumWebTest
     private static final String UNASSIGNED_1 = "Unassigned1";
     private static final String XPATH_COHORT_ASSIGNMENT_TABLE = "//table[@id='participant-cohort-assignments']";
     private static final String COHORT_TABLE = "Cohort Table";
-    private static final String COHORT_ALL = "All";
     private static final String COHORT_NEGATIVE = "Negative";
     private static final String COHORT_POSITIVE = "Positive";
     private static final String COHORT_NOCOHORT = "Not in any cohort";
@@ -367,16 +366,16 @@ public class CohortTest extends BaseSeleniumWebTest
         // rule #2:  we expect the "enrolled" text since we've selected the 'not in any cohort' group by default
         verifyParticipantList(PTIDS_NOCOHORT, true);
         // rule #3:  since "all" includes both enrolled and unenrolled cohorts, don't show the enrolled text
-        verifyCohortSelection(null, COHORT_ALL, PTIDS_ALL, false, "Found 5 participants of 5.");
+        verifyCohortSelection(true, null, null, PTIDS_ALL, false, "Found 5 participants of 5.");
 
         // rule #3: Negative cohort is not enrolled, so don't show enrolled text
-        verifyCohortSelection(COHORT_ALL, COHORT_NEGATIVE, PTIDS_NEGATIVE, false, "Found 1 participant of 5.");
+        verifyCohortSelection(true, null, COHORT_NEGATIVE, PTIDS_NEGATIVE, false, "Found 1 participant of 5.");
 
         // rule #3: Positive cohort is not enrolled, so don't show enrolled text
-        verifyCohortSelection(COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, false, "Found 3 participants of 5.");
+        verifyCohortSelection(false, COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, false, "Found 3 participants of 5.");
 
         // rule #2: "not in any cohort" is enrolled so show text
-        verifyCohortSelection(COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+        verifyCohortSelection(false, COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
 
         // All cohorts are unenrolled... should not see "Enrolled" filter item
         verifyDatasetEnrolledCohortFilter("Test Results", false, 16, 0);
@@ -393,16 +392,16 @@ public class CohortTest extends BaseSeleniumWebTest
         verifyParticipantList(PTIDS_POSITIVE_NOCOHORT, true);
 
         // rule #4, don't show enrolled text since we have a mix of enrolled and unenrolled
-        verifyCohortSelection(null, COHORT_ALL, PTIDS_ALL, false, "Found 5 participants of 5.");
+        verifyCohortSelection(true, null, null, PTIDS_ALL, false, "Found 5 participants of 5.");
 
         // rule #3, don't show enrolled text since we only have unenrolled cohorots
-        verifyCohortSelection(COHORT_ALL, COHORT_NEGATIVE, PTIDS_NEGATIVE, false, "Found 1 participant of 5.");
+        verifyCohortSelection(true, null, COHORT_NEGATIVE, PTIDS_NEGATIVE, false, "Found 1 participant of 5.");
 
         // rule #2, only showing enrolled cohorts
-        verifyCohortSelection(COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, true, "Found 3 enrolled participants of 5.");
+        verifyCohortSelection(false, COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, true, "Found 3 enrolled participants of 5.");
 
         // rule #2, only showing enrolled cohorts
-        verifyCohortSelection(COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+        verifyCohortSelection(false, COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
 
         verifyDatasetEnrolledCohortFilter("Test Results", true, 16, 12);
         verifySpecimenEnrolledCohortFilter("By Individual Vial", true, 20, 16);
@@ -509,13 +508,22 @@ public class CohortTest extends BaseSeleniumWebTest
         assertChecked(Locator.checkboxByName("quf_enrolled"));
     }
 
-    private void verifyCohortSelection(String previousCohort, String nextCohort, String[] expectedParticipants, boolean expectEnrolledText, String waitText)
+    private void verifyCohortSelection(boolean toggleAll, String previousCohort, String nextCohort, String[] expectedParticipants, boolean expectEnrolledText, String waitText)
     {
+        if (toggleAll)
+        {
+            Locator all = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//b[contains(@class, 'filter-description') and contains(text(), 'All')]/../../../..//div[contains(@class, 'x4-grid-row-checker')]");
+            waitForElement(all);
+            mouseDown(all);
+        }
+
         if (previousCohort != null)
         {
             mouseDownGridCellCheckbox(previousCohort);
         }
-        mouseDownGridCellCheckbox(nextCohort);
+
+        if (nextCohort != null)
+            mouseDownGridCellCheckbox(nextCohort);
         waitForText(waitText);
         verifyParticipantList(expectedParticipants, expectEnrolledText);
     }

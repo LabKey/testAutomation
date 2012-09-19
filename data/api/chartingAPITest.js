@@ -102,7 +102,8 @@ var beginTest = function(){
                     aes: {
                         color: 'person',
                         shape: 'consumedCoffee',
-                        hoverText: function(row){return 'Person: ' + row.person + "\n" + row.consumedCoffee + " Consumed \nEfficiency: " + row.efficiency}
+                        hoverText: function(row){return 'Person: ' + row.person + "\n" + row.consumedCoffee + " Consumed \nEfficiency: " + row.efficiency},
+                        pointClickFn: function(mouseEvent, data){Ext4.Msg.alert('Data Point Details', Ext4.JSON.encode(data));}
                     }
                 }),
                 new LABKEY.vis.Layer({
@@ -237,7 +238,8 @@ var beginTest = function(){
                     data: scatterData01,
                     aes: {
                         x: 'x',
-                        y: 'y'
+                        y: 'y',
+                        pointClickFn: function(mouseEvent, data){Ext4.Msg.alert('Teal Point Details', Ext4.JSON.encode(data));}
                     }
                 }),
                 new LABKEY.vis.Layer({
@@ -248,7 +250,8 @@ var beginTest = function(){
                     data: scatterData02,
                     aes: {
                         x: 'x',
-                        y: 'y'
+                        y: 'y',
+                        pointClickFn: function(mouseEvent, data){Ext4.Msg.alert('Maroon Point Details', Ext4.JSON.encode(data));}
                     }
                 })
             ]
@@ -321,7 +324,8 @@ var beginTest = function(){
             data: boxPlotData,
             aes: {
                 yLeft: 'age',
-                x: 'group'
+                x: 'group',
+                pointClickFn: function(mouseEvent, data){Ext4.Msg.alert('Outlier Point Details', Ext4.JSON.encode(data));}
             },
             scales: {
                 x: {

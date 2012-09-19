@@ -746,7 +746,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        clickMenuButton("Views", "Create", "Chart View");
+        clickMenuButton("Charts", "Create Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
@@ -761,7 +761,7 @@ public class ReportTest extends StudyBaseTest
 
         clickMenuButton("Views", "default");
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
-        clickMenuButton("Views", "Create", "Chart View");
+        clickMenuButton("Charts", "Create Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
         // create a non-participant chart
@@ -1016,8 +1016,10 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 25 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
-        mouseDownGridCellCheckbox("All", 1);
-        mouseDownGridCellCheckbox("All", 2);
+        Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");
+        click(filterExpander);
+
+        deselectAllFilterGroups();
         waitForText("Showing 0 Results");
 
         //Mouse down on GROUP 1
@@ -1042,14 +1044,17 @@ public class ReportTest extends StudyBaseTest
 
         //Mouse down GROUP 2
         mouseDownGridCellCheckbox(PARTICIPANT_GROUP_TWO);
-        waitForText("Showing 25 Results");
+        // groups are disjoint
+        waitForText("Showing 0 Results");
 
+/*
         //Check that all PTIDs from GROUP 1 and GROUP 2 are present at the same time.
         for(String ptid : PTIDS)
         {
             assertTextPresent(ptid);
         }
 
+*/
         //Mouse down on GROUP 1 to remove it.
         mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Showing 13 Results");
@@ -1091,8 +1096,8 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 116 Results", WAIT_FOR_JAVASCRIPT);
 
         //Deselect All
-        mouseDownGridCellCheckbox("All", 1);
-        mouseDownGridCellCheckbox("All", 2);
+        click(filterExpander);
+        deselectAllFilterGroups();
         waitForText("Showing 0 Results");
 
         //Mouse down on SPEC GROUP 1
@@ -1103,7 +1108,7 @@ public class ReportTest extends StudyBaseTest
 
         //Add SPEC GROUP 2
         mouseDownGridCellCheckbox(SPECIMEN_GROUP_TWO);
-        waitForText("Showing 2 Results");
+        waitForText("Showing 0 Results");
         //Remove SPEC GROUP 1
         mouseDownGridCellCheckbox(SPECIMEN_GROUP_ONE);
         waitForText("Showing 1 Results");
@@ -1243,7 +1248,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.waitForExtDialog(this, "Y Axis");
         mouseDown(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
         ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
 
         //Verify box plot
         waitForText(BOX_PLOT_MV_1);
@@ -1253,7 +1258,7 @@ public class ReportTest extends StudyBaseTest
         setFormElement(Locator.name("chart-title-textfield"), "Test Title");
         waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
         ExtHelper.clickExtButton(this, "Main Title", "OK", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
         waitForText("Test Title");
 
         log("Set Y Axis");
@@ -1263,7 +1268,7 @@ public class ReportTest extends StudyBaseTest
         mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
         setFormElement(Locator.name("label"), "TestYAxis");
         ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
         waitForText("TestYAxis");
 
         log("Set X Axis");
@@ -1273,7 +1278,7 @@ public class ReportTest extends StudyBaseTest
         mouseDown(Locator.xpath("//div[text()='Cat Mice Let']"));
         ExtHelper.setExtFormElementByLabel(this, "X Axis", "Label:", "TestXAxis");
         ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
         waitForText("TestXAxis");
 
         waitForText(BOX_PLOT_MV_2);
@@ -1284,12 +1289,13 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
         ExtHelper.waitForExtDialog(this, "Error");
         ExtHelper.clickExtButton(this, "Error", "OK", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
 
         //Test cancel button
         ExtHelper.setExtFormElementByLabel(this, "Report Name", "TestReportName");
         ExtHelper.setExtFormElementByLabel(this, "Report Description", "TestReportDescription");
         ExtHelper.clickExtButton(this, "Save Chart", "Cancel", 0);
+        Ext4Helper.waitForMaskToDisappear(this);
         assertTextNotPresent("TestReportName");
 
         saveBoxPlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
@@ -1306,12 +1312,12 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("RCH-1: Reactogenicity-Day 1");
         setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
-        clickMenuButton("Views", "Create", "Box Plot");
+        clickMenuButton("Charts", "Create Box Plot");
 
         ExtHelper.waitForExtDialog(this, "Y Axis");
         mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
         ExtHelper.clickExtButton(this, "Y Axis", "Ok", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
 
         //Verify box plot
         waitForText(BOX_PLOT_DR_1);
@@ -1360,6 +1366,7 @@ public class ReportTest extends StudyBaseTest
         doManageViewsScatterPlotTest();
         doDataRegionScatterPlotTest();
         doQuickChartScatterPlotTest();
+        doCustomizeScatterPlotTest(); // Uses scatter plot created by doDataRegionScatterPlotTest()
 
         log("Verify saved scatter plots");
         clickTab("Clinical and Assay Data");
@@ -1466,7 +1473,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
         setFilter("Dataset", "APXpulse", "Is Less Than", "100");
-        clickMenuButton("Views", "Create", "Scatter Plot");
+        clickMenuButton("Charts", "Create Scatter Plot");
 
         ExtHelper.waitForExtDialog(this, "Y Axis");
         mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Y Axis") + "//div[text()='1. Weight']"));
@@ -1488,8 +1495,6 @@ public class ReportTest extends StudyBaseTest
 
         log("Verify point stying");
 
-        clickButton("Options", 0);
-
         saveScatterPlot(SCATTER_PLOT_NAME_DR, SCATTER_PLOT_DESC_DR);
     }
 
@@ -1509,7 +1514,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.waitForExtDialog(this, "X Axis");
         mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "X Axis") + "//div[text()='Integer']"));
         ExtHelper.clickExtButton(this, "X Axis", "Ok", 0);
-        waitForExtMaskToDisappear();
+        Ext4Helper.waitForMaskToDisappear(this);
 
         clickButton("Options", 0);
         ExtHelper.waitForExtDialog(this, "Plot Options", WAIT_FOR_JAVASCRIPT);
@@ -1519,6 +1524,35 @@ public class ReportTest extends StudyBaseTest
         waitForText(SCATTER_PLOT_QC);
 
         saveScatterPlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
+    }
+
+    private void doCustomizeScatterPlotTest()
+    {
+        clickReportGridLink(SCATTER_PLOT_NAME_DR, "view");
+        Ext4Helper.waitForMaskToDisappear(this);
+
+        // Verify default styling for point at origin - blue circles
+        waitForElement(Locator.css("svg > a > circle"));
+        Assert.assertEquals("Scatter points doin't have expected initial color", "#3366ff", getAttribute(Locator.css("svg > a > circle"), "fill"));
+        clickButton("Grouping", 0);
+        ExtHelper.waitForExtDialog(this, "Grouping Options");
+        click(Locator.ext4Radio("By a measure"));
+        click(Locator.ext4Radio("Per measure"));
+        ExtHelper.selectExt4ComboBoxItem(this, "Point Measure:", "16. Evaluation Summary");
+        ExtHelper.clickExtButton(this, "Grouping Options", "OK", 0);
+        Ext4Helper.waitForMaskToDisappear(this);
+
+        waitForElement(Locator.css("svg > a > path"));
+
+        // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
+        Assert.assertEquals("Point at (60, 48) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
+        Assert.assertEquals("Point at (60, 48) was an unexpected shape", "M75,-45L80,-55L70,-55Z", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "d"));
+        // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal square
+        Assert.assertEquals("Square at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+        Assert.assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
+        Assert.assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
+
+        saveScatterPlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored");
     }
 
     private void assertSVG(String expectedSvgText)
@@ -1543,15 +1577,27 @@ public class ReportTest extends StudyBaseTest
 
     private void savePlot(String name, String description)
     {
-        clickButton("Save", 0);
-        ExtHelper.waitForExtDialog(this, "Save Chart");
+        boolean saveAs = getButtonLocator("Save As") != null;
+
+        clickButton(saveAs ? "Save As" : "Save", 0);
+        ExtHelper.waitForExtDialog(this, saveAs ? "Save As" : "Save Chart");
         ExtHelper.setExtFormElementByLabel(this, "Report Name", name);
         ExtHelper.setExtFormElementByLabel(this, "Report Description", description);
 
-        ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
+        ExtHelper.clickExtButton(this, saveAs ? "Save As" : "Save Chart", "Save", 0);
+        Ext4Helper.waitForMaskToDisappear(this);
+        ExtHelper.waitForExtDialogToDisappear(this, "Saved");
         waitForText(name);
-        waitForExtMaskToDisappear();
-        sleep(1000); // Takes a moment for page to not be marked as dirty
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return !Boolean.parseBoolean(selenium.getEval("var p = selenium.browserbot.getCurrentWindow().Ext4.getCmp('generic-report-panel-1'); " +
+                        "if (p) p.isDirty(); " +
+                        "else false;"));
+            }
+        },"Page still dirty", WAIT_FOR_JAVASCRIPT);
     }
 
     private void doParticipantGroupCategoriesTest()
@@ -1576,10 +1622,11 @@ public class ReportTest extends StudyBaseTest
 
         // Check that groups have correct number of members
         clickLinkWithText("Mice");
-        waitForText("Filter"); // Wait for participant list to appear.
+        waitForText("Cohorts"); // Wait for participant list to appear.
+        sleep(500); // Sleep because the list takes a while to populate.
 
-        mouseDownGridCellCheckbox("All", 1);
-        mouseDownGridCellCheckbox("All", 2);
+        // no longer an all check box
+        deselectAllFilterGroups();
         waitForText("No matching Mice");
 
         mouseDownGridCellCheckbox("Mice C");
@@ -1603,12 +1650,17 @@ public class ReportTest extends StudyBaseTest
         // Check that group has correct number of participants
         clickLinkWithText("Mice");
         waitForText("Filter"); // Wait for participant list to appear.
-        mouseDownGridCellCheckbox("All", 1);
-        mouseDownGridCellCheckbox("All", 2);
+        deselectAllFilterGroups();
         waitForText("No matching Mice");
         mouseDownGridCellCheckbox("Mice C");
         waitForText("Found 5 mice of 138.");
+    }
 
+    private void deselectAllFilterGroups()
+    {
+        Locator all = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//b[contains(@class, 'filter-description') and contains(text(), 'All')]/../../../..//div[contains(@class, 'x4-grid-row-checker')]");
+        waitForElement(all);
+        mouseDown(all);
     }
 
     private static final String QUERY_REPORT_NAME = "First Test Query Report";

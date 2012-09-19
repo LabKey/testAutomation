@@ -37,9 +37,9 @@ public class IssuesTest extends BaseSeleniumWebTest
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
     private static final String ISSUE_TITLE_2 = "A not so serious issue";
     private static final String ISSUE_TITLE_3 = "A sub-folder issue";
-    private static final String USER1 = "user1@issues.test";
-    private static final String USER2 = "user2@issues.test";
-    private static final String USER3 = "user3@issues.test";
+    private static final String USER1 = "user1_issuetest@issues.test";
+    private static final String USER2 = "user2_issuetest@issues.test";
+    private static final String USER3 = "user3_issuetest@issues.test";
     private static final String EMAILRECORD_TABLE = "dataregion_EmailRecord";
 
     private static final String[] REQUIRED_FIELDS = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",

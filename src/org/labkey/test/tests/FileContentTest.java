@@ -37,7 +37,7 @@ public class FileContentTest extends BaseSeleniumWebTest
     private static final String FILE_DESCRIPTION = "FileContentTestFile";
     private static final String CUSTOM_PROPERTY_VALUE = "ExtendedProperty";
     private static final String CUSTOM_PROPERTY = "customProperty";
-    private static final String TEST_USER = "user@filecontent.test";
+    private static final String TEST_USER = "user_filecontent@filecontent.test";
     private static final String TEST_GROUP = "FileContentTestGroup";
 
     // Lookup list info

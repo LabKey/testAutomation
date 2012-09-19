@@ -355,4 +355,3 @@ selenium.setEditAreaValue = function(id, value) {
 };
 
 "OK";
-

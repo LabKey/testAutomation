@@ -88,9 +88,13 @@ public class StudyProtectedExportTest extends StudyExportTest
         assertTextNotPresent(originalID);
         assertTextPresent(newID);
 
-        assertTextPresent("All", "Group 1", "Group 2", "Not in any cohort");
-        clickAt(Locator.tagContainingText("div", "All"), "2,2");
-        clickAt(Locator.tagContainingText("div", "Not in any cohort"), "2,2");
+        // not in any group only appears if there are participants not in any of the groups in a category
+        assertTextPresent("Group 1", "Group 2");
+        assertTextNotPresent("Not in any cohort");
+
+        mouseDownGridCellCheckbox("Group 1");
+        mouseDownGridCellCheckbox("Group 2");
+
         waitForText("No matching Mice");
 
 
@@ -136,7 +140,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickAt(checkbox, "1,1");
 
         selectImportDataAction("Import Study");
-        waitForPipelineJobsToFinish(++pipelineJobCount);
+        waitForPipelineJobsToComplete(++pipelineJobCount, "study import", false);
     }
 
     @Override

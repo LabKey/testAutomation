@@ -49,8 +49,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private static final String DISC1_BODY = "I don't know how normal this wiki is";
     private static final String RESP1_TITLE = "Let's Keep Talking";
     private static final String RESP1_BODY = "I disagree";
-    private static final String USER1 = "user1@wikilong.test";
-    private static final String USER2 = "user2@wikilong.test";
+    private static final String USER1 = "wikilong_user1@wikilong.test";
+    private static final String USER2 = "wikilong_user2@wikilong.test";
     private static final String USERS_GROUP = "Users";
     private static final String WIKI_PAGE3_WEBPART_TEST = "Best Gene Name";
     private static final String WIKI_NAVTREE_TITLE = "NavTree";
