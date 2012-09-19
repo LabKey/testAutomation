@@ -1450,18 +1450,27 @@
          </zip>
     </target>
 
-    <condition property="skipfish.src.dir" value="${teamcity.agent.home.dir}/plugins/skipfish">
-        <available file="${teamcity.agent.home.dir}/plugins/skipfish"/>
-    </condition>
+    <target name="skipfish_init">
 
-    <condition property="skipfish.built" value="true">
-        <or>
-            <available file="${skipfish.src.dir}/skipfish"/>
-            <available file="${skipfish.src.dir}/skipfish.exe"/>
-        </or>
-    </condition>
+        <condition property="skipfish.src.dir" value="${teamcity.agent.home.dir}/plugins/skipfish">
+            <available file="${teamcity.agent.home.dir}/plugins/skipfish"/>
+        </condition>
 
-    <target name="skipfish_scan" depends="skipfish_make">
+        <condition property="skipfish.built" value="true">
+            <or>
+                <available file="${skipfish.src.dir}/skipfish"/>
+                <available file="${skipfish.src.dir}/skipfish.exe"/>
+            </or>
+        </condition>
+
+        <condition property="skipfish.results.dir" else="${skipfish.src.dir}/results">
+            <isset property="skipfish.results.dir"/>
+        </condition>
+
+        <condition property="skipfish.report.dir" else="${skipfish.src.dir}">
+            <isset property="skipfish.report.dir"/>
+        </condition>
+
         <condition property="skipfish.wordlist" else="new_dict.wl">
             <isset property="skipfish.wordlist"/>
         </condition>
@@ -1478,22 +1487,16 @@
             <isset property="labkey.server"/>
         </condition>
 
-        <condition property="skipfish.results.dir" else="${skipfish.src.dir}/results">
-            <isset property="skipfish.results.dir"/>
-        </condition>
-
-        <condition property="skipfish.report.dir" else="${skipfish.src.dir}">
-            <isset property="skipfish.report.dir"/>
-        </condition>
-
         <condition property="skipfish.timeout" else="30">
             <isset property="skipfish.timeout"/>
         </condition>
 
         <property name="server.url" value="${labkey.server}:${labkey.port}"/>
 
+    </target>
+
+    <target name="skipfish_scan" depends="skipfish_init, skipfish_make">
         <delete dir="${skipfish.results.dir}"/>
-        <delete file="${skipfish.report.dir}/skipfish.zip"/>
 
         <touch file="${skipfish.src.dir}/${skipfish.wordlist}"/>
         <exec executable="${skipfish.src.dir}\skipfish.exe" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="windows" errorproperty="skipfish.failed">
@@ -1540,15 +1543,17 @@
         </exec>
     </target>
 
-    <target name="skipfish_teamcity" description="Fire up tomcat and run skipfish">
+    <target name="skipfish_teamcity" description="Fire up tomcat and run skipfish" depends="skipfish_init">
         <ant target="start_tomcat_cc" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
         <antcall target="skipfish_scan"/>
         <ant target="stop_tomcat" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
-        <antcall target="skipfish_fail"/>
 
+        <delete file="${skipfish.report.dir}/skipfish.zip"/>
         <zip destfile="${skipfish.report.dir}/skipfish.zip" update="true" >
             <zipfileset dir="${skipfish.results.dir}"/>
         </zip>
+
+        <antcall target="skipfish_fail"/>
     </target>
 
     <target name="skipfish_fail" if="skipfish.failed">
