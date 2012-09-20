@@ -48,7 +48,7 @@ public class ReportTest extends StudyBaseTest
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
     private final static String R_SCRIPT1_EDIT_FUNC = "length(x) * 2";
     protected static final String TEST_GROUP = "firstGroup";
-    protected static final String TEST_USER = "user1@report.test";
+    protected static final String TEST_USER = "report_user1@report.test";
     private static final String TEST_GRID_VIEW = "Test Grid View";
     public static final String AUTHOR_REPORT = "Author report";
 
