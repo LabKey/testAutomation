@@ -1289,7 +1289,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickExtButton(this, "Save Chart", "Save", 0);
         ExtHelper.waitForExtDialog(this, "Error");
         ExtHelper.clickExtButton(this, "Error", "OK", 0);
-        Ext4Helper.waitForMaskToDisappear(this);
+        ExtHelper.waitForExt3MaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
         //Test cancel button
         ExtHelper.setExtFormElementByLabel(this, "Report Name", "TestReportName");
@@ -1324,7 +1324,7 @@ public class ReportTest extends StudyBaseTest
 
         //Change filter and check box plot again
         clickButton("View Data", 0);
-        clearFilter("aqwp4", "RCHtempc", 0);
+        clearFilter("aqwp3", "RCHtempc", 0);
         waitForText("40.0");
         clickButton("View Chart", 0);
         waitForText(BOX_PLOT_DR_2);

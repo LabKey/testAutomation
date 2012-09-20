@@ -2937,24 +2937,36 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             Assert.fail(failMessage + " ["+wait+"ms]");
     }
 
-    public void waitForExtMaskToDisappear()
+    /**
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(BaseSeleniumWebTest, int)}
+     */
+    @Deprecated public void waitForExtMaskToDisappear()
     {
         waitForExtMaskToDisappear( WAIT_FOR_JAVASCRIPT );
     }
 
-    public void waitForExtMaskToDisappear(int wait)
+    /**
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(BaseSeleniumWebTest, int)}
+     */
+    @Deprecated public void waitForExtMaskToDisappear(int wait)
     {
-        waitForElementToDisappear(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and (contains(@class, 'ext-el-mask') or contains(@class, 'x4-mask'))]"), wait);
+        ExtHelper.waitForExt3MaskToDisappear(this, wait);
     }
 
-    public void waitForExtMask()
+    /**
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(BaseSeleniumWebTest, int)}
+     */
+    @Deprecated public void waitForExtMask()
     {
         waitForExtMask( WAIT_FOR_JAVASCRIPT );
     }
 
-    public void waitForExtMask(int wait)
+    /**
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(BaseSeleniumWebTest, int)}
+     */
+    @Deprecated public void waitForExtMask(int wait)
     {
-        waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and (contains(@class, 'ext-el-mask') or contains(@class, 'x4-mask'))]"), wait);
+        ExtHelper.waitForExt3Mask(this, wait);
     }
 
     //like wait for ExtMask, but waits for a draggable mask (for example, the file rename mask)
@@ -5160,37 +5172,26 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
-        if (1==0)
-        {
-            log("Setting permissions for " + userOrGroupName + " to " + permissionString);
-            //setWorkingForm("updatePermissions");
-            selenium.select(Locator.permissionSelect(userOrGroupName).toString(), permissionString);
-            clickNavButton("Update");
-            assertPermissionSetting(userOrGroupName, permissionString);
-        }
-        else
-        {
-            if (!isElementPresent(Locator.permissionRendered()))
-                enterPermissionsUI();
-            ExtHelper.clickExtTabContainingText(this, "Permissions");
+        if (!isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
+        ExtHelper.clickExtTabContainingText(this, "Permissions");
 
-            String role = toRole(permissionString);
-            if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
-            {
-                Assert.fail("call removePermission()");
-                return;
-            }
-            log("Setting permissions for group " + userOrGroupName + " to " + role);
-
-            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-            String input = "$add$" + role;
-            String combo = "$combo$";
-            click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + userOrGroupName + "']"));
-            sleep(100);
-            savePermissions();
-            assertPermissionSetting(userOrGroupName, permissionString);
+        String role = toRole(permissionString);
+        if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
+        {
+            Assert.fail("call removePermission()");
+            return;
         }
+        log("Setting permissions for group " + userOrGroupName + " to " + role);
+
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+        String input = "$add$" + role;
+        String combo = "$combo$";
+        click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
+        click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + userOrGroupName + "']"));
+        sleep(100);
+        savePermissions();
+        assertPermissionSetting(userOrGroupName, permissionString);
     }
 
 
