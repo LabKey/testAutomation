@@ -132,9 +132,9 @@ public class UserTest extends SecurityTest
         goToModule("Issues");
         clickLinkWithText("New Issue");
         assertElementNotPresent(Locator.css("#assignedTo option[value="+userId+"]"));
-        assertTextNotPresent(NORMAL_USER);
+        assertTextNotPresent(displayNameFromEmail(NORMAL_USER));
         assertElementPresent(Locator.css("#assignedTo option[value="+adminUserId+"]"));
-        assertTextPresent(PROJECT_ADMIN_USER);
+        assertTextPresent(displayNameFromEmail(PROJECT_ADMIN_USER));
     }
 
     /**if user NORMAL_USER2 does not exist, create them,
