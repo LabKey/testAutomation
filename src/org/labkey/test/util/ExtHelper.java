@@ -247,12 +247,12 @@ public class ExtHelper
 
     public static void waitForExt3MaskToDisappear(BaseSeleniumWebTest test, int wait)
     {
-        test.waitForElementToDisappear(Locator.css("div.ext-el-mask"), wait);
+        test.waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
     }
 
     public static void waitForExt3Mask(BaseSeleniumWebTest test, int wait)
     {
-        test.waitForElement(Locator.css("div.ext-el-mask"), wait);
+        test.waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
     }
 
     public static Locator locateGridRowCheckbox(String rowTextContent)
