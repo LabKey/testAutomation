@@ -304,7 +304,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected void runUploadAndCopyTest()
     {
-        ListHelper.importListArchive(this, getProjectName(), new File(getSampledataPath() + "\\Luminex\\UploadAndCopy.lists.zip"));
+        ListHelper.importListArchive(this, getProjectName(), new File(getSampledataPath(), "/Luminex/UploadAndCopy.lists.zip"));
 //        ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListColumnType.String, "Participant ID");
 //        ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListColumnType.Double, "Visit id");
 //        ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListColumnType.String, "Index", participantCol, visitCol);

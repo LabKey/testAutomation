@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -530,6 +531,8 @@ public class ListHelper
 
     public static void importListArchive(BaseSeleniumWebTest test, String folderName, File inputFile)
     {
+        Assert.assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
+
         test.clickLinkWithText(folderName);
         if (!test.isLinkPresentWithText("Lists"))
         {
