@@ -1032,7 +1032,7 @@ public class ReportTest extends StudyBaseTest
         {
             assertTextPresent(ptid);
 
-            String base = "//td//a[text()='" + ptid + "']/../../..//td[contains(text(), 'Groups:')]/following-sibling::td[contains(text(), '";
+            String base = "//td//a[text()='" + ptid + "']/../../..//td[contains(text(), 'Groups:')]/following-sibling::td[contains(normalize-space(), '";
             waitForElement(Locator.xpath(base + PARTICIPANT_GROUP_ONE + "')]"));
 
             if (ptid_list2.contains(ptid))
