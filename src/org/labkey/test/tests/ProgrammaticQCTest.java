@@ -112,6 +112,11 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         addWebPart("Assay List");
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/ProgrammaticQC/QC Assay.xar", 1, "QC Assay.xar");
+
+        goToProjectHome();
+        clickLinkContainingText("QC Assay");
+        click(Locator.linkWithText("manage assay design"));
+        clickLinkWithText("edit assay design");
 //        clickNavButton("Manage Assays");
 //        clickNavButton("New Assay Design");
 //        checkRadioButton("providerName", "General");
@@ -121,7 +126,10 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 //
 //        selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
 //
-//        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
+        clickNavButton("Save & Close");
+//        sleep(500);
+        goToProjectHome();
 //
 //        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
 //        {

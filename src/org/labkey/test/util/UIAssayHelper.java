@@ -28,7 +28,9 @@ public class UIAssayHelper extends AbstractAssayHelper
     @Override
     public void importAssay(String assayName, String file, String projectPath) throws CommandException, IOException
     {
-        _test.clickLinkWithText(projectPath);
+        String[] folders = projectPath.split("/");
+        for(String folder : folders)
+            _test.clickLinkWithText(folder);
         _test.clickLinkContainingText(assayName);
         _test.clickButton("Import Data");
         _test.clickButton("Next");
