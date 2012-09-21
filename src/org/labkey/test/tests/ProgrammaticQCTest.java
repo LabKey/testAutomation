@@ -134,7 +134,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         // create the list for the qc log
 //        ListHelper.createList(this, TEST_PROGRAMMATIC_QC_PRJ, "QC Log", ListHelper.ListColumnType.AutoInteger, "Key", _listCol1, _listCol2,
 //                _listCol3, _listCol4, _listCol5, _listCol6);
-        ListHelper.importListArchive(this, getProjectName(), new File(getSampledataPath() + "\\ProgrammaticQC\\Programmatic QC.lists.zip"));
+        ListHelper.importListArchive(this, getProjectName(), new File(getSampledataPath(), "/ProgrammaticQC/Programmatic QC.lists.zip"));
     }
 
     private void defineTransformAssay(String assayName, boolean addQCScript)
