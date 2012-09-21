@@ -2641,8 +2641,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
         int startCount = getXpathCount(removeButton);
         click(removeButton);
-        waitForExtMaskToDisappear();
-        assertElementPresent(removeButton, startCount - 1);
+        waitForElementToDisappear(removeButton.index(startCount), WAIT_FOR_JAVASCRIPT);
     }
 
     public boolean isTitleEqual(String match)
