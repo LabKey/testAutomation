@@ -400,6 +400,13 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
     }
 
+    private void dataRegionButtonTest()
+    {
+        //TODO: check custom buttons
+
+        //TODO: also check that delete, import, etc do not appear unless explicitly enabled
+    }
+
     /**
      * This tests misc views that are not included in detailsPagesTest()
      */
