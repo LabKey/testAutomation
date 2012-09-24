@@ -137,4 +137,11 @@ public class LabModuleHelper
     {
         return new DataRegionTable(getNameForQueryWebpart(title), _test);
     }
+
+    public void setFormField(String name, String value)
+    {
+        _test.setText(name, value);
+        //there is a deliberate delay after user input for a change to commit in the Ext store
+        _test.sleep(250);
+    }
 }

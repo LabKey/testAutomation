@@ -73,7 +73,6 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         peptideTableTest();
         searchPanelTest();
         queryMetadataTest();
-//        samplesWebpartTest();
     }
 
     private void setUpTest() throws Exception
@@ -284,8 +283,8 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _helper.clickNavPanelItem("Samples:", "Import Data");
         waitForElement(Locator.name("samplespecies"));
 
-        setText("samplename", "SampleName");
-        setText("samplespecies", "Species");
+        _helper.setFormField("samplename", "SampleName");
+        _helper.setFormField("samplespecies", "Species");
 
         //verify drop down menus show correct text by spot checking several drop-downs
         //NOTE: trailing spaces are added by ext template
@@ -305,8 +304,8 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         waitForElement(Ext4Helper.invalidField());
 
         //TODO: why doesnt this work?
-//        setText("box_row", "-100");
-//        setText("freezer", "Freezer1");
+//        _helper.setFormField("box_row", "-100");
+//        _helper.setFormField("freezer", "Freezer1");
 //        sleep(50);
 //        clickButton("Submit", 0);
 //
@@ -395,8 +394,8 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         Ext4Helper.clickExt4MenuItem(this, "Samples");
         waitForPageToLoad();
         waitForElement(Locator.name("freezer"));
-        setText("samplename", "Sample" + suffix);
-        setText("freezer", "freezer_" + _helper.getRandomInt());
+        _helper.setFormField("samplename", "Sample" + suffix);
+        _helper.setFormField("freezer", "freezer_" + _helper.getRandomInt());
 
         Ext4Helper.selectComboBoxItem(this, "Sample Type", "DNA");
         Ext4Helper.selectComboBoxItem(this, "Sample Source", "Blood");
@@ -446,8 +445,8 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         String sequence = "Sv LFpT LLF";
         String name = "Peptide 1"; //spaces should get replaced with '_' on import
 
-        setText("sequence", sequence + "123");
-        setText("name", name);
+        _helper.setFormField("sequence", sequence + "123");
+        _helper.setFormField("name", name);
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
@@ -457,7 +456,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         assertTextPresent(errorMsg);
         clickButton("OK", 0);
 
-        setText("sequence", sequence);
+        _helper.setFormField("sequence", sequence);
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
@@ -484,7 +483,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         waitForTextToDisappear("Loading...");
         waitForElement(Locator.name("name"));
         sleep(50);
-        setText("name", "TestPrimer");
+        _helper.setFormField("name", "TestPrimer");
         click(Locator.ext4Button("Submit"));
         waitForPageToLoad();
         DataRegionTable table = new DataRegionTable("query", this);
