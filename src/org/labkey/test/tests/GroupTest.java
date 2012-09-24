@@ -257,12 +257,12 @@ public class GroupTest extends BaseSeleniumWebTest
     {
         for(String[] wikiValues : nameTitleBody)
         {
-            waitForElement(Locator.linkContainingText(wikiValues[1]), defaultWaitForPage);
-            sleep(1000);
-            clickLinkWithText(wikiValues[1]);
+            waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText(wikiValues[1]), WAIT_FOR_PAGE);
+            waitForText(wikiValues[2]);
             if(!isTextPresent("Edit"))
                 return false;
             selenium.goBack();
+            waitForPageToLoad();
         }
         return true;
     }
@@ -271,7 +271,7 @@ public class GroupTest extends BaseSeleniumWebTest
     {
         for(String[] wikiValues : nameTitleBody)
         {
-            if(!isTextPresent(wikiValues[1]))
+            if(!isLinkPresentWithText(wikiValues[1]))
                 return false;
         }
         return true;
