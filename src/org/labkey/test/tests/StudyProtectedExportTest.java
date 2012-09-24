@@ -175,9 +175,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickButton("Manage Dataset");
         clickButton("Edit Definition");
 
-        sleep(1000); //TODO
-
-        click(Locator.name("ff_label9"));
+        waitAndClick(Locator.name("ff_label9"));
         setColumnProtected();
         sleep(1000); //TODO
         clickButton("Save", 0);
