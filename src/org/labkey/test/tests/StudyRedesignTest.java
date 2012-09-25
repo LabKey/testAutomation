@@ -63,7 +63,7 @@ public class StudyRedesignTest extends StudyBaseTest
         startSpecimenImport(2);
 
         // wait for study and specimens to finish loading
-        waitForPipelineJobsToComplete(2, "study and specimen import", false);
+        waitForSpecimenImport();
         setStudyRedesign();
         setupDatasetCategories();
         log("Create report for data view webpart test.");
