@@ -386,6 +386,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void log(String str)
     {
+        str = str.replace(Locator.NOT_HIDDEN, "NOT_HIDDEN"); // This xpath fragment really clutters up the log
         String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date());      // Include time with log entry.  Use format that matches labkey log.
         System.out.println(d + " " + str);
     }
