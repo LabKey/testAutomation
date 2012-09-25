@@ -1463,19 +1463,19 @@
             </or>
         </condition>
 
-        <condition property="skipfish.results.dir" else="${skipfish.src.dir}/results">
+        <condition property="skipfish.results.dir" value="${skipfish.results.dir}" else="${skipfish.src.dir}/results">
             <isset property="skipfish.results.dir"/>
         </condition>
 
-        <condition property="skipfish.report.dir" else="${skipfish.src.dir}">
+        <condition property="skipfish.report.dir" value="${skipfish.report.dir}" else="${skipfish.src.dir}">
             <isset property="skipfish.report.dir"/>
         </condition>
 
-        <condition property="skipfish.wordlist" else="new_dict.wl">
+        <condition property="skipfish.wordlist" value="${skipfish.wordlist}" else="new_dict.wl">
             <isset property="skipfish.wordlist"/>
         </condition>
 
-        <condition property="skipfish.supplemental.wordlist" else="minimal.wl">
+        <condition property="skipfish.supplemental.wordlist" value="${skipfish.supplemental.wordlist}" else="minimal.wl">
             <isset property="skipfish.supplemental.wordlist"/>
         </condition>
 
@@ -1483,7 +1483,7 @@
             <isset property="labkey.port"/>
         </condition>
 
-        <condition property="sysprop.labkey.server" else="http://localhost">
+        <condition property="sysprop.labkey.server" value="${labkey.server}" else="http://localhost">
             <isset property="labkey.server"/>
         </condition>
 
@@ -1491,7 +1491,7 @@
             <isset property="labkey.contextpath"/>
         </condition>
 
-        <condition property="skipfish.timeout" else="30">
+        <condition property="skipfish.timeout" value="${skipfish.timeout}" else="30">
             <isset property="skipfish.timeout"/>
         </condition>
 

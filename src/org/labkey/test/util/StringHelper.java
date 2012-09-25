@@ -15,17 +15,21 @@
  */
 package org.labkey.test.util;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 12/26/11
  * Time: 10:02 AM
- * To change this template use File | Settings | File Templates.
  */
 public class StringHelper
 {
-    public static boolean stringArraysAreEquivalent(String[] expected, String[] actual)
+    public static boolean stringArraysAreEquivalentTrimmed(String[] expected, String[] actual)
     {
-        return true;
+        HashSet<String> expectedSet = new HashSet<String>(Arrays.asList(expected));
+        HashSet<String> actualSet = new HashSet<String>(Arrays.asList(actual));
+
+        return expectedSet.equals(actualSet);
     }
 }

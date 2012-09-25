@@ -5461,7 +5461,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if(!isElementPresent(Locator.xpath("//li[contains(@class,'tab-strip-active')]//span[text()='Site Groups']")))
             goToSiteGroups();
 
-        waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
+        waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath("//div[text()='" + groupName + "']"));
         ExtHelper.waitForExtDialog(this, groupName + " Information");
     }
 
