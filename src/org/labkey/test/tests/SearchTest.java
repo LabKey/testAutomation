@@ -112,16 +112,16 @@ public class SearchTest extends StudyTest
         clickLinkWithText(listToDelete);
         ListHelper.deleteList(this);
 
-        SearchHelper.enqueueSearchItem("BoarQPine", null);
+        SearchHelper.enqueueSearchItem("BoarQPine");
         SearchHelper.enqueueSearchItem("Panda", Locator.bodyLinkWithText("List " + fullySearchableList));
         SearchHelper.enqueueSearchItem("2003-01-02", Locator.bodyLinkWithText("List " + fullySearchableList));
         SearchHelper.enqueueSearchItem("12345", Locator.bodyLinkWithText("List " + fullySearchableList));  //Issue 15419
         SearchHelper.enqueueSearchItem("Owlbear", Locator.bodyLinkWithText("List " + textOnlySearchableList));
-        SearchHelper.enqueueSearchItem("54321", null);
+        SearchHelper.enqueueSearchItem("54321");
         SearchHelper.enqueueSearchItem(metaOnlySearchable, Locator.bodyLinkWithText("List " + metaOnlySearchable));
         SearchHelper.enqueueSearchItem("Turtleduck", Locator.bodyLinkWithText("List " + metaOnlySearchable)); //this phrase is present in the metadata-only file
         SearchHelper.enqueueSearchItem("Cat", Locator.bodyLinkWithText("List " + customizedIndexingList));
-        SearchHelper.enqueueSearchItem("Garfield", null);
+        SearchHelper.enqueueSearchItem("Garfield");
     }
 
     protected void doVerifySteps()
@@ -267,7 +267,7 @@ public class SearchTest extends StudyTest
 
 
         SearchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
-        SearchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE", null);
+        SearchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE");
         SearchHelper.enqueueSearchItem(WIKI_TITLE, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem(WIKI_CONTENT, Locator.linkWithText(WIKI_TITLE));
         SearchHelper.enqueueSearchItem("moduleDependencies", Locator.linkWithText("\"module.template.properties\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file

@@ -67,7 +67,7 @@ public class SearchHelper
         {
             searchFor(test, item._searchTerm);
 
-            if(item._searchResults==null)
+            if(item._searchResults.length == 0)
             {
                 test.assertTextPresent("Found 0 results");
             }
@@ -185,10 +185,7 @@ public class SearchHelper
         public SearchItem(String term, boolean file, Locator... results)
         {
             _searchTerm = term;
-            if(results!=null)
-                _searchResults = results.clone();
-            else
-                _searchResults = null;
+            _searchResults = results;
             _file = file;
         }
 
