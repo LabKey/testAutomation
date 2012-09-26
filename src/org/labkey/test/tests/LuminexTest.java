@@ -1334,20 +1334,6 @@ public class LuminexTest extends AbstractQCAssayTest
         boolean displayingRowId = false;
         for (int i = 0; i < 2; i++)
         {
-                               //TODO
-            AbstractAssayHelper assayHelper = new APIAssayHelper(this);
-            try
-            {
-                assayHelper.importAssay("&TestAssayLuminex></% 1", files[i].getAbsolutePath(), getProjectName());
-            }
-            catch (CommandException e)
-            {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
             importRunForTestLuminexConfig(files[i], testDate, i);
 
             displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
