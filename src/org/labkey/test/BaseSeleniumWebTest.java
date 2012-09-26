@@ -1408,18 +1408,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                     try{
                         resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                     }
-                    catch(Exception e){log("Failed to reset DB long config after test failure");}
+                    catch(Throwable t){log("Failed to reset DB long config after test failure");}
 
                     try{
                         setSystemMaintenance(true); // Re-enable system maintenance.
                     }
-                    catch(Exception e){log("Failed to enable system maintenance after test failure");}
+                    catch(Throwable t){log("Failed to enable system maintenance after test failure");}
 
                     try{
                         if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
                             fixPipelineToolsDirectory();
                     }
-                    catch(Exception e){log("Failed to fix pipeline tools directory after test failure");}
+                    catch(Throwable t){log("Failed to fix pipeline tools directory after test failure");}
                 }
             }
 
