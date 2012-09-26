@@ -81,6 +81,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(ASSAY_NAME + " Batches");
         assertTitleEquals(ASSAY_NAME + " Batches: /" + PROJECT_NAME);
 
+        // Verify file-based view associated with assay design shows up, with expected columns
+        clickMenuButton("Views", "AssayDesignBatches");
+        assertTextPresent("Modified", "Created By");
+        assertTextNotPresent("First Batch", "Target Study", "Target Study", "Run Count");
+
+        // Verify file-based view associated with assay type shows up, with expected columns
+        clickMenuButton("Views", "AssayTypeBatches");
+        assertTextPresent("First Batch", "Created By");
+        assertTextNotPresent("Modified", "Run Count");
+
+        clickMenuButton("Views", "default");
+
         log("Visit batch details page");
         clickLinkWithText("details");
         assertTitleEquals(batchName + " Details: /" + PROJECT_NAME);
@@ -99,6 +111,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(batchName);
         assertTitleEquals(ASSAY_NAME + " Runs: /" + PROJECT_NAME);
 
+        // Verify file-based view associated with assay design shows up, with expected columns
+        clickMenuButton("Views", "AssayDesignRuns");
+        assertTextPresent("Created By", "Modified");
+        assertTextNotPresent("Assay Id", "MetaOverride Double Run", "Run Count", "run01.tsv", "run02.tsv");
+
+        // Verify file-based view associated with assay type shows up, with expected columns
+        clickMenuButton("Views", "AssayTypeRuns");
+        assertTextPresent("Assay Id", "Created By", "MetaOverride Double Run", "run01.tsv", "run02.tsv");
+        assertTextNotPresent("Modified", "Run Count");
+
+        clickMenuButton("Views", "default");
+
         log("Visit run details page");
         setSort(ASSAY_NAME + " Runs", "Name", SortDirection.ASC);
         clickLinkWithText("details");
@@ -112,6 +136,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         waitForPageToLoad();
         clickLinkWithText("run01.tsv");
         assertTitleEquals(ASSAY_NAME + " Results: /" + PROJECT_NAME);
+
+                // Verify file-based view associated with assay design shows up, with expected columns
+        clickMenuButton("Views", "AssayDesignData");
+        assertTextPresent("Created By", "Modified");
+        assertTextNotPresent("Sample Id", "Monkey 1", "Monkey 2", "MetaOverride Double Run", "Run Count");
+
+        // Verify file-based view associated with assay type shows up, with expected columns
+        clickMenuButton("Views", "AssayTypeData");
+        assertTextPresent("Sample Id", "Monkey 1", "Monkey 2", "Time Point", "Double Data", "Assay Id", "run01.tsv");
+        assertTextNotPresent("MetaOverride Double Run", "Run Count", "Target Study");
+
+        clickMenuButton("Views", "default");
 
         log("Visit result details page");
         clickLinkWithText("details");
@@ -143,6 +179,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void setupProject()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
+        enableModule("miniassay", true);
         setupPipeline(PROJECT_NAME);
         createAssayDesign();
         createSampleSet();

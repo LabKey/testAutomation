@@ -1,0 +1,7 @@
+<cv:customView xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+    <cv:columns>
+        <cv:column name="Name"/>
+        <cv:column name="CreatedBy"/>
+        <cv:column name="TargetStudy"/>
+    </cv:columns>
+</cv:customView>
