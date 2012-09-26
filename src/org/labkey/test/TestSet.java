@@ -62,7 +62,6 @@ public enum TestSet
         FlowTest.class,
         XTandemTest.class,
         StudyTest.class,
-        SystemMaintenanceTest.class,
         WebDavTest.class
     }),
 
@@ -113,6 +112,7 @@ public enum TestSet
         TimelineTest.class,
         ExternalSchemaTest.class,
         MenuBarTest.class,
+        AssayAPITest.class,
         LuminexUploadAndCopyTest.class,
         LuminexExcludableWellsTest.class,
         LuminexMultipleCurvesTest.class,
@@ -126,6 +126,7 @@ public enum TestSet
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
+//        SpecimenProgressReportTest.class,
         FormulationsTest.class,
         CohortTest.class,
         RlabkeyTest.class,
