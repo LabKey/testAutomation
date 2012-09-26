@@ -61,7 +61,7 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload data");
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement("text", TEST_DATA_FAIL);
         ListHelper.submitImportTsv_error(this, null);
         assertTextPresent(SEX_ERROR_MSG);
@@ -75,7 +75,7 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
 
         // ID regex validation
         log("Test inserting new row");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_id", "id:123abc:001");
         setFormElement("quf_name", "Sid");
         setFormElement("quf_sex", "male");
@@ -91,7 +91,7 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
 
         // age range validation
         log("Test inserting new row");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_id", "ID:123abc:001");
         setFormElement("quf_name", "Mikey");
         setFormElement("quf_sex", "male");
@@ -104,7 +104,7 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
 
         // sex validation
         log("Test inserting new row");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_id", "ID:123abc:001");
         setFormElement("quf_name", "Kim");
         setFormElement("quf_sex", "Female");

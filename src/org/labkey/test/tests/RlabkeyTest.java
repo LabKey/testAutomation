@@ -60,34 +60,34 @@ public class RlabkeyTest extends SimpleApiTest
 
         clickLinkWithText(PROJECT_NAME);        
         addWebPart("Issues List");
-        clickNavButton("Admin");
+        clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
-        clickNavButton("Update");
-        clickNavButton("Back to Issues");
-        clickNavButton("New Issue");
+        clickButton("Update");
+        clickButton("Back to Issues");
+        clickButton("New Issue");
         setFormElement("title", ISSUE_TITLE_0);
-        clickNavButton("Save");
+        clickButton("Save");
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
 
         clickLinkWithText(FOLDER_NAME);
         addWebPart("Issues List");
-        clickNavButton("Admin");
+        clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
-        clickNavButton("Update");
-        clickNavButton("Back to Issues");
-        clickNavButton("New Issue");
+        clickButton("Update");
+        clickButton("Back to Issues");
+        clickButton("New Issue");
         setFormElement("title", ISSUE_TITLE_1);
-        clickNavButton("Save");
+        clickButton("Save");
 
         clickLinkWithText(PROJECT_NAME_2);
         addWebPart("Issues List");
-        clickNavButton("Admin");
+        clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
-        clickNavButton("Update");
-        clickNavButton("Back to Issues");
-        clickNavButton("New Issue");
+        clickButton("Update");
+        clickButton("Back to Issues");
+        clickButton("New Issue");
         setFormElement("title", ISSUE_TITLE_2);
-        clickNavButton("Save");
+        clickButton("Save");
         
         RReportHelper.ensureRConfig(this);
     }

@@ -19,8 +19,6 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
-import java.util.Date;
-
 /**
  * User: jeckels
  * Date: Jul 20, 2012
@@ -93,21 +91,21 @@ public class UIContainerHelper extends AbstractContainerHelper
             if (_test.isElementPresent(Locator.name("approvedTermsOfUse")))
             {
                 _test.clickCheckbox("approvedTermsOfUse");
-                _test.clickNavButton("Agree");
+                _test.clickButton("Agree");
             }
             _test.ensureAdminMode();
             _test.goToFolderManagement();
             _test.waitForExt4FolderTreeNode(project, 10000);
-            _test.clickNavButton("Delete");
+            _test.clickButton("Delete");
             // in case there are sub-folders
             if (_test.isNavButtonPresent("Delete All Folders"))
             {
-                _test.clickNavButton("Delete All Folders");
+                _test.clickButton("Delete All Folders");
             }
             long startTime = System.currentTimeMillis();
             // confirm delete:
             _test.log("Starting delete of project '" + project + "'...");
-            _test.clickNavButton("Delete", _test.longWaitForPage);
+            _test.clickButton("Delete", _test.longWaitForPage);
 
             if(_test.isLinkPresentWithText(project))
             {

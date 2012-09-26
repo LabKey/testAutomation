@@ -141,7 +141,7 @@ public class MS1Test extends BaseSeleniumWebTest
         //go back to the portal page
         clickLinkWithText(project);
 
-        clickNavButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
+        clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
         ExtHelper.selectFileBrowserItem(this, PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/");
 
@@ -153,7 +153,7 @@ public class MS1Test extends BaseSeleniumWebTest
         //go back to the portal page
         clickLinkWithText(project);
 
-        clickNavButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
+        clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
         ExtHelper.selectFileBrowserItem(this, PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/" + PIPELINE_MS1PEP_DIR + "/" + featuresProtocol + "/");
 
@@ -165,7 +165,7 @@ public class MS1Test extends BaseSeleniumWebTest
         //go back to the portal page
         clickLinkWithText(project);
 
-        clickNavButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
+        clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
         ExtHelper.selectFileBrowserItem(this, PIPELINE_INSPECT_DIR + "/" + protocol + "/");
 
@@ -204,7 +204,7 @@ public class MS1Test extends BaseSeleniumWebTest
         log("Testing Compare Runs view");
         clickLinkWithText(project);
         checkAllOnPage("MSInspectFeatureRuns");
-        clickNavButton("Compare", 60000);
+        clickButton("Compare", 60000);
         assertTextPresent("-.TMITDSLAVVLQR.R");
         assertTextPresent("236.9828");
 
@@ -251,7 +251,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         setFormElement("pepSeq", "EASGDLPEAQIVK, AVVQDPALKPLALVYGEATSR");
         uncheckCheckbox("exact");
-        clickNavButton("Search");
+        clickButton("Search");
 
         //other scans should also be there
         assertTextPresent("459");
@@ -262,7 +262,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         //make sure that an exact search doesn't find peptides with modifiers
         checkCheckbox("exact");
-        clickNavButton("Search");
+        clickButton("Search");
         assertTextNotPresent("K.E^ASGDLPEAQIVK.H");
 
         //jump to details
@@ -292,7 +292,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         setFormElement("mzOffset", "100");
         selectOptionByValue("mzUnits", "mz");
-        clickNavButton("Search");
+        clickButton("Search");
 
         assertTextPresent("1888");
         assertTextPresent("1921");
@@ -301,7 +301,7 @@ public class MS1Test extends BaseSeleniumWebTest
         selectOptionByValue("timeUnits", "scans");
         assertFormElementEquals("timeSource", "1948");
         setFormElement("timeOffset", "2");
-        clickNavButton("Search");
+        clickButton("Search");
         assertTextNotPresent("659.3492"); //m/z value that should no longer be there
 
         log("Finished Testing Similar Search View.");
@@ -450,10 +450,10 @@ public class MS1Test extends BaseSeleniumWebTest
 
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
-        clickNavButton("Next Feature >>");
+        clickButton("Next Feature >>");
         Assert.assertTrue(isButtonDisabled("Next Feature >>"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
-        clickNavButton("<< Previous Feature");
+        clickButton("<< Previous Feature");
         Assert.assertTrue(isButtonDisabled("<< Previous Feature"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
 
@@ -500,7 +500,7 @@ public class MS1Test extends BaseSeleniumWebTest
         if(isNavButtonPresent("Purge Deleted MS1 Data Now"))
         {
             log("Purging MS1 Test data files...");
-            clickNavButton("Purge Deleted MS1 Data Now");
+            clickButton("Purge Deleted MS1 Data Now");
 
             int iters = 0;
             while(isTextPresent("MS1 data is currently being purged"))

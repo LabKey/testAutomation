@@ -66,13 +66,13 @@ public class BasicTest extends BaseSeleniumWebTest
 
 //        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
 //        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
-//        clickNavButton("Save");
+//        clickButton("Save");
 
         _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup("testers");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         enableModule(PROJECT_NAME, "MS2");
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] {"Messages", "Wiki", "MS2"});
         addWebPart("Messages");
@@ -106,7 +106,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         addWebPart("Search");
         setFormElement("query", "labkey");
-        clickNavButton("Search");
+        clickButton("Search");
         assertTextPresent("Found", "results");  // just make sure we get the results page
 
         goToAdminConsole();
@@ -133,7 +133,7 @@ public class BasicTest extends BaseSeleniumWebTest
         log("Test webpart buttons");
         clickWebpartMenuItem("Messages", "Customize");      
         assertTextPresent("Customize");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
         clickLinkWithImage(getContextPath() + "/_images/partdown.png", 0);
         Ext4Helper.waitForMaskToDisappear(this);
         assertTextBefore("No data to show", "No messages");

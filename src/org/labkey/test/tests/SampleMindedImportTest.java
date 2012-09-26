@@ -73,18 +73,18 @@ public class SampleMindedImportTest extends BaseSeleniumWebTest
     protected void doTestSteps() throws Exception
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         click(Locator.radioButtonByNameAndValue("simpleRepository", "true"));
-        clickNavButton("Create Study");
+        clickButton("Create Study");
 
         setPipelineRoot(getLabKeyRoot() + "/sampledata/study");
         clickLinkWithText(PROJECT_NAME + " Study");
         clickLinkWithText("Manage Files");
 
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "specimens/" + FILE);
         selectImportDataActionNoWaitForGrid("Import Specimen Data");
-        clickNavButton("Start Import");
+        clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "Import specimens: SampleMindedExport.xlsx", false);
         clickTab("Specimen Data");
         waitForElement(Locator.linkWithText("BAL"));

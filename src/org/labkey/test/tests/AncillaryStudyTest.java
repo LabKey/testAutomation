@@ -81,7 +81,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickTab("Manage");
 
         log("Create Special Emphasis Study.");
-        clickNavButton("Create Ancillary Study", 0);
+        clickButton("Create Ancillary Study", 0);
         
         //Wizard page 1 - location
         ExtHelper.waitForExtDialog(this, "Create Ancillary Study");
@@ -91,9 +91,9 @@ public class AncillaryStudyTest extends StudyBaseTest
         setFormElement("studyDescription", STUDY_DESCRIPTION);
         Assert.assertTrue(PROTOCOL_DOC.exists());
         setFormElement("protocolDoc", PROTOCOL_DOC);
-        clickNavButton("Change", 0);
+        clickButton("Change", 0);
         selenium.doubleClick(Locator.xpath(ExtHelper.getExtDialogXPath("Create Ancillary Study") + "//span[string() = '"+PROJECT_NAME+"']").toString());
-        clickNavButton("Next", 0);
+        clickButton("Next", 0);
 
         //Wizard page 2 - participant group
         Locator groupLocator = Locator.xpath("//span[contains(text(),  '" + PARTICIPANT_GROUP + "')]");
@@ -124,10 +124,10 @@ public class AncillaryStudyTest extends StudyBaseTest
         checkAllOnPage("demoDataRegion");
         uncheckDataRegionCheckbox("demoDataRegion", 0);
         uncheckDataRegionCheckbox("demoDataRegion", 1);
-        clickNavButton("Add Selected", 0);
+        clickButton("Add Selected", 0);
         sleep(1000); // wait for specimen Ids to appear in form.
 */
-        clickNavButton("Next", 0);
+        clickButton("Next", 0);
 
         //Wizard page 3 - select datasets
         waitForElement(Locator.xpath("//div[contains(@class, 'studyWizardDatasetList')]"), WAIT_FOR_JAVASCRIPT);
@@ -140,13 +140,13 @@ public class AncillaryStudyTest extends StudyBaseTest
         }
         assertWizardError("Finish", "An error occurred trying to create the study: A study already exists in the destination folder.");
 
-        clickNavButton("Previous", 0);
-        clickNavButton("Previous", 0);
+        clickButton("Previous", 0);
+        clickButton("Previous", 0);
         setFormElement("studyName", STUDY_NAME);
-        clickNavButton("Next", 0);
-        clickNavButton("Next", 0);
+        clickButton("Next", 0);
+        clickButton("Next", 0);
         checkRadioButton("autoRefresh", "false");
-        clickNavButton("Finish");
+        clickButton("Finish");
 
         waitForPipelineJobsToFinish(3);
         clickLinkWithText("Create Ancillary Study");
@@ -191,7 +191,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitForText(PARTICIPANT_GROUP);
         selenium.getEval("selenium.selectExtGridItem('label', '"+PARTICIPANT_GROUP+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+PARTICIPANT_GROUP+"']"));
-        clickNavButton("Edit Selected", 0);
+        clickButton("Edit Selected", 0);
         ExtHelper.waitForExtDialog(this, "Define Mouse Group");
         waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         String csp = PTIDS[0];
@@ -218,19 +218,19 @@ public class AncillaryStudyTest extends StudyBaseTest
         log("Insert rows into source dataset");
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATASETS[0]);
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement(Locator.name("text"), EXTRA_DATASET_ROWS);
-        clickNavButton("Submit", 0);
-        waitAndClickNavButton("OK");
+        clickButton("Submit", 0);
+        waitAndClickButton("OK");
 
         log("Verify changes in Ancillary Study. (insert)");
         clickLinkWithText(STUDY_NAME);
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
-        clickNavButton("View Data");
+        clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Update Snapshot", 0);
+        clickButton("Update Snapshot", 0);
         assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
         waitForPageToLoad();
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
@@ -244,16 +244,16 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText(DATASETS[0]);
         clickLinkWithText("edit", 1);
         setFormElement(Locator.name("quf_SequenceNum"), SEQ_NUMBER2);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         log("Verify changes in Ancillary Study. (modify)");
         clickLinkWithText(STUDY_NAME);
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
-        clickNavButton("View Data");
+        clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Update Snapshot", 0);
+        clickButton("Update Snapshot", 0);
         assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
         waitForPageToLoad();
         table = new DataRegionTable("Dataset", this, true, true);
@@ -266,7 +266,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATASETS[0]);
         checkCheckbox(".select", 1);
-        clickNavButton("Delete");
+        clickButton("Delete");
         assertConfirmation("Delete selected row from this dataset?");
 
         log("Verify changes in Ancillary Study. (delete)");
@@ -274,9 +274,9 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(DATASETS[0]);
-        clickNavButton("View Data");
+        clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Update Snapshot", 0);
+        clickButton("Update Snapshot", 0);
         assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
         waitForPageToLoad();
         table = new DataRegionTable("Dataset", this, true, true);
@@ -297,7 +297,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText("Attach a file", false);
         waitForElement(Locator.xpath("//div[@id='filePickers']//input[@type='file']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//div[@id='filePickers']//input[@type='file']"), PROTOCOL_DOC2.toString());
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertLinkPresentWithText(PROTOCOL_DOC.getName());
         assertLinkPresentWithText(PROTOCOL_DOC2.getName());
         assertTextPresent("Protocol documents:");
@@ -312,7 +312,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText(DEPENDENT_DATASETS[0]);
         clickLinkWithText("edit");
         setFormElement(Locator.name("quf_formlang"), UPDATED_DATASET_VAL);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText(STUDY_NAME);
         clickLinkWithText("Clinical and Assay Data");
@@ -327,7 +327,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText(DEPENDENT_DATASETS[0]);
         assertTextNotPresent(UPDATED_DATASET_VAL);
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Update Snapshot");
+        clickButton("Update Snapshot");
         assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
         assertTextPresent(UPDATED_DATASET_VAL);
     }
@@ -365,7 +365,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         StudyHelper.exportStudy(this, STUDY_NAME);
         goToModule("Pipeline");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
 
         ExtHelper.selectFileBrowserItem(this, "export/study/participant_groups.xml");
         log("Verify protocol document in export");
@@ -386,9 +386,9 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void assertWizardError(String button, String error)
     {
-        clickNavButton(button, 0);
+        clickButton(button, 0);
         waitForText(error);
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
         waitForTextToDisappear(error);
     }
 

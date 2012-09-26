@@ -128,7 +128,7 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("The following directories within '8color'");
         assertTextPresent(FCS_FILE_1 + " (25 fcs files)");
         assertTextPresent(FCS_FILE_2 + " (14 fcs files)");
-        clickNavButton("Cancel"); // go back to file-browser
+        clickButton("Cancel"); // go back to file-browser
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
         waitForPageToLoad();
@@ -138,7 +138,7 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("The following directories within '8color" + File.separator + FCS_FILE_1 + "'");
         assertTextPresent("Current Directory (25 fcs files)");
         assertTextNotPresent(FCS_FILE_2);
-        clickNavButton("Import Selected Runs");
+        clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
         clickLinkWithText("Flow Dashboard");
         // Drill into the run, and see that it was uploaded, and keywords were read.
@@ -154,7 +154,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("91761.fcs");
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
-        clickNavButton("edit");
+        clickButton("edit");
         setFormElement("ff_name", "FlowTest New Name");
         setFormElement("ff_comment", "FlowTest Comment");
         Locator locPlateName = Locator.xpath("//td/input[@type='hidden' and @value='PLATE NAME']/../../td/input[@name='ff_keywordValue']");
@@ -203,7 +203,7 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Analyze some runs");
 
         checkCheckbox(".toggle");
-        clickNavButton("Analyze selected runs");
+        clickButton("Analyze selected runs");
         setFormElement("ff_analysisName", "FlowExperiment2");
         submit();
         waitForPipeline(getContainerPath());
@@ -270,7 +270,7 @@ public class FlowTest extends BaseFlowTest
         selectImportDataAction("Import Directory of FCS Files");
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);
-        clickNavButton("Import Selected Runs");
+        clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
 
         clickLinkWithText("Flow Dashboard");
@@ -287,7 +287,7 @@ public class FlowTest extends BaseFlowTest
         waitForPageToLoad();
 
         checkCheckbox(".toggle");
-        clickNavButton("Analyze selected runs");
+        clickButton("Analyze selected runs");
         waitForPipeline(getContainerPath());
 
         clickLinkWithText("Flow Dashboard");

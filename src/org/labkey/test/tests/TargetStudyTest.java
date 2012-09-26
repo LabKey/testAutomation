@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 import java.util.Random;
@@ -119,17 +118,17 @@ public class TargetStudyTest extends AbstractAssayTest
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", _study1Label);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", _study2Label);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", _study3Label);
-        clickNavButton("Submit");
+        clickButton("Submit");
     }
 
     public boolean isFileUploadTest()
@@ -144,10 +143,10 @@ public class TargetStudyTest extends AbstractAssayTest
         if (!isLinkPresentWithText("Assay List"))
             addWebPart("Assay List");
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/TargetStudy/Assay.xar", 1, "Assay.xar");
-//        clickNavButton("Manage Assays");
-//        clickNavButton("New Assay Design");
+//        clickButton("Manage Assays");
+//        clickButton("New Assay Design");
 //        checkRadioButton("providerName", "General");
-//        clickNavButton("Next");
+//        clickButton("Next");
 //        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 //
 //        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
@@ -160,7 +159,7 @@ public class TargetStudyTest extends AbstractAssayTest
 //        // Add TargetStudy to the end of the default list of Results domain
 //        addField("Data Fields", 4, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
 //
-//        clickNavButton("Save", 0);
+//        clickButton("Save", 0);
 //        waitForText("Save successful.", 20000);
 
     }
@@ -173,7 +172,7 @@ public class TargetStudyTest extends AbstractAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(ASSAY_NAME);
 
-        clickNavButton("Import Data");
+        clickButton("Import Data");
 
         selenium.type("name", TEST_RUN1);
         selenium.click("//input[@value='textAreaDataProvider']");
@@ -181,13 +180,13 @@ public class TargetStudyTest extends AbstractAssayTest
                 .replace("${Study1ContainerID}", _study1ContainerId)
                 .replace("${Study1Label}", _study1Label);
         selenium.type("TextAreaDataCollector.textArea", data1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertTextPresent("Couldn't resolve TargetStudy 'StudyNotExist' to a study folder.");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         String data2 = data1.replace("StudyNotExist", "");
         selenium.type("TextAreaDataCollector.textArea", data2);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertNoLabkeyErrors();
 
         log("** Test the TargetStudy renderer resolved all studies");
@@ -220,7 +219,7 @@ public class TargetStudyTest extends AbstractAssayTest
     {
         DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
         table.checkAllOnPage();
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         log("** Check TargetStudy dropdowns");
         assertOptionEquals(table.xpath(0, 0).child("select[@name='targetStudy']"), "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + _study1Label + ")");
@@ -238,17 +237,17 @@ public class TargetStudyTest extends AbstractAssayTest
         assertAttributeContains(table.xpath(4, 1).child("img"), "src", "check.png");
         assertAttributeContains(table.xpath(5, 1).child("img"), "src", "cancel.png");
 
-        clickNavButton("Re-Validate");
+        clickButton("Re-Validate");
         assertTextPresent("You must specify a Target Study for all selected rows.");
 
         log("** Uncheck row 3 and 5");
         table.uncheckCheckbox(3);
         table.uncheckCheckbox(5);
-        clickNavButton("Re-Validate");
+        clickButton("Re-Validate");
         assertTextNotPresent("You must specify a Target Study for all selected rows.");
 
         log("** Copy to studies");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/dataset.view?datasetId=5001");
         DataRegionTable dataset = new DataRegionTable("Dataset", this);

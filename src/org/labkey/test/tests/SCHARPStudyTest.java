@@ -88,15 +88,15 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
     protected void importStudy()
     {
         log("Importing study from " + _zipFilePath + "...");
-        clickNavButton("Import Study");
+        clickButton("Import Study");
         setFormElement("studyZip", _zipFilePath);
-        clickNavButton("Import Study From Local Zip Archive");
+        clickButton("Import Study From Local Zip Archive");
         assertTextNotPresent("This file does not appear to be a valid .zip file");
 
         if (isTextPresent("You must select a .zip file to import"))
         {
             setFormElement("studyZip", _zipFilePath);
-            clickNavButton("Import Study");
+            clickButton("Import Study");
         }
 
         assertTextPresent("Data Pipeline");

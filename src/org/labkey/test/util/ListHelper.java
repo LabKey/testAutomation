@@ -20,11 +20,9 @@ import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.tests.SearchTest;
 
 import java.io.File;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * User: jeckels
@@ -38,7 +36,7 @@ public class ListHelper
 
         test.clickLinkWithText(listName);
 
-        test.clickNavButton("Import Data");
+        test.clickButton("Import Data");
         test.setLongTextField("text", listData);
         _submitImportTsv(test, null);
     }
@@ -63,7 +61,7 @@ public class ListHelper
 
     private static void _submitImportTsv(BaseSeleniumWebTest test, String error)
     {
-        test.clickNavButton("Submit", 0);
+        test.clickButton("Submit", 0);
         test.sleep(500);
         if (null != error)
         {
@@ -75,7 +73,7 @@ public class ListHelper
         {
             ExtHelper.waitForExtDialog(test, "Success");
             test.assertTextPresent(" inserted.");
-            test.clickNavButton("OK");
+            test.clickButton("OK");
             test.waitForPageToLoad();
         }
     }
@@ -90,12 +88,12 @@ public class ListHelper
     public static void insertNewRow(BaseSeleniumWebTest test, Map<String, String> data)
     {
 
-        test.clickNavButton("Insert New");
+        test.clickButton("Insert New");
         for(String key : data.keySet())
         {
             test.setFormElement(Locator.name("quf_" + key), data.get(key));
         }
-        test.clickNavButton("Submit");
+        test.clickButton("Submit");
         test.assertTextPresent(data.get(data.keySet().iterator().next()));  //make sure some text from the map is present
     }
 
@@ -107,7 +105,7 @@ public class ListHelper
     {
         String url = test.getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
         test.beginAt(url);
-        test.clickNavButton("OK");
+        test.clickButton("OK");
     }
 
     public static class LookupInfo
@@ -381,7 +379,7 @@ public class ListHelper
 
         test.selectOptionByText("ff_keyType", listKeyType.toString());
         test.setFormElement("ff_keyName", listKeyName);
-        test.clickNavButton("Create List", 0);
+        test.clickButton("Create List", 0);
         test.waitForElement(Locator.name("ff_description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.waitForElement(Locator.name("ff_name0"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
@@ -397,7 +395,7 @@ public class ListHelper
         {
             ListColumn col = cols[i-1];
             test.waitForElement(Locator.id("button_Add Field"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            test.clickNavButton("Add Field", 0);
+            test.clickButton("Add Field", 0);
             test.setFormElement(Locator.name("ff_name" + i),  col.getName());
             test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
             // Set type.
@@ -452,9 +450,9 @@ public class ListHelper
             {
                 ExtHelper.clickExtTab(test, "Validators");
                 if (validator instanceof RegExValidator)
-                    test.clickNavButton("Add RegEx Validator", 0);
+                    test.clickButton("Add RegEx Validator", 0);
                 else
-                    test.clickNavButton("Add Range Validator", 0);
+                    test.clickButton("Add Range Validator", 0);
                 test.setFormElement("name", validator.getName());
                 test.setFormElement("description", validator.getDescription());
                 test.setFormElement("errorMessage", validator.getMessage());
@@ -467,7 +465,7 @@ public class ListHelper
                 {
                     test.setFormElement("firstRangeValue", ((RangeValidator)validator).getFirstRange());
                 }
-                test.clickNavButton("OK", 0);
+                test.clickButton("OK", 0);
             }
 
             if (col.isMvEnabled())
@@ -505,7 +503,7 @@ public class ListHelper
         test.clickLinkWithText("manage lists");
 
         test.log("Add List");
-        test.clickNavButton("Create New List");
+        test.clickButton("Create New List");
         test.waitForElement(Locator.name("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.setFormElement("ff_name", listName);
     }
@@ -518,7 +516,7 @@ public class ListHelper
         test.click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
         //test.clickCheckbox("fileImport");
 
-        test.clickNavButton("Create List", 0);
+        test.clickButton("Create List", 0);
 
         test.waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
@@ -526,7 +524,7 @@ public class ListHelper
 
         test.waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
-        test.clickNavButton("Import");
+        test.clickButton("Import");
     }
 
     public static void importListArchive(BaseSeleniumWebTest test, String folderName, File inputFile)
@@ -542,11 +540,11 @@ public class ListHelper
         test.clickLinkWithText("manage lists");
 
         test.log("Import List Archive");
-        test.clickNavButton("Import List Archive");
+        test.clickButton("Import List Archive");
         test.waitForElement(Locator.xpath("//input[@name='listZip']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         test.setFormElement("listZip", inputFile);
-        test.clickNavButton("Import List Archive");
+        test.clickButton("Import List Archive");
     }
 
 
@@ -631,7 +629,7 @@ public class ListHelper
         if ( lookup.getFolder() != null ) test.setFormElement("lookupContainer", lookup.getFolder());
         if ( lookup.getSchema() != null ) test.setFormElement("schema", lookup.getSchema());
         if ( lookup.getTable() != null ) test.setFormElement("table", lookup.getTable());
-        test.clickNavButton("Apply", 0);
+        test.clickButton("Apply", 0);
     }
 
     public static void selectPropertyTab(BaseSeleniumWebTest test, String name)

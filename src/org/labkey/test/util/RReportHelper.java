@@ -230,7 +230,7 @@ public class RReportHelper
 
             ExtHelper.waitForExtDialog(test, "Delete Engine Configuration", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
-            test.clickNavButton("Yes", 0);
+            test.clickButton("Yes", 0);
             test.waitForElementToDisappear(engine, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
     }
@@ -238,7 +238,7 @@ public class RReportHelper
     public static void saveReport(BaseSeleniumWebTest test, String name)
     {
         test.clickLinkWithText("Source", false);
-        test.clickNavButton("Save", 0);
+        test.clickButton("Save", 0);
         ExtHelper.setExtFormElement(test, name);
         ExtHelper.clickExtButton(test, "Save");
     }

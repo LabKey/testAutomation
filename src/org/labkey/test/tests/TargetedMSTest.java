@@ -44,11 +44,11 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         setPipelineRoot(getSampledataPath() + "/TargetedMS");
         goToProjectHome();
         addWebPart("Data Pipeline");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         waitForText("MRMer", 5*defaultWaitForPage);
         selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
         waitForText("Confirm TargetedMS Data Import");
-        clickNavButton("Import");
+        clickButton("Import");
         waitForText("Targeted MS Runs ");
         waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
 

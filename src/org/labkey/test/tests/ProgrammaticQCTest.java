@@ -117,17 +117,17 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkContainingText("QC Assay");
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
-//        clickNavButton("Manage Assays");
-//        clickNavButton("New Assay Design");
+//        clickButton("Manage Assays");
+//        clickButton("New Assay Design");
 //        checkRadioButton("providerName", "General");
-//        clickNavButton("Next");
+//        clickButton("Next");
 //
 //        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 //
 //        selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
 //
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 //        sleep(500);
         goToProjectHome();
 //
@@ -136,7 +136,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 //            addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
 //        }
 //        sleep(1000);
-//        clickNavButton("Save", 0);
+//        clickButton("Save", 0);
 //        waitForText("Save successful.", 20000);
 
         // create the list for the qc log
@@ -152,10 +152,10 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
         addWebPart("Assay List");
 
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "General");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -174,7 +174,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Animal", "Animal", ListHelper.ListColumnType.String);
 
         sleep(1000);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
     }
 
@@ -185,19 +185,19 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(QC_ASSAY);
 
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         assertTextPresent("A duplicate PTID was discovered : b");
         assertTextPresent("A duplicate PTID was discovered : e");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         // verify the log entry
         clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
@@ -214,19 +214,19 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TRANSFORM_ASSAY);
 
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         assertTextPresent("A duplicate PTID was discovered : b");
         assertTextPresent("A duplicate PTID was discovered : e");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         clickLinkWithText("view results");
 
@@ -248,18 +248,18 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TRANSFORM_QC_ASSAY);
 
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         assertTextPresent("The animal column must contain a goat");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         clickLinkWithText("view results");
 

@@ -48,7 +48,7 @@ public class QuantitationTest extends AbstractXTandemTest
 
         log("Start analysis running.");
         clickLinkWithText("MS2 Dashboard");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
 
         ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SAMPLE_BASE_NAME + ".mzXML");
 
@@ -76,7 +76,7 @@ public class QuantitationTest extends AbstractXTandemTest
         clickLinkWithText(FOLDER_NAME);
         clickLinkContainingText(runDescription);
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
         assertTextPresent(PEPTIDE2);
         assertTextPresent(PEPTIDE3);
         assertTextPresent(PEPTIDE4);
@@ -87,7 +87,7 @@ public class QuantitationTest extends AbstractXTandemTest
         // Jump to the flow chart view
         clickLinkWithText("Data Pipeline");
         clickLinkWithText("COMPLETE");
-        clickNavButton("Data");
+        clickButton("Data");
         
         pushLocation();
         clickImageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".libra.tsv (Run Output)");

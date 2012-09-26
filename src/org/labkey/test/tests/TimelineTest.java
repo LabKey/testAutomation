@@ -179,7 +179,7 @@ public class TimelineTest extends BaseSeleniumWebTest
             }
         }
 
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         ListHelper.submitTsvData(this, data.toString());
         for (String[] rowData : TEST_DATA)
         {

@@ -172,7 +172,7 @@ public class ReportTest extends StudyBaseTest
 
         Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
         ref.setToFile(ATTACHMENT_REPORT2_FILE.toString());
-        clickNavButtonByIndex("Save", 1, 0);
+        clickButtonByIndex("Save", 1, 0);
 
         //no way to verify, unfortunately
     }
@@ -251,13 +251,13 @@ public class ReportTest extends StudyBaseTest
         selectOptionByValue("rowField",  "DEMsex");
         selectOptionByValue("colField", "DEMsexor");
         selectOptionByValue("statField", "SequenceNum");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
         assertTableRowsEqual("report", 3, new String[][] {row3});
 
         setFormElement("label", "TestReport");
-        clickNavButton("Save");
+        clickButton("Save");
 
         clickLinkWithText(getStudyLabel());
         assertTextPresent("TestReport");
@@ -275,7 +275,7 @@ public class ReportTest extends StudyBaseTest
         createReport(GRID_VIEW);
         setFormElement("label", viewName);
         selectOptionByText("params", "ECI-1: Eligibility Criteria");
-        clickNavButton("Create View");
+        clickButton("Create View");
         assertLinkPresentWithText("999320016");
         assertNavButtonNotPresent("go");
         clickLinkWithText(getStudyLabel());
@@ -289,15 +289,15 @@ public class ReportTest extends StudyBaseTest
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("Female");
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue("fileExtension", "tsv");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("Female");
         setFormElement("label", "tsv");
         selectOptionByText("showWithDataset", "DEM-1: Demographics");
-        clickNavButton("Save");
+        clickButton("Save");
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("tsv");
         assertTextPresent("Female");
@@ -377,7 +377,7 @@ public class ReportTest extends StudyBaseTest
         log("Check saved R script");
         clickMenuButton("Views", "default");
         pushLocation();
-        //clickNavButton("Reports >>", 0);
+        //clickButton("Reports >>", 0);
         //clickLinkWithText(R_SCRIPTS[0]);
         clickMenuButton("Views", R_SCRIPTS[0]);
         waitForText("Console output", WAIT_FOR_PAGE);
@@ -425,7 +425,7 @@ public class ReportTest extends StudyBaseTest
         clickManageGroup("Users");
         setFormElement("names", R_USER);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
         enterPermissionsUI();
         setPermissions("Users", "Editor");
         exitPermissionsUI();
@@ -487,7 +487,7 @@ public class ReportTest extends StudyBaseTest
 
         clickViewTab();
         waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Start Job", 0);
+        clickButton("Start Job", 0);
         waitForText("COMPLETE", WAIT_FOR_PAGE);
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
@@ -552,7 +552,7 @@ public class ReportTest extends StudyBaseTest
 
             Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
             ref.setToFile(ATTACHMENT_REPORT_FILE.toString());
-            clickNavButton("Save");
+            clickButton("Save");
             // save should return back to manage views page
             waitForText("Manage Views");
         }
@@ -564,7 +564,7 @@ public class ReportTest extends StudyBaseTest
         setFormElement("description", ATTACHMENT_REPORT2_DESCRIPTION);
         click(Locator.xpath("//input[../label[string()='Full file path on server']]"));
         setFormElement("filePath", ATTACHMENT_REPORT2_FILE.toString());
-        clickNavButton("Save");
+        clickButton("Save");
         // save should return to the Clinical and Assay Data tab
         waitForText("Data Views");
 
@@ -606,7 +606,7 @@ public class ReportTest extends StudyBaseTest
         assertTextNotPresent("URL must be absolute");
         Assert.assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
         ExtHelper.uncheckCheckbox(this, "Open link report in new window?");
-        clickNavButton("Save");
+        clickButton("Save");
         // save should return back to manage views page
         waitForText("Manage Views");
 
@@ -618,7 +618,7 @@ public class ReportTest extends StudyBaseTest
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
         Assert.assertTrue("Expected targetNewWindow checkbox to be checked", ExtHelper.isChecked(this, "Open link report in new window?"));
-        clickNavButton("Save");
+        clickButton("Save");
         // save should return back to Clinical and Assay Data tab
         waitForText("Data Views");
 
@@ -639,7 +639,7 @@ public class ReportTest extends StudyBaseTest
     private void saveReport(String name)
     {
         clickSourceTab();
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
 
         if (null != name)
         {
@@ -695,7 +695,7 @@ public class ReportTest extends StudyBaseTest
         if (isTextPresent(item))
         {
             checkCheckbox(Locator.raw("//td/a[contains(text(), '" + item + "')]/../../td/input"));
-            clickNavButton("Delete");
+            clickButton("Delete");
             assertTextNotPresent(item);
         }
     }
@@ -716,17 +716,17 @@ public class ReportTest extends StudyBaseTest
         clickManageGroup(TEST_GROUP);
         setFormElement("names", TEST_USER);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
         enterPermissionsUI();
         setPermissions(TEST_GROUP, "Reader");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         // give the test group read access to only the DEM-1 dataset
         clickLinkWithText("My Study");
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED_READ");
@@ -751,11 +751,11 @@ public class ReportTest extends StudyBaseTest
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
         checkCheckbox("participantChart");
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         sleep(2000);
 
         setFormElement("reportName", "participant chart");
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
@@ -767,13 +767,13 @@ public class ReportTest extends StudyBaseTest
         // create a non-participant chart
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         sleep(2000);
 
         setFormElement("reportName", "non participant chart");
         setFormElement("description", "a private chart");
         checkCheckbox("shareReport");
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
@@ -784,7 +784,7 @@ public class ReportTest extends StudyBaseTest
         createReport(GRID_VIEW);
         setFormElement("label", TEST_GRID_VIEW);
         selectOptionByText("datasetSelection", "APX-1: Abbreviated Physical Exam");
-        clickNavButton("Create View");
+        clickButton("Create View");
 
         // test security
         click(Locator.linkWithText("Projects"));
@@ -795,12 +795,12 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink("participant chart", "permissions");
         selenium.click("useCustom");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
-        clickNavButton("Save");
+        clickButton("Save");
 
         clickReportGridLink(TEST_GRID_VIEW, "permissions");
         selenium.click("useCustom");
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
-        clickNavButton("Save");
+        clickButton("Save");
 
         goToAdminConsole();
         impersonate(TEST_USER);
@@ -859,7 +859,7 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Create", "Mouse Report");
 
         // select some measures from a dataset
-        waitAndClickNavButton("Choose Measures", 0);
+        waitAndClickButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "cpf-1");
@@ -871,7 +871,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "1a. ALT (SGPT)", "measuresGridPanel", true);
 
-        clickNavButton("Select", 0);
+        clickButton("Select", 0);
 
         waitForText("Visit Date", 8, WAIT_FOR_JAVASCRIPT);
         assertTextPresent("2a. Creatinine", 19); // 8 mice + 8 grid field tooltips + 1 Report Field list + 2 in hidden add field dialog
@@ -879,7 +879,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
 
         // select additional measures from another dataset
-        clickNavButton("Choose Measures", 0);
+        clickButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "2a. Creatinine");
@@ -887,7 +887,7 @@ public class ReportTest extends StudyBaseTest
         waitForElementToDisappear(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
         Assert.assertEquals("Wrong number of measures visible after filtering.", 4, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
         ExtHelper.clickX4GridPanelCheckbox(this, "queryName", "CPS-1", "measuresGridPanel", true);
-        clickNavButton("Select", 0);
+        clickButton("Select", 0);
 
         // at this point the report should render some content
         waitForText("Creatinine", 37, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 columns + tooltips) + 1 Report Field list + 2 in hidden add field dialog
@@ -902,9 +902,9 @@ public class ReportTest extends StudyBaseTest
         // verify form validation
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         ExtHelper.waitForExtDialog(this, "Error");
-        waitAndClickNavButton("OK", 0);
+        waitAndClickButton("OK", 0);
         log("assert text prsent in original form");
         assertTextPresentInThisOrder("Visit", "Visit Date", "Screening");
         assertTextPresentInThisOrder("3.5", "45", "1.9");
@@ -917,7 +917,7 @@ public class ReportTest extends StudyBaseTest
         // save the report for real
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT_NAME);
         ExtHelper.setExtFormElementByLabel(this, "Report Description", PARTICIPANT_REPORT_DESCRIPTION);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // verify visiting saved report
@@ -935,7 +935,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Creatinine' column.
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // Delete a column save a copy of the report (Save As)
@@ -943,25 +943,25 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Severity Grade' column.
-        clickNavButton("Save As", 0);
+        clickButton("Save As", 0);
         ExtHelper.waitForExtDialog(this, "Save As");
         ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Name", PARTICIPANT_REPORT2_NAME);
         ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
-        clickNavButtonByIndex("Save", 1, 0);
+        clickButtonByIndex("Save", 1, 0);
         waitForTextToDisappear("Severity Grade");
 
         // Verify saving with existing report name.
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Save As", 0);
+        clickButton("Save As", 0);
         ExtHelper.waitForExtDialog(this, "Save As");
         ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Name", PARTICIPANT_REPORT_NAME);
         ExtHelper.setExtFormElementByLabel(this, "Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
-        clickNavButtonByIndex("Save", 1, 0);
+        clickButtonByIndex("Save", 1, 0);
         ExtHelper.waitForExtDialog(this, "Failure");
         assertTextPresent("Another report with the same name already exists.");
-        waitAndClickNavButton("OK", 0);
-        clickNavButton("Cancel", 0); // Verify cancel button.
+        waitAndClickButton("OK", 0);
+        clickButton("Cancel", 0); // Verify cancel button.
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
 
@@ -1002,14 +1002,14 @@ public class ReportTest extends StudyBaseTest
         goToManageViews();
         clickMenuButton("Create", "Mouse Report");
         // select some measures from a dataset
-        waitAndClickNavButton("Choose Measures", 0);
+        waitAndClickButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "17a. Preg. test result", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "1.Adverse Experience (AE)", "measuresGridPanel", true);
 
-        clickNavButton("Select", 0);
+        clickButton("Select", 0);
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
@@ -1073,14 +1073,14 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT3_NAME);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         //Participant report with specimen fields.
         goToManageViews();
         clickMenuButton("Create", "Mouse Report");
         // select some measures from a dataset
-        waitAndClickNavButton("Choose Measures", 0);
+        waitAndClickButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
@@ -1089,7 +1089,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):VialCount", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "Blood (Whole):AvailableCount", "measuresGridPanel", true);
 
-        clickNavButton("Select", 0);
+        clickButton("Select", 0);
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
@@ -1118,7 +1118,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT4_NAME);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         //Participant report with multiple demographic fields
@@ -1128,13 +1128,13 @@ public class ReportTest extends StudyBaseTest
         clickButtonContainingText("Edit Definition");
         waitForElement(Locator.xpath("//input[@name='demographicData']"));
         checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
-        clickNavButton("Save");
+        clickButton("Save");
 
         goToManageViews();
         clickMenuButton("Create", "Mouse Report");
 
         // select some measures from the demographics
-        waitAndClickNavButton("Choose Measures", 0);
+        waitAndClickButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
         ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", "demographic");
@@ -1143,7 +1143,7 @@ public class ReportTest extends StudyBaseTest
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "1.Date of Birth", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "2.What is your sex?", "measuresGridPanel", true);
         ExtHelper.clickX4GridPanelCheckbox(this, "label", "5. Sexual orientation", "measuresGridPanel", true);
-        clickNavButton("Select", 0);
+        clickButton("Select", 0);
         waitForText("Showing partial results while in edit mode.", WAIT_FOR_JAVASCRIPT);
 
         // verify the data in the report
@@ -1153,7 +1153,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresentInThisOrder("1965-03-06", "Female", "heterosexual");
 
         ExtHelper.setExtFormElementByLabel(this, "Report Name", PARTICIPANT_REPORT5_NAME);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
     }
@@ -1695,7 +1695,7 @@ public class ReportTest extends StudyBaseTest
         waitForTextToDisappear("loading...");
         setFormElement("selectedQueryName", QUERY_REPORT_QUERY_NAME);
 
-        clickNavButton("Save");
+        clickButton("Save");
         waitForText("Manage Views");
         waitForText(QUERY_REPORT_NAME);
 
@@ -1724,7 +1724,7 @@ public class ReportTest extends StudyBaseTest
         waitForTextToDisappear("loading...");
         Ext4Helper.selectComboBoxItem(this, "View", QUERY_REPORT_VIEW_NAME_2);
 
-        clickNavButton("Save");
+        clickButton("Save");
         waitForText("Manage Views");
         waitForText(QUERY_REPORT_NAME_2);
 

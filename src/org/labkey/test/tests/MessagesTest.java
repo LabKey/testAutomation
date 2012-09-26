@@ -89,7 +89,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("Check that Plain Text message works and is added everywhere");
         clickLinkWithText(PROJECT_NAME);
-        clickNavButton("New");
+        clickButton("New");
 
         // Check defaults for uncustomized message board
         assertTextNotPresent("Status");
@@ -163,11 +163,11 @@ public class MessagesTest extends BaseSeleniumWebTest
         clickLinkWithText("Messages");
         clickLinkWithText("Customize");
         checkCheckbox("expires");
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("test add response");
         clickLinkWithText("view message or respond");
-        clickNavButton("Respond");
+        clickButton("Respond");
         setFormElement("expires", EXPIRES);
         setFormElement("title", RESP1_TITLE);
         setFormElement("body", RESP1_BODY);
@@ -196,8 +196,8 @@ public class MessagesTest extends BaseSeleniumWebTest
         goToProjectHome();
         clickLinkWithText(RESP1_TITLE);
         waitForPageToLoad();
-        clickNavButton("Delete Message");
-        clickNavButton("Delete");
+        clickButton("Delete Message");
+        clickButton("Delete");
         assertTextNotPresent(MSG1_TITLE);
         assertTextNotPresent(RESP1_TITLE);
     }

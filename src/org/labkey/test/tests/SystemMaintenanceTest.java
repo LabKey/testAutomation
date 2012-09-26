@@ -1,6 +1,5 @@
 package org.labkey.test.tests;
 
-import org.bouncycastle.jcajce.provider.symmetric.ARC4;
 import org.labkey.test.BaseSeleniumWebTest;
 
 /**
@@ -29,7 +28,7 @@ public class SystemMaintenanceTest extends BaseSeleniumWebTest
 
         checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
         checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
-        clickNavButton("Save");
+        clickButton("Save");
 
         // Now that the test is done, ensure that system maintenance is complete...
         waitForSystemMaintenanceCompletion();

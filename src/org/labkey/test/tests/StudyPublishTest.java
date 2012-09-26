@@ -512,7 +512,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT); // Make sure charts are rendered
 
         // Add point click function
-        clickNavButton("Developer", 0);
+        clickButton("Developer", 0);
         waitForElement(Locator.button("Cancel"));
         clickButton("Enable", 0);
         setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
@@ -537,7 +537,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         goToManageViews();
         clickMenuButton("Create", "Mouse Report");
-        waitAndClickNavButton("Choose Measures", 0);
+        waitAndClickButton("Choose Measures", 0);
         ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
@@ -552,10 +552,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
             ExtHelper.clickX4GridPanelCheckbox(this, "label", pair[1], "measuresGridPanel", true);
         }
 
-        clickNavButton("Select", 0);
+        clickButton("Select", 0);
 
         ExtHelper.setExtFormElementByLabel(this, "Report Name", reportName);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
     }
 

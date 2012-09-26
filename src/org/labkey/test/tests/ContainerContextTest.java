@@ -98,7 +98,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         };
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
         ListHelper.createList(this, SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
-        clickNavButton("Done");
+        clickButton("Done");
 
         log("** Insert row into lookup target list");
         goToProjectHome();
@@ -121,15 +121,15 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         };
         String lookupSourceListName = "Project-LookupSource-List";
         ListHelper.createList(this, getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickNavButton("Done");
+        clickButton("Done");
 
         log("** Insert row into list");
         goToProjectHome();
         clickLinkWithText(lookupSourceListName);
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_MyName", "MyName");
         selectOptionByText(Locator.name("quf_ListLookup"), "MyLookupItem2");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         log("** Adding in lookup list columns to grid");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
@@ -166,35 +166,35 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         goToProjectHome();
         clickLinkWithText(SUB_FOLDER_A);
         goToManageStudy();
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         setFormElement(Locator.name("label"), SUB_FOLDER_A + "-Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
 
         log("** Creating study in " + SUB_FOLDER_B);
         goToProjectHome();
         clickLinkWithText(SUB_FOLDER_B);
         goToManageStudy();
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         setFormElement(Locator.name("label"), SUB_FOLDER_B + "-Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
 
         log("** Creating list with lookup to viscstudies.studies");
         ListHelper.ListColumn[] cols = {
             new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies")),
         };
         ListHelper.createList(this, getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickNavButton("Done");
+        clickButton("Done");
 
         log("** Insering row into list");
         goToProjectHome();
         clickLinkWithText("Issue15610-List");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText(SUB_FOLDER_A + "-Study"), "href");
@@ -236,7 +236,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         };
         String listName = folder + "-Issue15751-List";
         ListHelper.createList(this, folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
-        clickNavButton("Done");
+        clickButton("Done");
 
         log("** Creating background R script");
         goToProjectHome();
@@ -244,14 +244,14 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         clickLinkWithText(listName);
         clickMenuButton("Views", "Create", "R View");
         clickCheckboxById("runInBackground");
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), folder + "-BackgroundReport");
         ExtHelper.clickExtButton(this, "Save");
 
         log("** Executing background R script");
         clickMenuButton("Views", folder + "-BackgroundReport");
         waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Start Job", 0);
+        clickButton("Start Job", 0);
         waitForText("COMPLETE", WAIT_FOR_PAGE);
     }
 

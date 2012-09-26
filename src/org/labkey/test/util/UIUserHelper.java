@@ -23,7 +23,7 @@ public class UIUserHelper extends AbstractUserHelper
             _test.goToHome();
             _test.ensureAdminMode();
             _test.goToSiteUsers();
-            _test.clickNavButton("Add Users");
+            _test.clickButton("Add Users");
 
             _test.setFormElement("newUsers", userName);
             _test.uncheckCheckbox("sendMail");
@@ -32,7 +32,7 @@ public class UIUserHelper extends AbstractUserHelper
 //                checkCheckbox("cloneUserCheck");
 //                setFormElement("cloneUser", cloneUserName);
 //            }
-            _test.clickNavButton("Add Users");
+            _test.clickButton("Add Users");
 
             if (verifySuccess)
                 Assert.assertTrue("Failed to add user " + userName, _test.isTextPresent(userName + " added as a new user to the system"));

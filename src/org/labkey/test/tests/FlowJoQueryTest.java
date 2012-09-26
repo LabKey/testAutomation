@@ -112,16 +112,16 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickLinkWithText("Edit Settings");
         selectOptionByText(Locator.name("ff_filter_field", 0), "Comp");
         selectOptionByText(Locator.name("ff_filter_op", 0), "Contains");
-        setFormElement(Locator.name("ff_filter_value", 0), "non-comp"); clickNavButton("Update");
+        setFormElement(Locator.name("ff_filter_value", 0), "non-comp"); clickButton("Update");
 
         clickLinkWithText("Analyze some runs");
         selectOptionByValue("ff_targetExperimentId", "");
         waitForPageToLoad();
         // select mini-fcs.xml Analysis run
         checkCheckbox(".select", String.valueOf(runId));
-        clickNavButton("Analyze selected runs");
+        clickButton("Analyze selected runs");
         setFormElement("ff_analysisName", "LabKeyAnalysis");
-        clickNavButton("Analyze runs");
+        clickButton("Analyze runs");
         waitForPipeline(getContainerPath());
         goToFlowDashboard();
         clickLinkWithText("LabKeyAnalysis");

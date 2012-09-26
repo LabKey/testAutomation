@@ -88,10 +88,10 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTextPresent("Count: 10");
 
         clickLinkWithText("Reports");
-        clickNavButtonByIndex("View", 2); // Specimen Report: By Cohort
+        clickButtonByIndex("View", 2); // Specimen Report: By Cohort
         assertTextPresent("Specimen Report: By Cohort");
         checkCheckbox("viewPtidList");
-        clickNavButton("Refresh");
+        clickButton("Refresh");
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE).toString(), TABLE_NEGATIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE).toString(), TABLE_POSITIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_UNASSIGNED).toString(), TABLE_UNASSIGNED);
@@ -125,7 +125,7 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 6, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
 
         selectOptionByText("cohortFilterType", "Initial cohort");
-        clickNavButton("Refresh");
+        clickButton("Refresh");
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE).toString(), TABLE_NEGATIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE).toString(), TABLE_POSITIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_UNASSIGNED).toString(), TABLE_UNASSIGNED);
@@ -152,7 +152,7 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 6, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
 
         selectOptionByText("cohortFilterType", "Current cohort");
-        clickNavButton("Refresh");
+        clickButton("Refresh");
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE).toString(), TABLE_NEGATIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE).toString(), TABLE_POSITIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_UNASSIGNED).toString(), TABLE_UNASSIGNED);
@@ -188,17 +188,17 @@ public class CohortTest extends BaseSeleniumWebTest
         checkCheckbox("explicitChronologicalOrder");
         checkCheckbox("explicitDisplayOrder");
         selectOptionByText("displayOrderItems", "Visit 3");
-        clickNavButtonByIndex("Move Up", 0, 0);
-        clickNavButtonByIndex("Move Up", 0, 0);
+        clickButtonByIndex("Move Up", 0, 0);
+        clickButtonByIndex("Move Up", 0, 0);
         selectOptionByText("chronologicalOrderItems", "Visit 3");
-        clickNavButtonByIndex("Move Up", 1, 0);
-        clickNavButtonByIndex("Move Up", 1, 0);
-        clickNavButton("Save");
+        clickButtonByIndex("Move Up", 1, 0);
+        clickButtonByIndex("Move Up", 1, 0);
+        clickButton("Save");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("View Available Reports");
-        clickNavButtonByIndex("View", 2);
+        clickButtonByIndex("View", 2);
         checkCheckbox("viewPtidList");
-        clickNavButton("Refresh");
+        clickButton("Refresh");
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE).toString(), TABLE_NEGATIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE).toString(), TABLE_POSITIVE);
         assertTableCellContains(TABLE_NEGATIVE, 2, 3, INFECTED_1, INFECTED_2, INFECTED_4);
@@ -215,8 +215,8 @@ public class CohortTest extends BaseSeleniumWebTest
         clickTab("Manage");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("edit", 4); // Visit 4
-        clickNavButton("Delete visit");
-        clickNavButton("Delete");
+        clickButton("Delete visit");
+        clickButton("Delete");
         clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         selenium.assignId(Locator.xpath(XPATH_COHORT_ASSIGNMENT_TABLE).toString(), COHORT_TABLE);
@@ -271,10 +271,10 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTextPresent("Negative", 4);
         clickLinkWithText("Reports");
 
-        clickNavButtonByIndex("View", 2); // Specimen Report: By Cohort
+        clickButtonByIndex("View", 2); // Specimen Report: By Cohort
         assertTextPresent("Specimen Report: By Cohort");
         checkCheckbox("viewPtidList");
-        clickNavButton("Refresh");
+        clickButton("Refresh");
 
         // Basic cohorts should be determined only by the most recent cohort assignment.
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE).toString(), TABLE_NEGATIVE);

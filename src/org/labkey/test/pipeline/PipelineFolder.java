@@ -122,7 +122,7 @@ public class PipelineFolder
     protected void setupPipeline()
     {
         _test.log("Setup pipeline.");
-        _test.clickNavButton("Setup");
+        _test.clickButton("Setup");
 
         _test.log("Set pipeline root.");
         _test.setPipelineRoot(_pipelinePath);
@@ -197,7 +197,7 @@ public class PipelineFolder
                 if (_escalateUsers != null)
                     _test.setFormElement("escalationUsers", StringUtils.join(_escalateUsers, '\n'));
             }
-            _test.clickNavButton("Update");
+            _test.clickButton("Update");
         }
 
         private void check(String name, boolean check)

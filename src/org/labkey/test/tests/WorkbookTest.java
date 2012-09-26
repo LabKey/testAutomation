@@ -104,7 +104,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
 
         // Delete a workbook
         checkDataRegionCheckbox("query", 2); // Select renamed workbook
-        clickNavButton("Delete");
+        clickButton("Delete");
         assertConfirmation("Are you sure you want to delete the selected row?");
         assertTextNotPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
 
@@ -155,12 +155,12 @@ public class WorkbookTest extends BaseSeleniumWebTest
     private void createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
         clickLinkWithText(project);
-        clickNavButton("Insert New");
+        clickButton("Insert New");
 
         setFormElement("workbookTitle", title);
         setFormElement("workbookDescription", description);
         setFormElement("workbookFolderType", folderType.toString());
 
-        clickNavButton("Create Workbook");
+        clickButton("Create Workbook");
     }
 }

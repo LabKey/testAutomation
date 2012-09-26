@@ -209,20 +209,20 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         clickLinkWithText(FOLDER_NAME);
         beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/_initEHR.view");
-        clickNavButton("Delete All", 0);
+        clickButton("Delete All", 0);
         waitForText("Delete Complete", 120000);
-        clickNavButton("Populate All", 0);
+        clickButton("Populate All", 0);
         waitForText("Populate Complete", 120000);
 
         //these tables do not have a container field, so are not deleted when the test project is deleted
-        clickNavButton("Delete Data From SNOMED Subsets", 0);
+        clickButton("Delete Data From SNOMED Subsets", 0);
         waitForText("Delete Complete", 120000);
-        clickNavButton("Populate SNOMED Subsets Table", 0);
+        clickButton("Populate SNOMED Subsets Table", 0);
         waitForText("Populate Complete", 120000);
 
-        clickNavButton("Delete Data From SNOMED", 0);
+        clickButton("Delete Data From SNOMED", 0);
         waitForText("Delete Complete", 120000);
-        clickNavButton("Populate SNOMED Table", 0);
+        clickButton("Populate SNOMED Table", 0);
         waitForText("Populate Complete", 120000);
 
         goToModule("Study");
@@ -504,7 +504,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         waitAndClick(Locator.xpath("//table[text()='[Search By Project/Protocol]']"));
         ExtHelper.waitForExtDialog(this, "Search By Project/Protocol");
         ExtHelper.selectComboBoxItem(this, "Project", PROJECT_ID);
-        clickNavButton("Submit", 0);
+        clickButton("Submit", 0);
         waitForElement(Locator.button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
@@ -514,7 +514,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         waitAndClick(Locator.xpath("//table[text()='[Search By Project/Protocol]']"));
         ExtHelper.waitForExtDialog(this, "Search By Project/Protocol");
         ExtHelper.selectComboBoxItem(this, "Protocol", PROTOCOL_ID);
-        clickNavButton("Submit", 0);
+        clickButton("Submit", 0);
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
 
         // Check protocol search results.
@@ -532,7 +532,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         // Re-add animal.
         setFormElement("subjectBox",  PROTOCOL_MEMBER_IDS[0]);
-        clickNavButton("  Append -->", 0);
+        clickButton("  Append -->", 0);
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
@@ -550,10 +550,10 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
         ExtHelper.waitForExtDialog(this, "Return Distinct Values");
         ExtHelper.selectComboBoxItem(this, "Select Field", "Animal Id");
-        clickNavButton("Submit", 0);
+        clickButton("Submit", 0);
         ExtHelper.waitForExtDialog(this, "Distinct Values");
         assertFormElementEquals("distinctValues", PROTOCOL_MEMBER_IDS[0]+"\n"+PROTOCOL_MEMBER_IDS[1]+"\n"+PROTOCOL_MEMBER_IDS[2]);
-        clickNavButton("Close", 0);
+        clickButton("Close", 0);
 
         log("Return Distinct Values - filtered");
         setFilterAndWait(dataRegionName, "Id", "Does Not Equal", PROTOCOL_MEMBER_IDS[1], 0);
@@ -561,10 +561,10 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
         ExtHelper.waitForExtDialog(this, "Return Distinct Values");
         ExtHelper.selectComboBoxItem(this, "Select Field", "Animal Id");
-        clickNavButton("Submit", 0);
+        clickButton("Submit", 0);
         ExtHelper.waitForExtDialog(this, "Distinct Values");
         assertFormElementEquals("distinctValues", PROTOCOL_MEMBER_IDS[0]+"\n"+PROTOCOL_MEMBER_IDS[2]);
-        clickNavButton("Close", 0);
+        clickButton("Close", 0);
 
         log("Compare Weights - no selection");
         uncheckAllOnPage(dataRegionName);
@@ -575,19 +575,19 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         checkDataRegionCheckbox(dataRegionName, 0);
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         ExtHelper.waitForExtDialog(this, "Weights");
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
 
         log("Compare Weights - two selections");
         checkDataRegionCheckbox(dataRegionName, 1);
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         ExtHelper.waitForExtDialog(this, "Weights");
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
 
         log("Compare Weights - three selections");
         checkDataRegionCheckbox(dataRegionName, 2);
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         ExtHelper.waitForExtDialog(this, "Error"); // After error dialog.
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
 
         log("Jump to Other Dataset - no selection");
         uncheckAllOnPage(dataRegionName);
@@ -601,7 +601,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
         ExtHelper.selectComboBoxItem(this, "Dataset", "Blood Draws");
         ExtHelper.selectComboBoxItem(this, "Filter On", "Animal Id");
-        clickNavButton("Submit");
+        clickButton("Submit");
         waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
 
@@ -609,9 +609,9 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         checkDataRegionCheckbox("query", 0); // PROTOCOL_MEMBER_IDS[0]
         clickMenuButton("More Actions", "Jump To History");
         assertTitleContains("Animal History");
-        clickNavButton("  Append -->", 0);
+        clickButton("  Append -->", 0);
         setFormElement("subjectBox", PROTOCOL_MEMBER_IDS[2]);
-        clickNavButton("  Append -->", 0);
+        clickButton("  Append -->", 0);
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
@@ -619,14 +619,14 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         log("Check subjectBox parsing");
         setFormElement("subjectBox",  MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
-        clickNavButton("  Replace -->", 0);
+        clickButton("  Replace -->", 0);
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 5, getDataRegionRowCount(dataRegionName));
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[2]);
                                       
-        clickNavButton(" Clear ", 0);
+        clickButton(" Clear ", 0);
         refreshAnimalHistoryReport();
         assertAlert("Must Enter At Least 1 Animal ID");
         assertElementNotPresent(Locator.buttonContainingText("(X)"));
@@ -635,7 +635,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
     private void refreshAnimalHistoryReport()
     {
         waitForText("Abstract");
-        clickNavButton("Refresh", 0);
+        clickButton("Refresh", 0);
     }
 
     private void quickSearchTest()
@@ -645,7 +645,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement("animal", MORE_ANIMAL_IDS[0]);
-        clickNavButton("Show Animal");
+        clickButton("Show Animal");
         assertTitleContains("Animal - "+MORE_ANIMAL_IDS[0]);
 
         log("Quick Search - Show Group");
@@ -653,7 +653,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at Center");
-        clickNavButton("Show Group");
+        clickButton("Show Group");
         waitForText("1 - 36 of 36", WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Project");
@@ -661,7 +661,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='projectField']/.."), PROJECT_ID);
-        clickNavButton("Show Project");
+        clickButton("Show Project");
         waitForElement(Locator.linkWithText(PROJECT_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Protocol");
@@ -669,7 +669,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@name='protocolField']/.."), PROTOCOL_ID);
-        clickNavButton("Show Protocol");
+        clickButton("Show Protocol");
         waitForElement(Locator.linkWithText(PROTOCOL_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Room");
@@ -677,7 +677,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         clickLinkWithText(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement("room", ROOM_ID);
-        clickNavButton("Show Room");
+        clickButton("Show Room");
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
     }
 
@@ -724,7 +724,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         setPermissions(REQUEST_ADMIN.getGroup(), "Editor");
         savePermissions();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
 
         checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(DATA_ADMIN.getGroup(), "READOWN"));
         checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(REQUESTER.getGroup(), "READOWN"));
@@ -754,7 +754,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
             }
         }, "Per-dataset permission not set", WAIT_FOR_JAVASCRIPT);
 
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     private void weightDataEntryTest()
@@ -804,7 +804,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[0], true);
         _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[1], true);
         _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[2], true);
-        clickNavButton("Delete Selected", 0);
+        clickButton("Delete Selected", 0);
         ExtHelper.waitForExtDialog(this, "Confirm");
         ExtHelper.clickExtButton(this, "Yes", 0);
         waitForElementToDisappear(Locator.tagWithText("div", PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
@@ -818,7 +818,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         ExtHelper.clickExtButton(this, "Duplicate Records", "Submit", 0);
         ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
 
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
         ExtHelper.clickExtTab(this, "All Tasks");
@@ -878,9 +878,9 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         String href2 = getAttribute(Locator.linkWithText(TASK_TITLE), "href");
         beginAt(href2); // Clicking opens in a new window.
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Validate", 0);
+        clickButton("Validate", 0);
         waitForElement(Locator.xpath("//button[text() = 'Submit Final' and "+Locator.ENABLED+"]"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Submit Final", 0);
+        clickButton("Submit Final", 0);
         ExtHelper.waitForExtDialog(this, "Finalize Form");
         ExtHelper.clickExtButton(this, "Finalize Form", "Yes");
 
@@ -925,7 +925,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         sleep(1000);
 
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
         ExtHelper.clickExtTab(this, "All Tasks");
@@ -980,7 +980,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 //        waitForElement(Locator.xpath("/*//*["+VISIBLE+" and not(contains(@class, 'x-hide-display')) and contains(@class,'ehr-charges-records-grid')]"), WAIT_FOR_JAVASCRIPT);
 //        clickVisibleButton("Add Record");
 
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         stopImpersonating();
     }
@@ -1106,10 +1106,10 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
             setFormElement("newLabel", qcState.label);
             setFormElement("newDescription", qcState.description);
             if(!qcState.publicData) uncheckCheckbox("newPublicData");
-            clickNavButton("Save");
+            clickButton("Save");
         }
 
         setFormElement("showPrivateDataByDefault", "true");
-        clickNavButton("Done");
+        clickButton("Done");
     }
 }

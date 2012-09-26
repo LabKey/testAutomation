@@ -223,20 +223,20 @@ public class SearchTest extends StudyTest
         selectOptionByValue("rowField",  "DEMsex");
         selectOptionByValue("colField", "DEMsexor");
         selectOptionByValue("statField", "MouseId");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
         assertTableRowsEqual("report", 3, new String[][] {row3});
 
         setFormElement("label", REPORT_NAME);
-        clickNavButton("Save");
+        clickButton("Save");
 
         // create new grid view report:
         clickMenuButton("Views", "Manage Views");
         clickMenuButton("Create", "Grid View");
         setFormElement("label", GRID_VIEW_NAME);
         selectOptionByText("params", "ECI-1: Eligibility Criteria");
-        clickNavButton("Create View");
+        clickButton("Create View");
 
         // create new external report
         clickLinkWithText(getStudyLabel());
@@ -245,15 +245,15 @@ public class SearchTest extends StudyTest
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("Female");
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue("fileExtension", "tsv");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("Female");
         setFormElement("label", "tsv");
         selectOptionByText("showWithDataset", "DEM-1: Demographics");
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     private void addSearchableWiki()
@@ -276,13 +276,13 @@ public class SearchTest extends StudyTest
     private void addSearchableIssues()
     {
         createPermissionsGroup(GROUP_NAME, USER1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         clickLinkWithText(getFolderName());
         addWebPart("Issues Summary");
 
         // Setup issues options.
         clickLinkWithText("Issues Summary");
-        clickNavButton("Admin");
+        clickButton("Admin");
 
         // Add Area
         IssuesTest.addKeywordsAndVerify(this, "area", "Area", "Area51");
@@ -291,8 +291,8 @@ public class SearchTest extends StudyTest
         IssuesTest.addKeywordsAndVerify(this, "type", "Type", "UFO");
 
         // Create new issue.
-        clickNavButton("Back to Issues");
-        clickNavButton("New Issue");
+        clickButton("Back to Issues");
+        clickButton("New Issue");
         setFormElement("title", ISSUE_TITLE);
         selectOptionByText("type", "UFO");
         selectOptionByText("area", "Area51");
@@ -305,7 +305,7 @@ public class SearchTest extends StudyTest
             File file = new File(getLabKeyRoot() + "/common.properties");
             setFormElement("formFiles[00]", file);
         }
-        clickNavButton("Save");
+        clickButton("Save");
 
         SearchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
         SearchHelper.enqueueSearchItem(ISSUE_BODY, Locator.linkContainingText(ISSUE_TITLE));
@@ -328,7 +328,7 @@ public class SearchTest extends StudyTest
             File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
             setFormElement("formFiles[0]", file);
         }
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         SearchHelper.enqueueSearchItem(MESSAGE_TITLE, Locator.linkContainingText(MESSAGE_TITLE));
         SearchHelper.enqueueSearchItem(MESSAGE_BODY, Locator.linkContainingText(MESSAGE_TITLE));
@@ -358,7 +358,7 @@ public class SearchTest extends StudyTest
             }
         }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[@class = 'x-form-file']"), f.toString());
-        clickNavButton("Upload", 0);
+        clickButton("Upload", 0);
         waitForText(f.getName(), 10000);
     }
 }

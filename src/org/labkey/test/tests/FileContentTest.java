@@ -114,7 +114,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             checkDataRegionCheckbox("Users", table.getRow("Email", TEST_USER));
             ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
             click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Settings']"));
-            waitAndClickNavButton("Yes");
+            waitAndClickButton("Yes");
             waitForPageToLoad();
             Assert.assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
 
@@ -139,7 +139,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             setFormElement("ff_name0", CUSTOM_PROPERTY);
             setFormElement("url", "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
             addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
-            clickNavButton("Save & Close");
+            clickButton("Save & Close");
 
             waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
             ExtHelper.waitForFileGridReady(this);

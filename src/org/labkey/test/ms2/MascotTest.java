@@ -212,7 +212,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         // test import of .dat file
         log("Upload existing Mascot .dat result file.");
         clickLinkWithText(FOLDER_NAME);
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SEARCH_TYPE + "/test3/");
         selectImportDataAction("Import Results");
 
@@ -266,7 +266,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     protected void setupEngine()
     {
         log("Analyze " + SEARCH_NAME + " sample data.");
-        waitAndClickNavButton(SEARCH_BUTTON +  " Peptide Search");
+        waitAndClickButton(SEARCH_BUTTON + " Peptide Search");
     }
 
     protected void basicChecks()
@@ -276,7 +276,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
 
         log("Test filtering and sorting");
         setFilter("MS2Peptides", "Mass", "Is Greater Than", "1000");
@@ -285,21 +285,21 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
         log("Test Save View");
-        clickNavButton("Save View");
+        clickButton("Save View");
         setFormElement("name", VIEW);
-        clickNavButton("Save View");
+        clickButton("Save View");
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
         assertTextPresent(PEPTIDE);
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickButton("Go");
         assertTextNotPresent(PEPTIDE);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
         log("Test exporting");
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
-        clickNavButton("Export All", 0);
+        clickButton("Export All", 0);
         clickLinkWithText("TSV", 0);
         assertTextNotPresent(PEPTIDE);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
@@ -310,10 +310,10 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickLinkWithText("MS2 Dashboard");
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("Peptide");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickButton("Go");
         assertTextPresent("(Mass > 1000)");
 
         //Put in once bug with filters in postgres is fixed
@@ -331,20 +331,20 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Test Protein Search");
         selenium.type("identifier", SEARCH);
         selenium.click("exactMatch");
-        clickNavButton("Search");
+        clickButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
         selenium.type("minimumProbability", "2.0");
-        clickNavButton("Search");
+        clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
         selenium.type("identifier", "GarbageProteinName");
         selenium.type("minimumProbability", "");
-        clickNavButton("Search");
+        clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextNotPresent(SEARCH_FIND);
         assertTextNotPresent(SEARCH_FIND_ALT);

@@ -128,13 +128,13 @@ public class WikiLongTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT2_NAME, null);
         enableModule(PROJECT2_NAME, "MS2");
         setPermissions(USERS_GROUP, "Editor");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         _containerHelper.createProject(PROJECT_NAME, null);
         enableModule(PROJECT_NAME, "MS2");
         createPermissionsGroup("testers");
         setPermissions("testers", "Editor");
         setPermissions(USERS_GROUP, "Editor");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
@@ -254,14 +254,14 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("Check sibling order edit works");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         clickLinkWithText("Manage");
-        clickNavButton("Move Down", 0);
-        clickNavButton("Save");
+        clickButton("Move Down", 0);
+        clickButton("Save");
         clickLinkWithText(WIKI_PAGE3_NAME_TITLE);
         clickLinkWithText("next");
         assertTextPresent("normal normal normal");
         clickLinkWithText("Manage");
-        clickNavButton("Move Up", 0);
-        clickNavButton("Save");
+        clickButton("Move Up", 0);
+        clickButton("Save");
         clickLinkWithText("next");
         assertTextPresent("Page AAA");
 
@@ -270,7 +270,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText("Manage");
         selectOptionByText("parent", WIKI_PAGE1_TITLE + " (" + WIKI_PAGE1_NAME + ")");
         waitForPageToLoad();
-        clickNavButton("Save");
+        clickButton("Save");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         clickLinkWithText("next");
         assertTextPresent("Some HTML content");
@@ -291,14 +291,14 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertTextPresent(DISC1_BODY);
 
         log("Check response on discussion board works");
-        clickNavButton("Respond");
+        clickButton("Respond");
         setFormElement("title", RESP1_TITLE);
         setFormElement("body", RESP1_BODY);
         submit();
         assertTextPresent(RESP1_TITLE);
         assertTextPresent(RESP1_BODY);
-        clickNavButton("Delete Message");
-        clickNavButton("Delete");
+        clickButton("Delete Message");
+        clickButton("Delete");
         assertTextNotPresent(DISC1_TITLE);
         assertTextNotPresent(DISC1_BODY);
 
@@ -342,7 +342,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("test versions");
         clickLinkWithText("History");
         clickLinkWithText("2");
-        clickNavButton("Make Current");
+        clickButton("Make Current");
         assertTextPresent("6");
         clickLinkWithText(WIKI_PAGE1_TITLE);
         clickLinkWithText("next");
@@ -354,7 +354,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("test copy wiki");
         clickWebpartMenuItem("Pages", "Copy");
         clickLinkWithText(PROJECT2_NAME);
-        clickNavButton("Copy Pages");
+        clickButton("Copy Pages");
 
         log("test wiki customize link");
         clickTab("Portal");
@@ -379,7 +379,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
         selectOptionByText("name", WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         sleep(500);
-        clickNavButton("Submit");
+        clickButton("Submit");
         clickLinkWithText("Welcome");
         log("make sure it all got copied");
         clickLinkWithText(WIKI_PAGE3_ALTTITLE);
@@ -391,12 +391,12 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
         log("Check if permissions work");
         enterPermissionsUI();
         setPermissions(USERS_GROUP, "Reader");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         pushLocation();
@@ -408,7 +408,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         enterPermissionsUI();
         removePermission(USERS_GROUP, "Editor");
         removePermission(USERS_GROUP, "Reader");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         impersonate(USER1);
         assertTextNotPresent(PROJECT2_NAME);     // Project should not be visible
         popLocation();
@@ -437,7 +437,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE2_TITLE);
         enterPermissionsUI();
         setPermissions(USERS_GROUP, "Project Administrator");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
         assertTextNotPresent("Welcome");
@@ -451,7 +451,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
         impersonate(USER1);
         clickLinkWithText(PROJECT2_NAME);
@@ -464,7 +464,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         enterPermissionsUI();
         setPermissions(USERS_GROUP, "Project Administrator");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         log("make sure the changes went through");
         impersonate(USER1);
@@ -496,7 +496,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("Check that 'Copy Pages' in TOC works");
         clickWebpartMenuItem("Test Customize TOC", "Copy");
         clickLinkWithText(PROJECT_NAME);
-        clickNavButton("Copy Pages");
+        clickButton("Copy Pages");
         clickLinkWithText(PROJECT_NAME);
         clickTab("Wiki");
         assertTextPresent(WIKI_PAGE1_TITLE);
@@ -547,8 +547,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private void deleteWikiPage()
     {
         waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'disabled')]/span[text()='Delete Page']"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Delete Page");
-        clickNavButton("Delete");
+        clickButton("Delete Page");
+        clickButton("Delete");
     }
 
     private void termsOfUseTest()
@@ -559,7 +559,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER2);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
         log("Test terms of use");
         goToModule("Wiki");
@@ -602,7 +602,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
+        clickButton("Agree");
         goToHome();
         clickLinkWithText(PROJECT3_NAME);
         assertTextNotPresent("fight club");         
@@ -622,16 +622,16 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent("fight club");
         log("Submit without agreeing");
-        clickNavButton("Agree");
+        clickButton("Agree");
 
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
+        clickButton("Agree");
 
         clickLinkWithText(PROJECT4_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
+        clickButton("Agree");
 
         log("Check terms with impersonated user");
         impersonate(USER2);
@@ -639,21 +639,21 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
+        clickButton("Agree");
         clickLinkWithText(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
+        clickButton("Agree");
         clickLinkWithText(PROJECT4_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
+        clickButton("Agree");
 
         stopImpersonating();            
         clickLinkWithText(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
-        clickNavButton("Agree");
+        clickButton("Agree");
 
         clickLinkWithText(PROJECT_NAME);
         clickTab("Wiki");
@@ -664,10 +664,10 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
     private void changeFormat(String format)
     {
-        clickNavButton("Convert To...", 0);
+        clickButton("Convert To...", 0);
         sleep(500);
         selectOptionByValue("wiki-input-window-change-format-to", format);
-        clickNavButton("Convert", 0);
+        clickButton("Convert", 0);
         sleep(500);
     }
 
@@ -720,7 +720,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         // into the manage page
         manageIndexWiki(false);
         checkCheckbox(Locator.id(WIKI_INDEX_MANAGE_CHECKBOX));
-        clickNavButton("Save");
+        clickButton("Save");
         searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 1, null);
 
         //
@@ -729,7 +729,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("test index option:  manage and turn off indexing for a page that is indexed");
         manageIndexWiki(true);
         uncheckCheckbox(Locator.id(WIKI_INDEX_MANAGE_CHECKBOX));
-        clickNavButton("Save");
+        clickButton("Save");
         searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 0, null);
 
         //
@@ -738,7 +738,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         //
         log("test index option:  edit and turn off indexing for a page that was created indexed");
         editIndexWiki(false);
-        clickNavButton("Cancel");
+        clickButton("Cancel");
 
         //
         // cleanup
@@ -816,7 +816,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         }
 
         if ("HTML".equals(renderType) && isNavButtonPresent("Use HTML Source Editor"))
-            clickNavButton("Use HTML Source Editor");
+            clickButton("Use HTML Source Editor");
     }
 
     protected void doCleanup()

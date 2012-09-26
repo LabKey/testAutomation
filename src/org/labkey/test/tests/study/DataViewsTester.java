@@ -116,18 +116,18 @@ public class DataViewsTester
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         ExtHelper.checkCheckbox(_test, "datasets");
-        _test.clickNavButton("Manage Categories", 0);
+        _test.clickButton("Manage Categories", 0);
         ExtHelper.waitForExtDialog(_test, "Manage Categories");
         _test.waitAndClick(Locator.xpath("//img[@data-qtip='Delete']"));
         ExtHelper.waitForExtDialog(_test, "Delete Category");
-        _test.clickNavButton("OK", 0);
+        _test.clickButton("OK", 0);
         ExtHelper.waitForExtDialogToDisappear(_test, "Delete Category");
         _test.waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.clickNavButton("New Category", 0);
+        _test.clickButton("New Category", 0);
         _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"));
         _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"), "testcategory");
-        _test.clickNavButton("Done", 0);
-        _test.clickNavButton("Save", 0);
+        _test.clickButton("Done", 0);
+        _test.clickButton("Save", 0);
         _test.waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.refresh(); // Deleted category is still present, but hidden.  Refresh to clear page.
         _test.waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
@@ -155,7 +155,7 @@ public class DataViewsTester
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         ExtHelper.checkCheckbox(_test, "Status");
-        _test.clickNavButton("Save", 0);
+        _test.clickButton("Save", 0);
         _test.clickLinkContainingText("Data & Reports");
 
         for (String[] entry : datasets)
@@ -165,7 +165,7 @@ public class DataViewsTester
 //            Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
             Ext4Helper.selectComboBoxItem(_test, "Status", entry[1]);
 
-            _test.clickNavButton("Save", 0);
+            _test.clickButton("Save", 0);
 
             Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + entry[0] + "')]/../../../..//img[@alt='" + entry[1] + "']");
             _test.waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);

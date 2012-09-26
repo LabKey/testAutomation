@@ -65,8 +65,8 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         
         log("** Create Study");
         clickLinkWithText(getFolderName());
-        clickNavButton("Create Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
+        clickButton("Create Study");
     }
 
 
@@ -82,7 +82,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         clickLinkWithText("Specimen Data");
         addWebPart("Specimens");
         clickLinkWithText("By Vial Group");
-        clickNavButton("Import Specimens");
+        clickButton("Import Specimens");
         setLongTextField("tsv", getFileContents(specimensPath));
         submit();
         assertTextPresent("Specimens uploaded successfully");
@@ -93,10 +93,10 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         log("** Create viability assay");
         clickLinkWithText(getFolderName());
         addWebPart("Assay List");
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "Viability");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -107,7 +107,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         addField("Result Fields", 12, "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
 
         sleep(1000);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
     }
 
@@ -127,10 +127,10 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         log("** Upload viability run " + (runName != null ? runName : "<unnamed>"));
         clickLinkWithText(getFolderName());
         clickLinkWithText(getAssayName());
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         if (setBatchTargetStudy)
             selectOptionByText("targetStudy", "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
-        clickNavButton("Next");
+        clickButton("Next");
 
         if (runName != null)
             setFormElement("name", runName);
@@ -145,7 +145,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         clickLinkWithText("rerun");
 
         // No need to change batch fields (TargetStudy) for now, click Next
-        clickNavButton("Next");
+        clickButton("Next");
 
         if (runName != null)
             setFormElement("name", runName);
@@ -158,7 +158,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         File guavaFile = new File(getLabKeyRoot() + path);
         Assert.assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
         setFormElement("__primaryFile__", guavaFile);
-        clickNavButton("Next", 8000);
+        clickButton("Next", 8000);
     }
 
 

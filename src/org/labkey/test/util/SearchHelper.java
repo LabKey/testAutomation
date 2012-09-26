@@ -145,7 +145,7 @@ public class SearchHelper
         if ( test.isElementPresent(Locator.id("query")) )
         {
             test.setFormElement(Locator.id("query"), searchTerm);
-            test.clickNavButton("Search");
+            test.clickButton("Search");
         }
         else
         {
@@ -165,7 +165,7 @@ public class SearchHelper
         test.checkCheckbox("category", 2);
 
         test.setFormElement(Locator.id("query"), searchTerm);
-        test.clickNavButton("Search");
+        test.clickButton("Search");
     }
 
     public static void deleteIndex ( BaseSeleniumWebTest test )
@@ -173,7 +173,7 @@ public class SearchHelper
         test.ensureAdminMode();
         test.goToAdmin();
         test.clickLinkWithText("full-text search");
-        test.clickNavButton("Delete Index");
+        test.clickButton("Delete Index");
     }
 
     public static class SearchItem

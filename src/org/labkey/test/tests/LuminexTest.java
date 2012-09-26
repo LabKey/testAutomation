@@ -170,8 +170,8 @@ public class LuminexTest extends AbstractQCAssayTest
         //create a study within this project to which we will publish
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
         addWebPart("Study Overview");
-        clickNavButton("Create Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
+        clickButton("Create Study");
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
 
         //add the Assay List web part so we can create a new luminex assay
@@ -185,7 +185,7 @@ public class LuminexTest extends AbstractQCAssayTest
             goToManageAssays();
             clickLinkWithText(TEST_ASSAY_XAR_NAME);
             ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a[text() = 'manage assay design']"), "copy assay design");
-            clickNavButton("Copy to Current Folder", WAIT_FOR_PAGE);
+            clickButton("Copy to Current Folder", WAIT_FOR_PAGE);
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
             selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
             selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
@@ -194,11 +194,11 @@ public class LuminexTest extends AbstractQCAssayTest
         else
         {
             //create a new luminex assay
-            clickNavButton("Manage Assays");
-            clickNavButton("New Assay Design");
+            clickButton("Manage Assays");
+            clickButton("New Assay Design");
 
             checkRadioButton("providerName", "Luminex");
-            clickNavButton("Next");
+            clickButton("Next");
 
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -278,7 +278,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected void saveAssay()
     {
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
     }
 
@@ -318,29 +318,29 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY_LUM);
         log("Uploading Luminex Runs");
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
-        clickNavButton("Next");
+        clickButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
-        clickNavButton("Next", 60000);
-        clickNavButton("Save and Import Another Run");
+        clickButton("Next", 60000);
+        clickButton("Save and Import Another Run");
         clickLinkWithText(TEST_ASSAY_LUM);
 
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
-        clickNavButton("Next");
+        clickButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE2);
-        clickNavButton("Next", 60000);
+        clickButton("Next", 60000);
         selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]", "StandardName1b");
         selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']", "StandardName2");
         selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[5]//input[@type='text']", "StandardName4");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         // Upload another run using a thaw list pasted in as a TSV
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
         setFormElement("participantVisitResolver", "Lookup");
         setFormElement("ThawListType", "Text");
@@ -349,15 +349,15 @@ public class LuminexTest extends AbstractQCAssayTest
                 "2\tSpecimenID2\tParticipantID2\t1.2\n" +
                 "3\tSpecimenID3\tParticipantID3\t1.3\n" +
                 "4\tSpecimenID4\tParticipantID4\t1.4");
-        clickNavButton("Next");
+        clickButton("Next");
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
-        clickNavButton("Next", 60000);
+        clickButton("Next", 60000);
         Assert.assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
         Assert.assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         // Upload another run using a thaw list that pointed at the list we uploaded earlier
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
         Assert.assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
         Assert.assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));
@@ -365,17 +365,17 @@ public class LuminexTest extends AbstractQCAssayTest
         Assert.assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
         checkRadioButton("ThawListType", "List");
         waitForElement(Locator.id("button_Choose list..."), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Choose list...", 0);
+        clickButton("Choose list...", 0);
         setFormElement("schema", "lists");
         setFormElement("table", THAW_LIST_NAME);
-        clickNavButton("Close", 0);
-        clickNavButton("Next");
+        clickButton("Close", 0);
+        clickButton("Next");
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
-        clickNavButton("Next", 60000);
+        clickButton("Next", 60000);
         Assert.assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
         Assert.assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         log("Check that upload worked");
         clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME);
@@ -411,12 +411,12 @@ public class LuminexTest extends AbstractQCAssayTest
 
         setFilter(TEST_ASSAY_LUM + " Data", "FI", "Equals", "20");
         selenium.click(".toggle");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
         selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
-        clickNavButton("Next");
+        clickButton("Next");
         setFormElement("participantId", "ParticipantID");
         setFormElement("visitId", "100.1");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         log("Verify that the data was published");
         assertTextPresent("ParticipantID");
@@ -427,12 +427,12 @@ public class LuminexTest extends AbstractQCAssayTest
         // Upload another run that has both Raw and Summary data in the same excel file
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
         setFormElement("name", "raw and summary");
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE10);
-        clickNavButton("Next", 60000);
-        clickNavButton("Save and Finish");
+        clickButton("Next", 60000);
+        clickButton("Save and Finish");
 
         clickLinkWithText("raw and summary");
         // make sure the Summary, StdDev, and DV columns are visible
@@ -442,7 +442,7 @@ public class LuminexTest extends AbstractQCAssayTest
         CustomizeViewsHelper.addCustomizeViewColumn(this, "CV");
         CustomizeViewsHelper.applyCustomView(this);
         // show all rows (> 100 in full data file)
-        clickNavButton("Page Size", 0);
+        clickButton("Page Size", 0);
         clickLinkWithText("Show All");
 
         // check that both the raw and summary data were uploaded together
@@ -1148,16 +1148,16 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText("edit assay design");
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         goToTestAssayHome();
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
-        clickNavButton("Next");
+        clickButton("Next");
         setFormElement("name", "transformed assayId");
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
-        clickNavButton("Next", 60000);
-        clickNavButton("Save and Finish");
+        clickButton("Next", 60000);
+        clickButton("Save and Finish");
 
         // verify the description error was generated by the transform script
         clickLinkWithText("transformed assayId");
@@ -1195,19 +1195,19 @@ public class LuminexTest extends AbstractQCAssayTest
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
 
         // save changes to assay design
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         // upload the sample data file
         clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
         setFormElement("name", "r script transformed assayId");
         setFormElement("stndCurveFitInput", "FI");
         setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
         checkCheckbox("curveFitLogTransform");
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE4);
-        clickNavButton("Next", 60000);
+        clickButton("Next", 60000);
         // make sure the Standard checkboxes are checked
         checkCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("titration_MyAnalyte (1)_Standard1");
@@ -1217,7 +1217,7 @@ public class LuminexTest extends AbstractQCAssayTest
         checkCheckbox("_titrationRole_qccontrol_Standard1");
         // set LotNumber for the first analyte
         selenium.type("//input[@type='text' and contains(@name, '_LotNumber')][1]", TEST_ANALYTE_LOT_NUMBER);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         // verify that the PDF of curves was generated
         Locator l = Locator.tagWithAttribute("img", "src", "/labkey/_images/sigmoidal_curve.png");
@@ -1308,7 +1308,7 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement("expPerformer", expPerformer);
             setFormElement("testDate", testDate);
             setFormElement("__primaryFile__", file);
-            clickNavButton("Next", 60000);
+            clickButton("Next", 60000);
     }
     //requires drc, Ruminex, rlabkey and xtable packages installed in R
     protected void runGuideSetTest()
@@ -1324,7 +1324,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText("edit assay design");
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         // save changes to assay design
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         // setup the testDate variable
         Calendar testDate = Calendar.getInstance();
@@ -1380,15 +1380,15 @@ public class LuminexTest extends AbstractQCAssayTest
         for (int i = 2; i < files.length; i++)
         {
             goToTestAssayHome();
-            clickNavButton("Import Data");
+            clickButton("Import Data");
             setFormElement("network", "NETWORK" + (i + 1));
-            clickNavButton("Next");
+            clickButton("Next");
 
             importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
                         "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
             uncheckCheckbox("_titrationRole_standard_Standard1");
             checkCheckbox("_titrationRole_qccontrol_Standard1");
-            clickNavButton("Save and Finish");
+            clickButton("Save and Finish");
 
             displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
         }
@@ -1419,16 +1419,16 @@ public class LuminexTest extends AbstractQCAssayTest
     protected void importRunForTestLuminexConfig(File file, Calendar testDate, int i)
     {
         goToTestAssayHome();
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement("network", "NETWORK" + (i + 1));
-        clickNavButton("Next");
+        clickButton("Next");
 
         testDate.add(Calendar.DATE, 1);
         importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
                     "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
         uncheckCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("_titrationRole_qccontrol_Standard1");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
     }
 
     private void verifyHighlightUpdatesAfterQCFlagChange()
@@ -1633,15 +1633,15 @@ public class LuminexTest extends AbstractQCAssayTest
         //	- QC flags inserted for AUC for both analytes and HMFI for GS Analyte (1)
 
         goToTestAssayHome();
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement("network", "NETWORK" + (10));
-        clickNavButton("Next");
+        clickButton("Next");
 
         importLuminexRunPageTwo(newGuideSetPlate, isotype, conjugate, "", "", "Notebook" + 11,
                     "Experimental", "TECH" + (11), "",  TEST_ASSAY_LUM_FILE9.toString(), 6);
         uncheckCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("_titrationRole_qccontrol_Standard1");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
 
     }
@@ -2224,8 +2224,8 @@ public class LuminexTest extends AbstractQCAssayTest
     public void uploadPositivityFile(String assayName, String baseVisit, String foldChange, boolean isBackgroundUpload)
     {
         goToTestAssayHome();
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
         setFormElement("name", assayName);
         checkCheckbox("calculatePositivity");
         setFormElement("baseVisit", baseVisit);
@@ -2233,8 +2233,8 @@ public class LuminexTest extends AbstractQCAssayTest
         File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
         Assert.assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
         setFormElement("__primaryFile__", positivityData);
-        clickNavButton("Next");
-        clickNavButton("Save and Finish");
+        clickButton("Next");
+        clickButton("Save and Finish");
         if (!isBackgroundUpload && !isTextPresent("Error"))
             clickLinkWithText(assayName);
     }    

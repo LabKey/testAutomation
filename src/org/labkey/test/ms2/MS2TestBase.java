@@ -80,7 +80,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "MS2", new String[] { });
 
         log("Setup pipeline.");
-        clickNavButton("Setup");
+        clickButton("Setup");
 
         log("Set bad pipeline root.");
         setPipelineRoot("/bogus");
@@ -97,7 +97,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         if (isLinkPresentWithImage(getContextPath() + "/MS2/images/runIcon.gif"))
         {
             clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
-            clickNavButton("Manage Views");
+            clickButton("Manage Views");
             for (String viewName : viewNames)
             {
                 log("Deleting View " + viewName);
@@ -106,7 +106,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
                     checkCheckbox("viewsToDelete", viewName);
                 }
             }
-            clickNavButton("OK");
+            clickButton("OK");
         }
     }
 
@@ -122,10 +122,10 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         if (!isTextPresent("No data to show"))
         {
             checkCheckbox(".toggle");
-            clickNavButton("Delete");
+            clickButton("Delete");
 
             log("Confirm deletion");
-            clickNavButton("Confirm Delete");
+            clickButton("Confirm Delete");
         }
 
         log("Make sure all the data got deleted");

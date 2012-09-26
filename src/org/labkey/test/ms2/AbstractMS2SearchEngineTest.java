@@ -46,7 +46,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Start analysis running.");
         clickLinkWithText("MS2 Dashboard");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
 
         ExtHelper.selectFileBrowserItem(this, "bov_sample/CAexample_mini.mzXML");
         selectImportDataAction("Create New Mass Spec Metadata Assay Design");
@@ -60,16 +60,16 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         addField("Run Fields", 2, "BooleanField", "BooleanField", ListHelper.ListColumnType.Boolean);
 
         sleep(1000);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
 
         clickLinkWithText("MS2 Dashboard");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "bov_sample/CAexample_mini.mzXML");
         selectImportDataAction("Use " + TEST_ASSAY_NAME);
 
         log("Describe MS2 run.");
-        clickNavButton("Next");
+        clickButton("Next");
         setFormElement("name", ANNOTATION_RUN_NAME);
         setFormElement("integerField", "10");
         setFormElement("textField", "Text value");
@@ -84,14 +84,14 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         selectOptionByText("sampleSetListBox0", "<None>");
         setFormElement("sampleTextBox0", "verify:001");
 
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         log("Return to search page");
         clickLinkWithText("MS2 Dashboard");
 
         assertLinkPresentWithText(ANNOTATION_RUN_NAME);
 
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "bov_sample/");
         setupEngine();
 
@@ -135,7 +135,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Analyze again.");
         clickLinkWithText("MS2 Dashboard");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "bov_sample/");
 
         setupEngine();
@@ -162,7 +162,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         // that was submitted last, and that all the jobs have completed,
         // we can safely click on the first link
         clickLinkWithText("COMPLETE");
-        clickNavButton("Data");
+        clickButton("Data");
 
         log("Verify msPicture");
         assertImageMapAreaPresent("graphmap", ANNOTATION_RUN_NAME);
@@ -197,14 +197,14 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
         selectOptionByText("grouping", "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
         log("Test adding columns");
-        clickNavButton("Pick Peptide Columns");
-        clickNavButton("Pick", 0);
-        clickNavButton("Pick Columns");
+        clickButton("Pick Peptide Columns");
+        clickButton("Pick", 0);
+        clickButton("Pick Columns");
         assertTextPresent("Run Description");
         assertTextPresent("Next AA");
 

@@ -47,10 +47,10 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         clickLinkWithText("protein databases");
         assertTextNotPresent(UNIPROT_FILENAME);
 
-        clickNavButton("Load New Annot File");
+        clickButton("Load New Annot File");
         setFormElement("fname", getLabKeyRoot() + "/sampledata/proteinAnnotations/" + UNIPROT_FILENAME);
         setFormElement("fileType", "uniprot");
-        clickNavButton("Load Annotations");
+        clickButton("Load Annotations");
 
         setFilter("AnnotInsertions", "FileName", "Contains", UNIPROT_FILENAME);
         setFilter("AnnotInsertions", "CompletionDate", "Is Not Blank");
@@ -68,7 +68,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         setFormElement("identifier", "Ppia");
         uncheckCheckbox("restrictProteins");
-        clickNavButton("Search");
+        clickButton("Search");
 
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
         assertTextPresent("Peptidyl-prolyl cis-trans isomerase A");
@@ -89,7 +89,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         setFormElement("identifier", "Defa1");
         uncheckCheckbox("restrictProteins");
-        clickNavButton("Search");
+        clickButton("Search");
 
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
         assertTextPresent("Defensin-1 precursor");

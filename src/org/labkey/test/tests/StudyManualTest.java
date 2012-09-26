@@ -56,18 +56,18 @@ public class StudyManualTest extends StudyTest
     {
         initializeFolder();
 
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         click(Locator.radioButtonByNameAndValue("simpleRepository", "false"));
         setText("subjectNounSingular", "Mouse");
         setText("subjectNounPlural", "Mice");
         setText("subjectColumnName", "MouseId");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
 
         // change study label
         clickLinkWithText("Change Study Properties");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", getStudyLabel());
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent(getStudyLabel());
 
         // import visit map
@@ -76,7 +76,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText("Import Visit Map");
         String visitMapData = getFileContents(VISIT_MAP);
         setLongTextField("content", visitMapData);
-        clickNavButton("Import");
+        clickButton("Import");
 
         // import custom visit mapping
         importCustomVisitMappingAndVerify();
@@ -90,7 +90,7 @@ public class StudyManualTest extends StudyTest
         setFormElement("labelColumn", "platelabel");
         setFormElement("typeIdColumn", "plateno");
         setLongTextField("tsv", getFileContents(CRF_SCHEMAS));
-        clickNavButton("Submit", 180000);
+        clickButton("Submit", 180000);
 
         // setup cohorts:
         clickTab("Manage");
@@ -98,26 +98,26 @@ public class StudyManualTest extends StudyTest
         selectOptionByText("participantCohortDataSetId", "EVC-1: Enrollment Vaccination");
         waitForPageToLoad();
         selectOptionByText("participantCohortProperty", "2. Enrollment group");
-        clickNavButton("Update Assignments");
+        clickButton("Update Assignments");
 
         // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
         clickLinkWithText(getStudyLabel());
         clickTab("Manage");
         clickLinkWithText("Manage Dataset QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
-        clickNavButton("Save");
+        clickButton("Save");
 
         // upload datasets:
         clickLinkWithText(getStudyLabel());
         setPipelineRoot(getPipelinePath());
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Files");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "datasets/Study001.dataset");
         if (isNavButtonPresent("Delete log"))
-            clickNavButton("Delete log");
+            clickButton("Delete log");
         selectImportDataAction("Import Datasets");
-        clickNavButton("Start Import");
+        clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "study import", false);
 
     }
@@ -171,9 +171,9 @@ public class StudyManualTest extends StudyTest
         }
 
         clickLinkWithText("Visit Import Mapping");
-        clickNavButton("Import Custom Mapping");
+        clickButton("Import Custom Mapping");
         setLongTextField("tsv", VISIT_IMPORT_MAPPING);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         assertTextPresentInThisOrder("Cycle 10", "Vaccine 1", "Vaccination 1", "All Done");
     }
@@ -188,7 +188,7 @@ public class StudyManualTest extends StudyTest
         clickButtonContainingText("Edit Definition");
         waitForElement(Locator.name("description"), WAIT_FOR_JAVASCRIPT);
         setFormElement("description", DEMOGRAPHICS_DESCRIPTION);
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
 
@@ -216,7 +216,7 @@ public class StudyManualTest extends StudyTest
             {
                 clickLinkWithText("edit", row - 2);   // Zero-based, plus the header row doesn't have an edit link
                 uncheckCheckbox("showByDefault");
-                clickNavButton("Save");
+                clickButton("Save");
                 labels.remove(currentLabel);
             }
 
@@ -244,13 +244,13 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "verifyAssay");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         checkRadioButton("additionalKey", 1);
 
-        clickNavButton("Import Fields", 0);
+        clickButton("Import Fields", 0);
         waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_JAVASCRIPT);
 
         setFormElement("schemaImportBox", "Property\tLabel\tRangeURI\tNotNull\tDescription\n" +
@@ -259,7 +259,7 @@ public class StudyManualTest extends StudyTest
                 "NumberField\tNumberField\txsd:double\ttrue\tThis is a number\n" +
                 "TextField\tTextField\txsd:string\tfalse\tThis is a text field");
 
-        clickNavButton("Import", 0);
+        clickButton("Import", 0);
         waitForElement(Locator.xpath("//input[@name='ff_label3']"), WAIT_FOR_JAVASCRIPT);
 
         clickRadioButtonById("button_dataField");
@@ -269,10 +269,10 @@ public class StudyManualTest extends StudyTest
         waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), "aliasedColumn");
 
-        clickNavButton("Save");
+        clickButton("Save");
         waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("View Data");
-        clickNavButton("Import Data");
+        clickButton("View Data");
+        clickButton("Import Data");
 
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";
         setFormElement("text", _tsv + "\n" + errorRow);

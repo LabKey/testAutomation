@@ -113,13 +113,13 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         log("Check email preferences");
         clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "1");
-        clickNavButton("Update");
-        clickNavButton("Done");
+        clickButton("Update");
+        clickButton("Done");
 
         log("Customize message board");
         clickWebpartMenuItem("Messages", "Customize");
         checkCheckbox("expires");
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("Check email admin works");
         clickWebpartMenuItem("Messages", "Email", "Administration");
@@ -131,7 +131,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@name='defaultEmailOption']/../../div");
 
         waitForElement(Locator.xpath("//input[@name='defaultEmailOption']"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Update Folder Default", 0);
+        clickButton("Update Folder Default", 0);
 
         waitForExtMaskToDisappear();
         assertTextPresent("All conversations");
@@ -150,11 +150,11 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickLinkWithText("view message or respond");
         assertTextPresent(EXPIRES1);
         assertTextPresent("<b>first message testing</b>");
-        clickNavButton("Delete Message");
-        clickNavButton("Delete");
+        clickButton("Delete Message");
+        clickButton("Delete");
 
         log("Check that HTML message works");
-        clickNavButton("New");
+        clickButton("New");
         setFormElement("title", MSG1_TITLE);
         setFormElement("body", HTML_BODY);
         selectOptionByText("rendererType", "HTML");
@@ -170,7 +170,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent(MSG1_BODY);
 
         log("Add response");
-        clickNavButton("Respond");
+        clickButton("Respond");
         setFormElement("title", RESP1_TITLE);
         setFormElement("expires", EXPIRES2);
         setFormElement("body", RESP1_BODY);
@@ -182,7 +182,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent(RESP1_BODY);
 
         log("Add second response, make sure it was entered and recognized");
-        clickNavButton("Respond");
+        clickButton("Respond");
         setFormElement("body", RESP2_BODY);
         submit();
         assertTextPresent(RESP2_BODY);
@@ -194,7 +194,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickManageGroup("Users");
         setFormElement("names", USER1);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
         log("Check if permissions work without security");
         permissionCheck("Reader", true);
@@ -204,7 +204,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 1);
-        clickNavButton("Save");
+        clickButton("Save");
         permissionCheck("Reader", false);
         permissionCheck("Editor", true);
 
@@ -213,13 +213,13 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickWebpartMenuItem("Messages", "Customize");
         setFormElement("boardName", "Notes");
         setFormElement("conversationName", "Thread");
-        clickNavButton("Save");
+        clickButton("Save");
         assertTextPresent("Notes");
         assertTextPresent("thread");
         clickWebpartMenuItem("Notes", "Customize");
         setFormElement("boardName", "Messages");
         setFormElement("conversationName", "Message");
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("Check if sorting works");
         clickWebpartMenuItem("Messages", "New");
@@ -230,12 +230,12 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent(MSG2_TITLE);
         clickLinkWithText("Messages");
         clickLinkWithText("view message or respond", 1);
-        clickNavButton("Respond");
+        clickButton("Respond");
         submit();
         clickLinkWithText("Messages");
         clickLinkWithText("Customize");
         checkRadioButton("sortOrderIndex", 1);
-        clickNavButton("Save");
+        clickButton("Save");
         clickLinkWithText("view message or respond");
         assertTextPresent(MSG1_TITLE);
 
@@ -249,14 +249,14 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         checkCheckbox("assignedTo");
         uncheckCheckbox("formatPicker");
         selectOptionByText("defaultAssignedTo", displayNameFromEmail(USER1));
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("Check if status and expires work");
-        clickNavButton("New");
+        clickButton("New");
         assertTextPresent(displayNameFromEmail(USER1));
-        clickNavButton("Cancel");
+        clickButton("Cancel");
         clickLinkWithText(MSG2_TITLE);
-        clickNavButton("Respond");
+        clickButton("Respond");
         selectOptionByText("status", "Closed");
         assertFormElementEquals("assignedTo", "");
         submit();
@@ -277,10 +277,10 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         // USER2 is a nobody
         goToSiteUsers();
-        clickNavButton("Add Users");
+        clickButton("Add Users");
         setFormElement("newUsers", USER2);
         uncheckCheckbox("sendMail");
-        clickNavButton("Add Users");
+        clickButton("Add Users");
         clickLinkWithText(PROJECT_NAME);
 
         // USER3 is a Project Administrator
@@ -288,7 +288,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickManageGroup("Administrators");
         setFormElement("names", USER3);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
         clickLinkWithText(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "New");
@@ -312,15 +312,15 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 0);
-        clickNavButton("Save");
+        clickButton("Save");
         clickLinkWithText(MSG3_TITLE);
-        clickNavButton("Delete Message");
-        clickNavButton("Delete");
+        clickButton("Delete Message");
+        clickButton("Delete");
 
         log("Check delete response works and is recognized");
         clickLinkWithText("view message or respond", 1);
         clickLinkWithText("delete");
-        clickNavButton("Delete");
+        clickButton("Delete");
         assertTextNotPresent(RESP1_BODY);
         clickLinkWithText("Messages");
         assertTextPresent("2 response");
@@ -329,8 +329,8 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickLinkWithText("view message or respond");
 
         log("Check delete message works fully");
-        clickNavButton("Delete Message");
-        clickNavButton("Delete");
+        clickButton("Delete Message");
+        clickButton("Delete");
         assertTextNotPresent(MSG1_TITLE);
         clickLinkWithText(PROJECT_NAME);
         assertTextNotPresent(MSG1_TITLE);
@@ -394,7 +394,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
     private void createNewMessage(String title, String body)
     {
-        clickNavButton("New");
+        clickButton("New");
         setFormElement("title", title);
         setFormElement("body", body);
         selectOptionByText("rendererType", "HTML");

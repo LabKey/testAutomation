@@ -154,7 +154,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             setFormElement("userSchemaName", USER_SCHEMA_NAME);
             setFormElement("dbSchemaName", DB_SCHEMA_NAME);
             setFormElement("metaData", getFileContents("server/modules/core/resources/schemas/test.xml"));
-            clickNavButton("Create");
+            clickButton("Create");
         }
 
         assertTextPresent(USER_SCHEMA_NAME);
@@ -169,7 +169,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             checkCheckbox("editable");
         else
             uncheckCheckbox("editable");
-        clickNavButton("Update");
+        clickButton("Update");
     }
 
     protected void doCleanup() throws Exception

@@ -16,8 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
-
 import java.io.File;
 
 /**
@@ -89,12 +87,12 @@ public class NabOldTest extends AbstractQCAssayTest
 
         clickLinkWithText("Previous Runs By Sample");
         checkCheckbox(".select", 0);
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
         selectOptionByText("targetContainerId", "/NabVerifyProject/NabFolder (NabFolder Study)");
-        clickNavButton("Next");
+        clickButton("Next");
         setFormElement("sequenceNums", "100.1");
         setFormElement("participantIds", "Participant001");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         assertTextPresent("Participant001");
         assertTextPresent("100.1");
@@ -104,7 +102,7 @@ public class NabOldTest extends AbstractQCAssayTest
         clickLinkWithText("Previous Runs");
         log("Delete run");
         clickImgButtonNoNav("Select All");
-        clickNavButton("Delete");
+        clickButton("Delete");
         log("Verify deleted run");
         assertTextPresent("Incubation Time");
         assertTextNotPresent(TEST_FILE_NAME);
@@ -123,15 +121,15 @@ public class NabOldTest extends AbstractQCAssayTest
 
         // click the study tab to force creation of the study table row:
         clickTab("Study");
-        clickNavButton("Create Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
+        clickButton("Create Study");
         clickTab("Nab");
         clickLinkWithText("Deprecated NAb Run");
         File testFile = new File(getLabKeyRoot() + TEST_FILE_PATH);
         setFormElement("dataFile", testFile);
         setFormElement("metadata.virusName", "First run");
         uncheckCheckbox("runSettings.inferFromFile");
-        clickNavButton("Calculate", longWaitForPage);
+        clickButton("Calculate", longWaitForPage);
         assertTextPresent(TEST_FILE_NAME);
         assertTextPresent("1547");
         assertTextPresent("109935");
@@ -140,7 +138,7 @@ public class NabOldTest extends AbstractQCAssayTest
         clickLinkWithText("Deprecated NAb Run");
         setFormElement("dataFile", testFile);
         setFormElement("metadata.virusName", "Second run");
-        clickNavButton("Calculate");
+        clickButton("Calculate");
         assertTextPresent(TEST_FILE_NAME);
         assertTextPresent("1353");
 

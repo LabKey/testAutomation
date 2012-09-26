@@ -233,7 +233,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickEditDesign();
         setColumnName(1,_listCol1.getName());
         setColumnLabel(1, _listCol1.getLabel());
-        clickNavButton("Add Field", 0);
+        clickButton("Add Field", 0);
         setColumnName(4,_listCol4.getName());
         setColumnLabel(4, _listCol4.getLabel());
         setColumnType(4, _listCol4.getType());
@@ -241,7 +241,7 @@ public class ListTest extends BaseSeleniumWebTest
 
 
         // Create "Hidden Field" and remove from all views.
-        clickNavButton("Add Field", 0);
+        clickButton("Add Field", 0);
         setColumnName(5, _listCol5.getName());
         setColumnLabel(5,_listCol5.getLabel());
         setColumnType(5,_listCol5.getType());
@@ -250,7 +250,7 @@ public class ListTest extends BaseSeleniumWebTest
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
         uncheckCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
 
-        clickNavButton("Add Field", 0);
+        clickButton("Add Field", 0);
         setColumnName(6, _listCol6.getName());
         setColumnLabel(6,_listCol6.getLabel());
         setColumnType(6,_listCol6.getType());
@@ -297,15 +297,15 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
-        clickNavButton("Edit");
+        clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
-        clickNavButton("Cancel");
-        clickNavButton(DETAILS_BUTTON_NAME);
+        clickButton("Cancel");
+        clickButton(DETAILS_BUTTON_NAME);
 
         log("Test inserting new row");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
@@ -348,15 +348,15 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
-        clickNavButton("Edit");
+        clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
-        clickNavButton("Cancel");
-        clickNavButton(DETAILS_BUTTON_NAME);
-        clickNavButton("Insert New");
+        clickButton("Cancel");
+        clickButton(DETAILS_BUTTON_NAME);
+        clickButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
-        clickNavButton("Cancel");
+        clickButton("Cancel");
 
         dataregionToEditDesign();
 
@@ -369,13 +369,13 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
-        clickNavButton("Edit");
+        clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
-        clickNavButton("Cancel");
-        clickNavButton(DETAILS_BUTTON_NAME);
-        clickNavButton("Insert New");
+        clickButton("Cancel");
+        clickButton(DETAILS_BUTTON_NAME);
+        clickButton("Insert New");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
-        clickNavButton("Cancel");
+        clickButton("Cancel");
 
         dataregionToEditDesign();
 
@@ -388,13 +388,13 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
-        clickNavButton("Edit");
+        clickButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
-        clickNavButton("Cancel");
-        clickNavButton(DETAILS_BUTTON_NAME);
-        clickNavButton("Insert New");
+        clickButton("Cancel");
+        clickButton(DETAILS_BUTTON_NAME);
+        clickButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
-        clickNavButton("Cancel");
+        clickButton("Cancel");
 
         dataregionToEditDesign();
 
@@ -407,13 +407,13 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from details view.
-        clickNavButton("Edit");
+        clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
-        clickNavButton("Cancel");
-        clickNavButton(DETAILS_BUTTON_NAME);
-        clickNavButton("Insert New");
+        clickButton("Cancel");
+        clickButton(DETAILS_BUTTON_NAME);
+        clickButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
-        clickNavButton("Cancel");
+        clickButton("Cancel");
     }
 
     protected void doTestSteps()
@@ -492,7 +492,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent("No details available for this event.");
         assertTextNotPresent("Unable to find the audit history detail for this event");
 
-        clickNavButton("Done");
+        clickButton("Done");
         clickLinkWithText(PROJECT_VERIFY, 3);
 
         log("Test single list web part");
@@ -590,7 +590,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Get URL to test exporting deleted list.");
         clickTab("List");
         clickLinkWithText(LIST_NAME_COLORS);
-        clickNavButton("Export", 0);
+        clickButton("Export", 0);
         ExtHelper.clickSideTab(this, "Text");
         String exportButtonScript = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "onclick");
         String exportUrl = exportButtonScript.substring(exportButtonScript.indexOf("window.location=") + 17, exportButtonScript.indexOf("document.getElementById") - 11);
@@ -598,7 +598,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test deleting data");
         clickDeleteList();
-        clickNavButton("OK");
+        clickButton("OK");
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
@@ -616,7 +616,7 @@ public class ListTest extends BaseSeleniumWebTest
         Assert.assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME_COLORS + "' in schema 'lists' doesn't exist.");
 
-        clickNavButton("Folder");
+        clickButton("Folder");
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain " + LIST_NAME_COLORS + " was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
@@ -725,17 +725,17 @@ public class ListTest extends BaseSeleniumWebTest
         /*log("Infer from tsv file, but cancel before completion");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("manage lists");
-        clickNavButton("Create New List");
+        clickButton("Create New List");
         waitForElement(Locator.name("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setFormElement("ff_name",  TSV_LIST_NAME);
         checkCheckbox(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
-        clickNavButton("Create List", 0);
+        clickButton("Create List", 0);
         waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setFormElement("uploadFormElement", tsvFile);
         waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Import", 0);
+        clickButton("Import", 0);
         waitForElement(Locator.xpath("//div[text()='Creating columns...']"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Cancel");
+        clickButton("Cancel");
         assertTextNotPresent(TSV_LIST_NAME);*/
 
         log("Infer from a tsv file, then import data");
@@ -743,7 +743,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
         log("Verify correct types are inferred from file");
-        clickNavButton("View Design");
+        clickButton("View Design");
         waitForElement(Locator.xpath("//tr[./td/div[text()='BoolCol'] and ./td/div[text()='Boolean']]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//tr[./td/div[text()='IntCol'] and ./td/div[text()='Integer']]"));
         assertElementPresent(Locator.xpath("//tr[./td/div[text()='NumCol'] and ./td/div[text()='Number (Double)']]"));
@@ -753,12 +753,12 @@ public class ListTest extends BaseSeleniumWebTest
     private void customFormattingTest()
     {
         // Assumes we are at the list designer after doUploadTest()
-        clickNavButton("Edit Design", 0);
+        clickButton("Edit Design", 0);
 
         // Set conditional format on boolean column. Bold, italic, strikethrough, cyan text, red background
         click(Locator.name("ff_name3")); // BoolCol
         click(Locator.xpath("//span[text()='Format']"));
-        clickNavButton("Add Conditional Format", 0);
+        clickButton("Add Conditional Format", 0);
         ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
         setFormElement("value_1", "true");
         ExtHelper.clickExtButton(this, "Apply Conditional Format Where BoolCol", "OK", 0);
@@ -781,14 +781,14 @@ public class ListTest extends BaseSeleniumWebTest
         click(Locator.name("ff_name4")); // IntCol
         click(Locator.xpath("//span[text()='Format']"));
         // If greater than 7, strikethrough //TODO: Set after (>5) format. Blocked: 12865
-        clickNavButton("Add Conditional Format", 0);
+        clickButton("Add Conditional Format", 0);
         ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Greater Than");
         setFormElement("value_1", "7");
         ExtHelper.clickExtButton(this, "Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox("Strikethrough");
         // If greater than 5, Bold  //TODO: Set before (>7) format. Blocked: 12865
-        clickNavButton("Add Conditional Format", 0);
+        clickButton("Add Conditional Format", 0);
         ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Greater Than");
         setFormElement("value_1", "5");
@@ -800,8 +800,8 @@ public class ListTest extends BaseSeleniumWebTest
 //        dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
         assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
 
-        clickNavButton("Save", 0);
-        waitAndClickNavButton("Done");
+        clickButton("Save", 0);
+        waitAndClickButton("Done");
 
         // Verify conditional format of boolean column
         // look for cells that do not match the
@@ -850,7 +850,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
         clickEditDesign();
-        clickNavButton("Add Field", 0);
+        clickButton("Add Field", 0);
         setColumnName(2,"BarBar");
         clickSave();
         assertTextPresent("FooFoo");
@@ -1027,7 +1027,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     void dataregionToEditDesign()
     {
-        clickNavButton("View Design");
+        clickButton("View Design");
         clickEditDesign();
     }
 
@@ -1035,7 +1035,7 @@ public class ListTest extends BaseSeleniumWebTest
     {
         if (isElementPresent(Locator.navButton("Save")))
             clickSave();
-        clickNavButton("Done");
+        clickButton("Done");
     }
 
     void clickImportData()

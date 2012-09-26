@@ -535,10 +535,10 @@ public class StudyTest extends StudyBaseTest
         setFormElement("newDescription", "Unknown data is neither clean nor dirty.");
         clickCheckboxById("dirty_public");
         clickCheckbox("newPublicData");
-        clickNavButton("Save");
+        clickButton("Save");
         selectOptionByText("defaultDirectEntryQCState", "unknown QC");
         selectOptionByText("showPrivateDataByDefault", "Public data");
-        clickNavButton("Save");
+        clickButton("Save");
 
         // return to dataset import page
         clickLinkWithText(getStudyLabel());
@@ -552,7 +552,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("1234_B");
 
         //Import duplicate data
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement("text", _tsv);
         ListHelper.submitImportTsv_error(this, "Duplicates were found");
         //Now explicitly replace, using 'mouseid' instead of 'participantid'
@@ -569,13 +569,13 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("unknown QC");
 
         // Test Bad Field Names -- #13607
-        clickNavButton("Manage Dataset");
-        clickNavButton("Edit Definition");
+        clickButton("Manage Dataset");
+        clickButton("Edit Definition");
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
         int newFieldIndex = getXpathCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
         ListHelper.setColumnName(this, getPropertyXPath("Dataset Fields"), newFieldIndex, "Bad Name");
-        clickNavButton("Save");
-        clickNavButton("View Data");
+        clickButton("Save");
+        clickButton("View Data");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewColumn(this, "Bad Name", "Bad Name");
         CustomizeViewsHelper.applyCustomView(this);
@@ -614,7 +614,7 @@ public class StudyTest extends StudyBaseTest
         clickLinkWithText("Create New Dataset");
 
         setFormElement("typeName", PARTICIPANT_CMT_DATASET);
-        clickNavButton("Next");
+        clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         // set the demographic data checkbox
@@ -624,21 +624,21 @@ public class StudyTest extends StudyBaseTest
         ListHelper.setColumnName(this, 0, COMMENT_FIELD_NAME);
         ListHelper.setColumnLabel(this, 0, PARTICIPANT_COMMENT_LABEL);
         ListHelper.setColumnType(this, 0, ListHelper.ListColumnType.MutliLine);
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("creating the participant/visit comment dataset");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
 
         setFormElement("typeName", PARTICIPANT_VISIT_CMT_DATASET);
-        clickNavButton("Next");
+        clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         // add a comment field
         ListHelper.setColumnName(this, 0, COMMENT_FIELD_NAME);
         ListHelper.setColumnLabel(this, 0, PARTICIPANT_VISIT_COMMENT_LABEL);
         ListHelper.setColumnType(this, 0, ListHelper.ListColumnType.MutliLine);
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("configure comments");
         clickTab("Manage");
@@ -663,20 +663,20 @@ public class StudyTest extends StudyBaseTest
         selectOptionByText("participantVisitCommentDataSetId", PARTICIPANT_VISIT_CMT_DATASET);
         waitForPageToLoad();
         selectOptionByText("participantVisitCommentProperty", PARTICIPANT_VISIT_COMMENT_LABEL);
-        clickNavButton("Save");
+        clickButton("Save");
 
         clickLinkWithText(getStudyLabel());
         waitForText("Blood (Whole)");
         clickLinkWithText("Blood (Whole)");
-        clickNavButton("Enable Comments/QC");
+        clickButton("Enable Comments/QC");
         log("manage participant comments directly");
         clickMenuButton("Comments and QC", "Manage Mouse Comments");
 
         int datasetAuditEventCount = getDatasetAuditEventCount(); //inserting a new event should increase this by 1;
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_MouseId", "999320812");
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Mouse Comment");
-        clickNavButton("Submit");
+        clickButton("Submit");
         //Issue 14894: Datasets no longer audit row insertion
         verifyAuditEventAdded(datasetAuditEventCount);
 
@@ -691,16 +691,16 @@ public class StudyTest extends StudyBaseTest
         log("verify copying and moving vial comments");
         setFilter("SpecimenDetail", "GlobalUniqueId", "Equals", "AAA07XK5-01");
         selenium.click(".toggle");
-        clickNavButton("Enable Comments/QC");
+        clickButton("Enable Comments/QC");
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         setFormElement("comments", "Vial Comment");
-        clickNavButton("Save Changes");
+        clickButton("Save Changes");
 
         selenium.click(".toggle");
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         clickMenuButton("Copy or Move Comment(s)", "Copy", "To Mouse", "999320812");
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Copied PTID Comment");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("Copied PTID Comment");
 
         selenium.click(".toggle");
@@ -708,7 +708,7 @@ public class StudyTest extends StudyBaseTest
         clickMenuButtonAndContinue("Copy or Move Comment(s)", "Move", "To Mouse", "999320812");
         getConfirmationAndWait();
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Moved PTID Comment");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("Moved PTID Comment");
         assertTextNotPresent("Mouse Comment");
         assertTextNotPresent("Vial Comment");
@@ -816,7 +816,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("dataSetStatus", 6, "REQUIRED");
         selectOption("dataSetStatus", 7, "REQUIRED");
         selectOption("dataSetStatus", 8, "REQUIRED");
-        clickNavButton("Save");
+        clickButton("Save");
         clickLinkWithText("edit", 0);
         selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 1, "OPTIONAL");
@@ -827,7 +827,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("dataSetStatus", 6, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 7, "OPTIONAL");
         selectOption("dataSetStatus", 8, "REQUIRED");
-        clickNavButton("Save");
+        clickButton("Save");
         clickLinkWithText("edit", 0);
         assertSelectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         assertSelectOption("dataSetStatus", 1, "OPTIONAL");
@@ -898,7 +898,7 @@ public class StudyTest extends StudyBaseTest
         String replaceMapping = "Name\tSequenceNum\nBarBar\t4839\nFoofoo\t9732";
         clickLinkWithText("Replace Custom Mapping");
         setLongTextField("tsv", replaceMapping);
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTableRowsEqual("customMapping", 2, replaceMapping.replace("SequenceNum", "Sequence Number Mapping"));
         assertTextNotPresent("Cycle 10");
         assertTextNotPresent("All Done");

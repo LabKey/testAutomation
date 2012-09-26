@@ -456,7 +456,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
                 new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
 
         log("Importing some data...");
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         ListHelper.submitTsvData(this, LIST_DATA);
 
         log("Create list in subfolder to prevent query validation failure");
@@ -599,13 +599,13 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         createNewWikiPage();
         setFormElement("wiki-input-name", "Parameterized QWP");
         setWikiBody(getFileContents("/server/test/modules/simpletest/views/parameterizedQWP.html"));
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");
         setFormElement(Locator.id("headerSearchInput-inputEl"), MODULE_NAME);
         waitForElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), "P");
-        clickNavButton("Submit", 0);
+        clickButton("Submit", 0);
         waitForText("Manufacturer");
         Assert.assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("headerSearchInput-inputEl")));
         assertTextPresent("Pinto");

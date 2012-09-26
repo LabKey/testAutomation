@@ -168,7 +168,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         ///user/showUsers.view?
 
         //shouldn't be able to view own history either
-        clickNavButton("Home");
+        clickButton("Home");
         goToMyAccount();
         assertTextNotPresent(HISTORY_TAB_TITLE);
 
@@ -272,7 +272,7 @@ public class SecurityTest extends BaseSeleniumWebTest
                 String password2 = passwords[1];
                 if(password2==null) password2 = passwords[0];
                 setFormElement("password2", password2);
-                clickNavButton("Set Password");                
+                clickButton("Set Password");
                 assertTextPresent(errors);
         }
     }
@@ -340,7 +340,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickLinkContainingText(displayNameFromEmail(username));
         clickButtonContainingText("Reset Password", 0);
         getConfirmationAndWait();
-        clickNavButton("Done");
+        clickButton("Done");
 
         String url = getPasswordResetUrl(username);
 
@@ -369,11 +369,11 @@ public class SecurityTest extends BaseSeleniumWebTest
         goToSiteAdmins();
         setFormElement("names", NORMAL_USER);
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
         assertTextPresent(NORMAL_USER);
         checkCheckbox("delete", NORMAL_USER);
         selenium.chooseOkOnNextConfirmation();
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
         Assert.assertEquals(selenium.getConfirmation(), "Permanently remove selected users from this group?");
         assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         clickLinkWithText(PROJECT_NAME);
@@ -408,7 +408,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         //set display name to user's email minus domain
         String oldDisplayName = getDisplayName();
         goToMyAccount();
-        clickNavButton("Edit");
+        clickButton("Edit");
 
         String email = PasswordUtil.getUsername();
         String displayName;
@@ -421,12 +421,12 @@ public class SecurityTest extends BaseSeleniumWebTest
             displayName = email;
         }
         setFormElement("displayName", displayName);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         //now set it back
-        clickNavButton("Edit");
+        clickButton("Edit");
         setFormElement("displayName", oldDisplayName);
-        clickNavButton("Submit");
+        clickButton("Submit");
     }
 
     protected void clonePermissionsTest()
@@ -443,7 +443,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         createPermissionsGroup("Administrators");
         clickManageGroup("Administrators");
         setFormElement("names", ADMIN_USER_TEMPLATE);
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
         setPermissions("Administrators", "Project Administrator");
 
         createPermissionsGroup("Testers");
@@ -451,7 +451,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         setPermissions("Testers", "Editor");
         clickManageGroup("Testers");
         setFormElement("names", NORMAL_USER_TEMPLATE);
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
         // create users and verify permissions
         createUserAndNotify(PROJECT_ADMIN_USER, ADMIN_USER_TEMPLATE);
@@ -475,7 +475,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         // If user is not found but paging indicators are, then show all 
         if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
         {
-            clickNavButton("Page Size", 0);
+            clickButton("Page Size", 0);
             clickLinkWithText("Show All");
             isPresent = isElementPresent(userAccessLink);
         }
@@ -706,12 +706,12 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         setFormElement("password", shortPassword);
         setFormElement("password2", shortPassword);
-        clickNavButton("Set Password");
+        clickButton("Set Password");
         assertTextPresent("Your password must be eight characters or more."); // fail, too short
 
         setFormElement("password", PASSWORDS[0]);
         setFormElement("password2", PASSWORDS[0]);
-        clickNavButton("Set Password");
+        clickButton("Set Password");
         assertSignOutAndMyAccountPresent();
         //success
         impersonate(NORMAL_USER);

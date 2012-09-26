@@ -51,7 +51,7 @@ public class CustomizeViewsHelper
 
     public static void applyCustomView(BaseSeleniumWebTest test, int waitMillis)
     {
-        test.clickNavButtonAt("View Grid", waitMillis, "1,1");
+        test.clickButtonAt("View Grid", waitMillis, "1,1");
     }
 
     public static void saveDefaultView(BaseSeleniumWebTest test)
@@ -82,7 +82,7 @@ public class CustomizeViewsHelper
      */
     public static void saveCustomView(BaseSeleniumWebTest test, String name, boolean shared)
     {
-        test.clickNavButton("Save", 0);
+        test.clickButton("Save", 0);
         
         if(shared)
             test.checkCheckbox("saveCustomView_shared");
@@ -110,8 +110,8 @@ public class CustomizeViewsHelper
 
     public static void deleteView(BaseSeleniumWebTest test)
     {
-        test.clickNavButton("Delete", 0);
-        test.clickNavButton("Yes");
+        test.clickButton("Delete", 0);
+        test.clickButton("Yes");
     }
 
     /**
@@ -130,7 +130,7 @@ public class CustomizeViewsHelper
               test.click(Locator.tagContainingText("label", "Named"));
         }
 
-        test.clickNavButton("Save");
+        test.clickButton("Save");
     }
 
     public static void revertUnsavedViewGridClosed(BaseSeleniumWebTest test)
@@ -140,7 +140,7 @@ public class CustomizeViewsHelper
 
     public static void revertUnsavedView(BaseSeleniumWebTest test)
     {
-        test.clickNavButton("Revert");
+        test.clickButton("Revert");
     }
 
     /**

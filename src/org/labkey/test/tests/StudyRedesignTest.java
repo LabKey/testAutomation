@@ -71,10 +71,10 @@ public class StudyRedesignTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "R View");
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Please enter a view name:");
         setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
-        clickNavButton("Save");
+        clickButton("Save");
 
         StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
         StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
@@ -84,8 +84,8 @@ public class StudyRedesignTest extends StudyBaseTest
 //        goToSchemaBrowser();
 //        createNewQuery("study");
 //        setFormElement("ff_newQueryName", "testquery");
-//        clickNavButton("Create and Edit Source");
-//        clickNavButton("Save & Finish");
+//        clickButton("Create and Edit Source");
+//        clickButton("Save & Finish");
     }
 
     @Override
@@ -179,7 +179,7 @@ public class StudyRedesignTest extends StudyBaseTest
             setFormElement(Locator.name("extraData", i), CATEGORIES[i/10]);
         }
         uncheckCheckbox("visible", dsCount - 1); // Set last dataset to not be visible.
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     private void clickSingleDataSet(String title, String source, String type, boolean testDelete)
@@ -290,8 +290,8 @@ public class StudyRedesignTest extends StudyBaseTest
         exportStudy(true, false);
         deleteStudy(getStudyLabel());
 
-        clickNavButton("Import Study");
-        clickNavButton("Import Study Using Pipeline");
+        clickButton("Import Study");
+        clickButton("Import Study Using Pipeline");
         ExtHelper.selectFileBrowserItem(this, "export/study/study.xml");
         selectImportDataAction("Import Study");
 

@@ -502,10 +502,10 @@ public class ClientAPITest extends BaseSeleniumWebTest
         addWebPart("Assay List");
 
         //copied from old test
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "General");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -518,7 +518,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         ListHelper.setColumnType(this, getPropertyXPath("Run Fields"), 0, ListHelper.ListColumnType.DateTime);
 
         sleep(1000);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
         
         setSourceFromFile("assayTest.js");
@@ -536,24 +536,24 @@ public class ClientAPITest extends BaseSeleniumWebTest
     {
         addWebPart("Study Overview");
 
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         // next page
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         clickLinkWithText("Edit Definition");
         waitForText("No fields have been defined.", 10000);
 
-        clickNavButton("Add Field", 0);
+        clickButton("Add Field", 0);
 
         ListHelper.setColumnName(this, 0, "species");
         ListHelper.setColumnLabel(this, 0, "Species");
         
-        clickNavButton("Add Field", 0);
+        clickButton("Add Field", 0);
 
         ListHelper.setColumnName(this, 1, "color");
         ListHelper.setColumnLabel(this, 1, "Color");
 
         sleep(1000);
-        clickNavButton("Save", 10000);
+        clickButton("Save", 10000);
 
         setSourceFromFile("domainTest.js");
         waitForText("Finished DomainTests.", 30000);

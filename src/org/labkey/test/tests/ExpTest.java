@@ -63,10 +63,10 @@ public class ExpTest extends BaseSeleniumWebTest
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment", "Query" });
         addWebPart("Data Pipeline");
         addWebPart("Run Groups");
-        clickNavButton("Setup");
+        clickButton("Setup");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
         clickLinkWithText(FOLDER_NAME);
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
 
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, "experiment.xar.xml");
@@ -98,7 +98,7 @@ public class ExpTest extends BaseSeleniumWebTest
         createNewQuery("exp");
         setFormElement("ff_newQueryName", "dataCustomQuery");
         selectOptionByText("ff_baseTableName", "Data");
-        clickNavButton("Create and Edit Source");
+        clickButton("Create and Edit Source");
         setQueryEditorValue("queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
                 "Datas.Run AS Run,\n" +
@@ -122,11 +122,11 @@ public class ExpTest extends BaseSeleniumWebTest
         ListHelper.setColumnLabel(this, 5, "editedCreated");
         ExtHelper.clickExtTab(this, "Format");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
 
         // Verify that it ended up in the XML version of the metadata
-        clickNavButton("Edit Source");
+        clickButton("Edit Source");
         sleep(1000);
         ExtHelper.clickExtTab(this, "XML Metadata");
         toggleMetadataQueryEditor();
@@ -156,9 +156,9 @@ public class ExpTest extends BaseSeleniumWebTest
         mouseClick(Locator.name("ff_type" + (fieldCount - 1)).toString());
 
         // Save it
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
-        clickNavButton("View Data");
+        clickButton("View Data");
 
         // Customize the view to add the newly joined column
         CustomizeViewsHelper.openCustomizeViewPanel(this);

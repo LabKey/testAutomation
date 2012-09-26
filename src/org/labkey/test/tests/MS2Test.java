@@ -74,7 +74,7 @@ public class MS2Test extends MS2TestBase
 
         log("Upload existing MS2 data.");
         clickLinkWithText(FOLDER_NAME);
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SEARCH_TYPE + "/" + testFile1 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
 
         selectImportDataAction("Import Experiment");
@@ -104,7 +104,7 @@ public class MS2Test extends MS2TestBase
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
 
         assertTextPresent(SEARCH_NAME3);
         assertTextPresent("databases");
@@ -147,7 +147,7 @@ public class MS2Test extends MS2TestBase
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
         selectOptionByText("grouping", "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
@@ -231,9 +231,9 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("Scan DESC");
 
         log("Save view for later");
-        clickNavButton("Save View");
+        clickButton("Save View");
         setFormElement("name", VIEW);
-        clickNavButton("Save View");
+        clickButton("Save View");
 
         log("Continue with filters");
         setFilter("MS2Peptides", "Charge", "Equals", "2");
@@ -276,9 +276,9 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("(Scan > 6) AND (Scan <= 100) AND (Charge = 2) AND (Hyper >= 14.6) AND (Next <> 9.5) AND (B < 11.6) AND (Y < 11.3) AND (Expect > 1.2)");
 
         log("Test pick peptide columns");
-        clickNavButton("Pick Peptide Columns");
-        clickNavButton("Pick", 0);
-        clickNavButton("Pick Columns");
+        clickButton("Pick Peptide Columns");
+        clickButton("Pick", 0);
+        clickButton("Pick Columns");
         assertTextPresent("RetTime");
 
         log("Test export");
@@ -311,15 +311,15 @@ public class MS2Test extends MS2TestBase
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         setFilter("MS2Proteins", "SequenceMass", "Is Greater Than", "20000");
         log("Save view for later");
-        clickNavButton("Save View");
+        clickButton("Save View");
         setFormElement("name", VIEW2);
-        clickNavButton("Save View");
+        clickButton("Save View");
 
         log("Test using saved view");
         popLocation();
         pushLocation();
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickButton("Go");
 
         log("Test hyper charge filters too");
         setFormElement("Charge1", "11");
@@ -418,7 +418,7 @@ public class MS2Test extends MS2TestBase
 
         log("Test Protein Prophet with filters");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickButton("Go");
         selectOptionByText("grouping", "ProteinProphet (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextNotPresent("gi|4689022|ribosomal_protein_");
@@ -429,9 +429,9 @@ public class MS2Test extends MS2TestBase
         assertTextNotPresent("gi|30089158|low_density_lipop");
 
         log("Save view for later");
-        clickNavButton("Save View");
+        clickButton("Save View");
         setFormElement("name", VIEW3);
-        clickNavButton("Save View");
+        clickButton("Save View");
 
         setFilter("ProteinGroupsWithQuantitation", "PercentCoverage", "Is Not Blank");
         assertTextNotPresent("gi|13442951|MAIL");
@@ -454,12 +454,12 @@ public class MS2Test extends MS2TestBase
         setSort("ProteinGroupsWithQuantitation", "GroupProbability", SortDirection.ASC);
         assertTextPresent("GroupProbability ASC");
         assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
-        clickNavButton("Pick Peptide Columns");
-        clickNavButton("Pick", 0);
-        clickNavButton("Pick Columns");
-        clickNavButton("Pick Peptide Columns");
-        clickNavButton("Pick", 0);
-        clickNavButton("Pick Columns");
+        clickButton("Pick Peptide Columns");
+        clickButton("Pick", 0);
+        clickButton("Pick Columns");
+        clickButton("Pick Peptide Columns");
+        clickButton("Pick", 0);
+        clickButton("Pick Columns");
         selectOptionByText("grouping", "ProteinProphet (Legacy)");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
@@ -490,7 +490,7 @@ public class MS2Test extends MS2TestBase
         selectOptionByText("grouping", "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         selectOptionByText("views", VIEW);
-        clickNavButton("Go");
+        clickButton("Go");
 
         log("Test Query - Peptides Grouping");
         selectOptionByText("grouping", "Standard");
@@ -508,7 +508,7 @@ public class MS2Test extends MS2TestBase
         assertTextBefore("K.ERQPPPR.L", "K.KLHQK.L");
 
         log("Test customize view");
-        clickNavButton("Clear All");
+        clickButton("Clear All");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         CustomizeViewsHelper.addCustomizeViewSort(this, "Charge", "Z", "Descending");
         CustomizeViewsHelper.addCustomizeViewSort(this, "Mass", "CalcMH+", "Descending");
@@ -788,7 +788,7 @@ public class MS2Test extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
 
         log("Upload second MS2 Run");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SEARCH_TYPE + "/" + testFile2 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
 
         selectImportDataAction("Import Experiment");
@@ -812,10 +812,10 @@ public class MS2Test extends MS2TestBase
         pushLocation();
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         searchRunsTable.checkAllOnPage();
-        clickNavButton("MS2 Export");
+        clickButton("MS2 Export");
         checkRadioButton("exportFormat", "TSV");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Export");
+        clickButton("Export");
         assertTextPresent("Scan");
         assertTextPresent("Protein");
         assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
@@ -828,10 +828,10 @@ public class MS2Test extends MS2TestBase
         pushLocation();
 
         searchRunsTable.checkAllOnPage();
-        clickNavButton("MS2 Export");
+        clickButton("MS2 Export");
         checkRadioButton("exportFormat", "AMT");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Export");
+        clickButton("Export");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
         assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
@@ -846,7 +846,7 @@ public class MS2Test extends MS2TestBase
             clickLinkWithText("drt/CAexample_mini (DRT2)");
 
             selectOptionByText("viewParams", "<Standard View>");
-            clickNavButton("Go");
+            clickButton("Go");
 
             log("Test peptide filtering on protein page");
             assertLinkPresentWithText("gi|15645924|ribosomal_protein");
@@ -913,11 +913,11 @@ public class MS2Test extends MS2TestBase
             log("Test Compare Peptides using Query");
             searchRunsTable.checkAllOnPage();
             waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-            clickNavButton("Compare", 0);
+            clickButton("Compare", 0);
             clickLinkWithText("Peptide");
             click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
             setFormElement(Locator.input("targetProtein"), "");
-            clickNavButton("Compare");
+            clickButton("Compare");
             assertTextPresent("K.EEEESDEDMGFG.-");
             assertTextPresent("R.Q^YALHVDGVGTK.A");
             assertTextPresent("K.GSDSLSDGPACKR.S");
@@ -926,7 +926,7 @@ public class MS2Test extends MS2TestBase
             // verify the bulk protein coverage map export
             pushLocation();
             addUrlParameter("exportAsWebPage=true");
-            clickNavButton("Export Protein Coverage");
+            clickButton("Export Protein Coverage");
             assertTextPresentInThisOrder("22001886", "Q963B6");
             assertTextPresentInThisOrder("29827410", "NP_822044.1");
             assertTextPresentInThisOrder("17508693", "NP_492384.1");
@@ -943,7 +943,7 @@ public class MS2Test extends MS2TestBase
             clickLinkWithText("Setup Compare Peptides");
             click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
             setFormElement(Locator.input("peptideProphetProbability"), "0.9");
-            clickNavButton("Compare");
+            clickButton("Compare");
             assertTextPresent("K.EEEESDEDMGFG.-");
             assertTextPresent("R.Q^YALHVDGVGTK.A");
             assertTextNotPresent("K.GSDSLSDGPACKR.S");
@@ -952,7 +952,7 @@ public class MS2Test extends MS2TestBase
             // verify the bulk protein coverage map export for the peptideProphet probability filter
             pushLocation();
             addUrlParameter("exportAsWebPage=true");
-            clickNavButton("Export Protein Coverage");
+            clickButton("Export Protein Coverage");
             assertTextPresentInThisOrder("4689022", "CAA80880.2");
             assertTextPresentInThisOrder("18311790", "NP_558457.1");
             assertTextPresentInThisOrder("15828808", "NP_326168.1");
@@ -968,7 +968,7 @@ public class MS2Test extends MS2TestBase
 
             clickLinkWithText("Setup Compare Peptides");
             setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
-            clickNavButton("Compare");
+            clickButton("Compare");
             assertTextPresent("R.Q^YALHVDGVGTK.A");
             assertTextNotPresent("K.EEEESDEDMGFG.-");
             assertTextNotPresent("K.GSDSLSDGPACKR.S");
@@ -977,7 +977,7 @@ public class MS2Test extends MS2TestBase
             // verify the bulk protein coverage map export for peptideProphet filter with target protein
             pushLocation();
             addUrlParameter("exportAsWebPage=true");
-            clickNavButton("Export Protein Coverage");
+            clickButton("Export Protein Coverage");
             assertTextPresentInThisOrder("18311790", "NP_558457.1");
             assertTextNotPresent("CAA80880.2"); // for peptide K.EEEESDEDMGFG.-
             assertTextPresent("(all matching peptides)");
@@ -997,7 +997,7 @@ public class MS2Test extends MS2TestBase
             clickLinkWithText("Setup Compare Peptides");
             setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
             click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
-            clickNavButton("Compare");
+            clickButton("Compare");
             assertTextPresent("K.YTELK.D");
             assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
             assertTextNotPresent("R.Q^YALHVDGVGTK.A");
@@ -1008,7 +1008,7 @@ public class MS2Test extends MS2TestBase
             // verify the bulk protein coverage map export for target protein
             pushLocation();
             addUrlParameter("exportAsWebPage=true");
-            clickNavButton("Export Protein Coverage");
+            clickButton("Export Protein Coverage");
             assertTextPresentInThisOrder("15645924", "NP_208103.1");
             assertTextPresent("NP_208103.1", 4);
             assertTextNotPresent("15612296", "NP_223949.1");
@@ -1032,10 +1032,10 @@ public class MS2Test extends MS2TestBase
         log("Test Protein Prophet Compare");
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("ProteinProphet (Legacy)");
         selectOptionByText("viewParams", VIEW3);
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent("(GroupProbability > 0.7)");
         assertTextNotPresent("gi|30089158|emb|CAD89505.1|");
         assertTextPresent("GroupNumber");
@@ -1052,11 +1052,11 @@ public class MS2Test extends MS2TestBase
 
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("ProteinProphet (Legacy)");
         checkCheckbox("light2HeavyRatioMean");
         uncheckCheckbox("groupProbability");
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent("ratiomean");
         assertTextNotPresent("GroupProbability");
 
@@ -1065,11 +1065,11 @@ public class MS2Test extends MS2TestBase
 
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("Search Engine Protein");
         selectOptionByText("viewParams", VIEW2);
         checkCheckbox("total");
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent("(SequenceMass > 20000)");
         assertTextPresent("(DeltaMass > 0)");
         assertTextPresent("Total");
@@ -1085,10 +1085,10 @@ public class MS2Test extends MS2TestBase
 
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("Peptide (Legacy)");
         selectOptionByText("viewParams", VIEW2);
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent("(DeltaMass > 0)");
         assertTextNotPresent("R.TIDPVIAR.K");
         assertTextNotPresent("K.KLYNEELK.A");
@@ -1104,13 +1104,13 @@ public class MS2Test extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif");
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
-        clickNavButton("Create new group");
+        clickButton("Create new group");
         setFormElement("name", RUN_GROUP1_NAME1);
         setFormElement("contactId", RUN_GROUP1_CONTACT);
         setFormElement("experimentDescriptionURL", RUN_GROUP1_DESCRIPTION);
         setFormElement("hypothesis", RUN_GROUP1_HYPOTHESIS);
         setFormElement("comments", RUN_GROUP1_COMMENTS);
-        clickNavButton("Submit");
+        clickButton("Submit");
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         assertTextPresent(RUN_GROUP1_NAME1);
         assertTextPresent(RUN_GROUP1_HYPOTHESIS);
@@ -1119,14 +1119,14 @@ public class MS2Test extends MS2TestBase
         assertTextPresent(RUN_GROUP1_NAME1);
 
         clickLinkWithText("Run Groups");
-        clickNavButton("Create Run Group");
-        clickNavButton("Submit");
+        clickButton("Create Run Group");
+        clickButton("Submit");
         setFormElement("name", RUN_GROUP3_NAME);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
-        clickNavButton("Create Run Group");
+        clickButton("Create Run Group");
         setFormElement("name", RUN_GROUP2_NAME);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         log("Test editing run group info");
         clickLinkWithText(RUN_GROUP1_NAME1);
@@ -1135,9 +1135,9 @@ public class MS2Test extends MS2TestBase
         assertTextPresent(RUN_GROUP1_DESCRIPTION);
         assertTextPresent(RUN_GROUP1_HYPOTHESIS);
         assertTextPresent(RUN_GROUP1_COMMENTS);
-        clickNavButton("Edit");
+        clickButton("Edit");
         setFormElement("name", RUN_GROUP1_NAME2);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         log("Test customizing view to include the run groups");
         clickLinkWithText("MS2 Dashboard");
@@ -1167,16 +1167,16 @@ public class MS2Test extends MS2TestBase
         assertTextPresent(RUN_GROUP2_NAME);
         assertTextPresent("Default Experiment");
         checkDataRegionCheckbox("XTandemSearchRuns", 1);
-        clickNavButton("Remove");
+        clickButton("Remove");
         assert(!isTextPresent(testFile1) || !isTextPresent(testFile2));
         clickLinkWithText("MS2 Dashboard");
 
         log("Test that the compare run groups works");
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("ProteinProphet");
-        clickNavButton("Compare");
+        clickButton("Compare");
 
         clickLinkWithText("Comparison Overview", false);
         waitForText(RUN_GROUP1_NAME2, 1000);
@@ -1219,8 +1219,8 @@ public class MS2Test extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithText("Run Groups");
         checkAllOnPage("RunGroupWide");
-        clickNavButton("Delete");
-        clickNavButton("Confirm Delete");
+        clickButton("Delete");
+        clickButton("Confirm Delete");
         assertTextNotPresent(RUN_GROUP1_NAME2);
         assertTextNotPresent(RUN_GROUP2_NAME);
         assertTextNotPresent("Default Experiment");
@@ -1233,7 +1233,7 @@ public class MS2Test extends MS2TestBase
 //        log("Test the cross comparison feature at top of query comparison");
 //        selenium.click("//div[@id='org.labkey.ms2.RunComparator']/table/tbody/tr[1]/td/table/tbody/tr[2]/td/table/tbody/tr[3]/td[5]/img");
 //        selenium.click("//input[@type='checkbox'][1]");
-//        clickNavButton("OK", 0);
+//        clickButton("OK", 0);
 //        Assert.assertTrue(getText(Locator.raw("//div[@id='org.labkey.ms2.RunComparator']/table/tbody/tr[1]/td/table/tbody/tr[2]/td/table/tbody/tr[3]/td[3]/div")).compareTo("10") == 0);
 //        Assert.assertTrue(getText(Locator.raw("//div[contains(text(), 'Group #2')]/../td[2]")).compareTo("7") == 0);
 
@@ -1243,9 +1243,9 @@ public class MS2Test extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare");
+        clickButton("Compare");
         checkCheckbox("column", "QueryPeptides", true);
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
         assertTextPresent("R.VEKALLDNAGVR.N");
         assertTextPresent("PepProphet");
@@ -1256,7 +1256,7 @@ public class MS2Test extends MS2TestBase
         addCustomizeViewColumn("Run/IonPercent", "Run Ion%");
         removeCustomizeViewColumn("Run Count");
         addCustomizeViewFilter("Run/IonPercent", "Run Ion%", "Is Greater Than", "0.15");
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("Check filtering and columns were added correctly");
         assertTextPresent("Ion%");
@@ -1278,7 +1278,7 @@ public class MS2Test extends MS2TestBase
         log("Test exporting in Query Peptides Comparision");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        clickNavButton("Export to TSV");
+        clickButton("Export to TSV");
         assertTextPresent("Ion%");
         assertTextNotPresent("K.EIRQRQGDDLDGLSFAELR.G");
         assertTextBefore("K.KHGGPKDEER.H", "K.QGTTRYR.V");
@@ -1295,7 +1295,7 @@ public class MS2Test extends MS2TestBase
 
     private void pepXMLtest()
     {
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
 //        sleep(2000);
         ExtHelper.selectFileBrowserItem(this, "pepXML/truncated.pep.xml");
         selectImportDataAction("Import Search Results");

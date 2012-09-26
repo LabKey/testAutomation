@@ -45,7 +45,7 @@ public class FilterTest extends ListTest
     {
         ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
         ListHelper.createList(this, PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement(Locator.name("text"),"Car\tColor\tyear\n" +
                 "1\tBlue\t1980\n" +
                 "2\tRed\t1970\n" +

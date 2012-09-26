@@ -159,7 +159,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         if (transformScript.exists())
         {
             waitForElement(Locator.navButton("Add Script"));
-            clickNavButton("Add Script", 0);
+            clickButton("Add Script", 0);
             selenium.type("//input[@id='AssayDesignerTransformScript" + index + "']", transformScript.getAbsolutePath());
         }
         else
@@ -168,9 +168,9 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
 
     protected void startCreateNabAssay(String name)
     {
-        clickNavButton("New Assay Design");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         selenium.type("//input[@id='AssayDesignerName']", name);

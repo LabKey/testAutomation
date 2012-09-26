@@ -68,7 +68,7 @@ public class XTandemTest extends AbstractXTandemTest
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
 
         log("Test filtering and sorting");
         setFilter("MS2Peptides", "Mass", "Is Greater Than", "1000");
@@ -77,14 +77,14 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
         log("Test Save View");
-        clickNavButton("Save View");
+        clickButton("Save View");
         setFormElement("name", VIEW);
-        clickNavButton("Save View");
+        clickButton("Save View");
         selectOptionByText("viewParams", "<Standard View>");
-        clickNavButton("Go");
+        clickButton("Go");
         assertTextPresent(PEPTIDE);
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Go");
+        clickButton("Go");
         assertTextNotPresent("K.VFHFVR.Q");
         assertTextBefore(PEPTIDE2, PEPTIDE3);
 
@@ -94,7 +94,7 @@ public class XTandemTest extends AbstractXTandemTest
         log("Test exporting");
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
-        clickNavButton("Export All", 0);
+        clickButton("Export All", 0);
         click(Locator.xpath("//a/span[text()='TSV']"));
         assertTextNotPresent(PEPTIDE);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
@@ -105,10 +105,10 @@ public class XTandemTest extends AbstractXTandemTest
         clickLinkWithText("MS2 Dashboard");
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("Peptide (Legacy)");
         selectOptionByText("viewParams", VIEW);
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent("(Mass > 1000)");
 
         //Put in once bug with filters in postgres is fixed
@@ -129,7 +129,7 @@ public class XTandemTest extends AbstractXTandemTest
         clickLinkWithText("Setup Compare Peptides");
         clickRadioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID);
         setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.75");
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent(PEPTIDE3);
         assertTextPresent(PEPTIDE4);
         assertTextNotPresent(PEPTIDE);
@@ -143,20 +143,20 @@ public class XTandemTest extends AbstractXTandemTest
         log("Test Protein Search");
         selenium.type("identifier", SEARCH);
         selenium.click("exactMatch");
-        clickNavButton("Search");
+        clickButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
         selenium.type("minimumProbability", "2.0");
-        clickNavButton("Search");
+        clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
         selenium.type("identifier", "GarbageProteinName");
         selenium.type("minimumProbability", "");
-        clickNavButton("Search");
+        clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         Assert.assertTrue(!(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT)));
         assertTextNotPresent(SEARCH_FIND);
@@ -185,11 +185,11 @@ public class XTandemTest extends AbstractXTandemTest
         log("Test PeptideCrosstab");
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("Peptide");
 
         checkRadioButton(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE);
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent(PEPTIDE3);
         assertTextPresent(PEPTIDE4);
         assertTextPresent(PEPTIDE);

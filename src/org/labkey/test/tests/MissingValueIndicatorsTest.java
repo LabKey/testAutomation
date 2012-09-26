@@ -124,9 +124,9 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
     {
         log("Create MV project");
         _containerHelper.createProject(PROJECT_NAME, "Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         selectOptionByValue("securityString", "BASIC_WRITE");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         clickLinkWithText(PROJECT_NAME + " Study");
         setPipelineRoot(getSampleRoot());
         clickLinkWithText(PROJECT_NAME + " Study");
@@ -175,7 +175,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
             index++;
         }
 
-        clickNavButton("Save");
+        clickButton("Save");
 
         log("Set MV indicators.");
     }
@@ -212,11 +212,11 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         deleteListData(3);
 
         log("Test inserting a single new row");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_name", "Sid");
         setFormElement("quf_sex", "male");
         selectOptionByValue("quf_ageMVIndicator", "Z");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertNoLabkeyErrors();
         assertTextPresent("Sid");
         assertTextPresent("male");
@@ -225,7 +225,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         deleteListData(1);
 
         log("Test separate MVIndicator column");
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         setFormElement("text", TEST_DATA_TWO_COLUMN_LIST_BAD);
         ListHelper.submitImportTsv_error(this,null);
         assertLabkeyErrorPresent();
@@ -253,7 +253,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         clickLinkWithText("Import Visit Map");
         // Dummy visit map data (probably non-sensical), but enough to get a placeholder created for dataset #1:
         setFormElement("content", "20|S|Only Visit|1|1|1|1|1|1|1");
-        clickNavButton("Import");
+        clickButton("Import");
         clickLinkWithText("Manage Study");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Define Dataset Schemas");
@@ -262,14 +262,14 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         setFormElement("labelColumn", "datasetLabel");
         setFormElement("typeIdColumn", "datasetId");
         setLongTextField("tsv", getFileContents(DATASET_SCHEMA_FILE));
-        clickNavButton("Submit", 180000);
+        clickButton("Submit", 180000);
         assertNoLabkeyErrors();
         assertTextPresent("MV Dataset");
 
         log("Import dataset data");
         clickLinkWithText("MV Dataset");
-        clickNavButton("View Data");
-        clickNavButton("Import Data");
+        clickButton("View Data");
+        clickButton("Import Data");
 
         setFormElement("text", TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
         ListHelper.submitImportTsv_error(this, null);
@@ -281,7 +281,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         deleteDatasetData(3);
 
         log("Test inserting a single row");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_ParticipantId", "Sid");
         setFormElement("quf_SequenceNum", "1");
         selectOptionByValue("quf_AgeMVIndicator", "Z");
@@ -295,7 +295,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         deleteDatasetData(1);
 
         log("Import dataset data with two mv columns");
-        clickNavButton("Import Data");
+        clickButton("Import Data");
 
         setFormElement("text", TEST_DATA_TWO_COLUMN_DATASET_BAD);
         ListHelper.submitImportTsv_error(this, null);
@@ -347,21 +347,21 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
         log("Import single column MV data");
         clickLinkWithText(ASSAY_NAME);
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         String targetStudyValue = "/" + PROJECT_NAME + " (" + PROJECT_NAME + " Study)";
         selenium.select("//select[@name='targetStudy']", targetStudyValue);
 
-        clickNavButton("Next");
+        clickButton("Next");
         selenium.type("name", ASSAY_RUN_SINGLE_COLUMN);
         selenium.click("//input[@value='textAreaDataProvider']");
 
         selenium.type("TextAreaDataCollector.textArea", TEST_DATA_SINGLE_COLUMN_ASSAY_BAD);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertLabkeyErrorPresent();
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_DATA_SINGLE_COLUMN_ASSAY);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertNoLabkeyErrors();
         clickLinkWithText(ASSAY_RUN_SINGLE_COLUMN);
         validateSingleColumnData();
@@ -369,20 +369,20 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         log("Import two column MV data");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(ASSAY_NAME);
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         selenium.select("//select[@name='targetStudy']", targetStudyValue);
 
-        clickNavButton("Next");
+        clickButton("Next");
         selenium.type("name", ASSAY_RUN_TWO_COLUMN);
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_DATA_TWO_COLUMN_ASSAY_BAD);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertLabkeyErrorPresent();
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_DATA_TWO_COLUMN_ASSAY);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertNoLabkeyErrors();
         clickLinkWithText(ASSAY_RUN_TWO_COLUMN);
         validateTwoColumnData("MVAssay Data", "ParticipantID");
@@ -393,11 +393,11 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         clickLinkWithText(ASSAY_RUN_SINGLE_COLUMN);
         validateSingleColumnData();
         checkCheckbox(".toggle");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
         
-        clickNavButton("Next");
+        clickButton("Next");
 
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
         validateSingleColumnData();
 
         if (isFileUploadAvailable())
@@ -405,22 +405,22 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
             log("Import from Excel in single-column format");
             clickLinkWithText(PROJECT_NAME);
             clickLinkWithText(ASSAY_NAME);
-            clickNavButton("Import Data");
+            clickButton("Import Data");
             selenium.select("//select[@name='targetStudy']", targetStudyValue);
 
-            clickNavButton("Next");
+            clickButton("Next");
             selenium.type("name", ASSAY_EXCEL_RUN_SINGLE_COLUMN);
             checkRadioButton("dataCollectorName", "File upload");
 
             File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
             setFormElement("__primaryFile__", file);
-            clickNavButton("Save and Finish");
+            clickButton("Save and Finish");
             assertLabkeyErrorPresent();
 
             checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
             setFormElement("__primaryFile__", file);
-            clickNavButton("Save and Finish");
+            clickButton("Save and Finish");
             assertNoLabkeyErrors();
             clickLinkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN);
             validateSingleColumnData();
@@ -428,21 +428,21 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
             log("Import from Excel in two-column format");
             clickLinkWithText(PROJECT_NAME);
             clickLinkWithText(ASSAY_NAME);
-            clickNavButton("Import Data");
+            clickButton("Import Data");
             selenium.select("//select[@name='targetStudy']", targetStudyValue);
 
-            clickNavButton("Next");
+            clickButton("Next");
             selenium.type("name", ASSAY_EXCEL_RUN_TWO_COLUMN);
             checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
             setFormElement("__primaryFile__", file);
-            clickNavButton("Save and Finish");
+            clickButton("Save and Finish");
             assertLabkeyErrorPresent();
 
             checkRadioButton("dataCollectorName", "File upload");
             file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
             setFormElement("__primaryFile__", file);
-            clickNavButton("Save and Finish");
+            clickButton("Save and Finish");
             assertNoLabkeyErrors();
             clickLinkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN);
             validateTwoColumnData("MVAssay Data", "ParticipantID");
@@ -474,10 +474,10 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         addWebPart("Assay List");
 
         //copied from old test
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "General");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -495,7 +495,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         ListHelper.clickRow(this, getPropertyXPath("Data Fields"), 5);
         ListHelper.clickMvEnabled(this, getPropertyXPath("Data Fields"));
 
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
         assertNoLabkeyErrors();
 
     }

@@ -59,7 +59,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         log("Setting up data pipeline for project " + project);
         clickLinkWithText(project);
         addWebPart("Data Pipeline");
-        clickNavButton("Setup");
+        clickButton("Setup");
         File dir = getTestTempDir();
         dir.mkdirs();
 
@@ -123,15 +123,15 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY2, "Study", null, true);
         createDefaultStudy();
         createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY3, "Study", null, true);
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         //use date-based study
         click(Locator.xpath("(//input[@name='timepointType'])[1]"));
         setFormElement(Locator.xpath("//input[@name='startDate']"), "2000-01-01");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
 
         clickLinkWithText("Manage Timepoints");
         setFormElement(Locator.xpath("//input[@name='defaultTimepointDuration']"), "8");
-        clickNavButton("Update");
+        clickButton("Update");
 
         //setup security on sub-folders:
         // PIs should be Editors on Lab1 and Study1, but not Study2 or Study3
@@ -176,7 +176,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     {
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
         if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
-            clickNavButton("Save and Finish");
+            clickButton("Save and Finish");
         clickLinkWithText(project);
         clickLinkWithText(subfolder);
         enterPermissionsUI();
@@ -202,12 +202,12 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     {
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
         if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
-            clickNavButton("Save and Finish");
+            clickButton("Save and Finish");
         clickLinkWithText(project);
         clickLinkWithText(folder);
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
 
         selectOptionByValue("securityString", "ADVANCED_READ");
         waitForPageToLoad(30000);
@@ -226,13 +226,13 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickLinkWithText("Manage Dataset QC States");
         setFormElement("newLabel", "Approved");
         setFormElement("newDescription", "We all like approval.");
-        clickNavButton("Save");
+        clickButton("Save");
         setFormElement("newLabel", "Pending Review");
         setFormElement("newDescription", "No one likes to be reviewed.");
         clickCheckbox("newPublicData");
-        clickNavButton("Save");
+        clickButton("Save");
         selectOptionByText("defaultAssayQCState", "Pending Review");
-        clickNavButton("Save");
+        clickButton("Save");
     }
     /**
      * Reverts to the admin account after impersonating a different user.
@@ -265,7 +265,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickManageGroup(groupName);
         setFormElement("names", userName );
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
     } //addUserToProjGroup()
 
     protected File[] getTestFiles()

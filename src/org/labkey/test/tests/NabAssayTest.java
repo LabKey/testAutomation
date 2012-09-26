@@ -122,8 +122,8 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickLinkWithText(TEST_ASSAY_PRJ_NAB);
             _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
             addWebPart("Study Overview");
-            clickNavButton("Create Study");
-            clickNavButton("Create Study");
+            clickButton("Create Study");
+            clickButton("Create Study");
 
             //add the Assay List web part so we can create a new nab assay
             _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
@@ -131,12 +131,12 @@ public class NabAssayTest extends AbstractQCAssayTest
             addWebPart("Assay List");
 
             //create a new nab assay
-            clickNavButton("Manage Assays");
+            clickButton("Manage Assays");
             startCreateNabAssay(TEST_ASSAY_NAB);
             selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_NAB_DESC);
 
             sleep(1000);
-            clickNavButton("Save", 0);
+            clickButton("Save", 0);
             waitForText("Save successful.", 20000);
 
             clickLinkWithText("configure templates");
@@ -167,7 +167,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // note that we're intentionally leaving the fourth and fifth direction specifiers null, which should default to 'false'
 
-            clickNavButton("Save & Close");
+            clickButton("Save & Close");
 
             assertTextPresent(PLATE_TEMPLATE_NAME);
             assertTextPresent("NAb: 5 specimens in duplicate");
@@ -181,7 +181,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
 
-            clickNavButton("Save", 0);
+            clickButton("Save", 0);
             waitForText("Save successful.", 20000);
 
             clickLinkWithText("configure templates");
@@ -206,8 +206,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         if (isFileUploadAvailable())
         {
             log("Uploading NAb Runs");
-            clickNavButton("Import Data");
-            clickNavButton("Next");
+            clickButton("Import Data");
+            clickButton("Next");
 
             setFormElement("cutoff1", "50");
             setFormElement("cutoff2", "70");
@@ -294,7 +294,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             
             waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
             checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));
-            clickNavButton("Save & Close");
+            clickButton("Save & Close");
 
             // Edit the first run
             clickLinkWithText(TEST_ASSAY_FLDR_NAB);
@@ -306,7 +306,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             setText("quf_Name", "NameEdited.xlsx");
             setText("quf_HostCell", "EditedHostCell");
             setText("quf_PlateNumber", "EditedPlateNumber");
-            clickNavButton("Submit");
+            clickButton("Submit");
             assertLinkPresentWithText("NameEdited.xlsx");
             assertTextPresent("EditedHostCell", "EditedPlateNumber");
 
@@ -348,11 +348,11 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextNotPresent("ptid 1 C");
             assertTextNotPresent("ptid 5");
             checkAllOnPage(TEST_ASSAY_NAB + " Data");
-            clickNavButton("Copy to Study");
+            clickButton("Copy to Study");
 
             selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-            clickNavButton("Next");
-            clickNavButton("Copy to Study");
+            clickButton("Next");
+            clickButton("Copy to Study");
             assertStudyData(4);
 
             assertAliasedAUCStudyData();
@@ -407,7 +407,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         setFormElement("dataCollectorName", "File upload");
         File file1 = new File(filePath);
         setFormElement("__primaryFile__", file1);
-        clickNavButton(finalButton, 60000);
+        clickButton(finalButton, 60000);
     }
 
     private void assertStudyData(int ptidCount)
@@ -599,12 +599,12 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickLinkWithText("edit assay design");
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         clickLinkWithText(TEST_ASSAY_FLDR_NAB);
         clickLinkWithText(TEST_ASSAY_NAB);
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
 
         setFormElement("name", "transformed assayId");
         setFormElement("cutoff1", "50");

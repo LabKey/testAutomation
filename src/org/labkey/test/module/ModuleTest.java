@@ -41,7 +41,7 @@ public class ModuleTest extends BaseSeleniumWebTest
         goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkCheckbox(Locator.raw("//input[@value='" + TEST_MODULE_TEMPLATE_FOLDER_NAME + "']"));
-        clickNavButton("Update Folder");
+        clickButton("Update Folder");
         clickTab(TEST_MODULE_TEMPLATE_FOLDER_NAME);
         assertTextPresent("Hello, and welcome to the " + TEST_MODULE_TEMPLATE_FOLDER_NAME + " module.");
     }

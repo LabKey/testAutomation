@@ -51,7 +51,7 @@ public class LuminexPositivityTest extends LuminexTest
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"), 0);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 1);
 
-        //clickNavButton("Save & Close");
+        //clickButton("Save & Close");
         //TODO: Just 'Save & Close' to avoid timing issues. Blocked
         saveAssay();
         sleep(5000);
@@ -76,7 +76,7 @@ public class LuminexPositivityTest extends LuminexTest
         uploadPositivityFile(assayName + " No Fold Change", "1", "", false);
         // should result in error for having a base visit without a fold change
         assertTextPresent("An error occurred when running the script (exit code: 1).", "Error: No value provided for 'Positivity Fold Change'.");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
         // TODO: set positivity threshold analyte props to 1000
         uploadPositivityFile(assayName + " No Base Visit", "", "", false);
         posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A8", "B8", "A9", "B9"};

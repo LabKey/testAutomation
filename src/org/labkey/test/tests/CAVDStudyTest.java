@@ -211,10 +211,10 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText(STUDY_NAME);
         clickLinkWithText("Assays", true);
 
-        waitAndClickNavButton("Create Assay Datasets", 0);
+        waitAndClickButton("Create Assay Datasets", 0);
         waitForAlert("Placeholder datasets created. Use Manage/Study Schedule to define datasets or link to assay data.", WAIT_FOR_JAVASCRIPT);
 
-        waitAndClickNavButton("Create Study Timepoints", 0);
+        waitAndClickButton("Create Study Timepoints", 0);
         waitForAlert("2 timepoints created.", WAIT_FOR_JAVASCRIPT);
 
         clickLinkWithText("Manage");
@@ -272,7 +272,7 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText("Change Study Properties");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", study2name);
-        clickNavButton("Submit");
+        clickButton("Submit");
         waitForText("General Study Settings");
         assertTextPresent(study2name);
         clickLinkWithText("Manage Datasets");
@@ -291,7 +291,7 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText("Change Study Properties");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", study3name);
-        clickNavButton("Submit");
+        clickButton("Submit");
         waitForText("General Study Settings");
         assertTextPresent(study3name);
         clickLinkWithText("Manage Datasets");
@@ -343,20 +343,20 @@ public class CAVDStudyTest extends StudyBaseTest
                 new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "viscstudies", "studies"))
         };
         ListHelper.createList(this, FOLDER_NAME4, "AllStudiesList", ListHelper.ListColumnType.AutoInteger, "Key", columns);
-        clickNavButton("Done");
+        clickButton("Done");
 
         log("Add records to list for each study.");
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME4);
         clickLinkWithText("AllStudiesList", true);
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_MyStudyName", "Something");
         selectOptionByText("quf_StudyLookup", study2name);
-        clickNavButton("Submit");
-        clickNavButton("Insert New");
+        clickButton("Submit");
+        clickButton("Insert New");
         setFormElement("quf_MyStudyName", "TheOtherOne");
         selectOptionByText("quf_StudyLookup", study3name);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         log("Verify that the list lookup displays dataset status values.");
         clickLinkWithText(PROJECT_NAME);
@@ -418,7 +418,7 @@ public class CAVDStudyTest extends StudyBaseTest
         clickEditDatasetIcon(dataset);
         Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
         Ext4Helper.selectComboBoxItem(this, "Status", status);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
 
         // verify that the status icon appears
         Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + dataset + "')]/../../..//img[@alt='" + status + "']");
@@ -531,7 +531,7 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void clickEditDesign()
     {
-        waitAndClickNavButton("Edit");
+        waitAndClickButton("Edit");
         waitForElement(Locator.navButton("Finished"));
     }
 
@@ -559,7 +559,7 @@ public class CAVDStudyTest extends StudyBaseTest
 
 
         click(Locator.ext4Radio("Import data from file"));
-        clickNavButton("Next");
+        clickButton("Next");
 
         String datasetFileName = getStudySampleDataPath() + "/datasets/plate001.tsv";
         File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
@@ -571,7 +571,7 @@ public class CAVDStudyTest extends StudyBaseTest
             setFormElement(fileUpload, file.getAbsolutePath());
 
             waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), WAIT_FOR_JAVASCRIPT);
-            clickNavButton("Import");
+            clickButton("Import");
         }
         else
             Assert.fail("The dataset import .tsv file (plate001.tsv) does not exist");

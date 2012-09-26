@@ -131,8 +131,8 @@ public class StudyProtectedExportTest extends StudyExportTest
 
     private void importAlteredStudy()
     {
-        clickNavButton("Import Study");
-        clickNavButton("Import Study Using Pipeline");
+        clickButton("Import Study");
+        clickButton("Import Study Using Pipeline");
         waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
         ExtHelper.selectFileBrowserItem(this, "export/");
         Locator checkbox = Locator.xpath("(//div[contains(text(), 'My Study_')])[1]");

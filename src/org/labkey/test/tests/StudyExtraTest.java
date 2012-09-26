@@ -43,7 +43,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "None", null);
 
         addWebPart("Vaccine Study Protocols");
-        clickNavButton("New Protocol");
+        clickButton("New Protocol");
 
         waitForTextToDisappear("Loading", WAIT_FOR_JAVASCRIPT);        
 
@@ -55,7 +55,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.fireEvent(Locator.raw("//div[contains(text(), 'Click to edit description')]/..").toString(), "focus");
         setFormElement("protocolDescription", "This is a very important protocol");
 
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Revision 1 saved successfully", WAIT_FOR_JAVASCRIPT);
 
         setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[2]/input", "Immunogen1");
@@ -85,7 +85,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         selenium.type("timepointName", "Pre-immunization");
         click(Locator.tagWithText("button", "OK"));
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/../..//input");
-        clickNavButton("Finished");
+        clickButton("Finished");
 
         waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
 
@@ -94,20 +94,20 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Immunogen3|Adjuvant1");
         assertTextPresent("Pre-immunization");
 
-        clickNavButton("Edit");
+        clickButton("Edit");
         waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
 
 		selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Add Timepoint')]");
 		selenium.type("timepointCount", "8");
         click(Locator.tagWithText("button", "OK"));
         selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/ancestor::tr/td[5]//input");
-        clickNavButton("Finished");
+        clickButton("Finished");
 
         waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
 
-        clickNavButton("Create Study Folder");
+        clickButton("Create Study Folder");
         setFormElement("beginDate", "2007-01-01");
-        clickNavButton("Next");
+        clickButton("Next");
         String cohorts = "SubjectId\tCohort\tStartDate\n" +
                 "V1\tVaccine\t2007-01-01\n" +
                 "P1\tPlacebo\t2007-06-01\n" +
@@ -117,7 +117,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
                 "V4\tVaccine2\t2007-11-01";
 
         setFormElement("participantTSV", cohorts);
-        clickNavButton("Next");
+        clickButton("Next");
         String specimens = "Vial Id\tSample Id\tDate\tTimepoint Number\tVolume\tUnits\tSpecimen Type\tderivative_type\tAdditive Type\tSubject Id\n" +
  "V1-0\tV1-0\t2007-01-01\t1.0000\t\t\tBlood\tSerum\t\tV1\n" +
  "P1-0\tP1-0\t2007-06-01\t1.0000\t\t\tBlood\tSerum\t\tP1\n" +
@@ -132,29 +132,29 @@ public class StudyExtraTest extends BaseSeleniumWebTest
  "V3-8\tV3-8\t2007-11-09\t2.0000\t\t\tBlood\tSerum\t\tV3\n" +
  "V4-8\tV4-8\t2007-11-09\t2.0000\t\t\tBlood\tSerum\t\tV4";
         setFormElement("specimenTSV", specimens);
-		clickNavButton("Next");
-        clickNavButton("Finish");
+		clickButton("Next");
+        clickButton("Finish");
         goToFolderManagement();
         clickLinkWithText("Folder Type");
         checkCheckbox(Locator.checkboxByTitle("Experiment"));
         checkCheckbox(Locator.checkboxByTitle("Query"));
-        clickNavButton("Update Folder");
+        clickButton("Update Folder");
 
         addWebPart("Lists");
         clickLinkWithText("manage lists");
 
-        clickNavButton("Create New List");
+        clickButton("Create New List");
         waitForElement(Locator.id("ff_name"), defaultWaitForPage);
 		setFormElement("ff_name", LIST_NAME);
-		clickNavButton("Create List", 0);
+		clickButton("Create List", 0);
         waitForElement(Locator.navButton("Add Field"),30000);
-        clickNavButton("Add Field", 0);
+        clickButton("Add Field", 0);
         ListHelper.setColumnName(this, 1, "Value");
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.navButton("Done"), 30000);
-        clickNavButton("Done");
+        clickButton("Done");
         clickLinkWithText(LIST_NAME);
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         //
 		selenium.type("firstInputField", "1");
 		selenium.type("quf_Value", "One");
@@ -165,9 +165,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Manage Study");
-        clickNavButton("Snapshot Study Data");
+        clickButton("Snapshot Study Data");
         setFormElement("schemaName", "VerifySnapshot");
-        clickNavButton("Create Snapshot");
+        clickButton("Create Snapshot");
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
         goToModule("Query");
@@ -175,7 +175,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
 		setFormElement("dbSchemaName", "verifysnapshot");
-        clickNavButton("Create");
+        clickButton("Create");
 		assertTextPresent("VerifySnapshot");
         clickLinkWithText("Query Schema Browser");
         selectSchema("VerifySnapshot");
@@ -197,9 +197,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         clickLinkContainingText(TEST_RUN1);
         selenium.click(".toggle");
-        clickNavButton("Copy to Study");
-        clickNavButton("Next");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
+        clickButton("Next");
+        clickButton("Copy to Study");
         clickLinkContainingText(STUDY_FOLDER + " Study");
 
         addWebPart("Datasets");
@@ -212,8 +212,8 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkContainingText("Manage Study");
 
         //Resnapshot the data & pick up the new table
-        clickNavButton("Snapshot Study Data");
-        clickNavButton("Create Snapshot");
+        clickButton("Snapshot Study Data");
+        clickButton("Create Snapshot");
         clickLinkWithText(STUDY_FOLDER +" Study");
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
@@ -238,13 +238,13 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "Simple");
-        clickNavButton("Next");
+        clickButton("Next");
         waitForElement(Locator.raw("ff_name0"), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnName(this, 0, "Value");
-        clickNavButton("Save");
+        clickButton("Save");
         waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("View Data");
-        clickNavButton("Import Data");
+        clickButton("View Data");
+        clickButton("Import Data");
         ListHelper.submitTsvData(this, "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
 
         CustomizeViewsHelper.openCustomizeViewPanel(this);
@@ -265,7 +265,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Day 16");
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Subjects");
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         ListHelper.submitTsvData(this, "participantid\tDate\tCohort\tStartDate\nPnew\t11/7/2007\tPlacebo\t11/7/2007");
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
@@ -292,7 +292,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         log("Setting up data pipeline for project " + project);
         clickLinkWithText(project);
         addWebPart("Data Pipeline");
-        clickNavButton("Setup");
+        clickButton("Setup");
         File dir = getTestTempDir();
         dir.mkdirs();
 
@@ -321,10 +321,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/studyextra/TestAssay1.xar", 1, "TestAssay1.xar");
         goToProjectHome();
         //copied from old test
-//        clickNavButton("Manage Assays");
-//        clickNavButton("New Assay Design");
+//        clickButton("Manage Assays");
+//        clickButton("New Assay Design");
 //        checkRadioButton("providerName", "General");
-//        clickNavButton("Next");
+//        clickButton("Next");
 //
 //        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 //
@@ -340,7 +340,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 //        }
 //
 //        sleep(1000);
-//        clickNavButton("Save", 0);
+//        clickButton("Save", 0);
 //        waitForText("Save successful.", 20000);
 
     } //defineAssay()
@@ -372,10 +372,10 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY);
 
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(PROJECT_NAME, FOLDER_NAME, STUDY_FOLDER));
         click(Locator.radioButtonByNameAndValue("participantVisitResolver", "SampleInfo"));
-        clickNavButton("Next");
+        clickButton("Next");
 
 
         log("Run properties and data");
@@ -383,7 +383,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		selenium.type("comments", TEST_RUN1_COMMENTS);
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         // reenable the following lines when we've moved to strict type checking of the incoming file.  For now, we're
         // flexible and only error if required columns are missing.
     }

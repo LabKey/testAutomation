@@ -91,12 +91,12 @@ public class FolderTest extends BaseSeleniumWebTest
         log("Ensure folders will be visible");
         selenium.windowMaximize();
 
-        clickNavButton("Change Display Order");
+        clickButton("Change Display Order");
         checkRadioButton("resetToAlphabetical", "false");
         selectOptionByText(Locator.name("items"), PROJECT_NAME);
         for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+PROJECT_NAME+"']")) > 0; i++)
-            clickNavButton("Move Up", 0);
-        clickNavButton("Save");
+            clickButton("Move Up", 0);
+        clickButton("Save");
 
         // TODO: Use the 'old' UI options along the toolbar to perform the same actions reorder, move, rename, etc
 
@@ -108,12 +108,12 @@ public class FolderTest extends BaseSeleniumWebTest
 //        // TODO : Figure out how to get the order of project names within the panel
 //        //assertTextBefore("Shared", PROJECT_NAME);
 //
-//        clickNavButton("Change Display Order");
+//        clickButton("Change Display Order");
 //        checkRadioButton("resetToAlphabetical", "false");
 //        selectOptionByText(Locator.name("items"), PROJECT_NAME);
 //        for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+PROJECT_NAME+"']")) > 0; i++)
-//            clickNavButton("Move Up", 0);
-//        clickNavButton("Save");
+//            clickButton("Move Up", 0);
+//        clickButton("Save");
 //
 //        log("Reorder folders test");
 //        expandFolderNode("AB");
@@ -126,7 +126,7 @@ public class FolderTest extends BaseSeleniumWebTest
 //        log("Illegal folder move test: Project demotion");
 //        moveFolder(PROJECT_NAME, "home", false, false);
 //        ExtHelper.waitForExtDialog(this, "Change Display Order");  // it should only give option to reorder projects
-//        clickNavButton("Cancel", 0);
+//        clickButton("Cancel", 0);
 //
 //        log("Illegal folder move test: Folder promotion");
 //        expandFolderNode("");
@@ -201,7 +201,7 @@ public class FolderTest extends BaseSeleniumWebTest
         if(successExpected)
         {
             ExtHelper.waitForExtDialog(this, "Change Display Order");
-            clickNavButton("Confirm Reorder", 0);
+            clickButton("Confirm Reorder", 0);
         }
     }
 
@@ -216,7 +216,7 @@ public class FolderTest extends BaseSeleniumWebTest
         if(successExpected)
         {
             ExtHelper.waitForExtDialog(this, "Change Display Order");
-            clickNavButton("Confirm Reorder", 0);
+            clickButton("Confirm Reorder", 0);
         }
         //TODO: else {confirm failure}
     }
@@ -240,13 +240,13 @@ public class FolderTest extends BaseSeleniumWebTest
                 assertTextPresent("You are moving folder '"+folder+"'");
             if(confirmMove)
             {
-                clickNavButton("Confirm Move", 0);
+                clickButton("Confirm Move", 0);
                 if (multiple) ExtHelper.waitForExtDialog(this, "Moving Folders");
                 ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
             }
             else
             {
-                clickNavButton("Cancel", 0);
+                clickButton("Cancel", 0);
             }
         }
     }

@@ -133,7 +133,7 @@ public class AssayTest extends AbstractAssayTest
 
         checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
         checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
-        clickNavButton("Save");
+        clickButton("Save");
 
 
         log("Starting Assay security scenario tests");
@@ -190,7 +190,7 @@ public class AssayTest extends AbstractAssayTest
         assertConfirmation("This assay is defined in the /Assay Security Test folder. Would you still like to edit it?");
         waitForElement(Locator.xpath("//span[@id='id_editable_results_properties']"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.xpath("//span[@id='id_editable_results_properties']/input"));
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         // Try an edit
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
@@ -200,16 +200,16 @@ public class AssayTest extends AbstractAssayTest
         setText("quf_SpecimenID", "EditedSpecimenID");
         setText("quf_VisitID", "601.5");
         setText("quf_testAssayDataProp5", "a");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("Could not convert value: a");
         setText("quf_testAssayDataProp5", "514801");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("EditedSpecimenID", "601.5", "514801");
 
         // Try a delete
         checkCheckbox(".select");
         selenium.chooseOkOnNextConfirmation();
-        clickNavButton("Delete");
+        clickButton("Delete");
         assertConfirmation("Are you sure you want to delete the selected row?");
 
         // Verify that the edit was audited
@@ -238,11 +238,11 @@ public class AssayTest extends AbstractAssayTest
         addWebPart("Assay List");
 
         //copied from old test
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
         checkRadioButton("providerName", "General");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -278,7 +278,7 @@ public class AssayTest extends AbstractAssayTest
         setFormElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td/input[@id='importAliases']"), TEST_ASSAY_DATA_ALIASED_PROP_NAME);
 
         sleep(1000);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
 
     } //defineAssay()
@@ -314,16 +314,16 @@ public class AssayTest extends AbstractAssayTest
         //nav trail check
         assertTextPresent("Assay List >  " + TEST_ASSAY + " Batches >  ");
 
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + "3");
 
         log("Batch properties");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " is required and must be of type Number (Double).");
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1), "Bad Test");
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2), "Bad Test");
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3), "Bad Test");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " must be of type Number (Double).");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2) + " must be of type Integer.");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3) + " must be of type Date and Time.");
@@ -340,7 +340,7 @@ public class AssayTest extends AbstractAssayTest
         //select Study2 as the target study (note that PI is not an Editor in this study so we can test for override case)
         selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2));
 
-        clickNavButton("Next");
+        clickButton("Next");
 
         log("Check properties set.");
         assertTextPresent(TEST_ASSAY_SET_PROPERTIES[1]);
@@ -349,38 +349,38 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_ASSAY_SET_PROPERTIES[0]);
 
         log("Run properties and data");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertTextPresent(TEST_ASSAY_RUN_PROP_NAME + "0 is required and must be of type Text (String).");
         selenium.type("name", TEST_RUN1);
 		selenium.type("comments", TEST_RUN1_COMMENTS);
         setFormElement(TEST_ASSAY_RUN_PROP_NAME + "0", TEST_ASSAY_RUN_PROP1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertTextPresent("Data file contained zero data rows");
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         assertTextPresent("There are errors in the uploaded data: VisitID must be of type Number (Double)");
         Assert.assertEquals(TEST_RUN1, selenium.getValue("name"));
         Assert.assertEquals(TEST_RUN1_COMMENTS, selenium.getValue("comments"));
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
-        clickNavButton("Save and Import Another Run");
+        clickButton("Save and Import Another Run");
         assertTextPresent("There are errors in the uploaded data: " + TEST_ASSAY_DATA_PROP_NAME + "6 is required. ");
 
         selenium.click("//input[@value='textAreaDataProvider']");
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA4);
-        clickNavButton("Save and Import Another Run");
+        clickButton("Save and Import Another Run");
 
         Assert.assertEquals("", selenium.getValue("name"));
         Assert.assertEquals("", selenium.getValue("comments"));
         selenium.type("name", TEST_RUN2);
 		selenium.type("comments", TEST_RUN2_COMMENTS);
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN2_DATA1);
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
 
         log("Check out the data for one of the runs");
         assertNoLabkeyErrors();
@@ -471,7 +471,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Import Visit Map");
         setFormElement("content", "301-302|X|Test Visit");
-        clickNavButton("Import");
+        clickButton("Import");
 
         log("Publishing the data as the PI");
 
@@ -486,7 +486,7 @@ public class AssayTest extends AbstractAssayTest
 
         //select all the data rows and click publish
         selenium.click(".toggle");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         //the target study selected before was Study2, but the PI is not an editor there
         //so ensure that system has correctly caught this fact and now asks the PI to
@@ -509,11 +509,11 @@ public class AssayTest extends AbstractAssayTest
         // Make sure the selected study is Study1
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY1));
 
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY1 + " Study: Verify Results");
 
         setFormElement("visitId", "301.5");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         log("Verifying that the data was published");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
@@ -561,7 +561,7 @@ public class AssayTest extends AbstractAssayTest
 
         clickLinkWithText("details");
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        clickNavButton("Recall Rows", 0);
+        clickButton("Recall Rows", 0);
         getConfirmationAndWait();
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
 
@@ -593,7 +593,7 @@ public class AssayTest extends AbstractAssayTest
         setFormElement("sequenceNumMax", "89");
         setFormElement("typeCode", "Screening");
 
-        clickNavButton("Save");
+        clickButton("Save");
 
         //select the Lab1 folder and view all the data for the test assay
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
@@ -602,14 +602,14 @@ public class AssayTest extends AbstractAssayTest
 
         //select all the data rows and click publish
         selenium.click(".toggle");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         checkCheckbox(Locator.xpath("//td//input[@type='checkbox']"));
 
         // Make sure the selected study is Study3
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY3));
 
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY3 + " Study: Verify Results");
 
         //populate initial set of values and verify the timepoint preview column
@@ -639,7 +639,7 @@ public class AssayTest extends AbstractAssayTest
         assertElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td[text()='BAQ00051-09' and following-sibling::td[text()='7.0']]]"));
         assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='BAQ00051-08' and following-sibling::td[text()='8.0']]]"));
         assertElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='BAQ00051-11' and following-sibling::td[text()='9.0']]]"));
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         log("Verifying that the data was published");
         assertTextPresent("a");
@@ -691,7 +691,7 @@ public class AssayTest extends AbstractAssayTest
             "50-70|X|Test Visit2\n" +
             "302-303|X|Test Visit3\n"
         );
-        clickNavButton("Import");
+        clickButton("Import");
 
         //select the Lab1 folder and view all the data for the test assay
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
@@ -700,14 +700,14 @@ public class AssayTest extends AbstractAssayTest
 
         //select all the data rows and click publish
         selenium.click(".toggle");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         checkCheckbox(Locator.xpath("//td//input[@type='checkbox']"));
 
         // Make sure the selected study is Study2
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2));
 
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY2 + " Study: Verify Results");
 
         //populate initial set of values and verify the timepoint preview column
@@ -738,7 +738,7 @@ public class AssayTest extends AbstractAssayTest
         Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-08']]")));
         Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-11']]")));
 
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         log("Verifying that the data was published");
         assertTextPresent("a");
@@ -785,7 +785,7 @@ public class AssayTest extends AbstractAssayTest
         ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         ListHelper.setColumnLabel(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         deleteField("Data Fields", 4);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
 
         //ensure that label has changed in run data in Lab 1 folder
@@ -883,7 +883,7 @@ public class AssayTest extends AbstractAssayTest
 
         //verify grid view
         selectOptionByText(Locator.name("displayType"), "Grid");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertLinkNotPresentWithText("edit");
 
         //edit study properties
@@ -893,7 +893,7 @@ public class AssayTest extends AbstractAssayTest
         setFormElement("Investigator", INVESTIGATOR);
         setFormElement("Grant", GRANT);
         setFormElement("Description", DESCRIPTION);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         //verify study properties (grid view)
         clickLinkWithText(TEST_ASSAY_FLDR_STUDIES);
@@ -906,7 +906,7 @@ public class AssayTest extends AbstractAssayTest
         //verify study properties (details view)
         clickWebpartMenuItem("Studies", "Customize");
         selectOptionByText(Locator.name("displayType"), "Details");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent(INVESTIGATOR, DESCRIPTION);
         assertTextNotPresent(GRANT, TEST_ASSAY_FLDR_STUDY1 + " Study tracks data"); //Old description
     }

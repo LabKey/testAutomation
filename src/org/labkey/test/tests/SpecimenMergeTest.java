@@ -17,10 +17,8 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.PipelineStatusTable;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * User: kevink
@@ -82,9 +80,9 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT_NAME, null);
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         click(Locator.radioButtonByNameAndValue("simpleRepository", "true"));
-        clickNavButton("Create Study");
+        clickButton("Create Study");
 
         setPipelineRoot(_studyDataRoot);
         clickLinkWithText("My Study");

@@ -54,7 +54,7 @@ public class StudyHelper
             test.waitForText("groups allow");
         }
         test.log("Create "+participantString+" Group: " + groupName);
-        test.clickNavButton("Create", 0);
+        test.clickButton("Create", 0);
         ExtHelper.waitForExtDialog(test, "Define "+participantString+" Group");
         test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         test.setFormElement("groupLabel", groupName);
@@ -101,7 +101,7 @@ public class StudyHelper
         test.getWrapper().getEval("selenium.selectExtGridItem('label', '"+groupName+"', -1, 'participantCategoriesGrid', null, false)");
         test.click(Locator.xpath("//*[text()='"+groupName+"']"));
 
-        test.clickNavButton("Edit Selected", 0);
+        test.clickButton("Edit Selected", 0);
         ExtHelper.waitForExtDialog(test, "Define " + participantString + " Group");
         test.waitForElement(Locator.css(".doneLoadingTestMarker"));
 
@@ -149,14 +149,14 @@ public class StudyHelper
     {
         test.clickLinkWithText(folder);
         test.clickTab("Manage");
-        test.clickNavButton("Export Study");
+        test.clickButton("Export Study");
 
         test.assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
 
         test.checkRadioButton("format", useXmlFormat ? "new" : "old");
         test.checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
-        test.clickNavButton("Export");
+        test.clickButton("Export");
     }
 
 }

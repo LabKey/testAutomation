@@ -241,7 +241,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     public void startProcessing()
     {
         _test.log("Start analysis of " + getDataPath());
-        _test.clickNavButton("Process and Import Data");
+        _test.clickButton("Process and Import Data");
         ExtHelper.selectFileBrowserItem(_test, getDataPath()+"/");
 
         clickActionButton();
@@ -274,8 +274,8 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             _test.popLocation();
 
             _test.checkCheckbox(".select", id);
-            _test.clickNavButton("Delete");
-            _test.clickNavButton("Confirm Delete");
+            _test.clickButton("Delete");
+            _test.clickButton("Confirm Delete");
         }
     }
 
@@ -286,7 +286,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     
     private void validateExperiment()
     {
-        _test.clickNavButton("Data");
+        _test.clickButton("Data");
         ExperimentGraph graph = new ExperimentGraph(_test);
         graph.validate(this);
     }
@@ -384,12 +384,12 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         PipelineStatusTable statusTable = new PipelineStatusTable(_test, false, false);
         _test.pushLocation();
         statusTable.clickStatusLink(sampleExp);
-        _test.clickNavButton("Escalate Job Failure");
+        _test.clickButton("Escalate Job Failure");
         _test.setFormElement("escalateUser", escalateEmail);
         _test.setFormElement("escalationMessage", messageText);
         // DetailsView adds a useless form.
         //_test.submit();
-        _test.clickNavButton("Send");
+        _test.clickButton("Send");
         _test.popLocation();
 
         EmailRecordTable.EmailMessage message = emailTable.getMessage(sampleExp);

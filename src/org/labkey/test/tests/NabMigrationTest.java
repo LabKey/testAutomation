@@ -82,7 +82,7 @@ public class NabMigrationTest extends NabOldTest
             index=0;
 
         setFormElement(Locator.name("newField1", index), newFieldVal);
-        clickNavButtonByIndex("Migrate", index);
+        clickButtonByIndex("Migrate", index);
         waitForPipelineJobsToFinish(1);
     }
 

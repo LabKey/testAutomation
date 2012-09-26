@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
-import org.labkey.test.tests.StudyManualTest;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -66,8 +65,8 @@ public class StudyExportTest extends StudyManualTest
         deleteStudy(getStudyLabel());
 
         log("Importing exported study (legacy formats)");
-        clickNavButton("Import Study");
-        clickNavButton("Import Study Using Pipeline");
+        clickButton("Import Study");
+        clickButton("Import Study Using Pipeline");
         ExtHelper.selectFileBrowserItem(this, "export/study/study.xml");
 
         selectImportDataAction("Import Study");
@@ -99,8 +98,8 @@ public class StudyExportTest extends StudyManualTest
         deleteStudy(getStudyLabel());
 
         log("Importing exported study (xml formats)");
-        clickNavButton("Import Study");
-        clickNavButton("Import Study Using Pipeline");
+        clickButton("Import Study");
+        clickButton("Import Study Using Pipeline");
         waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
         ExtHelper.selectFileBrowserItem(this, "export/");
         ExtHelper.selectAllFileBrowserFiles(this);
@@ -188,18 +187,18 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickLinkWithText("Manage Request Statuses");
         setFormElement("newLabel", "New Request");
-        clickNavButton("Save");
+        clickButton("Save");
         setFormElement("newLabel", "Pending Approval");
-        clickNavButton("Save");
+        clickButton("Save");
         setFormElement("newLabel", "Complete");
-        clickNavButton("Done");
+        clickButton("Done");
         clickLinkWithText("Manage Actors and Groups");
         setFormElement("newLabel", "Institutional Review Board");
         selectOptionByText("newPerSite", "Multiple Per Study (Location Affiliated)");
-        clickNavButton("Save");
+        clickButton("Save");
         setFormElement("newLabel", "Scientific Leadership Group");
         selectOptionByText("newPerSite", "One Per Study");
-        clickNavButton("Save");
+        clickButton("Save");
         clickLinkWithText("Update Members");
         clickLinkWithText("FHCRC - Seattle");
         assertTextPresent("Institutional Review Board, FHCRC - Seattle");
@@ -208,19 +207,19 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Manage Default Requirements");
         selectOptionByText("providerActor", "Institutional Review Board");
         setFormElement("providerDescription", "To be deleted");
-        clickNavButtonByIndex("Add Requirement", 1);
+        clickButtonByIndex("Add Requirement", 1);
         assertTextPresent("To be deleted");
         clickLinkWithText("Delete");
         assertTextNotPresent("To be deleted");
         selectOptionByText("providerActor", "Institutional Review Board");
         setFormElement("providerDescription", "Providing lab approval");
-        clickNavButtonByIndex("Add Requirement", 1);
+        clickButtonByIndex("Add Requirement", 1);
         selectOptionByText("receiverActor", "Institutional Review Board");
         setFormElement("receiverDescription", "Receiving lab approval");
-        clickNavButtonByIndex("Add Requirement", 2);
+        clickButtonByIndex("Add Requirement", 2);
         selectOptionByText("generalActor", "Scientific Leadership Group");
         setFormElement("generalDescription", "SLG Request Approval");
-        clickNavButtonByIndex("Add Requirement", 3);
+        clickButtonByIndex("Add Requirement", 3);
         clickTab("Manage");
 
         // create specimen request
@@ -233,7 +232,7 @@ public class StudyExportTest extends StudyManualTest
 
         clickLinkWithText("24");
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        clickNavButton("View Specimens");
+        clickButton("View Specimens");
         assertLinkPresentWithText("999320016");
         assertLinkPresentWithText("999320518");
         clickLinkWithText("Show individual vials");
@@ -245,7 +244,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextNotPresent("KAQ0003Q-01");
         selectOptionByText("destinationSite", "Duke University");
         setFormElements("textarea", "inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
-        clickNavButton("Create and View Details");
+        clickButton("Create and View Details");
 
         assertTextPresent("This request has not been submitted");
         assertNavButtonPresent("Cancel Request");
@@ -256,7 +255,7 @@ public class StudyExportTest extends StudyManualTest
         assertNavButtonPresent("Cancel");
         assertNavButtonPresent("Details");
         assertTextPresent("Not Yet Submitted");
-        clickNavButton("Submit", 0);
+        clickButton("Submit", 0);
         getConfirmationAndWait();
         clickLinkWithText("Specimen Requests");
         assertNavButtonNotPresent("Submit");
@@ -264,16 +263,16 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("New Request");
 
         // test auto-fill:
-        clickNavButton("Create New Request");
+        clickButton("Create New Request");
         String inputs = selenium.getValue("inputs");
         System.out.println(inputs);
         assertFormElementNotEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
         selectOptionByText("destinationSite", "Duke University");
         assertFormElementEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
 
         // manage new request
-        clickNavButton("Details");
+        clickButton("Details");
         assertTextNotPresent("Complete");
         assertTextNotPresent("WARNING: Missing Specimens");
         assertTextPresent("New Request");
@@ -281,7 +280,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Update Request");
         selectOptionByText("status", "Pending Approval");
         setFormElement("comments", "Request is now pending.");
-        clickNavButton("Save Changes and Send Notifications");
+        clickButton("Save Changes and Send Notifications");
         assertTextNotPresent("New Request");
         assertTextPresent("Pending Approval");
         clickLinkWithText("Details", 0);
@@ -293,17 +292,17 @@ public class StudyExportTest extends StudyManualTest
             setFormElement("formFiles[0]", new File(getLabKeyRoot() + VISIT_MAP).getPath());
         else
             log("File upload skipped.");
-        clickNavButton("Save Changes and Send Notifications");
+        clickButton("Save Changes and Send Notifications");
         assertTextPresent("Complete");
 
         clickLinkWithText("Details", 1);
-        clickNavButton("Delete Requirement");
+        clickButton("Delete Requirement");
         assertTextNotPresent("Receiving lab approval");
 
         clickLinkWithText("Originating Location Specimen Lists");
         assertTextPresent("WARNING: The requirements for this request are incomplete");
         assertTextPresent("KCMC, Moshi, Tanzania");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
 
         clickLinkWithText("View History");
         assertTextPresent("Request is now pending.");
@@ -316,7 +315,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getFolderName());
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED_READ");
@@ -334,7 +333,7 @@ public class StudyExportTest extends StudyManualTest
         clickMenuButton("QC State", "Update state of selected rows");
         selectOptionByText("newState", "clean");
         setFormElement("comments", "This data is clean.");
-        clickNavButton("Update Status");
+        clickButton("Update Status");
         clickMenuButton("QC State", "clean");
 
         // test specimen comments
@@ -342,11 +341,11 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Vials by Derivative", false);
         waitForText("Plasma, Unknown Processing");
         clickLinkWithText("Plasma, Unknown Processing");
-        clickNavButton("Enable Comments/QC");
+        clickButton("Enable Comments/QC");
         checkAllOnPage("SpecimenDetail");
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         setFormElement("comments", "These vials are very important.");
-        clickNavButton("Save Changes");
+        clickButton("Save Changes");
         assertTextPresent("These vials are very important.", 25);
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
@@ -391,7 +390,7 @@ public class StudyExportTest extends StudyManualTest
         Ext4Helper.selectComboBoxItem(this, "Mouse", "999320528");
         Ext4Helper.selectComboBoxItem(this, "Visit", "201.0"); //use the raw value for: "Enroll/Vacc #1"
 
-        clickNavButton("Search");
+        clickButton("Search");
         assertTextPresent("999320528");
         clickLinkWithText("Show individual vials");
         // if our search worked, we'll only have six vials:
@@ -408,9 +407,9 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Specimen Requests", false);
         clickLinkWithText("View Current Requests");
-        clickNavButton("Details");
+        clickButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
-        clickNavButton("Delete missing specimens", 0);
+        clickButton("Delete missing specimens", 0);
         getConfirmationAndWait();
         assertTextNotPresent("WARNING: Missing Specimens");
         assertTextPresent("Duke University");
@@ -427,7 +426,7 @@ public class StudyExportTest extends StudyManualTest
 
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
 
         selectOptionByValue("securityString", "BASIC_WRITE");
         waitForPageToLoad(30000);
@@ -438,17 +437,17 @@ public class StudyExportTest extends StudyManualTest
 
         clickLinkWithText("edit");
         setFormElement("quf_DEMbdt", "2001-11-11");
-        clickNavButton("Submit");
+        clickButton("Submit");
         clickMenuButton("QC State", "unknown QC");
         assertTextPresent("2001-11-11");
 
         log("Test adding a row to a dataset");
-        clickNavButton("Insert New");
-        clickNavButton("Submit");
+        clickButton("Insert New");
+        clickButton("Submit");
         assertTextPresent("This field is required");
         setFormElement("quf_MouseId", TEST_ADD_ENTRY);
         setFormElement("quf_SequenceNum", "123");
-        clickNavButton("Submit");
+        clickButton("Submit");
         clickMenuButton("QC State", "All data");
         assertTextPresent(TEST_ADD_ENTRY);
 
@@ -461,7 +460,7 @@ public class StudyExportTest extends StudyManualTest
 
         log("Test deleting rows in a dataset");
         checkCheckbox(Locator.raw("//input[contains(@value, '999320529')]"));
-        clickNavButton("Delete", 0);
+        clickButton("Delete", 0);
         getConfirmationAndWait();
         assertTextNotPresent("999320529");
 
@@ -470,7 +469,7 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickLinkWithText("Manage Dataset QC States");
         selectOptionByText("showPrivateDataByDefault", "All data");
-        clickNavButton("Save");
+        clickButton("Save");
 
         // Test creating and importing a dataset from an excel file
         doTestDatasetImport();
@@ -507,8 +506,8 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Change Display Order");
         selectOptionByValue("items", value);
-        clickNavButton("Move Down", 0);
-        clickNavButton("Save");
+        clickButton("Move Down", 0);
+        clickButton("Save");
     }
 
     protected void hideDataset(String dataset)
@@ -523,10 +522,10 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
-        clickNavButton("Edit Definition");
+        clickButton("Edit Definition");
         waitForElement(Locator.name("dsCategory"), WAIT_FOR_PAGE);
         setFormElement("dsCategory", category);
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     private void modifyVisits()
@@ -535,12 +534,12 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Change Visit Order");
         checkCheckbox("explicitDisplayOrder");
         selectOptionByText("displayOrderItems", MODIFIED_VISIT);
-        clickNavButton("Move Down", 0);
-        clickNavButton("Save");
+        clickButton("Move Down", 0);
+        clickButton("Save");
         editVisit(MODIFIED_VISIT);
         selectOption("dataSetStatus", 0, "OPTIONAL");
         selectOptionByText("cohortId", GROUP_2);
-        clickNavButton("Save");
+        clickButton("Save");
         
     }
 
@@ -550,7 +549,7 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
-        clickNavButton("Edit Definition");
+        clickButton("Edit Definition");
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_PAGE);
         click(Locator.name("ff_name0"));
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
@@ -558,7 +557,7 @@ public class StudyExportTest extends StudyManualTest
         checkCheckbox("mvEnabled");
         setFormElement(Locator.id("propertyDescription"), COLUMN_DESC);
         // TODO: add lookups for current & other folders
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     private void setFormatStrings()
@@ -568,7 +567,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Manage Datasets");
         setText("dateFormat", DATE_FORMAT);
         setText("numberFormat", NUMBER_FORMAT);
-        clickNavButton("Submit");
+        clickButton("Submit");
     }
 
     private void setManualCohorts()
@@ -579,7 +578,7 @@ public class StudyExportTest extends StudyManualTest
         clickRadioButtonById("manualCohortAssignmentEnabled");
         waitForPageToLoad();
         setParticipantCohort(MODIFIED_PARTICIPANT, GROUP_2);
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     private void setParticipantCohort(String ptid, String cohort)
@@ -604,7 +603,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Create New Dataset");
         setFormElement("typeName", "fileImportDataset");
         clickCheckbox("fileImport");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), WAIT_FOR_JAVASCRIPT);
 
@@ -618,7 +617,7 @@ public class StudyExportTest extends StudyManualTest
         Locator.XPathLocator sequenceNum = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='Sequence Num:']/../div/div");
         ExtHelper.selectGWTComboBoxItem(this, sequenceNum, "visit number");
 
-        waitAndClickNavButton("Import");
+        waitAndClickButton("Import");
         waitForPageToLoad();
 
         assertTextPresent("kevin");

@@ -58,9 +58,9 @@ public class FlowCBCTest extends BaseFlowTest
         clickLinkWithText(CBC_FOLDER);
         if (!isLinkPresentWithText("Assay List"))
             addWebPart("Assay List");
-        clickNavButton("New Assay Design");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "CBC");
-        clickNavButton("Next");
+        clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
@@ -72,7 +72,7 @@ public class FlowCBCTest extends BaseFlowTest
         // Add TargetStudy to the end of the default list of Results domain
         addField("Result Fields", 25, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
 
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
     }
 
@@ -80,15 +80,15 @@ public class FlowCBCTest extends BaseFlowTest
     {
         log("** Initialize Study Folder");
         createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[] { "Study", "Letvin", "Flow" });
-        clickNavButton("Create Study");
+        clickButton("Create Study");
         // use date-based study
         click(Locator.xpath("(//input[@name='timepointType'])[1]"));
         setFormElement(Locator.xpath("//input[@name='startDate']"), "2012-03-01");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
 
         clickLinkWithText("Manage Timepoints");
         setFormElement(Locator.xpath("//input[@name='defaultTimepointDuration']"), "7");
-        clickNavButton("Update");
+        clickButton("Update");
     }
 
     @Override
@@ -115,7 +115,7 @@ public class FlowCBCTest extends BaseFlowTest
         assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
         setFormElement(Locator.name("date", 0), "2012-03-17");
         setFormElement(Locator.name("participantId", 1), PTID1);
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
 
         assertTitleContains("Dataset: Flow");
         Assert.assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
@@ -134,7 +134,7 @@ public class FlowCBCTest extends BaseFlowTest
         Assert.assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         pushLocation();
-        clickNavButton("View Source Assay");
+        clickButton("View Source Assay");
         assertTitleContains("Flow Runs:");
         Assert.assertTrue("Expected source assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
         popLocation();
@@ -152,12 +152,12 @@ public class FlowCBCTest extends BaseFlowTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(CBC_FOLDER);
         clickLinkWithText(ASSAY_NAME);
-        clickNavButton("Import Data");
+        clickButton("Import Data");
 
         setFormElement("name", "run01");
         String cbcDataPath = "/server/modules/cbcassay/data/ex_20081016_131859.small.dat";
         setFormElement("TextAreaDataCollector.textArea", getFileContents(cbcDataPath));
-        clickNavButton("Save and Finish", 8000);
+        clickButton("Save and Finish", 8000);
 
         // filter to rows we'd like to copy
         clickLinkWithText("run01");
@@ -165,7 +165,7 @@ public class FlowCBCTest extends BaseFlowTest
         table.setFilter("SampleId", "Equals One Of (e.g. \"a;b;c\")", "241-03A;317-03A");
         table.checkAllOnPage();
 
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
         selectOptionByText(Locator.name("targetStudy", 0), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         selectOptionByText(Locator.name("targetStudy", 1), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         setFormElement(Locator.name("participantId", 0), PTID1);
@@ -173,7 +173,7 @@ public class FlowCBCTest extends BaseFlowTest
         // Note that dates are not on the same day, but within the default timespan size
         setFormElement(Locator.name("date", 0), "2012-06-19");
         setFormElement(Locator.name("date", 1), "2012-03-18");
-        clickNavButton("Copy to Study");
+        clickButton("Copy to Study");
     }
 
     private void verifyQuery()

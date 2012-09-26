@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.tests.StudyBaseTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 
@@ -148,10 +147,10 @@ public class StudySecurityTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
 
         click(getRadioButtonLocator(groupName, setting));
-        clickNavButton("Update");
+        clickButton("Update");
 
         if (null != datasets && null != perm)
         {
@@ -159,7 +158,7 @@ public class StudySecurityTest extends StudyBaseTest
             {
                 selectOptionByText(getPerDatasetSelectId(dsName), perm.name());
             }
-            clickNavButton("Save");
+            clickButton("Save");
         }
 
         clickLinkWithText(getFolderName());
@@ -226,7 +225,7 @@ public class StudySecurityTest extends StudyBaseTest
         //setup advanced dataset security
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
 
         setFormElement("securityString", "ADVANCED_WRITE");
         waitForPageToLoad();
@@ -237,12 +236,12 @@ public class StudySecurityTest extends StudyBaseTest
         click(getRadioButtonLocator(GROUP_EDITORS, GroupSetting.editAll));
         click(getRadioButtonLocator(GROUP_LIMITED, GroupSetting.perDataset));
         click(getRadioButtonLocator(GROUP_NONE, GroupSetting.none));
-        clickNavButton("Update");
+        clickButton("Update");
 
         //grant limited rights to read a couple of datasets
         selectOptionByText("dataset.1", "Read");
         selectOptionByText("dataset.2", "Read");
-        clickNavButton("Save");
+        clickButton("Save");
 
         clickLinkWithText(getFolderName());
     }

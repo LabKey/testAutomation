@@ -98,7 +98,7 @@ public class ViabilityTest extends AbstractViabilityTest
         checkCheckbox("_pool_1604505335_0_Unreliable", 0);
         setFormElement("//input[@name='_pool_1604505335_0_IntValue'][1]", "300");
 
-        clickNavButton("Save and Finish", 0);
+        clickButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
@@ -182,7 +182,7 @@ public class ViabilityTest extends AbstractViabilityTest
         // Check the 'Unreliable' field isn't copied on re-run
         assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
 
-        clickNavButton("Save and Finish", 0);
+        clickButton("Save and Finish", 0);
         String actualConfirmation = getConfirmationAndWait();
         log("** Got confirmation: " + actualConfirmation);
 
@@ -233,7 +233,7 @@ public class ViabilityTest extends AbstractViabilityTest
         getConfirmationAndWait();
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         final String runName = "transformed assayId";
         uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
@@ -252,7 +252,7 @@ public class ViabilityTest extends AbstractViabilityTest
         addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
-        clickNavButton("Save and Finish", 0);
+        clickButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
@@ -275,8 +275,8 @@ public class ViabilityTest extends AbstractViabilityTest
     {
         log("** Create Study2");
         createSubfolder(getProjectName(), getProjectName(), STUDY2_NAME, "Study", null, true);
-        clickNavButton("Create Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
+        clickButton("Create Study");
 
         log("** Import specimens2");
         // create a 'xyzzy' vial id
@@ -295,12 +295,12 @@ public class ViabilityTest extends AbstractViabilityTest
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
         deleteField("Batch Fields", 0);
         addField("Result Fields", 13, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(getAssayName());
-        clickNavButton("Import Data");
+        clickButton("Import Data");
 
         final String runName = "result-level target study";
         uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
@@ -326,7 +326,7 @@ public class ViabilityTest extends AbstractViabilityTest
         addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
-        clickNavButton("Save and Finish", 0);
+        clickButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +

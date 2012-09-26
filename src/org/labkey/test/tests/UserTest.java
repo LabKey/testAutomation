@@ -61,9 +61,9 @@ public class UserTest extends SecurityTest
     protected void doCleanup()
     {
         super.doCleanup();
-        clickNavButton("Preferences");
+        clickButton("Preferences");
         checkRequiredField("FirstName", false);
-        clickNavButton("Update");
+        clickButton("Update");
 
         deleteUser(NORMAL_USER2);
         deleteUser(NORMAL_USER2_ALTERNATE);
@@ -160,32 +160,32 @@ public class UserTest extends SecurityTest
     private void requiredFieldsTest()
     {
         goToSiteUsers();
-        clickNavButton("Preferences");
+        clickButton("Preferences");
 
         for (String field : REQUIRED_FIELDS)
             checkRequiredField(field, true);
 
-        clickNavButton("Update");
-        clickNavButton("Preferences");
+        clickButton("Update");
+        clickButton("Preferences");
 
         for (String field : REQUIRED_FIELDS)
         {
             verifyFieldChecked(field);
             checkRequiredField(field, false);
         }
-        clickNavButton("Update");
-        clickNavButton("Preferences");
+        clickButton("Update");
+        clickButton("Preferences");
 
         checkRequiredField("FirstName", true);
-        clickNavButton("Update");
+        clickButton("Update");
 
         navigateToUserDetails(NORMAL_USER);
-        clickNavButton("Edit");
-        clickNavButton("Submit");
+        clickButton("Edit");
+        clickButton("Submit");
 
         assertTextPresent("This field is required");
 
-        clickNavButton("Show All Users");
+        clickButton("Show All Users");
     }
 
     private void simplePasswordResetTest()

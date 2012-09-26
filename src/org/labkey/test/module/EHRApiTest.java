@@ -145,9 +145,9 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
 
         beginAt(getBaseURL() + "/ehr/" + CONTAINER_PATH + "/_initEHR.view");
-        clickNavButton("Delete All", 0);
+        clickButton("Delete All", 0);
         waitForText("Delete Complete", 120000);
-        clickNavButton("Populate All", 0);
+        clickButton("Populate All", 0);
         waitForText("Populate Complete", 120000);
 
         goToProjectHome();

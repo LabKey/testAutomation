@@ -31,8 +31,6 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.remoteapi.security.CreateUserCommand;
-import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.APIUserHelper;
@@ -47,8 +45,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.UIContainerHelper;
-import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -268,7 +264,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             File defaultToolsDirectory = new File(getLabKeyRoot() + "/build/deploy/bin");
             log("Setting to default tools directory" + defaultToolsDirectory.toString());
             setFormElement("pipelineToolsDirectory", defaultToolsDirectory.toString());
-            clickNavButton("Save");
+            clickButton("Save");
         }
     }
 
@@ -644,7 +640,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         setFormElement("password", password);
         setFormElement("password2", password);
 
-        clickNavButton("Set Password");
+        clickButton("Set Password");
     }
 
     protected String getPasswordResetUrl(String username)
@@ -666,12 +662,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         setFormElement("password", newPassword);
         setFormElement("password2", newPassword);
 
-        clickNavButton("Set Password");
+        clickButton("Set Password");
 
         if(!isElementPresent(Locator.id("userMenuPopupLink")))
         {
             clickButtonContainingText("Submit", defaultWaitForPage*3);
-            clickNavButton("Done");
+            clickButton("Done");
 
             signOut();
             signIn(username, newPassword, true);
@@ -681,13 +677,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void changePassword(String oldPassword, String password)
     {
         goToMyAccount();
-        clickNavButton("Change Password");
+        clickButton("Change Password");
 
         setFormElement("oldPassword", oldPassword);
         setFormElement("password", password);
         setFormElement("password2", password);
 
-        clickNavButton("Set Password");
+        clickButton("Set Password");
     }
 
 
@@ -702,10 +698,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToSiteUsers();
         clickLinkContainingText(displayNameFromEmail(userEmail));
 
-        clickNavButton("Change Email");
+        clickButton("Change Email");
 
         setFormElement("newEmail", newUserEmail);
-        clickNavButton("Submit");
+        clickButton("Submit");
     }
 
 
@@ -743,7 +739,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             setFormElement("expiration", expiration.toString());
         }
 
-        clickNavButton("Save");
+        clickButton("Save");
 
         popLocation();
     }
@@ -768,7 +764,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             if ( oldStrength != null ) click(Locator.radioButtonByNameAndValue("strength", oldStrength.toString()));
             if ( oldExpiration != null ) setFormElement("expiration", oldExpiration.toString());
 
-            clickNavButton("Save");
+            clickButton("Save");
 
             if ( oldStrength != null ) Assert.assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))));
             if ( oldExpiration != null ) Assert.assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement("expiration")));
@@ -788,7 +784,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickLinkWithText("site settings");
         if (initialSystemMaintenanceSchedule == null) initialSystemMaintenanceSchedule = getFormElement("systemMaintenanceInterval").equals("daily");
         checkRadioButton("systemMaintenanceInterval", enable ? "daily" : "never");
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     protected void resetSystemMaintenance()
@@ -798,7 +794,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             goToAdminConsole();
             clickLinkWithText("site settings");
             checkRadioButton("systemMaintenanceInterval", initialSystemMaintenanceSchedule ? "daily" : "never");
-            clickNavButton("Save");
+            clickButton("Save");
         }
     }
 
@@ -926,8 +922,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected void createDefaultStudy()
     {
-        clickNavButton("Create Study");
-        clickNavButton("Create Study");
+        clickButton("Create Study");
+        clickButton("Create Study");
     }
 
 
@@ -1065,11 +1061,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
                 if (isNavButtonPresent("Next"))
                 {
-                    clickNavButton("Next");
+                    clickButton("Next");
 
                     // check for any additional upgrade pages inserted after module upgrade
                     if (isNavButtonPresent("Next"))
-                        clickNavButton("Next");
+                        clickButton("Next");
                 }
 
                 if (isLinkPresentContainingText("Go directly to the server's Home page"))
@@ -1136,7 +1132,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return;
         beginAt("/admin/customizeSite.view");
         click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     private long smStart = 0;
@@ -2278,7 +2274,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForPageToLoad();
         setFormElement("names", namesList.toString());
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
     }
 
     public void createPermissionsGroup(String groupName)
@@ -2326,7 +2322,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForPageToLoad();
         setFormElement("names", namesList.toString());
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
     }
 
 
@@ -2384,7 +2380,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickLinkWithText(_active);
         goToFolderManagement();
         waitForExt4FolderTreeNode(parent, 10000);
-        clickNavButton("Create Subfolder");
+        clickButton("Create Subfolder");
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setText("name", child);
 
@@ -2504,12 +2500,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
-        clickNavButton("Delete");
+        clickButton("Delete");
         // confirm delete subfolders if present
         if(isTextPresent("This folder has subfolders."))
-            clickNavButton("Delete All Folders");
+            clickButton("Delete All Folders");
         // confirm delete:
-        clickNavButton("Delete");
+        clickButton("Delete");
         // verify that we're not on an error page with a check for a project link:
         assertLinkPresentWithText(project);
         assertLinkNotPresentWithText(folderName);
@@ -2523,14 +2519,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
-        clickNavButton("Rename");
+        clickButton("Rename");
         setText("name", newFolderName);
         if (createAlias)
             checkCheckbox("addAlias");
         else
             uncheckCheckbox("addAlias");
         // confirm rename:
-        clickNavButton("Rename");
+        clickButton("Rename");
         // verify that we're not on an error page with a check for a new folder link:
         assertLinkPresentWithText(newFolderName);
         assertLinkNotPresentWithText(folderName);
@@ -2544,7 +2540,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
-        clickNavButton("Move");
+        clickButton("Move");
         if (createAlias)
             checkCheckbox("addAlias");
         else
@@ -2553,7 +2549,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(Locator.permissionsTreeNode(newParent), 10000);
         selectFolderTreeItem(newParent);
         // move:
-        clickNavButton("Confirm Move");
+        clickButton("Confirm Move");
         // verify that we're not on an error page with a check for folder link:
         assertLinkPresentWithText(folderName);
         assertLinkPresentWithText(newParent);
@@ -3054,9 +3050,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected void clickExportToText()
     {
-        clickNavButton("Export", 0);
+        clickButton("Export", 0);
         ExtHelper.clickSideTab(this, "Text");
-        clickNavButton("Export to Text");
+        clickButton("Export to Text");
     }
 
     /**
@@ -3067,7 +3063,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     protected void exportDataRegion(String tab, String type)
     {
-        clickNavButton("Export", 0);
+        clickButton("Export", 0);
         waitForText("Script");
         sleep(1500);
         ExtHelper.clickSideTab(this, tab);
@@ -4072,7 +4068,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         log("Set pipeline to: " + rootPath);
         goToModule("Pipeline");
-        clickNavButton("Setup");
+        clickButton("Setup");
 
         if (isLinkPresentWithText("override"))
         {
@@ -4150,7 +4146,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void showNumberInTable(String shareValue)
     {
-        clickNavButton("Page Size",0);
+        clickButton("Page Size", 0);
         waitForText("100 per page");
         Locator l = Locator.id("Page Size:" + shareValue);
         clickAndWait(l);
@@ -4382,41 +4378,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForText(textShouldAppearAfterLoading, defaultWaitForPage);
     }
 
-    public void clickNavButton(String buttonText)
-    {
-        clickNavButton(buttonText, defaultWaitForPage);
-    }
-
-    public void clickNavButton(String buttonText, int waitMillis)
-    {
-        clickButton(buttonText, waitMillis);
-    }
-
-    public void clickNavButtonAt(String buttonText, int waitMillis, String coord)
-    {
-        clickButtonAt(buttonText, waitMillis, coord);
-    }
-
-    public void clickNavButtonByIndex(String buttonText, int index, int wait)
-    {
-        clickButtonByIndex(buttonText, index, wait);
-    }
-
-    public void clickNavButtonByIndex(String buttonText, int index)
-    {
-        clickButtonByIndex(buttonText, index);
-    }
-
-
     /**
      *  wait for button to appear, click it, wait for page to load
      */
-    public void waitAndClickNavButton(final String text)
+    public void waitAndClickButton(final String text)
     {
-        waitAndClickNavButton(text, defaultWaitForPage);
+        waitAndClickButton(text, defaultWaitForPage);
     }
 
-    public void waitAndClickNavButton(final String text, final int wait)
+    public void waitAndClickButton(final String text, final int wait)
     {
         String failMessage = "Button with text '" + text + "' did not appear";
         waitFor(new Checker()
@@ -4426,7 +4396,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 return null != getButtonLocator(text);
             }
         }, failMessage, WAIT_FOR_JAVASCRIPT);
-        clickNavButton(text, wait);
+        clickButton(text, wait);
     }
 
 
@@ -4479,7 +4449,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void clickImgButtonNoNav(String buttonText)
     {
-        clickNavButton(buttonText, 0);
+        clickButton(buttonText, 0);
     }
 
     public void setText(String elementName, String text)
@@ -4567,7 +4537,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setFilter(String regionName, String columnName, String filterType)
     {
         setUpFilter(regionName, columnName, filterType, null);
-        clickNavButton("OK");
+        clickButton("OK");
     }
 
     public void setFilter(String regionName, String columnName, String filterType, String filter)
@@ -4578,7 +4548,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setFilter(String regionName, String columnName, String filterType, String filter, int waitMillis)
     {
         setUpFilter(regionName, columnName, filterType, filter);
-        clickNavButton("OK", waitMillis);
+        clickButton("OK", waitMillis);
     }
 
     public void setUpFilter(String regionName, String columnName, String filterType, String filter)
@@ -4589,7 +4559,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
     {
         setUpFilter(regionName, columnName, filterType, filter);
-        clickNavButton("OK", milliSeconds);
+        clickButton("OK", milliSeconds);
     }
 
     public void setUpFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
@@ -4626,7 +4596,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
     {
         setUpFilter(regionName, columnName, filter1Type, filter1, filter2Type, filter2);
-        clickNavButton("OK");
+        clickButton("OK");
     }
 
     public void setUpFacetedFilter(String regionName, String columnName, String... values)
@@ -4671,7 +4641,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setFacetedFilter(String regionName, String columnName, String... values)
     {
         setUpFacetedFilter(regionName, columnName, values);
-        clickNavButton("OK");
+        clickButton("OK");
     }
 
     public void clearFilter(String regionName, String columnName)
@@ -4700,7 +4670,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         runMenuItemHandler(id);
-        clickNavButton("CLEAR ALL FILTERS");
+        clickButton("CLEAR ALL FILTERS");
     }
 
     final static int MAX_TEXT_LENGTH = 2000;
@@ -4770,7 +4740,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (buttonLocator != null)
         {
             // Confirm the deletion
-            clickNavButton("OK", 0);
+            clickButton("OK", 0);
             waitForElement(Locator.raw("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
         }
     }
@@ -5159,7 +5129,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void savePermissions()
     {
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
     }
 
@@ -5247,7 +5217,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         setFormElement("names", userName );
         uncheckCheckbox("sendEmail");
-        clickNavButton("Update Group Membership");
+        clickButton("Update Group Membership");
 
     }
 
@@ -5281,7 +5251,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void exitPermissionsUI()
     {
         ExtHelper.clickExtTabContainingText(this, "Permissions");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
     }
 
     public void impersonateGroup(String group, boolean isSiteGroup)
@@ -5320,7 +5290,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertTextNotPresent("Stop Impersonating");
         goToAdminConsole();
         selectOptionByText(Locator.id("email").toString(), fakeUser);
-        clickNavButton("Impersonate");
+        clickButton("Impersonate");
         _impersonationStack.push(fakeUser);
     }
 
@@ -5348,7 +5318,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Impersonate");
         selectOptionByText(Locator.id("email").toString(), fakeUser);
-        clickNavButton("Impersonate");
+        clickButton("Impersonate");
         _impersonationStack.push(fakeUser);
     }
 
@@ -5408,7 +5378,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         ensureAdminMode();
         goToSiteUsers();
-        clickNavButton("Add Users");
+        clickButton("Add Users");
 
         setFormElement("newUsers", userName);
         if (cloneUserName != null)
@@ -5416,7 +5386,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             checkCheckbox("cloneUserCheck");
             setFormElement("cloneUser", cloneUserName);
         }
-        clickNavButton("Add Users");
+        clickButton("Add Users");
 
         if (verifySuccess)
             Assert.assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
@@ -5431,7 +5401,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             setFormElement("names", userEmail);
             uncheckCheckbox("sendEmail");
-            clickNavButton("Update Group Membership");
+            clickButton("Update Group Membership");
         }
     }
 
@@ -5500,7 +5470,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             // If we didn't find the user and we have more than one page, then show all pages and try again
             if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
             {
-                clickNavButton("Page Size", 0);
+                clickButton("Page Size", 0);
                 clickLinkWithText("Show All");
                 row = usersTable.getRow("Email", userEmail);
                 isPresent = row != -1;
@@ -5519,10 +5489,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         if(checked > 0)
         {
-            clickNavButton("Delete");
+            clickButton("Delete");
             assertTextPresent(displayNames);
             assertTextPresent("permanently delete");
-            clickNavButton("Permanently Delete");
+            clickButton("Permanently Delete");
         }
     }
 
@@ -5617,7 +5587,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
 
         log("Saving wiki...");
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         log("Waiting for AJAX save return...");
         //waitForText("Saved.", 10000);
         waitFor(new WikiSaveChecker(), "Wiki page failed to save!", 10000);
@@ -5703,7 +5673,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         ExtHelper.selectFileBrowserItem(this, file);
         selectImportDataActionNoWaitForGrid("Import Specimen Data");
-        clickNavButton("Start Import");
+        clickButton("Start Import");
     }
 
     //must already be on wiki page
@@ -5728,10 +5698,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return;
 
 
-        clickNavButton("Convert To...", 0);
+        clickButton("Convert To...", 0);
         sleep(500);
         selectOptionByValue("wiki-input-window-change-format-to", format);
-        clickNavButton("Convert", 0);
+        clickButton("Convert", 0);
         sleep(500);
     }
 
@@ -5872,7 +5842,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             checkCheckbox(Locator.checkboxByTitle(moduleName));
         }
-        clickNavButton("Update Folder");
+        clickButton("Update Folder");
     }
 
     public void disableModules(List<String> moduleNames)
@@ -5883,7 +5853,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             uncheckCheckbox(Locator.checkboxByTitle(moduleName));
         }
-        clickNavButton("Update Folder");
+        clickButton("Update Folder");
     }
 
     public void goToProjectHome()
@@ -5930,7 +5900,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
         clickAndWait(Locator.raw("//td[contains(text(),'" + item + "')]/../td[2]/a"));
         waitForElement(Locator.raw("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Data");
+        clickButton("Data");
     }
 
     public List<Locator> findAllMatches(Locator.XPathLocator loc)
@@ -5947,9 +5917,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected void startImportStudyFromZip(String studyFile)
     {
-        clickNavButton("Import Study");
+        clickButton("Import Study");
         setFormElement("studyZip", studyFile);
-        clickNavButton("Import Study From Local Zip Archive");
+        clickButton("Import Study From Local Zip Archive");
         assertTextNotPresent("You must select a .study.zip file to import.");
     }
 
@@ -6031,7 +6001,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickLinkWithText(projectName);
         assertElementPresent(Locator.name("q"));
         setFormElement("query", searchFor);
-        clickNavButton("Search");
+        clickButton("Search");
         long wait = 0;
         while (wait < 5*defaultWaitForPage)
         {
@@ -6236,7 +6206,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         beginAt(queryURL);
         createNewQuery(schemaName);
         setFormElement("ff_newQueryName", name);
-        clickNavButton("Create and Edit Source");
+        clickButton("Create and Edit Source");
 //        toggleSQLQueryEditor();
         setQueryEditorValue("queryText", sql);
 //        setFormElement("queryText", sql);
@@ -6682,7 +6652,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             }
 
             clickLinkWithText("Manage Files");
-            waitAndClickNavButton("Process and Import Data");
+            waitAndClickButton("Process and Import Data");
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;
@@ -6704,7 +6674,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             for (File copiedArchive : _copiedArchives)
                 ExtHelper.clickFileBrowserFileCheckbox(BaseSeleniumWebTest.this, copiedArchive.getName());
             selectImportDataAction("Import Specimen Data");
-            clickNavButton("Start Import");
+            clickButton("Start Import");
         }
 
         public void waitForComplete()
@@ -6834,7 +6804,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void importSpecimenData(String file, int pipelineJobs)
     {
         selectPipelineFileAndImportAction(file, "Import Specimen Data");
-        clickNavButton("Start Import");
+        clickButton("Start Import");
         waitForPipelineJobsToFinish(pipelineJobs);
     }
 
@@ -6846,7 +6816,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void selectImportDataActionNoWaitForGrid(String actionName)
     {
-        clickNavButton("Import Data", 0);
+        clickButton("Import Data", 0);
 
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = ExtHelper.getExtElementId(this, "btn_submit");
@@ -6940,9 +6910,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void reloadStudyFromZip(String studyFile)
     {
         goToManageStudy();
-        clickNavButton("Reload Study");
+        clickButton("Reload Study");
         setFormElement("studyZip", studyFile);
-        clickNavButton("Reload Study From Local Zip Archive");
+        clickButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(2, "Study Reload", false);
 
     }

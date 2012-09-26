@@ -18,8 +18,6 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
-import java.io.File;
-
 /**
  * Created by IntelliJ IDEA.
  * User: marki
@@ -79,7 +77,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
         waitForElement(Locator.tagWithText("option", WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")"), 2000);
         selectOptionByText("name", WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")");
-        clickNavButton("Submit");
+        clickButton("Submit");
         
         clickLinkWithText(PROJECT_NAME);
 
@@ -108,10 +106,10 @@ public class MenuBarTest extends BaseSeleniumWebTest
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/menubar/Test Assay.xar", 1, "Test Assay.xar");
 //        checkRadioButton("providerName", "General");
-//        clickNavButton("Next");
+//        clickButton("Next");
 //        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
 //        setFormElement(Locator.id("AssayDesignerName"), "Test Assay");
-//        clickNavButton("Save", 0);
+//        clickButton("Save", 0);
 //        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
         clickLinkWithText(PROJECT_NAME);
 

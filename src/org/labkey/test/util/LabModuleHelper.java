@@ -47,14 +47,14 @@ public class LabModuleHelper
 
         //copied from old test
         _test.goToManageAssays();
-        _test.clickNavButton("New Assay Design");
+        _test.clickButton("New Assay Design");
         _test.checkRadioButton("providerName", provider);
-        _test.clickNavButton("Next");
+        _test.clickButton("Next");
         _test.waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), _test.WAIT_FOR_JAVASCRIPT);
         _test.getWrapper().type("//input[@id='AssayDesignerName']", label);
 
         _test.sleep(1000);
-        _test.clickNavButton("Save", 0);
+        _test.clickButton("Save", 0);
         _test.waitForText("Save successful.", 20000);
     }
 

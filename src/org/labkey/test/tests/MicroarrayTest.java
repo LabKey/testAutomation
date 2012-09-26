@@ -74,10 +74,10 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         submit();
 
         log("Create an assay");
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "Microarray");
-        clickNavButton("Next");
+        clickButton("Next");
         waitForElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
         setFormElement(Locator.raw("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
@@ -86,9 +86,9 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         setFormElement("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']", XPATH_TEST);
         addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
         addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
         
         log("Setup the pipeline");
 
@@ -98,14 +98,14 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         log("Create Sample Set");
         addWebPart("Sample Sets");
-        clickNavButton("Import Sample Set");
+        clickButton("Import Sample Set");
         setFormElement("name", SAMPLE_SET);
         setFormElement("data", SAMPLE_SET_ROWS);
         submit();
 
         // First try importing the runs individually
         clickLinkWithText("Microarray Dashboard");
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
 
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE1);
@@ -114,12 +114,12 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         selectImportDataAction("Use " + ASSAY_NAME);
 
         setFormElement("batchStringField", "SingleRunProperties");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent(MAGEML_FILE1);
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), defaultWaitForPage);
         waitForElement(Locator.raw("//option[contains(text(), 'Second')]"), defaultWaitForPage);
         setFormElement("runIntegerField", "115468001");
-        clickNavButton("Save and Import Next File");
+        clickButton("Save and Import Next File");
 
         log("Import second run");
         waitForElement(Locator.raw("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), defaultWaitForPage);
@@ -127,7 +127,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         setFormElement("runIntegerField", "115468002");
         selectOptionByText("//div[contains(text(), 'Sample 1')]/../..//tr/td/select", "Third");
         selectOptionByText("//div[contains(text(), 'Sample 2')]/../..//tr/td/select", "Fourth");
-        clickNavButton("Save and Finish");
+        clickButton("Save and Finish");
         waitForText(ASSAY_NAME + " Runs", 30000);
         assertTextPresent("SingleRunProperties");
 
@@ -135,11 +135,11 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         // Now try doing the runs in bulk, so delete the existing runs
         checkAllOnPage(ASSAY_NAME + " Runs");
-        clickNavButton("Delete");
-        clickNavButton("Confirm Delete");
+        clickButton("Delete");
+        clickButton("Confirm Delete");
 
         // Start the upload wizard again
-        clickNavButton("Import Data");
+        clickButton("Import Data");
 
         ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE1);
         ExtHelper.clickFileBrowserFileCheckbox(this, MAGEML_FILE2);
@@ -154,53 +154,53 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\tBogusSampleName!!\tSecond\tFirstString\t11\n" +
                 "251379110137_A01\tThird\tFourth\tSecondString\t22\n");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("No sample with name 'BogusSampleName!!' was found");
 
         // Try with invalid sample set name
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\tBogus__SampleSetName.First\tSecond\tFirstString\t11\n" +
                 "251379110137_A01\tBogus__SampleSetName.Third\tFourth\tSecondString\t22\n");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("No sample with name 'Bogus__SampleSetName.First' was found");
 
         // Try with incorrect barcodes
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "FakeBarcode_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("Could not find a row for barcode '251379110131_A01'");
 
         // Try with incorrect property type
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22a\n");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent(RUN_INTEGER_FIELD + " must be of type Integer");
 
         // Try with the wrong sample colum names
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3a\tProbeID_Cy5a\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("Could not find a 'ProbeID_Cy3' column for sample information.");
 
         // Try with the wrong number of samples
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t\t\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("No sample information specified for 'ProbeID_Cy3'");
 
         // Try the same submit again to make sure the form was repopulated
-        clickNavButton("Next");
+        clickButton("Next");
         assertTextPresent("No sample information specified for 'ProbeID_Cy3'");
 
         // Finally do it with the right info
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t115468001\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t115468002\n");
-        clickNavButton("Next");
+        clickButton("Next");
 
         validateRuns();
     }

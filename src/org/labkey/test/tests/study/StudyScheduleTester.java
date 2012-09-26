@@ -87,7 +87,7 @@ public class StudyScheduleTester
         _test.clickWebpartMenuItem("Study Schedule", "Manage Visits");
         _test.clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
         _test.selectOption("dataSetStatus", 2, "OPTIONAL");
-        _test.clickNavButton("Save");
+        _test.clickButton("Save");
 
         // verify that change is noted in schedule
         goToStudySchedule();
@@ -97,7 +97,7 @@ public class StudyScheduleTester
         _test.clickWebpartMenuItem("Study Schedule", "Manage Visits");
         _test.clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
         _test.selectOption("dataSetStatus", 2, "REQUIRED");
-        _test.clickNavButton("Save");
+        _test.clickButton("Save");
 
         // verify dataset 'data' link
         goToStudySchedule();
@@ -229,17 +229,17 @@ public class StudyScheduleTester
         {
             case defineManually:
                 _test.click(Locator.ext4Radio("Define dataset manually"));
-                _test.clickNavButton("Next");
+                _test.clickButton("Next");
 
                 _test.waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
                 // add a single name field
                 ListHelper.setColumnName(_test, 0, "antigenName");
-                _test.clickNavButton("Save");
+                _test.clickButton("Save");
                 break;
             case importFromFile:
                 _test.click(Locator.ext4Radio("Import data from file"));
-                _test.clickNavButton("Next");
+                _test.clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
                 File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
@@ -251,7 +251,7 @@ public class StudyScheduleTester
                     _test.setFormElement(fileUpload, file.getAbsolutePath());
 
                     _test.waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-                    _test.clickNavButton("Import");
+                    _test.clickButton("Import");
                 }
                 else
                     Assert.fail("The dataset import .tsv file (plate002.tsv) does not exist");
@@ -303,17 +303,17 @@ public class StudyScheduleTester
         {
             case defineManually:
                 _test.click(Locator.ext4Radio("Define dataset manually"));
-                _test.clickNavButton("Next");
+                _test.clickButton("Next");
 
                 _test.waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
                 // add a single name field
                 ListHelper.setColumnName(_test, 0, "antigenName");
-                _test.clickNavButton("Save");
+                _test.clickButton("Save");
                 break;
             case importFromFile:
                 _test.click(Locator.ext4Radio("Import data from file"));
-                _test.clickNavButton("Next");
+                _test.clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
                 File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
@@ -325,7 +325,7 @@ public class StudyScheduleTester
                     _test.setFormElement(fileUpload, file.getAbsolutePath());
 
                     _test.waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-                    _test.clickNavButton("Import");
+                    _test.clickButton("Import");
                 }
                 else
                     Assert.fail("The dataset import .tsv file (plate002.tsv) does not exist");
@@ -353,7 +353,7 @@ public class StudyScheduleTester
 
             Ext4Helper.selectComboBoxItem(_test, "Status", entry[1]);
 
-            _test.clickNavButton("Save", 0);
+            _test.clickButton("Save", 0);
 
             Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + entry[0] + "')]/../../..//img[@alt='" + entry[1] + "']");
             _test.waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);

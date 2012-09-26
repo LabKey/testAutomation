@@ -129,7 +129,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             beginAt("/admin/begin.view");
             clickLinkWithText("flow cytometry");
             setFormElement("workingDirectory", "");
-            clickNavButton("update");
+            clickButton("update");
         }
         catch (Throwable t) {}
     }
@@ -155,7 +155,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickLinkWithText("flow cytometry");
         deletePipelineWorkDirectory();
         setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
-        clickNavButton("update");
+        clickButton("update");
         assertTextPresent("Path does not exist");
         getPipelineWorkDirectory().mkdir();
         setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
@@ -166,7 +166,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         else
             uncheckCheckbox(Locator.id("normalizationEnabled"));
 
-        clickNavButton("update");
+        clickButton("update");
         assertTextNotPresent("Path does not exist");
         if (normalizationEnabled)
         {
@@ -397,7 +397,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
         ExtHelper.selectFileBrowserItem(this, workspacePath);
-        clickNavButton("Next");
+        clickButton("Next");
     }
 
     protected void importAnalysis_FCSFiles(String containerPath, String fcsPath, boolean existingRun)
@@ -432,7 +432,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             setFormElement(Locator.name("runFilePathRoot"), "");
             clickRadioButtonById("noFCSFiles");
         }
-        clickNavButton("Next");
+        clickButton("Next");
     }
 
     protected void importAnalysis_analysisEngine(String containerPath, String engineId)
@@ -440,7 +440,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
         waitForElement(Locator.id(engineId), defaultWaitForPage);
         clickRadioButtonById(engineId);
-        clickNavButton("Next");
+        clickButton("Next");
     }
 
     protected void importAnalysis_analysisOptions(String containerPath, List<String> groupNames, boolean rEngineNormalization, String rEngineNormalizationReference, List<String> rEngineNormalizationSubsets, List<String> rEngineNormalizationParameters)
@@ -482,7 +482,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 Assert.fail("Expected to find R normalization options");
             log("Not setting normalization options");
         }
-        clickNavButton("Next");
+        clickButton("Next");
     }
 
     protected void importAnalysis_analysisFolder(String containerPath, String analysisName, boolean existing)
@@ -496,7 +496,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             setFormElement("newAnalysisName", analysisName);
         }
-        clickNavButton("Next");
+        clickButton("Next");
     }
 
     protected void importAnalysis_confirm(String containerPath, String workspacePath,
@@ -552,7 +552,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
         assertTextPresent("Workspace: " + workspacePath);
 
-        clickNavButton("Finish");
+        clickButton("Finish");
         waitForPipeline(containerPath);
         log("finished import analysis wizard");
     }

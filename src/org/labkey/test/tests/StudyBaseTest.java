@@ -143,7 +143,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         // Start importing study.xml to create the study and load all the datasets.  We'll wait for this import to
         // complete before doing any further tests.
         clickLinkWithText(getFolderName());
-        clickNavButton("Process and Import Data");
+        clickButton("Process and Import Data");
         ExtHelper.waitForImportDataEnabled(this);
         ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
         selectImportDataAction("Import Study");
@@ -164,7 +164,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     {
         clickLinkWithText(getStudyLabel());
         clickTab("Manage");
-        clickNavButton("Export Study");
+        clickButton("Export Study");
 
         assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
         // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
@@ -179,16 +179,16 @@ public abstract class StudyBaseTest extends SimpleApiTest
             checkCheckbox("alternateIds");
         if(useAlternateDates)
             checkCheckbox("shiftDates");
-        clickNavButton("Export");
+        clickButton("Export");
     }
 
     protected void deleteStudy(String studyLabel)
     {
         clickLinkWithText(studyLabel);
         clickTab("Manage");
-        clickNavButton("Delete Study");
+        clickButton("Delete Study");
         checkCheckbox("confirm");
-        clickNavButton("Delete", WAIT_FOR_PAGE);
+        clickButton("Delete", WAIT_FOR_PAGE);
     }
 
     protected void initializePipeline()
@@ -212,7 +212,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
         // in IE testing
         selenium.runScript("LABKEY.disablePipelineRefresh = true;");
-        waitAndClickNavButton("Setup");
+        waitAndClickButton("Setup");
         setPipelineRoot(pipelinePath);
     }
 
@@ -230,7 +230,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         else
             uncheckCheckbox("demographicData");
 
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     // Must be on study home page or "manage study" page
@@ -247,7 +247,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         else
             uncheckCheckbox("showByDefault");
 
-        clickNavButton("Save");
+        clickButton("Save");
     }
 
     protected void createReport(String reportType)

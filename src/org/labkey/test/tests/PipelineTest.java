@@ -170,7 +170,7 @@ public class PipelineTest extends PipelineWebTestBase
             PipelineStatusTable statusTable = new PipelineStatusTable(this, true, true);
             statusTable.clickStatusLink(sampleExp);
             log("Now on job with URL " + getURL());
-            clickNavButton("Retry");
+            clickButton("Retry");
             popLocation();
         }
 
@@ -245,7 +245,7 @@ public class PipelineTest extends PipelineWebTestBase
         clickLinkWithText("site settings");
         String existingValue = getFormElement("pipelineToolsDirectory");
         setFormElement("pipelineToolsDirectory", path);
-        clickNavButton("Save");
+        clickButton("Save");
         popLocation();
         return existingValue;
     }

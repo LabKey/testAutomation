@@ -191,10 +191,10 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(PROJECT_NAME);
 
         addWebPart("Assay List");
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "Noblis Simple");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -206,7 +206,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         setRequired("Batch Fields", 0);
 
         sleep(1000);
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
     }
 
@@ -216,7 +216,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(PROJECT_NAME);
 
         addWebPart("Sample Sets");
-        clickNavButton("Import Sample Set");
+        clickButton("Import Sample Set");
         setFormElement("name", SAMPLE_SET);
         setFormElement("data", SAMPLE_SET_ROWS);
         submit();
@@ -231,7 +231,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(ASSAY_NAME);
 
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         assertTitleEquals("Data Import: /" + PROJECT_NAME);
 
         setFormElement("batch_name_input", batchName);

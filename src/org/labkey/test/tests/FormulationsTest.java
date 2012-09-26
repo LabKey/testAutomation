@@ -163,7 +163,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         ListHelper.createList(this, PROJECT_NAME, TYPES_LIST, LIST_KEY_TYPE, "type");
         ListHelper.clickImportData(this);
         setFormElement(Locator.id("tsv3"), TYPES_HEADER + TYPES_DATA);
-        clickNavButton("Submit", 0);
+        clickButton("Submit", 0);
         ExtHelper.waitForExtDialog(this, "Success");
         assertTextPresent("6 rows inserted.");
         ExtHelper.clickExtButton(this, "Success", "OK");
@@ -185,7 +185,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         // Add compound lookup
         clickLinkWithText("Edit Fields");
-        waitAndClickNavButton("Add Field", 0);
+        waitAndClickButton("Add Field", 0);
         setFormElement(Locator.name("ff_name5"), "CompoundLookup");
         setFormElement(Locator.name("ff_label5"), "Type of Material");
         click(Locator.xpath("//input[@name='ff_type5']/../div[contains(@class, 'x-form-trigger-arrow')]"));
@@ -198,12 +198,12 @@ public class FormulationsTest extends BaseSeleniumWebTest
         setFormElement(Locator.tagWithName("input", "table"), lookup.getTable());
         click(Locator.tagWithText("button", "Apply"));
         sleep(1000);
-        clickNavButton("Save");
+        clickButton("Save");
 
-        clickNavButton("Import More Samples");
+        clickButton("Import More Samples");
         clickRadioButtonById("insertOnlyChoice");
         setFormElement("data", COMPOUNDS_HEADER + COMPOUNDS_DATA_1 + COMPOUNDS_DATA_2 + COMPOUNDS_DATA_3 + COMPOUNDS_DATA_4);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         this.setCompoundMaterial("adjuvant", 0);
         this.setCompoundMaterial("oil", 1);
@@ -217,7 +217,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         table.clickLink(rowIdx,0);
         selectOptionByText(Locator.tagWithName("select", "quf_CompoundLookup"), materialName);
-        clickNavButton("Submit");
+        clickButton("Submit");
     }
 
     protected void setupRawMaterials()
@@ -226,10 +226,10 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Enterting raw material information");
         clickLinkWithText(RAWMATERIALS_SET_NAME);
-        clickNavButton("Import More Samples");
+        clickButton("Import More Samples");
         clickRadioButtonById("insertOnlyChoice");
         setFormElement("data", RAWMATERIALS_HEADER + RAWMATERIALS_DATA_1 + RAWMATERIALS_DATA_2 + RAWMATERIALS_DATA_3 + RAWMATERIALS_DATA_4);
-        clickNavButton("Submit");
+        clickButton("Submit");
     }
 
     protected void insertFormulation()
@@ -241,7 +241,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         log("Inserting a Formulation");
         clickLinkWithText("Sample Sets");
         clickLinkWithText(FORMULATIONS_NAME, 1); // skip nav trail
-        clickNavButton("Insert New");
+        clickButton("Insert New");
 
         assertTextPresent("Formulation Type*");
         assertTextPresent("Stability Watch");
@@ -310,11 +310,11 @@ public class FormulationsTest extends BaseSeleniumWebTest
         
         log("Defining Particle Size Assay");
         clickLinkWithText("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("New Assay Design");
 
         assertTextPresent("Particle Size Data");
         checkRadioButton("providerName", "Particle Size");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         selenium.type("//input[@id='AssayDesignerName']", PS_ASSAY);
@@ -331,7 +331,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         assertTextPresent("meanCountRate");
         assertTextPresent("AnalysisTool");
 
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 10000);
     }
 
@@ -341,7 +341,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Uploading Particle Size Data");
         clickLinkWithText(PS_ASSAY);
-        clickNavButton("Import Data");
+        clickButton("Import Data");
 
         assertTextPresent("Must have working sets of size");
 
@@ -368,11 +368,11 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Defining Visual Assay");
         clickLinkWithText("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("New Assay Design");
 
         assertTextPresent("Visual Formulation Time-Point Data");
         checkRadioButton("providerName", "Visual");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         selenium.type("//input[@id='AssayDesignerName']", VIS_ASSAY);
@@ -389,7 +389,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         assertTextPresent("ColorChange");
         assertTextPresent("ForeignObject");
 
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 10000);
     }
 
@@ -399,7 +399,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Uploading Visual Data");
         clickLinkWithText(VIS_ASSAY);
-        clickNavButton("Import Data");
+        clickButton("Import Data");
 
         waitForText("What is the Lot Number?", WAIT_FOR_JAVASCRIPT);
         setFormElement("lot", FORMULATION);
@@ -464,11 +464,11 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Defining HPLC Assay");
         clickLinkWithText("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("New Assay Design");
 
         assertTextPresent("High performance liquid chromotography assay");
         checkRadioButton("providerName", "HPLC");
-        clickNavButton("Next");
+        clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         selenium.type("//input[@id='AssayDesignerName']", HPLC_ASSAY);
@@ -490,9 +490,9 @@ public class FormulationsTest extends BaseSeleniumWebTest
         checkCheckbox("editableRunProperties");
         checkCheckbox("editableResultProperties");
 
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 10000);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         // Set pipeline path
         setPipelineRoot(HPLC_PIPELINE_PATH);
@@ -565,7 +565,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         log("Using Formulation search");
         setFormElement("nameContains", FORMULATION);
-        clickNavButton("Search");
+        clickButton("Search");
 
     }
 

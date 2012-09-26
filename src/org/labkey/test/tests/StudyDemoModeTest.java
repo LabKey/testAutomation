@@ -78,7 +78,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Demo Mode");
         verifyNotInDemoMode();
-        clickNavButton("Enter Demo Mode");
+        clickButton("Enter Demo Mode");
         verifyInDemoMode();
     }
 
@@ -89,7 +89,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Demo Mode");
         verifyInDemoMode();
-        clickNavButton("Leave Demo Mode");
+        clickButton("Leave Demo Mode");
         verifyNotInDemoMode();
     }
 

@@ -151,15 +151,15 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
 
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
-        clickNavButton("Done");
+        clickButton("Done");
         clickLinkWithText(LIST_NAME);
         assertNavButtonNotPresent(METADATA_OVERRIDE_BUTTON);
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_name", "Seattle");
-        clickNavButton("Submit");
-        clickNavButton("Insert New");
+        clickButton("Submit");
+        clickButton("Insert New");
         setFormElement("quf_name", "Portland");
-        clickNavButton("Submit");
+        clickButton("Submit");
         
         // assert custom buttons can be added to the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
@@ -168,17 +168,17 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickLinkWithText("edit metadata");
         // wait for the domain editor to appear:
         waitForText("Label", 10000);
-        clickNavButton("Edit Source");
+        clickButton("Edit Source");
         ExtHelper.clickExtTab(this, "XML Metadata");
         setQueryEditorValue("metadataText", getMetadataXML(true));
         ExtHelper.clickExtTab(this, "Source");
-        clickNavButtonByIndex("Save", 1, 0);        // 0: source/save 1: metadata/save
+        clickButtonByIndex("Save", 1, 0);        // 0: source/save 1: metadata/save
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Execute Query", 0);
+        clickButton("Execute Query", 0);
         waitForText("Seattle", WAIT_FOR_JAVASCRIPT);
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         ExtHelper.clickExtTab(this, "Source");
-        clickNavButton("Save & Finish");
+        clickButton("Save & Finish");
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonPresent("Insert New");
 
@@ -188,13 +188,13 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         waitForText("edit metadata", 10000);
         clickLinkWithText("edit metadata");
         waitForText("Edit Source", 10000);
-        clickNavButton("Edit Source");
+        clickButton("Edit Source");
         ExtHelper.clickExtTab(this, "XML Metadata");
         setQueryEditorValue("metadataText", getMetadataXML(false));
         clickButton("Save", 0);
         assertTextNotPresent("Failed");
         ExtHelper.clickExtTab(this, "Source");
-        clickNavButton("Save & Finish");
+        clickButton("Save & Finish");
         verifyMetadataButtons();
 
         // Create a wiki page to hold a query webpart with JavaScript-based button customization:
@@ -204,25 +204,25 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         setFormElement("name", "buttonTest");
         setFormElement("title", "buttonTest");
         setWikiBody(getJavaScriptCustomizer());
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         addWebPart("Wiki");
         createNewWikiPage("HTML");
         setFormElement("name", "paramEcho");
         setFormElement("title", "Parameter Echo");
         setWikiBody(PARAM_ECHO_JAVASCRIPT);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         waitForText(JAVASCRIPT_LINK_BUTTON_TEXT, 10000);
-        clickNavButton(JAVASCRIPT_LINK_BUTTON_TEXT);
+        clickButton(JAVASCRIPT_LINK_BUTTON_TEXT);
         assertTextPresent("No messages");
         clickLinkWithText(PROJECT_NAME);
 
         waitForText(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 10000);
-        clickNavButton(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 0);
+        clickButton(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 0);
         assertAlert(JAVASCRIPT_MENU_ONCLICK_ALERT_TEXT);
 
-        clickNavButton(JAVASCRIPT_HANDLER_BUTTON_TEXT, 0);
+        clickButton(JAVASCRIPT_HANDLER_BUTTON_TEXT, 0);
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT1_TEXT);
 
         clickMenuButtonAndContinue(JAVASCRIPT_MENU_BUTTON_TEXT, JAVASCRIPT_MENU_SUBBUTTON1_TEXT);
@@ -239,14 +239,14 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         waitForElement(Locator.navButton(METADATA_LINK_BUTTON), 10000);
 
         // Verify that link buttons don't send parameters at all:
-        clickNavButton(METADATA_LINK_BUTTON);
+        clickButton(METADATA_LINK_BUTTON);
         assertTextNotPresent(".select");
 
         // wait for the button to enable:
         waitForElement(Locator.navButton(METADATA_GET_BUTTON), 10000);
         
         // Verify that GET buttons to send form values as GET parameters:
-        clickNavButton(METADATA_GET_BUTTON);
+        clickButton(METADATA_GET_BUTTON);
         assertTextPresent(".select: 2");
 
         // Verify that the JavaScript button override added to the metadata-defined button bar, rather than replacing it:

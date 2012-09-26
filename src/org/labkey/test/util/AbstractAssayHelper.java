@@ -45,8 +45,8 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     {
         Assert.assertTrue("XAR file does not exist: " + file.toString(), file.exists());
         //create a new luminex assay
-        _test.clickNavButton("Manage Assays");
-        _test.clickNavButton("New Assay Design");
+        _test.clickButton("Manage Assays");
+        _test.clickButton("New Assay Design");
 
         _test.clickLinkWithText("upload the XAR file directly");
         _test.setFormElement(Locator.name("uploadFile"), file);

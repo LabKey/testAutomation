@@ -90,7 +90,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         // enable advanced study security
         enterPermissionsUI();
         ExtHelper.clickExtTab(this, "Study Security");
-        waitAndClickNavButton("Study Security");
+        waitAndClickButton("Study Security");
         selectOptionByValue("securityString", "BASIC_WRITE");
         waitForPageToLoad(30000);
 
@@ -136,12 +136,12 @@ public class QuerySnapshotTest extends StudyBaseTest
         log("test automatic updates by altering the source dataset");
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("DEM-1: Demographics");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_MouseId", "999121212");
         setFormElement("quf_SequenceNum", "101");
         setFormElement("quf_DEMraco", "Armenian");
 
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText(getStudyLabel());
         clickLinkWithText(DEMOGRAPHICS_SNAPSHOT);
@@ -150,7 +150,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Delete Snapshot", 0);
+        clickButton("Delete Snapshot", 0);
         getConfirmationAndWait();
 
         // snapshot over a custom view
@@ -171,7 +171,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickLinkWithText("DEM-1: Demographics");
         clickLink(Locator.xpath("//a[.='999320016']/../..//td/a[.='edit']"));
         setFormElement("quf_DEMraco", "Slovakian");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText(getStudyLabel());
         clickLinkWithText(APX_SNAPSHOT);
@@ -181,7 +181,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Delete Snapshot", 0);
+        clickButton("Delete Snapshot", 0);
         getConfirmationAndWait();
 
         // snapshot over a custom query
@@ -196,12 +196,12 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         setFormElement("ff_newQueryName", "APX: Custom Query");
         selectOptionByText("ff_baseTableName", "APX-1: Abbreviated Physical Exam");
-        clickNavButton("Create and Edit Source");
-        clickNavButton("Save", 0);
+        clickButton("Create and Edit Source");
+        clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Edit Properties");
+        clickButton("Edit Properties");
         setFormElement("rename", "APX: Custom Query Advanced");        
-        clickNavButton("Save");
+        clickButton("Save");
         waitForText("study.APX: Custom Query Advanced", WAIT_FOR_PAGE);
         waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
         clickLinkWithText("view data");
@@ -214,15 +214,15 @@ public class QuerySnapshotTest extends StudyBaseTest
         log("edit the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
-        clickNavButton("Save");
+        clickButton("Save");
         Assert.assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
-        clickNavButton("Update Snapshot", 0);
+        clickButton("Update Snapshot", 0);
         getConfirmationAndWait();
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Delete Snapshot", 0);
+        clickButton("Delete Snapshot", 0);
         getConfirmationAndWait();
 
         clickTab("Manage");
@@ -234,21 +234,21 @@ public class QuerySnapshotTest extends StudyBaseTest
         createNewQuery("study");
 
         setFormElement("ff_newQueryName", "cross study query");
-        clickNavButton("Create and Edit Source");        
+        clickButton("Create and Edit Source");
         setQueryEditorValue("queryText", CROSS_STUDY_QUERY_SQL);
-        clickNavButton("Save & Finish");
+        clickButton("Save & Finish");
         
         createQuerySnapshot(CROSS_STUDY_SNAPSHOT, true, false, "keyField", 3);
 
         // verify refresh from both datasets
         clickLinkWithText(FOLDER_1);
         clickLinkWithText("DEM-1: Demographics");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_MouseId", "999121212");
         setFormElement("quf_SequenceNum", "101");
         setFormElement("quf_DEMsex", "Unknown");
 
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText(FOLDER_2);
         clickLinkWithText(CROSS_STUDY_SNAPSHOT);
@@ -256,19 +256,19 @@ public class QuerySnapshotTest extends StudyBaseTest
         
         clickLinkWithText(FOLDER_2);
         clickLinkWithText("DEM-1: Demographics");
-        clickNavButton("Insert New");
+        clickButton("Insert New");
         setFormElement("quf_MouseId", "999151515");
         setFormElement("quf_SequenceNum", "104");
         setFormElement("quf_DEMsexor", "Undecided");
 
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText(FOLDER_2);
         clickLinkWithText(CROSS_STUDY_SNAPSHOT);
         waitForSnapshotUpdate("Undecided");
 
         clickMenuButton("Views", "Edit Snapshot");
-        clickNavButton("Delete Snapshot", 0);
+        clickButton("Delete Snapshot", 0);
         getConfirmationAndWait();
     }
 
@@ -287,7 +287,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         if (keyField != null)
         {
-            clickNavButton("Edit Dataset Definition");
+            clickButton("Edit Dataset Definition");
             waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
             String xpath = getPropertyXPath("Dataset Fields") + "//span" + Locator.navButton("Add Field").getPath();
@@ -298,9 +298,9 @@ public class QuerySnapshotTest extends StudyBaseTest
             click(Locator.name("ff_name0"));
             clickRadioButtonById("button_managedField");
             selectOptionByText("list_managedField", keyField);
-            clickNavButton("Save", WAIT_FOR_JAVASCRIPT);
+            clickButton("Save", WAIT_FOR_JAVASCRIPT);
         }
-        clickNavButton("Create Snapshot");
+        clickButton("Create Snapshot");
     }
 
     private void waitForSnapshotUpdate(String text)

@@ -85,18 +85,18 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         ExtHelper.waitForExtDialog(this, "Primary Column Properties");
         ExtHelper.clickExtTab(this, "Advanced");
         checkCheckbox("mvEnabled");
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
         assertFormElementEquals("Date", "DrawDt");
         // Unable to check fail state: Selenium can't handle GWT alert.
-        // clickNavButton("Begin import", 0);
+        // clickButton("Begin import", 0);
         // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
         ListHelper.setColumnType(this, 5, ListHelper.ListColumnType.String); // Row 201 is a string
-        clickNavButton("Begin import");
-        clickNavButton("Next");
-        clickNavButton("Save and Finish");
+        clickButton("Begin import");
+        clickButton("Next");
+        clickButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_XLS);
         assertTextNotPresent("Role"); // excluded column
         assertTextPresent("1 - 100 of 201");
@@ -117,15 +117,15 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         ExtHelper.waitForExtDialog(this, "Primary Column Properties");
         ExtHelper.clickExtTab(this, "Advanced");
         checkCheckbox("mvEnabled");
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
         assertFormElementEquals("Date", "DrawDt");
         ListHelper.setColumnType(this, 5, ListHelper.ListColumnType.String); // Row 201 is a string
-        clickNavButton("Begin import");
-        clickNavButton("Next");
-        clickNavButton("Save and Finish");
+        clickButton("Begin import");
+        clickButton("Next");
+        clickButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_XLSX);
         assertTextNotPresent("Role"); // excluded column
         assertTextPresent("1 - 100 of 201");
@@ -146,13 +146,13 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         ExtHelper.waitForExtDialog(this, "Primary Column Properties");
         ExtHelper.clickExtTab(this, "Advanced");
         checkCheckbox("mvEnabled");
-        clickNavButton("OK", 0);
+        clickButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
         assertFormElementEquals("Date", "DrawDt");
         ListHelper.setColumnType(this, 5, ListHelper.ListColumnType.String);
-        clickNavButton("Show Assay Designer");
+        clickButton("Show Assay Designer");
 
         waitForElement(Locator.xpath( getPropertyXPath(ASSAY_NAME_TSV + " Data Fields")), WAIT_FOR_JAVASCRIPT);
         ListHelper.setColumnLabel(this, getPropertyXPath(ASSAY_NAME_TSV + " Data Fields"), 4, "Blank");
@@ -161,9 +161,9 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         click(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='" + "Advanced" + "']"));
         setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']") , "Score");                   
         
-        clickNavButton("Save & Close");
-        clickNavButton("Next");        
-        clickNavButton("Save and Finish");
+        clickButton("Save & Close");
+        clickButton("Next");
+        clickButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_TSV);
         assertTextNotPresent("Role"); // excluded column
         assertTextPresent("1 - 100 of 201");
@@ -177,7 +177,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("ParticipantID", "ParticipantID");
         assertFormElementEquals("VisitID", "visitNo");
         assertFormElementEquals("Date", "draw_date");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
         refresh(); // avoid file selection timeout
         ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_2);
         selectImportDataAction("Create New General Assay Design");
@@ -186,7 +186,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "visit_no");
         assertFormElementEquals("Date", "drawDate");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
         refresh(); // avoid file selection timeout
         ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_3);
         selectImportDataAction("Create New General Assay Design");
@@ -195,7 +195,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "visitId");
         assertFormElementEquals("Date", "date");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
         refresh(); // avoid file selection timeout
         ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_4);
         selectImportDataAction("Create New General Assay Design");
@@ -204,7 +204,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "visitId");
         assertFormElementEquals("Date", "date");
-        clickNavButton("Cancel");
+        clickButton("Cancel");
 
         log("Import FASTA GPAT assay");
         clickLinkWithText(PROJECT_NAME);
@@ -214,9 +214,9 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement("AssayDesignerName", ASSAY_NAME_FNA);
 
-        clickNavButton("Begin import");
-        clickNavButton("Next");
-        clickNavButton("Save and Finish");
+        clickButton("Begin import");
+        clickButton("Next");
+        clickButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_FNA);
 
         assertTextPresent("Header");

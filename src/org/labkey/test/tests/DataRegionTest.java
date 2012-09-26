@@ -21,8 +21,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.PasswordUtil;
-import org.seleniumhq.jetty7.util.security.Password;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -175,7 +173,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         log("Test 3 per page");
         table.setMaxRows(3);
-        clickNavButton("Page Size", 0);
+        clickButton("Page Size", 0);
         assertLinkPresentWithText("3 per page");
         assertLinkPresentWithText("40 per page");
         assertLinkPresentWithText("100 per page");
@@ -237,7 +235,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         for (int i = 0; i < 10 && !isTextPresent("Selected 5 of 15 rows."); i++)
             Thread.sleep(1000);
         assertTextPresent("Selected 5 of 15 rows.");
-        clickNavButton("Page Size", 0);
+        clickButton("Page Size", 0);
         clickLinkWithText("Show Selected");
         Assert.assertEquals(5, table.getDataRowCount());
         assertLinkNotPresentWithTitle(FIRST_LINK);
@@ -246,7 +244,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithTitle(LAST_LINK);
 
         log("Show All");
-        clickNavButton("Page Size", 0);
+        clickButton("Page Size", 0);
         clickLinkWithText("Show All");
         Assert.assertEquals(15, table.getDataRowCount());
         assertLinkNotPresentWithTitle(FIRST_LINK);
@@ -255,7 +253,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertLinkNotPresentWithTitle(LAST_LINK);
 
         log("Test 1000 per page");
-        clickNavButton("Page Size", 0);
+        clickButton("Page Size", 0);
         clickLinkWithText("1000 per page");
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);

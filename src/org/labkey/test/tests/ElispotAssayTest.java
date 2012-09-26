@@ -88,10 +88,10 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         //create a new elispot assay
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
-        clickNavButton("Manage Assays");
-        clickNavButton("New Assay Design");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
         checkRadioButton("providerName", "ELISpot");
-        clickNavButton("Next");
+        clickButton("Next");
 
         log("Setting up Elispot assay");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -107,7 +107,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         click(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//span[text()='Advanced']"));
         selectOptionByValue(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//select[@class='gwt-ListBox']"), "LAST_ENTERED");
 
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForText("Save successful.", 20000);
 
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
@@ -115,8 +115,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_ELISPOT);
 
         log("Uploading Elispot Runs");
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
 
         selectOptionByText("plateReader", "Cellular Technology Ltd. (CTL)");
         uploadFile(TEST_ASSAY_ELISPOT_FILE1, "A", "Save and Import Another Run", true);
@@ -159,7 +159,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         setFormElement("dataCollectorName", "File upload");
         File file1 = new File(filePath);
         setFormElement("__primaryFile__", file1);
-        clickNavButton("Next");
+        clickButton("Next");
 
         for (int i = 0; i < 6; i++)
         {
@@ -175,7 +175,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             setFormElement("antigen" + (i + 1) + "_CellWell", "150");
         }
 
-        clickNavButton(finalButton, 60000);
+        clickButton(finalButton, 60000);
     }
 
     @Override
@@ -310,8 +310,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
     protected void createTemplate()
     {
-        clickNavButton("Manage Assays");
-        clickNavButton("Configure Plate Templates");
+        clickButton("Manage Assays");
+        clickButton("Configure Plate Templates");
         clickLinkWithText("new 96 well (8x12) ELISpot default template");
         waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -341,7 +341,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         setFormElement(groupField, "other control group");
         pressTab(groupField.toString());
         clickButton("Create", 0);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
         assertTextPresent(PLATE_TEMPLATE_NAME);
     }
 
@@ -371,12 +371,12 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkWithText("edit assay design");
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
 
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText(TEST_ASSAY_ELISPOT);
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
 
         setFormElement("name", "transformed assayId");
         selectOptionByText("plateReader", "AID");
@@ -405,7 +405,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkWithText("edit assay design");
         waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
         selenium.mouseClick(Locator.css("#partdelete_removeTransformScript0 img").toString());
-        clickNavButton("Save & Close");
+        clickButton("Save & Close");
     }
 
     private final static String FILE4_PLATE_SUMMARY_POST_SUBTRACTION =
@@ -431,7 +431,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         }
 
         runTable.checkAllOnPage();
-        clickNavButton("Subtract Background");
+        clickButton("Subtract Background");
 
         waitForTextWithRefresh("COMPLETE", WAIT_FOR_PAGE);
 
@@ -477,8 +477,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     {
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText(TEST_ASSAY_ELISPOT);
-        clickNavButton("Import Data");
-        clickNavButton("Next");
+        clickButton("Import Data");
+        clickButton("Next");
 
         selectOptionByText("plateReader", "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE5, "E", "Save and Finish", false, true);

@@ -76,14 +76,14 @@ public class HTTPApiTest extends SimpleApiTest
 
         log("Create List");
         ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
-        clickNavButton("Edit Design", 0);
+        clickButton("Edit Design", 0);
         selectOptionByText("ff_titleColumn", "Like");    // Explicitly set to the PK (auto title will pick wealth column)
-        clickNavButton("Save", 0);
+        clickButton("Save", 0);
         waitForElement(Locator.id("button_Import Data"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Like");
 
         log("Upload data");
-        clickNavButton("Import Data");
+        clickButton("Import Data");
         ListHelper.submitTsvData(this, LIST_DATA);
         
         clickLinkWithText(PROJECT_NAME);

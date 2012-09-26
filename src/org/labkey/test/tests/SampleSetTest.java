@@ -81,18 +81,18 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Sample Sets");
 
-        clickNavButton("Import Sample Set");
+        clickButton("Import Sample Set");
         setFormElement("name", PROJECT_SAMPLE_SET_NAME);
         setFormElement("data", "KeyCol\tIntCol\tStringCol\tDateCol\tBoolCol\n" +
                 "SampleSetBVT1\t100\ta\t1/1/2000\tTRUE\n" +
                 "SampleSetBVT2\t200\tb\t2/2/2000\tFALSE\n" +
                 "SampleSetBVT3\t300\tc\t3/3/2000\tTRUE\n" +
                 "SampleSetBVT4\t400\td\t4/4/2000\tFALSE");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText(FOLDER_NAME);
         addWebPart("Sample Sets");
-        clickNavButton("Import Sample Set");
+        clickButton("Import Sample Set");
         setFormElement("name", FOLDER_SAMPLE_SET_NAME);
         setFormElement("data", "KeyCol-Folder\tIntCol-Folder\tStringCol-Folder\n" +
                 "SampleSetBVT11\t101\taa\n" +
@@ -100,19 +100,19 @@ public class SampleSetTest extends BaseSeleniumWebTest
                 "SampleSetBVT12\t102\tbb\n" +
                 "SampleSetBVT13\t103\tcc\n" +
                 "SampleSetBVT14\t104\tdd");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         // Do some manual derivation
         clickLinkWithText("Sample Sets");
         assertTextPresent(PROJECT_SAMPLE_SET_NAME);
         assertTextPresent(FOLDER_NAME);
 
-        clickNavButton("Show All Materials");
+        clickButton("Show All Materials");
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);
         assertTextNotPresent(PROJECT_SAMPLE_SET_NAME);
 
         clickCheckbox(".toggle");
-        clickNavButton("Derive Samples");
+        clickButton("Derive Samples");
 
         if (isLinkPresentWithText("configure a valid pipeline root for this folder"))
         {
@@ -124,7 +124,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent(PROJECT_SAMPLE_SET_NAME);
         clickLinkWithText(FOLDER_SAMPLE_SET_NAME);
         clickCheckbox(".toggle");
-        clickNavButton("Derive Samples");
+        clickButton("Derive Samples");
 
         selenium.select("inputRole0", "label=Add a new role...");
         setFormElement("customRole0", "FirstRole");
@@ -136,7 +136,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         setFormElement("customRole3", "FourthRole");
         selenium.select("outputCount", "label=2");
         selenium.select("targetSampleSetId", "label=FolderSampleSet in /SampleSetTestProject/SampleSetTestFolder");
-        clickNavButton("Next");
+        clickButton("Next");
 
         setFormElement("outputSample1_KeyColFolder", "SampleSetBVT15");
 		setFormElement("outputSample2_KeyColFolder", "SampleSetBVT16");
@@ -144,12 +144,12 @@ public class SampleSetTest extends BaseSeleniumWebTest
 		setFormElement("outputSample1_IntColFolder", "500a");
 		setFormElement("outputSample1_StringColFolder", "firstOutput");
 		setFormElement("outputSample2_StringColFolder", "secondOutput");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         assertTextPresent("must be of type Integer");
         clickCheckbox("outputSample1_IntColFolderCheckBox");
         setFormElement("outputSample1_IntColFolder", "500");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkContainingText("Derive 2 samples");
         clickLinkContainingText("Text View");
@@ -163,18 +163,18 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
         selectOptionByText("inputRole0", "FirstRole");
         selenium.select("targetSampleSetId", "label=ProjectSampleSet in /SampleSetTestProject");
-        clickNavButton("Next");
+        clickButton("Next");
 
         setFormElement("outputSample1_KeyCol", "200");
         setFormElement("outputSample1_IntCol", "600");
         setFormElement("outputSample1_StringCol", "String");
         setFormElement("outputSample1_DateCol", "BadDate");
         setFormElement("outputSample1_BoolCol", "FALSE");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         assertTextPresent("must be of type Date and Time");
         setFormElement("outputSample1_DateCol", "1/1/2007");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         assertLinkPresentWithText("Derive sample from SampleSetBVT16");
         assertLinkPresentWithText("SampleSetBVT11");
@@ -198,24 +198,24 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("secondOutput");
 
         clickLinkWithText("Sample Sets");
-        clickNavButton("Show All Materials");
+        clickButton("Show All Materials");
         assertTextPresent("ProjectSampleSet");
         assertTextPresent("200");
 
         // Try to derive samples using the parent column
         clickTab("Experiment");
         clickLinkWithText("Sample Sets");
-        clickNavButton("Import Sample Set");
+        clickButton("Import Sample Set");
         setFormElement("name", FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement("data", AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
         selectOptionByText("parentCol", "Parent");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("More than one match for parent material");
 
         // Try again with a qualified sample name
         setFormElement("data", CHILD_SAMPLE_SET_TSV);
         selectOptionByText("parentCol", "Parent");
-        clickNavButton("Submit");
+        clickButton("Submit");
         assertTextPresent("SampleSetBVTChildA");
 
         fileAttachmentTest();
@@ -232,15 +232,15 @@ public class SampleSetTest extends BaseSeleniumWebTest
         // Make a grandchild set, but first try to insert as a duplicate set name
         clickTab("Experiment");
         clickLinkWithText("Sample Sets");
-        clickNavButton("Import Sample Set");
+        clickButton("Import Sample Set");
         setFormElement("name", FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement("data", GRANDCHILD_SAMPLE_SET_TSV);
         selectOptionByText("parentCol", "Parent");
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         assertTextPresent("A sample set with that name already exists");
         setFormElement("name", FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText("SampleSetBVTGrandchildA");
         // Filter out any child materials, though there shouldn't be any
@@ -276,10 +276,10 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("SampleSetBVTGrandchildA");
 
         clickLinkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME);
-        clickNavButton("Import More Samples");
+        clickButton("Import More Samples");
         clickRadioButtonById("insertOrUpdateChoice");
         setFormElement("data", REPARENTED_CHILD_SAMPLE_SET_TSV);
-        clickNavButton("Submit");
+        clickButton("Submit");
 
         clickLinkWithText("SampleSetBVTChildB");
         assertTextPresent("2.222");

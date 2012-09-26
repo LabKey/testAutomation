@@ -74,7 +74,7 @@ public class LibraTest extends MS2Test
         configure();
         waitForText("Grouping");
         selenium.select("viewTypeGrouping", "Standard");
-        clickNavButton("Go");
+        clickButton("Go");
         CustomizeViewsHelper.openCustomizeViewPanel(this);
         addNormalizationCount();
 
@@ -94,17 +94,17 @@ public class LibraTest extends MS2Test
         clickLinkWithText(getProjectName());
         checkAllOnPage("MS2SearchRuns");
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickNavButton("Compare", 0);
+        clickButton("Compare", 0);
         clickLinkWithText("Spectra Count");
         clickRadioButtonById("SpectraCountPeptide");
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertTextPresent("-.MM'EILRGSPALSAFR.I");
         assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 27);
 
         // Try setting a target protein
         clickLinkWithText("Spectra Count Options");
         setFormElement("targetProtein", "gi|34392343");
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 1);
         assertTextPresent("R.TDTGEPM'GR.G");
         clickLinkContainingText("gi|34392343");
@@ -136,7 +136,7 @@ public class LibraTest extends MS2Test
         clickRadioButtonById("SpectraCountPeptideCharge");
         setFormElement(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
         setFormElement("targetProtein", "");
-        clickNavButton("Compare");
+        clickButton("Compare");
         assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 12);
         assertTextPresent("-.MM'EILRGSPALSAFR.I", "R.TDTGEPM'GR.G");
         assertTextNotPresent("R.AEGTFPGK.I", "R.ILEKSGSPER.I");
