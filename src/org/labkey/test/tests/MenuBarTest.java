@@ -16,7 +16,10 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.Locator;
+
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,6 +33,8 @@ public class MenuBarTest extends BaseSeleniumWebTest
     private static final String PROJECT_NAME = "MenuBarVerifyProject";
     private static final String WIKI_PAGE_TITLE = "Wiki Menu";
     private static final String WIKI_PAGE_CONTENT = "This is a fancy wiki";
+
+    private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
 
     public String getAssociatedModuleDirectory()
     {
@@ -124,6 +129,57 @@ public class MenuBarTest extends BaseSeleniumWebTest
 
         mouseOver(Locator.menuBarItem("Studies"));
         waitForText("StudyFolder Study", WAIT_FOR_JAVASCRIPT);
+
+
+        // Custom Menu
+        log("Test Custom Menu WebPart");
+        goToProjectSettings();
+        clickLinkWithText("Menu Bar");
+        addWebPart("Custom Menu");
+        clickWebpartMenuItem("My Menu", "Customize");
+
+        // Schema/Query/etc
+        _extHelper.setExtFormElementByLabel("Title", "Wiki Render Types");
+        _extHelper.clickExtDropDownMenu("userQuery_schema", "wiki");
+        _extHelper.clickExtDropDownMenu("userQuery_query", "renderertype");
+        _extHelper.clickExtDropDownMenu("userQuery_Column", "Value");
+        _extHelper.clickExtButton("Submit");
+        assertTextPresent("HTML", "RADEOX", "TEXT_WITH_LINKS");
+
+        // Another custom menu with links to Participant Report
+        createSubfolder(PROJECT_NAME, PROJECT_NAME, "DemStudyFolder", "Study", null);
+        importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
+
+        goToProjectSettings();
+        clickLinkWithText("Menu Bar");
+        addWebPart("Custom Menu");
+        clickWebpartMenuItem("My Menu", "Customize");
+        _extHelper.setExtFormElementByLabel("Title", "Participant Reports");
+        _extHelper.clickExtDropDownMenu("userQuery_folders", "DemStudyFolder");
+        _extHelper.clickExtDropDownMenu("userQuery_schema", "study");
+        _extHelper.clickExtDropDownMenu("userQuery_query", "Participant");
+        _extHelper.clickExtDropDownMenu("userQuery_Column", "ParticipantId");
+        _extHelper.setExtFormElementByLabel("URL", "/study-samples/typeParticipantReport.view?participantId=${participantId}");
+        _extHelper.clickExtButton("Submit");
+
+        // Should take us to participant report page
+        clickLinkWithText("249320107");
+        assertTextPresent("Specimen Report: Participant 249320107");
+
+        // Another custom Menu with links to folders
+        goToProjectSettings();
+        clickLinkWithText("Menu Bar");
+        addWebPart("Custom Menu");
+        clickWebpartMenuItem("My Menu", "Customize");
+        _extHelper.setExtFormElementByLabel("Title", "Folders");
+
+        Locator radioFolder = Locator.radioButtonById("folder-radio");
+        click(radioFolder);
+        _extHelper.clickExtDropDownMenu("userQuery_folderTypes", "Study");
+        _extHelper.clickExtButton("Submit");
+
+        clickLinkWithText("DemStudyFolder");
+        assertTextPresent("Demo Study", "Study Overview");
     }
 
     protected void doCleanup()
