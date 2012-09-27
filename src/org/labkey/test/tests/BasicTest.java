@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.UIContainerHelper;
 
 /**
