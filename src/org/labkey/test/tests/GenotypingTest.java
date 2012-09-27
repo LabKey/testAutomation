@@ -29,7 +29,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -96,7 +95,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         log("Import genotyping list");
         clickLinkContainingText(getProjectName());
-        ListHelper.importListArchive(this, getProjectName(), new File(pipelineLoc, "sequencing.lists.zip"));
+        _listHelper.importListArchive(getProjectName(), new File(pipelineLoc, "sequencing.lists.zip"));
         assertTextPresent(
                 samples,
                 "mids",
@@ -117,9 +116,9 @@ public class GenotypingTest extends BaseSeleniumWebTest
         {
             clickLinkContainingText("configure",i, false);
             waitForExtMask();
-            ExtHelper.clickExtDropDownMenu(this, "userQuery_schema", "lists");
-            ExtHelper.clickExtDropDownMenu(this, "userQuery_query", listVals[i]);
-            ExtHelper.clickExtDropDownMenu(this, "userQuery_view", "[default view]");
+            _extHelper.clickExtDropDownMenu("userQuery_schema", "lists");
+            _extHelper.clickExtDropDownMenu("userQuery_query", listVals[i]);
+            _extHelper.clickExtDropDownMenu("userQuery_view", "[default view]");
             clickButton("Submit", 0);
             waitForExtMaskToDisappear();
         }
@@ -275,7 +274,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 //        mouseDown(Locator.tagContainingText("div", alleles[2]));
 
         //combine some but not all of the matches
-        ExtHelper.clickXGridPanelCheckbox(this, 0, true);
+        _extHelper.clickXGridPanelCheckbox(0, true);
         clickButtonContainingText("Combine", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         refresh();
 
@@ -344,7 +343,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         clickButton("Add Analysis");
         Locator menuLocator = Locator.xpath("//input[@name='sequencesView']/../input[2]");
-        ExtHelper.clickExtDropDownMenu(this, menuLocator, "[default]");                       //TODO:  this should be cyno
+        _extHelper.clickExtDropDownMenu(menuLocator, "[default]");                       //TODO:  this should be cyno
         clickButton("Submit");
         waitForText("COMPLETE");
         findAndSetAnalysisNumber();
@@ -487,7 +486,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
             Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
         }
 
-        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         for (String[] a : fieldPairs)
         {
@@ -504,28 +503,28 @@ public class GenotypingTest extends BaseSeleniumWebTest
         //add new values
         String prop_name = "NewProperty";
         String prop_value = "NewValue";
-        Ext4FieldRef textarea = Ext4Helper.queryOne(this, "textarea[itemId='sourceField']", Ext4FieldRef.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRef.class);
         String newValue = prop_name + "," + prop_value;
         textarea.eval("this.setValue(this.getValue() + \"\\\\n" + newValue + "\")");
         clickButton("Done Editing", 0);
 
 
         //verify template has changed
-        Ext4Helper.clickTabContainingText(this, "General Info");
+        _ext4Helper.clickTabContainingText("General Info");
         Assert.assertEquals("Custom", Ext4FieldRef.getForLabel(this, "Template").getValue());
 
         //verify values persisted
-        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         Assert.assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
 
         //save template
         clickButton("Save As Template", 0);
         waitForElement(Ext4Helper.ext4Window("Choose Name"));
-        Ext4FieldRef textfield = Ext4Helper.queryOne(this, "textfield", Ext4FieldRef.class);
+        Ext4FieldRef textfield = _ext4Helper.queryOne("textfield", Ext4FieldRef.class);
         textfield.setValue(TEMPLATE_NAME);
         clickButton("OK", 0);
-        Ext4Helper.clickTabContainingText(this, "General Info");
+        _ext4Helper.clickTabContainingText("General Info");
         Assert.assertEquals(TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
 
         //if we navigate too quickly, before the insertRows has returned, the test can get a JS error
@@ -533,7 +532,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         sleep(200);
 
         //verify samples present
-        Ext4Helper.clickTabContainingText(this, "Preview Samples");
+        _ext4Helper.clickTabContainingText("Preview Samples");
         waitForText("Sample_ID");
 
         int expectRows = (11 * (45 +  1));  //11 cols, 45 rows, plus header
@@ -557,7 +556,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         Assert.assertTrue("Combo store does not have correct record number", 3 == count);
         sleep(50);
         Assert.assertEquals("Field value not set correctly", TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
-        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         Assert.assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
 
@@ -649,7 +648,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void startImportRun(String file, String importAction, String associatedRun)
     {
         clickLinkContainingText("Import Run");
-        ExtHelper.selectFileBrowserItem(this, file);
+        _extHelper.selectFileBrowserItem(file);
 
         selectImportDataAction(importAction);
         setFormElement("run", associatedRun);
@@ -660,7 +659,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void startImportIlluminaRun(String file, String importAction)
     {
         clickLinkContainingText("Import Run");
-        ExtHelper.selectFileBrowserItem(this, file);
+        _extHelper.selectFileBrowserItem(file);
 
         selectImportDataAction(importAction);
 

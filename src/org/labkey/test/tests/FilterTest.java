@@ -24,9 +24,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 
@@ -44,7 +42,7 @@ public class FilterTest extends ListTest
     protected void createList2()
     {
         ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
-        ListHelper.createList(this, PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
+        _listHelper.createList(PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
         clickButton("Import Data");
         setFormElement(Locator.name("text"),"Car\tColor\tyear\n" +
                 "1\tBlue\t1980\n" +
@@ -53,7 +51,7 @@ public class FilterTest extends ListTest
 
         clickButton("Submit", 0);
         waitForElement(Locator.tagWithText("button", "OK"), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.clickExtButton("OK");
         waitForPageToLoad();
     }
 
@@ -79,7 +77,7 @@ public class FilterTest extends ListTest
         log("Setup project and list module");
         _containerHelper.createProject(PROJECT_NAME, null);
         log("Add list -- " + LIST_NAME_COLORS);
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
         clickEditDesign();
         selectOptionByText("ff_titleColumn", "Desc");
@@ -93,9 +91,10 @@ public class FilterTest extends ListTest
 
     public void doTestSteps()
     {
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
         setUpList();
-        CustomizeViewsHelper.createRView(this, null, R_VIEW);
+        _customizeViewsHelper.createRView(null, R_VIEW);
         filterTest();
         facetedFilterTest();
     }
@@ -104,7 +103,7 @@ public class FilterTest extends ListTest
     {
         click(Locator.tagWithText("div", column));
         click(Locator.tagWithText("span", "Filter..."));
-        ExtHelper.waitForExtDialog(this, "Show Rows Where "+column+"...");
+        _extHelper.waitForExtDialog("Show Rows Where "+column+"...");
         waitForText("[All]");
         sleep(400);
     }
@@ -121,7 +120,7 @@ public class FilterTest extends ListTest
         assertTextPresent("Light", 2);
         assertTextPresent("Robust", 2);
         assertTextPresent("Zany", 2);
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.clickExtButton("OK");
         assertTextPresent("Light", "Robust", "Zany");
 
         setFacetedFilter("query", "Color", "Light");
@@ -129,38 +128,38 @@ public class FilterTest extends ListTest
         assertTextNotPresent("Robust", "Zany");
 
         setUpFacetedFilter("query", "Color", "Robust");
-        ExtHelper.clickExtTab(this, "Choose Filters");
+        _extHelper.clickExtTab("Choose Filters");
         //NOTE: the filter will optimize this to EQUALS, since there is 1 value
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement("value_1"));
-        ExtHelper.clickExtTab(this, "Choose Values");
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.clickExtTab("Choose Values");
+        _extHelper.clickExtButton("OK");
         assertTextNotPresent("Light", "Zany");
         assertTextPresent("Robust");
 
         // Issue 14710: Switching between faceted and logical filters breaks dialog
         setUpFacetedFilter("query", "Color", "Robust", "Light");
-        ExtHelper.clickExtTab(this, "Choose Filters");
+        _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
-        ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Blank");
-        ExtHelper.clickExtTab(this, "Choose Values");
-        ExtHelper.waitForExtDialog(this, "Confirm change");
-        ExtHelper.clickExtButton(this, "Confirm change", "Yes", 0);
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.selectComboBoxItem("Filter Type", "Is Blank");
+        _extHelper.clickExtTab("Choose Values");
+        _extHelper.waitForExtDialog("Confirm change");
+        _extHelper.clickExtButton("Confirm change", "Yes", 0);
+        _extHelper.clickExtButton("OK");
         //the change above would result in filters being dropped.  because we did not select new filters, we expect this to return an unfiltered grid
         assertTextPresent("Light", "Robust", "Zany");
 
         //now repeat with a filter that should be translated
         setUpFacetedFilter("query", "Color", "Light");
-        ExtHelper.clickExtTab(this, "Choose Filters");
+        _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement("value_1"));
 
         setFormElement("value_1", "Light;Robust");
 
-        ExtHelper.clickExtTab(this, "Choose Values"); //we should get no alerts, and Light + Robust should be checked
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.clickExtTab("Choose Values"); //we should get no alerts, and Light + Robust should be checked
+        _extHelper.clickExtButton("OK");
         assertTextPresent("Light", "Robust");
         //assertTextNotPresent("Zany");  //NOTE: the filter message is 'Is not any of (Zany)', so this will fail.  test for '1990' instead.
         assertTextNotPresent("1990");
@@ -176,7 +175,7 @@ public class FilterTest extends ListTest
         assertTextPresent("1990", 2);
         assertTextPresent("1970", 2);
 
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.clickExtButton("OK");
         assertTextPresent("1980", "1990", "1970");
 
         setFacetedFilter("query", "year", "1980");
@@ -184,23 +183,23 @@ public class FilterTest extends ListTest
         assertTextNotPresent("1990", "1970");
 
         setUpFacetedFilter("query", "year", "1990");
-        ExtHelper.clickExtTab(this, "Choose Filters");
+        _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement("value_1"));
-        ExtHelper.clickExtTab(this, "Choose Values");
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.clickExtTab("Choose Values");
+        _extHelper.clickExtButton("OK");
         assertTextNotPresent("1980", "1970");
         assertTextPresent("1990");
 
         setUpFacetedFilter("query", "year", "1990", "1980");
-        ExtHelper.clickExtTab(this, "Choose Filters");
+        _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement("value_1"));
-        ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Blank");
-        ExtHelper.clickExtTab(this, "Choose Values");
-        ExtHelper.waitForExtDialog(this, "Confirm change");
-        ExtHelper.clickExtButton(this, "Confirm change", "Yes", 0);
-        ExtHelper.clickExtButton(this, "OK");
+        _extHelper.selectComboBoxItem("Filter Type", "Is Blank");
+        _extHelper.clickExtTab("Choose Values");
+        _extHelper.waitForExtDialog("Confirm change");
+        _extHelper.clickExtButton("Confirm change", "Yes", 0);
+        _extHelper.clickExtButton("OK");
         assertTextPresent("1980", "1990");
         assertLinkNotPresentWithText("1970");
 
@@ -369,7 +368,7 @@ public class FilterTest extends ListTest
         //open filter
         runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
         waitForTextToDisappear("Loading...");
-        ExtHelper.clickExtTab(this, "Choose Filters");
+        _extHelper.clickExtTab("Choose Filters");
 
         if(filter1!=null)
             waitForFormElementToEqual(Locator.name("value_1"), filter1);

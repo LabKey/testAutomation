@@ -24,235 +24,232 @@ import org.labkey.test.Locator;
  * Date: Apr 6, 2009
  * Time: 5:21:53 PM
  */
-public class ExtHelper
+public class ExtHelper extends AbstractHelper
 {
+    public ExtHelper(BaseSeleniumWebTest test)
+    {
+        super(test);
+    }
     /**
      * Clicks the Ext or labkey menu item from the submenu specified by the menu object's text
      */
-    public static void clickMenuButton(BaseSeleniumWebTest test, boolean wait, String menusLabel, String ... subMenuLabels)
+    public void clickMenuButton(boolean wait, String menusLabel, String... subMenuLabels)
     {
         Locator menu = Locator.extButton(menusLabel);
-        if (!test.isElementPresent(menu))
+        if (!_test.isElementPresent(menu))
             menu = Locator.navButton(menusLabel);
-        if (!test.isElementPresent(menu))
+        if (!_test.isElementPresent(menu))
             Assert.fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
-        clickExtMenuButton(test, wait, menu, subMenuLabels);
+        clickExtMenuButton(wait, menu, subMenuLabels);
     }
 
     /**
      * Clicks the ext menu item from the submenu specified by the ext object's text
      */
-    public static void clickExtMenuButton(BaseSeleniumWebTest test, boolean wait, Locator menu, String ... subMenuLabels)
+    public void clickExtMenuButton(boolean wait, Locator menu, String... subMenuLabels)
     {
-        test.click(menu);
+        _test.click(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
-            test.waitForElement(parentLocator, 1000);
-            test.mouseOver(parentLocator);
+            _test.waitForElement(parentLocator, 1000);
+            _test.mouseOver(parentLocator);
         }
         Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
-        test.waitForElement(itemLocator, 1000);
+        _test.waitForElement(itemLocator, 1000);
         if (wait)
-            test.clickAndWait(itemLocator);
+            _test.clickAndWait(itemLocator);
         else
-            test.click(itemLocator);
+            _test.click(itemLocator);
     }
 
     // Tests for the presence of the last specified submenu. Main menu item plus intervening submenus must exist.
-    public static boolean isExtMenuPresent(BaseSeleniumWebTest test, String menuLabel, String ... subMenuLabels)
+    public boolean isExtMenuPresent(String menuLabel, String... subMenuLabels)
     {
         Locator menu = Locator.extButton(menuLabel);
-        if (!test.isElementPresent(menu))
+        if (!_test.isElementPresent(menu))
             menu = Locator.navButton(menuLabel);
-        if (!test.isElementPresent(menu))
+        if (!_test.isElementPresent(menu))
             Assert.fail("No Ext or LabKey menu for label '" + menuLabel + "' found");
-        test.click(menu);
+        _test.click(menu);
 
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
-            test.waitForElement(parentLocator, 1000);
-            test.mouseOver(parentLocator);
+            _test.waitForElement(parentLocator, 1000);
+            _test.mouseOver(parentLocator);
         }
 
         Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
-        return test.isElementPresent(itemLocator);
+        return _test.isElementPresent(itemLocator);
     }
 
-    public static void clickExtDropDownMenu(BaseSeleniumWebTest test, String menuId, String value)
+    public void clickExtDropDownMenu(String menuId, String value)
     {
-        clickExtDropDownMenu(test, Locator.id(menuId), value);
+        clickExtDropDownMenu(Locator.id(menuId), value);
     }
 
 
-    public static void clickExtDropDownMenu(BaseSeleniumWebTest test, Locator menuLocator, String value)
+    public void clickExtDropDownMenu(Locator menuLocator, String value)
     {
-        test.click(menuLocator);
+        _test.click(menuLocator);
         Locator element = Locator.xpath("//*[(self::li[contains(@class, 'x4-boundlist-item')] or self::div[contains(@class, 'x-combo-list-item')] or self::span[contains(@class, 'x-menu-item-text')]) and text()='" + value + "']");
-        test.waitForElement(element, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        test.click(element);
+        _test.waitForElement(element, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.click(element);
     }
 
-    public static void selectFolderManagementTreeItem(BaseSeleniumWebTest test, String path, boolean keepExisting)
+    public void selectFolderManagementTreeItem(String path, boolean keepExisting)
     {
-        test.getWrapper().getEval("selenium.selectFolderManagementItem('" + path + "', " + keepExisting +");");
+        _test.getWrapper().getEval("selenium.selectFolderManagementItem('" + path + "', " + keepExisting +");");
     }
 
-    public static void setQueryEditorValue(BaseSeleniumWebTest test, String id, String value)
+    public void setQueryEditorValue(String id, String value)
     {
         String script = "selenium.setEditAreaValue(" + jsString(id) + ", " + jsString(value) + ");";
-        test.getWrapper().getEval(script);
+        _test.getWrapper().getEval(script);
     }
 
     /**
      * Returns a DOM Element id from an ext object id. Assumes that the ext component
      * has already been rendered.
      */
-    public static String getExtElementId(BaseSeleniumWebTest test, String extId)
+    public String getExtElementId(String extId)
     {
         for (int attempt = 0; attempt < 5; attempt++)
         {
-            String id = test.getWrapper().getEval("selenium.getExtElementId('" + extId + "');");
-            test.log("Element id for ext component id: " + extId + " is: " + id);
+            String id = _test.getWrapper().getEval("selenium.getExtElementId('" + extId + "');");
+            _test.log("Element id for ext component id: " + extId + " is: " + id);
             if (id != null)
                 return id;
-            test.sleep(500);
+            _test.sleep(500);
         }
 
         Assert.fail("Failed to get element id for Ext component '" + extId + "'");
         return null;
     }
 
-    public static void waitForExtDialog(final BaseSeleniumWebTest test, String title)
+    public void waitForExtDialog(String title)
     {
-        waitForExtDialog(test, title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForExtDialog(title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static void waitForExtDialog(final BaseSeleniumWebTest test, String title, int timeout)
+    public void waitForExtDialog(String title, int timeout)
     {
         final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
 
-        test.waitFor(new BaseSeleniumWebTest.Checker()
+        _test.waitFor(new BaseSeleniumWebTest.Checker()
         {
             public boolean check()
             {
-                return test.isElementPresent(locator);
+                return _test.isElementPresent(locator);
             }
         }, "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
     }
 
-    public static void waitForExtDialogToDisappear(final BaseSeleniumWebTest test, String title)
+    public void waitForExtDialogToDisappear(String title)
     {
-        waitForExtDialogToDisappear(test, title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForExtDialogToDisappear(title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static void waitForExtDialogToDisappear(final BaseSeleniumWebTest test, String title, int timeout)
+    public void waitForExtDialogToDisappear(String title, int timeout)
     {
         final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
 
-        test.waitFor(new BaseSeleniumWebTest.Checker()
+        _test.waitFor(new BaseSeleniumWebTest.Checker()
         {
             public boolean check()
             {
-                return !test.isElementPresent(locator);
+                return !_test.isElementPresent(locator);
             }
         }, "Ext Dialog with title '" + title + "' was still present after " + timeout + "ms", timeout);
     }
 
-    public static String getExtMsgBoxText(BaseSeleniumWebTest test, String title)
+    public String getExtMsgBoxText(String title)
     {
-        return getExtMsgBoxText(test, title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        return getExtMsgBoxText(title, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static String getExtMsgBoxText(BaseSeleniumWebTest test, String title, int timeout)
+    public String getExtMsgBoxText(String title, int timeout)
     {
-        waitForExtDialog(test, title, timeout);
+        waitForExtDialog(title, timeout);
         Locator locator = Locator.xpath("//div[contains(@class, 'x-window-dlg')]//span[contains(@class, 'ext-mb-text')]");
-        String msg = test.getText(locator);
+        String msg = _test.getText(locator);
         return msg;
     }
 
-    public static void setExtFormElement(BaseSeleniumWebTest test, String text)
+    public void setExtFormElement(String text)
     {
         // Currently used only in RReportHelper.  Modify as needed to be more universal.
-        test.setFormElement(Locator.xpath("//input[(contains(@class, 'ext-mb-input') or contains(@class, 'x-form-field')) and @type='text']"), text);
+        _test.setFormElement(Locator.xpath("//input[(contains(@class, 'ext-mb-input') or contains(@class, 'x-form-field')) and @type='text']"), text);
     }
 
-    public static void setExtFormElementByType(BaseSeleniumWebTest test, String windowTitle, String inputType, String text)
+    public void setExtFormElementByType(String windowTitle, String inputType, String text)
     {
-        test.setFormElement(Locator.xpath(getExtDialogXPath(test, windowTitle) + "//input[contains(@class, 'form-field') and @type='"+inputType+"']"), text);
+        _test.setFormElement(Locator.xpath(getExtDialogXPath(windowTitle) + "//input[contains(@class, 'form-field') and @type='" + inputType + "']"), text);
     }
 
-    public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String label, String text)
+    public void setExtFormElementByLabel(String label, String text)
     {
-        setExtFormElementByLabel(test, null, label, text);
+        setExtFormElementByLabel(null, label, text);
     }
 
-    public static void setExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label, String text)
+    public void setExtFormElementByLabel(String windowTitle, String label, String text)
     {
-        Locator formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
-        if (!test.isElementPresent(formElement))
+        Locator formElement = Locator.xpath(getExtDialogXPath(windowTitle) + "//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        if (!_test.isElementPresent(formElement))
         {
             // try the ext4 version
-            formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//td[./label[text()='"+label+"']]/../td/*[self::input or self::textarea]");
+            formElement = Locator.xpath(getExtDialogXPath(windowTitle) + "//td[./label[text()='"+label+"']]/../td/*[self::input or self::textarea]");
         }
-        test.setFormElement(formElement, text);
-        test.fireEvent(formElement, BaseSeleniumWebTest.SeleniumEvent.blur);
+        _test.setFormElement(formElement, text);
+        _test.fireEvent(formElement, BaseSeleniumWebTest.SeleniumEvent.blur);
     }
 
-    public static String getExtFormElementByLabel(BaseSeleniumWebTest test, String label)
+    public String getExtFormElementByLabel(String label)
     {
-        return getExtFormElementByLabel(test, null, label);
+        return getExtFormElementByLabel(null, label);
     }
 
-    public static String getExtFormElementByLabel(BaseSeleniumWebTest test, String windowTitle, String label)
+    public String getExtFormElementByLabel(String windowTitle, String label)
     {
-        Locator formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
-        if (!test.isElementPresent(formElement))
+        Locator formElement = Locator.xpath(getExtDialogXPath(windowTitle) + "//div[./label/span[text()='"+label+"']]/div/*[self::input or self::textarea]");
+        if (!_test.isElementPresent(formElement))
         {
             // try the ext4 version
-            formElement = Locator.xpath(getExtDialogXPath(test, windowTitle) + "//td[./label[text()='"+label+"']]/../td/*[self::input or self::textarea]");
+            formElement = Locator.xpath(getExtDialogXPath(windowTitle) + "//td[./label[text()='"+label+"']]/../td/*[self::input or self::textarea]");
         }
-        return test.getFormElement(formElement);
+        return _test.getFormElement(formElement);
     }
 
-    @Deprecated
-    public static String getExtDialogXPath(String windowTitle)
-    {
-        return "//div[contains(@class, 'x-window') and " + Locator.NOT_HIDDEN + " and "+
-            "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '" + windowTitle + "')]]";
-    }
-
-    public static String getExtDialogXPath(BaseSeleniumWebTest test, String windowTitle)
+    public String getExtDialogXPath(String windowTitle)
     {
         if (windowTitle == null) return "";
         String ext3Dialog = "//div[contains(@class, 'x-window') and " + Locator.NOT_HIDDEN + " and "+
             "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '" + windowTitle + "')]]";
         String ext4Dialog = "//div[contains(@class, 'x4-window') and " + Locator.NOT_HIDDEN + " and "+
             "./div/div/div/div/div/span[contains(@class, 'x4-window-header-text') and contains(string(), '" + windowTitle + "')]]";
-        if( test.isElementPresent(Locator.xpath(ext3Dialog)) )
+        if( _test.isElementPresent(Locator.xpath(ext3Dialog)) )
             return ext3Dialog;
-        else if( test.isElementPresent(Locator.xpath(ext4Dialog)) )
+        else if( _test.isElementPresent(Locator.xpath(ext4Dialog)) )
             return ext4Dialog;
         else
             Assert.fail("Unable to locate Ext dialog: '" + windowTitle + "'");
         return null; // unreachable
     }
 
-    public static void waitForLoadingMaskToDisappear(BaseSeleniumWebTest test, int wait)
+    public void waitForLoadingMaskToDisappear(int wait)
     {
-        test.waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x-mask-loading')]"), wait);
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x-mask-loading')]"), wait);
     }
 
-    public static void waitForExt3MaskToDisappear(BaseSeleniumWebTest test, int wait)
+    public void waitForExt3MaskToDisappear(int wait)
     {
-        test.waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
     }
 
-    public static void waitForExt3Mask(BaseSeleniumWebTest test, int wait)
+    public void waitForExt3Mask(int wait)
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
     }
 
     public static Locator locateGridRowCheckbox(String rowTextContent)
@@ -280,106 +277,93 @@ public class ExtHelper
         return Locator.xpath("(" + ((Locator.XPathLocator)row).getPath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
     }
 
-    public static void clickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
+    public void clickFileBrowserFileCheckbox(String fileName)
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);
-        test.waitForElement(locateBrowserFileName(fileName), 60000);
-        test.sleep(100); // Avoid race condition for file selection.
-        test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);
+        _test.waitForElement(locateBrowserFileName(fileName), 60000);
+        _test.sleep(100); // Avoid race condition for file selection.
+        _test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
     }
 
-    public static void clickXGridPanelCheckbox(BaseSeleniumWebTest test, int index, boolean keepExisting)
+    public void clickXGridPanelCheckbox(int index, boolean keepExisting)
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'x-grid-panel')]"), 60000);
-        test.getWrapper().getEval("selenium.selectExtGridItem(null, null, " + index + ", 'x-grid-panel', " + keepExisting + ")");
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-grid-panel')]"), 60000);
+        _test.getWrapper().getEval("selenium.selectExtGridItem(null, null, " + index + ", 'x-grid-panel', " + keepExisting + ")");
     }
 
     //TODO:  comment this
-    public static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, int index, String markerCls, boolean keepExisting)
+    public void clickX4GridPanelCheckbox(int index, String markerCls, boolean keepExisting)
     {
-        clickX4GridPanelCheckbox(test, null, null, index, markerCls, keepExisting);
+        clickX4GridPanelCheckbox(null, null, index, markerCls, keepExisting);
     }
 
-    public static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, String markerCls, boolean keepExisting)
+    public void clickX4GridPanelCheckbox(String colName, String colValue, String markerCls, boolean keepExisting)
     {
-        clickX4GridPanelCheckbox(test, colName, colValue, -1, markerCls, keepExisting);
+        clickX4GridPanelCheckbox(colName, colValue, -1, markerCls, keepExisting);
     }
 
-    protected static void clickX4GridPanelCheckbox(BaseSeleniumWebTest test, String colName, String colValue, int rowIndex, String markerCls, boolean keepExisting)
+    protected void clickX4GridPanelCheckbox(String colName, String colValue, int rowIndex, String markerCls, boolean keepExisting)
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid')]"), 60000);
-        test.getWrapper().getEval("selenium.selectExt4GridItem('" + colName + "', '" + colValue + "', " + rowIndex + ", '" + markerCls + "', " + keepExisting + ")");
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid')]"), 60000);
+        _test.getWrapper().getEval("selenium.selectExt4GridItem('" + colName + "', '" + colValue + "', " + rowIndex + ", '" + markerCls + "', " + keepExisting + ")");
     }
 
     //Pick measure from split panel measure picker
-    public static void pickMeasure(BaseSeleniumWebTest test, String source, String measure, boolean keepSelection)
+    public void pickMeasure(String source, String measure, boolean keepSelection)
     {
-        test.waitForElement(Locator.css(".sourcepanel tr:contains('"+source+"')"));
-        test.mouseDown(Locator.css(".sourcepanel tr:contains('"+source+"')"));
+        _test.waitForElement(Locator.css(".sourcepanel tr:contains('" + source + "')"));
+        _test.mouseDown(Locator.css(".sourcepanel tr:contains('" + source + "')"));
         if(!keepSelection)
         {
-            test.waitForElement(Locator.css(".measurepanel tr:contains('"+measure+"')"));
-            test.mouseDown(Locator.css(".measurepanel tr:contains('"+measure+"')"));
+            _test.waitForElement(Locator.css(".measurepanel tr:contains('" + measure + "')"));
+            _test.mouseDown(Locator.css(".measurepanel tr:contains('" + measure + "')"));
         }
         else
         {
-            test.waitForElement(Locator.css(".measurepanel tr:contains('"+measure+"')"));
-            test.mouseDown(Locator.css(".measurepanel tr:contains('"+measure+"') div.x4-grid-row-checker"));
+            _test.waitForElement(Locator.css(".measurepanel tr:contains('" + measure + "')"));
+            _test.mouseDown(Locator.css(".measurepanel tr:contains('" + measure + "') div.x4-grid-row-checker"));
         }
     }
 
-    public static void pickMeasure(BaseSeleniumWebTest test, String source, String measure)
+    public void pickMeasure(String source, String measure)
     {
-        pickMeasure(test, source, measure, false);
+        pickMeasure(source, measure, false);
     }
 
     //Pick measure from one of multiple split panel measure pickers
-    public static void pickMeasure(BaseSeleniumWebTest test, String panelCls, String source, String measure, boolean keepSelection)
+    public void pickMeasure(String panelCls, String source, String measure, boolean keepSelection)
     {
-        test.waitForElement(Locator.css("."+panelCls+" .sourcepanel tr:contains('"+source+"')"));
-        test.mouseDown(Locator.css("."+panelCls+" .sourcepanel tr:contains('"+source+"')"));
+        _test.waitForElement(Locator.css("." + panelCls + " .sourcepanel tr:contains('" + source + "')"));
+        _test.mouseDown(Locator.css("." + panelCls + " .sourcepanel tr:contains('" + source + "')"));
         if(!keepSelection)
         {
-            test.waitForElement(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"')"));
-            test.mouseDown(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"')"));
+            _test.waitForElement(Locator.css("." + panelCls + " .measurepanel tr:contains('" + measure + "')"));
+            _test.mouseDown(Locator.css("." + panelCls + " .measurepanel tr:contains('" + measure + "')"));
         }
         else
         {
-            test.waitForElement(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"')"));
-            test.mouseDown(Locator.css("."+panelCls+" .measurepanel tr:contains('"+measure+"') div.x4-grid-row-checker"));
+            _test.waitForElement(Locator.css("." + panelCls + " .measurepanel tr:contains('" + measure + "')"));
+            _test.mouseDown(Locator.css("." + panelCls + " .measurepanel tr:contains('" + measure + "') div.x4-grid-row-checker"));
         }
     }
 
-    public static void pickMeasure(BaseSeleniumWebTest test, String panelCls, String source, String measure)
+    public void pickMeasure(String panelCls, String source, String measure)
     {
-        pickMeasure(test, panelCls, source, measure, false);
+        pickMeasure(panelCls, source, measure, false);
     }
 
     @Deprecated
-    public static void prevClickFileBrowserFileCheckbox(BaseSeleniumWebTest test, String fileName)
+    public void prevClickFileBrowserFileCheckbox(String fileName)
     {
         Locator file = locateGridRowCheckbox(fileName);
 
-        test.waitForElement(file, 60000);
-        test.mouseDown(file);
+        _test.waitForElement(file, 60000);
+        _test.mouseDown(file);
     }
 
-    /**
-     * Select a <b>single</b> row in the file browser by clicking on the file name.
-     * Use {@link ExtHelper#clickFileBrowserFileCheckbox(BaseSeleniumWebTest, String)} to click the checkbox for multi-select.
-     */
-    @Deprecated
-    public static void selectFileBrowserFile(BaseSeleniumWebTest test, String fileName)
+    public void selectFileBrowserItem(String path)
     {
-        Locator file = locateBrowserFileName(fileName);
-
-        test.waitForElement(file, 60000);
-        test.mouseDown(file);
-    }
-
-    public static void selectFileBrowserItem(BaseSeleniumWebTest test, String path)
-    {
-        test.log("selectFileBrowserItem path: " + path);
+        _test.log("selectFileBrowserItem path: " + path);
 
         String[] parts = {};
         StringBuilder nodeId = new StringBuilder();
@@ -390,11 +374,11 @@ public class ExtHelper
             parts = path.split("/");
             nodeId.append('/');
         }
-        waitForFileGridReady(test);
+        waitForFileGridReady();
 
         // expand root tree node
-        test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         for (int i = 0; i < parts.length; i++)
         {
@@ -403,203 +387,201 @@ public class ExtHelper
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
             {
                 // select last item: click on tree node name
-                clickFileBrowserFileCheckbox(test, parts[i]);
+                clickFileBrowserFileCheckbox(parts[i]);
             }
             else
             {
                 // expand tree node: click on expand/collapse icon
-                test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodeId + "']"));
-                test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+                _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodeId + "']"));
+                _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             }
         }
     }
 
-    public static void selectFileBrowserRoot(BaseSeleniumWebTest test)
+    public void selectFileBrowserRoot()
     {
-        selectFileBrowserItem(test, "/");
+        selectFileBrowserItem("/");
     }
 
-    public static void waitForImportDataEnabled(BaseSeleniumWebTest test)
+    public void waitForImportDataEnabled()
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static void waitForFileAdminEnabled(BaseSeleniumWebTest test)
+    public void waitForFileAdminEnabled()
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     /**
      * Used for directory refreshes or folder changes for the file webpart grid to be ready and initialized.
-     * @param test
      */
-    public static void waitForFileGridReady(BaseSeleniumWebTest test)
+    public void waitForFileGridReady()
     {
-        test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * test.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static void selectAllFileBrowserFiles(BaseSeleniumWebTest test)
+    public void selectAllFileBrowserFiles()
     {
         Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
-        test.waitForElement(file, 60000);
-        test.sleep(1000);
-        test.mouseClick(file.toString());
+        _test.waitForElement(file, 60000);
+        _test.sleep(1000);
+        _test.mouseClick(file.toString());
 
         file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-inner x-grid3-hd-checker x-grid3-hd-checker-on']");
-        test.waitForElement(file, 60000);
+        _test.waitForElement(file, 60000);
     }
 
-    public static void selectComboBoxItem(BaseSeleniumWebTest test,  Locator.XPathLocator parentLocator, String selection)
+    public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
-        test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");
-        if(test.getBrowser().startsWith(test.IE_BROWSER))
+        _test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");
+        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
-            test.sleep(500);
-            test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
+            _test.sleep(500);
+            _test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
+            _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
         }
         else
         {
-            test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
-            test.mouseDown(Locator.xpath("/html/body"));
+            _test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
+            _test.mouseDown(Locator.xpath("/html/body"));
         }
     }
 
-    public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
+    public void selectComboBoxItem(String label, String selection)
     {
-        selectComboBoxItem(test, Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+":']]/div/div"), selection);
+        selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+":']]/div/div"), selection);
     }
 
-    public static void selectExt4ComboBoxItem(BaseSeleniumWebTest test,  Locator.XPathLocator parentLocator, String selection)
+    public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
-        test.clickAt(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"), "1,1");
-        if(test.getBrowser().startsWith(test.IE_BROWSER))
+        _test.clickAt(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"), "1,1");
+        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
-            test.sleep(500);
-            test.clickAt(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"), "1,1");
-            test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
+            _test.sleep(500);
+            _test.clickAt(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"), "1,1");
+            _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
         }
         else
         {
-            test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
-            test.mouseDown(Locator.xpath("/html/body"));
+            _test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
+            _test.mouseDown(Locator.xpath("/html/body"));
         }
     }
 
-    public static void selectExt4ComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
+    public void selectExt4ComboBoxItem(String label, String selection)
     {
-        selectExt4ComboBoxItem(test, Locator.xpath("//tr["+Locator.NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
+        selectExt4ComboBoxItem(Locator.xpath("//tr["+Locator.NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
     }
 
-    public static void selectGWTComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
+    public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
-        test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x-form-trigger-arrow')]"));
-        test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x-form-trigger-arrow')]"));
+        _test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         Locator option = Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']");
 
-        test.mouseDown(option);
-        test.mouseDown(Locator.xpath("/html/body"));
+        _test.mouseDown(option);
+        _test.mouseDown(Locator.xpath("/html/body"));
     }
 
-    public static void closeExtTab(BaseSeleniumWebTest test, String tabName)
+    public void closeExtTab(String tabName)
     {
-        test.log("Closing Ext tab " + tabName);
-        test.mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 1, 1);
+        _test.log("Closing Ext tab " + tabName);
+        _test.mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 1, 1);
     }
 
-    public static void clickExtTab(BaseSeleniumWebTest test, String tabname)
+    public void clickExtTab(String tabname)
     {
-        test.log("Selecting Ext tab " + tabname);
+        _test.log("Selecting Ext tab " + tabname);
         Locator l = Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']");
-        test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        if(test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
+        _test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
-            test.mouseDownAt(l,  1,1);
-            test.clickAt(l, "1,1");
+            _test.mouseDownAt(l,  1,1);
+            _test.clickAt(l, "1,1");
         }
         else
         {
-            test.click(l);
+            _test.click(l);
         }
     }
 
-    public static void clickSideTab(BaseSeleniumWebTest test, String tab)
+    public void clickSideTab(String tab)
     {
-        if (test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]")))
+        if (_test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]")))
             // Tab hasn't rendered yet
-            test.mouseDown(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]"));
+            _test.mouseDown(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]"));
         else
             // Tab has rendered
-            test.mouseDown(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab + "')]]"));
+            _test.mouseDown(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab + "')]]"));
     }
 
-    public static void clickExtTabContainingText(BaseSeleniumWebTest test, String tabText)
+    public void clickExtTabContainingText(String tabText)
     {
-        test.log("Selecting Ext tab " + tabText);
-        test.click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and contains( text(), '" + tabText + "')]"));
+        _test.log("Selecting Ext tab " + tabText);
+        _test.click(Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and contains( text(), '" + tabText + "')]"));
     }
 
-    public static void clickExtButton(BaseSeleniumWebTest test, String caption)
+    public void clickExtButton(String caption)
     {
-        clickExtButton(test, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
+        clickExtButton(caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
     }
 
-    public static void clickExtButton(BaseSeleniumWebTest test, String caption, int wait)
+    public void clickExtButton(String caption, int wait)
     {
-        clickExtButton(test, null, caption, wait);
+        clickExtButton(null, caption, wait);
     }
 
-    public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption)
+    public void clickExtButton(String windowTitle, String caption)
     {
-        clickExtButton(test, windowTitle, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
+        clickExtButton(windowTitle, caption, BaseSeleniumWebTest.WAIT_FOR_PAGE);
     }
 
-     public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption, int wait)
+     public void clickExtButton(String windowTitle, String caption, int wait)
      {
-         clickExtButton(test, windowTitle, caption, wait, 1);
+         clickExtButton(windowTitle, caption, wait, 1);
      }
 
     /**
      * click an ext button
      *
-     * @param test  the calling test
      * @param windowTitle title of the extWindow, or null if you would like to autodetect
      * @param caption the button text
      * @param wait time to wait for page to load
      * @param index
      */
-    public static void clickExtButton(BaseSeleniumWebTest test, String windowTitle, String caption, int wait, int index)
+    public void clickExtButton(String windowTitle, String caption, int wait, int index)
     {
-        test.log("Clicking Ext button with caption: " + caption);
-        Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(test, windowTitle):"")+"//button[(contains(@class, 'x-btn-text') and text()='" + caption + "') or (@role='button' and ./span[text()='" + caption + "'])]["+index+"]");
-        test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        test.mouseDown(loc);
-        test.clickAndWait(loc, wait);
+        _test.log("Clicking Ext button with caption: " + caption);
+        Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(windowTitle):"")+"//button[(contains(@class, 'x-btn-text') and text()='" + caption + "') or (@role='button' and ./span[text()='" + caption + "'])]["+index+"]");
+        _test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.mouseDown(loc);
+        _test.clickAndWait(loc, wait);
     }
 
-    public static void checkCheckbox(BaseSeleniumWebTest test, String label)
+    public void checkCheckbox(String label)
     {
         Locator checkbox = Locator.ext4Checkbox(label);
-        if(!isChecked(test, label))
-            test.click(checkbox);
-        if(!isChecked(test, label))
+        if(!isChecked(label))
+            _test.click(checkbox);
+        if(!isChecked(label))
             Assert.fail("Failed to check checkbox '" + label + "'.");
     }
 
-    public static void uncheckCheckbox(BaseSeleniumWebTest test, String label)
+    public void uncheckCheckbox(String label)
     {
         Locator checkbox = Locator.ext4Checkbox(label);
-        if(isChecked(test, label))
-            test.click(checkbox);
-        if(isChecked(test, label))
+        if(isChecked(label))
+            _test.click(checkbox);
+        if(isChecked(label))
             Assert.fail("Failed to uncheck checkbox '" + label + "'.");
     }
 
-    public static boolean isChecked(BaseSeleniumWebTest test, String label)
+    public boolean isChecked(String label)
     {
         Locator checked = Locator.xpath("//table[contains(@class, 'x4-form-cb-checked')]//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
-        return test.isElementPresent(checked);
+        return _test.isElementPresent(checked);
     }
 
     private static String jsString(String s)

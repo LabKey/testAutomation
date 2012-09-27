@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import com.google.common.base.Function;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -149,8 +148,8 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         assertTextNotPresent("Oldness Factor");
         assertTextNotPresent("Total:");
 
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.saveCustomView(this, "Saved-" + INJECT_CHARS_1);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.saveCustomView("Saved-" + INJECT_CHARS_1);
 
         // TODO: pin, unpin, move columns/filters/sort, remove single filter clause
         saveFilterTest();
@@ -162,8 +161,8 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
             @Override
             public Void apply(Void v)
             {
-                CustomizeViewsHelper.openCustomizeViewPanel(CustomizeViewTest.this);
-                CustomizeViewsHelper.saveCustomView(CustomizeViewTest.this, "EVIL: " + Crawler.injectString);
+                _customizeViewsHelper.openCustomizeViewPanel();
+                _customizeViewsHelper.saveCustomView("EVIL: " + Crawler.injectString);
                 assertTextBefore("Billson", "Johnson");
                 return null;
             }
@@ -173,20 +172,20 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
     //Issue 13099: Unable to save custom view after applying view
     private void saveAfterApplyingView(String name, String newColumnLabel, String newColumnDisplayName)
     {
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, newColumnLabel);
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(newColumnLabel);
+        _customizeViewsHelper.applyCustomView();
         assertTextPresent(newColumnDisplayName);
         assertTextPresent("unsaved");
 
-        CustomizeViewsHelper.revertUnsavedViewGridClosed(this);
+        _customizeViewsHelper.revertUnsavedViewGridClosed(this);
         waitForPageToLoad();
         assertTextNotPresent(newColumnDisplayName);
 
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, newColumnLabel);
-        CustomizeViewsHelper.applyCustomView(this);
-        CustomizeViewsHelper.saveUnsavedViewGridClosed(this, name);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(newColumnLabel);
+        _customizeViewsHelper.applyCustomView();
+        _customizeViewsHelper.saveUnsavedViewGridClosed(this, name);
         assertTextNotPresent("unsaved");
         assertTextPresent(newColumnDisplayName);
 //        assertTextPresent(PasswordUtil.getUsername(),8);
@@ -203,9 +202,9 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
 
         for(String name : viewNames)
         {
-            CustomizeViewsHelper.openCustomizeViewPanel(this);
-            CustomizeViewsHelper.addCustomizeViewFilter(this, new String[] { fieldKey }, fieldKey, op, value);
-            CustomizeViewsHelper.saveCustomView(this, name);
+            _customizeViewsHelper.openCustomizeViewPanel();
+            _customizeViewsHelper.addCustomizeViewFilter(new String[] { fieldKey }, fieldKey, op, value);
+            _customizeViewsHelper.saveCustomView(name);
         }
 
         clickMenuButton("Views", "default");
@@ -215,7 +214,7 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
 
     private void createList()
     {
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
 
         StringBuilder data = new StringBuilder();
         data.append(LIST_KEY_NAME).append("\t");
@@ -233,8 +232,8 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
             }
         }
 
-        ListHelper.clickImportData(this);
-        ListHelper.submitTsvData(this, data.toString());
+        _listHelper.clickImportData();
+        _listHelper.submitTsvData(data.toString());
         for (String[] rowData : TEST_DATA)
         {
             // check that all the data is in the grid (skipping the key column at index 0)
@@ -247,46 +246,46 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
 
     void setColumns(String... fieldKeys)
     {
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.clearCustomizeViewColumns(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.clearCustomizeViewColumns();
         for (String fieldKey : fieldKeys)
-            CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { fieldKey });
-        CustomizeViewsHelper.applyCustomView(this);
+            _customizeViewsHelper.addCustomizeViewColumn(new String[] { fieldKey });
+        _customizeViewsHelper.applyCustomView();
     }
 
     void addFilter(String fieldKey, String op, String value)
     {
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewFilter(this, new String[] { fieldKey }, fieldKey, op, value);
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewFilter(new String[] { fieldKey }, fieldKey, op, value);
+        _customizeViewsHelper.applyCustomView();
     }
 
     void addSort(String fieldKey, String order)
     {
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewSort(this, new String[] { fieldKey }, fieldKey, order);
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewSort(new String[] { fieldKey }, fieldKey, order);
+        _customizeViewsHelper.applyCustomView();
     }
 
     void removeFilter(String fieldKey)
     {
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewFilter(this, fieldKey);
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewFilter(fieldKey);
+        _customizeViewsHelper.applyCustomView();
     }
 
     void removeSort(String fieldKey)
     {
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewSort(this, fieldKey);
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewSort(fieldKey);
+        _customizeViewsHelper.applyCustomView();
     }
 
     void setColumnProperties(String fieldKey, String columnTitle, List<Map<String, String>> aggregates)
     {
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.setColumnProperties(this, fieldKey, columnTitle, aggregates);
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.setColumnProperties(fieldKey, columnTitle, aggregates);
+        _customizeViewsHelper.applyCustomView();
     }
 
     @Override

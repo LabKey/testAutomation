@@ -50,16 +50,16 @@ public class FlowJoQueryTest extends BaseFlowTest
     protected void verifyQueryTest()
     {
         importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/PV1-public.xml", null, false, "FlowJoAnalysis", false, true);
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.clearCustomizeViewColumns(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Name");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "AnalysisScript", "Analysis Script");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Keyword/Comp", "Comp");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Keyword/Stim", "Stim");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Keyword/Sample Order", "Sample Order");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.clearCustomizeViewColumns();
+        _customizeViewsHelper.addCustomizeViewColumn("Name");
+        _customizeViewsHelper.addCustomizeViewColumn("AnalysisScript", "Analysis Script");
+        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Keyword/Comp", "Comp");
+        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Keyword/Stim", "Stim");
+        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Keyword/Sample Order", "Sample Order");
+        _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
+        _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
+        _customizeViewsHelper.applyCustomView();
         clickLinkWithText(PROJECT_NAME);
         goToFolderManagement();
         clickLinkWithText("Folder Type");

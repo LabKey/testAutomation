@@ -146,7 +146,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     {
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/begin.view");
-        ExtHelper.clickExtButton(this, "Schema Administration");
+        _extHelper.clickExtButton("Schema Administration");
 
         if (!isTextPresent("reload"))
         {

@@ -54,8 +54,6 @@ public class TimeChartTest extends StudyBaseTest
     public static final String ONE_CHART_PER_PARTICIPANT = "One Chart Per Participant";
     public static final String ONE_CHART_PER_MEASURE = "One Chart Per Measure/Dimension";
 
-    protected String addMeasuresPath = "";
-
     private static final String[] GROUP1_PTIDS = {"249318596", "249320107"};
     private static final String[] GROUP2_PTIDS = {"249320127", "249320489"};
     private static final String[] GROUP3_PTIDS = {"249320489"/*Duplicate from group 2*/, "249320897", "249325717"};
@@ -240,6 +238,14 @@ public class TimeChartTest extends StudyBaseTest
         return PROJECT_NAME;
     }
 
+    @Override
+    public void doCleanup()
+    {
+        try {deleteUser(USER1);} catch (Throwable T) {}
+        try {deleteUser(USER2);} catch (Throwable T) {}
+        try {deleteProject(PROJECT_NAME);} catch (Throwable T) {}
+    }
+
     public void configureStudy()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
@@ -254,8 +260,8 @@ public class TimeChartTest extends StudyBaseTest
 
         clickLinkWithText(VISIT_FOLDER_NAME);
         clickButton("Process and Import Data");
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
+        _extHelper.waitForImportDataEnabled();
+        _extHelper.clickFileBrowserFileCheckbox("study.xml");
         selectImportDataAction("Import Study");
 
         waitForPipelineJobsToComplete(1, "study import", false);
@@ -320,7 +326,7 @@ public class TimeChartTest extends StudyBaseTest
         goToTimeChartScreenAndStartChooseMeasure();
 
         //choose measure
-        clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'CD4+')]]"), "1,1");
+        _ext4Helper.clickGridRowText("CD4+ (cells/mm3)", 0);
         clickButton("Select", 0);
 
 
@@ -331,25 +337,25 @@ public class TimeChartTest extends StudyBaseTest
         applyChanges();
 
         waitForText("Lab Results: " + GROUP1_NAME);
+        waitForCharts(4);
 
         goToGroupingTab();
-        ExtHelper.checkCheckbox(this, "Show Mean"); // select show mean
-        ExtHelper.uncheckCheckbox(this, "Show Individual Lines"); // de-select show individual lines
+        _extHelper.checkCheckbox("Show Mean"); // select show mean
+        _extHelper.uncheckCheckbox("Show Individual Lines"); // de-select show individual lines
         applyChanges();
 
         // uncheck group 1 and 2
-        waitForText(GROUP1_NAME);
-        mouseDownGridCellCheckbox(GROUP1_NAME);
-        mouseDownGridCellCheckbox(GROUP2_NAME);
-        mouseDownGridCellCheckbox("Group 1: Accute HIV-1");
-        mouseDownGridCellCheckbox("Group 2: HIV-1 Negative");
+        waitForCharts(2);
+        _ext4Helper.uncheckGridRowCheckbox(GROUP1_NAME);
+        _ext4Helper.uncheckGridRowCheckbox(GROUP2_NAME);
+        _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
+        _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
 
-        sleep(2000);
         waitForText("Please select at least one group");
         // re-select group 1 and 2
-        mouseDownGridCellCheckbox(GROUP1_NAME);
-        mouseDownGridCellCheckbox(GROUP2_NAME);
-        sleep(2000);
+        _ext4Helper.checkGridRowCheckbox(GROUP1_NAME);
+        _ext4Helper.checkGridRowCheckbox(GROUP2_NAME);
+        waitForCharts(2);
 
         waitForText(GROUP1_NAME + " CD4");
         assertTextPresent(GROUP1_NAME + " CD4", 4); // 1 time in chart legend + 1 time in the thumbnail preview on the save dialog
@@ -360,14 +366,16 @@ public class TimeChartTest extends StudyBaseTest
         goToGroupingTab();
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
         applyChanges();
+        waitForCharts(1);
         waitForText("Lab Results: CD4");
 
         openSaveMenu();
         setFormElement("reportName", "Aggregate");
         setFormElement("reportDescription", REPORT_DESCRIPTION);
         saveReport(true);
-        mouseDownGridCellCheckbox("Group 1: Accute HIV-1");
-        mouseDownGridCellCheckbox("Group 2: HIV-1 Negative");
+        _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1"); // TODO : Remove workaround for bad chart loading
+        _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
+        waitForCharts(1);
         waitForText("Lab Results: CD4");
     }
 
@@ -380,8 +388,8 @@ public class TimeChartTest extends StudyBaseTest
 
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     private void generateChartPerParticipantTest()
@@ -401,7 +409,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 6); // 5 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
 
         // re-select participant
-        mouseDownGridCellCheckbox("249320127");
+        _ext4Helper.checkGridRowCheckbox("249320127");
         waitForText(CHART_TITLE + ": 249320127", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(CHART_TITLE, 7); // 6 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
     }
@@ -417,19 +425,18 @@ public class TimeChartTest extends StudyBaseTest
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForText("NAbAssay", WAIT_FOR_JAVASCRIPT);
 
         log("Test measure search.");
-        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_DIALOG, "text", "nab");
+        _extHelper.setExtFormElementByType(ADD_MEASURE_DIALOG, "text", "nab");
         sleep(500);
         // Count search results (11 in study's NAb assay)
-        Assert.assertEquals("", 11, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG)+"//div[contains(@class, 'x4-grid-view')]/table/tbody/tr"))-1);
+        Assert.assertEquals("", 11, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG)+"//div[contains(@class, 'x4-grid-view')]/table/tbody/tr"))-1);
 
         log("Check for appropriate message for measure with no data.");
-        addMeasuresPath = ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG) + "//table/tbody/tr/td";
-        clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Cutoff Percentage (3)']]"), "1,1");
+        _ext4Helper.clickGridRowText("Cutoff Percentage (3)", 0);
         clickButton("Select", 0);
         waitForText("No data found for the following measures/dimensions: RunCutoff3", WAIT_FOR_JAVASCRIPT);
     }
@@ -453,12 +460,11 @@ public class TimeChartTest extends StudyBaseTest
 
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForText("Physical Exam", WAIT_FOR_JAVASCRIPT);
 
-        addMeasuresPath = ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG) + "//table/tbody/tr/td";
-        clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Pulse']]"), "1,1");
+        _ext4Helper.clickGridRowText("Pulse", 0);
         clickButton("Select", 0);
         waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
 
@@ -476,14 +482,14 @@ public class TimeChartTest extends StudyBaseTest
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
-        ExtHelper.waitForLoadingMaskToDisappear(this, 5*WAIT_FOR_JAVASCRIPT);
-        clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), '1. Weight')]]"), "1,1");
+        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
+        _extHelper.waitForLoadingMaskToDisappear(5*WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.clickGridRowText("1. Weight", 0);
         clickButton("Select", 0);
         waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
 
         goToAxisTab("X-Axis");
-        Ext4Helper.selectRadioButton(this, "Chart Type:", "Visit Based Chart");
+        _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and contains(@class, 'x4-item-disabled')]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and contains(@class, 'x4-item-disabled')]"));
         applyChanges();
@@ -526,7 +532,7 @@ public class TimeChartTest extends StudyBaseTest
         waitForTextToDisappear("1 - 19 of 19");
         log("Revert to Date-based chart.");
         goToAxisTab("X-Axis");
-        Ext4Helper.selectRadioButton(this, "Chart Type:", "Date Based Chart");
+        _ext4Helper.selectRadioButton("Chart Type:", "Date Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and not(contains(@class, 'x4-item-disabled'))]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and not(contains(@class, 'x4-item-disabled'))]"));
         applyChanges();
@@ -544,17 +550,17 @@ public class TimeChartTest extends StudyBaseTest
     {
         openSaveMenu();
         assertTextPresent("Report Name");
-        ExtHelper.setExtFormElementByLabel(this, "Report Name:", REPORT_NAME_1);
-        ExtHelper.setExtFormElementByLabel(this, "Report Description:", REPORT_DESCRIPTION);
+        _extHelper.setExtFormElementByLabel("Report Name:", REPORT_NAME_1);
+        _extHelper.setExtFormElementByLabel("Report Description:", REPORT_DESCRIPTION);
         saveReport(true);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
 
         clickButton("Save As", 0);
         waitForText("Report Name");
-        ExtHelper.setExtFormElementByLabel(this, "Report Name:", REPORT_NAME_2);
-        ExtHelper.setExtFormElementByLabel(this, "Report Description:", "This is another report generated by the TimeChartTest");
-        Ext4Helper.selectRadioButton(this, "Viewable By:", "Only me");
+        _extHelper.setExtFormElementByLabel("Report Name:", REPORT_NAME_2);
+        _extHelper.setExtFormElementByLabel("Report Description:", "This is another report generated by the TimeChartTest");
+        _ext4Helper.selectRadioButton("Viewable By:", "Only me");
         saveReport(true);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
@@ -582,10 +588,9 @@ public class TimeChartTest extends StudyBaseTest
         enterMeasuresPanel();
         addMeasure();
 
-        ExtHelper.setExtFormElementByType(this, ADD_MEASURE_DIALOG, "text", "viral");
-        sleep(500);
-        Assert.assertEquals("", 1, getXpathCount(Locator.xpath(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_DIALOG)+"//div[contains(@class, 'x4-grid-view')]/table/tbody/tr"))-1);
-        clickAt(Locator.xpath(addMeasuresPath + "[div[text()='Viral Load Quantified (copies/ml)']]"), "1,1");
+        _extHelper.setExtFormElementByType(ADD_MEASURE_DIALOG, "text", "viral");
+        waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr").index(2), WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.clickGridRowText("Viral Load Quantified (copies/ml)", 0);
         clickButton("Select", 0);
         waitForText("Viral Load Quantified (copies/ml) from HIV Test Results");
         applyChanges();
@@ -596,9 +601,9 @@ public class TimeChartTest extends StudyBaseTest
 
         clickButton("View Data", 0);
         waitForText("1 - 33 of 33", WAIT_FOR_JAVASCRIPT); 
-        mouseDownGridCellCheckbox("249325717");
+        _ext4Helper.checkGridRowCheckbox("249325717");
         waitForText("1 - 38 of 38", WAIT_FOR_JAVASCRIPT);
-        mouseDownGridCellCheckbox("249320127");
+        _ext4Helper.uncheckGridRowCheckbox("249320127");
         waitForText("1 - 31 of 31", WAIT_FOR_JAVASCRIPT);
 
         // verify column headers for date based plotting option
@@ -614,13 +619,13 @@ public class TimeChartTest extends StudyBaseTest
         clickButton("View Chart(s)", 0);
 
         goToAxisTab("X-Axis");
-        Ext4Helper.selectComboBoxItemById(this, "xaxis_interval", "Weeks");
+        _ext4Helper.selectComboBoxItemById("xaxis_interval", "Weeks");
         applyChanges();
         waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
         setAxisValue("X", null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
         goToAxisTab("X-Axis");
-        Ext4Helper.selectComboBoxItemById(this, "xaxis_interval", "Days");
+        _ext4Helper.selectComboBoxItemById("xaxis_interval", "Days");
         Assert.assertEquals(X_AXIS_LABEL, getFormElement("x-axis-label-textfield")); // Label shouldn't change automatically once it has been set manually
 
         // set manual x-axis range
@@ -655,7 +660,7 @@ public class TimeChartTest extends StudyBaseTest
 
         if(scaleId!=null && scale!=null)
         {
-            Ext4Helper.selectComboBoxItemById(this, scaleId, scale);        
+            _ext4Helper.selectComboBoxItemById(scaleId, scale);
         }
 
         if(label!=null)
@@ -669,7 +674,7 @@ public class TimeChartTest extends StudyBaseTest
 
         if (rangeId!=null)
         {
-            Ext4Helper.selectRadioButtonById(this, rangeId + "-boxLabelEl");
+            _ext4Helper.selectRadioButtonById(rangeId + "-boxLabelEl");
             if (lowerBound!=null && upperBound!=null)
             {
                 Locator minInput = Locator.name(axis + "axis_rangemin");
@@ -708,16 +713,13 @@ public class TimeChartTest extends StudyBaseTest
         clickMenuButton("Create", "Time Chart");
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
-        Locator.XPathLocator measure = Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'CD4+')]]");
-        waitForElement(measure);
-        clickAt(measure, "1,1");
+        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.clickGridRowText("CD4+ (cells/mm3)", 0);
         clickButton("Select", 0);
         enterMeasuresPanel();
         addMeasure();
-        waitForElement(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Lymphs')]]"));
-        clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Lymphs')]]"), "1,1");
+        _ext4Helper.clickGridRowText("Lymphs (cells/mm3)", 0);
         clickButton("Select", 0);
         waitForText("Lymphs (cells/mm3) from Lab Results");
         applyChanges();
@@ -733,7 +735,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 3); // 2 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
         
         openSaveMenu();
-        ExtHelper.setExtFormElementByLabel(this, "Report Name:", REPORT_NAME_3);
+        _extHelper.setExtFormElementByLabel("Report Name:", REPORT_NAME_3);
         saveReport(true);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 2); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
@@ -875,9 +877,9 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Test charting with participant groups");
         log("Create participant groups");
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP1_NAME, "Participant", true, GROUP1_PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP2_NAME, "Participant", false, GROUP2_PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, FOLDER_NAME, GROUP3_NAME, "Participant", false, GROUP3_PTIDS);
+        _studyHelper.createCustomParticipantGroup(PROJECT_NAME, FOLDER_NAME, GROUP1_NAME, "Participant", true, GROUP1_PTIDS);
+        _studyHelper.createCustomParticipantGroup(PROJECT_NAME, FOLDER_NAME, GROUP2_NAME, "Participant", false, GROUP2_PTIDS);
+        _studyHelper.createCustomParticipantGroup(PROJECT_NAME, FOLDER_NAME, GROUP3_NAME, "Participant", false, GROUP3_PTIDS);
 
         clickLinkWithText(FOLDER_NAME);
         goToManageViews();
@@ -929,8 +931,8 @@ public class TimeChartTest extends StudyBaseTest
 
         log("Verify one line per measure per participant. 2/3 groups.");
         // uncheck group 2 (leaving group 1 and 3 checked)
-        mouseDownGridCellCheckbox(GROUP2_NAME);
-        sleep(2000);
+        _ext4Helper.uncheckGridRowCheckbox(GROUP2_NAME);
+        waitForCharts(4);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE);//, 4); // One chart per group + 1 hidden main title text field + 1 for chart title in thumbnail preview on save dialog
         // Expected counts = one for the legend plus one for each point on the line
@@ -962,25 +964,25 @@ public class TimeChartTest extends StudyBaseTest
         clickLinkWithText(FOLDER_NAME);
         clickTab("Manage");
         clickLinkWithText("Manage Participant Groups");
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         log("Remove a participant from one group.");
         selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP1_NAME+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+GROUP1_NAME+"']"));
         clickButton("Edit Selected", 0);
-        ExtHelper.waitForExtDialog(this, "Define Participant Group");
+        _extHelper.waitForExtDialog("Define Participant Group");
         waitForElement(Locator.id("dataregion_demoDataRegion"), WAIT_FOR_JAVASCRIPT);
         setFormElement("categoryIdentifiers", GROUP1_PTIDS[0]);
-        ExtHelper.clickExtButton(this, "Define Participant Group", "Save", 0);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.clickExtButton("Define Participant Group", "Save", 0);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         log("Delete one group.");
         selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP3_NAME+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+GROUP3_NAME+"']"));
         clickButton("Delete Selected", 0);
-        ExtHelper.waitForExtDialog(this, "Delete Group");
-        ExtHelper.clickExtButton(this, "Delete Group", "Yes", 0);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog("Delete Group");
+        _extHelper.clickExtButton("Delete Group", "Yes", 0);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForTextToDisappear(GROUP3_NAME, WAIT_FOR_JAVASCRIPT);
 
         log("Verify report after modifying participant groups.");
@@ -994,9 +996,8 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE);//, 1); // One chart per group.
 
-        mouseDownGridCellCheckbox("Group 1: Accute HIV-1");
-        mouseDownGridCellCheckbox("Group 2: HIV-1 Negative");
-        sleep(2000);
+        _ext4Helper.uncheckGridRowCheckbox("Cohorts");
+        waitForCharts(1);
 
         // Expected counts = one for the legend plus one for each point on the line
         // GROUP1
@@ -1023,8 +1024,8 @@ public class TimeChartTest extends StudyBaseTest
 
         log("Verify one line per measure per participant.");
         // re-select group 2
-        mouseDownGridCellCheckbox(GROUP2_NAME);
-        sleep(2000);
+        _ext4Helper.checkGridRowCheckbox(GROUP2_NAME);
+        waitForCharts(2);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE);// 2); // One chart per group.
         // Expected counts = one for the legend plus one for each point on the line
@@ -1050,8 +1051,8 @@ public class TimeChartTest extends StudyBaseTest
         //assertTextPresent(GROUP3_PTIDS[2]+",\n Days:", 0);
 
         // uncheck group 1
-        mouseDownGridCellCheckbox(GROUP1_NAME);
-        sleep(2000);
+        _ext4Helper.uncheckGridRowCheckbox(GROUP1_NAME);
+        waitForCharts(1);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE);//, 1); // One chart per group.
 
@@ -1065,11 +1066,11 @@ public class TimeChartTest extends StudyBaseTest
 
         waitForText(CHART_TITLE);
         waitForText("Group 1: Accute HIV-1");
-        mouseDownGridCellCheckbox("Group 1: Accute HIV-1");
-        mouseDownGridCellCheckbox("Group 2: HIV-1 Negative");
-        sleep(2000);
+        _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
+        _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
 
         waitForText("Please select at least one group");
+        assertElementNotPresent(Locator.css("svg"));
         waitForText("One or more of the participant groups originally saved with this chart are not currently visible.", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(GROUP1_NAME);
         assertTextNotPresent(GROUP2_NAME);
@@ -1088,14 +1089,14 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(CHART_TITLE);
 
         waitForText("Group 1: Accute HIV-1");
-        mouseDownGridCellCheckbox("Group 1: Accute HIV-1");
-        mouseDownGridCellCheckbox("Group 2: HIV-1 Negative");
-        sleep(2000);
+        _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
+        _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
+        waitForCharts(1);
 
         assertTextPresent("Days Since Start Date", 1); // X-Axis label for one selected group.
         enterMeasuresPanel();
         addMeasure();
-        clickAt(Locator.xpath(addMeasuresPath + "[div[starts-with(text(), 'Hemoglobin')]]"), "1,1");
+        _ext4Helper.clickGridRowText("Hemoglobin", 0);
         clickButton("Select", 0);
         sleep(1000); // attempt fix for intermittent failure issue where applyChanges button is clicked too quickly (selected measure properties need to be initialized)
         waitForText("Hemoglobin from Lab Results");
@@ -1106,7 +1107,7 @@ public class TimeChartTest extends StudyBaseTest
 //        double height = Double.parseDouble(transform.substring(transform.indexOf(" "), transform.indexOf(")") - 1));
 
         enterMeasuresPanel();
-        Ext4Helper.selectComboBoxItemById(this, "yaxis_side", "Right");
+        _ext4Helper.selectComboBoxItemById("yaxis_side", "Right");
         applyChanges();
 
         setAxisValue("Right", "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
@@ -1134,8 +1135,8 @@ public class TimeChartTest extends StudyBaseTest
     private void addMeasure()
     {
         clickButton("Add Measure", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_DIALOG);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     private void timeChartPermissionsTest()
@@ -1185,17 +1186,17 @@ public class TimeChartTest extends StudyBaseTest
         assertElementNotPresent(Locator.button("Disable"));
         // enable the feature and verify that you can switch tabs
         clickButton("Enable", 0);
-        Ext4Helper.clickTabContainingText(this, "Help");
+        _ext4Helper.clickTabContainingText("Help");
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
-        Ext4Helper.clickTabContainingText(this, "Source");
+        _ext4Helper.clickTabContainingText("Source");
         click(Locator.xpath("//input/../label[contains(text(), 'Toggle editor')]"));
         sleep(1000); // wait for editor to toggle
         Assert.assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         applyChanges();
         click(Locator.css("svg a circle"));
-        ExtHelper.waitForExtDialog(this, "Data Point Information");
-        ExtHelper.clickExtButton(this, "OK", 0);
+        _extHelper.waitForExtDialog("Data Point Information");
+        _extHelper.clickExtButton("OK", 0);
         // open developer panel and test JS function validation
         goToDeveloperTab();
         setFormElement("point-click-fn-textarea", "");
@@ -1205,8 +1206,8 @@ public class TimeChartTest extends StudyBaseTest
         applyChanges();
         assertTextPresent("Error parsing the function:");
         clickButton("Disable", 0);
-        ExtHelper.waitForExtDialog(this, "Confirmation...");
-        ExtHelper.clickExtButton(this, "Confirmation...", "Yes", 0);
+        _extHelper.waitForExtDialog("Confirmation...");
+        _extHelper.clickExtButton("Confirmation...", "Yes", 0);
         assertTextNotPresent("Error");
         clickButton("Enable", 0);
         // test use-case to navigate to participang page on click
@@ -1251,21 +1252,13 @@ public class TimeChartTest extends StudyBaseTest
         waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
         enterMeasuresPanel();
         addMeasure();
-        clickAt(Locator.xpath(addMeasuresPath + "[div[text()='StdDev']]"), "1,1");
+        _ext4Helper.clickGridRowText("StdDev", 0);
         clickButton("Select", 0);
         waitForText("StdDev from LuminexAssay");
         applyChanges();
         waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT); // x-axis label
         waitForText("StdDev", WAIT_FOR_JAVASCRIPT); // left-axis label
         waitForText("LuminexAssay", WAIT_FOR_JAVASCRIPT); // main title
-    }
-
-    @Override
-    public void doCleanup()
-    {
-        try {deleteUser(USER1);} catch (Throwable T) {}
-        try {deleteUser(USER2);} catch (Throwable T) {}
-        try {deleteProject(PROJECT_NAME);} catch (Throwable T) {}
     }
 
     private void enterMeasuresPanel()
@@ -1287,7 +1280,16 @@ public class TimeChartTest extends StudyBaseTest
         clickButtonByIndex("Save", 1, 0);
         if (expectReload)
             waitForPageToLoad();
-        sleep(5000); 
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return isTextPresent("Please select at least one") || // group/participant
+                       isTextPresent("No data found") ||
+                       isElementPresent(Locator.css("svg"));
+            }
+        }, "Time chart failed to appear after saving", WAIT_FOR_JAVASCRIPT);
     }
 
 
@@ -1331,12 +1333,17 @@ public class TimeChartTest extends StudyBaseTest
 
     private void setParticipantSelection(String selection)
     {
-        Ext4Helper.selectRadioButton(this, "Participant Selection:", selection);
+        _ext4Helper.selectRadioButton("Participant Selection:", selection);
     }
 
     private void setNumberOfCharts(String selection)
     {
-        Ext4Helper.selectRadioButton(this, "Number of Charts:", selection);
+        _ext4Helper.selectRadioButton("Number of Charts:", selection);
     }
 
+    private void waitForCharts(int count)
+    {
+        waitForElementToDisappear(Locator.css("div:nth-of-type(" + (count + 1) + ") > svg"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css("div:nth-of-type(" + count + ") > svg"));
+    }
 }

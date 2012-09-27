@@ -103,7 +103,7 @@ public class ComplianceTrainingTest extends BaseSeleniumWebTest implements Advan
         setModuleProperties(Collections.singletonMap("EHR_ComplianceDB", Collections.singletonList(props)));
 
         log("Creating Lists");
-        ListHelper.importListArchive(this, getProjectName(), new File(listZIP));
+        _listHelper.importListArchive(getProjectName(), new File(listZIP));
 
         try
         {

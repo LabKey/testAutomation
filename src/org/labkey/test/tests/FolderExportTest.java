@@ -59,7 +59,8 @@ public class FolderExportTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
         _containerHelper.createProject(getProjectName(), null);
         
         verifyImportFromZip();

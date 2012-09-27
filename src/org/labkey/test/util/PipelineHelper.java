@@ -49,7 +49,7 @@ public class PipelineHelper
         _test.click(Locator.css("button.iconRename"));
 
         _test.waitForDraggableMask();
-        ExtHelper.setExtFormElementByLabel(_test, "Filename:", newName);
+        _test._extHelper.setExtFormElementByLabel("Filename:", newName);
         Locator btnLocator = Locator.extButton("Rename");
         _test.click(btnLocator);
         _test.waitForText(newName);
@@ -97,14 +97,14 @@ public class PipelineHelper
     {
         goToAdminMenu();
 
-            ExtHelper.clickExtTab(_test, "Toolbar and Grid Settings");
+            _test._extHelper.clickExtTab("Toolbar and Grid Settings");
             _test.waitForText("Configure Grid columns and Toolbar");
     }
 
     public void goToAdminMenu()
     {
         _test.clickButton("Admin", _test.WAIT_FOR_EXT_MASK_TO_APPEAR);
-        ExtHelper.waitForExtDialog(_test, "Manage File Browser Configuration", 5000);
+        _test._extHelper.waitForExtDialog("Manage File Browser Configuration", 5000);
     }
 
     /**
@@ -129,11 +129,11 @@ public class PipelineHelper
     {
 
             _test.setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), file.toString());
-            ExtHelper.setExtFormElementByLabel(_test, "Description:", description);
+            _test._extHelper.setExtFormElementByLabel("Description:", description);
             _test.clickButton("Upload", 0);
-            ExtHelper.waitForExtDialog(_test, "Extended File Properties", _test.WAIT_FOR_JAVASCRIPT);
+            _test._extHelper.waitForExtDialog("Extended File Properties", _test.WAIT_FOR_JAVASCRIPT);
             _test.setFormElement(CUSTOM_PROPERTY, customProperty);
-            ExtHelper.selectComboBoxItem(_test, "LookupColumn",lookupColumn);
+            _test._extHelper.selectComboBoxItem("LookupColumn",lookupColumn);
             _test.clickButton("Done", 0);
             _test.waitForExtMaskToDisappear();
 
@@ -146,7 +146,7 @@ public class PipelineHelper
 
     public void importFile(String fileName, String importAction)
     {
-             ExtHelper.clickFileBrowserFileCheckbox(_test, fileName);
+            _test._extHelper.clickFileBrowserFileCheckbox(fileName);
             _test.selectImportDataAction(importAction);
     }
 }

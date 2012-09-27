@@ -27,49 +27,54 @@ import java.util.List;
  * Date: Apr 30, 2010
  * Time: 7:53:50 AM
  */
-public class SearchHelper
+public class SearchHelper extends AbstractHelper
 {
     private static LinkedList<SearchItem> _searchQueue = new LinkedList<SearchItem>();
 
-    public static void initialize(BaseSeleniumWebTest test)
+    public SearchHelper(BaseSeleniumWebTest test)
+    {
+        super(test);
+    }
+
+    public void initialize()
     {
         _searchQueue.clear();
-        deleteIndex(test);
+        deleteIndex();
     }
         
-    public static void verifySearchResults(BaseSeleniumWebTest test, String container, boolean crawlResults)
+    public void verifySearchResults(String container, boolean crawlResults)
     {
-        test.log("Verify search results.");
+        _test.log("Verify search results.");
 
-        List<SearchItem> notFound = verifySearchItems(_searchQueue, test, container, crawlResults);
+        List<SearchItem> notFound = verifySearchItems(_searchQueue, container, crawlResults);
 
         if (!notFound.isEmpty())
         {
-            test.sleep(5000);
-            notFound = verifySearchItems(notFound, test, container, crawlResults);
+            _test.sleep(5000);
+            notFound = verifySearchItems(notFound, container, crawlResults);
 
             if (!notFound.isEmpty())
             {
-                test.sleep(10000);
-                notFound = verifySearchItems(notFound, test, container, crawlResults);
+                _test.sleep(10000);
+                notFound = verifySearchItems(notFound, container, crawlResults);
 
                 Assert.assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
             }
         }
     }
 
-    private static List<SearchItem> verifySearchItems(List<SearchItem> items, BaseSeleniumWebTest test, String container, boolean crawlResults)
+    private List<SearchItem> verifySearchItems(List<SearchItem> items, String container, boolean crawlResults)
     {
-        test.log("Verifying " + items.size() + " items");
+        _test.log("Verifying " + items.size() + " items");
         LinkedList<SearchItem> notFound = new LinkedList<SearchItem>();
 
         for ( SearchItem item : items)
         {
-            searchFor(test, item._searchTerm);
+            searchFor(item._searchTerm);
 
             if(item._searchResults.length == 0)
             {
-                test.assertTextPresent("Found 0 results");
+                _test.assertTextPresent("Found 0 results");
             }
             else
             {
@@ -77,7 +82,7 @@ public class SearchHelper
 
                 for( Locator loc : item._searchResults )
                 {
-                    if (!test.isElementPresent(loc))
+                    if (!_test.isElementPresent(loc))
                     {
                         success = false;
                         break;
@@ -92,13 +97,13 @@ public class SearchHelper
 
                 if ( container != null )
                 {
-                    if ( test.isLinkPresentContainingText("@files") )
+                    if ( _test.isLinkPresentContainingText("@files") )
                         if(container.contains("@files"))
-                            test.assertLinkPresentWithText(container);
+                            _test.assertLinkPresentWithText(container);
                         else
-                            test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
+                            _test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
                     else
-                        test.assertLinkPresentWithText(container);
+                        _test.assertLinkPresentWithText(container);
                 }
 
                 if ( crawlResults )
@@ -109,71 +114,71 @@ public class SearchHelper
         }
 
         if (notFound.isEmpty())
-            test.log("All items were found");
+            _test.log("All items were found");
         else
-            test.log(notFound.size() + " items were not found.");
+            _test.log(notFound.size() + " items were not found.");
 
         return notFound;
     }
 
-    public static void verifyNoSearchResults(BaseSeleniumWebTest test)
+    public void verifyNoSearchResults()
     {
-        test.log("Verify null search results.");
+        _test.log("Verify null search results.");
         for( SearchItem item : _searchQueue )
         {
-            searchFor(test, item._searchTerm);
+            searchFor(item._searchTerm);
             for ( Locator loc : item._searchResults )
             {
-                test.assertElementNotPresent(loc);
+                _test.assertElementNotPresent(loc);
             }
         }
     }
 
-    public static void enqueueSearchItem(String searchTerm, Locator... expectedResults)
+    public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
         _searchQueue.add(new SearchItem(searchTerm, false, expectedResults));
     }
 
-    public static void enqueueSearchItem(String searchTerm, boolean file, Locator... expectedResults)
+    public void enqueueSearchItem(String searchTerm, boolean file, Locator... expectedResults)
     {
         _searchQueue.add(new SearchItem(searchTerm, file, expectedResults));
     }
 
-    public static void searchFor ( BaseSeleniumWebTest test, String searchTerm )
+    public void searchFor(String searchTerm)
     {
-        test.log("Searching for: '" + searchTerm + "'.");
-        if ( test.isElementPresent(Locator.id("query")) )
+        _test.log("Searching for: '" + searchTerm + "'.");
+        if ( _test.isElementPresent(Locator.id("query")) )
         {
-            test.setFormElement(Locator.id("query"), searchTerm);
-            test.clickButton("Search");
+            _test.setFormElement(Locator.id("query"), searchTerm);
+            _test.clickButton("Search");
         }
         else
         {
-            test.setFormElement(Locator.id("headerSearchInput"), searchTerm);
-            test.clickAndWait(Locator.xpath("//img[@src = '/labkey/_images/search.png']"));
+            _test.setFormElement(Locator.id("headerSearchInput"), searchTerm);
+            _test.clickAndWait(Locator.xpath("//img[@src = '/labkey/_images/search.png']"));
         }
     }
 
-    public static void searchForSubjects(BaseSeleniumWebTest test, String searchTerm)
+    public void searchForSubjects(String searchTerm)
     {
-        test.log("Searching for subject: '" + searchTerm + "'.");
-        if (!test.isElementPresent(Locator.id("query")) )
-            test.goToModule("Search");
-        if (test.getAttribute(Locator.id("adv-search-btn"), "src").contains("plus"))
-            test.click(Locator.id("adv-search-btn"));
+        _test.log("Searching for subject: '" + searchTerm + "'.");
+        if (!_test.isElementPresent(Locator.id("query")) )
+            _test.goToModule("Search");
+        if (_test.getAttribute(Locator.id("adv-search-btn"), "src").contains("plus"))
+            _test.click(Locator.id("adv-search-btn"));
 
-        test.checkCheckbox("category", 2);
+        _test.checkCheckbox("category", 2);
 
-        test.setFormElement(Locator.id("query"), searchTerm);
-        test.clickButton("Search");
+        _test.setFormElement(Locator.id("query"), searchTerm);
+        _test.clickButton("Search");
     }
 
-    public static void deleteIndex ( BaseSeleniumWebTest test )
+    public void deleteIndex()
     {
-        test.ensureAdminMode();
-        test.goToAdmin();
-        test.clickLinkWithText("full-text search");
-        test.clickButton("Delete Index");
+        _test.ensureAdminMode();
+        _test.goToAdmin();
+        _test.clickLinkWithText("full-text search");
+        _test.clickButton("Delete Index");
     }
 
     public static class SearchItem

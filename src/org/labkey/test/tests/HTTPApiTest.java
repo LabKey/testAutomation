@@ -75,7 +75,7 @@ public class HTTPApiTest extends SimpleApiTest
         addWebPart("Lists");
 
         log("Create List");
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
         clickButton("Edit Design", 0);
         selectOptionByText("ff_titleColumn", "Like");    // Explicitly set to the PK (auto title will pick wealth column)
         clickButton("Save", 0);
@@ -84,7 +84,7 @@ public class HTTPApiTest extends SimpleApiTest
 
         log("Upload data");
         clickButton("Import Data");
-        ListHelper.submitTsvData(this, LIST_DATA);
+        _listHelper.submitTsvData(LIST_DATA);
         
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Query");

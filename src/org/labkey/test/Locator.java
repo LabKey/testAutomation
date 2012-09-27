@@ -561,6 +561,11 @@ public class Locator
             return new XPathLocator("(" + path + ")/" + str);
         }
 
+        public XPathLocator append(String clause)
+        {
+            return new XPathLocator(path + clause);
+        }
+
         public String getPath()
         {
             return path;

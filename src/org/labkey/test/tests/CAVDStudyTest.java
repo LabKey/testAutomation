@@ -19,9 +19,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -342,7 +339,7 @@ public class CAVDStudyTest extends StudyBaseTest
                 new ListHelper.ListColumn("MyStudyName", "MyStudyName", ListHelper.ListColumnType.String, ""),
                 new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "viscstudies", "studies"))
         };
-        ListHelper.createList(this, FOLDER_NAME4, "AllStudiesList", ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(FOLDER_NAME4, "AllStudiesList", ListHelper.ListColumnType.AutoInteger, "Key", columns);
         clickButton("Done");
 
         log("Add records to list for each study.");
@@ -362,11 +359,11 @@ public class CAVDStudyTest extends StudyBaseTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME4);
         clickLinkWithText("AllStudiesList", true);
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "StudyLookup");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "StudyLookup/Dataset Status");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "StudyLookup/Label");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn("StudyLookup");
+        _customizeViewsHelper.addCustomizeViewColumn("StudyLookup/Dataset Status");
+        _customizeViewsHelper.addCustomizeViewColumn("StudyLookup/Label");
+        _customizeViewsHelper.applyCustomView();
         // verify each status icon appears once originally
         for (String[] status : statuses)
         {
@@ -417,7 +414,7 @@ public class CAVDStudyTest extends StudyBaseTest
     {
         clickEditDatasetIcon(dataset);
         Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
-        Ext4Helper.selectComboBoxItem(this, "Status", status);
+        _ext4Helper.selectComboBoxItem("Status", status);
         clickButton("Save", 0);
 
         // verify that the status icon appears
@@ -441,7 +438,7 @@ public class CAVDStudyTest extends StudyBaseTest
         waitForElement(editLink, WAIT_FOR_JAVASCRIPT);
         click(editLink);
 
-        ExtHelper.waitForExtDialog(this, dataset);
+        _extHelper.waitForExtDialog(dataset);
     }
 
     private void deleteStudyDesignRow(RowType type, int row)

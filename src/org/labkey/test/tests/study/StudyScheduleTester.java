@@ -20,8 +20,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.tests.StudyBaseTest;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -234,7 +232,7 @@ public class StudyScheduleTester
                 _test.waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
                 // add a single name field
-                ListHelper.setColumnName(_test, 0, "antigenName");
+                _test._listHelper.setColumnName(0, "antigenName");
                 _test.clickButton("Save");
                 break;
             case importFromFile:
@@ -308,7 +306,7 @@ public class StudyScheduleTester
                 _test.waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
                 // add a single name field
-                ListHelper.setColumnName(_test, 0, "antigenName");
+                _test._listHelper.setColumnName(0, "antigenName");
                 _test.clickButton("Save");
                 break;
             case importFromFile:
@@ -334,7 +332,7 @@ public class StudyScheduleTester
                 _test.click(Locator.ext4Radio("Link to existing dataset"));
 
                 Locator.XPathLocator comboParent = Locator.xpath("//table[contains(@class, 'existing-dataset-combo')]");
-                Ext4Helper.selectComboBoxItem(_test, comboParent, targetDataset);
+                _test._ext4Helper.selectComboBoxItem(comboParent, targetDataset);
 
                 _test.clickButton("Done", 0);
                 break;
@@ -351,7 +349,7 @@ public class StudyScheduleTester
         {
             clickCustomizeView(entry[0]);
 
-            Ext4Helper.selectComboBoxItem(_test, "Status", entry[1]);
+            _test._ext4Helper.selectComboBoxItem("Status", entry[1]);
 
             _test.clickButton("Save", 0);
 
@@ -385,6 +383,6 @@ public class StudyScheduleTester
         _test.waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.click(editLink);
 
-        ExtHelper.waitForExtDialog(_test, viewName);
+        _test._extHelper.waitForExtDialog(viewName);
     }
 }

@@ -24,9 +24,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -149,8 +147,8 @@ public class StudyTest extends StudyBaseTest
         addWebPart("Study Data Tools");
         clickLinkWithImage("/labkey/study/tools/participant_report.png");
         clickButton("Choose Measures", 0);
-        ExtHelper.waitForExtDialog(this, "Add Measure");
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog("Add Measure");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         String textToFilter = "AE-1:(VTN) AE Log";
         waitForText(textToFilter);
@@ -168,17 +166,17 @@ public class StudyTest extends StudyBaseTest
         assertTextNotPresent(textToFilter);
 
         log("select some records and include them in a report");
-        ExtHelper.clickX4GridPanelCheckbox(this, 4, "measuresGridPanel", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, 40, "measuresGridPanel", true);
-        ExtHelper.clickX4GridPanelCheckbox(this, 20, "measuresGridPanel", true);
-        ExtHelper.clickExtButton(this, "Select", 0);
+        _extHelper.clickX4GridPanelCheckbox(4, "measuresGridPanel", true);
+        _extHelper.clickX4GridPanelCheckbox(40, "measuresGridPanel", true);
+        _extHelper.clickX4GridPanelCheckbox(20, "measuresGridPanel", true);
+        _extHelper.clickExtButton("Select", 0);
         waitForExtMaskToDisappear();
 
         log("Verify report page looks as expected");
         String reportName = "Foo";
         String reportDescription = "Desc";
-        ExtHelper.setExtFormElementByLabel(this, "Report Name", reportName);
-        ExtHelper.setExtFormElementByLabel(this, "Report Description", reportDescription);
+        _extHelper.setExtFormElementByLabel("Report Name", reportName);
+        _extHelper.setExtFormElementByLabel("Report Description", reportDescription);
         clickButton("Save", 0);
         waitForText(reportName);
         assertTextPresent(reportName, 4); // 2 for the report, 2 for FooterMenu notations
@@ -251,8 +249,8 @@ public class StudyTest extends StudyBaseTest
             assertTextPresent("Dataset: DEM-1: Demographics, All Visits >  ");
             clickLinkContainingText("Dataset:");
 
-            ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
-            ExtHelper.waitForExtDialog(this, "Selection Error");
+            _extHelper.clickMenuButton(false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
+            _extHelper.waitForExtDialog("Selection Error");
             assertTextPresent("At least one " + SUBJECT_NOUN + " must be selected");
             clickButtonContainingText("OK", 0);
             waitForExtMaskToDisappear();
@@ -265,8 +263,8 @@ public class StudyTest extends StudyBaseTest
 
         // verify the selected list of identifiers is passed to the participant group wizard
         String[] selectedIDs = new String[]{"999320016","999320518","999320529","999320541","999320533"};
-        ExtHelper.clickMenuButton(this, false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
-        ExtHelper.waitForExtDialog(this, "Define " + SUBJECT_NOUN + " Group");
+        _extHelper.clickMenuButton(false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
+        _extHelper.waitForExtDialog("Define " + SUBJECT_NOUN + " Group");
         verifySubjectIDsInWizard(selectedIDs);
 
         // save the new group and use it
@@ -348,14 +346,14 @@ public class StudyTest extends StudyBaseTest
         clickButtonContainingText("Delete Selected", 0);
 
         //make sure we can change our minds
-        ExtHelper.waitForExtDialog(this, "Delete Group");
+        _extHelper.waitForExtDialog("Delete Group");
         clickButtonContainingText("No", 0);
         waitForExtMaskToDisappear();
         assertTextPresent(listName);
 
 
         clickButtonContainingText("Delete Selected", 0);
-        ExtHelper.waitForExtDialog(this, "Delete Group");
+        _extHelper.waitForExtDialog("Delete Group");
         clickButtonContainingText("Yes", 0);
         waitForExtMaskToDisappear();
         waitForTextToDisappear(listName);
@@ -405,7 +403,7 @@ public class StudyTest extends StudyBaseTest
         log("edit list of IDs to: " + newPids);
 
         //save, close, reopen, verify change
-        ExtHelper.waitForExtDialog(this, "Define Mouse Group");
+        _extHelper.waitForExtDialog("Define Mouse Group");
         clickButtonContainingText("Save", 0);
         waitForExtMaskToDisappear();
         selectListName(listName);
@@ -484,7 +482,7 @@ public class StudyTest extends StudyBaseTest
 
         clickButtonContainingText("Save", 0);
 
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForText(listName, WAIT_FOR_JAVASCRIPT);
         return idsInForm;
     }
@@ -554,18 +552,18 @@ public class StudyTest extends StudyBaseTest
         //Import duplicate data
         clickButton("Import Data");
         setFormElement("text", _tsv);
-        ListHelper.submitImportTsv_error(this, "Duplicates were found");
+        _listHelper.submitImportTsv_error("Duplicates were found");
         //Now explicitly replace, using 'mouseid' instead of 'participantid'
         _tsv = "mouseid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
-        ListHelper.submitTsvData(this, _tsv);
+        _listHelper.submitTsvData(_tsv);
         assertTextPresent("5000.0");
         assertTextPresent("new text");
         assertTextPresent("QC State");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCState", "QC State");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("QCState", "QC State");
+        _customizeViewsHelper.applyCustomView();
         assertTextPresent("unknown QC");
 
         // Test Bad Field Names -- #13607
@@ -573,12 +571,12 @@ public class StudyTest extends StudyBaseTest
         clickButton("Edit Definition");
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
         int newFieldIndex = getXpathCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
-        ListHelper.setColumnName(this, getPropertyXPath("Dataset Fields"), newFieldIndex, "Bad Name");
+        _listHelper.setColumnName(getPropertyXPath("Dataset Fields"), newFieldIndex, "Bad Name");
         clickButton("Save");
         clickButton("View Data");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Bad Name", "Bad Name");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Bad Name", "Bad Name");
+        _customizeViewsHelper.applyCustomView();
         clickMenuButton("QC State", "All data");
         clickLinkWithText("edit", 0);
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value");
@@ -621,9 +619,9 @@ public class StudyTest extends StudyBaseTest
         checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
 
         // add a comment field
-        ListHelper.setColumnName(this, 0, COMMENT_FIELD_NAME);
-        ListHelper.setColumnLabel(this, 0, PARTICIPANT_COMMENT_LABEL);
-        ListHelper.setColumnType(this, 0, ListHelper.ListColumnType.MutliLine);
+        _listHelper.setColumnName(0, COMMENT_FIELD_NAME);
+        _listHelper.setColumnLabel(0, PARTICIPANT_COMMENT_LABEL);
+        _listHelper.setColumnType(0, ListHelper.ListColumnType.MutliLine);
         clickButton("Save");
 
         log("creating the participant/visit comment dataset");
@@ -635,9 +633,9 @@ public class StudyTest extends StudyBaseTest
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         // add a comment field
-        ListHelper.setColumnName(this, 0, COMMENT_FIELD_NAME);
-        ListHelper.setColumnLabel(this, 0, PARTICIPANT_VISIT_COMMENT_LABEL);
-        ListHelper.setColumnType(this, 0, ListHelper.ListColumnType.MutliLine);
+        _listHelper.setColumnName(0, COMMENT_FIELD_NAME);
+        _listHelper.setColumnLabel(0, PARTICIPANT_VISIT_COMMENT_LABEL);
+        _listHelper.setColumnType(0, ListHelper.ListColumnType.MutliLine);
         clickButton("Save");
 
         log("configure comments");
@@ -795,8 +793,8 @@ public class StudyTest extends StudyBaseTest
     {
         log("verify demographic data set not present");
         clickLinkContainingText(DEMOGRAPHICS_TITLE);
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        Assert.assertFalse(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
+        _customizeViewsHelper.openCustomizeViewPanel();
+        Assert.assertFalse(_customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
     protected void verifyVisitMapPage()
@@ -862,8 +860,8 @@ public class StudyTest extends StudyBaseTest
 
         log("verify ");
         clickButtonContainingText("View Data");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        Assert.assertTrue(CustomizeViewsHelper.isColumnPresent(this, "MouseVisit/DEM-1"));
+        _customizeViewsHelper.openCustomizeViewPanel();
+        assertTrue(_customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
     private void verifyHiddenVisits()

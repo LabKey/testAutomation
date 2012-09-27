@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -72,18 +71,18 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Import XLS GPAT assay");
         sleep(2000);
-        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_XLS);
+        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_XLS);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement("AssayDesignerName", ASSAY_NAME_XLS);
         uncheckCheckbox(Locator.xpath("//span[@id='id_import_Role']/input"));
         click(Locator.xpath("//tr[./td/span[@id='id_import_Score']]//div[contains(@class, 'x-tbar-page-next')]"));
-        ExtHelper.waitForExtDialog(this, "Score Column Properties");
-        ExtHelper.clickExtTab(this, "Validators");
+        _extHelper.waitForExtDialog("Score Column Properties");
+        _extHelper.clickExtTab("Validators");
         checkCheckbox("required");
         click(Locator.xpath("//tr[./td/span[@id='id_import_Primary']]//div[contains(@class, 'x-tbar-page-next')]"));
-        ExtHelper.waitForExtDialog(this, "Primary Column Properties");
-        ExtHelper.clickExtTab(this, "Advanced");
+        _extHelper.waitForExtDialog("Primary Column Properties");
+        _extHelper.clickExtTab("Advanced");
         checkCheckbox("mvEnabled");
         clickButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
@@ -93,7 +92,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         // Unable to check fail state: Selenium can't handle GWT alert.
         // clickButton("Begin import", 0);
         // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
-        ListHelper.setColumnType(this, 5, ListHelper.ListColumnType.String); // Row 201 is a string
+        _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         clickButton("Next");
         clickButton("Save and Finish");
@@ -103,26 +102,26 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Import XLSX GPAT assay");
         clickLinkWithText(PROJECT_NAME);
-        ExtHelper.waitForFileGridReady(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_XLSX);
+        _extHelper.waitForFileGridReady();
+        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_XLSX);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement("AssayDesignerName", ASSAY_NAME_XLSX);
         uncheckCheckbox(Locator.xpath("//span[@id='id_import_Role']/input"));
         click(Locator.xpath("//tr[./td/span[@id='id_import_Score']]//div[contains(@class, 'x-tbar-page-next')]"));
-        ExtHelper.waitForExtDialog(this, "Score Column Properties");
-        ExtHelper.clickExtTab(this, "Validators");
+        _extHelper.waitForExtDialog("Score Column Properties");
+        _extHelper.clickExtTab("Validators");
         checkCheckbox("required");
         click(Locator.xpath("//tr[./td/span[@id='id_import_Primary']]//div[contains(@class, 'x-tbar-page-next')]"));
-        ExtHelper.waitForExtDialog(this, "Primary Column Properties");
-        ExtHelper.clickExtTab(this, "Advanced");
+        _extHelper.waitForExtDialog("Primary Column Properties");
+        _extHelper.clickExtTab("Advanced");
         checkCheckbox("mvEnabled");
         clickButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
         assertFormElementEquals("Date", "DrawDt");
-        ListHelper.setColumnType(this, 5, ListHelper.ListColumnType.String); // Row 201 is a string
+        _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         clickButton("Next");
         clickButton("Save and Finish");
@@ -132,32 +131,32 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Import TSV GPAT assay");
         clickLinkWithText(PROJECT_NAME);
-        ExtHelper.waitForFileGridReady(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_TSV);
+        _extHelper.waitForFileGridReady();
+        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_TSV);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement("AssayDesignerName", ASSAY_NAME_TSV);
         uncheckCheckbox(Locator.xpath("//span[@id='id_import_Role']/input"));
         click(Locator.xpath("//tr[./td/span[@id='id_import_Score']]//div[contains(@class, 'x-tbar-page-next')]"));
-        ExtHelper.waitForExtDialog(this, "Score Column Properties");
-        ExtHelper.clickExtTab(this, "Validators");
+        _extHelper.waitForExtDialog("Score Column Properties");
+        _extHelper.clickExtTab("Validators");
         checkCheckbox("required");
         click(Locator.xpath("//tr[./td/span[@id='id_import_Primary']]//div[contains(@class, 'x-tbar-page-next')]"));
-        ExtHelper.waitForExtDialog(this, "Primary Column Properties");
-        ExtHelper.clickExtTab(this, "Advanced");
+        _extHelper.waitForExtDialog("Primary Column Properties");
+        _extHelper.clickExtTab("Advanced");
         checkCheckbox("mvEnabled");
         clickButton("OK", 0);
         assertFormElementEquals("SpecimenID", "SpecimenID");
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
         assertFormElementEquals("Date", "DrawDt");
-        ListHelper.setColumnType(this, 5, ListHelper.ListColumnType.String);
+        _listHelper.setColumnType(5, ListHelper.ListColumnType.String);
         clickButton("Show Assay Designer");
 
         waitForElement(Locator.xpath( getPropertyXPath(ASSAY_NAME_TSV + " Data Fields")), WAIT_FOR_JAVASCRIPT);
-        ListHelper.setColumnLabel(this, getPropertyXPath(ASSAY_NAME_TSV + " Data Fields"), 4, "Blank");
-        ListHelper.setColumnLabel(this, 7, "Result");
-        ListHelper.setColumnName(this, 7, "Result");
+        _listHelper.setColumnLabel(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields"), 4, "Blank");
+        _listHelper.setColumnLabel(7, "Result");
+        _listHelper.setColumnName(7, "Result");
         click(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='" + "Advanced" + "']"));
         setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']") , "Score");                   
         
@@ -170,7 +169,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Verify standard column aliases");
         clickLinkWithText(PROJECT_NAME);
-        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_1);
+        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_1);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "specId");
@@ -179,7 +178,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("Date", "draw_date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_2);
+        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_2);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId1");
@@ -188,7 +187,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("Date", "drawDate");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_3);
+        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_3);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId");
@@ -197,7 +196,7 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         assertFormElementEquals("Date", "date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        ExtHelper.selectFileBrowserItem(this, ALIASED_ASSAY_4);
+        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_4);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "guspec");
@@ -208,8 +207,8 @@ public class GpatAssayTest extends BaseSeleniumWebTest
 
         log("Import FASTA GPAT assay");
         clickLinkWithText(PROJECT_NAME);
-        ExtHelper.waitForFileGridReady(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, GPAT_ASSAY_FNA);
+        _extHelper.waitForFileGridReady();
+        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_FNA);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement("AssayDesignerName", ASSAY_NAME_FNA);

@@ -22,32 +22,34 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 4/23/12
  * Time: 12:56 PM
- * To change this template use File | Settings | File Templates.
  */
-public class PerlHelper
+public class PerlHelper extends AbstractHelper
 {
+    public PerlHelper(BaseSeleniumWebTest test)
+    {
+        super(test);
+    }
 
-    public static boolean ensurePerlConfig(BaseSeleniumWebTest test)
+    public boolean ensurePerlConfig()
     {
 
-        test.goToAdminConsole();
-        test.clickLinkWithText("views and scripting");
-        test.log("Check if Perl already is configured");
+        _test.goToAdminConsole();
+        _test.clickLinkWithText("views and scripting");
+        _test.log("Check if Perl already is configured");
 
 
-        if (test.isPerlEngineConfigured())
+        if (_test.isPerlEngineConfigured())
             return true;
 
 
-        test.log("Try configuring Perl");
+        _test.log("Try configuring Perl");
         String perlHome = System.getenv("PERL_HOME");
         if (perlHome != null)
         {
-            test.log("PERL_HOME is set to: " + perlHome + " searching for the Perl application");
+            _test.log("PERL_HOME is set to: " + perlHome + " searching for the Perl application");
             File perlHomeDir = new File(perlHome);
             FilenameFilter perlFilenameFilter = new FilenameFilter()
             {
@@ -68,33 +70,33 @@ public class PerlHelper
                 for (File file : files)
                 {
                     // add a new r engine configuration
-                    String id = ExtHelper.getExtElementId(test, "btn_addEngine");
-                    test.click(Locator.id(id));
+                    String id = _test._extHelper.getExtElementId("btn_addEngine");
+                    _test.click(Locator.id(id));
 
-                    id = ExtHelper.getExtElementId(test, "add_perlEngine");
-                    test.click(Locator.id(id));
+                    id = _test._extHelper.getExtElementId("add_perlEngine");
+                    _test.click(Locator.id(id));
 
-                    id = ExtHelper.getExtElementId(test, "btn_submit");
-                    test.waitForElement(Locator.id(id), 10000);
+                    id = _test._extHelper.getExtElementId("btn_submit");
+                    _test.waitForElement(Locator.id(id), 10000);
 
-                    id = ExtHelper.getExtElementId(test, "editEngine_exePath");
-                    test.setFormElement(Locator.id(id), file.getAbsolutePath());
+                    id = _test._extHelper.getExtElementId("editEngine_exePath");
+                    _test.setFormElement(Locator.id(id), file.getAbsolutePath());
 
-                    id = ExtHelper.getExtElementId(test, "btn_submit");
-                    test.click(Locator.id(id));
+                    id = _test._extHelper.getExtElementId("btn_submit");
+                    _test.click(Locator.id(id));
 
                     // wait until the dialog has been dismissed
                     int cnt = 3;
-                    while (test.isElementPresent(Locator.id(id)) && cnt > 0)
+                    while (_test.isElementPresent(Locator.id(id)) && cnt > 0)
                     {
-                        test.sleep(1000);
+                        _test.sleep(1000);
                         cnt--;
                     }
 
-                    if (test.isPerlEngineConfigured())
+                    if (_test.isPerlEngineConfigured())
                         return true;
 
-                    test.refresh();
+                    _test.refresh();
                 }
             }
         }

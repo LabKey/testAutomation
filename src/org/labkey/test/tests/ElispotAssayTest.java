@@ -212,9 +212,9 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertTextPresent("atg_4B");
 
         // show the normalized spot count column and verify it is calculated correctly
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "NormalizedSpotCount");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("NormalizedSpotCount");
+        _customizeViewsHelper.applyCustomView();
 
         DataRegionTable dataTable = new DataRegionTable(TEST_ASSAY_ELISPOT + " Data", this);
         List<String> cellWell = dataTable.getColumnDataAsText("CellWell");
@@ -233,8 +233,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
             Assert.assertEquals(computed.intValue(), nsc.intValue());
         }
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.revertUnsavedView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.revertUnsavedView();
 
         clickLinkWithText("view runs");
         clickLinkContainingText("details");
@@ -275,18 +275,18 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             Assert.assertEquals(median, table.getDataAsText(row++, "Atg1CMedian"));
 
         // verify customization of the run details view is possible
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Mean");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Median");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 8_Mean");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 8_Median");
-        CustomizeViewsHelper.saveCustomView(this, "Without Antigen7&8");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Mean");
+        _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Median");
+        _customizeViewsHelper.removeCustomizeViewColumn("Antigen 8_Mean");
+        _customizeViewsHelper.removeCustomizeViewColumn("Antigen 8_Median");
+        _customizeViewsHelper.saveCustomView("Without Antigen7&8");
 
         clickMenuButton("Views", "default");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Mean");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Antigen 7_Median");
-        CustomizeViewsHelper.saveDefaultView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Mean");
+        _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Median");
+        _customizeViewsHelper.saveDefaultView();
 
         clickMenuButton("Views", "Without Antigen7&8");
         assertTextNotPresent("Antigen 7 Mean");

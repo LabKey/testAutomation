@@ -325,9 +325,9 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickLinkWithText(TEST_ASSAY_NAB);
 
             // test creating a custom details view via a "magic" named run-level view:
-            CustomizeViewsHelper.openCustomizeViewPanel(this);
-            CustomizeViewsHelper.removeCustomizeViewColumn(this, "VirusName");
-            CustomizeViewsHelper.saveCustomView(this, "CustomDetailsView");
+            _customizeViewsHelper.openCustomizeViewPanel();
+            _customizeViewsHelper.removeCustomizeViewColumn("VirusName");
+            _customizeViewsHelper.saveCustomView("CustomDetailsView");
 
             clickLinkContainingText("details", 1);
             assertNabData(true);
@@ -493,20 +493,20 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Adding AUC columns to custom view");
         // add AUC columns. ORDER MATTERS!
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_4pl", "AUC 4pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_5pl", "AUC 5pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_poly", "AUC Poly");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_4pl", "Curve IC50 4pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_5pl", "Curve IC50 5pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_poly", "Curve IC50 Poly");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_4pl", "Curve IC70 4pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_5pl", "Curve IC70 5pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_poly", "Curve IC70 Poly");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl", "Curve IC80 4pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_5pl", "Curve IC80 5pl");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_poly", "Curve IC80 Poly");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_4pl", "AUC 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_5pl", "AUC 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_poly", "AUC Poly");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_4pl", "Curve IC50 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_5pl", "Curve IC50 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_poly", "Curve IC50 Poly");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_4pl", "Curve IC70 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_5pl", "Curve IC70 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_poly", "Curve IC70 Poly");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_4pl", "Curve IC80 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_5pl", "Curve IC80 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_poly", "Curve IC80 Poly");
+        _customizeViewsHelper.applyCustomView();
     }
 
     private void assertAliasedAUCCellData()
@@ -543,15 +543,15 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Checking data in aliased AUC columns in Study");
         // check copied AUC data.
         setSort("Dataset", "ParticipantId", SortDirection.ASC);
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_poly",        AUC_POLY_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_4pl",         AUC_4PL_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/AUC_5pl",         AUC_5PL_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC50_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC70_poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Properties/Curve IC80_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_poly",        AUC_POLY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_4pl",         AUC_4PL_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_5pl",         AUC_5PL_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
+        _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
         Assert.assertEquals(table.getDataAsText(0, AUC_STUDY_COL_TITLE),        table.getDataAsText(0, AUC_POLY_STUDY_COL_TITLE));        //AUC = AUC_poly

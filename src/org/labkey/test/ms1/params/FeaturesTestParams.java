@@ -38,10 +38,10 @@ public class FeaturesTestParams extends AbstractInspectTestParams
         String[] names = getSampleNames();
         if (names.length != 0)
         {
-            ExtHelper.waitForImportDataEnabled(_test);
+            _test._extHelper.waitForImportDataEnabled();
             for (String name : names)
             {
-                ExtHelper.clickFileBrowserFileCheckbox(getTest(), name + ".mzXML");
+                _test._extHelper.clickFileBrowserFileCheckbox(name + ".mzXML");
                 getTest().sleep(1000);
             }
         }

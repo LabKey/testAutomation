@@ -26,8 +26,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +45,8 @@ import java.util.Set;
  */
 public class LuminexTest extends AbstractQCAssayTest
 {
+    RReportHelper _rReportHelper = new RReportHelper(this);
+
     private boolean _useXarImport = false;
 
     private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
@@ -155,7 +155,8 @@ public class LuminexTest extends AbstractQCAssayTest
         prepareProgrammaticQC();
 
         // fail fast if R is not configured
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
 
         //revert to the admin user
         revertToAdmin();
@@ -184,7 +185,7 @@ public class LuminexTest extends AbstractQCAssayTest
             // since we want to test special characters in the assay name, copy the assay design to rename
             goToManageAssays();
             clickLinkWithText(TEST_ASSAY_XAR_NAME);
-            ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a[text() = 'manage assay design']"), "copy assay design");
+            _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'manage assay design']"), "copy assay design");
             clickButton("Copy to Current Folder", WAIT_FOR_PAGE);
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
             selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
@@ -304,7 +305,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected void runUploadAndCopyTest()
     {
-        ListHelper.importListArchive(this, getProjectName(), new File(getSampledataPath(), "/Luminex/UploadAndCopy.lists.zip"));
+        _listHelper.importListArchive(getProjectName(), new File(getSampledataPath(), "/Luminex/UploadAndCopy.lists.zip"));
 //        ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListColumnType.String, "Participant ID");
 //        ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListColumnType.Double, "Visit id");
 //        ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListColumnType.String, "Index", participantCol, visitCol);
@@ -436,11 +437,11 @@ public class LuminexTest extends AbstractQCAssayTest
 
         clickLinkWithText("raw and summary");
         // make sure the Summary, StdDev, and DV columns are visible
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Summary");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "StdDev");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "CV");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Summary");
+        _customizeViewsHelper.addCustomizeViewColumn("StdDev");
+        _customizeViewsHelper.addCustomizeViewColumn("CV");
+        _customizeViewsHelper.applyCustomView();
         // show all rows (> 100 in full data file)
         clickButton("Page Size", 0);
         clickLinkWithText("Show All");
@@ -512,12 +513,18 @@ public class LuminexTest extends AbstractQCAssayTest
         log("Checking R 32-bit vs 64-bit");
         pushLocation();
         clickMenuButton("Views", "Create", "R View");
-        boolean is64bit = RReportHelper.executeScript(this, "print(.Machine$sizeof.pointer)", "[1] 8", true);
-        RReportHelper.saveReport(this, "dummy");
+        boolean is64bit = _rReportHelper.executeScript("print(.Machine$sizeof.pointer)", "[1] 8", true);
+        _rReportHelper.saveReport("dummy");
         popLocation();
         waitForText(TEST_ASSAY_LUM + " CurveFit");
 
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("TitrationId/Name");
+        _customizeViewsHelper.applyCustomView();
+
         DataRegionTable table = new DataRegionTable("query", this);
+        table.setFilter("TitrationId/Name", "Equals One Of (e.g. \"a;b;c\")", "Standard1;Standard2");
+
         List<String> analyte = table.getColumnDataAsText("Analyte");
         List<String> formula = table.getColumnDataAsText("Curve Type");
         List<String> ec50 = table.getColumnDataAsText("EC50");
@@ -553,23 +560,20 @@ public class LuminexTest extends AbstractQCAssayTest
                     Assert.assertTrue( "AUC was unpopulated for row " + i, auc.get(i).length()>0);
             }
         }
-        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected " + (is64bit ? 10 : 11) + " of 19).", is64bit ? 10 : 11, rum5ec50count);
+        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected 9 of 13).", 9, rum5ec50count);
 
         // check that the 5PL parameters are within the expected ranges (note: exact values can change based on R 32-bit vs R 64-bit)
-        Double[] FiveParameter32bitEC50mins = {32211.66, 44975.52, 110.72, 32.29, 32.46, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
-        Double[] FiveParameter32bitEC50maxs = {32211.67, 45012.09, 112.85, 32.48, 35.80, 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
-        Double[] FiveParameter64bitEC50mins = {32211.66, 44975.52, 110.24, 32.29, /*no ENV7 Sample 1*/ 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
-        Double[] FiveParameter64bitEC50maxs = {32211.67, 45012.09, 112.85, 32.48, /*no ENV7 Sample 1*/ 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
+        Double[] FiveParameterEC50mins = {32211.66, 44975.52, 110.72, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
+        Double[] FiveParameterEC50maxs = {32211.67, 45012.09, 112.85, 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
         table.setFilter("CurveType", "Equals", "Five Parameter");
         table.setFilter("EC50", "Is Not Blank", "");
         ec50 = table.getColumnDataAsText("EC50");
-        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected " + (is64bit ? FiveParameter64bitEC50maxs.length : FiveParameter32bitEC50maxs.length) + ")",
-                (is64bit ? FiveParameter64bitEC50maxs.length : FiveParameter32bitEC50maxs.length), ec50.size());
+        Assert.assertEquals("Unexpected number of Five Parameter EC50 values (expected " + FiveParameterEC50maxs.length + ")", FiveParameterEC50maxs.length, ec50.size());
         for (int i = 0; i < ec50.size(); i++)
         {
             Double val = Double.parseDouble(ec50.get(i));
-            Double min = is64bit ? FiveParameter64bitEC50mins[i] : FiveParameter32bitEC50mins[i];
-            Double max = is64bit ? FiveParameter64bitEC50maxs[i] : FiveParameter32bitEC50maxs[i];
+            Double min = FiveParameterEC50mins[i];
+            Double max = FiveParameterEC50maxs[i];
             Assert.assertTrue("Unexpected 5PL EC50 value for " + table.getDataAsText(i, "Analyte"), min <= val && val <= max);
         }
         table.clearFilter("EC50");
@@ -588,9 +592,9 @@ public class LuminexTest extends AbstractQCAssayTest
         Assert.assertTrue("Unexpected analyte for Four Parameter curve fit failure", values.size() == 1 && values.get(0).equals("ENV6 (97)"));
         table.clearFilter("CurveType");
 
-        // expect ten (32-bit) or 11 (64-bit) 5PL curve fit failures
+        // expect four 5PL curve fit failures
         table.setFilter("CurveType", "Equals", "Five Parameter");
-        Assert.assertEquals("Unexpected number of Five Parameter curve fit failure flags", is64bit ? 11 : 10, table.getDataRowCount());
+        Assert.assertEquals("Unexpected number of Five Parameter curve fit failure flags", 4, table.getDataRowCount());
         table.clearFilter("CurveType");
 
         table.clearFilter("FailureFlag");
@@ -613,9 +617,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
         String[] analytes = getListOfAnalytesMultipleCurveData();
 
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "ExclusionComment");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("ExclusionComment");
+        _customizeViewsHelper.applyCustomView();
 
         //"all" excludes all
         String excludeAllWellName = "E1";
@@ -665,7 +669,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickExclusionMenuIconForWell(wellName);
         clickRadioButtonById("excludeselected");
         clickButton(SAVE_CHANGES_BUTTON, 0);
-        ExtHelper.waitForExtDialog(this, "Warning");
+        _extHelper.waitForExtDialog("Warning");
         clickButton("Yes", 2 * defaultWaitForPage);
     }
 
@@ -743,7 +747,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void excludeAnalyteForAllWellsTest(String analyte)
     {
         clickButtonContainingText("Exclude Analytes", 0);
-        ExtHelper.waitForExtDialog(this, "Exclude Analytes from Analysis");
+        _extHelper.waitForExtDialog("Exclude Analytes from Analysis");
         clickExcludeAnalyteCheckBox(analyte, true);
         String comment = "Changed for all analytes";
         setText(EXCLUDE_COMMENT_FIELD, comment);
@@ -788,7 +792,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void clickExclusionMenuIconForWell(String wellName)
     {
         waitAndClick(Locator.id(getLinkIDFromWellName(wellName)));
-        ExtHelper.waitForExtDialog(this, "Exclude Replicate Group from Analysis");
+        _extHelper.waitForExtDialog("Exclude Replicate Group from Analysis");
         waitForElement(Locator.xpath("//table[@id='saveBtn' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
     }
 
@@ -803,7 +807,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void clickExcludeAnalyteCheckBox(String analyte, boolean b)
     {
         if(b)
-            ExtHelper.prevClickFileBrowserFileCheckbox(this, analyte);
+            _extHelper.prevClickFileBrowserFileCheckbox(analyte);
         else
             Assert.fail("not supported at this time");
     }
@@ -884,12 +888,12 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText(name);
 
         //edit view to show Analyte Standard
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/Standard");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/StdCurve");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/FitProb");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/ResVar");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Analyte/Standard");
+        _customizeViewsHelper.addCustomizeViewColumn("Analyte/StdCurve");
+        _customizeViewsHelper.addCustomizeViewColumn("Analyte/FitProb");
+        _customizeViewsHelper.addCustomizeViewColumn("Analyte/ResVar");
+        _customizeViewsHelper.applyCustomView();
 
         // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
         // the same curve fits
@@ -1235,9 +1239,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // verify that the lot number value are as expected
         clickLinkWithText("r script transformed assayId");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/Properties/LotNumber");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Analyte/Properties/LotNumber");
+        _customizeViewsHelper.applyCustomView();
         setFilter(TEST_ASSAY_LUM + " Data", "Analyte/Properties/LotNumber", "Equals", TEST_ANALYTE_LOT_NUMBER);
         assertTextPresent("1 - 40 of 40");
         clearFilter(TEST_ASSAY_LUM + " Data", "Analyte/Properties/LotNumber");
@@ -1278,7 +1282,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void setFormat(String where, int index, String formatStr)
     {
         String prefix = getPropertyXPath(where);
-        ListHelper.clickRow(this, prefix, index);
+        _listHelper.clickRow(prefix, index);
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Format']"));
         setFormElement("propertyFormat", formatStr);
     }
@@ -1421,7 +1425,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         goToTestRunList();
         clickLinkWithText("Guide Set plate 4");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
         String expectedHMFI=  "9173.8";
 
         String[] newColumns = {"AnalyteTitration/MaxFIQCFlagsEnabled", "AnalyteTitration/MaxFI",
@@ -1433,9 +1437,9 @@ public class LuminexTest extends AbstractQCAssayTest
             "AnalyteTitration/Five ParameterCurveFit/AUCQCFlagsEnabled"};
         for(String column : newColumns)
         {
-            CustomizeViewsHelper.addCustomizeViewColumn(this, column);
+            _customizeViewsHelper.addCustomizeViewColumn(column);
         }
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.saveCustomView();
 
         assertElementPresent(Locator.xpath("//span[contains(@style, 'red') and text()=" + expectedHMFI + "]"));
         String expectedEC50 = "36676.656";
@@ -1516,9 +1520,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //add QC flag colum
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCFlags");
-        CustomizeViewsHelper.saveCustomView(this, "QC Flags View");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("QCFlags");
+        _customizeViewsHelper.saveCustomView("QC Flags View");
 
         DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
 
@@ -1527,7 +1531,7 @@ public class LuminexTest extends AbstractQCAssayTest
         excludeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
-        ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
+        _extHelper.clickExtMenuButton(true, Locator.navButton("Views"), "QC Flags View");
         Assert.assertEquals("AUC, EC50-4, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //3. un-exclude wells A4, B4 from plate 5a for both analytes
@@ -1535,7 +1539,7 @@ public class LuminexTest extends AbstractQCAssayTest
         includeWellFromRun("Guide Set plate 5", "A4,B4");
         goBack();
         refresh();
-        ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
+        _extHelper.clickExtMenuButton(true, Locator.navButton("Views"), "QC Flags View");
         Assert.assertEquals("AUC, EC50-5, HMFI, PCV",  drt.getDataAsText(1, "QC Flags"));
 
         //4. For GS Analyte (2), apply the non-current guide set to plate 5a
@@ -1553,7 +1557,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent(newQcFlags);
         //verify new flags present in run list
         goToTestRunList();
-        ExtHelper.clickExtMenuButton(this, true, Locator.navButton("Views"), "QC Flags View");
+        _extHelper.clickExtMenuButton(true, Locator.navButton("Views"), "QC Flags View");
         assertTextPresent("AUC, EC50-4, EC50-5, HMFI, PCV");
 
         //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
@@ -1652,9 +1656,9 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyQCFlagsInRunGrid()
     {
         //add QC flag colum
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCFlags");
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("QCFlags");
+        _customizeViewsHelper.saveCustomView();
 
         //verify expected values in column
         String[] flags = getColumnValues(TEST_ASSAY_LUM + " Runs", "QC Flags").get(0).toArray(new String[] {});
@@ -1743,12 +1747,12 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyQCReport()
     {
         //make sure all the columns we want are viable
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.showHiddenItems(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Five ParameterCurveFit/FailureFlag");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Four ParameterCurveFit/FailureFlag");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Five ParameterCurveFit/EC50");
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
+        _customizeViewsHelper.addCustomizeViewColumn("Five ParameterCurveFit/FailureFlag");
+        _customizeViewsHelper.addCustomizeViewColumn("Four ParameterCurveFit/FailureFlag");
+        _customizeViewsHelper.addCustomizeViewColumn("Five ParameterCurveFit/EC50");
+        _customizeViewsHelper.saveCustomView();
 
         assertTextPresent(TEST_ASSAY_LUM + " QC Report");
         DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " AnalyteTitration", this);
@@ -1808,7 +1812,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickRadioButtonById("excludeselected");
         clickButton("Save", 0);
 //        sleep(1000);
-        ExtHelper.clickExtButton(this, "Yes");
+        _extHelper.clickExtButton("Yes");
         waitForExtMaskToDisappear();
     }
 
@@ -1897,7 +1901,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // to the test
         for (int i = 1; i <= 5; i++)
         {
-            clickAt(ExtHelper.locateGridRowCheckbox("NETWORK" + i), "1,2");
+            clickAt(_extHelper.locateGridRowCheckbox("NETWORK" + i), "1,2");
         }
         clickButton("View 4PL Curves", 0);
         waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
@@ -1933,11 +1937,11 @@ public class LuminexTest extends AbstractQCAssayTest
         selectQuery("assay", TEST_ASSAY_LUM + " AnalyteTitration");
         waitForText("view data");
         clickLinkContainingText("view data");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Analyte/RowId");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Titration/RowId");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSet/RowId");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Analyte/RowId");
+        _customizeViewsHelper.addCustomizeViewColumn("Titration/RowId");
+        _customizeViewsHelper.addCustomizeViewColumn("GuideSet/RowId");
+        _customizeViewsHelper.applyCustomView();
         DataRegionTable table = new DataRegionTable("query", this);
         for (String analyte : analytes)
         {
@@ -1955,9 +1959,9 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("view data");
         clickLinkContainingText("view data");
         Map<String, Integer> guideSetIds = new HashMap<String, Integer>();
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("RowId");
+        _customizeViewsHelper.applyCustomView();
         DataRegionTable table = new DataRegionTable("query", this);
         table.setFilter("CurrentGuideSet", "Equals", "true");
         guideSetIds.put(table.getDataAsText(0, "Analyte Name"), Integer.parseInt(table.getDataAsText(0, "Row Id")));
@@ -1985,9 +1989,9 @@ public class LuminexTest extends AbstractQCAssayTest
     private void setIsoAndConjugate()
     {
         log("unimplemented");
-        ExtHelper.selectComboBoxItem(this,"Isotype", isotype);
+        _extHelper.selectComboBoxItem("Isotype", isotype);
 
-        ExtHelper.selectComboBoxItem(this,"Conjugate", conjugate);
+        _extHelper.selectComboBoxItem("Conjugate", conjugate);
 
     }
 
@@ -2096,9 +2100,9 @@ public class LuminexTest extends AbstractQCAssayTest
         selectQuery("assay", TEST_ASSAY_LUM + " GuideSetCurveFit");
         waitForText("view data");
         clickLinkContainingText("view data");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "GuideSetId/RowId");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("GuideSetId/RowId");
+        _customizeViewsHelper.applyCustomView();
         DataRegionTable table = new DataRegionTable("query", this);
         for (int i = 0; i < analytes.length; i++)
         {
@@ -2115,12 +2119,12 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void applyGuideSetToRun(String network, int runRowIndex, String comment, int guideSetIndex)
     {
-        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + runRowIndex);
+        clickAt(_extHelper.locateGridRowCheckbox(network), "1," + runRowIndex);
         clickButton("Apply Guide Set", 0);
         sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
 
         if(guideSetIndex!=-1) //not clicking anything will apply the current guide set
-            clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + guideSetIndex);
+            clickAt(_extHelper.locateGridRowCheckbox(comment), "1," + guideSetIndex);
 
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0);
         waitForExtMaskToDisappear();
@@ -2131,18 +2135,18 @@ public class LuminexTest extends AbstractQCAssayTest
     }
     private void verifyGuideSetToRun(String network, int networkColIndex, String comment, int commentColIndex)
     {
-        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + networkColIndex);
+        clickAt(_extHelper.locateGridRowCheckbox(network), "1," + networkColIndex);
         clickButton("Apply Guide Set", 0);
-        waitForElement(ExtHelper.locateGridRowCheckbox(network), defaultWaitForPage);
-        waitForElement(ExtHelper.locateGridRowCheckbox(comment), defaultWaitForPage);
+        waitForElement(_extHelper.locateGridRowCheckbox(network), defaultWaitForPage);
+        waitForElement(_extHelper.locateGridRowCheckbox(comment), defaultWaitForPage);
         sleep(1000);
         // deselect the current guide set to test error message
-        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
+        clickAt(_extHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
         clickButton("Apply Thresholds", 0);
         waitForText("Please select a guide set to be applied to the selected records.");
         clickButton("OK", 0);
         // reselect the current guide set and apply it
-        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
+        clickAt(_extHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0); 
         waitForExtMaskToDisappear();
         // verify that the plot is reloaded
@@ -2159,13 +2163,13 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 5; i > 0; i--)
         {
-            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), i+","+columnIndex);
+            clickAt(_extHelper.locateGridRowCheckbox(colValuePrefix + i), i+","+columnIndex);
         }
         // set start and end date filter
         setFormElement("start-date-field", "2011-03-26");
         setFormElement("end-date-field", "2011-03-28");
         // click a different element on the page to trigger the date change event
-        clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
+        clickAt(_extHelper.locateGridRowCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
         Locator l = Locator.extButton("Apply", 1);
         clickAt(l,  "1,1");
         waitForTextToDisappear("Loading");
@@ -2173,16 +2177,16 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that only 3 runs are now present
         for (int i = 4; i > 1; i--)
         {
-            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
+            clickAt(_extHelper.locateGridRowCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
         }
-        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"));
-        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "1"));
+        assertElementNotPresent(_extHelper.locateGridRowCheckbox(colValuePrefix + "5"));
+        assertElementNotPresent(_extHelper.locateGridRowCheckbox(colValuePrefix + "1"));
     }
 
     private void applyLogYAxisScale()
     {
         setUpGuideSet("GS Analyte (2)");
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//input[@id='scale-combo-box']/.."), "Log");
+        _extHelper.selectComboBoxItem(Locator.xpath("//input[@id='scale-combo-box']/.."), "Log");
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
     }
@@ -2192,9 +2196,9 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the PDF of curves file was generated along with the xls file and the Rout file
         if (!displayingRowId)
         {
-            CustomizeViewsHelper.openCustomizeViewPanel(this);
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "RowId");
-            CustomizeViewsHelper.applyCustomView(this);
+            _customizeViewsHelper.openCustomizeViewPanel();
+            _customizeViewsHelper.addCustomizeViewColumn("RowId");
+            _customizeViewsHelper.applyCustomView();
             displayingRowId = true;
         }
         DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);

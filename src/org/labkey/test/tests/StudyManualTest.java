@@ -18,8 +18,8 @@ package org.labkey.test.tests;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.StudyHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -35,6 +35,8 @@ public class StudyManualTest extends StudyTest
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
 
     protected final String VISIT_MAP = getStudySampleDataPath() + "v068_visit_map.txt";
+
+    protected final StudyHelper _studyHelper = new StudyHelper(this);
 
     @Override
     protected boolean isFileUploadTest()
@@ -113,7 +115,7 @@ public class StudyManualTest extends StudyTest
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("Manage Files");
         clickButton("Process and Import Data");
-        ExtHelper.selectFileBrowserItem(this, "datasets/Study001.dataset");
+        _extHelper.selectFileBrowserItem("datasets/Study001.dataset");
         if (isNavButtonPresent("Delete log"))
             clickButton("Delete log");
         selectImportDataAction("Import Datasets");
@@ -276,10 +278,10 @@ public class StudyManualTest extends StudyTest
 
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";
         setFormElement("text", _tsv + "\n" + errorRow);
-        ListHelper.submitImportTsv_error(this, "Could not convert 'badvisitd'");
+        _listHelper.submitImportTsv_error("Could not convert 'badvisitd'");
         assertTextPresent("Could not convert 'text'");
 
-        ListHelper.submitTsvData(this, _tsv);
+        _listHelper.submitTsvData(_tsv);
         assertTextPresent("1234");
         assertTextPresent("2006-02-01");
         assertTextPresent("1.2");

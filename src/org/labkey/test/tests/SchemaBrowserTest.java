@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 /*
@@ -53,14 +52,14 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
         clickLookupLink("lists", AUTHORS_LIST, "AuthorId");
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_AUTHORS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        ExtHelper.closeExtTab(this, "lists." + AUTHORS_LIST);
+        _extHelper.closeExtTab("lists." + AUTHORS_LIST);
         sleep(500);
         assertTextNotPresent(TEST_DESC_AUTHORS);
 
         clickLookupLink("lists", PUBLISHERS_LIST, "PublisherId");
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_PUBLISHERS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        ExtHelper.closeExtTab(this, "lists." + PUBLISHERS_LIST);
+        _extHelper.closeExtTab("lists." + PUBLISHERS_LIST);
         sleep(500);
         assertTextNotPresent(TEST_DESC_PUBLISHERS);
 
@@ -85,18 +84,18 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
     public void createLists()
     {
-        ListHelper.createList(this, PROJECT_NAME, AUTHORS_LIST,
+        _listHelper.createList(PROJECT_NAME, AUTHORS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "AuthorId",
                 new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, TEST_DESC_AUTHORS),
                 new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "")
         );
 
-        ListHelper.createList(this, PROJECT_NAME, PUBLISHERS_LIST,
+        _listHelper.createList(PROJECT_NAME, PUBLISHERS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "PublisherId",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, TEST_DESC_PUBLISHERS)
         );
 
-        ListHelper.createList(this, PROJECT_NAME, BOOKS_LIST,
+        _listHelper.createList(PROJECT_NAME, BOOKS_LIST,
                 ListHelper.ListColumnType.AutoInteger, "TitleId",
                 new ListHelper.ListColumn("Title", "Title", ListHelper.ListColumnType.String, TEST_DESC_BOOKS),
                 new ListHelper.ListColumn("Subtitle", "Subtitle", ListHelper.ListColumnType.String, ""),

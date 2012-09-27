@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -149,7 +148,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
                 new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "")
         };
 
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         clickButton("Done");
         clickLinkWithText(LIST_NAME);
@@ -169,15 +168,15 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         // wait for the domain editor to appear:
         waitForText("Label", 10000);
         clickButton("Edit Source");
-        ExtHelper.clickExtTab(this, "XML Metadata");
+        _extHelper.clickExtTab("XML Metadata");
         setQueryEditorValue("metadataText", getMetadataXML(true));
-        ExtHelper.clickExtTab(this, "Source");
+        _extHelper.clickExtTab("Source");
         clickButtonByIndex("Save", 1, 0);        // 0: source/save 1: metadata/save
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         clickButton("Execute Query", 0);
         waitForText("Seattle", WAIT_FOR_JAVASCRIPT);
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
-        ExtHelper.clickExtTab(this, "Source");
+        _extHelper.clickExtTab("Source");
         clickButton("Save & Finish");
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonPresent("Insert New");
@@ -189,11 +188,11 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickLinkWithText("edit metadata");
         waitForText("Edit Source", 10000);
         clickButton("Edit Source");
-        ExtHelper.clickExtTab(this, "XML Metadata");
+        _extHelper.clickExtTab("XML Metadata");
         setQueryEditorValue("metadataText", getMetadataXML(false));
         clickButton("Save", 0);
         assertTextNotPresent("Failed");
-        ExtHelper.clickExtTab(this, "Source");
+        _extHelper.clickExtTab("Source");
         clickButton("Save & Finish");
         verifyMetadataButtons();
 

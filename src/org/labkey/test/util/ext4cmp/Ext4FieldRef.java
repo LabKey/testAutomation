@@ -32,7 +32,7 @@ public class Ext4FieldRef extends Ext4CmpRef
 
     public static Ext4FieldRef getForLabel(BaseSeleniumWebTest test, String label)
     {
-        return Ext4Helper.queryOne(test, "field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
+        return test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
     }
 
     public String setValue(String val)

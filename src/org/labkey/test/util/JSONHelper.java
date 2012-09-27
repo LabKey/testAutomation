@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * User: kevink
  * Date: Mar 9, 2011
  */
-public class JSONHelper
+public class JSONHelper extends AbstractHelper
 {
     // json key elements to ignore during the comparison phase, these can be regular expressions
     static final Pattern[] GLOBALLY_IGNORED = {
@@ -52,17 +52,18 @@ public class JSONHelper
             Pattern.compile("displayName", Pattern.CASE_INSENSITIVE)
     };
 
-    private BaseSeleniumWebTest _test;
     private ArrayList<Pattern> _ignoredElements;
 
     public JSONHelper(BaseSeleniumWebTest test)
     {
-        this(test, null);
+        super(test);
+        _ignoredElements = new ArrayList<Pattern>();
+        _ignoredElements.addAll(Arrays.asList(GLOBALLY_IGNORED));
     }
 
     public JSONHelper(BaseSeleniumWebTest test, Pattern[] ignored)
     {
-        _test = test;
+        super(test);
 
         // load up the elements to skip comparisons on
         _ignoredElements = new ArrayList<Pattern>();

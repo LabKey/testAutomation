@@ -30,7 +30,7 @@ public class ComponentQuery
         StringBuilder sb = new StringBuilder(xtype);
         for (String attrName : attrs.keySet())
         {
-            sb.append("[" + attrName + "=\"" + attrs.get(attrName) + "\"]");
+            sb.append("[").append(attrName).append("=\"").append(attrs.get(attrName)).append("\"]");
         }
         return sb.toString();
     }

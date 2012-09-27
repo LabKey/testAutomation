@@ -19,10 +19,8 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
@@ -61,7 +59,8 @@ public class FlowTest extends BaseFlowTest
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
 
         super.init();
     }
@@ -121,9 +120,9 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("Browse for FCS files to be imported");
 
         // Should allow for import all directories containing FCS Files
-        ExtHelper.selectFileBrowserItem(this, "8color/");
-        ExtHelper.waitForImportDataEnabled(this);
-        waitForElement(ExtHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
+        _extHelper.selectFileBrowserItem("8color/");
+        _extHelper.waitForImportDataEnabled();
+        waitForElement(_extHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
         assertTextPresent("The following directories within '8color'");
         assertTextPresent(FCS_FILE_1 + " (25 fcs files)");
@@ -132,8 +131,8 @@ public class FlowTest extends BaseFlowTest
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
         waitForPageToLoad();
-        ExtHelper.selectFileBrowserItem(this, "8color/" + FCS_FILE_1 + "/");
-        waitForElement(ExtHelper.locateGridRowCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
+        _extHelper.selectFileBrowserItem("8color/" + FCS_FILE_1 + "/");
+        waitForElement(_extHelper.locateGridRowCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Current directory of 25 FCS Files");
         assertTextPresent("The following directories within '8color" + File.separator + FCS_FILE_1 + "'");
         assertTextPresent("Current Directory (25 fcs files)");
@@ -264,9 +263,9 @@ public class FlowTest extends BaseFlowTest
          clickLinkWithText("Flow Dashboard");
         clickLinkWithText("Browse for more FCS files to be imported");
 
-        ExtHelper.selectFileBrowserItem(this, "8color/");
-        ExtHelper.waitForImportDataEnabled(this);
-        waitForElement(ExtHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
+        _extHelper.selectFileBrowserItem("8color/");
+        _extHelper.waitForImportDataEnabled();
+        waitForElement(_extHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);
@@ -324,27 +323,27 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("29 FCS files");
         clickLinkWithText("Show Graphs");
 //            sleep(3000);
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Count");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Count");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets:Freq_Of_Parent");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Background/Singlets$SL:Count");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<APC-A>)");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<Alexa 680-A>)");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<FITC-A>)");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Graph/(<PE Cy55-A>)");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn("Background/Count");
+        _customizeViewsHelper.removeCustomizeViewColumn("Background/Singlets:Count");
+        _customizeViewsHelper.removeCustomizeViewColumn("Background/Singlets:Freq_Of_Parent");
+        _customizeViewsHelper.removeCustomizeViewColumn("Background/Singlets$SL:Count");
+        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<APC-A>)");
+        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<Alexa 680-A>)");
+        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<FITC-A>)");
+        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<PE Cy55-A>)");
 
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/PTID");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Visit");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "FCSFile/Sample/Stim");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Statistic/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Background/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/(FSC-H:FSC-A)");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets(SSC-A:FSC-A)");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Sample/PTID");
+        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Sample/Visit");
+        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Sample/Stim");
+        _customizeViewsHelper.addCustomizeViewColumn("Statistic/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addCustomizeViewColumn("Background/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addCustomizeViewColumn("Statistic/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addCustomizeViewColumn("Background/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addCustomizeViewColumn("Graph/(FSC-H:FSC-A)");
+        _customizeViewsHelper.addCustomizeViewColumn("Graph/Singlets(SSC-A:FSC-A)");
+        _customizeViewsHelper.addCustomizeViewColumn("Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
+        _customizeViewsHelper.saveCustomView();
 
         // check PTID value from sample set present
         assertTextPresent("P02034");
@@ -413,8 +412,8 @@ public class FlowTest extends BaseFlowTest
         selenium.fireEvent(Locator.name("filter[4].property_subset").toString(), "blur");
 
 //        Issue 12630: add stat/threshold fo TCell filter to positivity report
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='filter[4].property_stat']]"), "Count");
-        ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='filter[4].op']]"), "Is Greater Than or Equal To");
+        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[4].property_stat']]"), "Count");
+        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[4].op']]"), "Is Greater Than or Equal To");
 
         // NOTE: this filter is set high so we filter out all of the data and produce an error message.
         setFormElement("filter[4].value", "5000");
@@ -428,7 +427,7 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text()='manage']"), "Edit");
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Edit");
         setFormElement("filter[4].value", "100");
         clickButton("Save");
     }
@@ -464,13 +463,13 @@ public class FlowTest extends BaseFlowTest
 
         String reportNameEscaped = EscapeUtil.fieldKeyEncodePart(reportName);
 
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { reportNameEscaped, "Raw P" });
-        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { reportNameEscaped, "Adjusted P"});
-        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { reportNameEscaped, "Response"});
-        CustomizeViewsHelper.addCustomizeViewFilter(this, new String[] { reportNameEscaped, "Response"}, "Response", "Equals", "1");
-        CustomizeViewsHelper.addCustomizeViewSort(this, "Name", "Ascending");
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { reportNameEscaped, "Raw P" });
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { reportNameEscaped, "Adjusted P"});
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { reportNameEscaped, "Response"});
+        _customizeViewsHelper.addCustomizeViewFilter(new String[] { reportNameEscaped, "Response"}, "Response", "Equals", "1");
+        _customizeViewsHelper.addCustomizeViewSort("Name", "Ascending");
+        _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("query", this, false);
         Assert.assertEquals(4, table.getDataRowCount());
@@ -483,7 +482,7 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        ExtHelper.clickExtMenuButton(this, true, Locator.xpath("//a/span[text()='manage']"), "Delete");
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Delete");
         clickButton("OK");
     }
 

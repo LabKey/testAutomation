@@ -19,8 +19,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.text.DateFormat;
@@ -68,8 +66,8 @@ public class ExpTest extends BaseSeleniumWebTest
         clickLinkWithText(FOLDER_NAME);
         clickButton("Process and Import Data");
 
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "experiment.xar.xml");
+        _extHelper.waitForImportDataEnabled();
+        _extHelper.clickFileBrowserFileCheckbox("experiment.xar.xml");
         selectImportDataAction("Import Experiment");
         clickLinkWithText("Data Pipeline");
         assertLinkNotPresentWithText("ERROR");
@@ -114,13 +112,13 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent("file:/", 10);
 
         // Edit the metadata to use a special date format
-        ExtHelper.clickExtTab(this, "Source");
+        _extHelper.clickExtTab("Source");
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         clickButton("Edit Metadata");
         waitForElement(Locator.name("ff_label5"), WAIT_FOR_JAVASCRIPT);
-        ListHelper.setColumnLabel(this, 5, "editedCreated");
-        ExtHelper.clickExtTab(this, "Format");
+        _listHelper.setColumnLabel(5, "editedCreated");
+        _extHelper.clickExtTab("Format");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
         clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
@@ -128,13 +126,13 @@ public class ExpTest extends BaseSeleniumWebTest
         // Verify that it ended up in the XML version of the metadata
         clickButton("Edit Source");
         sleep(1000);
-        ExtHelper.clickExtTab(this, "XML Metadata");
+        _extHelper.clickExtTab("XML Metadata");
         toggleMetadataQueryEditor();
         assertTextPresent("<ns:columnTitle>editedCreated</ns:columnTitle>");
         assertTextPresent("<ns:formatString>ddd MMM dd yyyy</ns:formatString>");
 
         // Run it and see if we used the format correctly
-        ExtHelper.clickExtTab(this, "Data");
+        _extHelper.clickExtTab("Data");
         waitForText("editedCreated", WAIT_FOR_JAVASCRIPT);
         dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
         waitForText(dateFormat.format(new Date()), WAIT_FOR_JAVASCRIPT);
@@ -152,7 +150,7 @@ public class ExpTest extends BaseSeleniumWebTest
         // Make it a lookup into our custom query
         int fieldCount = selenium.getXpathCount("//input[contains(@name, 'ff_type')]").intValue();
         Assert.assertTrue(fieldCount > 0);
-        ListHelper.setColumnType(this, fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
+        _listHelper.setColumnType(fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
         mouseClick(Locator.name("ff_type" + (fieldCount - 1)).toString());
 
         // Save it
@@ -161,9 +159,9 @@ public class ExpTest extends BaseSeleniumWebTest
         clickButton("View Data");
 
         // Customize the view to add the newly joined column
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "WrappedRowId/Created", "Wrapped Row Id editedCreated");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("WrappedRowId/Created", "Wrapped Row Id editedCreated");
+        _customizeViewsHelper.applyCustomView();
         // Verify that it was joined and formatted correctly
         assertTextPresent(dateFormat.format(new Date()), 5);
 

@@ -142,7 +142,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
         _helper.clickNavPanelItem("Sequence Data:", "Import Data");
         assertElementPresent(Ext4Helper.ext4MenuItem("Import Sequence Files"));
-        Ext4Helper.clickExt4MenuItem(this, "Import Readsets");
+        _ext4Helper.clickExt4MenuItem("Import Readsets");
         waitForElement(Ext4Helper.ext4Window("Import Sequence Data"));
         waitForElement(Locator.ext4Button("Close"));
         click(Locator.ext4Button("Close"));
@@ -200,7 +200,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(s));
         }
-        Ext4Helper.clickExt4MenuItem(this, "DNA_Oligos");
+        _ext4Helper.clickExt4MenuItem("DNA_Oligos");
         waitForPageToLoad();
         waitForElement(Locator.name("name"));
         waitForElement(Locator.name("purification"));
@@ -241,7 +241,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         assertTextPresent(errorMsg);
         clickButton("OK", 0);
 
-        Ext4Helper.clickTabContainingText(this, "Import Spreadsheet");
+        _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
         setText("text", "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\tABCDEFG");
         click(Locator.ext4Button("Upload"));
@@ -288,10 +288,10 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
         //verify drop down menus show correct text by spot checking several drop-downs
         //NOTE: trailing spaces are added by ext template
-        Ext4Helper.selectComboBoxItem(this, "Sample Type", "Cell Line");
-        Ext4Helper.selectComboBoxItem(this, "Sample Source", "DNA");
-        Ext4Helper.selectComboBoxItem(this, "Additive", "EDTA");
-        Ext4Helper.selectComboBoxItem(this, "Molecule Type", "vRNA");
+        _ext4Helper.selectComboBoxItem("Sample Type", "Cell Line");
+        _ext4Helper.selectComboBoxItem("Sample Source", "DNA");
+        _ext4Helper.selectComboBoxItem("Additive", "EDTA");
+        _ext4Helper.selectComboBoxItem("Molecule Type", "vRNA");
 
         assertElementNotPresent(Ext4Helper.invalidField());
         fireEvent(Locator.name("samplename"), SeleniumEvent.blur);
@@ -315,13 +315,13 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
 
         //test presence of UI to download multiple templates
-        Ext4Helper.clickTabContainingText(this, "Import Spreadsheet");
+        _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
 
         //we only care that these items are present
-        Ext4Helper.selectComboBoxItem(this, "Choose Template", "Default Template");
-        Ext4Helper.selectComboBoxItem(this, "Choose Template", "Cells Template");
-        Ext4Helper.selectComboBoxItem(this, "Choose Template", "DNA Samples Template");
+        _ext4Helper.selectComboBoxItem("Choose Template", "Default Template");
+        _ext4Helper.selectComboBoxItem("Choose Template", "Cells Template");
+        _ext4Helper.selectComboBoxItem("Choose Template", "DNA Samples Template");
     }
 
     /**
@@ -391,14 +391,14 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         Locator locator = Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']");
         waitForElement(locator);
         click(locator);
-        Ext4Helper.clickExt4MenuItem(this, "Samples");
+        _ext4Helper.clickExt4MenuItem("Samples");
         waitForPageToLoad();
         waitForElement(Locator.name("freezer"));
         _helper.setFormField("samplename", "Sample" + suffix);
         _helper.setFormField("freezer", "freezer_" + _helper.getRandomInt());
 
-        Ext4Helper.selectComboBoxItem(this, "Sample Type", "DNA");
-        Ext4Helper.selectComboBoxItem(this, "Sample Source", "Blood");
+        _ext4Helper.selectComboBoxItem("Sample Type", "DNA");
+        _ext4Helper.selectComboBoxItem("Sample Source", "Blood");
 
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);

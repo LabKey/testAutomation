@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
@@ -47,7 +46,8 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
 
     public void configure()
     {
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
         log("Setup project and list module");
         _containerHelper.createProject(getProjectName(), null);
         resetTracker = new ResetTracker(this);
@@ -79,7 +79,7 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
         waitForText("Display Name");
 
         String rViewName = TRICKY_CHARACTERS + "new R view";
-        CustomizeViewsHelper.createRView(this, null, rViewName);
+        _customizeViewsHelper.createRView(null, rViewName);
 
         resetTracker.startTrackingRefresh();
 

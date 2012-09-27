@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
@@ -167,7 +166,7 @@ public class AssayTest extends AbstractAssayTest
     private void verifyWebdavTree()
     {
         beginAt("_webdav");
-        ExtHelper.selectFileBrowserItem(this, TEST_ASSAY_PRJ_SECURITY + "/Studies/Study 1");
+        _extHelper.selectFileBrowserItem(TEST_ASSAY_PRJ_SECURITY + "/Studies/Study 1");
         assertTextPresent("@pipeline", 2);
         Locator.XPathLocator l = Locator.xpath("//span[text()='@pipeline']");
         assertElementPresent(l,  1);
@@ -272,7 +271,7 @@ public class AssayTest extends AbstractAssayTest
         setRequired("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2);
 
         // import aliases
-        ListHelper.clickRow(this, getPropertyXPath("Data Fields"), TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 3);
+        _listHelper.clickRow(getPropertyXPath("Data Fields"), TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 3);
         click(Locator.xpath(getPropertyXPath("Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td/input[@id='importAliases']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td/input[@id='importAliases']"), TEST_ASSAY_DATA_ALIASED_PROP_NAME);
@@ -406,14 +405,14 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("f");
         assertTextPresent(ALIASED_DATA);
 
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "SpecimenID/AssayMatch", "Specimen Assay Match");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/testAssayRunProp1");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "Run/Batch/testAssaySetProp2");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "testAssayDataProp4");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
+        _customizeViewsHelper.addCustomizeViewColumn("SpecimenID/Specimen/PrimaryType", "Specimen Specimen Primary Type");
+        _customizeViewsHelper.addCustomizeViewColumn("SpecimenID/AssayMatch", "Specimen Assay Match");
+        _customizeViewsHelper.removeCustomizeViewColumn("Run/testAssayRunProp1");
+        _customizeViewsHelper.removeCustomizeViewColumn("Run/Batch/testAssaySetProp2");
+        _customizeViewsHelper.removeCustomizeViewColumn("testAssayDataProp4");
+        _customizeViewsHelper.applyCustomView();
 
         assertTextPresent("Blood (Whole)", 4);
 
@@ -516,9 +515,9 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Copy to Study");
 
         log("Verifying that the data was published");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "QCState", "QC State");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("QCState", "QC State");
+        _customizeViewsHelper.applyCustomView();
         assertTextPresent("Pending Review");
         assertTextPresent("a");
         assertTextPresent(TEST_RUN1_COMMENTS);
@@ -782,8 +781,8 @@ public class AssayTest extends AbstractAssayTest
         click(Locator.linkWithText("manage assay design"));
         clickLinkWithText("edit assay design");
         waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
-        ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
-        ListHelper.setColumnLabel(this, getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
+        _listHelper.setColumnName(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
+        _listHelper.setColumnLabel(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         deleteField("Data Fields", 4);
         clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
@@ -816,10 +815,10 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("SecondRun");
 
         log("Setting the customized view to include subfolders");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
 
-        CustomizeViewsHelper.clipFolderFilter(this);
-        CustomizeViewsHelper.saveCustomView(this, "");
+        _customizeViewsHelper.clipFolderFilter();
+        _customizeViewsHelper.saveCustomView("");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");

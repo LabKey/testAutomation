@@ -18,8 +18,6 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 
@@ -143,37 +141,37 @@ public class FormulationsTest extends BaseSeleniumWebTest
         assertTextPresent("There are no user-defined lists in this folder");
 
         log("Add list -- " + TEMPERATURE_LIST);
-        ListHelper.createList(this, PROJECT_NAME, TEMPERATURE_LIST, LIST_KEY_TYPE, "temperature");
+        _listHelper.createList(PROJECT_NAME, TEMPERATURE_LIST, LIST_KEY_TYPE, "temperature");
         assertTextPresent(TEMPERATURE_LIST);
 
         log("Upload temperature data");
-        ListHelper.clickImportData(this);
-        ListHelper.submitTsvData(this, TEMPERATURE_HEADER + TEMPERATURE_DATA);
+        _listHelper.clickImportData();
+        _listHelper.submitTsvData(TEMPERATURE_HEADER + TEMPERATURE_DATA);
 
         clickLinkWithText("Lists");
 
         log("Add list -- " + TIME_LIST);
-        ListHelper.createList(this, PROJECT_NAME, TIME_LIST, LIST_KEY_TYPE, "time", LIST_COL_SORT);
-        ListHelper.clickImportData(this);
-        ListHelper.submitTsvData(this, TIME_HEADER + TIME_DATA);
+        _listHelper.createList(PROJECT_NAME, TIME_LIST, LIST_KEY_TYPE, "time", LIST_COL_SORT);
+        _listHelper.clickImportData();
+        _listHelper.submitTsvData(TIME_HEADER + TIME_DATA);
 
         clickLinkWithText("Lists");
 
         log("Add list -- " + TYPES_LIST);
-        ListHelper.createList(this, PROJECT_NAME, TYPES_LIST, LIST_KEY_TYPE, "type");
-        ListHelper.clickImportData(this);
+        _listHelper.createList(PROJECT_NAME, TYPES_LIST, LIST_KEY_TYPE, "type");
+        _listHelper.clickImportData();
         setFormElement(Locator.id("tsv3"), TYPES_HEADER + TYPES_DATA);
         clickButton("Submit", 0);
-        ExtHelper.waitForExtDialog(this, "Success");
+        _extHelper.waitForExtDialog("Success");
         assertTextPresent("6 rows inserted.");
-        ExtHelper.clickExtButton(this, "Success", "OK");
+        _extHelper.clickExtButton("Success", "OK");
 
         clickLinkWithText("Lists");
 
         log("Add list -- " + MATERIAL_TYPES_LIST);
-        ListHelper.createList(this, PROJECT_NAME, MATERIAL_TYPES_LIST, ListHelper.ListColumnType.AutoInteger, "key", MATERIAL_COL_TYPE, MATERIAL_COL_UNITS);
-        ListHelper.clickImportData(this);
-        ListHelper.submitTsvData(this, MTYPES_HEADER + MTYPES_DATA);
+        _listHelper.createList(PROJECT_NAME, MATERIAL_TYPES_LIST, ListHelper.ListColumnType.AutoInteger, "key", MATERIAL_COL_TYPE, MATERIAL_COL_UNITS);
+        _listHelper.clickImportData();
+        _listHelper.submitTsvData(MTYPES_HEADER + MTYPES_DATA);
     }
 
     protected void setupCompounds()
@@ -189,7 +187,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         setFormElement(Locator.name("ff_name5"), "CompoundLookup");
         setFormElement(Locator.name("ff_label5"), "Type of Material");
         click(Locator.xpath("//input[@name='ff_type5']/../div[contains(@class, 'x-form-trigger-arrow')]"));
-        ExtHelper.waitForExtDialog(this, "Choose Field Type", WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog("Choose Field Type", WAIT_FOR_JAVASCRIPT);
 
         ListHelper.LookupInfo lookup = new ListHelper.LookupInfo(PROJECT_NAME, "lists", "MaterialTypes");
         checkRadioButton(Locator.xpath("//label[text()='Lookup']/../input[@name = 'rangeURI']"));
@@ -256,14 +254,14 @@ public class FormulationsTest extends BaseSeleniumWebTest
         setFormElement("nbpg", "549-87");
 
         clickButton(addButton, 0);
-        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(0), RAW_MATERIAL_1);
+        _extHelper.selectComboBoxItem(this.getRawMaterialLocator(0), RAW_MATERIAL_1);
         waitForText("%w/vol", WAIT_FOR_JAVASCRIPT);
         setFormElement("concentration", "25.4");
 
         // Test Duplicate Material
         log("Test Duplicate Material");
         clickButton(addButton, 0);
-        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(1), RAW_MATERIAL_1);
+        _extHelper.selectComboBoxItem(this.getRawMaterialLocator(1), RAW_MATERIAL_1);
         sleep(2000);
         setFormElements("input", "concentration", new String[]{"25.4", "66.2"});
         clickButton("Create", 0);
@@ -279,7 +277,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         
         // Test empty concentration
         log("Test empty concentration");
-        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(2), RAW_MATERIAL_2);
+        _extHelper.selectComboBoxItem(this.getRawMaterialLocator(2), RAW_MATERIAL_2);
         waitForText("%v/vol", WAIT_FOR_JAVASCRIPT);
         clickButton("Create", 0);
         waitForText("Invalid material.", WAIT_FOR_JAVASCRIPT);
@@ -290,7 +288,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         // Add final material
         clickButton(addButton, 0);
-        ExtHelper.selectComboBoxItem(this, this.getRawMaterialLocator(3), RAW_MATERIAL_4);
+        _extHelper.selectComboBoxItem(this.getRawMaterialLocator(3), RAW_MATERIAL_4);
         waitForText("mM", WAIT_FOR_JAVASCRIPT);
         
         // Create        
@@ -507,7 +505,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         assertTextPresent("No data to show.");
 
         clickButton("Import Data");
-        ExtHelper.selectFileBrowserItem(this, "HPLCRun/");
+        _extHelper.selectFileBrowserItem("HPLCRun/");
 
         clickButton("Import HPLC", 0);
         waitForText("Selected Subfiles", 10000);
@@ -533,15 +531,15 @@ public class FormulationsTest extends BaseSeleniumWebTest
 
         // Fill out Sample Form
         waitForText("Preview not Available");
-        Ext4Helper.selectComboBoxItem(this, "Formulation", FORMULATION);
+        _ext4Helper.selectComboBoxItem("Formulation", FORMULATION);
         setText("Diluent", "Starch");
         setText("Dilution", "123.45");
-        Ext4Helper.selectComboBoxItem(this, "Temperature", "5");
-        Ext4Helper.selectComboBoxItem(this, "Time", "T=0");
+        _ext4Helper.selectComboBoxItem("Temperature", "5");
+        _ext4Helper.selectComboBoxItem("Time", "T=0");
 
         clickButton("Next", 0);
 
-//        Ext4Helper.selectComboBoxItem(this, "Compound", "Alum");
+//        _ext4Helper.selectComboBoxItem(this, "Compound", "Alum");
         setText("Concentration", "789.01");
         setFormElement(Locator.xpath("(//input[@name='Diluent'])[2]"), "Not Starch");
 

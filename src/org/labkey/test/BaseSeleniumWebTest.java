@@ -39,12 +39,14 @@ import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.ComponentQuery;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -129,6 +131,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected long _startTime;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
+    public ExtHelper _extHelper = new ExtHelper(this);
+    public Ext4Helper _ext4Helper = new Ext4Helper(this);
+    public CustomizeViewsHelper _customizeViewsHelper = new CustomizeViewsHelper(this);
+    public StudyHelper _studyHelper = new StudyHelper(this);
+    public ListHelper _listHelper = new ListHelper(this);
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
 
@@ -208,6 +215,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         if (this.enableScriptCheck())
             beginJsErrorChecker();
+
+
     }
 
     public void beginJsErrorChecker()
@@ -255,8 +264,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         log("Ensuring pipeline tools directory points to the right place");
         goToHome();
-        clickAdminMenuItem("Site", "Admin Console");
-        clickLinkWithText("site settings");
+        goToSiteSettings();
         File currentToolsDirectory = new File(getFormElement("pipelineToolsDirectory"));
         if(!currentToolsDirectory.exists())
         {
@@ -777,23 +785,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    private Boolean initialSystemMaintenanceSchedule = null; // true = daily : false = never
     protected void setSystemMaintenance(boolean enable)
     {
-        goToAdminConsole();
-        clickLinkWithText("site settings");
-        if (initialSystemMaintenanceSchedule == null) initialSystemMaintenanceSchedule = getFormElement("systemMaintenanceInterval").equals("daily");
-        checkRadioButton("systemMaintenanceInterval", enable ? "daily" : "never");
-        clickButton("Save");
-    }
-
-    protected void resetSystemMaintenance()
-    {
-        if (initialSystemMaintenanceSchedule != null)
+        // Not available in production mode
+        if (enableDevMode())
         {
             goToAdminConsole();
-            clickLinkWithText("site settings");
-            checkRadioButton("systemMaintenanceInterval", initialSystemMaintenanceSchedule ? "daily" : "never");
+            clickLinkWithText("system maintenance");
+
+            if (enable)
+                checkCheckbox("enableSystemMaintenance");
+            else
+                uncheckCheckbox("enableSystemMaintenance");
+
             clickButton("Save");
         }
     }
@@ -808,7 +812,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void goToAdminConsole()
     {
+        goToHome();
         clickAdminMenuItem("Site", "Admin Console");
+    }
+
+    public void goToSiteSettings()
+    {
+        goToAdminConsole();
+        clickLinkWithText("site settings");
     }
 
     public void goToAuditLog()
@@ -837,7 +848,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
     {
-        ExtHelper.clickExtMenuButton(this, wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
+        _extHelper.clickExtMenuButton(wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
     }
 
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
@@ -1139,13 +1150,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void startSystemMaintenance()
     {
-        if(!isElementPresent(Locator.linkWithText("Run system maintenance now")))
-        {
-            goToAdminConsole();
-            clickLinkWithText("site settings");
-        }
+        goToAdminConsole();
+        clickLinkWithText("system maintenance");
         selenium.openWindow("", "systemMaintenance");
-        clickLinkWithText("Run system maintenance now", false);
+        clickLinkWithText("Run all tasks", false);
         smStart = System.currentTimeMillis();
     }
 
@@ -2222,7 +2230,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void assertExtMsgBox(String title, String text)
     {
-        String actual = ExtHelper.getExtMsgBoxText(this, title);
+        String actual = _extHelper.getExtMsgBoxText(title);
         Assert.assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.indexOf(text) != -1);
     }
 
@@ -2252,7 +2260,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         setFormElement(l,groupName);
         clickButton("Create New Group", 0);
-        ExtHelper.waitForExtDialog(this, groupName + " Information");
+        _extHelper.waitForExtDialog(groupName + " Information");
     }
 
     public void createGlobalPermissionsGroup(String groupName, String... users)
@@ -2283,7 +2291,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickExtTabContainingText(this, "Project Groups");
+        _extHelper.clickExtTabContainingText("Project Groups");
         setFormElement("newGroupForm$input",groupName);
         clickButton("Create New Group", 0);
         sleep(500);
@@ -2298,7 +2306,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        ExtHelper.clickExtTabContainingText(this, "Project Groups");
+        _extHelper.clickExtTabContainingText("Project Groups");
         createPermissionGroupFromGroupScreen(groupName, memberNames);
         enterPermissionsUI();
     }
@@ -2328,7 +2336,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void clickManageGroup(String groupName)
     {
-        ExtHelper.clickExtTab(this, "Project Groups");
+        _extHelper.clickExtTab("Project Groups");
         // warning Adminstrators can apper multiple times
         waitAndClick(Locator.xpath("//div[@id='groupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
         sleep(100);
@@ -2339,7 +2347,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void clickManageSiteGroup(String groupName)
     {
-        ExtHelper.clickExtTab(this, "Site Groups");
+        _extHelper.clickExtTab("Site Groups");
         // warning Adminstrators can apper multiple times
         waitAndClick(Locator.xpath("//div[@id='siteGroupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
         sleep(100);
@@ -2417,7 +2425,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 sleep(500); //Clicking too soon causes the dropdown menu to not populate
                 click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
                 Locator.XPathLocator l = Locator.xpath("//tr[./td/input[@name='templateSourceId']]");
-                Ext4Helper.selectComboBoxItem(this, l, templateFolder);
+                _ext4Helper.selectComboBoxItem(l, templateFolder);
 
                 //TODO:  the checkboxes.  I don't need this right now so I haven't written it, but my intention is to use tabsToAdd
             }
@@ -2509,6 +2517,24 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         // verify that we're not on an error page with a check for a project link:
         assertLinkPresentWithText(project);
         assertLinkNotPresentWithText(folderName);
+    }
+
+    /**
+     * from the file management page, select a file and rename it
+     *
+     * @param oldFilename the name of the file to select
+     * @param newFilename the new file name
+     */
+    public void renameFile(String oldFilename, String newFilename)
+    {
+        Locator l = Locator.xpath("//div[text()='" + oldFilename + "']");
+        clickAt(l, "1,1");
+        click(Locator.css("button.iconRename"));
+
+        waitForDraggableMask();
+        _extHelper.setExtFormElementByLabel("Filename:", newFilename);
+        Locator btnLocator = Locator.extButton("Rename");
+        click(btnLocator);
     }
 
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
@@ -2835,7 +2861,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             text = text.replace("&nbsp;", " ");
             Assert.assertFalse("Text '" + text + "' was present", isTextPresent(text));
-
         }
     }
 
@@ -2957,7 +2982,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     @Deprecated public void waitForExtMaskToDisappear(int wait)
     {
-        ExtHelper.waitForExt3MaskToDisappear(this, wait);
+        _extHelper.waitForExt3MaskToDisappear(wait);
     }
 
     /**
@@ -2973,7 +2998,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     @Deprecated public void waitForExtMask(int wait)
     {
-        ExtHelper.waitForExt3Mask(this, wait);
+        _extHelper.waitForExt3Mask(wait);
     }
 
     //like wait for ExtMask, but waits for a draggable mask (for example, the file rename mask)
@@ -3051,7 +3076,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void clickExportToText()
     {
         clickButton("Export", 0);
-        ExtHelper.clickSideTab(this, "Text");
+        _extHelper.clickSideTab("Text");
         clickButton("Export to Text");
     }
 
@@ -3066,7 +3091,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton("Export", 0);
         waitForText("Script");
         sleep(1500);
-        ExtHelper.clickSideTab(this, tab);
+        _extHelper.clickSideTab(tab);
         if(type!=null)
         {
             click(Locator.xpath("//tr[td[contains(text()," +  type + ")]]/td/input"));
@@ -3107,7 +3132,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 map.put("propName", array[1]);
                 waitForText(array[1]); //wait for the property name to appear
                 String query = ComponentQuery.fromAttributes("field", map);
-                Ext4FieldRef ref = Ext4Helper.queryOne(this, query, Ext4FieldRef.class);
+                Ext4FieldRef ref = _ext4Helper.queryOne(query, Ext4FieldRef.class);
                 String val = ref.getValue();
                 if(StringUtils.isEmpty(val) || !val.equals(array[2]))
                 {
@@ -3380,6 +3405,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             public boolean check()
             {
                 return value.equals(getFormElement(locator));
+            }
+        }, failMessage, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void waitForFormElementToNotEqual(final Locator locator, final String value)
+    {
+        String failMessage = "Field with locator " + locator + " did not equal " + value + ".";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return !value.equals(getFormElement(locator));
             }
         }, failMessage, WAIT_FOR_JAVASCRIPT);
     }
@@ -3712,21 +3749,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void selectFolderTreeItem(String folderName)
     {
         click(Locator.permissionsTreeNode(folderName));
-    }
-
-    public void mouseDownGridCellCheckbox(String cellText)
-    {
-        mouseDownGridCellCheckbox(cellText, 1);
-    }
-
-    public void mouseDownGridCellCheckbox(String cellText, int index)
-    {
-        mouseDown(mouseDownGridCellLocator(cellText, index));
-    }
-
-    public Locator mouseDownGridCellLocator(String cellText, int index)
-    {
-        return Locator.xpath("(//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + cellText + "')]/../../..//div[contains(@class, 'x4-grid-row-checker')])[" + index + "]");
     }
 
     public void mouseOut(Locator l)
@@ -4252,7 +4274,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             Assert.fail("No button found with text \"" + text + "\" at index " + index);
     }
 
-    private Locator.XPathLocator getButtonLocator(String text, int index)
+    public Locator.XPathLocator getButtonLocator(String text, int index)
     {
         // check for normal labkey nav button:
         Locator.XPathLocator locator = Locator.navButton(text, index);
@@ -4575,20 +4597,20 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String columnLabel = getText(header);
         runMenuItemHandler(id);
-        ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
+        _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
         waitForTextToDisappear("Loading...");
 
         if (isTextPresent("Choose Values"))
         {
             log("Switching to advanced filter UI");
-            ExtHelper.clickExtTab(this, "Choose Filters");
+            _extHelper.clickExtTab("Choose Filters");
             waitForElement(Locator.xpath("//span["+Locator.NOT_HIDDEN+" and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
         }
-        ExtHelper.selectComboBoxItem(this, "Filter Type", filter1Type); //Select combo box item.
+        _extHelper.selectComboBoxItem("Filter Type", filter1Type); //Select combo box item.
         if(filter1 != null) setFormElement("value_1", filter1);
         if(filter2Type!=null)
         {
-            ExtHelper.selectComboBoxItem(this, "and", filter2Type); //Select combo box item.
+            _extHelper.selectComboBoxItem("and", filter2Type); //Select combo box item.
             if(filter2 != null) setFormElement("value_2", filter2);
         }
     }
@@ -4613,7 +4635,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String columnLabel = getText(header);
         runMenuItemHandler(id);
-        ExtHelper.waitForExtDialog(this, "Show Rows Where " + columnLabel + "...");
+        _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
 
         sleep(500);
 
@@ -4627,13 +4649,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             for(String v : values)
             {
-                mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Show Rows Where "+columnLabel+"...")+
+                mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
                     "//div[contains(@class,'x-grid3-row') and .//span[text()='"+v+"']]//div[@class='x-grid3-row-checker']"));
             }
         }
         else if (values.length == 1)
         {
-            mouseDown(Locator.xpath(ExtHelper.getExtDialogXPath(this, "Show Rows Where "+columnLabel+"...")+
+            mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
                     "//div[contains(@class,'x-grid3-row')]//span[text()='"+values[0]+"']"));
         }
     }
@@ -4696,9 +4718,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         String xpath = ("//input[starts-with(@name, 'ff_name");
         int newFieldIndex = getXpathCount(Locator.xpath(xpath + "')]"));
         clickButtonByIndex("Add Field", 1, 0);
-        ListHelper.setColumnName(this, newFieldIndex, name);
-        ListHelper.setColumnLabel(this, newFieldIndex, label);
-        ListHelper.setColumnType(this, newFieldIndex, type);
+        _listHelper.setColumnName(newFieldIndex, name);
+        _listHelper.setColumnLabel(newFieldIndex, label);
+        _listHelper.setColumnType(newFieldIndex, type);
     }
 
     // UNDONE: move usages to use ListHelper
@@ -4709,9 +4731,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         selenium.click(addField);
         waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
-        ListHelper.setColumnName(this, prefix, index, name);
-        ListHelper.setColumnLabel(this, prefix, index, label);
-        ListHelper.setColumnType(this, prefix, index, type);
+        _listHelper.setColumnName(prefix, index, name);
+        _listHelper.setColumnLabel(prefix, index, label);
+        _listHelper.setColumnType(this, prefix, index, type);
     }
 
     // UNDONE: move usages to use ListHelper
@@ -4722,9 +4744,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         selenium.click(addField);
         waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
-        ListHelper.setColumnName(this, prefix, index, name);
-        ListHelper.setColumnLabel(this, prefix, index, label);
-        ListHelper.setColumnType(this, prefix, index, type);
+        _listHelper.setColumnName(prefix, index, name);
+        _listHelper.setColumnLabel(prefix, index, label);
+        _listHelper.setColumnType(prefix, index, type);
     }
 
     // UNDONE: move usages to ListHelper
@@ -4810,7 +4832,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void clickMenuButton(String menusLabel, String ... subMenusLabels)
     {
-        ExtHelper.clickMenuButton(this, true, menusLabel, subMenusLabels);
+        _extHelper.clickMenuButton(true, menusLabel, subMenusLabels);
     }
 
     /**
@@ -4819,7 +4841,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void clickMenuButtonAndContinue(String menusLabel, String ... subMenusLabels)
     {
-        ExtHelper.clickMenuButton(this, false, menusLabel, subMenusLabels);
+        _extHelper.clickMenuButton(false, menusLabel, subMenusLabels);
     }
 
     public void dataRegionPageFirst(String dataRegionName)
@@ -5155,7 +5177,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
-        ExtHelper.clickExtTabContainingText(this, "Permissions");
+        _extHelper.clickExtTabContainingText("Permissions");
 
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
@@ -5163,16 +5185,23 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             Assert.fail("call removePermission()");
             return;
         }
-        log("Setting permissions for group " + userOrGroupName + " to " + role);
+        else
+        {
+            if (!isElementPresent(Locator.permissionRendered()))
+                enterPermissionsUI();
+            _extHelper.clickExtTabContainingText("Permissions");
 
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        String input = "$add$" + role;
-        String combo = "$combo$";
-        click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-        click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + userOrGroupName + "']"));
-        sleep(100);
-        savePermissions();
-        assertPermissionSetting(userOrGroupName, permissionString);
+            log("Setting permissions for group " + userOrGroupName + " to " + role);
+
+            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+            String input = "$add$" + role;
+            String combo = "$combo$";
+            click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
+            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + userOrGroupName + "']"));
+            sleep(100);
+            savePermissions();
+            assertPermissionSetting(userOrGroupName, permissionString);
+        }
     }
 
 
@@ -5250,7 +5279,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void exitPermissionsUI()
     {
-        ExtHelper.clickExtTabContainingText(this, "Permissions");
+        _extHelper.clickExtTabContainingText("Permissions");
         clickButton("Save and Finish");
     }
 
@@ -5316,7 +5345,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertTextNotPresent("Stop Impersonating");
         ensureAdminMode();
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Impersonate");
+        _extHelper.clickExtTab("Impersonate");
         selectOptionByText(Locator.id("email").toString(), fakeUser);
         clickButton("Impersonate");
         _impersonationStack.push(fakeUser);
@@ -5445,7 +5474,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//div[text()='" + groupName + "']"));
-        ExtHelper.waitForExtDialog(this, groupName + " Information");
+        _extHelper.waitForExtDialog(groupName + " Information");
     }
 
     public void deleteUsers(boolean failIfNotFound, String... userEmails)
@@ -5516,7 +5545,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Project Groups");
+        _extHelper.clickExtTab("Project Groups");
         boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         exitPermissionsUI();
         return ret;
@@ -5541,7 +5570,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Project Groups");
+        _extHelper.clickExtTab("Project Groups");
         click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
         click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
@@ -5671,7 +5700,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     //TODO
     protected void importSpecimen(String file)
     {
-        ExtHelper.selectFileBrowserItem(this, file);
+        _extHelper.selectFileBrowserItem(file);
         selectImportDataActionNoWaitForGrid("Import Specimen Data");
         clickButton("Start Import");
     }
@@ -5945,7 +5974,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToFolderManagement();
         clickLinkWithText("Import");
         clickButtonContainingText("Import Folder Using Pipeline");
-        ExtHelper.selectFileBrowserItem(this, folderFile);
+        _extHelper.selectFileBrowserItem(folderFile);
         selectImportDataAction("Import Folder");
         waitForPipelineJobsToComplete(1, "foo", false);
     }
@@ -6212,7 +6241,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 //        setFormElement("queryText", sql);
         if (xml != null)
         {
-            ExtHelper.clickExtTab(this, "XML Metadata");
+            _extHelper.clickExtTab("XML Metadata");
             setQueryEditorValue("metadataText", xml);
 //        toggleMetadataQueryEditor();
 //        setFormElement("metadataText", xml);
@@ -6230,7 +6259,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void validateQueries()
     {
-        ExtHelper.clickExtButton(this, "Validate Queries", 0);
+        _extHelper.clickExtButton("Validate Queries", 0);
         Locator locButton = Locator.xpath("//button[text()='Start Validation']");
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
         waitForElement(locButton, WAIT_FOR_JAVASCRIPT);
@@ -6669,10 +6698,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             for (String dir : dirNames)
                 path += dir + "/";
 
-            ExtHelper.selectFileBrowserItem(BaseSeleniumWebTest.this, path);
+            _extHelper.selectFileBrowserItem(path);
 
             for (File copiedArchive : _copiedArchives)
-                ExtHelper.clickFileBrowserFileCheckbox(BaseSeleniumWebTest.this, copiedArchive.getName());
+                _extHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
             selectImportDataAction("Import Specimen Data");
             clickButton("Start Import");
         }
@@ -6777,7 +6806,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + id);
         waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
-        ExtHelper.setQueryEditorValue(this, id, value);
+        _extHelper.setQueryEditorValue(id, value);
     }
 
     /**
@@ -6795,8 +6824,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void selectImportDataAction(String actionName)
     {
         sleep(100);
-        ExtHelper.waitForFileGridReady(this);
-        ExtHelper.waitForImportDataEnabled(this);
+        _extHelper.waitForFileGridReady();
+        _extHelper.waitForImportDataEnabled();
         selectImportDataActionNoWaitForGrid(actionName);
     }
 
@@ -6810,7 +6839,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void selectPipelineFileAndImportAction(String file, String actionName)
     {
-        ExtHelper.selectFileBrowserItem(this, file);
+        _extHelper.selectFileBrowserItem(file);
         selectImportDataAction(actionName);
     }
 
@@ -6819,7 +6848,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton("Import Data", 0);
 
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
-        String id = ExtHelper.getExtElementId(this, "btn_submit");
+        String id = _extHelper.getExtElementId("btn_submit");
         clickAndWait(Locator.id(id));
     }
 

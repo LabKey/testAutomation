@@ -91,7 +91,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     {
         goToModule("CDS");
         clickLinkWithText(query);
-        ListHelper.clickImportData(this);
+        _listHelper.clickImportData();
 
         setFormElement(Locator.id("tsv3"), getFileContents(dataFile), true);
         clickButton("Submit");

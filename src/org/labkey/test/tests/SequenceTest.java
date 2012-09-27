@@ -93,7 +93,7 @@ public class SequenceTest extends LabModulesTest
         _helper.clickSpanContaining("Create Readsets");
         waitForPageToLoad();
         waitForText("Run Id");
-        Ext4Helper.clickTabContainingText(this, "Import Spreadsheet");
+        _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
 
         setText("text", getIlluminaNames());
@@ -145,7 +145,7 @@ public class SequenceTest extends LabModulesTest
         Ext4FieldRef templateCombo = Ext4FieldRef.getForLabel(this, "Template");
         int originalCount = Integer.parseInt(templateCombo.eval("this.store.getCount()"));
 
-        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         for (String[] a : fieldPairs)
         {
@@ -162,27 +162,27 @@ public class SequenceTest extends LabModulesTest
         //add new values
         String prop_name = "NewProperty";
         String prop_value = "NewValue";
-        Ext4FieldRef textarea = Ext4Helper.queryOne(this, "textarea[itemId='sourceField']", Ext4FieldRef.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRef.class);
         String newValue = prop_name + "," + prop_value;
         textarea.eval("this.setValue(this.getValue() + \"\\\\n" + newValue + "\")");
         clickButton("Done Editing", 0);
 
         //verify template has changed
-        Ext4Helper.clickTabContainingText(this, "General Info");
+        _ext4Helper.clickTabContainingText("General Info");
         Assert.assertEquals("Custom", Ext4FieldRef.getForLabel(this, "Template").getValue());
 
         //verify values persisted
-        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         Assert.assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
 
         //save template
         clickButton("Save As Template", 0);
         waitForElement(Ext4Helper.ext4Window("Choose Name"));
-        Ext4FieldRef textfield = Ext4Helper.queryOne(this, "textfield", Ext4FieldRef.class);
+        Ext4FieldRef textfield = _ext4Helper.queryOne("textfield", Ext4FieldRef.class);
         textfield.setValue(TEMPLATE_NAME);
         clickButton("OK", 0);
-        Ext4Helper.clickTabContainingText(this, "General Info");
+        _ext4Helper.clickTabContainingText("General Info");
         Assert.assertEquals(TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
 
         //if we navigate too quickly, before the insertRows has returned, the test can get a JS error
@@ -190,7 +190,7 @@ public class SequenceTest extends LabModulesTest
         sleep(500);
 
         //verify samples present
-        Ext4Helper.clickTabContainingText(this, "Preview Samples");
+        _ext4Helper.clickTabContainingText("Preview Samples");
         waitForText("Sample_ID");
 
         int expectRows = (11 * (14 +  1));  //11 cols, 14 rows, plus header
@@ -214,13 +214,13 @@ public class SequenceTest extends LabModulesTest
         Assert.assertEquals("Combo store does not have correct record number", (originalCount + 1), count);
         sleep(50);
         Assert.assertEquals("Field value not set correctly", TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
-        Ext4Helper.clickTabContainingText(this, "Preview Header");
+        _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         Assert.assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
 
         //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
         //to directly get the output
-        Ext4CmpRef panel = Ext4Helper.queryOne(this, "#illuminaPanel", Ext4CmpRef.class);
+        Ext4CmpRef panel = _ext4Helper.queryOne("#illuminaPanel", Ext4CmpRef.class);
         String outputTable = panel.eval("this.getTableOutput().join(\"<>\")");
         outputTable = outputTable.replaceAll("<>", "\n");
 
@@ -392,10 +392,10 @@ public class SequenceTest extends LabModulesTest
         waitForPageToLoad();
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
-        ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "Download Sequence Files");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "Download Sequence Files");
         waitForElement(Ext4Helper.ext4Window("Export Files"));
         waitForText("Export Files As");
-        Ext4CmpRef window = Ext4Helper.queryOne(this, "#exportFilesWin", Ext4CmpRef.class);
+        Ext4CmpRef window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRef.class);
         String fileName = "MyFile";
         Ext4FieldRef.getForLabel(this, "File Prefix").setValue(fileName);
         String url = window.eval("this.getURL()");
@@ -403,8 +403,8 @@ public class SequenceTest extends LabModulesTest
         Assert.assertTrue("Improper URL to download sequences", url.contains("exportFiles.view?"));
         Assert.assertEquals("Wrong number of files selected", 28, StringUtils.countMatches(url, "dataIds="));
 
-        Ext4Helper.queryOne(this, "field[boxLabel='Forward Reads']", Ext4FieldRef.class).setValue("false");
-        Ext4Helper.queryOne(this,"field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRef.class).setChecked(true);
+        _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRef.class).setValue("false");
+        _ext4Helper.queryOne("field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRef.class).setChecked(true);
 
         url = window.eval("this.getURL()");
         Assert.assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
@@ -417,7 +417,7 @@ public class SequenceTest extends LabModulesTest
         log("Verifying FASTQC Report");
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
-        ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "View FASTQC Report");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "View FASTQC Report");
         waitForPageToLoad();
         waitForText("File Summary");
         assertTextPresent("Per base sequence quality");
@@ -438,7 +438,7 @@ public class SequenceTest extends LabModulesTest
         dr.checkCheckbox(2);
         filterText.append(dr.getDataAsText(2, "Readset Id") + ")");
 
-        ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "View Analyses");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "View Analyses");
         waitForPageToLoad();
         waitForText("Analysis Type"); //proxy for dataRegion loading
         assertTextPresent(filterText.toString());
@@ -484,7 +484,7 @@ public class SequenceTest extends LabModulesTest
         dr.checkCheckbox(6);
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
 
-        ExtHelper.clickExtMenuButton(this, false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "Analyze Selected");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "Analyze Selected");
         waitForElement(Ext4Helper.ext4Window("Import Data"));
         waitForText("Description");
         waitAndClick(Locator.ext4Button("Submit"));
@@ -547,12 +547,12 @@ public class SequenceTest extends LabModulesTest
         assertTextPresent(rocheAdapters[0][1]);
         assertTextPresent(rocheAdapters[1][1]);
 
-        Ext4Helper.queryOne(this, "#adapterGrid", Ext4CmpRef.class).eval("this.getSelectionModel().select(0)");
+        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRef.class).eval("this.getSelectionModel().select(0)");
         clickButton("Move Down", 0);
         sleep(500);
         assertTextBefore(rocheAdapters[1][0], rocheAdapters[0][0]);
 
-        Ext4Helper.queryOne(this, "#adapterGrid", Ext4CmpRef.class).eval("this.getSelectionModel().select(1)");
+        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRef.class).eval("this.getSelectionModel().select(1)");
         clickButton("Move Up", 0);
         sleep(500);
         assertTextBefore(rocheAdapters[0][0], rocheAdapters[1][0]);
@@ -664,7 +664,7 @@ public class SequenceTest extends LabModulesTest
         Ext4FieldRef.getForLabel(this, "Import Results into LabKey").setChecked(true);
         Ext4FieldRef.getForLabel(this, "Do Not Import SNPs").setChecked(true);
 
-        Ext4CmpRef panel = Ext4Helper.queryOne(this, "#sequenceAnalysisPanel", Ext4CmpRef.class);
+        Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
         String jsonString = panel.eval("selenium.browserbot.getCurrentWindow().Ext4.encode(this.getJsonParams())");
         JSONObject json = new JSONObject(jsonString);
 
@@ -869,10 +869,10 @@ public class SequenceTest extends LabModulesTest
         _helper.clickSpanContaining("Upload Files / Start Analysis");
         waitForPageToLoad();
         waitForText("fileset");
-        ExtHelper.selectFileBrowserRoot(this);
+        _extHelper.selectFileBrowserRoot();
         for (String f : files)
         {
-            ExtHelper.selectFileBrowserItem(this, f);
+            _extHelper.selectFileBrowserItem(f);
         }
 
         selectImportDataAction(importAction);

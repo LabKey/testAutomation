@@ -449,7 +449,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
-        ListHelper.createList(this, getProjectName(), LIST_NAME,
+        _listHelper.createList(getProjectName(), LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
@@ -457,10 +457,10 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("Importing some data...");
         clickButton("Import Data");
-        ListHelper.submitTsvData(this, LIST_DATA);
+        _listHelper.submitTsvData(LIST_DATA);
 
         log("Create list in subfolder to prevent query validation failure");
-        ListHelper.createList(this, FOLDER_NAME, LIST_NAME,
+        _listHelper.createList(FOLDER_NAME, LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
@@ -498,9 +498,9 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         assertTextBefore("Adam", "Josh");
 
         //Issue 11307: Inconsistencies saving session view over file-based view
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "CreatedBy");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("CreatedBy");
+        _customizeViewsHelper.applyCustomView();
         assertTextPresent("is unsaved");
         assertTextPresent("Created By");
         CustomizeViewsHelper.saveUnsavedViewGridClosed(this, null);
@@ -510,7 +510,8 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
     private void doTestReports()
     {
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");
         clickLinkWithText(getProjectName());

@@ -146,7 +146,7 @@ public class StudySecurityTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Study Security");
+        _extHelper.clickExtTab("Study Security");
         waitAndClickButton("Study Security");
 
         click(getRadioButtonLocator(groupName, setting));
@@ -224,7 +224,7 @@ public class StudySecurityTest extends StudyBaseTest
     {
         //setup advanced dataset security
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Study Security");
+        _extHelper.clickExtTab("Study Security");
         waitAndClickButton("Study Security");
 
         setFormElement("securityString", "ADVANCED_WRITE");

@@ -156,7 +156,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         // uncheck the row with the specimen id and go to create vials page.
         table.uncheckCheckbox(0);
         clickButton("Create Vials", 0);
-        ExtHelper.waitForExtDialog(this, "Create Vials");
+        _extHelper.waitForExtDialog("Create Vials");
 
         // Check for 'Sally Lab' in ComboBox
         click(Locator.xpath("//input[@name='defaultLocationField']/../img"));
@@ -278,7 +278,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         table.checkCheckbox(1);
         table.checkCheckbox(3);
         clickButton("Move Vials", 0);
-        ExtHelper.waitForExtDialog(this, "Move Vials");
+        _extHelper.waitForExtDialog("Move Vials");
         setFormElement("changeLocationField", "Site C");
         clickButton("Move Vials", WAIT_FOR_JAVASCRIPT);
 

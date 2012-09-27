@@ -46,7 +46,7 @@ public class Ext4CmpRef
     public List<Ext4CmpRef> query(String selector)
     {
         String res = _test.getWrapper().getEval("selenium.ext4ComponentQuery('" + selector + "', '" + _id + "')");
-        return Ext4Helper.componentsFromJson(_test, res, Ext4CmpRef.class);
+        return _test._ext4Helper.componentsFromJson(res, Ext4CmpRef.class);
     }
 
     public String eval(String expr)

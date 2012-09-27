@@ -20,11 +20,9 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 3/14/12
  * Time: 12:03 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ProjectSettingsTest extends BaseSeleniumWebTest
 {
@@ -32,7 +30,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
-    private Locator helpMenuLink = enableDevMode()?helpMenuLinkDev:helpMenuLinkProduction;
+    private Locator helpMenuLink = enableDevMode() ? helpMenuLinkDev : helpMenuLinkProduction;
 
     @Override
     //this project will remain unaltered and copy every property from the site.

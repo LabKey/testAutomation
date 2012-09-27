@@ -69,8 +69,8 @@ public class AncillaryStudyTest extends StudyBaseTest
         importStudy();
         startSpecimenImport(2);
         waitForPipelineJobsToComplete(2, "study import", false);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", true, PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", true, PTIDS_BAD);
+        _studyHelper.createCustomParticipantGroup(PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP, "Mouse", true, PTIDS);
+        _studyHelper.createCustomParticipantGroup(PROJECT_NAME, getFolderName(), PARTICIPANT_GROUP_BAD, "Mouse", true, PTIDS_BAD);
         createAncillaryStudy();
     }
 
@@ -84,7 +84,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickButton("Create Ancillary Study", 0);
         
         //Wizard page 1 - location
-        ExtHelper.waitForExtDialog(this, "Create Ancillary Study");
+        _extHelper.waitForExtDialog("Create Ancillary Study");
         clickAt(Locator.xpath("//label/span[text()='Protocol']"), "1,1");
         waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Protocol Document']"), WAIT_FOR_JAVASCRIPT);
         setFormElement("studyName", getFolderName());
@@ -92,7 +92,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         Assert.assertTrue(PROTOCOL_DOC.exists());
         setFormElement("protocolDoc", PROTOCOL_DOC);
         clickButton("Change", 0);
-        selenium.doubleClick(Locator.xpath(ExtHelper.getExtDialogXPath("Create Ancillary Study") + "//span[string() = '"+PROJECT_NAME+"']").toString());
+        selenium.doubleClick(Locator.xpath(_extHelper.getExtDialogXPath("Create Ancillary Study") + "//span[string() = '"+PROJECT_NAME+"']").toString());
         clickButton("Next", 0);
 
         //Wizard page 2 - participant group
@@ -192,13 +192,13 @@ public class AncillaryStudyTest extends StudyBaseTest
         selenium.getEval("selenium.selectExtGridItem('label', '"+PARTICIPANT_GROUP+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+PARTICIPANT_GROUP+"']"));
         clickButton("Edit Selected", 0);
-        ExtHelper.waitForExtDialog(this, "Define Mouse Group");
+        _extHelper.waitForExtDialog("Define Mouse Group");
         waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         String csp = PTIDS[0];
         for( int i = 1; i < PTIDS.length - 1; i++ )
             csp += ","+PTIDS[i];
         setFormElement("categoryIdentifiers", csp);
-        ExtHelper.clickExtButton(this, "Define Mouse Group", "Save", 0);
+        _extHelper.clickExtButton("Define Mouse Group", "Save", 0);
         waitForExtMaskToDisappear();
 
         log("Verify that modified participant group has no effect on ancillary study.");
@@ -350,7 +350,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickLinkWithText("Manage");
         assertTextNotPresent("Specimen Repository Settings");
         assertTextNotPresent("Specimen Request Settings");
-        assertTextPresent("NOTE: specimen repository and request settings are not available for ancillary studies.");
+        assertTextPresent("NOTE: specimen repository and request settings are not available for ancillary or published studies.");
         assertElementNotPresent(Locator.linkWithText("Change Repository Type"));
         assertElementNotPresent(Locator.linkWithText("Manage Display and Behavior"));
         assertElementNotPresent(Locator.linkWithText("Manage Request Statuses"));
@@ -363,23 +363,23 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void verifyExportImport()
     {
-        StudyHelper.exportStudy(this, STUDY_NAME);
+        _studyHelper.exportStudy(STUDY_NAME);
         goToModule("Pipeline");
         clickButton("Process and Import Data");
 
-        ExtHelper.selectFileBrowserItem(this, "export/study/participant_groups.xml");
+        _extHelper.selectFileBrowserItem("export/study/participant_groups.xml");
         log("Verify protocol document in export");
-        ExtHelper.selectFileBrowserItem(this, "export/study/protocolDocs/" + PROTOCOL_DOC.getName());
+        _extHelper.selectFileBrowserItem("export/study/protocolDocs/" + PROTOCOL_DOC.getName());
         assertTextPresent(PROTOCOL_DOC2.getName());
 
-        ExtHelper.selectFileBrowserItem(this, "export/study/datasets/datasets_metadata.xml");
+        _extHelper.selectFileBrowserItem("export/study/datasets/datasets_metadata.xml");
         assertTextPresent(".tsv", (DATASETS.length + DEPENDENT_DATASETS.length) * 3);
         assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset125.tsv",
                 "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset200.tsv",
                 "dataset300.tsv", "dataset350.tsv", "dataset420.tsv", "dataset423.tsv", "dataset490.tsv");
 
         log("Verify reloading study");
-        ExtHelper.selectFileBrowserItem(this, "export/study/study.xml");
+        _extHelper.selectFileBrowserItem("export/study/study.xml");
         selectImportDataAction("Reload Study");
         waitForPipelineJobsToComplete(1, "study import", false);
     }

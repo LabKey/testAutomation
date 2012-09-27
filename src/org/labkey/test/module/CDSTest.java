@@ -19,10 +19,9 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.JSONHelper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 
@@ -126,7 +125,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickLinkWithText(PROJECT_NAME);
         waitForTextWithRefresh("Fact Table", defaultWaitForPage*4);  //wait for study to fully load
         clickLinkWithText(query);
-        ListHelper.clickImportData(this);
+        _listHelper.clickImportData();
 
         setFormElement(Locator.id("tsv3"), getFileContents(new File(getSampledataPath(), "CDS/"+dataFilePath)), true);
         clickButton("Submit");
@@ -461,7 +460,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         openFilterPanel("Study Name");
         waitForElement(Locator.tagWithText("div", "PI1"));
-        ExtHelper.clickX4GridPanelCheckbox(this, 2, "lookupcols", true);
+        _extHelper.clickX4GridPanelCheckbox(2, "lookupcols", true);
         clickButton("OK", 0);
 
         log("Filter on a looked-up column");
@@ -473,7 +472,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         log("Ensure filtering goes away when column does");
         openFilterPanel("Study Name");
         waitForElement(Locator.tagWithText("div", "PI1"));
-        ExtHelper.clickX4GridPanelCheckbox(this, 1, "lookupcols", false);
+        _extHelper.clickX4GridPanelCheckbox(1, "lookupcols", false);
         clickButton("OK", 0);
         waitForTextToDisappear("PI1");
         waitForGridCount(246);
@@ -714,18 +713,18 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.tagWithText("span", "Plot Data"));
         waitForText("\u25b2");
         clickButton("\u25b2", 0);
-        ExtHelper.pickMeasure(this, "xaxispicker", "Lab Results", "CD4");
+        _extHelper.pickMeasure("xaxispicker", "Lab Results", "CD4");
         clickButton("Set X-Axis", 0);
         waitForText("Y Axis");
-        ExtHelper.pickMeasure(this, "yaxispicker", "Lab Results", "Lymphocytes");
+        _extHelper.pickMeasure("yaxispicker", "Lab Results", "Lymphocytes");
         clickButton("Set Y-Axis", 0);
         waitForText(CD4_LYMPH);
 
         clickButton("\u25ba", 0);
-        ExtHelper.pickMeasure(this, "yaxispicker", "Lab Results", "CD4");
+        _extHelper.pickMeasure("yaxispicker", "Lab Results", "CD4");
         clickButton("Set Y-Axis", 0);
         clickButton("\u25b2", 0);
-        ExtHelper.pickMeasure(this, "xaxispicker", "Lab Results", "Hemoglobin");
+        _extHelper.pickMeasure("xaxispicker", "Lab Results", "Hemoglobin");
         clickButton("Set X-Axis", 0);
         waitForText(HEMO_CD4); // svg to text
 
@@ -743,11 +742,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         // Test log scales
         clickButton("\u25ba", 0);
-        ExtHelper.pickMeasure(this, "yaxispicker", "Physical Exam", "Weight Kg");
+        _extHelper.pickMeasure("yaxispicker", "Physical Exam", "Weight Kg");
         click(Locator.xpath("(//input[contains(@class, 'x4-form-radio')])[2]")); // set Y to log scale
         clickButton("Set Y-Axis", 0);
         clickButton("\u25b2", 0);
-        ExtHelper.pickMeasure(this, "xaxispicker", "Physical Exam", "Pulse");
+        _extHelper.pickMeasure("xaxispicker", "Physical Exam", "Pulse");
         click(Locator.xpath("(//input[contains(@class, 'x4-form-radio')])[4]")); // set X to log scale
         clickButton("Set X-Axis", 0);
         waitForText(WT_PLSE_LOG);
@@ -928,7 +927,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
             waitForElement(Locator.css("div.sourcepanel"));
         }
 
-        ExtHelper.pickMeasure(this, source, measure, keepSelection);
+        _extHelper.pickMeasure(source, measure, keepSelection);
 
         if (!keepOpen)
         {
@@ -945,7 +944,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         openFilterPanel(colName);
         if (null != filter)
-            Ext4Helper.selectComboBoxItem(this, "Value", filter);
+            _ext4Helper.selectComboBoxItem("Value", filter);
 
         waitForElement(Locator.id("value_1"));
         setFormElement(Locator.css("#value_1 input"), value);
@@ -954,7 +953,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void openFilterPanel (String colHeader)
     {
-        List<Ext4CmpRef> headers = Ext4Helper.componentQuery(this, "#raw-data-view grid gridcolumn", Ext4CmpRef.class);
+        List<Ext4CmpRef> headers = _ext4Helper.componentQuery("#raw-data-view grid gridcolumn", Ext4CmpRef.class);
         for (Ext4CmpRef ref : headers)
         {
             String colNameStr = ref.eval("this.text");
@@ -963,7 +962,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
                 String triggerid = ref.eval("this.triggerEl.id");
                 mouseOver(Locator.id(triggerid));
                 click(Locator.id(triggerid));
-                waitFor(new Ext4Helper.Ext4SelectorChecker(this, "rawdatafilterwin"), "No filter win", WAIT_FOR_JAVASCRIPT);
+                waitFor(_ext4Helper.getExt4SelectorChecker("rawdatafilterwin"), "No filter win", WAIT_FOR_JAVASCRIPT);
             }
         }
     }

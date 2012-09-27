@@ -82,7 +82,7 @@ public class SampleMindedImportTest extends BaseSeleniumWebTest
         clickLinkWithText("Manage Files");
 
         clickButton("Process and Import Data");
-        ExtHelper.selectFileBrowserItem(this, "specimens/" + FILE);
+        _extHelper.selectFileBrowserItem("specimens/" + FILE);
         selectImportDataActionNoWaitForGrid("Import Specimen Data");
         clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "Import specimens: SampleMindedExport.xlsx", false);

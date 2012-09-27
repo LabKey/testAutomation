@@ -120,7 +120,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
 
         log("Creating list for Query test...");
 
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME,
+        _listHelper.createList(PROJECT_NAME, LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "First Name"),
                 new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "Last Name"),

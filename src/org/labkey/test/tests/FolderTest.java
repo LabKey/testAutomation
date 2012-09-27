@@ -125,7 +125,7 @@ public class FolderTest extends BaseSeleniumWebTest
 //
 //        log("Illegal folder move test: Project demotion");
 //        moveFolder(PROJECT_NAME, "home", false, false);
-//        ExtHelper.waitForExtDialog(this, "Change Display Order");  // it should only give option to reorder projects
+//        _extHelper.waitForExtDialog(this, "Change Display Order");  // it should only give option to reorder projects
 //        clickButton("Cancel", 0);
 //
 //        log("Illegal folder move test: Folder promotion");
@@ -200,7 +200,7 @@ public class FolderTest extends BaseSeleniumWebTest
         dragAndDrop(p, t, order == Reorder.preceding ? Position.top : Position.bottom);
         if(successExpected)
         {
-            ExtHelper.waitForExtDialog(this, "Change Display Order");
+            _extHelper.waitForExtDialog("Change Display Order");
             clickButton("Confirm Reorder", 0);
         }
     }
@@ -215,7 +215,7 @@ public class FolderTest extends BaseSeleniumWebTest
         dragAndDrop(Locator.xpath(PROJECT_FOLDER_XPATH + "//div/a/span[text()='"+folder+"']"), Locator.xpath(PROJECT_FOLDER_XPATH + "//div/a/span[text()='"+targetFolder+"']"), order == Reorder.preceding ? Position.top : Position.bottom);
         if(successExpected)
         {
-            ExtHelper.waitForExtDialog(this, "Change Display Order");
+            _extHelper.waitForExtDialog("Change Display Order");
             clickButton("Confirm Reorder", 0);
         }
         //TODO: else {confirm failure}
@@ -233,7 +233,7 @@ public class FolderTest extends BaseSeleniumWebTest
         dragAndDrop(Locator.xpath(PROJECT_FOLDER_XPATH + "//div/a/span[text()='"+folder+"']"), Locator.xpath("//div/a/span[text()='"+targetFolder+"']"), Position.middle);
         if(successExpected)
         {
-            ExtHelper.waitForExtDialog(this, "Move Folder");
+            _extHelper.waitForExtDialog("Move Folder");
             if (multiple)
                 assertTextPresent("You are moving multiple folders.");
             else
@@ -241,8 +241,8 @@ public class FolderTest extends BaseSeleniumWebTest
             if(confirmMove)
             {
                 clickButton("Confirm Move", 0);
-                if (multiple) ExtHelper.waitForExtDialog(this, "Moving Folders");
-                ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+                if (multiple) _extHelper.waitForExtDialog("Moving Folders");
+                _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
             }
             else
             {

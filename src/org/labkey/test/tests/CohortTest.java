@@ -430,7 +430,7 @@ public class CohortTest extends BaseSeleniumWebTest
         }
         else
         {
-            assertFalse("Enrolled menu should not be present", ExtHelper.isExtMenuPresent(this, "Participant Groups", "Enrolled"));
+            assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
         }
     }
 
@@ -476,7 +476,7 @@ public class CohortTest extends BaseSeleniumWebTest
         }
         else
         {
-            assertFalse("Enrolled menu should not be present", ExtHelper.isExtMenuPresent(this, "Participant Groups", "Enrolled"));
+            assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
         }
     }
 
@@ -519,11 +519,11 @@ public class CohortTest extends BaseSeleniumWebTest
 
         if (previousCohort != null)
         {
-            mouseDownGridCellCheckbox(previousCohort);
+            _ext4Helper.checkGridRowCheckbox(previousCohort);
         }
 
         if (nextCohort != null)
-            mouseDownGridCellCheckbox(nextCohort);
+            _ext4Helper.checkGridRowCheckbox(nextCohort);
         waitForText(waitText);
         verifyParticipantList(expectedParticipants, expectEnrolledText);
     }

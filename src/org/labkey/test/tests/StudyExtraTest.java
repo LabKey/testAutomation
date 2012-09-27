@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -149,7 +148,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		clickButton("Create List", 0);
         waitForElement(Locator.navButton("Add Field"),30000);
         clickButton("Add Field", 0);
-        ListHelper.setColumnName(this, 1, "Value");
+        _listHelper.setColumnName(1, "Value");
         clickButton("Save", 0);
         waitForElement(Locator.navButton("Done"), 30000);
         clickButton("Done");
@@ -171,7 +170,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("Snapshot completed successfully");
         clickLinkWithText(STUDY_FOLDER + " Study");
         goToModule("Query");
-        ExtHelper.clickExtButton(this, "Schema Administration");
+        _extHelper.clickExtButton(this, "Schema Administration");
 		clickLinkWithText("define new schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
 		setFormElement("dbSchemaName", "verifysnapshot");
@@ -218,7 +217,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
         goToModule("Query");
-        ExtHelper.clickExtButton(this, "Schema Administration");
+        _extHelper.clickExtButton(this, "Schema Administration");
         clickLinkWithText("reload");
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
         clickLinkWithText("Query Schema Browser");
@@ -240,16 +239,16 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         setFormElement("typeName", "Simple");
         clickButton("Next");
         waitForElement(Locator.raw("ff_name0"), WAIT_FOR_JAVASCRIPT);
-        ListHelper.setColumnName(this, 0, "Value");
+        _listHelper.setColumnName(0, "Value");
         clickButton("Save");
         waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
         clickButton("View Data");
         clickButton("Import Data");
-        ListHelper.submitTsvData(this, "participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
+        _listHelper.submitTsvData("participantid\tDate\tValue\treplace\nP1\t2/1/2007\tHello\nPnew\t11/17/2007\tGoodbye");
 
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "Day");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Day");
+        _customizeViewsHelper.applyCustomView();
         assertTextPresent("-120");
         assertTextPresent("320");
         clickLinkWithText(STUDY_FOLDER + " Study");
@@ -266,7 +265,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Subjects");
         clickButton("Import Data");
-        ListHelper.submitTsvData(this, "participantid\tDate\tCohort\tStartDate\nPnew\t11/7/2007\tPlacebo\t11/7/2007");
+        _listHelper.submitTsvData("participantid\tDate\tCohort\tStartDate\nPnew\t11/7/2007\tPlacebo\t11/7/2007");
         clickLinkWithText(STUDY_FOLDER + " Study");
         clickLinkWithText("Study Navigator");
         //Make sure our guy picked up the his personal start date
@@ -342,6 +341,23 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 //        sleep(1000);
 //        clickButton("Save", 0);
 //        waitForText("Save successful.", 20000);
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+
+        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
+        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
+
+        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
+        {
+            selenium.click(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
+            _listHelper.setColumnName(getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            _listHelper.setColumnLabel(getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            _listHelper.setColumnType(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+        }
+
+        sleep(1000);
+        clickButton("Save", 0);
+        waitForText("Save successful.", 20000);
 
     } //defineAssay()
 

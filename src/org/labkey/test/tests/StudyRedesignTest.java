@@ -19,9 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.tests.study.StudyScheduleTester;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.StudyHelper;
 
 /**
  * User: elvan
@@ -58,7 +56,8 @@ public class StudyRedesignTest extends StudyBaseTest
     @Override
     protected void doCreateSteps()
     {
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
         importStudy();
         startSpecimenImport(2);
 
@@ -76,9 +75,9 @@ public class StudyRedesignTest extends StudyBaseTest
         setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
         clickButton("Save");
 
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), PARTICIPANT_GROUP_THREE, "Mouse", PTIDS[0]);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_THREE, "Mouse", PTIDS[0]);
 
 //        log("Create query for data view webpart.");
 //        goToSchemaBrowser();
@@ -215,14 +214,14 @@ public class StudyRedesignTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("Overview");
         addWebPart("Mouse List");
-        waitForText("Filter"); // Wait for participant list to appear.
+        waitForText("Found 138 mice of 138."); // Wait for participant list to appear.
 
         deselectAllFilterGroups();
 
         waitForText("No matching Mice");
 
         //Mouse down on GROUP 1
-        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
+        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Found 10 mice of 138.");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -232,11 +231,11 @@ public class StudyRedesignTest extends StudyBaseTest
         }
 
         //Mouse down GROUP 2
-        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_TWO);
+        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_TWO);
         waitForText("Found 1 mouse of 138.");
 
         //Mouse down on GROUP 1 to remove it.
-        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_ONE);
+        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE);
         waitForText("Found 13 mice of 138.");
         
         //Check if all PTIDs of GROUP 2 are visible
@@ -266,7 +265,7 @@ public class StudyRedesignTest extends StudyBaseTest
         //assertElementPresent(Locator.xpath("//div[contains(@class, 'normalwrap-gridcell')]"), 9); // 4 cohort grid cells and 4 group grid cells
 
         // compare the height of a non text-wrapped group grid cell to a wrapped one
-        mouseDownGridCellCheckbox(PARTICIPANT_GROUP_THREE);
+        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_THREE);
         int group2Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 8)"));
         int group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 11)"));
         Assert.assertTrue("Expected " + PARTICIPANT_GROUP_THREE + " grid cell to wrap text", group3Height > group2Height);
@@ -292,7 +291,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        ExtHelper.selectFileBrowserItem(this, "export/study/study.xml");
+        _extHelper.selectFileBrowserItem("export/study/study.xml");
         selectImportDataAction("Import Study");
 
         waitForPipelineJobsToComplete(3, "Study import", false);

@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -206,7 +205,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickLinkWithText(project);
         clickLinkWithText(folder);
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Study Security");
+        _extHelper.clickExtTab("Study Security");
         waitAndClickButton("Study Security");
 
         selectOptionByValue("securityString", "ADVANCED_READ");
@@ -276,7 +275,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected void setRequired(String where, int index)
     {
         String prefix = getPropertyXPath(where);
-        ListHelper.clickRow(this, prefix, index);
+        _listHelper.clickRow(prefix, index);
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
     }

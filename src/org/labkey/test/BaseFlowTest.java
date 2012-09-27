@@ -380,7 +380,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         log("browse pipeline to begin import analysis wizard");
         goToFlowDashboard();
         clickLinkContainingText("FCS files to be imported");
-        ExtHelper.selectFileBrowserItem(this, workspacePath);
+        _extHelper.selectFileBrowserItem(workspacePath);
 
         selectImportDataAction("Import FlowJo Workspace");
     }
@@ -396,7 +396,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
-        ExtHelper.selectFileBrowserItem(this, workspacePath);
+        _extHelper.selectFileBrowserItem(workspacePath);
         clickButton("Next");
     }
 
@@ -404,6 +404,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         sleep(100); // Avoid race condition for form
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
+        _extHelper.waitForFileGridReady();
         if (existingRun)
         {
             selectOptionByText("existingKeywordRunId", fcsPath);
@@ -417,7 +418,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
         else if (fcsPath != null)
         {
-            ExtHelper.selectFileBrowserItem(this, fcsPath);
+            _extHelper.selectFileBrowserItem(fcsPath);
             waitFor(new Checker()
             {
                 public boolean check()
@@ -428,7 +429,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         }
         else
         {
-            // XXX: clicking the radio button doesn't clear selection for some reason
             setFormElement(Locator.name("runFilePathRoot"), "");
             clickRadioButtonById("noFCSFiles");
         }

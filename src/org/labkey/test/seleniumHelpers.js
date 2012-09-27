@@ -180,7 +180,7 @@ selenium.ext4ComponentEval = function(cmpId, expr) {
     return fn.call(ext.getCmp(cmpId));
 };
 
-// Example: ExtHelper.selectFolderManagementTreeItem(this, "/home/545dcbbc9f7fa0f85a86190b9acd6381/14/15/3/2", true);
+// Example: _extHelper.selectFolderManagementTreeItem(this, "/home/545dcbbc9f7fa0f85a86190b9acd6381/14/15/3/2", true);
 selenium.selectFolderManagementItem = function(path, keepExisting) {
     selenium.selectExtFolderTreeNode(path, 'folder-management-tree', keepExisting);
 };

@@ -18,8 +18,6 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -89,7 +87,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // enable advanced study security
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Study Security");
+        _extHelper.clickExtTab("Study Security");
         waitAndClickButton("Study Security");
         selectOptionByValue("securityString", "BASIC_WRITE");
         waitForPageToLoad(30000);
@@ -158,10 +156,10 @@ public class QuerySnapshotTest extends StudyBaseTest
         log("create a snapshot over a custom view");
         clickLinkWithText(getStudyLabel());
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
 
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "MouseId/DataSet/DEM-1: Demographics/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
-        CustomizeViewsHelper.saveCustomView(this, "APX Joined View");
+        _customizeViewsHelper.addCustomizeViewColumn("MouseId/DataSet/DEM-1: Demographics/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
+        _customizeViewsHelper.saveCustomView("APX Joined View");
 
         createQuerySnapshot(APX_SNAPSHOT, true, false);
         assertTextNotPresent("Slovakian");
@@ -292,8 +290,8 @@ public class QuerySnapshotTest extends StudyBaseTest
 
             String xpath = getPropertyXPath("Dataset Fields") + "//span" + Locator.navButton("Add Field").getPath();
             selenium.click(xpath);
-            ListHelper.setColumnName(this, index, keyField);
-            ListHelper.setColumnType(this, index, ListHelper.ListColumnType.Integer);
+            _listHelper.setColumnName(index, keyField);
+            _listHelper.setColumnType(index, ListHelper.ListColumnType.Integer);
 
             click(Locator.name("ff_name0"));
             clickRadioButtonById("button_managedField");

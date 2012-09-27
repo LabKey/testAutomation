@@ -420,12 +420,12 @@ public class SecurityTest extends BaseSeleniumWebTest
         {
             displayName = email;
         }
-        setFormElement("displayName", displayName);
+        setFormElement("quf_DisplayName", displayName);
         clickButton("Submit");
 
         //now set it back
         clickButton("Edit");
-        setFormElement("displayName", oldDisplayName);
+        setFormElement("quf_DisplayName", oldDisplayName);
         clickButton("Submit");
     }
 

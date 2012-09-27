@@ -45,7 +45,7 @@ public class LibraTest extends MS2Test
         clickLinkWithText(getProjectName());
 
         clickButton("Process and Import Data");
-        ExtHelper.selectFileBrowserItem(this, "xtandem/Libra/iTRAQ.search.xar.xml");
+        _extHelper.selectFileBrowserItem("xtandem/Libra/iTRAQ.search.xar.xml");
         selectImportDataAction("Import Experiment");
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(1, "Experiment Import - iTRAQ.search.xar.xml", false);
@@ -75,10 +75,10 @@ public class LibraTest extends MS2Test
         waitForText("Grouping");
         selenium.select("viewTypeGrouping", "Standard");
         clickButton("Go");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
         addNormalizationCount();
 
-        CustomizeViewsHelper.saveCustomView(this, standardView);
+        _customizeViewsHelper.saveCustomView(standardView);
 
         checkForITRAQNormalization();
 
@@ -112,12 +112,12 @@ public class LibraTest extends MS2Test
         goBack();
 
         // Customize view to pull in other columns
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "TrimmedPeptide");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] {"Protein", "ProtSequence"});
-        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] {"Protein", "BestName"});
-        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] {"Protein", "Mass"});
-        CustomizeViewsHelper.saveDefaultView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("TrimmedPeptide");
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] {"Protein", "ProtSequence"});
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] {"Protein", "BestName"});
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] {"Protein", "Mass"});
+        _customizeViewsHelper.saveDefaultView();
         assertTextPresent("84731", "MPEETQAQDQPMEEEEVETFAFQAEIAQLM");
 
         // Try a TSV export
@@ -130,9 +130,9 @@ public class LibraTest extends MS2Test
         clickLinkWithText("Spectra Count Options");
         clickLinkWithText("Create or Edit View", false);
         waitForElement(Locator.xpath("//button[text()='Save']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        CustomizeViewsHelper.addCustomizeViewFilter(this, "Hyper", "Hyper", "Is Greater Than", "250");
+        _customizeViewsHelper.addCustomizeViewFilter("Hyper", "Hyper", "Is Greater Than", "250");
         assertRadioButtonSelected("spectraConfig", "SpectraCountPeptide");
-        CustomizeViewsHelper.saveCustomView(this, "HyperFilter");
+        _customizeViewsHelper.saveCustomView("HyperFilter");
         clickRadioButtonById("SpectraCountPeptideCharge");
         setFormElement(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
         setFormElement("targetProtein", "");
@@ -205,7 +205,7 @@ public class LibraTest extends MS2Test
     {
         for(int i = 1; i <= normalizationCount; i++)
         {
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "iTRAQQuantitation/Normalized" + i, "Normalized " + i);
+            _customizeViewsHelper.addCustomizeViewColumn("iTRAQQuantitation/Normalized" + i, "Normalized " + i);
         }
     }
 
@@ -214,15 +214,15 @@ public class LibraTest extends MS2Test
         clickMenuButton("Views", "ProteinProphet");
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
         for(int i=1; i<=normalizationCount; i++)
         {
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "ProteinProphetData/ProteinGroupId/iTRAQQuantitation/Ratio" + i, "Ratio " + i);
+            _customizeViewsHelper.addCustomizeViewColumn("ProteinProphetData/ProteinGroupId/iTRAQQuantitation/Ratio" + i, "Ratio " + i);
         }
 
         addNormalizationCount();
 
-        CustomizeViewsHelper.saveCustomView(this, proteinProphetView);
+        _customizeViewsHelper.saveCustomView(proteinProphetView);
         checkForITRAQQuantitation();
 
 

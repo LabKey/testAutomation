@@ -556,7 +556,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         createNewQuery("issues");
         setFormElement("ff_newQueryName", "xxyzzy");
         clickButton("Create and Edit Source");
-        ExtHelper.clickExtTab(this, "Data");
+        _extHelper.clickExtTab("Data");
         waitForText(ISSUE_TITLE_0, WAIT_FOR_JAVASCRIPT);
         waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
         clickLinkWithText(PROJECT_NAME);

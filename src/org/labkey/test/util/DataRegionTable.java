@@ -142,9 +142,9 @@ public class DataRegionTable
             return;
         else
         {
-            CustomizeViewsHelper.openCustomizeViewPanel(_test);
-            CustomizeViewsHelper.addCustomizeViewColumn(_test, columnName);
-            CustomizeViewsHelper.applyCustomView(_test);
+            _test._customizeViewsHelper.openCustomizeViewPanel();
+            _test._customizeViewsHelper.addCustomizeViewColumn(columnName);
+            _test._customizeViewsHelper.applyCustomView();
         }
     }
 
@@ -162,14 +162,14 @@ public class DataRegionTable
             {
                 if(!opened)
                 {
-                    CustomizeViewsHelper.openCustomizeViewPanel(_test);
+                    _test._customizeViewsHelper.openCustomizeViewPanel();
                     opened = true;
                 }
-                CustomizeViewsHelper.addCustomizeViewColumn(_test, name);
+                _test._customizeViewsHelper.addCustomizeViewColumn(name);
             }
         }
         if(opened)
-            CustomizeViewsHelper.applyCustomView(_test);
+            _test._customizeViewsHelper.applyCustomView();
     }
 
     /**

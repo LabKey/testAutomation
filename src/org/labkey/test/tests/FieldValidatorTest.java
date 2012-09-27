@@ -58,17 +58,17 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
                         new ListHelper.RegExValidator("sexValidator", "sexValidator", SEX_ERROR_MSG, "male|female")),
         };
 
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload data");
         clickButton("Import Data");
         setFormElement("text", TEST_DATA_FAIL);
-        ListHelper.submitImportTsv_error(this, null);
+        _listHelper.submitImportTsv_error(null);
         assertTextPresent(SEX_ERROR_MSG);
         assertTextPresent(ID_ERROR_MSG);
         assertTextPresent(AGE_ERROR_MSG);
 
-        ListHelper.submitTsvData(this, TEST_DATA_PASS);
+        _listHelper.submitTsvData(TEST_DATA_PASS);
         assertTextPresent("Ted");
         assertTextPresent("Alice");
         assertTextPresent("Bob");

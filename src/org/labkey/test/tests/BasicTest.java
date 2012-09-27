@@ -64,9 +64,10 @@ public class BasicTest extends BaseSeleniumWebTest
 //        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
 //        startSystemMaintenance();
 
-//        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
-//        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
-//        clickButton("Save");
+        goToSiteSettings();
+        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
+        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
+        clickButton("Save");
 
         _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup("testers");
@@ -83,7 +84,7 @@ public class BasicTest extends BaseSeleniumWebTest
         addWebPart("Wiki Table of Contents");
         // move messages below wiki:
         clickLinkWithImage("/_images/partdown.png", 0);
-        Ext4Helper.waitForMaskToDisappear(this, 30000);
+        _ext4Helper.waitForMaskToDisappear(30000);
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
         refresh();
@@ -92,7 +93,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         // remove wiki by clicking the first delete link:
         clickLinkWithImage("/_images/partdelete.png", 0);
-        Ext4Helper.waitForMaskToDisappear(this, 30000);
+        _ext4Helper.waitForMaskToDisappear(30000);
         assertTextNotPresent(WIKI_WEBPART_TEXT);
 
         refresh();
@@ -135,7 +136,7 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTextPresent("Customize");
         clickButton("Cancel");
         clickLinkWithImage(getContextPath() + "/_images/partdown.png", 0);
-        Ext4Helper.waitForMaskToDisappear(this);
+        _ext4Helper.waitForMaskToDisappear();
         assertTextBefore("No data to show", "No messages");
         
         refresh();
@@ -143,7 +144,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         final Locator searchLocator = Locator.raw("//tr[th[@title='Search']]//a/img[@title='Remove From Page']");
         clickAndWait(searchLocator, 0);
-        Ext4Helper.waitForMaskToDisappear(this);
+        _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(searchLocator);
         refresh();
         // verify that web part is gone, even after a refresh:

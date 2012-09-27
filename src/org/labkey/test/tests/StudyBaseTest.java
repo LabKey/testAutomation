@@ -144,8 +144,8 @@ public abstract class StudyBaseTest extends SimpleApiTest
         // complete before doing any further tests.
         clickLinkWithText(getFolderName());
         clickButton("Process and Import Data");
-        ExtHelper.waitForImportDataEnabled(this);
-        ExtHelper.clickFileBrowserFileCheckbox(this, "study.xml");
+        _extHelper.waitForImportDataEnabled();
+        _extHelper.clickFileBrowserFileCheckbox("study.xml");
         selectImportDataAction("Import Study");
     }
 
@@ -253,10 +253,10 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void createReport(String reportType)
     {
         // click the create button dropdown
-        String id = ExtHelper.getExtElementId(this, "btn_createView");
+        String id = _extHelper.getExtElementId("btn_createView");
         click(Locator.id(id));
 
-        id = ExtHelper.getExtElementId(this, reportType);
+        id = _extHelper.getExtElementId(reportType);
         clickAndWait(Locator.id(id));
     }
 

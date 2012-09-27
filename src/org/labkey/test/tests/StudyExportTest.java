@@ -67,7 +67,7 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (legacy formats)");
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        ExtHelper.selectFileBrowserItem(this, "export/study/study.xml");
+        _extHelper.selectFileBrowserItem("export/study/study.xml");
 
         selectImportDataAction("Import Study");
 
@@ -89,7 +89,7 @@ public class StudyExportTest extends StudyManualTest
         hideDataset(HIDDEN_DATASET);
         modifyDatasetColumn(MODIFIED_DATASET);
 
-        ListHelper.importListArchive(this, getFolderName(), new File(getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
+        _listHelper.importListArchive(getFolderName(), new File(getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
 
         // export new study to zip file using "xml" formats
         exportStudy(true, true);
@@ -101,8 +101,8 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
         waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
-        ExtHelper.selectFileBrowserItem(this, "export/");
-        ExtHelper.selectAllFileBrowserFiles(this);
+        _extHelper.selectFileBrowserItem("export/");
+        _extHelper.selectAllFileBrowserFiles();
 
         selectImportDataAction("Import Study");
 
@@ -314,7 +314,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Study Security");
+        _extHelper.clickExtTab("Study Security");
         waitAndClickButton("Study Security");
 
         // enable advanced study security
@@ -375,7 +375,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText("Search");
         waitForTextToDisappear("Loading");
         waitForText("Additive Type");
-        Ext4Helper.selectRadioButton(this, "Search Type:", "Grouped Vials");
+        _ext4Helper.selectRadioButton("Search Type:", "Grouped Vials");
 
 //        WARNING: Using getFormElementNameByTableCaption() is dangerous... if muliple values are returned their
 //        order is unpredictable, since they come back in keyset order.  The code below breaks under Java 6.
@@ -387,8 +387,8 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        Ext4Helper.selectComboBoxItem(this, "Mouse", "999320528");
-        Ext4Helper.selectComboBoxItem(this, "Visit", "201.0"); //use the raw value for: "Enroll/Vacc #1"
+        _ext4Helper.selectComboBoxItem("Mouse", "999320528");
+        _ext4Helper.selectComboBoxItem("Visit", "201.0"); //use the raw value for: "Enroll/Vacc #1"
 
         clickButton("Search");
         assertTextPresent("999320528");
@@ -425,7 +425,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getFolderName());
 
         enterPermissionsUI();
-        ExtHelper.clickExtTab(this, "Study Security");
+        _extHelper.clickExtTab("Study Security");
         waitAndClickButton("Study Security");
 
         selectOptionByValue("securityString", "BASIC_WRITE");
@@ -613,9 +613,9 @@ public class StudyExportTest extends StudyManualTest
         waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_JAVASCRIPT);
 
         Locator.XPathLocator mouseId = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='MouseId:']/../div/div");
-        ExtHelper.selectGWTComboBoxItem(this, mouseId, "name");
+        _extHelper.selectGWTComboBoxItem(mouseId, "name");
         Locator.XPathLocator sequenceNum = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='Sequence Num:']/../div/div");
-        ExtHelper.selectGWTComboBoxItem(this, sequenceNum, "visit number");
+        _extHelper.selectGWTComboBoxItem(sequenceNum, "visit number");
 
         waitAndClickButton("Import");
         waitForPageToLoad();

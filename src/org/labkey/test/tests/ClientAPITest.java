@@ -205,7 +205,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     private void createLists()
     {
-        ListHelper.createList(this, FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
 
         StringBuilder data = new StringBuilder();
         data.append(LIST_KEY_NAME).append("\t");
@@ -223,9 +223,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
             }
         }
 
-        ListHelper.clickImportData(this);
+        _listHelper.clickImportData();
         setFormElement("text", data.toString());
-        ListHelper.submitImportTsv_success(this);
+        _listHelper.submitImportTsv_success();
         for (String[] rowData : TEST_DATA)
         {
             // check that all the data is in the grid (skipping the key column at index 0)
@@ -236,16 +236,16 @@ public class ClientAPITest extends BaseSeleniumWebTest
         }
 
         // Create lists for cross-folder query test.
-        ListHelper.createList(this, SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
-        ListHelper.clickImportData(this);
+        _listHelper.createList(SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.clickImportData();
         setFormElement("text", data.toString());
-        ListHelper.submitImportTsv_success(this);
+        _listHelper.submitImportTsv_success();
 
         // Create lists for cross-folder query test.
-        ListHelper.createList(this, OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
-        ListHelper.clickImportData(this);
+        _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.clickImportData();
         setFormElement("text", data.toString());
-        ListHelper.submitImportTsv_success(this);
+        _listHelper.submitImportTsv_success();
 
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
@@ -513,9 +513,9 @@ public class ClientAPITest extends BaseSeleniumWebTest
         selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
 
         selenium.click(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
-        ListHelper.setColumnName(this, getPropertyXPath("Run Fields"), 0, "RunDate");
-        ListHelper.setColumnLabel(this, getPropertyXPath("Run Fields"), 0, "Run Date");
-        ListHelper.setColumnType(this, getPropertyXPath("Run Fields"), 0, ListHelper.ListColumnType.DateTime);
+        _listHelper.setColumnName(getPropertyXPath("Run Fields"), 0, "RunDate");
+        _listHelper.setColumnLabel(getPropertyXPath("Run Fields"), 0, "Run Date");
+        _listHelper.setColumnType(this, getPropertyXPath("Run Fields"), 0, ListHelper.ListColumnType.DateTime);
 
         sleep(1000);
         clickButton("Save", 0);
@@ -544,13 +544,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         clickButton("Add Field", 0);
 
-        ListHelper.setColumnName(this, 0, "species");
-        ListHelper.setColumnLabel(this, 0, "Species");
+        _listHelper.setColumnName(0, "species");
+        _listHelper.setColumnLabel(0, "Species");
         
         clickButton("Add Field", 0);
 
-        ListHelper.setColumnName(this, 1, "color");
-        ListHelper.setColumnLabel(this, 1, "Color");
+        _listHelper.setColumnName(1, "color");
+        _listHelper.setColumnLabel(1, "Color");
 
         sleep(1000);
         clickButton("Save", 10000);

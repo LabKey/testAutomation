@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
@@ -31,6 +30,7 @@ import java.util.List;
  */
 public class RlabkeyTest extends SimpleApiTest
 {
+    RReportHelper _rReportHelper = new RReportHelper(this);
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
     private static final String PROJECT_NAME_2 = PROJECT_NAME + "2";
     private static final String LIST_NAME = "AllTypes";
@@ -55,7 +55,7 @@ public class RlabkeyTest extends SimpleApiTest
         if (!listArchive.exists())
             Assert.fail("Unable to locate the list archive: " + listArchive.getName());
 
-        ListHelper.importListArchive(this, PROJECT_NAME, listArchive);
+        _listHelper.importListArchive(PROJECT_NAME, listArchive);
         // create an issues list in a project and subfolder to test ContainerFilters.
 
         clickLinkWithText(PROJECT_NAME);        
@@ -89,7 +89,7 @@ public class RlabkeyTest extends SimpleApiTest
         setFormElement("title", ISSUE_TITLE_2);
         clickButton("Save");
         
-        RReportHelper.ensureRConfig(this);
+        _rReportHelper.ensureRConfig();
     }
 
     @Override
@@ -120,10 +120,10 @@ public class RlabkeyTest extends SimpleApiTest
                     String verify = test.getReponse().trim();
 
                     log("exceute test: " + test.getName());
-                    if (!RReportHelper.executeScript(this, sb.toString(), verify))
+                    if (!_rReportHelper.executeScript(sb.toString(), verify))
                         Assert.fail("Failed executing R script for test case: " + test.getName());
                 }
-                RReportHelper.saveReport(this, "dummy");
+                _rReportHelper.saveReport("dummy");
             }
         }
     }

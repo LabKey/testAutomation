@@ -34,7 +34,7 @@ public class Ext4FileFieldRef extends Ext4CmpRef
     //often there is only one file field on screen, so we'll just grab that
     public static Ext4FileFieldRef create(BaseSeleniumWebTest test)
     {
-        return Ext4Helper.queryOne(test, "filefield", Ext4FileFieldRef.class);
+        return test._ext4Helper.queryOne("filefield", Ext4FileFieldRef.class);
     }
 
     public void setToFile(String file)

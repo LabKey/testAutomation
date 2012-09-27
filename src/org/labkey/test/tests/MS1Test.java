@@ -143,7 +143,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        ExtHelper.selectFileBrowserItem(this, PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/");
+        _extHelper.selectFileBrowserItem(PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/");
 
         selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
@@ -155,7 +155,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        ExtHelper.selectFileBrowserItem(this, PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/" + PIPELINE_MS1PEP_DIR + "/" + featuresProtocol + "/");
+        _extHelper.selectFileBrowserItem(PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/" + PIPELINE_MS1PEP_DIR + "/" + featuresProtocol + "/");
 
         selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
@@ -167,7 +167,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        ExtHelper.selectFileBrowserItem(this, PIPELINE_INSPECT_DIR + "/" + protocol + "/");
+        _extHelper.selectFileBrowserItem(PIPELINE_INSPECT_DIR + "/" + protocol + "/");
 
         selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
@@ -222,9 +222,9 @@ public class MS1Test extends BaseSeleniumWebTest
         popLocation();
 
         //test measure filtering
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewFilter(this, "CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewFilter("CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
+        _customizeViewsHelper.applyCustomView();
         assertLinkNotPresentWithText("1");
 
         pushLocation();
@@ -234,9 +234,9 @@ public class MS1Test extends BaseSeleniumWebTest
         popLocation();
 
         //test fk table column filtering
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewFilter(this, "CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewFilter("CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
+        _customizeViewsHelper.applyCustomView();
         assertTextNotPresent("461.7480"); //mz value
 
         log("Compare runs view OK.");
@@ -341,28 +341,28 @@ public class MS1Test extends BaseSeleniumWebTest
 
         //test customize view
         log("Testing customize view...");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "RelatedPeptide");
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, "RelatedPeptide/Fraction/Run/Description");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "KL");
-        CustomizeViewsHelper.applyCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn("RelatedPeptide");
+        _customizeViewsHelper.removeCustomizeViewColumn("RelatedPeptide/Fraction/Run/Description");
+        _customizeViewsHelper.addCustomizeViewColumn("KL");
+        _customizeViewsHelper.applyCustomView();
 
         assertTextPresent("KL");
         assertTextNotPresent("Related Peptide");
         assertTextNotPresent("K.AVVQDPALKPLALVYGEATSR.R");
 
         //reset view
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.revertUnsavedView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.revertUnsavedView();
 
         //add other columns from peptide data
         //and test saving under a name
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "RelatedPeptide/PeptideProphet", "PepProphet");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "RelatedPeptide/Protein", "Protein");
-        CustomizeViewsHelper.addCustomizeViewSort(this, "RelatedPeptide/PeptideProphet", "PepProphet", "Ascending");
-        CustomizeViewsHelper.moveCustomizeViewSort(this, "RelatedPeptide/PeptideProphet", true);
-        CustomizeViewsHelper.saveCustomView(this, "My View");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("RelatedPeptide/PeptideProphet", "PepProphet");
+        _customizeViewsHelper.addCustomizeViewColumn("RelatedPeptide/Protein", "Protein");
+        _customizeViewsHelper.addCustomizeViewSort("RelatedPeptide/PeptideProphet", "PepProphet", "Ascending");
+        _customizeViewsHelper.moveCustomizeViewSort("RelatedPeptide/PeptideProphet", true);
+        _customizeViewsHelper.saveCustomView("My View");
 
         assertTextPresent("PepProphet");
         assertTextPresent("Protein");

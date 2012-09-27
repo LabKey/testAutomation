@@ -45,10 +45,10 @@ public class PepMatchTestParams extends AbstractInspectTestParams
         String[] names = getSampleNames();
         if (names.length != 0)
         {
-            ExtHelper.waitForImportDataEnabled(_test);
+            _test._extHelper.waitForImportDataEnabled();
             for (String name : names)
             {
-                ExtHelper.clickFileBrowserFileCheckbox(getTest(), name + ".pep.xml");
+                _test._extHelper.clickFileBrowserFileCheckbox(name + ".pep.xml");
                 getTest().sleep(1000);
             }
         }

@@ -339,9 +339,9 @@ public class ViabilityTest extends AbstractViabilityTest
 
         clickLinkWithText(runName);
 
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "TargetStudy", "Target Study");
-        CustomizeViewsHelper.saveDefaultView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("TargetStudy", "Target Study");
+        _customizeViewsHelper.saveDefaultView();
 
         DataRegionTable table = new DataRegionTable(getAssayName() + " Data", this);
         Assert.assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));

@@ -110,7 +110,7 @@ public class GroupTest extends BaseSeleniumWebTest
         clickLinkWithText(getProjectName());
         enterPermissionsUI();
         waitForText("Author");
-        ExtHelper.clickExtDropDownMenu(this, "$add$org.labkey.api.security.roles.AuthorRole", "Site: All Site Users");
+        _extHelper.clickExtDropDownMenu("$add$org.labkey.api.security.roles.AuthorRole", "Site: All Site Users");
 
         clickButton("Save", 0);
         waitForText("save successful");
@@ -302,7 +302,7 @@ public class GroupTest extends BaseSeleniumWebTest
         startCreateGlobalPermissionsGroup(BAD_GROUP, true);
         setFormElement("Users_dropdownMenu", "All Site Users");
 
-        ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//input[@id='Users_dropdownMenu']/../img"), "Site: All Site Users");
+        _extHelper.clickExtDropDownMenu(Locator.xpath("//input[@id='Users_dropdownMenu']/../img"), "Site: All Site Users");
         waitForText("Can't add a system group to another group");
         clickButton("OK", 0);
         clickButton("Done");
@@ -332,7 +332,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
         //second page of the wizard
         click(Locator.xpath("//label[contains(text(), 'Copy From Existing Project')]/../input"));
-        ExtHelper.clickExtDropDownMenu(this, Locator.xpath("//td[@id='targetProject-inputCell']/input"), getProjectName());
+        _extHelper.clickExtDropDownMenu(Locator.xpath("//td[@id='targetProject-inputCell']/input"), getProjectName());
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
         waitForPageToLoad();
 

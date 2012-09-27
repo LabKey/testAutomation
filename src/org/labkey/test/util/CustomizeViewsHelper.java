@@ -30,88 +30,91 @@ import java.util.Map;
  * Time: 2:32:05 PM
  */
 
-public class CustomizeViewsHelper
+public class CustomizeViewsHelper extends AbstractHelper
 {
-    public static void openCustomizeViewPanel(BaseSeleniumWebTest test)
+    public CustomizeViewsHelper(BaseSeleniumWebTest test)
     {
-        ExtHelper.clickExtMenuButton(test, false, Locator.navButton("Views"), "Customize View");
-        test.waitForElement(Locator.xpath("//button[text()='View Grid']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        super(test);
     }
 
-    public static void closeCustomizeViewPanel(BaseSeleniumWebTest test)
+    public void openCustomizeViewPanel()
+    {
+        _test._extHelper.clickExtMenuButton(false, Locator.navButton("Views"), "Customize View");
+        _test.waitForElement(Locator.xpath("//button[text()='View Grid']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void closeCustomizeViewPanel()
     {
         // UNDONE: click 'X' close button on columns/filter/sort tab panel instead.
-        test.clickMenuButtonAndContinue("Views", "Customize View");
+        _test.clickMenuButtonAndContinue("Views", "Customize View");
     }
 
-    public static void applyCustomView(BaseSeleniumWebTest test)
+    public void applyCustomView()
     {
-        applyCustomView(test, test.getDefaultWaitForPage());
+        applyCustomView(_test.getDefaultWaitForPage());
     }
 
-    public static void applyCustomView(BaseSeleniumWebTest test, int waitMillis)
+    public void applyCustomView(int waitMillis)
     {
-        test.clickButtonAt("View Grid", waitMillis, "1,1");
+        _test.clickButtonAt("View Grid", waitMillis, "1,1");
     }
 
-    public static void saveDefaultView(BaseSeleniumWebTest test)
+    public void saveDefaultView()
     {
-        saveCustomView(test, "");
+        saveCustomView("");
     }
 
-    public static void saveCustomView(BaseSeleniumWebTest test)
+    public void saveCustomView()
     {
-        saveCustomView(test, null);
+        saveCustomView(null);
     }
 
     /**
      * Save a custom view
-     * @param test test
      * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
      */
-    public static void saveCustomView(BaseSeleniumWebTest test, String name)
+    public void saveCustomView(String name)
     {
-        saveCustomView(test, name, false);
+        saveCustomView(name, false);
     }
 
     /**
      * Save a custom view
-     * @param test test
      * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
      * @param shared if false the report will not be shared, otherwise will mark the view as shared.
      */
-    public static void saveCustomView(BaseSeleniumWebTest test, String name, boolean shared)
+    public void saveCustomView(String name, boolean shared)
     {
-        test.clickButton("Save", 0);
+        _test.clickButton("Save", 0);
         
         if(shared)
-            test.checkCheckbox("saveCustomView_shared");
+            _test.checkCheckbox("saveCustomView_shared");
 
         if (name != null)
         {
             if ("".equals(name))
             {
-                test.log("Saving default custom view");
-                test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "default"));
+                _test.log("Saving default custom view");
+                _test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "default"));
             }
             else
             {
-                test.log("Saving custom view '" + name + "'");
-                test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "named"));
-                test.setFormElement(Locator.xpath("//input[@name='saveCustomView_name']"), name);
+                _test.log("Saving custom view '" + name + "'");
+                _test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "named"));
+                _test.setFormElement(Locator.xpath("//input[@name='saveCustomView_name']"), name);
             }
         }
         else
         {
-            test.log("Saving current custom view");
+            _test.log("Saving current custom view");
         }
-        test.clickButtonByIndex("Save", 1);
+        _test.clickButtonByIndex("Save", 1);
     }
 
-    public static void deleteView(BaseSeleniumWebTest test)
+    public void deleteView()
     {
-        test.clickButton("Delete", 0);
-        test.clickButton("Yes");
+        _test.clickButton("Delete", 0);
+        _test.clickButton("Yes");
     }
 
     /**
@@ -138,38 +141,37 @@ public class CustomizeViewsHelper
         test.click(Locator.tagContainingText("span", "Revert"));
     }
 
-    public static void revertUnsavedView(BaseSeleniumWebTest test)
+    public void revertUnsavedView()
     {
-        test.clickButton("Revert");
+        _test.clickButton("Revert");
     }
 
     /**
      * add a column to an already open customize view gried
      *
-     * @param test The BaseSeleniumWebTest that will be used to make Selenium calls.  Almost always "this"
      * @param column_name Name of the column.  If your column is nested, should be of the form
      *          "nodename/nodename/lastnodename", where nodename is not the displayed text of a node
      *          but the name included in the span containing the checkbox.  It will often be the same name,
      *          but with less whitespace
      */
-    public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String column_name)
+    public void addCustomizeViewColumn(String column_name)
     {
-        addCustomizeViewColumn(test, column_name, column_name);
+        addCustomizeViewColumn(column_name, column_name);
     }
 
-    public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String[] fieldKeyParts)
+    public void addCustomizeViewColumn(String[] fieldKeyParts)
     {
-        addCustomizeViewItem(test, fieldKeyParts, StringUtils.join(fieldKeyParts, "/"), ViewItemType.Columns);
+        addCustomizeViewItem(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"), ViewItemType.Columns);
     }
 
-    public static void changeTab(BaseSeleniumWebTest test, ViewItemType tab)
+    public void changeTab(ViewItemType tab)
     {
-        if (test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]")))
+        if (_test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]")))
             // Tab hasn't rendered yet
-            test.mouseDown(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]"));
+            _test.mouseDown(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]"));
         else
             // Tab has rendered
-            test.mouseDown(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
+            _test.mouseDown(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
     }
 
     private static enum ViewItemType
@@ -181,11 +183,11 @@ public class CustomizeViewsHelper
 
     /**
      * expand customize view menu to all but the last of fieldKeyParts
-     * @param test
+     *
      * @param fieldKeyParts
      * @return A Locator for the &lt;div&gt; item in the "Available Fields" column tree.
      */
-    private static Locator expandPivots(BaseSeleniumWebTest test, String[] fieldKeyParts)
+    private Locator expandPivots(String[] fieldKeyParts)
     {
         String nodePath = "";
         String fieldKey = StringUtils.join(fieldKeyParts, "/");
@@ -193,88 +195,88 @@ public class CustomizeViewsHelper
         for (int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
             nodePath += fieldKeyParts[i];
-            test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            if (test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
-                test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
-            test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT*2);
+            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            if (_test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
+                _test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
+            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT * 2);
             nodePath += "/";
         }
 
         return Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(fieldKey) + "]");
     }
 
-    private static void addCustomizeViewItem(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, ViewItemType type)
+    private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
     {
         // fieldKey is the value contained in @fieldKey
-        test.log("Adding " + column_name + " " + type.toString());
+        _test.log("Adding " + column_name + " " + type.toString());
 
-        changeTab(test, type);
+        changeTab(type);
 
         // Expand all nodes necessary to reveal the desired node.
-        Locator columnItem = expandPivots(test, fieldKeyParts);
+        Locator columnItem = expandPivots(fieldKeyParts);
         Locator checkbox = Locator.xpath(columnItem.toXpath() + "/input[@type='checkbox']");
 
-        test.checkCheckbox(checkbox);
+        _test.checkCheckbox(checkbox);
     }
 
-    public static void addCustomizeViewColumn(BaseSeleniumWebTest test, String fieldKey, String column_name)
+    public void addCustomizeViewColumn(String fieldKey, String column_name)
     {
         // fieldKey is the value contained in @fieldKey
-        test.log("Adding " + column_name + " column");
+        _test.log("Adding " + column_name + " column");
 
-        addCustomizeViewItem(test, fieldKey.split("/"), column_name, ViewItemType.Columns);
+        addCustomizeViewItem(fieldKey.split("/"), column_name, ViewItemType.Columns);
     }
 
-    public static void addCustomizeViewFilter(BaseSeleniumWebTest test, String fieldKey, String filter_type)
+    public void addCustomizeViewFilter(String fieldKey, String filter_type)
     {
-        addCustomizeViewFilter(test, fieldKey, fieldKey, filter_type, "");
+        addCustomizeViewFilter(fieldKey, fieldKey, filter_type, "");
     }
 
-    public static void addCustomizeViewFilter(BaseSeleniumWebTest test, String fieldKey, String filter_type, String filter)
+    public void addCustomizeViewFilter(String fieldKey, String filter_type, String filter)
     {
-        addCustomizeViewFilter(test, fieldKey, fieldKey, filter_type, filter);
+        addCustomizeViewFilter(fieldKey, fieldKey, filter_type, filter);
     }
 
-    public static void addCustomizeViewFilter(BaseSeleniumWebTest test, String fieldKey, String column_name, String filter_type, String filter)
+    public void addCustomizeViewFilter(String fieldKey, String column_name, String filter_type, String filter)
     {
-        addCustomizeViewFilter(test, fieldKey.split("/"), column_name, filter_type, filter);
+        addCustomizeViewFilter(fieldKey.split("/"), column_name, filter_type, filter);
     }
 
-    public static void addCustomizeViewFilter(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, String filter_type, String filter)
+    public void addCustomizeViewFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
     {
         if (filter.equals(""))
-            test.log("Adding " + column_name + " filter of " + filter_type);
+            _test.log("Adding " + column_name + " filter of " + filter_type);
         else
-            test.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
+            _test.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
 
-        changeTab(test, ViewItemType.Filter);
+        changeTab(ViewItemType.Filter);
         String itemXPath = itemXPath(ViewItemType.Filter, fieldKeyParts);
 
-        if (!test.isElementPresent(Locator.xpath(itemXPath)))
+        if (!_test.isElementPresent(Locator.xpath(itemXPath)))
         {
             // Add filter if it doesn't exist
-            addCustomizeViewItem(test, fieldKeyParts, column_name, ViewItemType.Filter);
-            test.assertElementPresent(Locator.xpath(itemXPath));
+            addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Filter);
+            _test.assertElementPresent(Locator.xpath(itemXPath));
         }
         else
         {
             // Add new clause
-            test.click(Locator.xpath(itemXPath + "//a[text() = 'Add']"));
+            _test.click(Locator.xpath(itemXPath + "//a[text() = 'Add']"));
         }
 
         // XXX: why doesn't 'clauseIndex' work?
         String clauseXPath = itemXPath + "//tr[@clauseindex]";
-        int clauseCount = test.getXpathCount(new Locator.XPathLocator(clauseXPath));
+        int clauseCount = _test.getXpathCount(new Locator.XPathLocator(clauseXPath));
 
         String newClauseXPath = clauseXPath + "[" + clauseCount + "]";
-        test.assertElementPresent(Locator.xpath(newClauseXPath));
+        _test.assertElementPresent(Locator.xpath(newClauseXPath));
 
-        ExtHelper.selectComboBoxItem(test, Locator.xpath(newClauseXPath), filter_type);
+        _test._extHelper.selectComboBoxItem(Locator.xpath(newClauseXPath), filter_type);
 
         if ( !(filter.compareTo("") == 0) )
         {
-            test.setFormElement(Locator.xpath(newClauseXPath + "//input[contains(@class, 'item-value')]"), filter);
-            test.fireEvent(Locator.xpath(newClauseXPath + "//input[contains(@class, 'item-value')]"), BaseSeleniumWebTest.SeleniumEvent.blur);
+            _test.setFormElement(Locator.xpath(newClauseXPath + "//input[contains(@class, 'item-value')]"), filter);
+            _test.fireEvent(Locator.xpath(newClauseXPath + "//input[contains(@class, 'item-value')]"), BaseSeleniumWebTest.SeleniumEvent.blur);
         }
     }
 
@@ -298,110 +300,110 @@ public class CustomizeViewsHelper
         return "//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item')][" + (item_index + 1) + "]";
     }
 
-    private static void removeCustomizeViewItem(BaseSeleniumWebTest test, String fieldKey, ViewItemType type)
+    private void removeCustomizeViewItem(String fieldKey, ViewItemType type)
     {
-        changeTab(test, type);
+        changeTab(type);
 
         String itemXPath = itemXPath(type, fieldKey);
 
         Locator.XPathLocator item = Locator.xpath(itemXPath);
         Locator.XPathLocator close = Locator.xpath(itemXPath + "//*[contains(@class, 'labkey-tool-close')]");
 
-        int clauseCount = test.getXpathCount(close);
+        int clauseCount = _test.getXpathCount(close);
 
         do{
-            test.click(close);
-            test.assertElementPresent(close, --clauseCount); // Make sure clause is deleted. Prevent infinite loop on failure.
-        }while (test.isElementPresent(item)); // Removes all clauses for a single fieldkey
+            _test.click(close);
+            _test.assertElementPresent(close, --clauseCount); // Make sure clause is deleted. Prevent infinite loop on failure.
+        }while (_test.isElementPresent(item)); // Removes all clauses for a single fieldkey
     }
 
     //enable customize view grid to show hidden fields
-    public static void showHiddenItems(BaseSeleniumWebTest test)
+    public void showHiddenItems()
     {
-        test.click(Locator.tagWithText("Label","Show Hidden Fields"));
+        _test.click(Locator.tagWithText("Label", "Show Hidden Fields"));
     }
 
-    private static void removeCustomizeViewItem(BaseSeleniumWebTest test, int item_index, ViewItemType type)
+    private void removeCustomizeViewItem(int item_index, ViewItemType type)
     {
-        changeTab(test, type);
+        changeTab(type);
 
         String itemXPath = itemXPath(type, item_index);
-        String fieldKey = test.getAttribute(Locator.xpath(itemXPath), "fieldkey");
+        String fieldKey = _test.getAttribute(Locator.xpath(itemXPath), "fieldkey");
 
-        removeCustomizeViewItem(test, fieldKey, type); // Need to remove by key to avoid unintentional removals
+        removeCustomizeViewItem(fieldKey, type); // Need to remove by key to avoid unintentional removals
     }
 
-    public static void addCustomizeViewSort(BaseSeleniumWebTest test, String column_name, String order)
+    public void addCustomizeViewSort(String column_name, String order)
     {
-        addCustomizeViewSort(test, column_name, column_name, order);
+        addCustomizeViewSort(column_name, column_name, order);
     }
 
-    public static void addCustomizeViewSort(BaseSeleniumWebTest test, String fieldKey, String column_name, String order)
+    public void addCustomizeViewSort(String fieldKey, String column_name, String order)
     {
-        addCustomizeViewSort(test, fieldKey.split("/"), column_name, order);
+        addCustomizeViewSort(fieldKey.split("/"), column_name, order);
     }
 
-    public static void addCustomizeViewSort(BaseSeleniumWebTest test, String[] fieldKeyParts, String column_name, String order)
+    public void addCustomizeViewSort(String[] fieldKeyParts, String column_name, String order)
     {
-        test.log("Adding " + column_name + " sort");
+        _test.log("Adding " + column_name + " sort");
         String itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
 
-        test.assertElementNotPresent(Locator.xpath(itemXPath));
-        addCustomizeViewItem(test, fieldKeyParts, column_name, ViewItemType.Sort);
+        _test.assertElementNotPresent(Locator.xpath(itemXPath));
+        addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Sort);
 
-        ExtHelper.selectComboBoxItem(test, Locator.xpath(itemXPath), order);
+        _test._extHelper.selectComboBoxItem(Locator.xpath(itemXPath), order);
     }
 
-    public static void removeCustomizeViewColumn(BaseSeleniumWebTest test, String fieldKey)
+    public void removeCustomizeViewColumn(String fieldKey)
     {
-        test.log("Removing " + fieldKey + " column");
-        removeCustomizeViewItem(test, fieldKey, ViewItemType.Columns);
+        _test.log("Removing " + fieldKey + " column");
+        removeCustomizeViewItem(fieldKey, ViewItemType.Columns);
     }
 
-    public static void removeCustomizeViewFilter(BaseSeleniumWebTest test, String fieldKey)
+    public void removeCustomizeViewFilter(String fieldKey)
     {
-        test.log("Removing " + fieldKey + " filter");
-        removeCustomizeViewItem(test, fieldKey, ViewItemType.Filter);
+        _test.log("Removing " + fieldKey + " filter");
+        removeCustomizeViewItem(fieldKey, ViewItemType.Filter);
     }
 
-    public static void removeCustomizeViewFilter(BaseSeleniumWebTest test, int item_index)
+    public void removeCustomizeViewFilter(int item_index)
     {
-        test.log("Removing filter at position " + item_index);
-        removeCustomizeViewItem(test, item_index, ViewItemType.Filter);
+        _test.log("Removing filter at position " + item_index);
+        removeCustomizeViewItem(item_index, ViewItemType.Filter);
     }
 
-    public static void removeCustomizeViewSort(BaseSeleniumWebTest test, String fieldKey)
+    public void removeCustomizeViewSort(String fieldKey)
     {
-        test.log("Removing " + fieldKey + " sort");
-        removeCustomizeViewItem(test, fieldKey, ViewItemType.Sort);
+        _test.log("Removing " + fieldKey + " sort");
+        removeCustomizeViewItem(fieldKey, ViewItemType.Sort);
     }
 
-    public static void clearCustomizeViewColumns(BaseSeleniumWebTest test)
+    public void clearCustomizeViewColumns()
     {
-        test.log("Clear all Customize View columns.");
-        clearAllCustomizeViewItems(test, ViewItemType.Columns);
+        _test.log("Clear all Customize View columns.");
+        clearAllCustomizeViewItems(ViewItemType.Columns);
     }
 
-    public static void clearCustomizeViewFilters(BaseSeleniumWebTest test)
+    public void clearCustomizeViewFilters()
     {
-        test.log("Clear all Customize View filters.");
-        clearAllCustomizeViewItems(test, ViewItemType.Filter);
+        _test.log("Clear all Customize View filters.");
+        clearAllCustomizeViewItems(ViewItemType.Filter);
     }
 
-    public static void clearCustomizeViewSorts(BaseSeleniumWebTest test)
+    public void clearCustomizeViewSorts()
     {
-        test.log("Clear all Customize View sorts.");
-        clearAllCustomizeViewItems(test, ViewItemType.Sort);
+        _test.log("Clear all Customize View sorts.");
+        clearAllCustomizeViewItems(ViewItemType.Sort);
     }
 
-    private static void clearAllCustomizeViewItems(BaseSeleniumWebTest test, ViewItemType type)
+    private void clearAllCustomizeViewItems(ViewItemType type)
     {
-        changeTab(test, type);
+        changeTab(type);
         String tabXPath = tabContentXPath(type);
 
         String deleteButtonXPath = tabXPath + "//*[contains(@class, 'labkey-tool-close')]";
-        while (test.isElementPresent(Locator.xpath(deleteButtonXPath)))
-            test.click(Locator.xpath(deleteButtonXPath));
+        while (_test.isElementPresent(Locator.xpath(deleteButtonXPath)))
+            _test.click(Locator.xpath(deleteButtonXPath));
     }
 
     private static String folderFilterComboXPath()
@@ -414,144 +416,143 @@ public class CustomizeViewsHelper
         return tabContentXPath(ViewItemType.Filter) + "//table[contains(@class, 'labkey-folder-filter-paperclip')]";
     }
 
-    public static void setFolderFilter(BaseSeleniumWebTest test, String folderFilter)
+    public void setFolderFilter(String folderFilter)
     {
-        test.log("Setting folder filter to: " + folderFilter);
-        changeTab(test, ViewItemType.Filter);
+        _test.log("Setting folder filter to: " + folderFilter);
+        changeTab(ViewItemType.Filter);
 
         String folderFilterComboXPath = folderFilterComboXPath();
-        ExtHelper.selectComboBoxItem(test, Locator.xpath(folderFilterComboXPath), folderFilter);
+        _test._extHelper.selectComboBoxItem(Locator.xpath(folderFilterComboXPath), folderFilter);
     }
 
-    public static void togglePaperclipFolderFilter(BaseSeleniumWebTest test)
+    public void togglePaperclipFolderFilter()
     {
         Locator loc = Locator.xpath(folderFilterPaperclipXPath());
-        String attr = test.getAttribute(loc, "class");
+        String attr = _test.getAttribute(loc, "class");
         if (attr.contains("x-btn-pressed"))
-            unclipFolderFilter(test);
+            unclipFolderFilter();
         else
-            clipFolderFilter(test);
+            clipFolderFilter();
     }
 
-    public static void clipFolderFilter(BaseSeleniumWebTest test)
+    public void clipFolderFilter()
     {
-        test.log("Clip folder filter");
-        changeTab(test, ViewItemType.Filter);
+        _test.log("Clip folder filter");
+        changeTab(ViewItemType.Filter);
 
         Locator loc = Locator.xpath(folderFilterPaperclipXPath());
-        test.assertAttributeNotContains(loc, "class", "x-btn-pressed");
-        test.click(loc);
-        test.assertAttributeContains(loc, "class", "x-btn-pressed");
+        _test.assertAttributeNotContains(loc, "class", "x-btn-pressed");
+        _test.click(loc);
+        _test.assertAttributeContains(loc, "class", "x-btn-pressed");
     }
 
-    public static void unclipFolderFilter(BaseSeleniumWebTest test)
+    public void unclipFolderFilter()
     {
-        test.log("Unclip folder filter");
-        changeTab(test, ViewItemType.Filter);
+        _test.log("Unclip folder filter");
+        changeTab(ViewItemType.Filter);
 
         Locator loc = Locator.xpath(folderFilterPaperclipXPath());
-        test.assertAttributeContains(loc, "class", "x-btn-pressed");
-        test.click(loc);
-        test.assertAttributeNotContains(loc, "class", "x-btn-pressed");
+        _test.assertAttributeContains(loc, "class", "x-btn-pressed");
+        _test.click(loc);
+        _test.assertAttributeNotContains(loc, "class", "x-btn-pressed");
     }
 
-    public static void clipFilter(BaseSeleniumWebTest test, String column_id)
+    public void clipFilter(String column_id)
     {
         throw new RuntimeException("not yet implemented");
     }
 
-    public static void clipSort(BaseSeleniumWebTest test, String column_id)
+    public void clipSort(String column_id)
     {
         throw new RuntimeException("not yet implemented");
     }
 
-    public static void moveCustomizeViewColumn(BaseSeleniumWebTest test, String fieldKey, boolean moveUp)
+    public void moveCustomizeViewColumn(String fieldKey, boolean moveUp)
     {
-        test.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
-        moveCustomizeViewItem(test, fieldKey, moveUp, ViewItemType.Columns);
+        _test.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
+        moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Columns);
     }
 
-    public static void moveCustomizeViewFilter(BaseSeleniumWebTest test, String fieldKey, boolean moveUp)
+    public void moveCustomizeViewFilter(String fieldKey, boolean moveUp)
     {
-        test.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
-        moveCustomizeViewItem(test, fieldKey, moveUp, ViewItemType.Filter);
+        _test.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
+        moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Filter);
     }
 
-    public static void moveCustomizeViewSort(BaseSeleniumWebTest test, String fieldKey, boolean moveUp)
+    public void moveCustomizeViewSort(String fieldKey, boolean moveUp)
     {
-        test.log("Moving sort, " + fieldKey + " " + (moveUp ? "up." : "down."));
-        moveCustomizeViewItem(test, fieldKey, moveUp, ViewItemType.Sort);
+        _test.log("Moving sort, " + fieldKey + " " + (moveUp ? "up." : "down."));
+        moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Sort);
     }
 
-    private static void moveCustomizeViewItem(final BaseSeleniumWebTest test, String fieldKey, boolean moveUp, ViewItemType type)
+    private void moveCustomizeViewItem(String fieldKey, boolean moveUp, ViewItemType type)
     {
         final String itemXPath = itemXPath(type, fieldKey);
-        changeTab(test, type);
-        final int itemIndex = test.getElementIndex(Locator.xpath(itemXPath));
+        changeTab(type);
+        final int itemIndex = _test.getElementIndex(Locator.xpath(itemXPath));
 
-        moveCustomizeViewItem(test, itemIndex, moveUp, type);
+        moveCustomizeViewItem(itemIndex, moveUp, type);
 
-        test.waitFor(new BaseSeleniumWebTest.Checker()
+        _test.waitFor(new BaseSeleniumWebTest.Checker()
         {
             public boolean check()
             {
-                return itemIndex != test.getElementIndex(Locator.xpath(itemXPath));
+                return itemIndex != _test.getElementIndex(Locator.xpath(itemXPath));
             }
         }, "Item was not reordered.", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    private static void moveCustomizeViewItem(BaseSeleniumWebTest test, int field_index, boolean moveUp, ViewItemType type)
+    private void moveCustomizeViewItem(int field_index, boolean moveUp, ViewItemType type)
     {
         String fromItemXPath = itemXPath(type, field_index);
         String toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 );
 
-        changeTab(test, type);
-        test.dragAndDrop(Locator.xpath(fromItemXPath), Locator.xpath(toItemXPath));               
+        changeTab(type);
+        _test.dragAndDrop(Locator.xpath(fromItemXPath), Locator.xpath(toItemXPath));
     }
 
-    public static void removeColumnProperties(BaseSeleniumWebTest test, String fieldKey)
+    public void removeColumnProperties(String fieldKey)
     {
-        setColumnProperties(test, fieldKey, null, new ArrayList<Map<String,String>>());
+        setColumnProperties(fieldKey, null, new ArrayList<Map<String,String>>());
     }
 
-    public static void setColumnProperties(BaseSeleniumWebTest test, String fieldKey, String caption, Map<String, String> aggregate)
+    public void setColumnProperties(String fieldKey, String caption, Map<String, String> aggregate)
     {
         List<Map<String, String>> aggregates = new ArrayList<Map<String,String>>();
         aggregates.add(aggregate);
-        setColumnProperties(test, fieldKey, caption, aggregates);
+        setColumnProperties(fieldKey, caption, aggregates);
     }
 
     /**
      * Sets the column title and aggregate.
-     * @param test The test.
      * @param fieldKey The field key of the column to change.  Note that the column should already be in the selected column list.
      * @param caption The caption value or null to unset the column caption.
      * @param aggregates An array of the aggregates to apply to the column or null to unset.
      */
-    public static void setColumnProperties(BaseSeleniumWebTest test, String fieldKey, String caption, List<Map<String, String>> aggregates)
+    public void setColumnProperties(String fieldKey, String caption, List<Map<String, String>> aggregates)
     {
         String msg = "Setting column " + fieldKey;
         if (caption != null)
             msg = msg + " caption to '" + caption + "'";
         if (aggregates != null && aggregates.size() > 0)
             msg = msg + " aggregates to '" + StringUtils.join(aggregates, ", ") + "'";
-        test.log(msg);
+        _test.log(msg);
 
-        changeTab(test, ViewItemType.Columns);
+        changeTab(ViewItemType.Columns);
 
         String itemXPath = itemXPath(ViewItemType.Columns, fieldKey);
-        test.click(Locator.xpath(itemXPath + "//div[contains(@class, 'labkey-tool-gear')]"));
-        ExtHelper.waitForExtDialog(test, "Edit column properties for", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.click(Locator.xpath(itemXPath + "//div[contains(@class, 'labkey-tool-gear')]"));
+        _test._extHelper.waitForExtDialog("Edit column properties for", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         String parent = "//div[contains(@class, 'x-window')]";
 
         if (caption == null)
             caption = "";
-        test.setFormElement(Locator.xpath(parent + "//input[contains(@class, 'x-form-text')]"), caption);
+        _test.setFormElement(Locator.xpath(parent + "//input[contains(@class, 'x-form-text')]"), caption);
 
         //reset all aggregates
         String deleteButtonXPath = "//div[contains(@class, 'x-window')]" + "//*[contains(@class, 'labkey-tool-close')]";
-        while (test.isElementPresent(Locator.xpath(deleteButtonXPath)))
-            test.click(Locator.xpath(deleteButtonXPath));
+        while (_test.isElementPresent(Locator.xpath(deleteButtonXPath)))
+            _test.click(Locator.xpath(deleteButtonXPath));
 
         //then re-add them
         int idx = 1;
@@ -564,106 +565,104 @@ public class CustomizeViewsHelper
                 if (aggregate == null || aggregate.get("type") == null)
                     continue;
 
-                test.clickButton("Add Aggregate", 0);
-                Locator row = ExtHelper.locateExt3GridRow(idx, parent);
+                _test.clickButton("Add Aggregate", 0);
+                Locator row = _test._extHelper.locateExt3GridRow(idx, parent);
 
-                Locator comboCell = ExtHelper.locateExt3GridCell(row, 1);
-                test.dblclickAtAndWait(comboCell);
-                ExtHelper.selectComboBoxItem(test, (Locator.XPathLocator)grid, aggregate.get("type"));
+                Locator comboCell = _test._extHelper.locateExt3GridCell(row, 1);
+                _test.dblclickAtAndWait(comboCell);
+                _test._extHelper.selectComboBoxItem((Locator.XPathLocator)grid, aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
-                    Locator labelCell = ExtHelper.locateExt3GridCell(row, 2);
-                    test.dblclickAtAndWait(labelCell);
+                    Locator labelCell = _test._extHelper.locateExt3GridCell(row, 2);
+                    _test.dblclickAtAndWait(labelCell);
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");
-                    test.setFormElement(fieldPath, aggregate.get("label"));
+                    _test.setFormElement(fieldPath, aggregate.get("label"));
                 }
 
                 idx++;
             }
         }
-        test.clickButton("OK", 0);
+        _test.clickButton("OK", 0);
     }
 
     /**
      * pre-conditions:  at page with grid for which you would like an R view (grid should be only
      *      or at least first element on page)
      * post-conditions:  grid has R view of name name
-     * @param test
      * @param view   string to enter in view box (null for default) - Unimplemented
      * @param name name to give new R view
      */
-    public static void createRView(BaseSeleniumWebTest test, String view, String name)
+    public void createRView(String view, String name)
     {
-        createRView(test, view, name, false);
+        createRView(view, name, false);
     }
 
     /**
      * pre-conditions:  at page with grid for which you would like an R view (grid should be only
      *      or at least first element on page)
      * post-conditions:  grid has R view of name name
-     * @param test
      * @param view   string to enter in view box (null for default) - Unimplemented
      * @param name name to give new R view
      * @param shareView should this view be available to all users
      */
-    public static void createRView(BaseSeleniumWebTest test, String view, String name, boolean shareView)
+    public void createRView(String view, String name, boolean shareView)
     {
-        test.waitForText(("Views"));
-        test.clickMenuButtonAndContinue("Views", "Create", "R View");
-        test.waitForPageToLoad();
+        _test.waitForText(("Views"));
+        _test.clickMenuButtonAndContinue("Views", "Create", "R View");
+        _test.waitForPageToLoad();
 
         if(view!=null)
             Assert.fail("Unimplemented");
 
         if (shareView)
         {
-            test.checkCheckbox("shareReport");
+            _test.checkCheckbox("shareReport");
         }
 
-        test.clickButton("Save", 0);
+        _test.clickButton("Save", 0);
 
 
-        test.setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
-        ExtHelper.clickExtButton(test, "Save");
+        _test.setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
+        _test._extHelper.clickExtButton("Save");
     }
 
     /** Check that a column is present. */
-    public static boolean isColumnPresent(BaseSeleniumWebTest test, String fieldKey)
+    public boolean isColumnPresent(String fieldKey)
     {
-        Locator columnItem = expandPivots(test,fieldKey.split("/"));
-        return test.isElementPresent(columnItem);
+        Locator columnItem = expandPivots(fieldKey.split("/"));
+        return _test.isElementPresent(columnItem);
     }
 
     /** Check that a column is present and is not selectable. */
-    public static boolean isColumnUnselectable(BaseSeleniumWebTest test, String fieldKey)
+    public boolean isColumnUnselectable(String fieldKey)
     {
-        Locator columnItem = expandPivots(test,fieldKey.split("/"));
-        return test.isElementPresent(columnItem) && "on".equals(test.getAttribute(columnItem, "unselectable"));
+        Locator columnItem = expandPivots(fieldKey.split("/"));
+        return _test.isElementPresent(columnItem) && "on".equals(_test.getAttribute(columnItem, "unselectable"));
     }
 
     /** Check that a column is present and not hidden. Assumes that the 'show hidden columns' is unchecked. */
-    public static boolean isColumnVisible(BaseSeleniumWebTest test, String fieldKey)
+    public boolean isColumnVisible(String fieldKey)
     {
-        return isColumnHidden(test, fieldKey, false);
+        return isColumnHidden(fieldKey, false);
     }
 
     /** Check that a column is present and is hidden. Assumes that the 'show hidden columns' is unchecked. */
-    public static boolean isColumnHidden(BaseSeleniumWebTest test, String fieldKey)
+    public boolean isColumnHidden(String fieldKey)
     {
-        return isColumnHidden(test, fieldKey, true);
+        return isColumnHidden(fieldKey, true);
     }
 
-    private static boolean isColumnHidden(BaseSeleniumWebTest test, String fieldKey, boolean hidden)
+    private boolean isColumnHidden(String fieldKey, boolean hidden)
     {
-        Locator columnItem = expandPivots(test,fieldKey.split("/"));
-        if (!test.isElementPresent(columnItem))
+        Locator columnItem = expandPivots(fieldKey.split("/"));
+        if (!_test.isElementPresent(columnItem))
             return false;
 
         // back up the DOM one element to find the <li> node
         Locator li = Locator.xpath(columnItem.toXpath() + "/..");
-        String liStyle = test.getAttribute(li, "style");
-        test.log("Column '" + li.toString() + "' style attribute: " + liStyle);
+        String liStyle = _test.getAttribute(li, "style");
+        _test.log("Column '" + li.toString() + "' style attribute: " + liStyle);
 
         if (hidden)
             return liStyle.contains("display: none");

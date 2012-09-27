@@ -31,6 +31,8 @@ import java.util.HashMap;
 
 public class SearchTest extends StudyTest
 {
+    private final SearchHelper _searchHelper = new SearchHelper(this);
+    
     private static final String PROJECT_NAME = "SearchTest Project";
     private static final String FOLDER_A = "Folder Apple";
     private static final String FOLDER_B = "Folder Banana"; // Folder move destination
@@ -80,7 +82,7 @@ public class SearchTest extends StudyTest
 
     protected void doCreateSteps()
     {
-        SearchHelper.deleteIndex(this);
+        _searchHelper.deleteIndex();
         addSearchableStudy(); // Must come first;  Creates project.
         addSearchableLists();
         addSearchableContainers();
@@ -106,35 +108,35 @@ public class SearchTest extends StudyTest
     {
         clickTab("Overview");
         addWebPart("Lists");
-        ListHelper.importListArchive(this, FOLDER_A, new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
+        _listHelper.importListArchive(FOLDER_A, new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
 
 
         clickLinkWithText(listToDelete);
-        ListHelper.deleteList(this);
+        _listHelper.deleteList();
 
-        SearchHelper.enqueueSearchItem("BoarQPine");
-        SearchHelper.enqueueSearchItem("Panda", Locator.bodyLinkWithText("List " + fullySearchableList));
-        SearchHelper.enqueueSearchItem("2003-01-02", Locator.bodyLinkWithText("List " + fullySearchableList));
-        SearchHelper.enqueueSearchItem("12345", Locator.bodyLinkWithText("List " + fullySearchableList));  //Issue 15419
-        SearchHelper.enqueueSearchItem("Owlbear", Locator.bodyLinkWithText("List " + textOnlySearchableList));
-        SearchHelper.enqueueSearchItem("54321");
-        SearchHelper.enqueueSearchItem(metaOnlySearchable, Locator.bodyLinkWithText("List " + metaOnlySearchable));
-        SearchHelper.enqueueSearchItem("Turtleduck", Locator.bodyLinkWithText("List " + metaOnlySearchable)); //this phrase is present in the metadata-only file
-        SearchHelper.enqueueSearchItem("Cat", Locator.bodyLinkWithText("List " + customizedIndexingList));
-        SearchHelper.enqueueSearchItem("Garfield");
+        _searchHelper.enqueueSearchItem("BoarQPine");
+        _searchHelper.enqueueSearchItem("Panda", Locator.bodyLinkWithText("List " + fullySearchableList));
+        _searchHelper.enqueueSearchItem("2003-01-02", Locator.bodyLinkWithText("List " + fullySearchableList));
+        _searchHelper.enqueueSearchItem("12345", Locator.bodyLinkWithText("List " + fullySearchableList));  //Issue 15419
+        _searchHelper.enqueueSearchItem("Owlbear", Locator.bodyLinkWithText("List " + textOnlySearchableList));
+        _searchHelper.enqueueSearchItem("54321");
+        _searchHelper.enqueueSearchItem(metaOnlySearchable, Locator.bodyLinkWithText("List " + metaOnlySearchable));
+        _searchHelper.enqueueSearchItem("Turtleduck", Locator.bodyLinkWithText("List " + metaOnlySearchable)); //this phrase is present in the metadata-only file
+        _searchHelper.enqueueSearchItem("Cat", Locator.bodyLinkWithText("List " + customizedIndexingList));
+        _searchHelper.enqueueSearchItem("Garfield");
     }
 
     protected void doVerifySteps()
     {
         sleep(10000); // wait for indexer
-        SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         renameFolder(getProjectName(), getFolderName(), FOLDER_C, false);
         FOLDER_NAME = FOLDER_C;
         sleep(10000); // wait for indexer
-        SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         moveFolder(getProjectName(), getFolderName(), FOLDER_B, false);
         alterListsAndReSearch();
-        SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
 
         verifySyntaxErrorMessages();
 
@@ -148,11 +150,11 @@ public class SearchTest extends StudyTest
         HashMap<String, String> data = new HashMap<String, String>();
         String newAnimal = "Zebra Seal";
         data.put("Animal", newAnimal);
-        ListHelper.insertNewRow(this, data);
+        _listHelper.insertNewRow(data);
         goBack();
 
-        SearchHelper.enqueueSearchItem(newAnimal, Locator.linkContainingText(listIndexAsWhole));
-//        SearchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
+        _searchHelper.enqueueSearchItem(newAnimal, Locator.linkContainingText(listIndexAsWhole));
+//        _searchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
         log("TODO");
     }
 
@@ -163,11 +165,11 @@ public class SearchTest extends StudyTest
     
     private void verifySyntaxErrorMessages()
     {
-        SearchHelper.searchFor(this, "age()");
+        _searchHelper.searchFor("age()");
         checkSyntaxErrorMessage("Error: Can't parse 'age()': Problem character is highlighted", "These characters have special meaning within search queries:", "You can escape special characters using \\ before the character or you can enclose the query string in double quotes.", "For more information, visit the search syntax documentation.");
-        SearchHelper.searchFor(this, "incomplete(");
+        _searchHelper.searchFor("incomplete(");
         checkSyntaxErrorMessage("Error: Can't parse 'incomplete(': Query string is incomplete", "These characters have special meaning within search queries:");
-        SearchHelper.searchFor(this, "this AND OR");
+        _searchHelper.searchFor("this AND OR");
         checkSyntaxErrorMessage("Error: Can't parse 'this AND OR': Problem character is highlighted", "Boolean operators AND, OR, and NOT have special meaning within search queries");
     }
 
@@ -193,7 +195,7 @@ public class SearchTest extends StudyTest
         if (_testDone)
         {
             sleep(5000); // wait for index to update.
-            SearchHelper.verifyNoSearchResults(this);
+            _searchHelper.verifyNoSearchResults();
         }
         super.doCleanup();
     }
@@ -208,8 +210,8 @@ public class SearchTest extends StudyTest
     {
         super.doCreateSteps(); // import study and specimens
 
-        SearchHelper.enqueueSearchItem("999320016", Locator.linkContainingText("999320016"));
-        SearchHelper.enqueueSearchItem("Urinalysis", Locator.linkContainingText("URF-1"),
+        _searchHelper.enqueueSearchItem("999320016", Locator.linkContainingText("999320016"));
+        _searchHelper.enqueueSearchItem("Urinalysis", Locator.linkContainingText("URF-1"),
                                                      Locator.linkContainingText("URF-2"),
                                                      Locator.linkContainingText("URS-1"));
     }
@@ -258,19 +260,21 @@ public class SearchTest extends StudyTest
 
     private void addSearchableWiki()
     {
+        WikiHelper _wikiHelper = new WikiHelper(this);
+        
         clickLinkWithText(getFolderName());
         addWebPart("Wiki");
-        WikiHelper.createWikiPage(this, "RADEOX", WIKI_NAME, WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
+        _wikiHelper.createWikiPage("RADEOX", WIKI_NAME, WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
         addWebPart("Wiki");
         //Issue 9454: Don't index option for wiki page
-        WikiHelper.createWikiPage(this, "RADEOX", WIKI_NAME+"UNSEARCHABLE", WIKI_TITLE, WIKI_CONTENT, false, null);
+        _wikiHelper.createWikiPage("RADEOX", WIKI_NAME+"UNSEARCHABLE", WIKI_TITLE, WIKI_CONTENT, false, null);
 
 
-        SearchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
-        SearchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE");
-        SearchHelper.enqueueSearchItem(WIKI_TITLE, Locator.linkWithText(WIKI_TITLE));
-        SearchHelper.enqueueSearchItem(WIKI_CONTENT, Locator.linkWithText(WIKI_TITLE));
-        SearchHelper.enqueueSearchItem("moduleDependencies", Locator.linkWithText("\"module.template.properties\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file
+        _searchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
+        _searchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE");
+        _searchHelper.enqueueSearchItem(WIKI_TITLE, Locator.linkWithText(WIKI_TITLE));
+        _searchHelper.enqueueSearchItem(WIKI_CONTENT, Locator.linkWithText(WIKI_TITLE));
+        _searchHelper.enqueueSearchItem("moduleDependencies", Locator.linkWithText("\"module.template.properties\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file
     }
 
     private void addSearchableIssues()
@@ -307,12 +311,12 @@ public class SearchTest extends StudyTest
         }
         clickButton("Save");
 
-        SearchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
-        SearchHelper.enqueueSearchItem(ISSUE_BODY, Locator.linkContainingText(ISSUE_TITLE));
-        SearchHelper.enqueueSearchItem(USER1_DISPLAY_NAME, Locator.linkContainingText(ISSUE_TITLE));
-        SearchHelper.enqueueSearchItem("Area51", Locator.linkContainingText(ISSUE_TITLE));
-        SearchHelper.enqueueSearchItem("UFO", Locator.linkContainingText(ISSUE_TITLE));
-        //SearchHelper.enqueueSearchItem("Override", Locator.linkWithText("\"common.properties\" attached to issue \"" + ISSUE_TITLE + "\"")); // some text from attached file
+        _searchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
+        _searchHelper.enqueueSearchItem(ISSUE_BODY, Locator.linkContainingText(ISSUE_TITLE));
+        _searchHelper.enqueueSearchItem(USER1_DISPLAY_NAME, Locator.linkContainingText(ISSUE_TITLE));
+        _searchHelper.enqueueSearchItem("Area51", Locator.linkContainingText(ISSUE_TITLE));
+        _searchHelper.enqueueSearchItem("UFO", Locator.linkContainingText(ISSUE_TITLE));
+        //_searchHelper.enqueueSearchItem("Override", Locator.linkWithText("\"common.properties\" attached to issue \"" + ISSUE_TITLE + "\"")); // some text from attached file
     }
 
     private void addSearchableMessages()
@@ -330,9 +334,9 @@ public class SearchTest extends StudyTest
         }
         clickButton("Submit");
 
-        SearchHelper.enqueueSearchItem(MESSAGE_TITLE, Locator.linkContainingText(MESSAGE_TITLE));
-        SearchHelper.enqueueSearchItem(MESSAGE_BODY, Locator.linkContainingText(MESSAGE_TITLE));
-        SearchHelper.enqueueSearchItem("persimmon", Locator.linkContainingText("\"fruits.tsv\" attached to message \"" + MESSAGE_TITLE + "\"")); // some text from attached file
+        _searchHelper.enqueueSearchItem(MESSAGE_TITLE, Locator.linkContainingText(MESSAGE_TITLE));
+        _searchHelper.enqueueSearchItem(MESSAGE_BODY, Locator.linkContainingText(MESSAGE_TITLE));
+        _searchHelper.enqueueSearchItem("persimmon", Locator.linkContainingText("\"fruits.tsv\" attached to message \"" + MESSAGE_TITLE + "\"")); // some text from attached file
     }
 
     private void addSearchableFiles()
@@ -345,8 +349,8 @@ public class SearchTest extends StudyTest
         uploadFile(file);
         uploadFile(MLfile);
 
-        SearchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(file.getName()));
-        SearchHelper.enqueueSearchItem("ThermoFinnigan", true, Locator.linkWithText(MLfile.getName()));
+        _searchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(file.getName()));
+        _searchHelper.enqueueSearchItem("ThermoFinnigan", true, Locator.linkWithText(MLfile.getName()));
     }
 
     private void uploadFile(File f)

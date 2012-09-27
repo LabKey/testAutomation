@@ -90,7 +90,7 @@ public class DataViewsTester
         Assert.assertEquals("Incorrect number of datasets after collapsing category.", 6, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
         _test.clickWebpartMenuItem("Data Views", false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        ExtHelper.uncheckCheckbox(_test, "datasets");
+        _test._extHelper.uncheckCheckbox("datasets");
         _test.setFormElement(Locator.name("webpart.title"), WEBPART_TITLE);
         _test.clickButton("Save", 0);
         setDataBrowseSearch("");
@@ -101,8 +101,8 @@ public class DataViewsTester
         _test.log("Verify cancel button");
         _test.clickWebpartMenuItem("Data Views", false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        ExtHelper.checkCheckbox(_test, "datasets");
-        ExtHelper.uncheckCheckbox(_test, "reports");
+        _test._extHelper.checkCheckbox("datasets");
+        _test._extHelper.uncheckCheckbox("reports");
         _test.setFormElement(Locator.name("webpart.title"), "nothing");
         _test.clickButton("Cancel", 0);
         _test.sleep(500);               //TODO: \
@@ -115,13 +115,13 @@ public class DataViewsTester
         _test.log("Verify category management");
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        ExtHelper.checkCheckbox(_test, "datasets");
+        _test._extHelper.checkCheckbox("datasets");
         _test.clickButton("Manage Categories", 0);
-        ExtHelper.waitForExtDialog(_test, "Manage Categories");
+        _test._extHelper.waitForExtDialog("Manage Categories");
         _test.waitAndClick(Locator.xpath("//img[@data-qtip='Delete']"));
-        ExtHelper.waitForExtDialog(_test, "Delete Category");
+        _test._extHelper.waitForExtDialog("Delete Category");
         _test.clickButton("OK", 0);
-        ExtHelper.waitForExtDialogToDisappear(_test, "Delete Category");
+        _test._extHelper.waitForExtDialogToDisappear("Delete Category");
         _test.waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.clickButton("New Category", 0);
         _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"));
@@ -136,10 +136,10 @@ public class DataViewsTester
 
         _test.log("Verify modify dataset");
         _test.click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
-        ExtHelper.waitForExtDialog(_test, EDITED_DATASET);
+        _test._extHelper.waitForExtDialog(EDITED_DATASET);
         _test.setFormElement(Locator.xpath("//label[text() = 'Category']/../..//input"), NEW_CATEGORY);
         _test.setFormElement(Locator.name("description"), NEW_DESCRIPTION);
-        ExtHelper.clickExtButton(_test, EDITED_DATASET, "Save", 0);
+        _test._extHelper.clickExtButton(EDITED_DATASET, "Save", 0);
         _test.waitForText(NEW_CATEGORY);
         _test.clickLinkWithText(EDITED_DATASET);
         _test.assertTextPresent(NEW_DESCRIPTION);
@@ -154,7 +154,7 @@ public class DataViewsTester
 
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        ExtHelper.checkCheckbox(_test, "Status");
+        _test._extHelper.checkCheckbox("Status");
         _test.clickButton("Save", 0);
         _test.clickLinkContainingText("Data & Reports");
 
@@ -163,7 +163,7 @@ public class DataViewsTester
             clickCustomizeView(entry[0]);
 
 //            Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
-            Ext4Helper.selectComboBoxItem(_test, "Status", entry[1]);
+            _test._ext4Helper.selectComboBoxItem("Status", entry[1]);
 
             _test.clickButton("Save", 0);
 
@@ -185,7 +185,7 @@ public class DataViewsTester
         _test.waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.click(editLink);
         
-        ExtHelper.waitForExtDialog(_test, viewName);
+        _test._extHelper.waitForExtDialog(viewName);
     }
 
     //Issue 12914: dataset browse web part not displaying data sets alphabetically
@@ -230,17 +230,17 @@ public class DataViewsTester
         _test.waitForTextToDisappear("Type:");
         _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        ExtHelper.checkCheckbox(_test, "Modified");
-        ExtHelper.checkCheckbox(_test, "Data Cut Date");
+        _test._extHelper.checkCheckbox("Modified");
+        _test._extHelper.checkCheckbox("Data Cut Date");
         Locator manageButton = _test.getButtonLocator("Manage Categories");
         _test.clickButton("Save", 0);
         _test.waitForElementToDisappear(manageButton, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForText("Data Cut Date");
         _test.waitForText("Modified");
         _test.click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
-        ExtHelper.waitForExtDialog(_test, EDITED_DATASET);
+        _test._extHelper.waitForExtDialog(EDITED_DATASET);
         _test.setFormElement("refreshDate", refreshDate);
-        ExtHelper.clickExtButton(_test, EDITED_DATASET, "Save", 0);
+        _test._extHelper.clickExtButton(EDITED_DATASET, "Save", 0);
         _test.waitForText(refreshDate, 1, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         // check hover box
         _test.mouseOver(Locator.linkWithText(EDITED_DATASET));

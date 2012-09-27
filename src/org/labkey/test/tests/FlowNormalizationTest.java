@@ -33,7 +33,8 @@ public class FlowNormalizationTest extends BaseFlowTest
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
 
         super.init();
     }

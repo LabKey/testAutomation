@@ -71,7 +71,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         doTestValidation();
 
         log("Create list in subfolder to prevent query validation failure");
-        ListHelper.createList(this, getProjectName(), LIST_NAME,
+        _listHelper.createList(getProjectName(), LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),

@@ -42,16 +42,16 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         if (!isEngineConfigured())
         {
             // add a new r engine configuration
-            String id = ExtHelper.getExtElementId(this, "btn_addEngine");
+            String id = _extHelper.getExtElementId("btn_addEngine");
             click(Locator.id(id));
 
-            id = ExtHelper.getExtElementId(this, "add_externalEngine");
+            id = _extHelper.getExtElementId("add_externalEngine");
             click(Locator.id(id));
 
-            id = ExtHelper.getExtElementId(this, "btn_submit");
+            id = _extHelper.getExtElementId("btn_submit");
             waitForElement(Locator.id(id), 10000);
 
-            id = ExtHelper.getExtElementId(this, "editEngine_exePath");
+            id = _extHelper.getExtElementId("editEngine_exePath");
 
             String javaHome = System.getProperty("java.home");
             File javaExe = new File(javaHome + "/bin/java.exe");
@@ -63,22 +63,22 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             }
             setFormElement(Locator.id(id), javaExe.getAbsolutePath());
 
-            id = ExtHelper.getExtElementId(this, "editEngine_name");
+            id = _extHelper.getExtElementId("editEngine_name");
             setFormElement(Locator.id(id), "Java");
 
-            id = ExtHelper.getExtElementId(this, "editEngine_languageName");
+            id = _extHelper.getExtElementId("editEngine_languageName");
             setFormElement(Locator.id(id), "java");
 
-            id = ExtHelper.getExtElementId(this, "editEngine_extensions");
+            id = _extHelper.getExtElementId("editEngine_extensions");
             setFormElement(Locator.id(id), "jar");
 
-            id = ExtHelper.getExtElementId(this, "editEngine_exeCommand");
+            id = _extHelper.getExtElementId("editEngine_exeCommand");
             setFormElement(Locator.id(id), "-jar \"${scriptFile}\" \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"", true);
 
             // add -Xdebug and -Xrunjdwp parameters to the engine command in order to attach a debugger to you transform script
             //setFormElement(Locator.id(id), "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006 -jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
 
-            id = ExtHelper.getExtElementId(this, "btn_submit");
+            id = _extHelper.getExtElementId("btn_submit");
             click(Locator.id(id));
 
             // wait until the dialog has been dismissed
@@ -144,10 +144,10 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
             selenium.mouseDown(engine.toString());
 
-            String id = ExtHelper.getExtElementId(this, "btn_deleteEngine");
+            String id = _extHelper.getExtElementId("btn_deleteEngine");
             click(Locator.id(id));
 
-            ExtHelper.waitForExtDialog(this, "Delete Engine Configuration", WAIT_FOR_JAVASCRIPT);
+            _extHelper.waitForExtDialog("Delete Engine Configuration", WAIT_FOR_JAVASCRIPT);
 
             String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
             click(Locator.id(btnId));

@@ -2,13 +2,8 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
-import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 
@@ -103,7 +98,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
     protected void doCreateSteps()
     {
         // fail fast if R is not configured
-        RReportHelper.ensureRConfig(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
 
         importStudy();
         goToModule("Pipeline");
@@ -113,10 +109,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
         setStudyProperties(STUDY_LABEL, STUDY_INVESTIGATOR, STUDY_GRANT, STUDY_DESCRIPTION);
 
         // Create some mouse groups
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), GROUP1_NAME, "Mouse", true, GROUP1_PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), GROUP2_NAME, "Mouse", true, GROUP2_PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), GROUP3_NAME, "Mouse", true, GROUP3_PTIDS);
-        StudyHelper.createCustomParticipantGroup(this, getProjectName(), getFolderName(), GROUP0_NAME, "Mouse", false, GROUP0_PTIDS);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP1_NAME, "Mouse", true, GROUP1_PTIDS);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP2_NAME, "Mouse", true, GROUP2_PTIDS);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP3_NAME, "Mouse", true, GROUP3_PTIDS);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP0_NAME, "Mouse", false, GROUP0_PTIDS);
 
         // Create some views and reports
         createRView(R_VIEW, REPORT_DATASET, true);
@@ -128,7 +124,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         createCustomView(CUSTOM_VIEW2, DATASETS[2], CUSTOM_VIEW_PTIDS2, false);
 
         // Create some lists
-        ListHelper.importListArchive(this, getFolderName(), LIST_ARCHIVE);
+        _listHelper.importListArchive(getFolderName(), LIST_ARCHIVE);
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
@@ -172,10 +168,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     protected void verifyPublishedStudy(final String name, final String[] ptids, final String[] datasets, final String[] dependentDatasets, final String[] visits, final String[] views, final String[] reports, final String[] lists, final boolean removeProtected, final boolean shiftDates, final boolean alternateIDs)
     {
+        SearchHelper searchHelper = new SearchHelper(this);
         // Verify alternate IDs (or lack thereof)
         for (String ptid : ptids)
         {
-            SearchHelper.searchForSubjects(this, ptid);
+            searchHelper.searchForSubjects(ptid);
             if (alternateIDs)
                 assertFalse("Published study contains non-alternate ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
             else
@@ -272,7 +269,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
                 if (isTextPresent(report))
                 {
-                    ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+                    _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
                     if (alternateIDs)
                         assertTextNotPresent(ptids);
                     else
@@ -282,7 +279,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
                     {
                         // Verify that time chart on click function is published with time chart
                         waitAndClick(Locator.css("svg a>path"));
-                        ExtHelper.waitForExtDialog(this, "Data Point Information");
+                        _extHelper.waitForExtDialog("Data Point Information");
                         clickButton("OK", 0);
                         waitForExtMaskToDisappear();
                     }
@@ -356,7 +353,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         log("Publish study.");
         clickButton("Publish Study", 0);
-        ExtHelper.waitForExtDialog(this, "Publish Study");
+        _extHelper.waitForExtDialog("Publish Study");
 
         // Wizard page 1 : General Setup
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
@@ -373,9 +370,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (groups != null && groups.length > 0)
         {
             clickButton("Next", 0);
-            ExtHelper.waitForExtDialog(this, "Error");
+            _extHelper.waitForExtDialog("Error");
             assertTextPresent("You must select at least one Mouse group.");
-            ExtHelper.clickExtButton(this, "Error", "OK", 0);
+            _extHelper.clickExtButton("Error", "OK", 0);
             checkRadioButton("renderType", "existing");
             for (String group : groups)
             {
@@ -393,9 +390,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
         waitForElement(Locator.css(".studyWizardDatasetList"));
         clickButton("Next", 0);
-        ExtHelper.waitForExtDialog(this, "Error");
+        _extHelper.waitForExtDialog("Error");
         assertTextPresent("You must select at least one dataset to create the new study from.");
-        ExtHelper.clickExtButton(this, "Error", "OK", 0);
+        _extHelper.clickExtButton("Error", "OK", 0);
         for (String dataset : datasets)
         {
             getWrapper().getEval("selenium.selectExtGridItem('Label', '"+dataset+"', -1, 'studyWizardDatasetList', true)");
@@ -408,9 +405,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Visits']"));
         waitForElement(Locator.css(".studyWizardVisitList"));
         clickButton("Next", 0);
-        ExtHelper.waitForExtDialog(this, "Error");
+        _extHelper.waitForExtDialog("Error");
         assertTextPresent("You must select at least one visit.");
-        ExtHelper.clickExtButton(this, "Error", "OK", 0);
+        _extHelper.clickExtButton("Error", "OK", 0);
         for (String visit : visits)
         {
             getWrapper().getEval("selenium.selectExtGridItem('SequenceNumMin', '" + visit + "', -1, 'studyWizardVisitList', true)");
@@ -475,11 +472,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
-        ExtHelper.waitForExtDialog(this, "Add Measure...");
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog("Add Measure...");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         setFormElement(Locator.name("filterSearch"), datasetMeasurePairs[0][0]);
-        String measureXpath = ExtHelper.getExtDialogXPath(this, "Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[0][1]+"')]]";
+        String measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[0][1]+"')]]";
         waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
         mouseDown(Locator.xpath(measureXpath));
         clickButton("Select", 0);
@@ -493,11 +490,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
             for (int i = 1; i < datasetMeasurePairs.length; i++)
             {
                 clickButton("Add Measure", 0);
-                ExtHelper.waitForExtDialog(this, "Add Measure...");
-                ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+                _extHelper.waitForExtDialog("Add Measure...");
+                _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
                 setFormElement(Locator.name("filterSearch", i), datasetMeasurePairs[i][0]);
-                measureXpath = ExtHelper.getExtDialogXPath(this, "Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[i][1]+"')]]";
+                measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[i][1]+"')]]";
                 waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
                 mouseDown(Locator.xpath(measureXpath));
                 clickButton("Select", 0);
@@ -509,7 +506,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         mouseDown(Locator.tagWithText("b", "Mice"));
         sleep(1000);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT); // Make sure charts are rendered
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT); // Make sure charts are rendered
 
         // Add point click function
         clickButton("Developer", 0);
@@ -521,7 +518,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Visit-based chart
         getWrapper().getEval("window.showTimeChartAxisPanel('X-Axis');");
         waitForElement(Locator.button("Cancel"));
-        Ext4Helper.selectRadioButton(this, "Chart Type:", "Visit Based Chart");
+        _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         waitAndClick(Locator.button("OK"));
         waitForTextToDisappear("Days Since Contact Date");
 
@@ -538,23 +535,23 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToManageViews();
         clickMenuButton("Create", "Mouse Report");
         waitAndClickButton("Choose Measures", 0);
-        ExtHelper.waitForExtDialog(this, ADD_MEASURE_TITLE);
-        ExtHelper.waitForLoadingMaskToDisappear(this, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         for (String[] pair : datasetMeasurePairs)
         {
-            ExtHelper.setExtFormElementByType(this, ADD_MEASURE_TITLE, "text", pair[0]);
-//            pressEnter(ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
-            String measureXpath = ExtHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE) + "//table/tbody/tr[not(contains(@class, 'x4-grid-row-selected'))]/td[div[starts-with(text(), '"+ pair[1]+"')]]";
+            _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", pair[0]);
+//            pressEnter(_extHelper.getExtDialogXPath(this, ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
+            String measureXpath = _extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//table/tbody/tr[not(contains(@class, 'x4-grid-row-selected'))]/td[div[starts-with(text(), '"+ pair[1]+"')]]";
             waitForElement(Locator.xpath(measureXpath), WAIT_FOR_JAVASCRIPT); // Make sure measure has appeared
             waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
 
-            ExtHelper.clickX4GridPanelCheckbox(this, "label", pair[1], "measuresGridPanel", true);
+            _extHelper.clickX4GridPanelCheckbox("label", pair[1], "measuresGridPanel", true);
         }
 
         clickButton("Select", 0);
 
-        ExtHelper.setExtFormElementByLabel(this, "Report Name", reportName);
+        _extHelper.setExtFormElementByLabel("Report Name", reportName);
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
     }
@@ -565,7 +562,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
         clickButton("View Data");
-        CustomizeViewsHelper.createRView(this, null, name, shareView);
+        _customizeViewsHelper.createRView(null, name, shareView);
     }
 
     private void createCustomView(String name, String dataset, String[] ptids, boolean shared)
@@ -584,9 +581,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickLinkWithText(getFolderName());
 
         clickLinkWithText(dataset);
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewFilter(this, "MouseId", "Mouse Id", "Equals One Of", ptidFilter);
-        CustomizeViewsHelper.saveCustomView(this, name, shared);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewFilter("MouseId", "Mouse Id", "Equals One Of", ptidFilter);
+        _customizeViewsHelper.saveCustomView(name, shared);
     }
 
     /**

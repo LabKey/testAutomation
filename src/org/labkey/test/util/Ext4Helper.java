@@ -33,77 +33,163 @@ import java.util.List;
  * Date: Jan 3, 2012
  * Time: 3:34:16 PM
  */
-public class Ext4Helper
+public class Ext4Helper extends AbstractHelper
 {
-
-    public static void selectComboBoxItem(BaseSeleniumWebTest test, Locator.XPathLocator parentLocator, String selection)
+    public Ext4Helper(BaseSeleniumWebTest test)
+    {
+        super(test);
+    }
+    
+    public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
-        test.waitForElement(l);
-        test.clickAt(l,  "1,1");
-        if(test.getBrowser().startsWith(test.IE_BROWSER))
+        _test.waitForElement(l);
+        _test.clickAt(l, "1,1");
+        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
-            test.sleep(500);
-            test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
+            _test.sleep(500);
+            _test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
+            _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
         }
         else
         {
             // wait for the dropdown to open
             Locator listItem =     Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '" + selection + "')]");
-            test.waitForElement(listItem);
+            _test.waitForElement(listItem);
 
             // select the list item
-            test.click(listItem);
+            _test.click(listItem);
             //test.mouseDown(Locator.xpath("/html/body"));
         }
     }
 
-    public static void selectComboBoxItem(BaseSeleniumWebTest test, String label, String selection)
+    public void selectComboBoxItem(String label, String selection)
     {
-       Ext4FieldRef.getForLabel(test, label).setValue(selection);
+       Ext4FieldRef.getForLabel(_test, label).setValue(selection);
     }
 
-    public static void selectComboBoxItemById(BaseSeleniumWebTest test, String labelId, String selection)
+    public void selectComboBoxItemById(String labelId, String selection)
     {
         Locator.XPathLocator loc = Locator.xpath("//tbody[./tr/td/label[@id='" + labelId + "-labelEl']]");
-        selectComboBoxItem(test, loc, selection);
+        selectComboBoxItem(loc, selection);
     }
 
-    public static void selectRadioButton(BaseSeleniumWebTest test, String label, String selection)
+    public void selectRadioButton(String label, String selection)
     {
         Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");
-        if (!test.isElementPresent(l))
+        if (!_test.isElementPresent(l))
         {
             // try Ext 4.1.0 version
             l = Locator.xpath("//div[./table//label[text()='" + label + "']]//label[text()='" + selection + "']");
         }
-        test.click(l);
+        _test.click(l);
     }
 
-    public static void selectRadioButtonById(BaseSeleniumWebTest test, String labelId)
+    public void selectRadioButtonById(String labelId)
     {
         Locator l = Locator.xpath("//label[@id='" + labelId + "']");
-        test.click(l);
+        _test.click(l);
     }
 
-    public static <Type extends Ext4CmpRef> List<Type> componentQuery(BaseSeleniumWebTest test, String componentSelector, Class<Type> clazz)
+    /**
+     * Check the checkbox for an Ext4 grid row
+     * Currently used only for participant filter panel.
+     * @param cellText Exact text from any cell in the desired row
+     */
+    public void checkGridRowCheckbox(String cellText)
+    {
+        checkGridRowCheckbox(cellText, 0);
+    }
+
+    /**
+     * Check the checkbox for an Ext4 grid row
+     * Currently used only for participant filter panel
+     * @param cellText Exact text from any cell in the desired row
+     * @param index 0-based index of rows with matching cellText
+     */
+    public void checkGridRowCheckbox(String cellText, int index)
+    {
+        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        if (!isChecked(rowLoc))
+            _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
+    }
+
+    /**
+     * Uncheck the checkbox for an Ext4 grid row
+     * Currently used only for participant filter panel.
+     * @param cellText Exact text from any cell in the desired row
+     */
+    public void uncheckGridRowCheckbox(String cellText)
+    {
+        uncheckGridRowCheckbox(cellText, 0);
+    }
+
+    /**
+     * Uncheck the checkbox for an Ext4 grid row
+     * Currently used only for participant filter panel
+     * @param cellText Exact text from any cell in the desired row
+     * @param index 0-based index of rows with matching cellText
+     */
+    public void uncheckGridRowCheckbox(String cellText, int index)
+    {
+        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        if (isChecked(rowLoc))
+            _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
+    }
+
+    /**
+     * Click the text of an Ext4 grid row
+     * Currently used only for participant filter panel
+     * @param cellText Exact text from any cell in the desired row
+     * @param index 0-based index of rows with matching cellText
+     */
+    public void clickGridRowText(String cellText, int index)
+    {
+        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-cell')][string() = '"+cellText+"']"));
+    }
+
+    /**
+     * Determines if the specified row has a checked checkbox
+     * @param rowLoc Locator provided by {@link #getGridRow(String, int)}
+     * @return true if the specified row has a checked checkbox
+     */
+    private boolean isChecked(Locator.XPathLocator rowLoc)
+    {
+        _test.assertElementPresent(rowLoc);
+        return _test.isElementPresent(rowLoc.append("[contains(@class, 'x4-grid-row-selected')]"));
+    }
+
+    /**
+     * Determines if the specified row has a checked checkbox
+     * @param cellText Exact text from any cell in the desired row
+     * @param index 0-based index of rows with matching cellText
+     * @return true if the specified row has a checked checkbox
+     */
+    public boolean isChecked(String cellText, int index)
+    {
+        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        _test.assertElementPresent(rowLoc);
+        return _test.isElementPresent(rowLoc.append("[contains(@class, 'x4-grid-row-selected')]"));
+    }
+
+    public <Type extends Ext4CmpRef> List<Type> componentQuery(String componentSelector, Class<Type> clazz)
     {
         componentSelector = componentSelector.replaceAll("'", "\"");  //escape single quotes
-        String res = test.getWrapper().getEval("selenium.ext4ComponentQuery('" + componentSelector + "')");
-        return componentsFromJson(test, res, clazz);
+        String res = _test.getWrapper().getEval("selenium.ext4ComponentQuery('" + componentSelector + "')");
+        return componentsFromJson(res, clazz);
     }
 
-    public static <Type extends Ext4CmpRef> Type queryOne(BaseSeleniumWebTest test, String componentSelector, Class<Type> clazz)
+    public <Type extends Ext4CmpRef> Type queryOne(String componentSelector, Class<Type> clazz)
     {
-        List<Type> cmpRefs = componentQuery(test, componentSelector, clazz);
+        List<Type> cmpRefs = componentQuery(componentSelector, clazz);
         if (null == cmpRefs || cmpRefs.size() == 0)
             return null;
 
         return cmpRefs.get(0);
     }
 
-    public static <Type extends Ext4CmpRef> List<Type> componentsFromJson(BaseSeleniumWebTest test, String jsonArrayStr, Class<Type> clazz)
+    public <Type extends Ext4CmpRef> List<Type> componentsFromJson(String jsonArrayStr, Class<Type> clazz)
     {
         if (null == jsonArrayStr || "null".equals(jsonArrayStr))
             return null;
@@ -115,7 +201,7 @@ public class Ext4Helper
             for (Object o : array)
             {
                 Constructor<Type> constructor = clazz.getConstructor(String.class, BaseSeleniumWebTest.class);
-                ret.add(constructor.newInstance(o.toString(), test));
+                ret.add(constructor.newInstance(o.toString(), _test));
             }
             return ret;
         }
@@ -137,55 +223,59 @@ public class Ext4Helper
         }
     }
 
-    public static class Ext4SelectorChecker implements BaseSeleniumWebTest.Checker
+    public BaseSeleniumWebTest.Checker getExt4SelectorChecker(final String selector)
     {
-        private BaseSeleniumWebTest _test;
-        private String _selector;
-
-        public Ext4SelectorChecker(BaseSeleniumWebTest test, String selector)
+        return new BaseSeleniumWebTest.Checker()
         {
-            this._selector = selector;
-            this._test = test;
-        }
-
-        @Override
-        public boolean check()
-        {
-            return queryOne(_test, _selector, Ext4CmpRef.class) != null;
-        }
+            @Override
+            public boolean check()
+            {
+                return queryOne(selector, Ext4CmpRef.class) != null;
+            }
+        };
     }
 
-    public static void clickTabContainingText(BaseSeleniumWebTest test, String tabText)
+    public void clickTabContainingText(String tabText)
     {
-        test.click(Locator.xpath("//span[contains(@class, 'x4-tab-inner') and contains( text(), '" + tabText + "')]"));
+        _test.click(Locator.xpath("//span[contains(@class, 'x4-tab-inner') and contains( text(), '" + tabText + "')]"));
     }
 
-    public static void waitForMaskToDisappear(BaseSeleniumWebTest test)
+    public void waitForMaskToDisappear()
     {
-        waitForMaskToDisappear(test, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static void waitForMaskToDisappear(BaseSeleniumWebTest test, int wait)
+    public void waitForMaskToDisappear(int wait)
     {
-        test.waitForElementToDisappear(getExtMask(), wait);
+        _test.waitForElementToDisappear(getExtMask(), wait);
     }
 
-    public static void waitForMask(BaseSeleniumWebTest test)
+    public void waitForMask()
     {
-        waitForMask(test, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForMask(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static void waitForMask(BaseSeleniumWebTest test, int wait)
+    public void waitForMask(int wait)
     {
-        test.waitForElement(getExtMask(), wait);
+        _test.waitForElement(getExtMask(), wait);
     }
 
-    private static Locator getExtMask()
+    private Locator getExtMask()
     {
         return Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-mask')]");
     }
 
-    public static Locator invalidField()
+    /**
+     * @param cellText Exact text from any cell in the desired row
+     * @param index 0-based index of rows with matching cellText
+     * @return XPathLocator for the desired row
+     */
+    private Locator.XPathLocator getGridRow(String cellText, int index)
+    {
+        return Locator.xpath("(//tr[contains(@class, 'x4-grid-row')][td[string() = '" + cellText + "']])[" + (index + 1) + "]");
+    }
+
+    public static Locator.XPathLocator invalidField()
     {
         return Locator.xpath("//input[contains(@class, 'x4-form-field') and contains(@class, 'x4-form-invalid-field')]");
     }
@@ -209,17 +299,17 @@ public class Ext4Helper
             test.click(itemLocator);
     }
 
-    public static void clickExt4MenuItem(BaseSeleniumWebTest test, String text)
+    public void clickExt4MenuItem(String text)
     {
-        test.click(ext4MenuItem(text));
+        _test.click(ext4MenuItem(text));
     }
 
-    public static Locator ext4MenuItem(String text)
+    public static Locator.XPathLocator ext4MenuItem(String text)
     {
         return Locator.xpath("//span[contains(@class, 'x4-menu-item-text') and text() = '" + text + "']");
     }
 
-    public static Locator ext4Window(String title)
+    public static Locator.XPathLocator ext4Window(String title)
     {
         return Locator.xpath("//div[contains(@class, 'x4-window-header')]//span[text() = '" + title + "']");
     }

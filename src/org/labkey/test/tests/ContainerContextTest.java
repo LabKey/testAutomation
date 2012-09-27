@@ -21,11 +21,8 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
@@ -97,18 +94,18 @@ public class ContainerContextTest extends BaseSeleniumWebTest
             new ListHelper.ListColumn("LookupAge", "LookupAge", ListHelper.ListColumnType.Integer, "Lookup Age", null, null, null, "fake/action.view?key=${Key}")
         };
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
-        ListHelper.createList(this, SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
+        _listHelper.createList(SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
         clickButton("Done");
 
         log("** Insert row into lookup target list");
         goToProjectHome();
         clickLinkWithText(SUB_FOLDER_A);
         clickLinkWithText(lookupTargetListName);
-        ListHelper.insertNewRow(this, Maps.<String, String>of(
+        _listHelper.insertNewRow(Maps.<String, String>of(
                 "LookupName", "MyLookupItem1",
                 "LookupAge", "100"
         ));
-        ListHelper.insertNewRow(this, Maps.<String, String>of(
+        _listHelper.insertNewRow(Maps.<String, String>of(
                 "LookupName", "MyLookupItem2",
                 "LookupAge", "200"
         ));
@@ -120,7 +117,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
             new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.String, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName)),
         };
         String lookupSourceListName = "Project-LookupSource-List";
-        ListHelper.createList(this, getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
         clickButton("Done");
 
         log("** Insert row into list");
@@ -132,9 +129,9 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         clickButton("Submit");
 
         log("** Adding in lookup list columns to grid");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, new String[] { "ListLookup", "LookupAge" });
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "ListLookup", "LookupAge" });
+        _customizeViewsHelper.saveCustomView();
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("edit"), "href");
@@ -182,7 +179,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         ListHelper.ListColumn[] cols = {
             new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies")),
         };
-        ListHelper.createList(this, getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
         clickButton("Done");
 
         log("** Insering row into list");
@@ -235,7 +232,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
             new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name")
         };
         String listName = folder + "-Issue15751-List";
-        ListHelper.createList(this, folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        _listHelper.createList(folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
         clickButton("Done");
 
         log("** Creating background R script");
@@ -246,7 +243,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         clickCheckboxById("runInBackground");
         clickButton("Save", 0);
         setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), folder + "-BackgroundReport");
-        ExtHelper.clickExtButton(this, "Save");
+        _extHelper.clickExtButton("Save");
 
         log("** Executing background R script");
         clickMenuButton("Views", folder + "-BackgroundReport");
@@ -371,7 +368,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
     {
         goToProjectHome();
         clickButton("Create New Workbook", 0);
-        waitForElement(Ext4Helper.ext4Window("Create Workbook"));
+        waitForElement(_ext4Helper.ext4Window("Create Workbook"));
         setText("title", workbookTitle);
         setText("description", workbookDescription);
         clickButton("Submit");

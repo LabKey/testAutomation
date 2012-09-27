@@ -161,7 +161,7 @@ public class TimelineTest extends BaseSeleniumWebTest
 
     private void createList()
     {
-        ListHelper.createList(this, FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
 
         StringBuilder data = new StringBuilder();
         data.append(LIST_KEY_NAME).append("\t");
@@ -180,7 +180,7 @@ public class TimelineTest extends BaseSeleniumWebTest
         }
 
         clickButton("Import Data");
-        ListHelper.submitTsvData(this, data.toString());
+        _listHelper.submitTsvData(data.toString());
         for (String[] rowData : TEST_DATA)
         {
             // check that all the data is in the grid (skipping the key column at index 0)

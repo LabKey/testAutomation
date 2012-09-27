@@ -21,10 +21,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
@@ -167,7 +165,7 @@ public class ListTest extends BaseSeleniumWebTest
         _containerHelper.createProject(projectName, null);
 
         log("Add list -- " + LIST_NAME_COLORS);
-        ListHelper.createList(this, projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
+        _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
         clickEditDesign();
@@ -431,11 +429,11 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test Customize View");
         clickButton("Clear All");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol4.getName());
-        CustomizeViewsHelper.addCustomizeViewFilter(this, _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        CustomizeViewsHelper.addCustomizeViewSort(this, _listCol2.getName(), _listCol2.getLabel(), "Ascending");
-        CustomizeViewsHelper.saveCustomView(this, TEST_VIEW);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn(_listCol4.getName());
+        _customizeViewsHelper.addCustomizeViewFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addCustomizeViewSort(_listCol2.getName(), _listCol2.getLabel(), "Ascending");
+        _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check Customize View worked");
         assertTextPresent(TEST_DATA[0][3]);
@@ -444,15 +442,15 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(_listCol4.getLabel());
 
         log("4725: Check Customize View can't remove all fields");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, LIST_KEY_NAME2);
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol1.getName());
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol2.getName());
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, _listCol3.getName());
-        CustomizeViewsHelper.removeCustomizeViewColumn(this, EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
-        CustomizeViewsHelper.applyCustomView(this, 0);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn(LIST_KEY_NAME2);
+        _customizeViewsHelper.removeCustomizeViewColumn(_listCol1.getName());
+        _customizeViewsHelper.removeCustomizeViewColumn(_listCol2.getName());
+        _customizeViewsHelper.removeCustomizeViewColumn(_listCol3.getName());
+        _customizeViewsHelper.removeCustomizeViewColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
+        _customizeViewsHelper.applyCustomView(0);
         assertAlert("You must select at least one field to display in the grid.");
-        CustomizeViewsHelper.closeCustomizeViewPanel(this);
+        _customizeViewsHelper.closeCustomizeViewPanel();
 
         log("Test Export");
         addUrlParameter("exportAsWebPage=true");
@@ -511,18 +509,18 @@ public class ListTest extends BaseSeleniumWebTest
         String project2_url = getCurrentRelativeURL();
 
         log("Add List -- " + LIST3_NAME_OWNERS);
-        ListHelper.createList(this, PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
+        _listHelper.createList(PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
         assertTextPresent("<AUTO> (Owner)");
 
         log("Upload data to second list");
-        ListHelper.uploadData(this, PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_DATA);
+        _listHelper.uploadData(PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_DATA);
 
         log("Navigate back to first project");
         log("Add list -- " + LIST2_NAME_CARS);
-        ListHelper.createList(this, PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, _list3Col1);
+        _listHelper.createList(PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, _list3Col1);
 
         log("Upload data to second list");
-        ListHelper.uploadData(this, PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_DATA);
+        _listHelper.uploadData(PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_DATA);
 
         log("Check that upload worked");
         assertTextPresent(LIST2_KEY);
@@ -531,15 +529,15 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent(LIST2_KEY4);
 
         log("Check that reference worked");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, _list2Col1.getName() + "/" +  _listCol1.getName(), _list2Col1.getLabel() + " " +  _listCol1.getLabel());
-        CustomizeViewsHelper.addCustomizeViewColumn(this, _list2Col1.getName() + "/" +  _listCol2.getName(), _list2Col1.getLabel() + " " +  _listCol2.getLabel());
-        CustomizeViewsHelper.addCustomizeViewColumn(this, _list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
-        CustomizeViewsHelper.addCustomizeViewFilter(this, _list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Is Less Than", "10");
-        CustomizeViewsHelper.addCustomizeViewSort(this, _list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Ascending");
-        CustomizeViewsHelper.addCustomizeViewColumn(this, _list3Col1.getName() + "/" +  _list3Col1.getName(), _list3Col1.getLabel() + " " +  _list3Col1.getLabel());
-        CustomizeViewsHelper.addCustomizeViewColumn(this, _list3Col1.getName() + "/" +  _list3Col2.getName(), _list3Col1.getLabel() + " " +  _list3Col2.getLabel());
-        CustomizeViewsHelper.saveCustomView(this, TEST_VIEW);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol1.getName(), _list2Col1.getLabel() + " " +  _listCol1.getLabel());
+        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol2.getName(), _list2Col1.getLabel() + " " +  _listCol2.getLabel());
+        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
+        _customizeViewsHelper.addCustomizeViewFilter(_list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addCustomizeViewSort(_list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Ascending");
+        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col1.getName(), _list3Col1.getLabel() + " " +  _list3Col1.getLabel());
+        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col2.getName(), _list3Col1.getLabel() + " " +  _list3Col2.getLabel());
+        _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");
         waitForText(_listCol1.getLabel(), WAIT_FOR_JAVASCRIPT);
@@ -591,7 +589,7 @@ public class ListTest extends BaseSeleniumWebTest
         clickTab("List");
         clickLinkWithText(LIST_NAME_COLORS);
         clickButton("Export", 0);
-        ExtHelper.clickSideTab(this, "Text");
+        _extHelper.clickSideTab("Text");
         String exportButtonScript = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "onclick");
         String exportUrl = exportButtonScript.substring(exportButtonScript.indexOf("window.location=") + 17, exportButtonScript.indexOf("document.getElementById") - 11);
         clickLinkWithText("View Design");
@@ -604,7 +602,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(LIST_NAME_COLORS);
         clickLinkWithText(LIST2_NAME_CARS);
         pushLocation();
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
         assertElementNotPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST_KEY_NAME + "']"));
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
         popLocation();
@@ -633,15 +631,15 @@ public class ListTest extends BaseSeleniumWebTest
     {
         //create list with look up A
         String lookupColumn = "lookup";
-        ListHelper.createList(this, PROJECT_OTHER, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
+        _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
         clickImportData();
         setListImportAsTestDataField(lookupColumn + "\n1");
 
         log("verify look column set properly");
         assertTextPresent("one A");
-        CustomizeViewsHelper.openCustomizeViewPanel(this);
-        CustomizeViewsHelper.addCustomizeViewColumn(this, "lookup/Bfk/Cfk/title");
-        CustomizeViewsHelper.saveCustomView(this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("lookup/Bfk/Cfk/title");
+        _customizeViewsHelper.saveCustomView();
 
         clickLink(Locator.linkContainingText("one C"));
         assertElementPresent(Locator.xpath("//input[@type='submit']"));
@@ -666,13 +664,13 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test that the right filters are present for each type");
         runMenuItemHandler("qwp3:" + _listCol4.getName() + ":filter");
-        ExtHelper.waitForExtDialog(this, "Show Rows Where " + _listCol4.getLabel());
-        ExtHelper.clickExtTab(this, "Choose Filters");
+        _extHelper.waitForExtDialog("Show Rows Where " + _listCol4.getLabel());
+        _extHelper.clickExtTab("Choose Filters");
         click(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
 
         assertElementNotPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
         assertElementPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
-        ExtHelper.clickExtButton(this, "Show Rows Where " + _listCol4.getLabel(), "CANCEL", 0);
+        _extHelper.clickExtButton("Show Rows Where " + _listCol4.getLabel(), "CANCEL", 0);
 
         log("Test that filters don't affect multiple web parts");
         assertTextPresent(TEST_DATA[1][0], 2);
@@ -716,7 +714,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Infer from excel file, then import data");
         File excelFile = new File(EXCEL_DATA_FILE);
-        ListHelper.createListFromFile(this, PROJECT_VERIFY, "Fruits from Excel", excelFile);
+        _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", excelFile);
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
 
@@ -739,7 +737,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(TSV_LIST_NAME);*/
 
         log("Infer from a tsv file, then import data");
-        ListHelper.createListFromFile(this, PROJECT_VERIFY, TSV_LIST_NAME, tsvFile);
+        _listHelper.createListFromFile(PROJECT_VERIFY, TSV_LIST_NAME, tsvFile);
         assertNoLabkeyErrors();
         assertTextPresent("pomegranate");
         log("Verify correct types are inferred from file");
@@ -759,9 +757,9 @@ public class ListTest extends BaseSeleniumWebTest
         click(Locator.name("ff_name3")); // BoolCol
         click(Locator.xpath("//span[text()='Format']"));
         clickButton("Add Conditional Format", 0);
-        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog("Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
         setFormElement("value_1", "true");
-        ExtHelper.clickExtButton(this, "Apply Conditional Format Where BoolCol", "OK", 0);
+        _extHelper.clickExtButton("Apply Conditional Format Where BoolCol", "OK", 0);
         checkCheckbox("Bold");
         checkCheckbox("Italic");
         checkCheckbox("Strikethrough");
@@ -782,17 +780,17 @@ public class ListTest extends BaseSeleniumWebTest
         click(Locator.xpath("//span[text()='Format']"));
         // If greater than 7, strikethrough //TODO: Set after (>5) format. Blocked: 12865
         clickButton("Add Conditional Format", 0);
-        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
-        ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Greater Than");
+        _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
+        _extHelper.selectComboBoxItem("Filter Type", "Is Greater Than");
         setFormElement("value_1", "7");
-        ExtHelper.clickExtButton(this, "Apply Conditional Format Where IntCol", "OK", 0);
+        _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox("Strikethrough");
         // If greater than 5, Bold  //TODO: Set before (>7) format. Blocked: 12865
         clickButton("Add Conditional Format", 0);
-        ExtHelper.waitForExtDialog(this, "Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
-        ExtHelper.selectComboBoxItem(this, "Filter Type", "Is Greater Than");
+        _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
+        _extHelper.selectComboBoxItem("Filter Type", "Is Greater Than");
         setFormElement("value_1", "5");
-        ExtHelper.clickExtButton(this, "Apply Conditional Format Where IntCol", "OK", 0);
+        _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox("Bold", 1);
 
         // TODO: Blocked: 12865: ListTest failing to reorder conditional formats
@@ -841,7 +839,7 @@ public class ListTest extends BaseSeleniumWebTest
     private void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
-        ListHelper.createList(this, PROJECT_VERIFY, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
+        _listHelper.createList(PROJECT_VERIFY, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
         clickEditDesign();
         setColumnName(1,"FooFoo");
@@ -944,19 +942,19 @@ public class ListTest extends BaseSeleniumWebTest
 
     void submitImportTsv(String error)
     {
-        ListHelper.submitImportTsv_error(this, error);
+        _listHelper.submitImportTsv_error(error);
     }
 
     void submitImportTsv()
     {
-        ListHelper.submitImportTsv_success(this);
+        _listHelper.submitImportTsv_success();
     }
 
 
     void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
     {
         log("Add List -- " + name);
-        ListHelper.createList(this, PROJECT_VERIFY, name, cols.get(0).getType(), cols.get(0).getName(),
+        _listHelper.createList(PROJECT_VERIFY, name, cols.get(0).getType(), cols.get(0).getName(),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
         clickEditDesign();
         selectOptionByText("ff_titleColumn", cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
@@ -1006,13 +1004,13 @@ public class ListTest extends BaseSeleniumWebTest
             popLocation();
 
             // show all columns
-            CustomizeViewsHelper.openCustomizeViewPanel(this);
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/B", "Bfk B");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/title", "Bfk Title");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/Cfk", "Bfk Cfk");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/Cfk/C", "Bfk Cfk C");
-            CustomizeViewsHelper.addCustomizeViewColumn(this, "Bfk/Cfk/title", "Bfk Cfk Title");
-            CustomizeViewsHelper.saveCustomView(this, "allColumns");
+            _customizeViewsHelper.openCustomizeViewPanel();
+            _customizeViewsHelper.addCustomizeViewColumn("Bfk/B", "Bfk B");
+            _customizeViewsHelper.addCustomizeViewColumn("Bfk/title", "Bfk Title");
+            _customizeViewsHelper.addCustomizeViewColumn("Bfk/Cfk", "Bfk Cfk");
+            _customizeViewsHelper.addCustomizeViewColumn("Bfk/Cfk/C", "Bfk Cfk C");
+            _customizeViewsHelper.addCustomizeViewColumn("Bfk/Cfk/title", "Bfk Cfk Title");
+            _customizeViewsHelper.saveCustomView("allColumns");
 
             clickLinkWithText("one C", 1);
             assertElementPresent(inputWithValue("key","1"));
@@ -1040,22 +1038,22 @@ public class ListTest extends BaseSeleniumWebTest
 
     void clickImportData()
     {
-        ListHelper.clickImportData(this);
+        _listHelper.clickImportData();
     }
 
     void clickEditDesign()
     {
-        ListHelper.clickEditDesign(this);
+        _listHelper.clickEditDesign();
     }
 
     void clickSave()
     {
-        ListHelper.clickSave(this);
+        _listHelper.clickSave();
     }
 
     void clickDeleteList()
     {
-        ListHelper.clickDeleteList(this);
+        _listHelper.clickDeleteList();
     }
 
     void selectPropertyTab(String name)
@@ -1080,6 +1078,6 @@ public class ListTest extends BaseSeleniumWebTest
     }
     void TAB(Locator l)
     {
-        ListHelper.TAB(this, l);
+        _listHelper.TAB(l);
     }
 }

@@ -73,7 +73,7 @@ public class StudyProtectedExportTest extends StudyExportTest
     {
         clickTab("Manage");
         clickLinkContainingText("Manage Alternate");
-        ExtHelper.setExtFormElementByLabel(this, "Prefix", idPreface);
+        _extHelper.setExtFormElementByLabel("Prefix", idPreface);
         setFormElement("numberOfDigits", "" + idLength);
         clickButton("Change Alternate IDs", 0);
         waitForText("If you have published this study before ");
@@ -92,15 +92,15 @@ public class StudyProtectedExportTest extends StudyExportTest
         assertTextPresent("Group 1", "Group 2");
         assertTextNotPresent("Not in any cohort");
 
-        mouseDownGridCellCheckbox("Group 1");
-        mouseDownGridCellCheckbox("Group 2");
+        _ext4Helper.checkGridRowCheckbox("Group 1");
+        _ext4Helper.checkGridRowCheckbox("Group 2");
 
         waitForText("No matching Mice");
 
 
-        clickAt(Locator.tagContainingText("div", "Group 1"), "2,2");
+        _ext4Helper.clickGridRowText("Group 1", 0);
         waitForText("Found 10 mice of 25");
-        assertEquals(10, getXpathCount(Locator.xpath("//a[contains(@href, 'participant.view')]")));
+        assertElementPresent(Locator.xpath("//a[contains(@href, 'participant.view')]"), 10);
 
         log("verify sorting by groups works properly");
         goToDatasets();
@@ -134,7 +134,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
         waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
-        ExtHelper.selectFileBrowserItem(this, "export/");
+        _extHelper.selectFileBrowserItem("export/");
         Locator checkbox = Locator.xpath("(//div[contains(text(), 'My Study_')])[1]");
         waitForElement(checkbox);
         clickAt(checkbox, "1,1");

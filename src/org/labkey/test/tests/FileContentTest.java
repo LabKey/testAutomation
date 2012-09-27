@@ -21,7 +21,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PipelineHelper;
 import org.labkey.test.util.SearchHelper;
@@ -30,6 +29,8 @@ import java.io.File;
 
 public class FileContentTest extends BaseSeleniumWebTest
 {
+    private final SearchHelper _searchHelper = new SearchHelper(this);
+
     // Use a special exotic character in order to make sure we don't break
     // i18n. See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=5369
     private static final String PROJECT_NAME = "File Content T\u017Dst Project";
@@ -77,7 +78,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             "so if this fails, check that tomcat's server.xml contains the following attribute " +
             "in its Connector element: URIEncoding=\"UTF-8\"");
 
-        SearchHelper.initialize(this);
+        _searchHelper.initialize();
 
         PipelineHelper pipelineHelper = new PipelineHelper(this);
 
@@ -105,14 +106,14 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickLinkWithText("Notifications");
             click(Locator.navButton("Update Settings"));
             // Set folder default
-            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
+            _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
             click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
-            ExtHelper.waitForExtDialog(this, "Update complete", WAIT_FOR_JAVASCRIPT);            
+            _extHelper.waitForExtDialog("Update complete", WAIT_FOR_JAVASCRIPT);
             waitForExtMaskToDisappear();
             // Change user setting TEST_USER -> No Email
             DataRegionTable table = new DataRegionTable("Users", this);
             checkDataRegionCheckbox("Users", table.getRow("Email", TEST_USER));
-            ExtHelper.selectComboBoxItem(this, Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
+            _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
             click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Settings']"));
             waitAndClickButton("Yes");
             waitForPageToLoad();
@@ -121,18 +122,18 @@ public class FileContentTest extends BaseSeleniumWebTest
             waitForElement(Locator.xpath("//a/span[text() = 'Admin']"), WAIT_FOR_JAVASCRIPT);
             enableEmailRecorder();
             // Create list for lookup custom file property
-            ListHelper.createList(this, PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
-            ListHelper.uploadData(this, PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
+            _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
+            _listHelper.uploadData(PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
             clickLinkWithText(PROJECT_NAME);
             // Setup custom file properties
-            ExtHelper.waitForFileGridReady(this);
-            ExtHelper.waitForFileAdminEnabled(this);
+            _extHelper.waitForFileGridReady();
+            _extHelper.waitForFileAdminEnabled();
             pipelineHelper.goToAdminMenu();
             // Setup custom file actions
             uncheckCheckbox("importAction");
 
 
-            ExtHelper.clickExtTab(this, "File Properties");
+            _extHelper.clickExtTab("File Properties");
             checkRadioButton("fileOption", "useCustom");
             clickButton("Edit Properties...");
             waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
@@ -142,16 +143,16 @@ public class FileContentTest extends BaseSeleniumWebTest
             clickButton("Save & Close");
 
             waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
-            ExtHelper.waitForFileGridReady(this);
-            ExtHelper.waitForFileAdminEnabled(this);
+            _extHelper.waitForFileGridReady();
+            _extHelper.waitForFileAdminEnabled();
             pipelineHelper.goToAdminMenu();
 
             // enable custom file properties.
-            ExtHelper.clickExtTab(this, "File Properties");
+            _extHelper.clickExtTab("File Properties");
             checkRadioButton("fileOption", "useCustom");
 
             // Modify toolbar.
-            ExtHelper.clickExtTab(this, "Toolbar and Grid Settings");
+            _extHelper.clickExtTab("Toolbar and Grid Settings");
             waitForText("Configure Grid columns and Toolbar");
 
             waitForText("Import Data");
@@ -228,15 +229,15 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             clickLinkWithText(PROJECT_NAME);
 
-            SearchHelper.enqueueSearchItem(filename, true, Locator.linkContainingText(filename));
-            SearchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename));
-            SearchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(filename));
+            _searchHelper.enqueueSearchItem(filename, true, Locator.linkContainingText(filename));
+            _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename));
+            _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(filename));
 
-            SearchHelper.verifySearchResults(this, "/" + PROJECT_NAME + "/@files/" + folderName, false);
+            _searchHelper.verifySearchResults("/" + PROJECT_NAME + "/@files/" + folderName, false);
 
             // Delete file.
             clickLinkWithText(PROJECT_NAME);
-            ExtHelper.selectFileBrowserItem(this, folderName + "/" + filename);
+            _extHelper.selectFileBrowserItem(folderName + "/" + filename);
             click(Locator.css("button.iconDelete"));
             clickButton("Yes", 0);
             waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);

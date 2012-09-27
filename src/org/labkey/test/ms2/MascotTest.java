@@ -213,7 +213,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Upload existing Mascot .dat result file.");
         clickLinkWithText(FOLDER_NAME);
         clickButton("Process and Import Data");
-        ExtHelper.selectFileBrowserItem(this, "bov_sample/" + SEARCH_TYPE + "/test3/");
+        _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/test3/");
         selectImportDataAction("Import Results");
 
         log("Verify upload started.");

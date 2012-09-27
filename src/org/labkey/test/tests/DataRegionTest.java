@@ -140,10 +140,10 @@ public class DataRegionTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT_NAME, null);
 
         log("Define list");
-        ListHelper.createList(this, PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);
 
         log("Upload data");
-        ListHelper.uploadData(this, PROJECT_NAME, LIST_NAME, LIST_DATA);
+        _listHelper.uploadData(PROJECT_NAME, LIST_NAME, LIST_DATA);
     }
 
     private void dataRegionTest(URL url, String dataRegionName) throws Exception
