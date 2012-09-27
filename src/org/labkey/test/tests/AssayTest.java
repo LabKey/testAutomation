@@ -130,6 +130,7 @@ public class AssayTest extends AbstractAssayTest
         // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
         startSystemMaintenance();
 
+        goToSiteSettings();
         checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
         checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
         clickButton("Save");
