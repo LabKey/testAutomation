@@ -18,6 +18,7 @@ data/api/http-api.xml -text
 data/api/jsReportTest.html -text
 data/api/queryTest.js -text
 data/api/rlabkey-api.xml -text
+data/api/scatterPlotPointClickTestFn.js -text
 data/api/security-api.xml -text
 data/api/study-api.xml -text
 data/api/timeChartPointClickTestFn.js -text

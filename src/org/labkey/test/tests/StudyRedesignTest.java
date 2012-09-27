@@ -214,7 +214,7 @@ public class StudyRedesignTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText("Overview");
         addWebPart("Mouse List");
-        waitForText("Found 138 mice of 138."); // Wait for participant list to appear.
+        waitForText("Showing all 138 mice."); // Wait for participant list to appear.
 
         deselectAllFilterGroups();
 

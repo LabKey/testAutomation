@@ -272,7 +272,7 @@ public class Ext4Helper extends AbstractHelper
      */
     private Locator.XPathLocator getGridRow(String cellText, int index)
     {
-        return Locator.xpath("(//tr[contains(@class, 'x4-grid-row')][td[string() = '" + cellText + "']])[" + (index + 1) + "]");
+        return Locator.xpath("(//tr[contains(@class, 'x4-grid-row')][td[string() = '" + cellText + "']]["+Locator.NOT_HIDDEN+"])[" + (index + 1) + "]");
     }
 
     public static Locator.XPathLocator invalidField()

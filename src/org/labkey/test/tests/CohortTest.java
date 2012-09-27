@@ -519,7 +519,7 @@ public class CohortTest extends BaseSeleniumWebTest
 
         if (previousCohort != null)
         {
-            _ext4Helper.checkGridRowCheckbox(previousCohort);
+            _ext4Helper.uncheckGridRowCheckbox(previousCohort);
         }
 
         if (nextCohort != null)

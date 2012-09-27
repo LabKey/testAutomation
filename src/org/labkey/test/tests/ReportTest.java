@@ -51,6 +51,7 @@ public class ReportTest extends StudyBaseTest
     protected static final String TEST_USER = "report_user1@report.test";
     private static final String TEST_GRID_VIEW = "Test Grid View";
     public static final String AUTHOR_REPORT = "Author report";
+    protected static final String DEVELOPER_USER = "developer_user1@report.test";
     public static final String COHORT_1 = "Group 1";
     public static final String COHORT_2 = "Group 2";
 
@@ -1026,7 +1027,7 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 0 Results");
 
         //Mouse down on GROUP 1
-        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE);
+        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1);
         waitForText("Showing 12 Results");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -1045,11 +1046,11 @@ public class ReportTest extends StudyBaseTest
 
         }
 
-        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_TWO);
+        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_TWO, 1);
         // groups are disjoint
         waitForText("Showing 0 Results");
 
-        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE);
+        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1);
         waitForText("Showing 13 Results");
 
         //Check if all PTIDs of GROUP 2 are visible
@@ -1094,16 +1095,16 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 0 Results");
 
         //Mouse down on SPEC GROUP 1
-        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_ONE);
+        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_ONE, 1);
         waitForText("Showing 1 Results");
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
-        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_TWO);
+        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_TWO, 1);
         waitForText("Showing 0 Results");
         //Remove SPEC GROUP 1
-        _ext4Helper.uncheckGridRowCheckbox(SPECIMEN_GROUP_ONE);
+        _ext4Helper.uncheckGridRowCheckbox(SPECIMEN_GROUP_ONE, 1);
         waitForText("Showing 1 Results");
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
@@ -1383,8 +1384,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.clickExtButton("Select Chart Query", "Save", 0);
         _extHelper.waitForExtDialog("Y Axis");
         mouseDown(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
-        _extHelper.clickExtButton("Y Axis", "Ok", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
         //Verify box plot
         waitForText(BOX_PLOT_MV_1);
@@ -1393,8 +1393,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.waitForExtDialog("Main Title");
         setFormElement(Locator.name("chart-title-textfield"), "Test Title");
         waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
-        _extHelper.clickExtButton("Main Title", "OK", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Main Title", "OK");
         waitForText("Test Title");
 
         log("Set Y Axis");
@@ -1403,8 +1402,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.ext4Radio("log"));
         mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
         setFormElement(Locator.name("label"), "TestYAxis");
-        _extHelper.clickExtButton("Y Axis", "Ok", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
         waitForText("TestYAxis");
 
         log("Set X Axis");
@@ -1413,8 +1411,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.ext4Radio("log"));
         mouseDown(Locator.xpath("//div[text()='Cat Mice Let']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
-        _extHelper.clickExtButton("X Axis", "Ok", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
         waitForText("TestXAxis");
 
         waitForText(BOX_PLOT_MV_2);
@@ -1424,14 +1421,12 @@ public class ReportTest extends StudyBaseTest
         //Verify name requirement
         _extHelper.clickExtButton("Save Chart", "Save", 0);
         _extHelper.waitForExtDialog("Error");
-        _extHelper.clickExtButton("Error", "OK", 0);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickDialogButtonAndWaitForMaskToDisappear("Error", "OK");
 
         //Test cancel button
         _extHelper.setExtFormElementByLabel("Report Name", "TestReportName");
         _extHelper.setExtFormElementByLabel("Report Description", "TestReportDescription");
-        _extHelper.clickExtButton("Save Chart", "Cancel", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Save Chart", "Cancel");
         assertTextNotPresent("TestReportName");
 
         saveBoxPlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
@@ -1452,8 +1447,7 @@ public class ReportTest extends StudyBaseTest
 
         _extHelper.waitForExtDialog("Y Axis");
         mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
-        _extHelper.clickExtButton("Y Axis", "Ok", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
         //Verify box plot
         waitForText(BOX_PLOT_DR_1);
@@ -1464,6 +1458,17 @@ public class ReportTest extends StudyBaseTest
         waitForText("40.0");
         clickButton("View Chart", 0);
         waitForText(BOX_PLOT_DR_2);
+
+        //Enable point click function for this box plot
+        clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
+        clickButton("Enable", 0);
+        clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
+        Locator svgCircleLoc = Locator.css("svg a circle");
+        waitForElement(svgCircleLoc);
+        click(svgCircleLoc);
+        _extHelper.waitForExtDialog("Data Point Information");
+        assertTextPresentInThisOrder("MouseId/Cohort: Group 1", "RCHtempc:");
+        clickButton("OK", 0);
 
         saveBoxPlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
     }
@@ -1503,8 +1508,11 @@ public class ReportTest extends StudyBaseTest
         doDataRegionScatterPlotTest();
         doQuickChartScatterPlotTest();
         doCustomizeScatterPlotTest(); // Uses scatter plot created by doDataRegionScatterPlotTest()
+        doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
 
         log("Verify saved scatter plots");
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
         clickTab("Clinical and Assay Data");
         for(int i = 0; i < _scatterPlots.size(); i++)
         {
@@ -1544,8 +1552,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.clickExtButton("Y Axis", "Ok", 0);
         _extHelper.waitForExtDialog("X Axis");
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
-        _extHelper.clickExtButton("X Axis", "Ok", 0);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
         //Verify scatter plot
         waitForText(SCATTER_PLOT_MV_1);
@@ -1555,8 +1562,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.waitForExtDialog("Main Title");
         setFormElement(Locator.name("chart-title-textfield"), "Test Title");
         waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
-        _extHelper.clickExtButton("Main Title", "OK", 0);
-        waitForExtMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Main Title", "OK");
         waitForText("Test Title");
 
         log("Set Y Axis");
@@ -1565,8 +1571,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.ext4Radio("log"));
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='2. Body Temp']"));
         setFormElement(Locator.name("label"), "TestYAxis");
-        _extHelper.clickExtButton("Y Axis", "Ok", 0);
-        waitForExtMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
         waitForText("TestYAxis");
 
         log("Set X Axis");
@@ -1575,8 +1580,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.ext4Radio("log"));
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Cat Mice Let']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
-        _extHelper.clickExtButton("X Axis", "Ok", 0);
-        waitForExtMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
         waitForText("TestXAxis");
 
         waitForText(SCATTER_PLOT_MV_2);
@@ -1586,8 +1590,7 @@ public class ReportTest extends StudyBaseTest
         //Verify name requirement
         _extHelper.clickExtButton("Save Chart", "Save", 0);
         _extHelper.waitForExtDialog("Error");
-        _extHelper.clickExtButton("Error", "OK", 0);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickDialogButtonAndWaitForMaskToDisappear("Error", "OK");
 
         //Test cancel button
         _extHelper.setExtFormElementByLabel("Report Name", "TestReportName");
@@ -1616,8 +1619,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.clickExtButton("Y Axis", "Ok", 0);
         _extHelper.waitForExtDialog("X Axis");
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
-        _extHelper.clickExtButton("X Axis", "Ok", 0);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
         //Verify scatter plot
         waitForText(SCATTER_PLOT_DR_1);
@@ -1649,13 +1651,11 @@ public class ReportTest extends StudyBaseTest
         waitAndClick(Locator.css("svg text:contains('Cohort')"));
         _extHelper.waitForExtDialog("X Axis");
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Integer']"));
-        _extHelper.clickExtButton("X Axis", "Ok", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
-        clickButton("Options", 0);
-        _extHelper.waitForExtDialog("Plot Options", WAIT_FOR_JAVASCRIPT);
+        clickOptionButtonAndWaitForDialog("Options", "Plot Options");
         _extHelper.selectExt4ComboBoxItem("Plot Type", "Scatter Plot");
-        _extHelper.clickExtButton("Plot Options", "OK", 0);
+        clickDialogButtonAndWaitForMaskToDisappear("Plot Options", "OK");
 
         waitForText(SCATTER_PLOT_QC);
 
@@ -1677,12 +1677,10 @@ public class ReportTest extends StudyBaseTest
 
         // Enable Grouping - Colors
         log("Group with colors");
-        clickButton("Grouping", 0);
-        _extHelper.waitForExtDialog("Grouping Options");
+        clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.ext4Radio("By a measure"));
         click(Locator.ext4Radio("Single shape"));
-        _extHelper.clickExtButton("Grouping Options", "OK", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         waitForText(SCATTER_PLOT_CUSTOMIZED_COLORS, WAIT_FOR_JAVASCRIPT);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
@@ -1695,13 +1693,11 @@ public class ReportTest extends StudyBaseTest
 
         // Enable Grouping - Shapes
         log("Group with shapes");
-        clickButton("Grouping", 0);
-        _extHelper.waitForExtDialog("Grouping Options");
+        clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.ext4Radio("With a single color"));
         click(Locator.ext4Radio("Per measure"));
         _extHelper.selectExt4ComboBoxItem("Point Measure:", "16. Evaluation Summary");
-        _extHelper.clickExtButton("Grouping Options", "OK", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         waitForText(SCATTER_PLOT_CUSTOMIZED_SHAPES, WAIT_FOR_JAVASCRIPT);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
@@ -1715,13 +1711,11 @@ public class ReportTest extends StudyBaseTest
 
         // Enable Grouping - Shapes & Colors
         log("Group with both");
-        clickButton("Grouping", 0);
-        _extHelper.waitForExtDialog("Grouping Options");
+        clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.ext4Radio("By a measure"));
         click(Locator.ext4Radio("Per measure"));
         _extHelper.selectExt4ComboBoxItem("Point Measure:", "16. Evaluation Summary");
-        _extHelper.clickExtButton("Grouping Options", "OK", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         waitForText(SCATTER_PLOT_CUSTOMIZED_BOTH, WAIT_FOR_JAVASCRIPT);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
@@ -1733,6 +1727,86 @@ public class ReportTest extends StudyBaseTest
         Assert.assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
 
         saveScatterPlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored");
+    }
+
+    private static final String TEST_DATA_API_PATH = "server/test/data/api";
+
+    private void doPointClickScatterPlotTest()
+    {
+        clickReportGridLink(SCATTER_PLOT_NAME_MV, "view");
+        _ext4Helper.waitForMaskToDisappear();
+
+        log("Check Scatter Plot Point Click Function (Developer Only)");
+        // open the developer panel and verify that it is disabled by default
+        assertElementPresent(Locator.button("Developer"));
+        clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
+        assertElementPresent(Locator.button("Enable"));
+        assertElementNotPresent(Locator.button("Disable"));
+        // enable the feature and verify that you can switch tabs
+        clickButton("Enable", 0);
+        _ext4Helper.clickTabContainingText("Help");
+        assertTextPresentInThisOrder("Your code should define a single function", "data:", "measureInfo:", "clickEvent:");
+        assertTextPresentInThisOrder("YAxisMeasure:", "XAxisMeasure:", "ColorMeasure:", "PointMeasure:");
+        _ext4Helper.clickTabContainingText("Source");
+        click(Locator.xpath("//input/../label[contains(text(), 'Toggle editor')]"));
+        sleep(1000); // wait for editor to toggle
+        Assert.assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, measureInfo, clickEvent) {"));
+        // apply the default point click function
+        clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
+        Locator svgCircleLoc = Locator.css("svg a circle");
+        waitForElement(svgCircleLoc);
+        click(svgCircleLoc);
+        _extHelper.waitForExtDialog("Data Point Information");
+        clickButton("OK", 0);
+        // open developer panel and test JS function validation
+        clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
+        setFormElement("point-click-fn-textarea", "");
+        _extHelper.clickExtButton("Developer Options", "OK", 0);
+        assertTextPresent("Error: the value provided does not begin with a function declaration.");
+        setFormElement("point-click-fn-textarea", "function(){");
+        _extHelper.clickExtButton("Developer Options", "OK", 0);
+        assertTextPresent("Error parsing the function:");
+        clickButton("Disable", 0);
+        _extHelper.waitForExtDialog("Confirmation...");
+        _extHelper.clickExtButton("Confirmation...", "Yes", 0);
+        assertTextNotPresent("Error");
+        // test use-case to navigate to query page on click
+        clickButton("Enable", 0);
+        // TODO: after merge to trunk change this to use the scatterPlotPointClickTestFn.js file contents
+        //String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
+        String function = "function (data, measureInfo, clickEvent) {\n"
+           + "   var queryHref = LABKEY.ActionURL.buildURL('query', 'executeQuery', LABKEY.container.path,\n"
+           + "                   {schemaName: measureInfo[\"schemaName\"], \"query.queryName\": measureInfo[\"queryName\"]});\n"
+           + "   window.location = queryHref;\n"
+           + "}";
+        setFormElement("point-click-fn-textarea", function);
+        clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
+        saveScatterPlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn");
+        clickAndWait(Locator.css("svg a circle"));
+        waitForText("Query Schema Browser");
+        assertTextPresent("APX-1: Abbreviated Physical Exam");
+        // verify that only developers can see the button to add point click function
+        createUser(DEVELOPER_USER, null);
+        clickLinkWithText(getProjectName());
+        enterPermissionsUI();
+        setUserPermissions(DEVELOPER_USER, "Editor");
+        impersonate(DEVELOPER_USER);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        clickLinkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn");
+        waitForText("Test Title");
+        pushLocation();
+        assertElementNotPresent(Locator.button("Developer"));
+        clickAndWait(Locator.css("svg a circle"));
+        waitForText("APX-1: Abbreviated Physical Exam");
+        stopImpersonating();
+        // give DEVELOPER_USER developer perms and try again
+        createSiteDeveloper(DEVELOPER_USER);
+        impersonate(DEVELOPER_USER);
+        popLocation();
+        waitForText("Test Title");
+        assertElementPresent(Locator.button("Developer"));
+        stopImpersonating();
     }
 
     private void assertSVG(String expectedSvgText)
@@ -1764,8 +1838,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.setExtFormElementByLabel("Report Name", name);
         _extHelper.setExtFormElementByLabel("Report Description", description);
 
-        _extHelper.clickExtButton(saveAs ? "Save As" : "Save Chart", "Save", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        clickDialogButtonAndWaitForMaskToDisappear(saveAs ? "Save As" : "Save Chart", "Save");
         _extHelper.waitForExtDialogToDisappear("Saved");
         waitForText(name);
         waitFor(new Checker()
@@ -1840,6 +1913,20 @@ public class ReportTest extends StudyBaseTest
     {
         _ext4Helper.checkGridRowCheckbox("All");
         _ext4Helper.uncheckGridRowCheckbox("All");
+    }
+
+    private void clickDialogButtonAndWaitForMaskToDisappear(String dialogTitle, String btnTxt)
+    {
+        _extHelper.clickExtButton(dialogTitle, btnTxt, 0);
+        _extHelper.waitForExtDialogToDisappear(dialogTitle);
+        sleep(500);
+        _ext4Helper.waitForMaskToDisappear();
+    }
+
+    private void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)
+    {
+        clickButton(btnTxt, 0);
+        _extHelper.waitForExtDialog(dialogTitle);
     }
 
     private void selectAllFilterGroups()

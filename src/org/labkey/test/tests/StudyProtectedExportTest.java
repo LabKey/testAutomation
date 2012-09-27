@@ -92,8 +92,8 @@ public class StudyProtectedExportTest extends StudyExportTest
         assertTextPresent("Group 1", "Group 2");
         assertTextNotPresent("Not in any cohort");
 
-        _ext4Helper.checkGridRowCheckbox("Group 1");
-        _ext4Helper.checkGridRowCheckbox("Group 2");
+        _ext4Helper.uncheckGridRowCheckbox("Group 1");
+        _ext4Helper.uncheckGridRowCheckbox("Group 2");
 
         waitForText("No matching Mice");
 
