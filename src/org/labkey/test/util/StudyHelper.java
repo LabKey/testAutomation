@@ -140,6 +140,7 @@ public class StudyHelper extends AbstractHelper
                 _test.uncheckCheckbox("Shared");
             }
         }
+        _test.sleep(100);
         _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
         _test.waitForExtMaskToDisappear();
     }
