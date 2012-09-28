@@ -247,7 +247,8 @@ public class ListHelper extends AbstractHelper
 
     public enum ListColumnType
     {
-        MutliLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), DateTime("DateTime"), Boolean("Boolean"), Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer");
+        MutliLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), DateTime("DateTime"), Boolean("Boolean"),
+        Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag");
 
         private final String _description;
 
@@ -666,6 +667,44 @@ public class ListHelper extends AbstractHelper
         _test.getWrapper().keyDown(sel, "\t");
         _test.getWrapper().keyUp(sel, "\t");
         _test.sleep(50);
+    }
+
+    public void addField(String areaTitle, int index, String name, String label, ListHelper.ListColumnType type)
+    {
+        String prefix = _test.getPropertyXPath(areaTitle);
+        String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
+        _test.click(Locator.xpath(addField));
+        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), _test.WAIT_FOR_JAVASCRIPT);
+        setColumnName(prefix, index, name);
+        setColumnLabel(prefix, index, label);
+        setColumnType(_test, prefix, index, type);
+    }
+
+    public void addLookupField(String areaTitle, int index, String name, String label, ListHelper.LookupInfo type)
+    {
+        String prefix = areaTitle==null ? "" : _test.getPropertyXPath(areaTitle);
+        String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
+        _test.click(Locator.xpath(addField));
+        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), _test.WAIT_FOR_JAVASCRIPT);
+        setColumnName(prefix, index, name);
+        setColumnLabel(prefix, index, label);
+        setColumnType(prefix, index, type);
+    }
+
+    public void deleteField(String areaTitle, int index)
+    {
+        String prefix = _test.getPropertyXPath(areaTitle);
+        _test.mouseClick(prefix + "//div[@id='partdelete_" + index + "']");
+
+        // If domain hasn't been saved yet, the 'OK' prompt will not appear.
+        Locator.XPathLocator buttonLocator = _test.getButtonLocator("OK");
+        // TODO: Be smarter about this.  Might miss the OK that should be there.
+        if (buttonLocator != null)
+        {
+            // Confirm the deletion
+            _test.clickButton("OK", 0);
+            _test.waitForElement(Locator.raw("//td/img[@id='partdeleted_" + index + "']"), _test.WAIT_FOR_JAVASCRIPT);
+        }
     }
     
 }

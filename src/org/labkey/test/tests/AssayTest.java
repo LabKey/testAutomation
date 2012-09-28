@@ -196,6 +196,7 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view results");
+        assertElementPresent(Locator.xpath("//img[@src='/labkey/Experiment/unflagDefault.gif'][@title='Flag for review']"), 9);
         clickLinkWithText("edit");
         setText("quf_SpecimenID", "EditedSpecimenID");
         setText("quf_VisitID", "601.5");
@@ -203,8 +204,11 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Submit");
         assertTextPresent("Could not convert value: a");
         setText("quf_testAssayDataProp5", "514801");
+        setText("quf_Flags", "This Flag Has Been Edited");
         clickButton("Submit");
         assertTextPresent("EditedSpecimenID", "601.5", "514801");
+        assertElementPresent(Locator.xpath("//img[@src='/labkey/Experiment/flagDefault.gif'][@title='This Flag Has Been Edited']"), 1);
+        assertElementPresent(Locator.xpath("//img[@src='/labkey/Experiment/unflagDefault.gif'][@title='Flag for review']"), 8);
 
         // Try a delete
         checkCheckbox(".select");
@@ -251,18 +255,20 @@ public class AssayTest extends AbstractAssayTest
 
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
-            addField("Batch Fields", i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
+            _listHelper.addField("Batch Fields", i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_NAME + i, TEST_ASSAY_SET_PROP_TYPES[i - TEST_ASSAY_SET_PREDEFINED_PROP_COUNT]);
         }
 
         for (int i = TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT + TEST_ASSAY_RUN_PROP_TYPES.length; i++)
         {
-            addField("Run Fields", i, TEST_ASSAY_RUN_PROP_NAME + i, TEST_ASSAY_RUN_PROP_NAME + i, TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
+            _listHelper.addField("Run Fields", i, TEST_ASSAY_RUN_PROP_NAME + i, TEST_ASSAY_RUN_PROP_NAME + i, TEST_ASSAY_RUN_PROP_TYPES[i - TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT]);
         }
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            _listHelper.addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
         }
+
+        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Flags", "Flags", ListColumnType.Flag);
 
         // Set some to required
         setRequired("Batch Fields", TEST_ASSAY_SET_PREDEFINED_PROP_COUNT);
