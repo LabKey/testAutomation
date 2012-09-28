@@ -30,7 +30,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -804,10 +803,10 @@ public class SequenceTest extends LabModulesTest
         Assert.assertEquals("Incorect param in form JSON", molType, json.getString("dna.mol_type"));
         Assert.assertEquals("Incorect param in form JSON", "KIR1D;HLA-A", json.getString("dna.locus"));
 
-        //also test lastz params
-        Assert.assertEquals("Incorect param in form JSON", "lastz", json.getString("aligner"));
-        Assert.assertEquals("Incorect param in form JSON", "90", json.getString("lastz.continuity"));
-        Assert.assertEquals("Incorect param in form JSON", "98", json.getString("lastz.identity"));
+        //also test mosaik params
+        Assert.assertEquals("Incorect param in form JSON", "mosaik", json.getString("aligner"));
+        Assert.assertEquals("Incorect param in form JSON", "0.02", json.getString("mosaik.max_mismatch_pct"));
+        Assert.assertEquals("Incorect param in form JSON", "200", json.getString("mosaik.max_hash_positions"));
 
         Assert.assertEquals("Incorect param in form JSON", "true", json.getString("noSnpImport"));
         Assert.assertEquals("Incorect param in form JSON", 4, StringUtils.split(json.getString("fileNames"), ";").length);
