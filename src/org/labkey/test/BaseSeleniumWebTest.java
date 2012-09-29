@@ -785,13 +785,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    private boolean _systemMaintenanceTouched = false;
     protected void setSystemMaintenance(boolean enable)
     {
         // Not available in production mode
         if (enableDevMode())
         {
-            _systemMaintenanceTouched = true;
             goToAdminConsole();
             clickLinkWithText("system maintenance");
 
@@ -1415,11 +1413,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                         resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                     }
                     catch(Throwable t){log("Failed to reset DB long config after test failure");}
-
-                    try{
-                        if (_systemMaintenanceTouched) setSystemMaintenance(true); // Re-enable system maintenance.
-                    }
-                    catch(Throwable t){log("Failed to enable system maintenance after test failure");}
 
                     try{
                         if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
