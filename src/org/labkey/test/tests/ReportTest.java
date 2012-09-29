@@ -1590,7 +1590,8 @@ public class ReportTest extends StudyBaseTest
         //Verify name requirement
         _extHelper.clickExtButton("Save Chart", "Save", 0);
         _extHelper.waitForExtDialog("Error");
-        clickDialogButtonAndWaitForMaskToDisappear("Error", "OK");
+        _extHelper.clickExtButton("Error", "OK", 0);
+        _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
         _extHelper.setExtFormElementByLabel("Report Name", "TestReportName");
