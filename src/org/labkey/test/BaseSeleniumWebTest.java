@@ -1150,10 +1150,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void startSystemMaintenance()
     {
+        startSystemMaintenance("Run all tasks");
+    }
+
+    public void startSystemMaintenance(String task)
+    {
         goToAdminConsole();
         clickLinkWithText("system maintenance");
         selenium.openWindow("", "systemMaintenance");
-        clickLinkWithText("Run all tasks", false);
+        clickLinkWithText(task, false);
         smStart = System.currentTimeMillis();
     }
 
@@ -5460,6 +5465,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         Locator l = Locator.xpath("//td[text()='" + userName +  "']/..//td/a/span[text()='remove']");
         click(l);
+    }
+
+    public void addUserToGroup(String groupName, String userName)
+    {
+         if(!isTextPresent("Group " + groupName))
+             selectGroup(groupName);
+
+        setFormElement(Locator.id("Users_dropdownMenu"), userName);
+        pressTab(Locator.id("Users_dropdownMenu").toString());
+        _extHelper.clickExtButton(groupName + " Information", "Done", 0);
+        _extHelper.waitForExtDialogToDisappear(groupName + " Information");
+        clickButton("Done");
     }
 
     public void selectGroup(String groupName)

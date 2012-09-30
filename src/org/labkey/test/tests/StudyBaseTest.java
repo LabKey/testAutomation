@@ -86,7 +86,11 @@ public abstract class StudyBaseTest extends SimpleApiTest
     // verification steps to speed up the test.  Call waitForSpecimenImport() before verifying specimens.
     protected void startSpecimenImport(int completeJobsExpected)
     {
-        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
+        startSpecimenImport(completeJobsExpected, SPECIMEN_ARCHIVE_A);
+    }
+    protected void startSpecimenImport(int completeJobsExpected, String specimenArchivePath)
+    {
+        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), specimenArchivePath), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
         _specimenImporter.startImport();
     }
 

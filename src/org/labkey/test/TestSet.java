@@ -165,7 +165,8 @@ public enum TestSet
         PivotQueryTest.class,
         LabModulesTest.class,
         SequenceTest.class,
-        StudyPublishTest.class
+        StudyPublishTest.class,
+        ExperimentalFeaturesTest.class
     }),
 
     MiniTest(new Class[]

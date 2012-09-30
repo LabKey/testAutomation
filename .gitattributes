@@ -168,6 +168,7 @@ src/org/labkey/test/tests/DataRegionTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
 src/org/labkey/test/tests/ExpTest.java -text
+src/org/labkey/test/tests/ExperimentalFeaturesTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
 src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
@@ -281,6 +282,7 @@ src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/CustomizeViewsHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
+src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
 src/org/labkey/test/util/EHRTestHelper.java -text
 src/org/labkey/test/util/Echo.java -text

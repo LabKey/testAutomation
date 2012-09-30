@@ -16,10 +16,13 @@
 package org.labkey.test.util;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Treygdor
  * Date: Mar 19, 2012
  * Time: 4:01:12 PM
+ */
+
+/**
+ * Marker interface for tests that can only test LabKey running on PostreSQL
  */
 public interface PostgresOnlyTest
 {

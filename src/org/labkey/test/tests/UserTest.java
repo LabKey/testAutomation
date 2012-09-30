@@ -61,9 +61,9 @@ public class UserTest extends SecurityTest
     protected void doCleanup()
     {
         super.doCleanup();
-        clickButton("Preferences");
+        clickButton("Change User Properties");
         checkRequiredField("FirstName", false);
-        clickButton("Update");
+        clickButton("Save");
 
         deleteUser(NORMAL_USER2);
         deleteUser(NORMAL_USER2_ALTERNATE);
@@ -83,7 +83,7 @@ public class UserTest extends SecurityTest
         impersonate(NORMAL_USER);
 
         goToMyAccount();
-        assertTextNotPresent("User Id");
+        assertTextPresent("User Id");
         assertTextNotPresent("Last Login");
 
         stopImpersonating();
@@ -160,30 +160,31 @@ public class UserTest extends SecurityTest
     private void requiredFieldsTest()
     {
         goToSiteUsers();
-        clickButton("Preferences");
+        clickButton("Change User Properties");
 
         for (String field : REQUIRED_FIELDS)
             checkRequiredField(field, true);
 
-        clickButton("Update");
-        clickButton("Preferences");
+        clickButton("Save");
+        clickButton("Change User Properties");
 
         for (String field : REQUIRED_FIELDS)
         {
             verifyFieldChecked(field);
             checkRequiredField(field, false);
         }
-        clickButton("Update");
-        clickButton("Preferences");
+        clickButton("Save");
+        clickButton("Change User Properties");
 
         checkRequiredField("FirstName", true);
-        clickButton("Update");
+        clickButton("Save");
 
         navigateToUserDetails(NORMAL_USER);
         clickButton("Edit");
         clickButton("Submit");
 
         assertTextPresent("This field is required");
+        clickButton("Cancel");
 
         clickButton("Show All Users");
     }
@@ -226,28 +227,41 @@ public class UserTest extends SecurityTest
 
     private void checkRequiredField(String name, boolean select)
     {
-        Locator checkBoxLocator = Locator.checkboxByNameAndValue("requiredFields", name);
+        Locator fieldLocator = Locator.xpath("//div[@class='gwt-Label' and contains(text(),'" + name + "')]");
+        waitForElement(fieldLocator);
 
-        if (select)
-            checkCheckbox("requiredFields", name);
-        else
-        {
-            if (isChecked(checkBoxLocator))
-                click(checkBoxLocator);
-        }
+        click(fieldLocator);
+
+        String prefix = getPropertyXPath("Field Properties");
+        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
+
+        Locator checkboxLocator = Locator.xpath(prefix + "//span/input[@name='required']");
+
+        if (isChecked(checkboxLocator) != select)
+            click(checkboxLocator);
     }
 
-    private void verifyFieldChecked(String fieldName)
+    private void verifyFieldChecked(String name)
     {
-        if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)))
-            return;
+        Locator fieldLocator = Locator.xpath("//div[@class='gwt-Label' and contains(text(),'" + name + "')]");
+        waitForElement(fieldLocator);
 
-        Assert.assertFalse("Checkbox not set for element: " + fieldName, false);
+        click(fieldLocator);
+
+        String prefix = getPropertyXPath("Field Properties");
+        click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
+
+        Locator checkboxLocator = Locator.xpath(prefix + "//span/input[@name='required']");
+
+        assertTrue("Checkbox not set for element: " + name, isChecked(checkboxLocator));
     }
 
     private void navigateToUserDetails(String userName)
     {
-        selenium.click("//td[.='" + userName + "']/..//td/a[.='details']");
+        Locator details = Locator.xpath("//td[.='" + userName + "']/..//td[contains(@class, 'labkey-details')]/a");
+        waitForElement(details);
+        click(details);
+
         waitForPageToLoad(30000);
     }
 }
