@@ -37,8 +37,6 @@ public class ListHelper extends AbstractHelper
 
     public void uploadData(String folderName, String listName, String listData)
     {
-        _test.clickLinkWithText(folderName);
-
         _test.clickButton("Import Data");
         _test.setLongTextField("text", listData);
         _submitImportTsv(null);
@@ -632,6 +630,7 @@ public class ListHelper extends AbstractHelper
         if ( lookup.getSchema() != null ) _test.setFormElement("schema", lookup.getSchema());
         if ( lookup.getTable() != null ) _test.setFormElement("table", lookup.getTable());
         _test.clickButton("Apply", 0);
+        _test.sleep(1000);
     }
 
     public void selectPropertyTab(String name)
