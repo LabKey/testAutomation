@@ -22,6 +22,7 @@ import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.UIAssayHelper;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.StringTokenizer;
 
 /**
@@ -54,22 +55,22 @@ public class AssayAPITest extends BaseSeleniumWebTest
         importAssayAndRun(getSampledataPath() + "\\AssayAPI\\XLS Assay.xar.xml", ++pipelineCount, "XLS Assay",
                 getSampledataPath() + "\\GPAT\\" + runName,  runName, new String[] {"1 - 100 of 201", "K770K3VY-19"});
 //
-//        goToProjectHome();
+        goToProjectHome();
 
         //Issue 16073
-//        importAssayAndRun(getSampledataPath() + "\\AssayAPI\\BatchPropRequired.xar", ++pipelineCount, "BatchPropRequired",
-//                getSampledataPath() + "\\GPAT\\" + runName,  runName, new String[] {"1 - 100 of 201", "K770K3VY-19"});
-//        assayHelper.getCurrentAssayNumber();
+        importAssayAndRun(getSampledataPath() + "\\AssayAPI\\BatchPropRequired.xar", ++pipelineCount, "BatchPropRequired",
+                getSampledataPath() + "\\GPAT\\" + runName,   "trial01-1.xls", new String[] {"1 - 100 of 201", "K770K3VY-19"});
+//        _assayHelper.getCurrentAssayNumber();
     }
 
     protected void  importAssayAndRun(String assayPath, int pipelineCount, String assayName, String runPath,
                                       String runName, String[] textToCheck)
     {
-        AbstractAssayHelper assayHelper = new APIAssayHelper(this);
+        APIAssayHelper assayHelper = new APIAssayHelper(this);
         assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount, assayName);
         try
         {
-            assayHelper.importAssay(assayName, runPath, getProjectName());
+            assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
         }
         catch (Exception e)
         {

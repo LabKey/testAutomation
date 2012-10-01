@@ -24,6 +24,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,15 +42,25 @@ public class APIAssayHelper extends AbstractAssayHelper
         super(test);
     }
 
-    public void importAssay(int assayID, String file, String projectPath) throws CommandException, IOException
+    public void importAssay(int assayID, String file, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, new File(file));
+        irc.setBatchProperties(batchProperties);
         irc.execute(_test.getDefaultConnection(), "/" + projectPath);
+
+    }
+    public void importAssay(int assayID, String file, String projectPath) throws CommandException, IOException
+    {
+        importAssay(assayID, file, projectPath, null);
     }
 
     public void importAssay(String assayName, String file, String projectPath) throws CommandException, IOException
     {
-        importAssay(getIdFromAssayName(assayName, projectPath), file, projectPath);
+        importAssay(assayName, file, projectPath, null);
+    }
+    public void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException
+    {
+        importAssay(getIdFromAssayName(assayName, projectPath), file, projectPath, batchProperties);
     }
 
     private int getIdFromAssayName(String assayName, String projectPath)
