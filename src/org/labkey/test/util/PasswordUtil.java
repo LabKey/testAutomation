@@ -65,6 +65,8 @@ public class PasswordUtil
             ensureCredentials();
         else if ("echo".equals(args[0]))
             echoCredentials();
+        else if ("getSkipfishCredentials".equals(args[0]))
+            getSkipfishCredentials();
         else
             util.outputUsage();
     }
@@ -179,6 +181,19 @@ public class PasswordUtil
         {
             System.out.println("Username: " + credentials.getUsername());
             System.out.println("Password: " + credentials.getPassword());
+        }
+    }
+
+    public static void getSkipfishCredentials()
+    {
+        Credentials credentials = getCredentials();
+        if (credentials == null)
+        {
+            System.setProperty("skipfishNoCredentials", "true");
+        }
+        else
+        {
+            System.out.println(credentials.getUsername() + ":" + credentials.getPassword());
         }
     }
 

@@ -1503,7 +1503,7 @@
 
     </target>
 
-    <target name="skipfish_scan" depends="skipfish_init, skipfish_make">
+    <target name="skipfish_scan" depends="skipfish_init, skipfish_make, skipfish_getCredentials">
         <delete dir="${skipfish.results.dir}"/>
 
         <touch file="${skipfish.src.dir}/${skipfish.wordlist}"/>
@@ -1519,6 +1519,8 @@
             <arg value="/logout.view"/>
             <arg value="-k"/>
             <arg value="${skipfish.timeout}"/>
+            <arg value="-A"/>
+            <arg value="${skipfish.credentials}"/>
             <arg value="${server.url}"/>
         </exec>
         <exec executable="${skipfish.src.dir}/skipfish" dir="${skipfish.src.dir}" failifexecutionfails="false" osfamily="unix" errorproperty="skipfish.failed">
@@ -1533,6 +1535,8 @@
             <arg value="/logout.view"/>
             <arg value="-k"/>
             <arg value="${skipfish.timeout}"/>
+            <arg value="-A"/>
+            <arg value="${skipfish.credentials}"/>
             <arg value="${server.url}"/>
         </exec>
     </target>
@@ -1563,6 +1567,13 @@
         </zip>
 
         <antcall target="skipfish_fail"/>
+    </target>
+
+    <target name="skipfish_getCredentials" depends="compile">
+        <java classname="org.labkey.test.util.PasswordUtil" outputproperty="skipfish.credentials" failonerror="true">
+            <classpath refid="test.run.classpath"/>
+            <arg id="action" value="getSkipfishCredentials"/>
+        </java>
     </target>
 
     <target name="skipfish_fail" if="skipfish.failed">
