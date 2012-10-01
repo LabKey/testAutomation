@@ -62,7 +62,7 @@ public class ExperimentalFeaturesTest extends BaseSeleniumWebTest implements Dev
     private void setupHiddenEmailTest()
     {
         // Create users and groups
-        createUser(ADMIN_USER, "");
+        createUser(ADMIN_USER, null);
         addUserToGroup("Site Administrators", ADMIN_USER);
         createGlobalPermissionsGroup(TEST_GROUP, IMPERSONATED_USER, CHECKED_USER);
         _containerHelper.createProject(getProjectName(), null);
