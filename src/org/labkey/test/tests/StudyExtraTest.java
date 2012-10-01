@@ -319,45 +319,6 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/studyextra/TestAssay1.xar", 1, "TestAssay1.xar");
         goToProjectHome();
-        //copied from old test
-//        clickButton("Manage Assays");
-//        clickButton("New Assay Design");
-//        checkRadioButton("providerName", "General");
-//        clickButton("Next");
-//
-//        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-//
-//        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
-//        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
-//
-//        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
-//        {
-//            selenium.click(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
-//            ListHelper.setColumnName(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-//            ListHelper.setColumnLabel( this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-//            ListHelper.setColumnType(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-//        }
-//
-//        sleep(1000);
-//        clickButton("Save", 0);
-//        waitForText("Save successful.", 20000);
-
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
-        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
-
-        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
-        {
-            selenium.click(getPropertyXPath("Data Fields") + Locator.navButton("Add Field").getPath());
-            _listHelper.setColumnName(getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-            _listHelper.setColumnLabel(getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_NAMES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-            _listHelper.setColumnType(this, getPropertyXPath("Data Fields"), i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-        }
-
-        sleep(1000);
-        clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
 
     } //defineAssay()
 
