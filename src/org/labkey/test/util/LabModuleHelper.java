@@ -61,7 +61,7 @@ public class LabModuleHelper
     public static Locator getNavPanelItem(String label, String itemText)
     {
         //NOTE: this should return only visible items
-        return Locator.xpath("//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//span[text() = '" + itemText + "']");
+        return Locator.xpath("//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//a[text() = '" + itemText + "']");
     }
 
     public void clickNavPanelItem(String label, String itemText)

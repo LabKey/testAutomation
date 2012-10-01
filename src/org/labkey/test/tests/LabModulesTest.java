@@ -518,7 +518,8 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
     protected List<String> getEnabledModules()
     {
         List<String> modules = new ArrayList<String>();
-        modules.add("Immunophenotype_Assay");
+        modules.add("FlowAssays");
+        modules.add("GenotypeAssays");
         modules.add("SequenceAnalysis");
         modules.add("SSP_Assay");
         modules.add("Viral_Load_Assay");
