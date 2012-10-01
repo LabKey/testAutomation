@@ -52,8 +52,8 @@ public class AssayAPITest extends BaseSeleniumWebTest
         goToProjectHome();
         int pipelineCount = 0;
         String runName = "trial01.xls";
-        importAssayAndRun(getSampledataPath() + "\\AssayAPI\\XLS Assay.xar.xml", ++pipelineCount, "XLS Assay",
-                getSampledataPath() + "\\GPAT\\" + runName,  runName, new String[] {"1 - 100 of 201", "K770K3VY-19"});
+        importAssayAndRun(getSampledataPath() + "/AssayAPI/XLS Assay.xar.xml", ++pipelineCount, "XLS Assay",
+                getSampledataPath() + "/GPAT/" + runName,  runName, new String[] {"1 - 100 of 201", "K770K3VY-19"});
 //
         goToProjectHome();
 
