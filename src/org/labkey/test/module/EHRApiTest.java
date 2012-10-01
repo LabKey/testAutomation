@@ -1013,14 +1013,13 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
             return;
 
         long sum = 0;
-        for(int i=0; i < _saveRowsTimes.size(); i++){
-            sum = sum + _saveRowsTimes.get(i);
+        for(long time : _saveRowsTimes){
+            sum += time;
         }
 
         //calculate average of all elements
         long average = sum / _saveRowsTimes.size();
-        average = average / 1000;
-        log("The average save time per record was : " + average + " seconds");
+        log("The average save time per record was : " + average + " ms");
 
         _saveRowsTimes = new ArrayList<Long>();
     }
