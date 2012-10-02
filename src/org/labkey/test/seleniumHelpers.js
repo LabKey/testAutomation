@@ -247,7 +247,7 @@ selenium.getContainerId = function () {
 selenium.getExtElementHeight = function(className, index) {
     var ext = selenium.browserbot.getCurrentWindow().Ext4;
     return ext.get(ext.query('.' + className)[index]).getHeight();
-}
+};
 
 // firefox error console listener
 // http://sejq.blogspot.com/2008/12/can-selenium-detect-if-page-has.html
@@ -270,7 +270,8 @@ if (browserVersion.isFirefox) {
                     msg.message.indexOf("ext-all-sandbox-dev.js") == -1 && // Ignore error that's junking up the weekly
                     msg.message.indexOf("XULElement.selectedIndex") == -1 && // Ignore known Firefox Issue
                     msg.message.indexOf("Failed to decode base64 string!") == -1 && // Firefox issue
-                    msg.message.indexOf("xulrunner-1.9.0.14/components/FeedProcessor.js") == -1) // Firefox problem
+                    msg.message.indexOf("xulrunner-1.9.0.14/components/FeedProcessor.js") == -1 && // Firefox problem
+                    msg.message.indexOf("Image corrupt or truncated: <unknown>") == -1)  // Selenium problem with pages that lack a favicon (e.g., errors since reset)
                 {
                     LOG.error("JsErrorChecker: " + msg.message);
 
