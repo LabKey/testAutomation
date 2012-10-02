@@ -888,7 +888,7 @@ public class Runner extends TestSuite
 
                 while ((line = reader.readLine()) != null)
                 {
-                    if (line.length() > 0 && line.charAt(0) != '?' && line.charAt(0) != '-')
+                    if (line.length() > 0 && line.charAt(0) != '?' && line.charAt(0) != '-' && line.charAt(0) != ':')
                     {
                         String path = line.substring(0, line.indexOf(':') - 1);
 
