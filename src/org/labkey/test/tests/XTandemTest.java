@@ -95,7 +95,7 @@ public class XTandemTest extends AbstractXTandemTest
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
         clickButton("Export All", 0);
-        click(Locator.xpath("//a/span[text()='TSV']"));
+        clickAndWait(Locator.xpath("//a/span[text()='TSV']"));
         assertTextNotPresent(PEPTIDE);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
         assertTextPresent(PROTEIN);
