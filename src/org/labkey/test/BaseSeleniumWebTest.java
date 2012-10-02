@@ -45,6 +45,8 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggingAspect;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -75,7 +77,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -259,7 +260,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return false;
     }
 
-    // Set pipeline tools directory to the default location if the current location does not exist.
+    /**
+     * Set pipeline tools directory to the default location if the current location does not exist.
+      */
+    @LogMethod
     private void fixPipelineToolsDirectory()
     {
         log("Ensuring pipeline tools directory points to the right place");
@@ -391,8 +395,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void log(String str)
     {
         str = str.replace(Locator.NOT_HIDDEN, "NOT_HIDDEN"); // This xpath fragment really clutters up the log
-        String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date());      // Include time with log entry.  Use format that matches labkey log.
-        System.out.println(d + " " + str);
+        LoggingAspect.log(str);
     }
 
     private static final Pattern LABKEY_ERROR_TITLE_PATTERN = Pattern.compile("\\d\\d\\d\\D.*Error.*", Pattern.CASE_INSENSITIVE);
@@ -539,6 +542,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
+    @LogMethod
     public void signIn()
     {
         if ( isGuestModeTest() )
@@ -752,6 +756,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         popLocation();
     }
 
+    @LogMethod
     protected void resetDbLoginConfig()
     {
         if ( oldStrength != null || oldExpiration != null )
@@ -1136,7 +1141,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.selectWindow(null);
     }
 
-
+    @LogMethod
     public void disableMaintenance()
     {
         if ( isGuestModeTest() )
@@ -1433,6 +1438,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
+    @LogMethod
     public void ensureSignedInAsAdmin()
     {
         goToHome();
@@ -1567,8 +1573,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         this.isQuickTest = isQuickTest;
     }
 
-
-
+    @LogMethod
     public void checkLeaksAndErrors()
     {
         if ( isGuestModeTest() )
@@ -1671,6 +1676,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         popLocation();
     }
 
+    @LogMethod
     protected void checkQueries()
     {
         if (skipQueryCheck())
@@ -1685,6 +1691,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
+    @LogMethod
     protected void checkViews()
     {
         if (skipViewCheck())
@@ -1821,6 +1828,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
+    @LogMethod
     private void checkActionCoverage()
     {
         if ( isGuestModeTest() )
@@ -2970,7 +2978,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(BaseSeleniumWebTest, int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(int)}
      */
     @Deprecated public void waitForExtMaskToDisappear()
     {
@@ -2978,7 +2986,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(BaseSeleniumWebTest, int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(int)}
      */
     @Deprecated public void waitForExtMaskToDisappear(int wait)
     {
@@ -2986,7 +2994,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(BaseSeleniumWebTest, int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(int)}
      */
     @Deprecated public void waitForExtMask()
     {
@@ -2994,7 +3002,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(BaseSeleniumWebTest, int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(int)}
      */
     @Deprecated public void waitForExtMask(int wait)
     {
@@ -5489,6 +5497,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         _extHelper.waitForExtDialog(groupName + " Information");
     }
 
+    @LogMethod
     public void deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         int checked = 0;
@@ -6668,6 +6677,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             waitForComplete();
         }
 
+        @LogMethod
         public void startImport()
         {
             log("Starting import of specimen archive(s):");
@@ -6718,6 +6728,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             clickButton("Start Import");
         }
 
+        @LogMethod
         public void waitForComplete()
         {
             log("Waiting for completion of specimen archives");
@@ -6735,6 +6746,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
 
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
+    @LogMethod
     public void waitForPipelineJobsToComplete(int completeJobsExpected, String description, boolean expectError)
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
@@ -6761,6 +6773,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
+    @LogMethod
     protected void waitForPipelineJobsToFinish(int jobsExpected)
     {
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
@@ -6827,12 +6840,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      *
      * @param actionName
      */
-    /**
-     * For invoking pipeline actions from the file web part. Displays the import data
-     * dialog and selects and submits the specified action.
-     *
-     * @param actionName
-     */
+    @LogMethod
     public void selectImportDataAction(String actionName)
     {
         sleep(100);

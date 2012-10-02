@@ -404,6 +404,7 @@ public class Crawler
         return false;
     }
 
+    @LogMethod
     public void crawlAllLinks(boolean inject)
     {
         // quick unit-test

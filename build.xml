@@ -193,7 +193,8 @@
 
     <path id="test.build.classpath">
         <path refid="test.lib.classpath" />
-         <pathelement path="${clover.jar}"/>
+        <pathelement path="${clover.jar}"/>
+        <pathelement path="${test.lib.home}/aspectjrt.jar"/>
     </path>
 
     <path id="test.run.classpath">
@@ -206,7 +207,7 @@
         <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
             <srcfiles dir="${test.src.home}" />
         </uptodate>
-        <antcall target="compileIfDirty" />
+        <antcall target="compileIfDirty_ajc" />
     </target>
 
     <target name="compileIfDirty" unless="testClassesUpToDate">
@@ -221,6 +222,32 @@
             source="1.6"
             classpathref="test.build.classpath">
         </javac>
+        <copy todir="${test.build.home}/classes" >
+            <fileset dir="${test.src.home}">
+                <include name="**/*.js"/>
+            </fileset>
+        </copy>
+        <touch file="${test.build.uptodate}" />
+    </target>
+
+    <target name="compileIfDirty_ajc" unless="testClassesUpToDate">
+        <taskdef
+            resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
+          <classpath>
+            <pathelement location="${test.lib.home}/aspectjtools.jar"/>
+          </classpath>
+        </taskdef>
+
+        <antcall target="test_with_clover" />
+        <antcall target="clean" />
+        <antcall target="prepare" />
+        <iajc srcdir="${test.src.home}"
+            destdir="${test.build.home}/classes"
+            debug="${test.compile.debug}"
+            deprecation="${test.compile.deprecation}"
+            source="1.6"
+            classpathref="test.build.classpath">
+        </iajc>
         <copy todir="${test.build.home}/classes" >
             <fileset dir="${test.src.home}">
                 <include name="**/*.js"/>

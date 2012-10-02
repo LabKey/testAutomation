@@ -39,7 +39,8 @@ public class Ext4Helper extends AbstractHelper
     {
         super(test);
     }
-    
+
+    @LogMethod
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
@@ -68,12 +69,14 @@ public class Ext4Helper extends AbstractHelper
        Ext4FieldRef.getForLabel(_test, label).setValue(selection);
     }
 
+    @LogMethod
     public void selectComboBoxItemById(String labelId, String selection)
     {
         Locator.XPathLocator loc = Locator.xpath("//tbody[./tr/td/label[@id='" + labelId + "-labelEl']]");
         selectComboBoxItem(loc, selection);
     }
 
+    @LogMethod
     public void selectRadioButton(String label, String selection)
     {
         Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");
@@ -107,6 +110,7 @@ public class Ext4Helper extends AbstractHelper
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
+    @LogMethod
     public void checkGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
@@ -130,6 +134,7 @@ public class Ext4Helper extends AbstractHelper
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
+    @LogMethod
     public void uncheckGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
@@ -143,6 +148,7 @@ public class Ext4Helper extends AbstractHelper
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
+    @LogMethod
     public void clickGridRowText(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
@@ -280,6 +286,7 @@ public class Ext4Helper extends AbstractHelper
         return Locator.xpath("//input[contains(@class, 'x4-form-field') and contains(@class, 'x4-form-invalid-field')]");
     }
 
+    @LogMethod
     public static void clickExt4MenuButton(BaseSeleniumWebTest test, boolean wait, Locator menu, boolean onlyOpen, String ... subMenuLabels)
     {
         test.click(menu);

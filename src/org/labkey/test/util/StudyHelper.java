@@ -31,21 +31,26 @@ public class StudyHelper extends AbstractHelper
         super(test);
     }
 
+    @LogMethod
     public void createParticipantGroup(String projectName, String studyFolder, String groupName, String... ptids)
     {
         createCustomParticipantGroup(projectName, studyFolder, groupName, "Participant", ptids);
     }
 
+    @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString, String... ptids)
     {
         createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, null, ptids);
     }
 
+    @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                                     Boolean shared, String... ptids)
     {
         createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, null, false, shared, ptids);
     }
+
+    @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                                     String categoryName, boolean isCategoryNameNew, Boolean shared, String... ptids)
     {
@@ -93,6 +98,7 @@ public class StudyHelper extends AbstractHelper
         _test.waitForExtMaskToDisappear();
     }
 
+    @LogMethod
     public void editCustomParticipantGroup(String groupName, String participantString,
                                                   String categoryName, boolean isCategoryNameNew, Boolean shared, String... newPtids)
     {
@@ -150,6 +156,7 @@ public class StudyHelper extends AbstractHelper
         exportStudy(folder, true, false);
     }
 
+    @LogMethod
     public void exportStudy(String folder, boolean useXmlFormat, boolean zipFile)
     {
         _test.clickLinkWithText(folder);

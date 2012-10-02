@@ -296,6 +296,9 @@ src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/JUnitHeader.java -text
 src/org/labkey/test/util/LabModuleHelper.java -text
 src/org/labkey/test/util/ListHelper.java -text
+src/org/labkey/test/util/LogMethod.java -text
+src/org/labkey/test/util/LoggedParam.java -text
+src/org/labkey/test/util/LoggingAspect.java -text
 src/org/labkey/test/util/Maps.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
@@ -310,6 +313,7 @@ src/org/labkey/test/util/SqlserverOnlyTest.java -text
 src/org/labkey/test/util/StopSelenium.java -text
 src/org/labkey/test/util/StringHelper.java -text
 src/org/labkey/test/util/StudyHelper.java -text
+src/org/labkey/test/util/TestAspect.aj -text
 src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text
 src/org/labkey/test/util/UIUserHelper.java -text

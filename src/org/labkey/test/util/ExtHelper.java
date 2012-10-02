@@ -33,6 +33,7 @@ public class ExtHelper extends AbstractHelper
     /**
      * Clicks the Ext or labkey menu item from the submenu specified by the menu object's text
      */
+    @LogMethod
     public void clickMenuButton(boolean wait, String menusLabel, String... subMenuLabels)
     {
         Locator menu = Locator.extButton(menusLabel);
@@ -46,6 +47,7 @@ public class ExtHelper extends AbstractHelper
     /**
      * Clicks the ext menu item from the submenu specified by the ext object's text
      */
+    @LogMethod
     public void clickExtMenuButton(boolean wait, Locator menu, String... subMenuLabels)
     {
         _test.click(menu);
@@ -84,12 +86,14 @@ public class ExtHelper extends AbstractHelper
         return _test.isElementPresent(itemLocator);
     }
 
+    @LogMethod
     public void clickExtDropDownMenu(String menuId, String value)
     {
         clickExtDropDownMenu(Locator.id(menuId), value);
     }
 
 
+    @LogMethod
     public void clickExtDropDownMenu(Locator menuLocator, String value)
     {
         _test.click(menuLocator);
@@ -361,6 +365,7 @@ public class ExtHelper extends AbstractHelper
         _test.mouseDown(file);
     }
 
+    @LogMethod
     public void selectFileBrowserItem(String path)
     {
         _test.log("selectFileBrowserItem path: " + path);
@@ -421,6 +426,7 @@ public class ExtHelper extends AbstractHelper
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
     public void selectAllFileBrowserFiles()
     {
         Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
@@ -432,6 +438,7 @@ public class ExtHelper extends AbstractHelper
         _test.waitForElement(file, 60000);
     }
 
+    @LogMethod
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");

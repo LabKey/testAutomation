@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
@@ -120,6 +121,7 @@ public class ReportTest extends StudyBaseTest
         super.doCleanup();
     }
 
+    @LogMethod
     protected void doCreateSteps()
     {
         enableEmailRecorder();
@@ -145,6 +147,7 @@ public class ReportTest extends StudyBaseTest
         setDemographicsBit("DEM-1: Demographics", false);
     }
 
+    @LogMethod
     protected void doVerifySteps()
     {
         doParticipantGroupCategoriesTest();
@@ -1503,6 +1506,7 @@ public class ReportTest extends StudyBaseTest
 
     private List<String> _scatterPlots = new ArrayList<String>();
     private List<String> _scatterPlotsDescriptions = new ArrayList<String>();
+    @LogMethod
     private void doScatterPlotTests()
     {
         doManageViewsScatterPlotTest();
@@ -1530,6 +1534,7 @@ public class ReportTest extends StudyBaseTest
     private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AnullMice BMice CTestYAxis";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
+    @LogMethod
     private void doManageViewsScatterPlotTest()
     {
         clickLinkWithText(getProjectName());
@@ -1608,6 +1613,7 @@ public class ReportTest extends StudyBaseTest
     private static final String SCATTER_PLOT_NAME_DR = "DataRegionScatterPlot";
     private static final String SCATTER_PLOT_DESC_DR = "This scatter plot was created through a data region's 'Views' menu";
     /// Test Scatter Plot created from a filtered data region.
+    @LogMethod
     private void doDataRegionScatterPlotTest()
     {
         clickLinkWithText(getProjectName());
@@ -1641,6 +1647,7 @@ public class ReportTest extends StudyBaseTest
     private static final String SCATTER_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleInteger0.0200000.0400000.0600000.0800000.01000000.01200000.0Double10000000.020000000.030000000.040000000.050000000.060000000.070000000.080000000.090000000.0100000000.0110000000.0120000000.0";
     private static final String SCATTER_PLOT_NAME_QC = "QuickChartScatterPlot";
     private static final String SCATTER_PLOT_DESC_QC = "This scatter plot was created through the 'Quick Chart' column header menu option";
+    @LogMethod
     private void doQuickChartScatterPlotTest()
     {
         clickLinkWithText(getProjectName());
@@ -1668,6 +1675,7 @@ public class ReportTest extends StudyBaseTest
     private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200normalabnormal/insignificantabnormal/significant";
     private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200Group 1Group 2normalabnormal/insignificantabnormal/significant";
 
+    @LogMethod
     private void doCustomizeScatterPlotTest()
     {
         clickReportGridLink(SCATTER_PLOT_NAME_DR, "view");
@@ -1733,6 +1741,7 @@ public class ReportTest extends StudyBaseTest
 
     private static final String TEST_DATA_API_PATH = "server/test/data/api";
 
+    @LogMethod
     private void doPointClickScatterPlotTest()
     {
         clickReportGridLink(SCATTER_PLOT_NAME_MV, "view");
@@ -1855,6 +1864,7 @@ public class ReportTest extends StudyBaseTest
         },"Page still dirty", WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
     private void doParticipantGroupCategoriesTest()
     {
         clickLinkWithText(getProjectName());
@@ -1950,6 +1960,7 @@ public class ReportTest extends StudyBaseTest
 
 
 
+    @LogMethod
     private void doQueryReportTests()
     {
         log("Create a query report.");
