@@ -121,7 +121,9 @@ public class PipelineHelper
         _test.click(Locator.xpath("//button[contains(@class,'iconMove')]"));
         _test.waitForExtMask();
         //TODO:  this doesn't yet support nested folders
-        _test.clickAt(Locator.xpath("(//a/span[contains(text(),'" + destinationPath + "')])[2]"), "1,1");
+        Locator folder =Locator.xpath("(//a/span[contains(text(),'" + destinationPath + "')])[2]");
+        _test.waitForElement(folder);
+        _test.clickAt(folder, "1,1");
         _test.clickButton("Move", _test.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
     }
 
