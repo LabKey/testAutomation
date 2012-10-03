@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
+import java.awt.image.LookupTable;
 import java.io.File;
 import java.io.IOException;
 
@@ -69,5 +70,42 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.waitForPageToLoad();
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + name, false);
     }
+
+    public void addAliasedFieldToMetadata(String tableName, String aliasedColumn, String columnName, ListHelper.LookupInfo lookupInfo)
+    {
+        //go to schema browser
+        _test.goToSchemaBrowser();
+
+        //go to assay
+        _test.selectQuery("assay", tableName);
+
+        //edit metadata
+        _test.waitForText("edit metadata");
+        _test.clickLinkWithText("edit metadata");
+        _test.sleep(5000); //TODO;
+        _test.clickButton("Alias Field", "Choose a field");
+
+        _test.setFormElement(Locator.name("sourceColumn"), aliasedColumn);
+        _test.clickButton("OK", _test.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+
+        //set name
+        //TODO:  better locator
+        int fieldCount = getLastPropertyFieldNumber();
+        _test.setFormElement(Locator.name("ff_name" + fieldCount), columnName);
+        _test._listHelper.setColumnType(fieldCount, lookupInfo);
+        //set lookup
+        //todo
+    }
+
+    //TODO:  best location for this?
+    private int getLastPropertyFieldNumber()
+    {
+        int count = _test.getXpathCount(Locator.xpath("//input[contains(@name, 'ff_name')]"));
+        Locator l = Locator.xpath("(//input[contains(@name, 'ff_name')])["+count + "]");
+        _test.isElementPresent(l);
+        String name = _test.getAttribute(l,  "name");
+        return new Integer(name.substring(7)).intValue();
+    }
+
 
 }
