@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 {
-    public static final String STUDY_PIPELINE_ROOT = "C:/labkey_base/sampledata/specimenprogressreport";
+    public static final String STUDY_PIPELINE_ROOT = getLabKeyRoot() + "/sampledata/specimenprogressreport";
     public static final String assay1 = "PCR";
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     String studyFolder = "study folder";
@@ -48,7 +48,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         _assayHelper = new UIAssayHelper(this); //todo:  would like to use api, need to see if batch fields are necessary
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), studyFolder, "Study");
-        importFolderFromZip(STUDY_PIPELINE_ROOT + "/study.folder.zip");
+        importFolderFromZip(STUDY_PIPELINE_ROOT + "/Study.folder.zip");
 
         createSpecimenFolder();
         waitForText("This assay is unlocked");
@@ -59,22 +59,22 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
 
 
-        sleep(8000);
 //        _ext4Helper.selectRadioButtonByText("PCR");
 //        sleep(4000);
 
         Locator.XPathLocator table = Locator.xpath("//table[@id='dataregion_ProgressReport']");//Locator.xpath("//table[contains(@class,'labkey-data-region')]");
+        waitForElement(table);
 //        getSimpleTableCell(table, 4,3);
         Assert.assertTrue(getAttribute(getSimpleTableCell(table, 3, 4), "style").contains("green"));
         Assert.assertTrue(getAttribute(getSimpleTableCell(table, 3,5), "style").contains("red"));
         Assert.assertTrue(getAttribute(getSimpleTableCell(table, 4,11), "style").contains("orange"));
 
         flagSpecimenForReview();
-        sleep(5000);
 
 //        _ext4Helper.selectRadioButtonByText("PCR");
+        waitForElement(table);
         Assert.assertTrue(getAttribute(getSimpleTableCell(table, 4,12), "style").contains("flagged.png"));
-
+        Assert.assertTrue(getAttribute(getSimpleTableCell(table, 4,12), "style").contains("yellow"));
 
 //        clic
 //            _customizeViewsHelper.addCustomizeViewColumn("flag", "Flag");
@@ -87,6 +87,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         click(Locator.tagWithAttribute("img", "title", "Flag for review"));
         clickButton("OK", 0);
+        waitForElement(Locator.tagWithAttribute("img", "title", "Flagged for review"));
 
         clickLinkWithText(assayFolder);
     }
@@ -121,7 +122,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("", "rho", assayName + " Query");
         _assayHelper.addAliasedFieldToMetadata(assayName + " Data", "rowid", "qcmessage", lookupInfo);
         clickButton("Save", 0);
-        sleep(10000);
+        waitForText("Save successful.");
         clickButton("View Data");
 
         log("Set up data viewto include QC message");
