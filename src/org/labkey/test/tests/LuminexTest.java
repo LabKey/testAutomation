@@ -112,6 +112,8 @@ public class LuminexTest extends AbstractQCAssayTest
     private String rum5 = "Five Parameter";
     private String trapezoidal = "Trapezoidal";
 
+    private String today = null;
+
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/luminex";
@@ -1318,6 +1320,7 @@ public class LuminexTest extends AbstractQCAssayTest
     protected void runGuideSetTest()
     {
         log("Uploading Luminex run with a R transform script for Guide Set test");
+        today = df.format(Calendar.getInstance().getTime());
 
         File[] files = {TEST_ASSAY_LUM_FILE5, TEST_ASSAY_LUM_FILE6, TEST_ASSAY_LUM_FILE7, TEST_ASSAY_LUM_FILE8, TEST_ASSAY_LUM_FILE9};
         String[] analytes = {"GS Analyte (1)", "GS Analyte (2)"};
@@ -2038,8 +2041,6 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void editGuideSet(String[] rows, String comment, boolean creating)
     {
-        String today = df.format(Calendar.getInstance().getTime());
-
         if (creating)
         {
             waitForText("Create Guide Set...");

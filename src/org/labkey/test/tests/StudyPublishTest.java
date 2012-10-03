@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
 
@@ -646,7 +647,13 @@ public class StudyPublishTest extends StudyProtectedExportTest
             clickButton("OK", 0);
         }
 
-        mouseDown(Locator.tagWithText("b", "Mice"));
+        _ext4Helper.checkGridRowCheckbox("Mice");
+        _ext4Helper.uncheckGridRowCheckbox("Mice");
+        for (String mouseId : GROUP1_PTIDS)
+        {
+            // Select all of the Mice in GROUP1
+            _ext4Helper.checkGridRowCheckbox(mouseId);
+        }
         sleep(1000);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT); // Make sure charts are rendered
 

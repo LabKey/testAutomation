@@ -1056,6 +1056,10 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE);//, 1); // One chart per group.
 
+        // reselect cohorts
+        _ext4Helper.checkGridRowCheckbox("Cohorts");
+        waitForCharts(3);
+
         openSaveMenu();
         saveReport(false);
 
