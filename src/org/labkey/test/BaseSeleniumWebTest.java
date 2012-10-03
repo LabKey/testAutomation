@@ -3846,6 +3846,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickAndWait(l, mills);
     }
 
+//    public void clickImageWithSrc(String src)
+//    {
+//        Locator l = Locator.tagWithAttribute("img", "title", title);
+//    }
+
     public void clickImageWithAltText(String altText, int millis)
     {
         log("Clicking first image with alt text " + altText );
@@ -3892,6 +3897,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public String getTableCellText(String tableId, int row, int column)
     {
         return getText(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]/tbody/tr["+(row+1)+"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = "+(column+1)+"]"));
+    }
+
+    public Locator getSimpleTableCell(Locator.XPathLocator table, int row, int column)
+    {
+        return Locator.xpath(table.toXpath() + "/tbody/tr["+(row+1)+"]/td[" + (column +1)  + "]");
     }
 
     public String getTableCellText(String tableName, int row, String columnTitle)
@@ -4357,12 +4367,25 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return null;
     }
 
+
     // waits for page to load after button is clicked
     // use clickButton(text, 0) to click a button and continure immediately
     public void clickButton(String text)
     {
         clickButton(text, defaultWaitForPage);
     }
+
+    /**
+     * click a button with text text and wait for text waitForText to appear
+     * @param text
+     * @param waitForText
+     */
+    public void clickButton(String text, String waitForText)
+        {
+            clickButton(text, 0);
+            waitForText(waitForText);
+        }
+
 
     public void clickButton(String text, int waitMillis)
     {
@@ -5984,7 +6007,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToFolderManagement();
         clickLinkWithText("Import");
         sleep(2000);
-        setFormElement(Locator.name("folderZip"), folderFile);
+        setFormElement(Locator.name("folderZip"), new File(folderFile));
         clickButtonContainingText("Import Folder From Local Zip Archive");
         waitForText("Data Pipeline");
         waitForPipelineJobsToComplete(1, "Folder import", false);
