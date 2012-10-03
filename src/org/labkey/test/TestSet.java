@@ -32,17 +32,17 @@ import java.util.List;
 
 public enum TestSet
 {
-    DRT(new Class[] {
+    DRT(
         BasicTest.class,
         JUnitTest.class,
         SecurityShortTest.class,
         FlowShortTest.class,
         XTandemShortTest.class,
-        StudyShortTest.class,
-    }),
+        StudyShortTest.class
+    ),
     //new tests added to the DRTs should be added to BVT as well
 
-    BVT(new Class[] {
+    BVT(
         BasicTest.class,
         JUnitTest.class,
         WikiTest.class,
@@ -63,21 +63,19 @@ public enum TestSet
         XTandemTest.class,
         StudyTest.class,
         WebDavTest.class
-    }),
+    ),
 
-    MS2(new Class[]
-    {
+    MS2(
         XTandemTest.class,
         MascotTest.class,
         SequestTest.class,
         MS2Test.class,
         MS2GZTest.class,
         LibraTest.class,
-        TargetedMSTest.class,
-    }),
+        TargetedMSTest.class
+    ),
 
-    Daily(600000, new Class[]
-    {
+    Daily(600000,
         BasicTest.class,
         EmbeddedWebPartTest.class,
         ModuleAssayTest.class,
@@ -167,10 +165,9 @@ public enum TestSet
         SequenceTest.class,
         StudyPublishTest.class,
         ExperimentalFeaturesTest.class
-    }),
+    ),
 
-    MiniTest(new Class[]
-    {
+    MiniTest(
         LuminexUploadAndCopyTest.class,
         LuminexJavaTransformTest.class,
         LuminexExcludableWellsTest.class,
@@ -179,11 +176,10 @@ public enum TestSet
         LuminexEC50Test.class,
         LuminexGuideSetTest.class,
         LuminexAsyncImportTest.class,
-        LuminexPositivityTest.class,
-    }),
+        LuminexPositivityTest.class
+    ),
 
-    IE(new Class[]
-    {
+    IE(
         BasicTest.class,
         FlowTest.class,
         SecurityTest.class,
@@ -193,52 +189,45 @@ public enum TestSet
         AssayTest.class,
         FolderTest.class,
         StudyTest.class
-    }),
+    ),
 
-    Cluster(new Class[]
-    {
+    Cluster(
         MS2ClusterTest.class
-    }),
+    ),
 
-    XTandem(new Class[]
-    {
+    XTandem(
         XTandemTest.class
-    }),
+    ),
 
-    Mascot(new Class[]
-    {
+    Mascot(
         MascotTest.class
-    }),
+    ),
 
-    Sequest(new Class[]
-    {
+    Sequest(
         SequestTest.class
-    }),
+    ),
 
-    Module(new Class[]
-    {
-        ModuleTest.class
-    }),
+    Module(ModuleTest.class),
 
-    Flow(new Class[] {
+    Flow(
         FlowTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
         FlowNormalizationTest.class,
-        FlowCBCTest.class,
-    }),
+        FlowCBCTest.class
+    ),
 
     // Many (but not all) of the tests that use wiki functionality
-    Wiki(new Class[] {
+    Wiki(
         WikiTest.class,
         WikiLongTest.class,
         ClientAPITest.class,
         ButtonCustomizationTest.class,
         EmbeddedWebPartTest.class,
         TimelineTest.class
-    }),
+    ),
 
-    Study(new Class[] {
+    Study(
         StudyTest.class,
         StudyExportTest.class,
         StudyCohortExportTest.class,
@@ -256,9 +245,9 @@ public enum TestSet
         ExtraKeyStudyTest.class,
         SampleMindedImportTest.class,
         StudyPublishTest.class
-    }),
+    ),
 
-    Assays(new Class[] {
+    Assays(
         AssayTest.class,
         MissingValueIndicatorsTest.class,
         ElispotAssayTest.class,
@@ -276,18 +265,18 @@ public enum TestSet
         LuminexPositivityTest.class,
         ViabilityTest.class,
         ModuleAssayTest.class,
-        FormulationsTest.class,
-    }),
+        FormulationsTest.class
+    ),
 
-    UnitTests(new Class[] {
+    UnitTests(
         JUnitTest.class
-    }),
+    ),
 
-    Chrome(new Class[] {
+    Chrome(
         ListExportTest.class
-    }),
+    ),
 
-    Data(new Class[] {
+    Data(
         DataRegionTest.class,
         ExternalSchemaTest.class,
         ListTest.class,
@@ -295,29 +284,30 @@ public enum TestSet
         ScriptValidationTest.class,
         FilterTest.class,
         PivotQueryTest.class
-    }),
+    ),
 
-    IDRI(new Class[] {
+    IDRI(
         FormulationsTest.class
-    }),
+    ),
 
     BVTnDaily(BVT, Daily.tests),
 
-    Weekly(600000, BVTnDaily, new Class[] {
+    Weekly(600000, BVTnDaily,
             // Add special test classes, not in daily or BVT.
             SecurityTestExtended.class,
             NabMigrationTest.class
-    }),
+    ),
 
-    EHR(new Class[]{
-            EHRStudyTest.class
-    }),
+    EHR(
+        EHRStudyTest.class,
+        EHRApiTest.class
+    ),
 
-    CDSPopulation(new Class[] {
+    CDSPopulation(
             CDSPopulation.class
-    }),
+    ),
 
-    CONTINUE(new Class[] {})
+    CONTINUE()
     {
         public boolean isSuite()
         {
@@ -325,7 +315,7 @@ public enum TestSet
         }
     },
 
-    TEST(new Class[] {})
+    TEST()
     {
         public boolean isSuite()
         {
