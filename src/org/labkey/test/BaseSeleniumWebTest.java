@@ -2430,8 +2430,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             if(folderType.equals("Create From Template Folder"))
             {
                 log("create from template");
-                sleep(500); //Clicking too soon causes the dropdown menu to not populate
                 click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
+                _ext4Helper.waitForMaskToDisappear();
                 Locator.XPathLocator l = Locator.xpath("//tr[./td/input[@name='templateSourceId']]");
                 _ext4Helper.selectComboBoxItem(l, templateFolder);
 
