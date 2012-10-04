@@ -70,6 +70,12 @@ public class CAVDStudyTest extends StudyBaseTest
     }
 
     @Override
+    protected boolean isFileUploadTest()
+    {
+        return true; // for importFolderFromZip
+    }
+
+    @Override
     protected String getProjectName()
     {
         return PROJECT_NAME;

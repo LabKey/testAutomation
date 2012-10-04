@@ -57,6 +57,12 @@ public class FolderExportTest extends BaseSeleniumWebTest
     }
 
     @Override
+    protected boolean isFileUploadTest()
+    {
+        return true; // for importFolderFromZip
+    }
+
+    @Override
     protected void doTestSteps() throws Exception
     {
         RReportHelper _rReportHelper = new RReportHelper(this);
