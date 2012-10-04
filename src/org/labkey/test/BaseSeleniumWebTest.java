@@ -2418,11 +2418,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param tabsToAdd module tabs to add iff foldertype=null,  or the copy related checkboxes iff foldertype=create from template
      * @param inheritPermissions should folder inherit permissions from parent?
      */
+    @LogMethod
     public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
     {
-        log("Starting subfolder creation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        try
-        {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
         {
@@ -2484,11 +2482,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         // verify that there's a link to our new folder:
         assertLinkPresentWithText(child);
-        }
-        finally
-        {
-            log("Done with subfolder creation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        }
     }
 
     protected void deleteDir(File dir)
@@ -2508,6 +2501,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
+    @LogMethod
     public void deleteFolder(String project, String folderName)
     {
         log("Deleting folder " + folderName + " under project " + project);
@@ -2545,6 +2539,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         click(btnLocator);
     }
 
+    @LogMethod
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
@@ -2566,6 +2561,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertLinkNotPresentWithText(folderName);
     }
 
+    @LogMethod
     public void moveFolder(String projectName, String folderName, String newParent, boolean createAlias)
     {
         log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
@@ -2621,6 +2617,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         _containerHelper.deleteProject(project, true, wait);
     }
 
+    @LogMethod
     public void enableEmailRecorder()
     {
         log("Enable email recorder");
@@ -2635,6 +2632,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         popLocation();
     }
 
+    @LogMethod
     public void disableEmailRecorder()
     {
         log("Disable email recorder");
