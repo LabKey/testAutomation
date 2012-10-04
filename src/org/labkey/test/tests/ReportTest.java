@@ -168,6 +168,7 @@ public class ReportTest extends StudyBaseTest
         doReportSecurity();
     }
 
+    @LogMethod
     private void doThumbnailChangeTest()
     {
         clickTab("Clinical and Assay Data");
@@ -184,6 +185,7 @@ public class ReportTest extends StudyBaseTest
         //no way to verify, unfortunately
     }
 
+    @LogMethod
     private void openFirstRReport()
     {
         Locator l =Locator.xpath("//tr[td/div/div/a[text()=' Author report']]/td/div/span");
@@ -192,6 +194,7 @@ public class ReportTest extends StudyBaseTest
         waitForText("Share this report with all users");
     }
 
+    @LogMethod
     protected void deleteReport(String reportName)
     {
         clickLinkWithText("Manage Views");
@@ -219,6 +222,7 @@ public class ReportTest extends StudyBaseTest
                 }, "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
     protected Locator getReportGridLink(String reportName, String linkText)
     {
         goToManageViews();
@@ -249,6 +253,7 @@ public class ReportTest extends StudyBaseTest
         clickAndWait(link);
     }
 
+    @LogMethod
     private void doCreateCharts()
     {
         clickLinkWithText(getStudyLabel());
@@ -316,6 +321,7 @@ public class ReportTest extends StudyBaseTest
         return "ReportVerifyProject";  // don't want this test to stomp on StudyVerifyProject
     }
 
+    @LogMethod
     protected void doCreateRReports()
     {
         log("Create an R Report");
@@ -512,6 +518,7 @@ public class ReportTest extends StudyBaseTest
      * @param share should this be shared with others?
      * @param shareSource if so, should they be able to see the source (ignored if share is false)
      */
+    @LogMethod
     private void createRReport(String name, String scriptValue, boolean share, boolean shareSource)
     {
 
@@ -542,6 +549,7 @@ public class ReportTest extends StudyBaseTest
     private static final String ATTACHMENT_REPORT2_DESCRIPTION= "This attachment report points at a file on the server.";
     private static final File ATTACHMENT_REPORT2_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
 
+    @LogMethod
     private void doAttachmentReportTest()
     {
         clickLinkWithText(getProjectName());
@@ -597,6 +605,7 @@ public class ReportTest extends StudyBaseTest
     private static final String LINK_REPORT2_NAME = "Link Report2";
     private static final String LINK_REPORT2_DESCRIPTION= "This link report points links to an external page.";
 
+    @LogMethod
     private void doLinkReportTest()
     {
         clickLinkWithText(getProjectName());
@@ -643,6 +652,7 @@ public class ReportTest extends StudyBaseTest
         Assert.assertEquals("_blank", target);
     }
 
+    @LogMethod
     private void saveReport(String name)
     {
         clickSourceTab();
@@ -676,6 +686,7 @@ public class ReportTest extends StudyBaseTest
         sleep(2000); // TODO
     }
 
+    @LogMethod
     protected void deleteRReports()
     {
         log("Clean up R Reports");
@@ -694,6 +705,7 @@ public class ReportTest extends StudyBaseTest
         }
     }
 
+    @LogMethod
     protected void cleanPipelineItem(String item)
     {
         clickLinkWithText(getProjectName());
@@ -707,6 +719,7 @@ public class ReportTest extends StudyBaseTest
         }
     }
 
+    @LogMethod
     protected void setupDatasetSecurity()
     {
         click(Locator.linkWithText("Projects"));
@@ -746,6 +759,7 @@ public class ReportTest extends StudyBaseTest
         clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//a[@class='labkey-button']/span[text() = 'Save']"));
     }
 
+    @LogMethod
     protected void doReportSecurity()
     {
         // create charts
@@ -856,6 +870,7 @@ public class ReportTest extends StudyBaseTest
     private static final String[] SPEC_PTID_ONE = {"999320016"};
     private static final String[] SPEC_PTID_TWO = {"999320518"};
     private static final String PARTICIPANT_REPORT5_NAME = "Demographic Participant Report";
+    @LogMethod
     private void doParticipantReportTest()
     {
         log("Testing Participant Report");
@@ -1155,12 +1170,14 @@ public class ReportTest extends StudyBaseTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
     private void doParticipantFilterTests()
     {
         doParticipantReportFilterTest();
         doParticipantListFilterTest();
     }
 
+    @LogMethod
     private void doParticipantReportFilterTest()
     {
         clickLinkWithText(getProjectName());
@@ -1221,6 +1238,7 @@ public class ReportTest extends StudyBaseTest
         //TODO: Blocked: 16110: Participant report filter panel loses state when switching between participant and group modes
     }
 
+    @LogMethod
     private void doParticipantListFilterTest()
     {
         clickLinkWithText(getProjectName());
@@ -1302,6 +1320,7 @@ public class ReportTest extends StudyBaseTest
     private static final String DISCUSSION_TITLE_1 = "Discussion about R report";
     private static final String DISCUSSION_BODY_2 = "Responding to a discussion";
     private static final String DISCUSSION_BODY_3 = "Editing a discussion response";
+    @LogMethod
     private void doReportDiscussionTest()
     {
         clickLinkWithText(getProjectName());
@@ -1344,6 +1363,7 @@ public class ReportTest extends StudyBaseTest
 
     private List<String> _boxPlots = new ArrayList<String>();
     private List<String> _boxPlotsDescriptions = new ArrayList<String>();
+    @LogMethod
     private void doBoxPlotTests()
     {
         doManageViewsBoxPlotTest();
@@ -1367,6 +1387,7 @@ public class ReportTest extends StudyBaseTest
     private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AMice BMice CNot in Cat Mice LetTestYAxis40.0";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
+    @LogMethod
     private void doManageViewsBoxPlotTest()
     {
         clickLinkWithText(getProjectName());
@@ -1441,6 +1462,7 @@ public class ReportTest extends StudyBaseTest
     private static final String BOX_PLOT_NAME_DR = "DataRegionBoxPlot";
     private static final String BOX_PLOT_DESC_DR = "This box plot was created through a data region's 'Views' menu";
     /// Test Box Plot created from a filtered data region.
+    @LogMethod
     private void doDataRegionBoxPlotTest()
     {
         clickLinkWithText(getProjectName());
@@ -1480,6 +1502,7 @@ public class ReportTest extends StudyBaseTest
     private static final String BOX_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleCohortGroup 1Group 2Double0.020000000.040000000.060000000.080000000.0100000000.0120000000.0";
     private static final String BOX_PLOT_NAME_QC = "QuickChartBoxPlot";
     private static final String BOX_PLOT_DESC_QC = "This box plot was created through the 'Quick Chart' column header menu option";
+    @LogMethod
     private void doQuickChartBoxPlotTest()
     {
         clickLinkWithText(getProjectName());
@@ -1494,6 +1517,7 @@ public class ReportTest extends StudyBaseTest
         saveBoxPlot(BOX_PLOT_NAME_QC, BOX_PLOT_DESC_QC);
     }
 
+    @LogMethod
     private void createQuickChart(String regionName, String columnName)
     {
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
@@ -1840,6 +1864,7 @@ public class ReportTest extends StudyBaseTest
         _scatterPlotsDescriptions.add(description);
     }
 
+    @LogMethod
     private void savePlot(String name, String description)
     {
         boolean saveAs = getButtonLocator("Save As") != null;
@@ -1921,6 +1946,7 @@ public class ReportTest extends StudyBaseTest
         waitForText("Found 5 mice of 138.");
     }
 
+    @LogMethod
     private void deselectAllFilterGroups()
     {
         _ext4Helper.checkGridRowCheckbox("All");
