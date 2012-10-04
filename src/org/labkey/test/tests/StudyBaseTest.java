@@ -16,9 +16,11 @@
 
 package org.labkey.test.tests;
 
+import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -76,8 +78,17 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void initializeFolder()
     {
-        if (!isLinkPresentWithText(getProjectName()))
+        int response = -1;
+        try{
+            response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/" + stripContextPath(getAttribute(Locator.linkWithText(getProjectName()), "href")));
+        }
+        catch(Exception e){/*No link or bad response*/}
+
+        if (HttpStatus.SC_OK != response)
+        {
             _containerHelper.createProject(getProjectName(), null);
+        }
+
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 
