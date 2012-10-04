@@ -71,6 +71,13 @@ public class LabModuleHelper
         _test.waitAndClick(l);
     }
 
+    public void clickNavPanelItem(String itemText)
+    {
+        Locator l = Locator.xpath("//a[contains(text(), '" + itemText + "')]");
+        _test.waitForElement(l);
+        _test.waitAndClick(l);
+    }
+
     public static Locator getNavPanelRow(String label)
     {
         return Locator.xpath("//div[descendant::span[text() = '" + label + "']]");
@@ -114,11 +121,6 @@ public class LabModuleHelper
         {
             throw new RuntimeException(e);
         }
-    }
-
-    public void clickSpanContaining(String text)
-    {
-        _test.click(Locator.xpath("//span[contains(text(), '" + text + "')]"));
     }
 
     public int getRandomInt()

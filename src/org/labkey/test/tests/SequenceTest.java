@@ -104,7 +104,7 @@ public class SequenceTest extends LabModulesTest
         //create readset records for illumina run
         goToProjectHome();
         waitForText("Create Readsets");
-        _helper.clickSpanContaining("Create Readsets");
+        _helper.clickNavPanelItem("Create Readsets");
         waitForPageToLoad();
         waitForText("Run Id");
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
@@ -880,7 +880,7 @@ public class SequenceTest extends LabModulesTest
     {
         goToProjectHome();
         waitForText("Upload Files");
-        _helper.clickSpanContaining("Upload Files / Start Analysis");
+        _helper.clickNavPanelItem("Upload Files / Start Analysis");
         waitForPageToLoad();
         waitForText("fileset");
         _extHelper.selectFileBrowserRoot();
