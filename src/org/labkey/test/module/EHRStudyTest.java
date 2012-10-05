@@ -26,7 +26,7 @@ import org.labkey.test.tests.SimpleApiTest;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EHRTestHelper;
-import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -485,37 +485,37 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         //NOTE: rendering the entire colony is slow, so instead of abstract we load a simpler report
         log("Verify Entire colony history");
         checkRadioButton("selector", "renderColony");
-        _extHelper.clickExtTab("Demographics");
+        _ext4Helper.clickTabContainingText("Demographics");
         waitForText("Rhesus"); //a proxy for the loading of the dataRegion
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Demographics");
         Assert.assertEquals("Did not find the expected number of Animals", 44, getDataRegionRowCount(dataRegionName));
 
         log("Verify location based history");
         checkRadioButton("selector", "renderRoomCage");
-        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='areaField']/.."), AREA_ID);
+        _ext4Helper.selectComboBoxItem("Area", AREA_ID);
         setFormElement("roomField", ROOM_ID);
         setFormElement("cageField", CAGE_ID);
-        _extHelper.clickExtTab("Abstract");
+        _ext4Helper.clickTabContainingText("Abstract");
         // No results expected due to anonymized cage info.
         waitForText("No records found", WAIT_FOR_JAVASCRIPT);
 
         log("Verify Project search");
         checkRadioButton("selector", "renderMultiSubject");
-        waitAndClick(Locator.xpath("//table[text()='[Search By Project/Protocol]']"));
-        _extHelper.waitForExtDialog("Search By Project/Protocol");
-        _extHelper.selectComboBoxItem("Project", PROJECT_ID);
+        waitAndClick(Locator.xpath("//a[text()='[Search By Project/Protocol]']"));
+        waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
+        _ext4Helper.selectComboBoxItem("Project", PROJECT_ID);
         clickButton("Submit", 0);
-        waitForElement(Locator.button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.ext4Button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Verify Protocol search");
         checkRadioButton("selector", "renderMultiSubject");
-        waitAndClick(Locator.xpath("//table[text()='[Search By Project/Protocol]']"));
-        _extHelper.waitForExtDialog("Search By Project/Protocol");
-        _extHelper.selectComboBoxItem("Protocol", PROTOCOL_ID);
+        waitAndClick(Locator.xpath("//a[text()='[Search By Project/Protocol]']"));
+        waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
+        _ext4Helper.selectComboBoxItem("Protocol", PROTOCOL_ID);
         clickButton("Submit", 0);
-        waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.ext4Button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
 
         // Check protocol search results.
         refreshAnimalHistoryReport();
@@ -524,8 +524,8 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         assertLinkPresentWithText(PROTOCOL_MEMBER_IDS[0]);
 
         // Check animal count after removing one from search.
-        waitAndClick(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"));
-        waitForElementToDisappear(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
+        waitAndClick(Locator.ext4Button(PROTOCOL_MEMBER_IDS[0] + " (X)"));
+        waitForElementToDisappear(Locator.ext4Button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length - 1, getDataRegionRowCount(dataRegionName));

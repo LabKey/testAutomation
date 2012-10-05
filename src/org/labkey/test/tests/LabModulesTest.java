@@ -496,19 +496,19 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         //TODO: also verify records imported into workbook show up here.  verify lookups / view
     }
 
-//    private void samplesWebpartTest()
-//    {
-//        log("Testing samples webpart");
-//
-//        clickTab("Materials");
-//        waitForPageToLoad();
-//        waitForText("Samples and Materials:");
-//        String msg = "Sample type missing or sample count incorrect";
-//
-//        Assert.assertTrue(msg, isTextPresent("DNA_Oligos" + (_oligosTotal > 0 ? " (" + _oligosTotal + ")" : "") + ":"));
-//        Assert.assertTrue(msg, isTextPresent("Peptides" + (_peptideTotal > 0 ? " (" + _peptideTotal + ")" : "") + ":"));
-//        Assert.assertTrue(msg, isTextPresent("Samples" + (_samplesTotal > 0 ? " (" + _samplesTotal + ")" : "") + ":"));
-//    }
+    private void samplesWebpartTest()
+    {
+        log("Testing samples webpart");
+
+        clickTab("Materials");
+        waitForPageToLoad();
+        waitForText("Samples and Materials:");
+        String msg = "Sample type missing or sample count incorrect";
+
+        Assert.assertTrue(msg, isTextPresent("DNA_Oligos" + (_oligosTotal > 0 ? " (" + _oligosTotal + ")" : "") + ":"));
+        Assert.assertTrue(msg, isTextPresent("Peptides" + (_peptideTotal > 0 ? " (" + _peptideTotal + ")" : "") + ":"));
+        Assert.assertTrue(msg, isTextPresent("Samples" + (_samplesTotal > 0 ? " (" + _samplesTotal + ")" : "") + ":"));
+    }
 
     private void queryMetadataTest()
     {
