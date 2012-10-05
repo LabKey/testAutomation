@@ -413,11 +413,14 @@ public class StudyTest extends StudyBaseTest
         String pidsAfterEdit =   getFormElement(ID_FIELD);
         log("pids after edit: " + pidsAfterEdit);
 
-
-        Assert.assertEquals(newPids, pidsAfterEdit );
+        String[] arrPids = newPids.replace(" ","").split(","); Arrays.sort(arrPids);
+        String[] arrAfter = pidsAfterEdit.replace(" ","").split(","); Arrays.sort(arrAfter);
+        Assert.assertTrue(Arrays.deepEquals(arrPids, arrAfter));
 
         clickButtonContainingText("Cancel", 0);
     }
+
+
 
     // select the list name from the main classification page
     private void selectListName(String listName)
