@@ -94,7 +94,7 @@ public class ExperimentalFeaturesTest extends BaseSeleniumWebTest implements Dev
         ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(getProjectName(), "core", "Users"));
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
-        clickLinkWithText("view data");
+        clickLinkWithText(EMAIL_TEST_LIST);
         clickButton("Insert New");
         setFormElement("quf_user", CHECKED_USER);
         clickButton("Submit");
