@@ -167,7 +167,7 @@ public class DataViewsTester
 
             _test.clickButton("Save", 0);
 
-            Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + entry[0] + "')]/../../../..//img[@alt='" + entry[1] + "']");
+            Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + entry[0] + "')]/../../../../..//div//img[@alt='" + entry[1] + "']");
             _test.waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
             // visit the dataset page and make sure we inject the correct class onto the page
@@ -181,11 +181,16 @@ public class DataViewsTester
 
     private void clickCustomizeView(String viewName)
     {
-        Locator editLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + viewName + "')]/../../../..//span[contains(@class, 'edit-views-link')]");
+        Locator editLink = getEditLinkLocator(viewName);
         _test.waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.click(editLink);
         
         _test._extHelper.waitForExtDialog(viewName);
+    }
+
+    public static Locator getEditLinkLocator(String viewName)
+    {
+        return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(),'" + viewName + "')]/../../../../..//td//div//span[contains(@class, 'edit-views-link')]");
     }
 
     //Issue 12914: dataset browse web part not displaying data sets alphabetically

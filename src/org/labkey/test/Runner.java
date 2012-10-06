@@ -28,6 +28,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.PostgresOnlyTest;
@@ -436,6 +437,15 @@ public class Runner extends TestSuite
                         {
                             illegalTest = true;
                             System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                        }
+                        break;
+                    }
+                    if (i.getName().equals(DevModeOnlyTest.class.getCanonicalName()))
+                    {
+                        if(!"true".equals(System.getProperty("devMode")))
+                        {
+                            illegalTest = true;
+                            System.out.println("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
                         }
                         break;
                     }

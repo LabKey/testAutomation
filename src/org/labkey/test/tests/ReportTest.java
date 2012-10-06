@@ -1201,29 +1201,29 @@ public class ReportTest extends StudyBaseTest
         selectAllFilterGroups();
         waitForText("Showing 24 Results");
 
-        _ext4Helper.clickGridRowText("Not in any cohort", 0);
+        _ext4Helper.clickParticipantFilterGridRowText("Not in any cohort", 0);
         waitForText("Showing 0 Results");
 
         _ext4Helper.checkGridRowCheckbox(COHORT_1);
         waitForText("Showing 10 Results");
 
-        _ext4Helper.clickGridRowText(COHORT_2, 0);
+        _ext4Helper.clickParticipantFilterGridRowText(COHORT_2, 0);
         waitForText("Showing 14 Results");
 
         // Selecting all or none of an entire category should not filter report
-        _ext4Helper.clickGridRowText(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
         waitForText("Showing 6 Results");
         _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
         waitForText("Showing 14 Results");
-        _ext4Helper.clickGridRowText(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
         waitForText("Showing 6 Results");
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0); // click category
         waitForText("Showing 14 Results");
 
         //Check intersection between cohorts and multiple categories
-        _ext4Helper.clickGridRowText(MICE_A, 0);
+        _ext4Helper.clickParticipantFilterGridRowText(MICE_A, 0);
         waitForText("Showing 3 Results");
-        _ext4Helper.clickGridRowText(SPECIMEN_GROUP_TWO, 1); // click group, not category with the same name
+        _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 1); // click group, not category with the same name
         waitForText("Showing 1 Results");
 
         selectAllFilterGroups();
@@ -1254,29 +1254,29 @@ public class ReportTest extends StudyBaseTest
         selectAllFilterGroups();
         waitForText("Found 138 mice of 138.");
 
-        _ext4Helper.clickGridRowText("Not in any cohort", 0);
+        _ext4Helper.clickParticipantFilterGridRowText("Not in any cohort", 0);
         waitForText("Found 113 mice of 138.");
 
         _ext4Helper.checkGridRowCheckbox(COHORT_1);
         waitForText("Found 123 mice of 138.");
 
-        _ext4Helper.clickGridRowText(COHORT_2, 0);
+        _ext4Helper.clickParticipantFilterGridRowText(COHORT_2, 0);
         waitForText("Found 15 mice of 138.");
 
         // Selecting all or none of an entire category should not filter report
-        _ext4Helper.clickGridRowText(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1);
         waitForText("Found 7 mice of 138.");
         _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1);
         waitForText("Found 15 mice of 138.");
-        _ext4Helper.clickGridRowText(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1);
         waitForText("Found 7 mice of 138.");
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
         waitForText("Found 15 mice of 138.");
 
         //Check intersection between cohorts and multiple categories
-        _ext4Helper.clickGridRowText(MICE_A, 0);
+        _ext4Helper.clickParticipantFilterGridRowText(MICE_A, 0);
         waitForText("Found 3 mice of 138.");
-        _ext4Helper.clickGridRowText(SPECIMEN_GROUP_TWO, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 1);
         waitForText("Found 1 mouse of 138.");
 
         setFormElement(Locator.id("participantsDiv1.filter"), PTIDS_ONE[0]);
@@ -1695,9 +1695,9 @@ public class ReportTest extends StudyBaseTest
         saveScatterPlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
     }
 
-    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200Group 1Group 2";
-    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200normalabnormal/insignificantabnormal/significant";
-    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200Group 1Group 2normalabnormal/insignificantabnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200 Group 1 Group 2";
+    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200 normal abnormal/insignificant abnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200 Group 1 Group 2 normal abnormal/insignificant abnormal/significant";
 
     @LogMethod
     private void doCustomizeScatterPlotTest()

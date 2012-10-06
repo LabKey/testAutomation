@@ -222,7 +222,7 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText("No matching Mice");
 
         //Mouse down on GROUP 1
-        _ext4Helper.clickGridRowText(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1);
         waitForText("Found 10 mice of 138.");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -232,7 +232,7 @@ public class StudyRedesignTest extends StudyBaseTest
         }
 
         //Mouse down GROUP 2
-        _ext4Helper.clickGridRowText(PARTICIPANT_GROUP_TWO, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_TWO, 1);
         waitForText("Found 1 mouse of 138.");
 
         //Mouse down on GROUP 1 to remove it.

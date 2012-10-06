@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.DataRegionTable;
 
 /**
@@ -55,6 +56,7 @@ public class UserTest extends SecurityTest
 //        simplePasswordResetTest();
 //        changeUserEmailTest();
         deactivatedUserTest();
+        addCustomPropertiesTest();
     }
 
 
@@ -263,5 +265,62 @@ public class UserTest extends SecurityTest
         click(details);
 
         waitForPageToLoad(30000);
+    }
+
+    private static final String PROP_NAME1 = "Institution";
+    private static final String PROP_NAME2 = "InstitutionId";
+
+    private void addCustomPropertiesTest()
+    {
+        goToSiteUsers();
+        clickButton("Change User Properties");
+
+        waitForText("Add Field");
+        int firstIdx = findLastUserCustomField();
+        addField("Field Properties", firstIdx++, PROP_NAME1, PROP_NAME1, ListHelper.ListColumnType.String);
+        addField("Field Properties", firstIdx, PROP_NAME2, PROP_NAME2, ListHelper.ListColumnType.Integer);
+
+        try {
+            clickButton("Save");
+
+            assertTextPresent(PROP_NAME1, PROP_NAME2);
+
+            navigateToUserDetails(NORMAL_USER);
+            assertTextPresent(PROP_NAME1, PROP_NAME2);
+
+            clickButton("Edit");
+            assertTextPresent(PROP_NAME1, PROP_NAME2);
+            clickButton("Cancel");
+        }
+        finally
+        {
+            goToSiteUsers();
+            clickButton("Change User Properties");
+
+            waitForText("Add Field");
+
+            deleteField("Field Properties", firstIdx--);
+            deleteField("Field Properties", firstIdx);
+
+            clickButton("Save");
+        }
+    }
+
+    /**
+     * Helper to find the last custom property in the section, just so we don't stomp on any that were added manually.
+     */
+    private int findLastUserCustomField()
+    {
+        for (int i = 15; i > 6; i--)
+        {
+            String prefix = getPropertyXPath("Field Properties");
+            Locator field = Locator.xpath(prefix + "//input[@name='ff_name" + i + "']");
+
+            if (isElementPresent(field))
+                return i+1;
+        }
+        // there are currently 6 default non-editable fields, without any customizations, the first
+        // field would be 7th.
+        return 7;
     }
 }

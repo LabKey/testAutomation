@@ -144,7 +144,7 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Click the text of an Ext4 grid row
-     * Currently used only for participant filter panel
+     * Currently used only for time chart measure picker
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
@@ -153,6 +153,18 @@ public class Ext4Helper extends AbstractHelper
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
         _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-cell')][string() = '"+cellText+"']"));
+    }
+
+    /**
+     * Click the text of an Participant filter panel grid row
+     * Currently used only for participant filter panel
+     * @param cellText Exact text from any cell in the desired row
+     * @param index 0-based index of rows with matching cellText
+     */
+    public void clickParticipantFilterGridRowText(String cellText, int index)
+    {
+        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][string() = '"+cellText+"']"));
     }
 
     /**
