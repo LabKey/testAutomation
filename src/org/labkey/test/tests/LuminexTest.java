@@ -524,7 +524,7 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.addCustomizeViewColumn("TitrationId/Name");
         _customizeViewsHelper.applyCustomView();
 
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = new DataRegionTable("query", this, false);
         table.setFilter("TitrationId/Name", "Equals One Of (e.g. \"a;b;c\")", "Standard1;Standard2");
 
         List<String> analyte = table.getColumnDataAsText("Analyte");
@@ -584,7 +584,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // expect to already be viewing CurveFit query
         assertTextPresent(TEST_ASSAY_LUM + " CurveFit");
 
-        table = new DataRegionTable("query", this);
+        table = new DataRegionTable("query", this, false);
         table.setFilter("FailureFlag", "Equals", "true");
 
         // expect one 4PL curve fit failure (for Standard1 - ENV6 (97))
