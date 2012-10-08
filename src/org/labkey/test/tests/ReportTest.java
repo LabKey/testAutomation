@@ -188,9 +188,10 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void openFirstRReport()
     {
-        Locator l =Locator.xpath("//tr[td/div/div/a[text()=' Author report']]/td/div/span");
+        Locator l = Locator.linkContainingText(AUTHOR_REPORT);
         waitForElement(l);
         click(l);
+        waitForPageToLoad();
         waitForText("Share this report with all users");
     }
 
