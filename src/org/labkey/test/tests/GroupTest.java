@@ -51,10 +51,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
     protected void doCleanup()
     {
-        for(String user : TEST_USERS_FOR_GROUP)
-        {
-            deleteUser(user);
-        }
+        deleteUsers(false, TEST_USERS_FOR_GROUP);
         try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(COMPOUND_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(BAD_GROUP);}catch(Throwable t){/*ignore*/}

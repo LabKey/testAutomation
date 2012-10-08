@@ -5480,10 +5480,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     private void deleteAllUsersFromGroup()
     {
-        Locator l = Locator.xpath("//td/a/span[text()='remove']");
+        Locator.XPathLocator l = Locator.xpath("//td/a/span[text()='remove']");
 
         while(isElementPresent(l))
+        {
+            int i = getXpathCount(l);
             click(l);
+            waitForElementToDisappear(l.index(i), WAIT_FOR_JAVASCRIPT);
+        }
     }
 
 
