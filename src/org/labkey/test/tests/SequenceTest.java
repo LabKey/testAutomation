@@ -446,16 +446,17 @@ public class SequenceTest extends LabModulesTest
 
         //NOTE: this is going to be sensitive to the ordering of params by the DataRegion.  May need a more robust
         //approach if that is variable.
-        StringBuilder filterText = new StringBuilder("readset IS ONE OF (");
         dr.checkCheckbox(1);
-        filterText.append(dr.getDataAsText(1, "Readset Id") + ", ");
+        String id1 = dr.getDataAsText(1, "Readset Id");
         dr.checkCheckbox(2);
-        filterText.append(dr.getDataAsText(2, "Readset Id") + ")");
+        String id2 = dr.getDataAsText(2, "Readset Id");
 
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "View Analyses");
         waitForPageToLoad();
         waitForText("Analysis Type"); //proxy for dataRegion loading
-        assertTextPresent(filterText.toString());
+
+        assertTextPresent("readset IS ONE OF (");
+        Assert.assertTrue("Filter not applied correct", (isTextPresent(id1 + ", " + id2) || isTextPresent(id2 + ", " + id1)));
 
         log("Verifying Readset Edit");
         goToProjectHome();

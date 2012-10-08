@@ -26,6 +26,7 @@ import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,10 +49,12 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
     private int _samplesTotal = 0;
     private int _peptideTotal = 0;
 
+    private String IMPORT_DATA_TEXT = "Import Data";
+
     @Override
     protected String getProjectName()
     {
-        return "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES; //INJECT_CHARS_1;
+        return "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     public LabModulesTest()
@@ -119,31 +122,33 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         impersonateRole("Reader");
         _helper.goToLabHome();
 
-        _helper.verifyNavPanelRowItemPresent("Sequence Data:");
+        _helper.verifyNavPanelRowItemPresent("Sequence:");
 
         for(Pair<String, String> pair : getAssaysToCreate())
         {
-            _helper.verifyNavPanelRowItemPresent(pair.getValue() + " Data:");
-            assertElementNotPresent(LabModuleHelper.getNavPanelItem(pair.getValue() + " Data:", "Import Data"));
+            _helper.verifyNavPanelRowItemPresent(pair.getValue() + ":");
+            assertElementNotPresent(LabModuleHelper.getNavPanelItem(pair.getValue() + ":", IMPORT_DATA_TEXT));
         }
 
         _helper.verifyNavPanelRowItemPresent("DNA_Oligos:");
-        assertElementNotPresent(LabModuleHelper.getNavPanelItem("DNA_Oligos:", "Import Data"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelItem("DNA_Oligos:", IMPORT_DATA_TEXT));
 
         _helper.verifyNavPanelRowItemPresent("Peptides:");
-        assertElementNotPresent(LabModuleHelper.getNavPanelItem("Peptides:", "Import Data"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelItem("Peptides:", IMPORT_DATA_TEXT));
 
         _helper.verifyNavPanelRowItemPresent("Samples:");
-        assertElementNotPresent(LabModuleHelper.getNavPanelItem("Samples:", "Import Data"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelItem("Samples:", IMPORT_DATA_TEXT));
 
         //now try UI will normal permissions
         stopImpersonatingRole();
         _helper.goToLabHome();
 
-        _helper.clickNavPanelItem("Sequence Data:", "Import Data");
-        assertElementPresent(Ext4Helper.ext4MenuItem("Import Sequence Files"));
-        _ext4Helper.clickExt4MenuItem("Import Readsets");
-        waitForElement(Ext4Helper.ext4Window("Import Sequence Data"));
+        _helper.clickNavPanelItem("Sequence:", IMPORT_DATA_TEXT);
+        assertElementPresent(Ext4Helper.ext4MenuItem("Create Readsets"));
+        assertElementPresent(Ext4Helper.ext4MenuItem("Upload Raw Data"));
+
+        _ext4Helper.clickExt4MenuItem("Create Readsets");
+        waitForElement(Ext4Helper.ext4Window("Create Readsets"));
         waitForElement(Locator.ext4Button("Close"));
         click(Locator.ext4Button("Close"));
 
@@ -151,14 +156,14 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
     private void labToolsWebpartTest()
     {
-        click(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Data']"));
-        assertElementPresent(Ext4Helper.ext4MenuItem("Sequence Data"));
+        waitAndClick(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Data']"));
+        assertElementPresent(Ext4Helper.ext4MenuItem("Sequence"));
         for(Pair<String, String> pair : getAssaysToCreate())
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(pair.getValue()));
         }
 
-        click(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']"));
+        waitAndClick(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']"));
         for (String s : getSampleItems())
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(s));
@@ -200,6 +205,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(s));
         }
+        //NOTE: we are in a workbook here
         _ext4Helper.clickExt4MenuItem("DNA_Oligos");
         waitForPageToLoad();
         waitForElement(Locator.name("name"));
@@ -224,7 +230,10 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         log("Testing DNA Oligos Table");
         _helper.goToLabHome();
 
-        _helper.clickNavPanelItem("DNA_Oligos:", "Import Data");
+        _helper.clickNavPanelItem("DNA_Oligos:", IMPORT_DATA_TEXT);
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitAndClick(Locator.ext4Button("Submit"));
+
         waitForElement(Locator.name("purification"));
 
         setText("name", "TestPrimer1");
@@ -280,8 +289,13 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         log("Testing Samples Table");
         _helper.goToLabHome();
 
-        _helper.clickNavPanelItem("Samples:", "Import Data");
+        _helper.clickNavPanelItem("Samples:", IMPORT_DATA_TEXT);
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitAndClick(Locator.ext4Button("Submit"));
+
         waitForElement(Locator.name("samplespecies"));
+
+        verifyFreezerColOrder();
 
         _helper.setFormField("samplename", "SampleName");
         _helper.setFormField("samplespecies", "Species");
@@ -330,6 +344,9 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
      */
     private void urlGenerationTest() throws UnsupportedEncodingException
     {
+        log("Testing DataRegion URL generation");
+        _helper.goToLabHome();
+
         //insert dummy data:
         String[] workbookIds = new String[3];
         Integer i = 0;
@@ -352,38 +369,58 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         {
             //first record for each workbook
             int rowNum = dr.getRow("Folder", "Workbook" + i);
-            String container = getProjectName() + "/workbook-" + workbookIds[i];
+            String workbook = getProjectName() + "/workbook-" + workbookIds[i];
 
-//TODO: most of these links are broken due to Issue 15829
-//            //details link
-//            String href = URLDecoder.decode(getAttribute(Locator.linkWithText("details", rowNum), "href"), "UTF-8");
-//            Assert.assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
-//                    href.contains("/query/" + getProjectName() + "/recordDetails.view?"));
-//
-//            //update link
-//            href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit", rowNum), "href"), "UTF-8");
-//            Assert.assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
-//                    href.contains("/query/" + container + "/manageRecord.view?"));
-//
-//            //sample source
-//            href = URLDecoder.decode(getAttribute(Locator.linkWithText("Blood", rowNum), "href"), "UTF-8");
-//            Assert.assertTrue("Expected sample source column URL to go to " + getProjectName() + " container, href=" + href,
-//                    href.contains("/query/" + container + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_source?"));
-//
-//            //sample type
-//            href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
-//            Assert.assertTrue("Expected sample type column URL to go to " + getProjectName() + " container, href=" + href,
-//                    href.contains("/query/" + container + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type?"));
-//
-//            //container column
-//            href = URLDecoder.decode(getAttribute(Locator.linkWithText("Workbook" + i), "href"), "UTF-8");
-//            Assert.assertTrue("Expected container column to go to " + getProjectName() + " container, href=" + href,
-//                    href.contains("/project/" + container + "/start.view?"));
-//
+            //NOTE: these URLs should point to the workbook where the record was created, not the current folder
+
+            //details link
+            String href = URLDecoder.decode(getAttribute(Locator.linkWithText("details", rowNum), "href"), "UTF-8");
+            Assert.assertTrue("Expected [details] link to go to the container: " + workbook + ", href was: " + href,
+                    href.contains(workbook));
+
+            //update link
+            href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit", rowNum), "href"), "UTF-8");
+            Assert.assertTrue("Expected [edit] link to go to the container: " + workbook + ", href was: " + href,
+                    href.contains("/query/" + workbook + "/manageRecord.view?"));
+
+            //sample source: this is the current container
+            href = URLDecoder.decode(getAttribute(Locator.linkWithText("Blood", rowNum), "href"), "UTF-8");
+            Assert.assertTrue("Expected sample source column URL to go to the container: " + getProjectName() + ", href was: " + href,
+                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_source&source=Blood"));
+
+            //sample type
+            href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
+            Assert.assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href,
+                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type&type=DNA"));
+
+            //container column
+            href = URLDecoder.decode(getAttribute(Locator.linkWithText("Workbook" + i), "href"), "UTF-8");
+            Assert.assertTrue("Expected container column to go to the container: " + workbook + ", href was:" + href,
+                    href.contains("/project/" + workbook + "/start.view?"));
+
             i++;
         }
 
-        //TODO: click through on DetailsURL and test detailsPanel
+        //Test DetailsPanel:
+        log("Testing details panel");
+        dr.clickLink(1, 1);
+        waitForPageToLoad();
+        waitForText("Back");
+        assertTextPresent("Sample1", "DNA", "Blood", "Freezer:");
+
+        verifyFreezerColOrder();
+    }
+
+    private void verifyFreezerColOrder()
+    {
+        //NOTE: we expect these columns to respect the order defined in the schema XML file
+        log("Verifying freezer column order");
+        assertTextBefore("Location", "Freezer");
+        assertTextBefore("Freezer", "Cane");
+        assertTextBefore("Cane", "Box");
+        assertTextBefore("Box", "Row");
+        assertTextBefore("Row", "Column");
+        assertTextBefore("Column", "Parent Sample");
     }
 
     private  void insertDummySampleRow(String suffix)
@@ -391,8 +428,10 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         Locator locator = Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']");
         waitForElement(locator);
         click(locator);
+        //NOTE: we are in a workbook
         _ext4Helper.clickExt4MenuItem("Samples");
         waitForPageToLoad();
+
         waitForElement(Locator.name("freezer"));
         _helper.setFormField("samplename", "Sample" + suffix);
         _helper.setFormField("freezer", "freezer_" + _helper.getRandomInt());
@@ -410,28 +449,6 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         waitForPageToLoad();
 
         _helper.goToLabHome();
-
-//        try
-//        {
-//            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-//            InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "samples");
-//            Map<String,Object> rowMap = new HashMap<String,Object>();
-//            rowMap.put("samplename", "Sample" + suffix);
-//            rowMap.put("freezer", "freezer");
-//            rowMap.put("sampletype", "DNA");
-//            rowMap.put("samplesource", "Blood");
-//
-//            insertCmd.addRow(rowMap);
-//            insertCmd.execute(cn, containerPath);
-//        }
-//        catch (CommandException e)
-//        {
-//            throw new RuntimeException(e);
-//        }
-//        catch (IOException e)
-//        {
-//            throw new RuntimeException(e);
-//        }
     }
 
     private void peptideTableTest()
@@ -439,7 +456,10 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         log("Testing Peptide Table");
         _helper.goToLabHome();
 
-        _helper.clickNavPanelItem("Peptides:", "Import Data");
+        _helper.clickNavPanelItem("Peptides:", IMPORT_DATA_TEXT);
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitAndClick(Locator.ext4Button("Submit"));
+
         waitForElement(Locator.name("sequence"));
 
         String sequence = "Sv LFpT LLF";
