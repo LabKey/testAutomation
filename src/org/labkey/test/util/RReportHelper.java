@@ -53,6 +53,7 @@ public class RReportHelper extends AbstractHelper
      * Execute an R script and verify the specified text is present.
      * @return - true if the test result was present
      */
+    @LogMethod
     public boolean executeScript(String script, String verify, boolean failOnError)
     {
         _test.log("execute script");
@@ -103,6 +104,7 @@ public class RReportHelper extends AbstractHelper
      * directory. In order to install any dependent packages: (RCurl, rjson), an installation from the CRAN repository
      * is performed first, then if the local flag has been set, the local package is installed over the top.
      */
+    @LogMethod
     public void installRlabkey(boolean local)
     {
         if (executeScript(INSTALL_RLABKEY, null, true))
@@ -124,6 +126,7 @@ public class RReportHelper extends AbstractHelper
             Assert.fail("Unable to install the base Rlabkey package and dependencies.");
     }
 
+    @LogMethod
     public boolean ensureRConfig()
     {
         _test.ensureAdminMode();
@@ -223,6 +226,7 @@ public class RReportHelper extends AbstractHelper
         return false;
     }
 
+    @LogMethod
     public void deleteEngine()
     {
         if (_test.isREngineConfigured())
@@ -240,6 +244,7 @@ public class RReportHelper extends AbstractHelper
         }
     }
 
+    @LogMethod
     public void saveReport(String name)
     {
         _test.clickLinkWithText("Source", false);
