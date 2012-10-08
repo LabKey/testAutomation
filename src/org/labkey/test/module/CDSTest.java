@@ -77,6 +77,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     }
 
     @Override
+    public boolean isFileUploadTest()
+    {
+        return true;
+    }
+
+    @Override
     public void doTestSteps()
     {
         setupProject();
