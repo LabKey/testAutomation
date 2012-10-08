@@ -5568,6 +5568,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             assertTextPresent(displayNames);
             assertTextPresent("permanently delete");
             clickButton("Permanently Delete");
+            assertTextNotPresent(userEmails);
         }
     }
 

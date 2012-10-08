@@ -51,10 +51,10 @@ public class UserTest extends SecurityTest
     {
         super.doTestStepsSetDetph(true);
 
-//        siteUsersTest();
-//        requiredFieldsTest();
-//        simplePasswordResetTest();
-//        changeUserEmailTest();
+        siteUsersTest();
+        requiredFieldsTest();
+        simplePasswordResetTest();
+        changeUserEmailTest();
         deactivatedUserTest();
         addCustomPropertiesTest();
     }
@@ -67,8 +67,7 @@ public class UserTest extends SecurityTest
         checkRequiredField("FirstName", false);
         clickButton("Save");
 
-        deleteUser(NORMAL_USER2);
-        deleteUser(NORMAL_USER2_ALTERNATE);
+        deleteUsers(false, NORMAL_USER2, NORMAL_USER2_ALTERNATE);
     }
 
     private void siteUsersTest()
@@ -128,6 +127,7 @@ public class UserTest extends SecurityTest
         usersTable.checkCheckbox(row);
         clickButton("Deactivate");
         clickButton("Deactivate");
+        assertTextNotPresent(NORMAL_USER);
 
         log("Deactivated users shouldn't show up in issues 'Assign To' list");
         clickLinkWithText(getProjectName());
@@ -137,6 +137,20 @@ public class UserTest extends SecurityTest
         assertTextNotPresent(displayNameFromEmail(NORMAL_USER));
         assertElementPresent(Locator.css("#assignedTo option[value="+adminUserId+"]"));
         assertTextPresent(displayNameFromEmail(PROJECT_ADMIN_USER));
+
+        log("Reactivate user");
+        goToSiteUsers();
+        assertTextNotPresent(NORMAL_USER);
+        clickLinkWithText("include inactive users");
+        usersTable = new DataRegionTable("Users", this, true, true);
+        row = usersTable.getRow("Email", NORMAL_USER);
+        Assert.assertEquals(NORMAL_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
+        usersTable.checkCheckbox(row);
+        clickButton("Re-Activate");
+        clickButton("Re-activate");
+        usersTable = new DataRegionTable("Users", this, true, true);
+        row = usersTable.getRow("Email", NORMAL_USER);
+        Assert.assertEquals(NORMAL_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));
     }
 
     /**if user NORMAL_USER2 does not exist, create them,
