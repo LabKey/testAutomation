@@ -16,8 +16,10 @@
 
 package org.labkey.test.tests;
 
+import com.sun.istack.internal.NotNull;
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
@@ -173,7 +175,8 @@ public class ReportTest extends StudyBaseTest
     {
         clickTab("Clinical and Assay Data");
         clickWebpartMenuItem("Data Views", false, "Customize");
-        openFirstRReport();
+        DataViewsTester.clickCustomizeView(AUTHOR_REPORT, this);
+        assertTextPresent("Share this report with all users");
 
         //set change thumbnail
 //        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
@@ -183,16 +186,6 @@ public class ReportTest extends StudyBaseTest
         clickButtonByIndex("Save", 1, 0);
 
         //no way to verify, unfortunately
-    }
-
-    @LogMethod
-    private void openFirstRReport()
-    {
-        Locator l = Locator.linkContainingText(AUTHOR_REPORT);
-        waitForElement(l);
-        click(l);
-        waitForPageToLoad();
-        waitForText("Share this report with all users");
     }
 
     @LogMethod
@@ -413,7 +406,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
-        createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true);
+        createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
         stopImpersonating();
         popLocation();
 
@@ -520,11 +513,18 @@ public class ReportTest extends StudyBaseTest
      * @param shareSource if so, should they be able to see the source (ignored if share is false)
      */
     @LogMethod
-    private void createRReport(String name, String scriptValue, boolean share, boolean shareSource)
+    private void createRReport(String name, String scriptValue, boolean share, boolean shareSource, @NotNull String[] sharedScripts)
     {
 
         clickMenuButton("Views", "Create", "R View");
         setQueryEditorValue("script", scriptValue);
+
+        // if there are any shared scripts, check the check box so they get included when the report is rendered
+        if (sharedScripts != null && sharedScripts.length > 0)
+        {
+            for (String script : sharedScripts)
+                click(Locator.raw("//td[contains(text(),'" + script + "')]/input"));
+        }
 
         if(share)
         {

@@ -160,7 +160,7 @@ public class DataViewsTester
 
         for (String[] entry : datasets)
         {
-            clickCustomizeView(entry[0]);
+            clickCustomizeView(entry[0], _test);
 
 //            Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
             _test._ext4Helper.selectComboBoxItem("Status", entry[1]);
@@ -179,13 +179,13 @@ public class DataViewsTester
         }
     }
 
-    private void clickCustomizeView(String viewName)
+    public static void clickCustomizeView(String viewName, BaseSeleniumWebTest test)
     {
         Locator editLink = getEditLinkLocator(viewName);
-        _test.waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.click(editLink);
+        test.waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        test.click(editLink);
         
-        _test._extHelper.waitForExtDialog(viewName);
+        test._extHelper.waitForExtDialog(viewName);
     }
 
     public static Locator getEditLinkLocator(String viewName)
