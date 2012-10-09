@@ -83,15 +83,6 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _containerHelper.createProject(getProjectName(), "Laboratory Folder");
         enableModules(getEnabledModules(), true);
 
-        //insert initial values into tables
-        waitForElement(Locator.xpath("//img[@src='" + getContextPath() + "/study/tools/settings.png']"));
-        clickLink(Locator.xpath("//img[@src='" + getContextPath() + "/study/tools/settings.png']"));
-        clickLinkWithText("Initialize Module");
-        click(Locator.extButton("Delete All"));
-        waitForText("Delete Complete");
-        click(Locator.extButton("Populate All"));
-        waitForText("Insert Complete");
-
         setupAssays();
     }
 
@@ -386,7 +377,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
             //sample source: this is the current container
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("Blood", rowNum), "href"), "UTF-8");
             Assert.assertTrue("Expected sample source column URL to go to the container: " + getProjectName() + ", href was: " + href,
-                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_source&source=Blood"));
+                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type&type=Blood"));
 
             //sample type
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
