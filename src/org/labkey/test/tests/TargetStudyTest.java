@@ -171,7 +171,7 @@ public class TargetStudyTest extends AbstractAssayTest
 
         clickLinkWithText("Assay List");
         clickLinkWithText(ASSAY_NAME);
-
+        clickLinkContainingText("XLS");
         clickButton("Import Data");
 
         selenium.type("name", TEST_RUN1);
