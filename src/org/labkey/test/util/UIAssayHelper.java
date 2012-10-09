@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,5 +57,11 @@ public class UIAssayHelper extends AbstractAssayHelper
 
 
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException
+    {
+        importAssay(assayName, file, projectPath); //UI doesn't need to worry about the batch properties, it's done automatically
     }
 }

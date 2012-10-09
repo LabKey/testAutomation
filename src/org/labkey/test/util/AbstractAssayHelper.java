@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import java.awt.image.LookupTable;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -108,4 +109,5 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     }
 
 
+    public abstract void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 }

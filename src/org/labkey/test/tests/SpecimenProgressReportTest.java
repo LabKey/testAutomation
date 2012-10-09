@@ -3,15 +3,15 @@ package org.labkey.test.tests;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
+import org.junit.Assert;
 import org.labkey.test.util.UIAssayHelper;
-import org.testng.Assert;
 
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +34,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     @Override
     protected String getProjectName()
     {
-        return "Foo";
+        //Issue 16247: tricky characters in project name cause alert when trying to add a lookup to a rho query in the folder
+        return "Specimen Progress Report Test"; //+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     public boolean isFileUploadTest()
@@ -45,7 +46,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        _assayHelper = new UIAssayHelper(this); //todo:  would like to use api, need to see if batch fields are necessary
+        _assayHelper = new UIAssayHelper(this);
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), studyFolder, "Study");
         importFolderFromZip(STUDY_PIPELINE_ROOT + "/Study.folder.zip");
@@ -64,20 +65,16 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         Locator.XPathLocator table = Locator.xpath("//table[@id='dataregion_ProgressReport']");//Locator.xpath("//table[contains(@class,'labkey-data-region')]");
         waitForElement(table);
-//        getSimpleTableCell(table, 4,3);
-        Assert.assertTrue(getAttribute(getSimpleTableCell(table, 3, 4), "style").contains("green"));
-        Assert.assertTrue(getAttribute(getSimpleTableCell(table, 3,5), "style").contains("red"));
-        Assert.assertTrue(getAttribute(getSimpleTableCell(table, 4,11), "style").contains("orange"));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:green')]")));
+        Assert.assertEquals(21, getXpathCount( Locator.xpath("//td[contains(@style, 'background:red')]")));
+        Assert.assertEquals(1, getXpathCount( Locator.xpath("//td[contains(@style, 'background:orange')]")));
+        Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
 
         flagSpecimenForReview();
 
-//        _ext4Helper.selectRadioButtonByText("PCR");
         waitForElement(table);
-        Assert.assertTrue(getAttribute(getSimpleTableCell(table, 4,12), "style").contains("flagged.png"));
-        Assert.assertTrue(getAttribute(getSimpleTableCell(table, 4,12), "style").contains("yellow"));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
 
-//        clic
-//            _customizeViewsHelper.addCustomizeViewColumn("flag", "Flag");
     }
 
     private void flagSpecimenForReview()
@@ -100,10 +97,10 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + "/assays/PCR.xar", ++pipelineCount, "PCR");
         assay1File = "PCR Data.tsv";
-        _assayHelper.importAssay("PCR", STUDY_PIPELINE_ROOT + "/assays/" + assay1File,  getProjectName() + "/" + assayFolder );
+        _assayHelper.importAssay("PCR", STUDY_PIPELINE_ROOT + "/assays/" + assay1File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
         clickLinkWithText(assayFolder);
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + "/assays/RNA.xar", ++pipelineCount, "RNA");
-        _assayHelper.importAssay("RNA", STUDY_PIPELINE_ROOT + "/assays/RNA Data.tsv",  getProjectName() + "/" + assayFolder );
+        _assayHelper.importAssay("RNA", STUDY_PIPELINE_ROOT + "/assays/RNA Data.tsv",  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
 
 
         clickLinkWithText(assayFolder);
