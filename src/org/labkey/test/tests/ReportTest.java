@@ -1808,13 +1808,7 @@ public class ReportTest extends StudyBaseTest
         assertTextNotPresent("Error");
         // test use-case to navigate to query page on click
         clickButton("Enable", 0);
-        // TODO: after merge to trunk change this to use the scatterPlotPointClickTestFn.js file contents
-        //String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
-        String function = "function (data, measureInfo, clickEvent) {\n"
-           + "   var queryHref = LABKEY.ActionURL.buildURL('query', 'executeQuery', LABKEY.container.path,\n"
-           + "                   {schemaName: measureInfo[\"schemaName\"], \"query.queryName\": measureInfo[\"queryName\"]});\n"
-           + "   window.location = queryHref;\n"
-           + "}";
+        String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
         setFormElement("point-click-fn-textarea", function);
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         saveScatterPlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn");
