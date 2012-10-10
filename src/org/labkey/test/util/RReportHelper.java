@@ -130,7 +130,7 @@ public class RReportHelper extends AbstractHelper
     public boolean ensureRConfig()
     {
         _test.ensureAdminMode();
-        // user need to be added to the site develpers group
+        // user need to be added to the site developers group
         // createSiteDeveloper(PasswordUtil.getUsername());
 
         _test.goToAdminConsole();
