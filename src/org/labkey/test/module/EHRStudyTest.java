@@ -557,17 +557,17 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         assertFormElementEquals("distinctValues", PROTOCOL_MEMBER_IDS[0]+"\n"+PROTOCOL_MEMBER_IDS[1]+"\n"+PROTOCOL_MEMBER_IDS[2]);
         clickButton("Close", 0);
 
-        //TODO: re-enable once we figure out why is there's still 'Loading...' present on the page
-//        log("Return Distinct Values - filtered");
-//        setFilterAndWait(dataRegionName, "Id", "Does Not Equal", PROTOCOL_MEMBER_IDS[1], 0);
-//        waitForText("Filter: (Id <> " + PROTOCOL_MEMBER_IDS[1], WAIT_FOR_JAVASCRIPT);
-//        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
-//        _extHelper.waitForExtDialog("Return Distinct Values");
-//        _extHelper.selectComboBoxItem("Select Field", "Animal Id");
-//        clickButton("Submit", 0);
-//        _extHelper.waitForExtDialog("Distinct Values");
-//        assertFormElementEquals("distinctValues", PROTOCOL_MEMBER_IDS[0]+"\n"+PROTOCOL_MEMBER_IDS[2]);
-//        clickButton("Close", 0);
+        log("Return Distinct Values - filtered");
+        waitForTextToDisappear("Loading...");
+        setFilterAndWait(dataRegionName, "Id", "Does Not Equal", PROTOCOL_MEMBER_IDS[1], 0);
+        waitForText("Filter: (Id <> " + PROTOCOL_MEMBER_IDS[1], WAIT_FOR_JAVASCRIPT);
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
+        _extHelper.waitForExtDialog("Return Distinct Values");
+        _extHelper.selectComboBoxItem("Select Field", "Animal Id");
+        clickButton("Submit", 0);
+        _extHelper.waitForExtDialog("Distinct Values");
+        assertFormElementEquals("distinctValues", PROTOCOL_MEMBER_IDS[0]+"\n"+PROTOCOL_MEMBER_IDS[2]);
+        clickButton("Close", 0);
 
         log("Compare Weights - no selection");
         uncheckAllOnPage(dataRegionName);
