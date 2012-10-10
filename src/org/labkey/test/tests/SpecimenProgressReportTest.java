@@ -35,7 +35,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     protected String getProjectName()
     {
         //Issue 16247: tricky characters in project name cause alert when trying to add a lookup to a rho query in the folder
-        return "Specimen Progress Report Test"; //+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        return "Specimen Progress Report Test" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     public boolean isFileUploadTest()
