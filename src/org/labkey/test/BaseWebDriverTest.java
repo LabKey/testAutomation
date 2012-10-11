@@ -4738,7 +4738,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
         {
-            executeScript("arguments[0].value = arguments[1]", el, text.substring(0, text.length()-2));
+            executeScript("arguments[0].value = arguments[1]", el, text.substring(0, text.length()-1));
             //Retype the last character manually to trigger events
             el.sendKeys(text.substring(text.length()-1));
         }

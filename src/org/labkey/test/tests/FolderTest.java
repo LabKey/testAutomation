@@ -15,15 +15,14 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 
 /**
  * User: Nick
  * Date: May 5, 2011
  */
-public class FolderTest extends BaseSeleniumWebTest
+public class FolderTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "FolderTest#Project";
     private static final String WIKITEST_NAME = "WikiTestFolderCreate";
@@ -65,7 +64,7 @@ public class FolderTest extends BaseSeleniumWebTest
     protected void createFolders()
     {
         // Initialize the Creation Wiki
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         addWebPart("Wiki");
 
         createNewWikiPage();
@@ -84,7 +83,7 @@ public class FolderTest extends BaseSeleniumWebTest
     protected void moveFolders()
     {
         log("Moving Folders");
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         goToFolderManagement();
         waitForExt4FolderTreeNode(PROJECT_NAME, 10000);
 
@@ -125,7 +124,7 @@ public class FolderTest extends BaseSeleniumWebTest
 //
 //        log("Illegal folder move test: Project demotion");
 //        moveFolder(PROJECT_NAME, "home", false, false);
-//        _extHelper.waitForExtDialog(this, "Change Display Order");  // it should only give option to reorder projects
+//        _extHelper.waitForExtDialog("Change Display Order");  // it should only give option to reorder projects
 //        clickButton("Cancel", 0);
 //
 //        log("Illegal folder move test: Folder promotion");
@@ -155,9 +154,9 @@ public class FolderTest extends BaseSeleniumWebTest
 //        log("Illegal multiple folder move: non-siblings");
 //        expandFolderNode("A");
 //        expandFolderNode("B");
-//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[A]/[AA]', false)");
+//        _extHelper.selectFolderManagementTreeItem(PROJECT_NAME + "/[A]/[AA]", false);
 //        sleep(100);
-//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[B]/[BA]', true)");
+//        _extHelper.selectFolderManagementTreeItem(PROJECT_NAME + "/[B]/[BA]", true);
 //        sleep(500);
 //        moveFolder("[AA]", "[C]", false, true);
 //        waitForExtMaskToDisappear(); // shouldn't be a confirmation dialog.
@@ -165,11 +164,11 @@ public class FolderTest extends BaseSeleniumWebTest
 //        log("Move multiple folders");
 //        sleep(500); // wait for failed move ghost to disappear.
 //        expandFolderNode("AB");
-//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[D]', false)");
+//        _extHelper.selectFolderManagementTreeItem(PROJECT_NAME + "/[D]", false);
 //        sleep(100);
-//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[E]', true)");
+//        _extHelper.selectFolderManagementTreeItem(PROJECT_NAME + "/[E]", true);
 //        sleep(100);
-//        selenium.getEval("selenium.selectFolderManagementItem('" + PROJECT_NAME + "/[F]', true)");
+//        _extHelper.selectFolderManagementTreeItem(PROJECT_NAME + "/[F]", true);
 //        sleep(500);
 //        moveFolder("[D]", "[AB]", true, true);
 //        sleep(500);

@@ -15,19 +15,16 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.pipeline.PipelineWebTestBase;
+import org.labkey.test.BaseWebDriverTest;
 
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 2/29/12
  * Time: 6:48 PM
- * To change this template use File | Settings | File Templates.
  */
-public class PipelineCancelTest  extends BaseSeleniumWebTest
+public class PipelineCancelTest  extends BaseWebDriverTest
 {
     private static final String STUDY_ZIP = "/sampledata/pipelineCancel/LabkeyDemoStudy.zip";
     @Override

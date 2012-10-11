@@ -15,21 +15,17 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * User: kevink
  * Date: 6/27/12
  */
-public class PivotQueryTest extends BaseSeleniumWebTest
+public class PivotQueryTest extends BaseWebDriverTest
 {
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
 

@@ -15,9 +15,8 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 
@@ -27,7 +26,7 @@ import java.io.File;
  *
  * Imports a SampleMinded data export (.xlsx) into the specimen repository.
  */
-public class SampleMindedImportTest extends BaseSeleniumWebTest
+public class SampleMindedImportTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleMindedImportTest";
 
