@@ -534,7 +534,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         // Re-add animal.
         setFormElement("subjectBox",  PROTOCOL_MEMBER_IDS[0]);
-        clickButton("  Append -->", 0);
+        waitAndClickButton("  Append -->", 0);
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
