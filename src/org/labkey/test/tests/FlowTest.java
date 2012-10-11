@@ -97,7 +97,7 @@ public class FlowTest extends BaseFlowTest
     {
         beginAt("/query" + getContainerPath() + "/begin.view?schemaName=flow");
         createNewQuery("flow");
-        setFormElement(Locator.nameOrId("ff_newQueryName"), query1);
+        setFormElement(Locator.name("ff_newQueryName"), query1);
         selectOptionByText("identifier=ff_baseTableName",  analysisName);
         clickButton("Create and Edit Source");
 

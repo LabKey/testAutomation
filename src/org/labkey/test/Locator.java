@@ -17,6 +17,11 @@
 package org.labkey.test;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * User: Mark Igra
@@ -26,26 +31,59 @@ import org.openqa.selenium.By;
 public class Locator
 {
     private String loc;
+    private int _nth;
+    private String _contains;
+
     // XPATH fragments
     public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
 
-
     protected Locator(String rawString)
     {
         loc = rawString;
+        _nth = 0;
     }
 
+    private Locator(String rawString, int nth)
+    {
+        loc = rawString;
+        _nth = nth;
+    }
+
+    private Locator(String rawString, int nth, String contains)
+    {
+        loc = rawString;
+        _nth = nth;
+        _contains = contains;
+    }
+
+    public Locator contains(String contains)
+    {
+        return new Locator(loc, _nth, contains);
+    }
+
+    @Deprecated
     public String toString()
     {
-        return loc;
+        if (_contains != null)
+            throw new IllegalStateException("Unable to convert Locator to string. Locator.contains() can only be used with WebDriver.findElement().");
+        if (loc.startsWith("name=") && _nth > 0)
+            return loc + " index=" + _nth;
+        else
+            return loc;
+    }
+
+    protected int nth()
+    {
+        return _nth;
     }
 
     public String toXpath()
     {
-        String xpath = loc.substring(loc.indexOf("=")+1);
-        return xpath;
-
+        if (loc.startsWith("xpath="))
+            return loc.substring(loc.indexOf("=")+1);
+        else
+            throw new RuntimeException(loc + " is not an xpath locator.");
     }
 
     public By toBy()
@@ -59,24 +97,56 @@ public class Locator
         if (loc.startsWith("css="))
             return By.cssSelector(loc.substring(loc.indexOf("=")+1));
         if (loc.startsWith("link="))
-            return By.partialLinkText(loc.substring(loc.indexOf("=")+1));
+            return By.linkText(loc.substring(loc.indexOf("=")+1));
         else
-            return By.name(loc.substring(loc.indexOf("=")+1)); // best guess for dom/identifier. will break
+            throw new RuntimeException("Unable to convert locator: " + loc);
     }
 
-    protected void setRawLocator(String locator)
-    {
-        loc = locator;
-    }
-
+    @Deprecated
     public static Locator raw(String str)
     {
         return new Locator(str);
     }
 
-    public static Locator nameOrId(String str)
+    public WebElement findElement(WebDriver driver)
     {
-        return new Locator("identifier=" + str);
+        if (_contains == null && _nth == 0)
+        {
+            return driver.findElement(this.toBy());
+        }
+        else
+        {
+            List<WebElement> elements = driver.findElements(this.toBy());
+            if (_contains != null)
+            {
+                Iterator<WebElement> it = elements.iterator();
+                WebElement el;
+                while (it.hasNext())
+                {
+                    el = it.next();
+                    if (!el.getText().contains(_contains))
+                        it.remove();
+                }
+            }
+            return elements.get(_nth);
+        }
+    }
+
+    public List<WebElement> findElements(WebDriver driver)
+    {
+        List<WebElement> elements = driver.findElements(this.toBy());
+        if (_contains != null)
+        {
+            Iterator<WebElement> it = elements.iterator();
+            WebElement el;
+            while (it.hasNext())
+            {
+                el = it.next();
+                if (!el.getText().contains(_contains))
+                    it.remove();
+            }
+        }
+        return elements;
     }
 
     public static Locator id(String id)
@@ -91,6 +161,8 @@ public class Locator
 
     public static Locator css(String selector)
     {
+        if (selector.contains(":contains("))
+            throw new IllegalArgumentException("CSS3 has deprecated :contains()");
         return new Locator("css=" + selector);
     }
 
@@ -100,9 +172,9 @@ public class Locator
      * @param index
      * @return
      */
-    public static Locator name(String name, int index)
+    @Deprecated public static Locator name(String name, int index)
     {
-        return new Locator("name=" + name + " index=" + index);
+        return new Locator("name=" + name, index);
     }
 
     /**
@@ -111,6 +183,7 @@ public class Locator
      * @param scriptExpr
      * @return
      */
+    @Deprecated
     public static Locator dom(String scriptExpr)
     {
         return new Locator("dom=" + scriptExpr);
@@ -337,6 +410,7 @@ public class Locator
         return tagWithAttribute("input", "value", value);
     }
 
+    @Deprecated
     public static Locator formElement(String formName, String elementName)
     {
         return dom("document['" + formName + "']['" +elementName + "']");

@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
 
 /**
@@ -24,7 +24,7 @@ import org.labkey.test.Runner;
  * Date: May 3, 2011
  * Time: 3:34:58 PM
  */
-public class JUnitHeader extends BaseSeleniumWebTest
+public class JUnitHeader extends BaseWebDriverTest
 {
     @Override
     public String getAssociatedModuleDirectory()

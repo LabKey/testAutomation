@@ -16,7 +16,7 @@
 
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.UIContainerHelper;
 
@@ -27,7 +27,7 @@ import java.io.File;
  * Date: Nov 15, 2005
  * Time: 1:55:56 PM
  */
-public class WikiTest extends BaseSeleniumWebTest
+public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";
 
@@ -87,7 +87,7 @@ public class WikiTest extends BaseSeleniumWebTest
             clickButton("pause crawler");
         beginAt(selenium.getLocation().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
 
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         addWebPart("Wiki");
         addWebPart("Search");
 

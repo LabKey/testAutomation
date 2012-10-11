@@ -96,6 +96,7 @@ modules/simpletest/web/simpletest/testfile2.js -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseSeleniumWebTest.java -text
+src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/Locator.java -text
 src/org/labkey/test/Runner.java -text
@@ -277,11 +278,13 @@ src/org/labkey/test/util/APIUserHelper.java -text
 src/org/labkey/test/util/AbstractAssayHelper.java -text
 src/org/labkey/test/util/AbstractContainerHelper.java -text
 src/org/labkey/test/util/AbstractHelper.java -text
+src/org/labkey/test/util/AbstractHelperWD.java -text
 src/org/labkey/test/util/AbstractUserHelper.java -text
 src/org/labkey/test/util/AdvancedSqlTest.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/CustomizeViewsHelper.java -text
+src/org/labkey/test/util/CustomizeViewsHelperWD.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
@@ -291,12 +294,15 @@ src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/EscapeUtil.java -text
 src/org/labkey/test/util/ExperimentRunTable.java -text
 src/org/labkey/test/util/Ext4Helper.java -text
+src/org/labkey/test/util/Ext4HelperWD.java -text
 src/org/labkey/test/util/ExtHelper.java -text
+src/org/labkey/test/util/ExtHelperWD.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/JUnitHeader.java -text
 src/org/labkey/test/util/LabModuleHelper.java -text
 src/org/labkey/test/util/ListHelper.java -text
+src/org/labkey/test/util/ListHelperWD.java -text
 src/org/labkey/test/util/LogMethod.java -text
 src/org/labkey/test/util/LoggedParam.java -text
 src/org/labkey/test/util/LoggingAspect.java -text
@@ -314,6 +320,7 @@ src/org/labkey/test/util/SqlserverOnlyTest.java -text
 src/org/labkey/test/util/StopSelenium.java -text
 src/org/labkey/test/util/StringHelper.java -text
 src/org/labkey/test/util/StudyHelper.java -text
+src/org/labkey/test/util/StudyHelperWD.java -text
 src/org/labkey/test/util/TestAspect.aj -text
 src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text

@@ -16,7 +16,7 @@
 
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.io.IOException;
  * Time: 3:49:59 PM
  */
 
-public class JUnitFooter extends BaseSeleniumWebTest
+public class JUnitFooter extends BaseWebDriverTest
 {
     @Override
     public String getAssociatedModuleDirectory()

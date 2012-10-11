@@ -16,16 +16,16 @@
 
 package org.labkey.test;
 
-import com.thoughtworks.selenium.DefaultSelenium;
-import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.AssertionFailedError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Assert;
+
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -39,20 +39,34 @@ import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.ComponentQuery;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.CustomizeViewsHelperWD;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.ExtHelperWD;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggingAspect;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.StudyHelperWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+
+import com.thoughtworks.selenium.SeleniumException;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverBackedSelenium;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -94,7 +108,6 @@ import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
 import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
-import static org.labkey.test.WebTestHelper.FolderIdentifier;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.getTabLinkId;
@@ -102,16 +115,19 @@ import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
 import static org.labkey.test.WebTestHelper.logToServer;
 
+import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
+
 /**
  * User: Mark Igra
  * Date: Feb 7, 2007
  * Time: 5:31:38 PM
  */
-public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
+public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements Cleanable, WebTest
 {
     public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
-    protected DefaultSeleniumWrapper selenium;
+    @Deprecated protected final DefaultSeleniumWrapper selenium;
+    public final WebDriver _driver;
     private static final int DEFAULT_SELENIUM_PORT = 4444;
     private static final String DEFAULT_SELENIUM_SERVER = "localhost";
     private String _lastPageTitle = null;
@@ -120,7 +136,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     private Stack<String> _locationStack = new Stack<String>();
     private String _savedLocation = null;
     private Stack<String> _impersonationStack = new Stack<String>();
-    private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
+    private List<WebTestHelper.FolderIdentifier> _createdFolders = new ArrayList<WebTestHelper.FolderIdentifier>();
     protected boolean _testFailed = true;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 60000;
@@ -129,13 +145,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
     protected long _startTime;
+    private ArrayList<JavaScriptError> _jsErrors;
+    public final WebDriverWait _shortWait;
+    public final WebDriverWait _longWait;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
-    public ExtHelper _extHelper = new ExtHelper(this);
-    public Ext4Helper _ext4Helper = new Ext4Helper(this);
-    public CustomizeViewsHelper _customizeViewsHelper = new CustomizeViewsHelper(this);
-    public StudyHelper _studyHelper = new StudyHelper(this);
-    public ListHelper _listHelper = new ListHelper(this);
+    public ExtHelperWD _extHelper = new ExtHelperWD(this);
+    public Ext4HelperWD _ext4Helper = new Ext4HelperWD(this);
+    public CustomizeViewsHelperWD _customizeViewsHelper = new CustomizeViewsHelperWD(this);
+    public StudyHelperWD _studyHelper = new StudyHelperWD(this);
+    public ListHelperWD _listHelper = new ListHelperWD(this);
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
 
@@ -162,25 +181,45 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected static final String PERMISSION_ERROR = "401: User does not have permission to perform this operation";
 
 
-    public BaseSeleniumWebTest()
+    public BaseWebDriverTest()
     {
+        _extHelper = new ExtHelperWD(this);
+        _ext4Helper = new Ext4HelperWD(this);
+        _listHelper = new ListHelperWD(this);
+        _customizeViewsHelper = new CustomizeViewsHelperWD(this);
+        _jsErrors = new ArrayList<JavaScriptError>();
+
+        if (getBrowser().startsWith("*ie"))
+            _driver = new InternetExplorerDriver();
+        else
+        {
+            final FirefoxProfile profile = new FirefoxProfile();
+            try
+                {JavaScriptError.addExtension(profile);}
+            catch(IOException e)
+                {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
+            try
+            {
+                profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.10.3.xpi"));
+                profile.setPreference("extensions.firebug.currentVersion", "1.10.3");
+            }
+            catch(IOException e)
+                {Assert.fail("Failed to load Firebug: " + e.getMessage());}
+            profile.setEnableNativeEvents(useNativeEvents());
+            _driver = new FirefoxDriver(profile);
+        }
+
+        selenium = new DefaultSeleniumWrapper(_driver, WebTestHelper.getBaseURL());
+        selenium.setTimeout(Integer.toString(defaultWaitForPage));
+
+        _shortWait = new WebDriverWait(_driver, WAIT_FOR_JAVASCRIPT/1000);
+        _longWait = new WebDriverWait(_driver, WAIT_FOR_PAGE/1000);
 
     }
 
-    public static int getSeleniumServerPort()
+    protected boolean useNativeEvents()
     {
-        String portString = System.getProperty("selenium.server.port", "" + DEFAULT_SELENIUM_PORT);
-        return Integer.parseInt(portString);
-    }
-
-    public static String getSeleniumServer()
-    {
-        return System.getProperty("selenium.server", DEFAULT_SELENIUM_SERVER);
-    }
-
-    public DefaultSeleniumWrapper getWrapper()
-    {
-        return selenium;
+        return false;
     }
 
     public static String getLabKeyRoot()
@@ -203,40 +242,47 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @Before
     public void setUp() throws Exception
     {
-        selenium = new DefaultSeleniumWrapper();
-        selenium.start();
-//        driver = selenium.getWrappedDriver();
-        selenium.setTimeout(Integer.toString(defaultWaitForPage));
-        //Now inject our standard javascript functions...
-        InputStream inputStream = BaseSeleniumWebTest.class.getResourceAsStream("seleniumHelpers.js");
-        String script = getStreamContentsAsString(inputStream);
-        System.out.println("Loading scripts from seleniumHelpers.js");
-        System.out.println(selenium.getEval(script));
-
-        if (this.enableScriptCheck())
-            beginJsErrorChecker();
-
-
+        /*block base setup*/
     }
 
-    public void beginJsErrorChecker()
+    public Object executeScript(String script, Object... arguments)
     {
-        selenium.getEval("selenium.doBeginJsErrorChecker();");
+        JavascriptExecutor exec = (JavascriptExecutor) _driver;
+        return exec.executeScript(script, arguments);
+
+
     }
 
-    public void endJsErrorChecker()
+    public void resetJsErrorChecker()
     {
-        selenium.getEval("selenium.doEndJsErrorChecker();");
+        _jsErrors = new ArrayList<JavaScriptError>();
+        JavaScriptError.readErrors(_driver); // clear errors
+        jsCheckerPaused = false;
     }
 
+    private boolean jsCheckerPaused = false;
     public void pauseJsErrorChecker()
     {
-        selenium.getEval("selenium.pauseJsErrorChecker();");
+        if (this.enableScriptCheck())
+        {
+            if (!jsCheckerPaused)
+            {
+                jsCheckerPaused = true;
+                _jsErrors.addAll(JavaScriptError.readErrors(_driver));
+            }
+        }
     }
 
     public void resumeJsErrorChecker()
     {
-        selenium.getEval("selenium.resumeJsErrorChecker();");
+        if (this.enableScriptCheck())
+        {
+            if (jsCheckerPaused)
+            {
+                jsCheckerPaused = false;
+                JavaScriptError.readErrors(_driver); // clear errors
+            }
+        }
     }
 
     /**
@@ -380,15 +426,25 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @After
     public void tearDown() throws Exception
     {
-        if (this.enableScriptCheck())
-            endJsErrorChecker();
-
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
         if (!skipTearDown)
         {
-            //selenium.close(); // unnecessary since selenium.stop will close windows.
-            selenium.stop();
+            _driver.quit();
         }
+    }
+
+    private boolean validateJsError(JavaScriptError error)
+    {
+        return !error.getErrorMessage().contains("setting a property that has only a getter") &&
+                !error.getErrorMessage().contains("records[0].get is not a function") &&
+                !error.getErrorMessage().contains("{file: \"chrome://") &&
+                !error.getErrorMessage().contains("ext-all-sandbox-debug.js") && // Ignore error caused by project webpart
+                !error.getErrorMessage().contains("ext-all-sandbox.js") && // Ignore error that's junking up the weekly
+                !error.getErrorMessage().contains("ext-all-sandbox-dev.js") && // Ignore error that's junking up the weekly
+                !error.getErrorMessage().contains("XULElement.selectedIndex") && // Ignore known Firefox Issue
+                !error.getErrorMessage().contains("Failed to decode base64 string!") && // Firefox issue
+                !error.getErrorMessage().contains("xulrunner-1.9.0.14/components/FeedProcessor.js") && // Firefox problem
+                !error.getErrorMessage().contains("Image corrupt or truncated: <unknown>");  // Selenium problem with pages that lack a favicon (e.g., errors since reset)
     }
 
     public void log(String str)
@@ -438,10 +494,17 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public String[] getLinkAddresses()
     {
-        String js = "selenium.getLinkAddresses();";
-        String linkStr = selenium.getEval(js);
-        String[] linkArray = linkStr.split("\\\\n");
-        ArrayList<String> links = new ArrayList<String>(linkArray.length);
+        String js =
+                "getLinkAddresses = function () {\n" +
+                "        var links = window.document.links;\n" +
+                "        var addresses = new Array();\n" +
+                "        for (var i = 0; i < links.length; i++)\n" +
+                "          addresses[i] = links[i].getAttribute('href');\n" +
+                "        return addresses;\n" +
+                "};" +
+                "return getLinkAddresses();";
+        List<String> linkArray = (ArrayList<String>)executeScript(js);
+        ArrayList<String> links = new ArrayList<String>();
         for (String link : linkArray)
         {
             if (link.contains("#"))
@@ -462,7 +525,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
 
         URL url = getURL();
-        String urlString = selenium.getLocation();
+        String urlString = _driver.getCurrentUrl();
         if ("80".equals(WebTestHelper.getWebPort()) && url.getAuthority().endsWith(":-1"))
         {
             int portIdx = urlString.indexOf(":-1");
@@ -586,7 +649,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             assertFormPresent("login");
             setText("email", PasswordUtil.getUsername());
             setText("password", PasswordUtil.getPassword());
-            clickLinkWithText("Sign In");
+            clickButton("Sign In");
 
             if (isTextPresent("Type in your email address and password"))
                 Assert.fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
@@ -608,8 +671,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if ( !isLinkPresentWithText("Sign In") )
             Assert.fail("You need to be logged out to log in.  Please log out to log in.");
 
-        clickLinkWithText("Sign In");
-
         attemptSignIn(email, password);
 
         if ( failOnError )
@@ -630,7 +691,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertFormPresent("login");
         setText("email", email);
         setText("password", password);
-        clickLinkWithText("Sign In");
+        clickButton("Sign In");
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)
@@ -646,7 +707,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         // Get setPassword URL from notification email.
         goToModule("Dumbster");
-        clickLink(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + user + "']/..//a[contains(@href, 'setPassword.view')]"));
+        String emailSubject = user + " : Welcome to the Demo Installation LabKey Server Web Site new user registration";
+        clickLinkWithText(emailSubject, 0);
+        WebElement resetLink = _shortWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//a[text() = '" + emailSubject + "']/..//a[contains(@href, 'setPassword.view')]")));
+        resetLink.click();
+        waitForPageToLoad();
 
         setFormElement("password", password);
         setFormElement("password2", password);
@@ -658,9 +723,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         goToHome();
         goToModule("Dumbster");
-        clickLink(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]"));
-
-        return getCurrentRelativeURL();
+        String emailSubject = "Reset Password Notification from the LabKey Server Web Site";
+        WebElement email = _driver.findElement(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[text() = '"+emailSubject+"']"));
+        email.click();
+        WebElement resetLink = _shortWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]")));
+        return resetLink.getText();
     }
 
     protected void resetPassword(String resetUrl, String username, String newPassword)
@@ -859,7 +926,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void clickAdminMenuItem(String... items)
     {
         waitForElement(Locator.xpath(ADMIN_MENU_XPATH));
-        Ext4Helper.clickExt4MenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), false, items);
+        Ext4HelperWD.clickExt4MenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), false, items);
     }
 
     public void clickUserMenuItem(String... items)
@@ -870,7 +937,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void clickUserMenuItem(boolean wait, boolean onlyOpen, String... items)
     {
         waitForElement(USER_MENU_LOC);
-        Ext4Helper.clickExt4MenuButton(this, true, USER_MENU_LOC, onlyOpen, items);
+        Ext4HelperWD.clickExt4MenuButton(this, true, USER_MENU_LOC, onlyOpen, items);
     }
 
     // Click on a module listed on the admin menu
@@ -1161,7 +1228,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         goToAdminConsole();
         clickLinkWithText("system maintenance");
-        selenium.openWindow("", "systemMaintenance");
         clickLinkWithText(task, false);
         smStart = System.currentTimeMillis();
     }
@@ -1178,19 +1244,20 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             sleep(5000 - elapsed);
         }
 
-        selenium.selectWindow("systemMaintenance");
+        Object[] windows =_driver.getWindowHandles().toArray();
+        _driver.switchTo().window((String)windows[1]);
         log("Waiting for system maintenance to complete");
 
-        // Page updates automatically via AJAX... keep checking (up to 10 minutes) for system maintenance complete text
+        // Page updates automatically via AJAX... keep checking (up to 10 minutes from the start of the test) for system maintenance complete text
         waitFor(new Checker() {
             public boolean check()
             {
                 return isTextPresent("System maintenance complete");
             }
-        }, "System maintenance failed to complete in 10 minutes.", 10 * 60 * 1000);
+        }, "System maintenance failed to complete in 10 minutes.", 10 * 60 * 1000 - ((Long)elapsed).intValue());
 
-        selenium.close();
-        selenium.selectWindow(null);
+        _driver.close();
+        _driver.switchTo().window((String)windows[0]);
     }
 
     //This is for the split test, I don't want to wait until that's complete to be able to check in other changes in this file
@@ -1235,8 +1302,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         if (_lastPageTitle == null)
         {
-            if (null != selenium.getTitle())
-                return selenium.getTitle();
+            if (null != _driver.getTitle())
+                return _driver.getTitle();
             else
                 return "[no title: content type is not html]";
         }
@@ -1245,14 +1312,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public String getLastPageText()
     {
-        return _lastPageText != null ? _lastPageText : selenium.getHtmlSource();
+        return _lastPageText != null ? _lastPageText : _driver.getPageSource();
     }
 
     public boolean isPageEmpty()
     {
         //IE and Firefox have different notions of empty.
         //IE returns html for all pages even empty text...
-        String text = selenium.getHtmlSource();
+        String text = _driver.getPageSource();
         if (null == text || text.trim().length() == 0)
             return true;
 
@@ -1264,7 +1331,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         try
         {
-            return _lastPageURL != null ? _lastPageURL : new URL(selenium.getLocation());
+            return _lastPageURL != null ? _lastPageURL : new URL(_driver.getCurrentUrl());
         }
         catch (MalformedURLException x)
         {
@@ -1431,6 +1498,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 }
             }
 
+            checkJsErrors();
+
             logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
 
             log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
@@ -1463,7 +1532,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             log("========= Cleaning up " + getClass().getSimpleName() + " =========");
             if (selenium == null)
             {
-                setUp();
                 tearDown = true;
             }
 
@@ -1475,7 +1543,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             beginAt("");
 
             // The following checks verify that the test deleted all projects and folders that it created.
-            for (FolderIdentifier folder : _createdFolders)
+            for (WebTestHelper.FolderIdentifier folder : _createdFolders)
                 assertLinkNotPresentWithText(folder.getFolderName());
 
             for (String projectName : _containerHelper.getCreatedProjects())
@@ -1682,7 +1750,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return;
         if(getProjectName() != null)
         {
-            clickLinkWithText(getProjectName());
+            clickFolder(getProjectName());
             if(!"Query Schema Browser".equals(selenium.getTitle()))
                 goToSchemaBrowser();
             validateQueries();
@@ -1703,8 +1771,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             doViewCheck(projectName);
             checked.add(projectName);
         }
-        
-        for (FolderIdentifier folderId : _createdFolders)
+
+        for (WebTestHelper.FolderIdentifier folderId : _createdFolders)
         {
             String project = folderId.getProjectName();
             String folder = folderId.getFolderName();
@@ -1749,6 +1817,34 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             waitForPageToLoad();
             waitForText(viewName);
             popLocation();
+        }
+    }
+
+    private void checkJsErrors()
+    {
+        if (this.enableScriptCheck())
+        {
+            _jsErrors.addAll(JavaScriptError.readErrors(_driver));
+            List<JavaScriptError> validErrors = new ArrayList<JavaScriptError>();
+            for (JavaScriptError error : _jsErrors)
+            {
+                if (!validErrors.contains(error) && validateJsError(error))
+                {
+                    if (validErrors.size() == 0)
+                        log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>"); // first error
+                    validErrors.add(error);
+                    log(error.toString());
+                }
+            }
+            if (validErrors.size() > 0)
+            {
+                log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
+                String errorCtStr = "";
+                if (validErrors.size() > 1)
+                    errorCtStr = " (1 of " + validErrors.size() + ") ";
+                if (!_testFailed) // Don't clobber existing failures. Just log them.
+                    Assert.fail("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
+            }
         }
     }
 
@@ -2083,7 +2179,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             File tsvFile = new File(dir, fileName);
             writer = new FileWriter(tsvFile);
-            writer.write(contents);
+            writer.write(selenium.getBodyText());
             return tsvFile;
         }
         catch (IOException e)
@@ -2152,14 +2248,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         pushLocation();
         beginAt(url);
-        String containerId = selenium.getEval("selenium.getContainerId()");
+        String containerId = (String)executeScript("return getContainerId()");
         popLocation();
         return containerId;
     }
 
     public String getConfirmationAndWait()
     {
-        String confirmation = selenium.getConfirmation();
+        Alert alert = _driver.switchTo().alert();
+        String confirmation = alert.getText();
+        alert.accept();
         waitForPageToLoad();
         return confirmation;
     }
@@ -2202,26 +2300,32 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void assertConfirmation(String msg)
     {
-        Assert.assertEquals(msg, selenium.getConfirmation());
+        assertAlert(msg);
     }
 
     public void assertAlert(String msg)
     {
-        Assert.assertEquals(msg, selenium.getAlert());
+        Alert alert = _driver.switchTo().alert();
+        Assert.assertEquals(msg, alert.getText());
+        alert.accept();
     }
 
     public void dismissAlerts()
     {
-        boolean present = false;
-        while (selenium.isAlertPresent())
-            log("Found unexpected alert: " + selenium.getAlert());
+        while (selenium.isAlertPresent()){
+            Alert alert = _driver.switchTo().alert();
+            log("Found unexpected alert: " + alert.getText());
+            alert.accept();
+        }
     }
 
     public void logJavascriptAlerts()
     {
         while (selenium.isAlertPresent())
         {
-            log("JavaScript Alert Ignored: " + selenium.getAlert());
+            Alert alert = _driver.switchTo().alert();
+            log("JavaScript Alert Ignored: " + alert.getText());
+            alert.accept();
         }
     }
 
@@ -2232,7 +2336,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
 	public String getAlert()
 	{
-		return selenium.getAlert();
+        Alert alert = _driver.switchTo().alert();
+        String text = alert.getText();
+        alert.accept();
+        return text;
 	}
 
     public void assertExtMsgBox(String title, String text)
@@ -2299,7 +2406,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTabContainingText("Project Groups");
-        setFormElement("newGroupForm$input",groupName);
+        setFormElement(Locator.id("newGroupForm$input"),groupName);
         clickButton("Create New Group", 0);
         sleep(500);
         waitAndClick(Locator.xpath("//div[@id='userInfoPopup']//div[contains(@class,'x-tool-close')]"));
@@ -2447,7 +2554,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
 
         waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
-        _createdFolders.add(new FolderIdentifier(project, child));
+        _createdFolders.add(new WebTestHelper.FolderIdentifier(project, child));
         waitForPageToLoad();
 
         //second page of the wizard
@@ -2582,6 +2689,20 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         // verify that we're not on an error page with a check for folder link:
         assertLinkPresentWithText(folderName);
         assertLinkPresentWithText(newParent);
+    }
+
+    public void clickFolder(String project)
+    {
+        String xpath = "//tr[not(ancestor-or-self::*[contains(@style,'none')]) and following-sibling::tr[contains(@style,'none')]//a[text()='"+project+"']]//a/img[contains(@src,'plus')]";
+        List<WebElement> possibleAncestors = _driver.findElements(By.xpath(xpath));
+        int depth = 0;
+        while(possibleAncestors.size() > 0 && depth < 10)
+        {
+            possibleAncestors.get(possibleAncestors.size()-1).click(); // the last one in the list is the actual ancestor.
+            possibleAncestors = _driver.findElements(By.xpath(xpath));
+            depth++;
+        }
+        clickLinkWithText(project);
     }
 
     public void deleteProject(String project)
@@ -2915,7 +3036,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void waitForPageToLoad(int millis)
     {
         if( selenium.isAlertPresent() )
-            Assert.fail("ERROR: Unexpected alert.\n" + selenium.getAlert());
+        {
+            Alert alert = _driver.switchTo().alert();
+            String text = alert.getText();
+            alert.accept();
+            Assert.fail("ERROR: Unexpected alert.\n" + text);
+        }
         else
         {
             _testTimeout = true;
@@ -2954,6 +3080,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return false;
     }
 
+    public interface ElementChecker
+    {
+        public boolean check(WebElement el);
+    }
+
+    public List<WebElement> filterElements(ElementChecker checker, List<WebElement> elements)
+    {
+        List<WebElement> filteredElements = new ArrayList<WebElement>();
+        for (WebElement el : elements)
+        {
+            if (checker.check(el))
+                filteredElements.add(el);
+        }
+        return filteredElements;
+    }
+
     public void waitFor(Checker checker, String failMessage, int wait)
     {
         if (!doesElementAppear(checker, wait))
@@ -2961,7 +3103,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3MaskToDisappear(int)}
      */
     @Deprecated public void waitForExtMaskToDisappear()
     {
@@ -2969,7 +3111,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3MaskToDisappear(int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3MaskToDisappear(int)}
      */
     @Deprecated public void waitForExtMaskToDisappear(int wait)
     {
@@ -2977,7 +3119,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3Mask(int)}
      */
     @Deprecated public void waitForExtMask()
     {
@@ -2985,7 +3127,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#waitForExt3Mask(int)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3Mask(int)}
      */
     @Deprecated public void waitForExtMask(int wait)
     {
@@ -3100,7 +3242,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void exportFolderAsZip()
     {
         goToFolderManagement();
-        clickLinkWithText("Export");
+        clickLinkWithText("Export "); // TODO: Trailing spaces on folder management tabs
         checkRadioButton("location", 1);
 
     }
@@ -3109,7 +3251,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         goToFolderManagement();
         log("setting module properties");
-        clickLinkWithText("Module Properties");
+        clickLinkWithText("Module Properties "); // TODO: Trailing spaces on folder management tabs
         waitForText("Save Changes");
         boolean changed = false;
         for (String moduleName : props.keySet())
@@ -3151,25 +3293,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForExt4FolderTreeNode(String nodeText, int wait)
     {
-        final Locator locator = new Locator("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
+        final Locator locator = Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
         String failMessage = "Ext 4 Tree Node with locator " + locator + " did not appear.";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return isElementPresent(locator);
-            }
-        }, failMessage, wait);
-    }
-
-    /**
-     * This function only works for Ext 3.4 or less.
-     */
-    @Deprecated
-    public void waitForExtFolderTreeNode(String nodeText, int wait)
-    {
-        final Locator locator = new Locator("//a[contains(@class, 'x-tree-node-anchor')]/span[text() = " + Locator.xq(nodeText) + "]");
-        String failMessage = "Ext NodeTree with locator " + locator + " did not appear.";
         waitFor(new Checker()
         {
             public boolean check()
@@ -3181,47 +3306,42 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForElement(final Locator locator)
     {
-        waitForElement(locator, defaultWaitForPage);
+        waitForElement(locator, WAIT_FOR_JAVASCRIPT);
     }
 
     /**
      *
      * @param locator Element to wait for
-     * @param wait amount of time to wait for
+     * @param elementTimeout amount of time to wait for
      * @param failIfNotFound should fail if element is not found?  If not, will return false
      * @return
      */
-    public boolean waitForElement(final Locator locator, int wait, boolean failIfNotFound)
+    public boolean waitForElement(final Locator locator, int elementTimeout, boolean failIfNotFound)
     {
-
-        String failMessage = "Element with locator " + locator + " did not appear.";
-        Checker checker = new Checker()
+        if (failIfNotFound)
         {
-            public boolean check()
+            WebDriverWait wait = new WebDriverWait(_driver, elementTimeout/1000);
+            wait.until(ExpectedConditions.presenceOfElementLocated(locator.toBy()));
+        }
+        else
+        {
+            try
             {
-                return isElementPresent(locator);
+                WebDriverWait wait = new WebDriverWait(_driver, elementTimeout/1000);
+                wait.until(ExpectedConditions.presenceOfElementLocated(locator.toBy()));
             }
-        };
-
-        if(!doesElementAppear(checker, wait))
-            if(failIfNotFound)
-                Assert.fail(failMessage);
-            else
+            catch(Exception e)
+            {
+                /*ignore*/
                 return false;
+            }
+        }
         return true;
     }
 
     public void waitForElement(final Locator locator, int wait)
     {
         waitForElement(locator, wait, true);
-//        String failMessage = "Element with locator " + locator + " did not appear.";
-//        waitFor(new Checker()
-//        {
-//            public boolean check()
-//            {
-//                return isElementPresent(locator);
-//            }
-//        }, failMessage, wait);
     }
 
     public void waitForElementToDisappear(final Locator locator, int wait)
@@ -3267,7 +3387,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForText(final String text)
     {
-         waitForText(text, defaultWaitForPage);
+         waitForText(text, WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForTextWithRefresh(String text, int wait)
@@ -3325,6 +3445,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForPageToLoad();
     }
 
+    public void submit(WebElement form)
+    {
+        executeScript("arguments[0].submit()", form);
+    }
+
     public void submit(String buttonName)
     {
         Locator l = findButton(buttonName);
@@ -3349,13 +3474,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         try
         {
-            return selenium.isElementPresent(loc.toString());
+            return selenium.isElementPresent(loc.toString()) || isElementPresent(loc.toBy());
         }
         catch(SeleniumException e)
         {
             /*ignore permission denied errors in IE when page refreshes during this check*/
         }
         return false;
+    }
+
+    public boolean isElementPresent(By by)
+    {
+        return _driver.findElements(by).size() > 0;
     }
 
     public void assertElementPresent(Locator loc)
@@ -3385,7 +3515,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void assertFormElementEquals(String elementName, String value)
     {
-        assertFormElementEquals(new Locator(elementName), value);
+        assertFormElementEquals(Locator.name(elementName), value);
     }
 
     public void waitForFormElementToEqual(final Locator locator, final String value)
@@ -3417,10 +3547,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return selenium.getValue(loc.toString());
     }
 
-    public String getFormElement(String elementName)
+    /**
+     * @deprecated Use explicit Locator: {@link #getFormElement(Locator)}
+     */
+    @Deprecated public String getFormElement(String elementName)
     {
-        Locator loc = new Locator(elementName);
-        return selenium.getValue(loc.toString());
+        Locator loc = Locator.name(elementName);
+        return getFormElement(loc);
     }
 
     public void assertFormElementEquals(Locator loc, String value)
@@ -3436,7 +3569,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public boolean isFormElementPresent(String elementName)
     {
-        return isElementPresent(Locator.dom(firstForm + "['" + elementName + "']"));
+        return isElementPresent(Locator.xpath(firstForm + "['" + elementName + "']"));
     }
 
     public void assertFormElementPresent(String elementName)
@@ -3447,7 +3580,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void assertOptionEquals(String selectName, String value)
     {
-        assertOptionEquals(new Locator(selectName), value);
+        assertOptionEquals(Locator.name(selectName), value);
     }
 
     public void assertOptionEquals(Locator loc, String value)
@@ -3467,7 +3600,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public String getSelectedOptionText(String selectName)
     {
-        return getSelectedOptionText(new Locator(selectName));
+        return getSelectedOptionText(Locator.name(selectName));
     }
 
     public void assertElementNotPresent(String errorMsg, Locator loc)
@@ -3590,14 +3723,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void clickLinkWithText(String text, int index, int millis)
     {
         log("Clicking link with text '" + text + "'");
-        Locator l;
 
         if (index > 0)
-            l = Locator.linkWithText(text, index);
+            clickAndWait(Locator.linkWithText(text, index));
         else
-            l = Locator.linkWithText(text);
-
-        clickAndWait(l, millis);
+        {
+            if (_driver.findElements(By.linkText(text.toUpperCase())).size() > 0)
+                clickAndWait(_driver.findElement(By.linkText(text.toUpperCase())));
+            else
+                clickAndWait(_driver.findElement(By.linkText(text)));
+        }
     }
 
     public void clickLinkContainingText(String text)
@@ -3682,11 +3817,35 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickAndWait(l, 0);
     }
 
-
-
-    public void clickAt(Locator l, String coord)
+    /**
+     * @deprecated Use {@link #clickAt(org.openqa.selenium.By, int, int)}
+     */
+    @Deprecated public void clickAt(Locator l, String coord)
     {
-        selenium.clickAt(l.toString(), coord);
+        String[] splitCoord = coord.split(",");
+        Integer xCoord = Integer.parseInt(splitCoord[0]);
+        Integer yCoord = Integer.parseInt(splitCoord[1]);
+
+        clickAt(l.toBy(), xCoord, yCoord);
+    }
+
+    public void clickAt(By by, int xCoord, int yCoord)
+    {
+        WebDriverWait wait = new WebDriverWait(_driver, 10);
+        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(by));
+
+        Actions builder = new Actions(_driver);
+        builder.moveToElement(el, xCoord, yCoord)
+                .click()
+                .build()
+                .perform();
+    }
+
+    public void clickAt(By by, int xCoord, int yCoord, int pageTimeout)
+    {
+        clickAt(by, xCoord, yCoord);
+
+        waitForPageToLoad(pageTimeout);
     }
 
     public void clickAndWait(Locator l)
@@ -3698,18 +3857,44 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public static final int WAIT_FOR_EXT_MASK_TO_APPEAR = -2;
     public void clickAndWait(Locator l, int millis)
     {
-        selenium.click(l.toString());
-        if (millis > 0)
-            waitForPageToLoad(millis);
-        else if(millis==WAIT_FOR_EXT_MASK_TO_APPEAR)
+        WebElement el;
+
+        if (l.nth() > 0)
+        {
+            List<WebElement> els = _driver.findElements(l.toBy());
+            el = els.get(l.nth());
+        }
+        else
+        {
+            el = _driver.findElement(l.toBy());
+        }
+
+        clickAndWait(el, millis);
+    }
+
+    public void clickAndWait(WebElement el, int pageTimeoutMs)
+    {
+        el.click();
+
+        if (pageTimeoutMs > 0)
+            waitForPageToLoad(pageTimeoutMs);
+        else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
             waitForExtMask();
-        else if(millis==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
+        else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
             waitForExtMaskToDisappear();
     }
 
-    public void clickAtAndWait(Locator l, String coord, int millis)
+    public void clickAndWait(WebElement el)
     {
-        selenium.clickAt(l.toString(), coord);
+        clickAndWait(el, WAIT_FOR_PAGE);
+    }
+
+    /**
+     * @deprecated Use {@link #clickAt(org.openqa.selenium.By, int, int, int)}
+     */
+    @Deprecated public void clickAtAndWait(Locator l, String coord, int millis)
+    {
+        clickAt(l, coord);
         if (millis > 0)
             waitForPageToLoad(millis);
     }
@@ -3721,7 +3906,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void dblclickAtAndWait(Locator l, int millis)
     {
-        selenium.doubleClick(l.toString());
+        _driver.findElement(l.toBy()).click();
+        _driver.findElement(l.toBy()).click();
         if (millis > 0)
             waitForPageToLoad(millis);
 
@@ -3749,17 +3935,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void mouseOver(Locator l)
     {
-        selenium.mouseOver(l.toString());
+        Actions builder = new Actions(_driver);
+        builder.moveToElement(_driver.findElement(l.toBy())).build().perform();
     }
 
-    public void mouseDown(Locator l)
+    /**
+     * @deprecated Click shenanigans shouldn't be necessary with WebDriver. If click doesn't work, try WebDriver 'Actions'
+     */
+    @Deprecated public void mouseDown(Locator l)
     {
-        selenium.mouseDown(l.toString());
-    }
-
-    public void mouseUp(Locator l)
-    {
-        selenium.mouseUp(l.toString());
+        _driver.findElement(l.toBy()).click();
     }
 
     public void mouseDownAt(Locator l, int x, int y)
@@ -3851,10 +4036,17 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public int getImageWithAltTextCount(String altText)
     {
-        String js = "function countImagesWithAlt(txt) {var doc=selenium.browserbot.getCurrentWindow().document; var count = 0; for (var i = 0; i < doc.images.length; i++) {if (doc.images[i].alt == txt) count++;} return count}; ";
-        js = js + "countImagesWithAlt('" + altText + "');";
-        String count = selenium.getEval(js);
-        return Integer.parseInt(count);
+        String js = "function countImagesWithAlt(txt) {" +
+                        "var doc=document;" +
+                        "var count = 0;" +
+                        "for (var i = 0; i < doc.images.length; i++) {" +
+                            "if (doc.images[i].alt == txt) " +
+                                "count++;" +
+                            "}" +
+                        "return count;" +
+                    "};" +
+                    "return countImagesWithAlt('" + altText + "');";
+        return Integer.parseInt(executeScript(js).toString());
     }
 
     public boolean isImagePresentWithSrc(String src)
@@ -4327,7 +4519,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (isElementPresent(locator))
             return locator;
 
-        return null;
+        if (text.equals(text.toUpperCase()))
+            return null;
+        else
+        {
+            log("WARNING: Update test. Possible wrong casing for button: " + text);
+            return getButtonLocator(text.toUpperCase());
+        }
     }
 
     protected Locator.XPathLocator getButtonLocatorContainingText(String text)
@@ -4498,24 +4696,53 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.typeSilent(elementName, text);
     }
 
-    public void setFormElement(String element, String text)
+    /**
+     * @deprecated Use explicit Locator: {@link #setFormElement(Locator, String)}
+     */
+    @Deprecated public void setFormElement(String name, String text)
     {
-        setFormElement(Locator.raw(element), text, false);
+        if(_driver.findElements(By.name(name)).size() > 0)
+            setFormElement(Locator.name(name), text, false);
+        else
+            setFormElement(Locator.id(name), text, false);
     }
 
-    public void setFormElement(Locator element, String text, boolean suppressValueLogging)
+    public void setFormElement(Locator l, String text, boolean suppressValueLogging)
     {
-        selenium.type(element.toString(), text, suppressValueLogging);
-        fireEvent(element, SeleniumEvent.keyup);
-        // Element might disappear after keyup
-        if(isElementPresent(element))
-            fireEvent(element, SeleniumEvent.blur);
+        WebElement el;
+        if (l.nth() > 0)
+        {
+            List<WebElement> els = _driver.findElements(l.toBy());
+            el = els.get(l.nth());
+        }
+        else
+        {
+            el = _driver.findElement(l.toBy());
+        }
+
+        setFormElement(el, text);
+        fireEvent(l, SeleniumEvent.blur);
+    }
+
+    public void setFormElement(WebElement el, String text)
+    {
+        if (text.length() < 1000)
+        {
+            try {el.clear();} catch(WebDriverException e) {/*Probably a file input*/}
+            el.sendKeys(text);
+        }
+        else
+        {
+            executeScript("arguments[0].value = arguments[1]", el, text.substring(0, text.length()-2));
+            //Retype the last character manually to trigger events
+            el.sendKeys(text.substring(text.length()-1));
+        }
     }
 
     public void setFormElement(String element, File file)
     {
         Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
-        setFormElement(Locator.raw(element), file.getAbsolutePath());
+        setFormElement(Locator.name(element), file.getAbsolutePath());
     }
 
     public void setFormElement(Locator loc, File file)
@@ -4526,7 +4753,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void setFormElement(Locator element, String text)
     {
-        setFormElement(element.toString(), text);
+        setFormElement(element, text, false);
     }
 
     public void setFormElements(String tagName, String formElementName, String[] values)
@@ -4556,8 +4783,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
-        if (runMenuItemHandler(id));
-            waitForPageToLoad(wait);
+        runMenuItemHandler(id);
+        waitForPageToLoad(wait);
     }
 
     public void setSort(String regionName, String columnName, SortDirection direction, int wait)
@@ -4566,8 +4793,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":" + direction.toString().toLowerCase());
-        if (runMenuItemHandler(id))
-            waitForPageToLoad(wait);
+        runMenuItemHandler(id);
+        waitForPageToLoad(wait);
     }
 
     public void setFilter(String regionName, String columnName, String filterType)
@@ -4727,7 +4954,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param label
      * @param type
      */
-    public void addRunField(String name, String label, ListHelper.ListColumnType type)
+    public void addRunField(String name, String label, ListHelperWD.ListColumnType type)
     {
         String xpath = ("//input[starts-with(@name, 'ff_name");
         int newFieldIndex = getXpathCount(Locator.xpath(xpath + "')]"));
@@ -4737,9 +4964,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         _listHelper.setColumnType(newFieldIndex, type);
     }
 
-    // UNDONE: move usages to use ListHelper
-    @Deprecated
-    public void addField(String areaTitle, int index, String name, String label, ListHelper.ListColumnType type)
+    /**
+     * @deprecated Move usages to use ListHelperWD
+     */
+    @Deprecated public void addField(String areaTitle, int index, String name, String label, ListHelperWD.ListColumnType type)
     {
         String prefix = getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
@@ -4747,12 +4975,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(prefix, index, name);
         _listHelper.setColumnLabel(prefix, index, label);
-        _listHelper.setColumnType(this, prefix, index, type);
+        _listHelper.setColumnType(prefix, index, type);
     }
 
-    // UNDONE: move usages to use ListHelper
-    @Deprecated
-    public void addLookupField(String areaTitle, int index, String name, String label, ListHelper.LookupInfo type)
+    /**
+     * @deprecated Move usages to use ListHelperWD
+     */
+    @Deprecated public void addLookupField(String areaTitle, int index, String name, String label, ListHelperWD.LookupInfo type)
     {
         String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
@@ -4763,9 +4992,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         _listHelper.setColumnType(prefix, index, type);
     }
 
-    // UNDONE: move usages to ListHelper
-    @Deprecated
-    public void deleteField(String areaTitle, int index)
+    /**
+     * @deprecated Move usages to use ListHelperWD
+     */
+    @Deprecated public void deleteField(String areaTitle, int index)
     {
         String prefix = getPropertyXPath(areaTitle);
         selenium.mouseClick(prefix + "//div[@id='partdelete_" + index + "']");
@@ -4777,11 +5007,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             // Confirm the deletion
             clickButton("OK", 0);
-            waitForElement(Locator.raw("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
+            waitForElement(Locator.xpath("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
         }
     }
 
-    public void setLongTextField(final String elementName, final String text)
+    /**
+     * @deprecated Use explicit Locator: {@link #setLongTextField(Locator, String)}
+     * @param elementName
+     * @param text
+     */
+    @Deprecated public void setLongTextField(final String elementName, final String text)
     {
         setFormElement(Locator.name(elementName), text, true);
 
@@ -4794,9 +5029,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }, elementName + " was not set.", WAIT_FOR_JAVASCRIPT);
     }
 
-    public void setLongTextField(Locator loc, String text)
+    /**
+     * Set a form element and verify
+     * @param loc Selenium locator of text field to be set
+     * @param text Value to be inserted into text field
+     */
+    public void setLongTextField(final Locator loc, final String text)
     {
-        setLongTextField(loc.toString(), text);
+        setFormElement(loc, text, true);
+
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return getFormElement(loc).replace("\r", "").trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns, which are present in IE but absent in firefox
+            }
+        }, "Text was not set.", WAIT_FOR_JAVASCRIPT);
     }
 
 
@@ -4808,6 +5056,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public boolean isMenuButtonPresent(String buttonText)
     {
         return isButtonPresent(buttonText);
+    }
+
+    public void assertButtonPresent(String buttonText)
+    {
+        Assert.assertTrue("Button not present with text: " + buttonText, isButtonPresent(buttonText));
     }
 
     public void assertNavButtonPresent(String buttonText)
@@ -4836,9 +5089,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public boolean runMenuItemHandler(String id)
     {
         log("Invoking Ext menu item handler '" + id + "'");
-        //selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "').handler();");
-        String result = selenium.getEval("selenium.clickExtComponent(" + EscapeUtil.jsString(EscapeUtil.filter(id)) + ");");
-        return result != null && Boolean.parseBoolean(result);
+        return _extHelper.clickExtComponent(EscapeUtil.filter(id));
     }
 
     /**
@@ -4898,14 +5149,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void checkAllOnPage(String dataRegionName)
     {
         String id = EscapeUtil.jsString(dataRegionName);
-        checkCheckbox(Locator.raw("document.forms[" + id + "].elements['.toggle']"));
+        checkCheckbox((WebElement)executeScript("return document.forms[" + id + "].elements['.toggle']"));
     }
 
     /** Clears selection state for rows of the data region on the current page. */
     public void uncheckAllOnPage(String dataRegionName)
     {
         String id = EscapeUtil.jsString(dataRegionName);
-        Locator toggle = Locator.raw("document.forms[" + id + "].elements['.toggle']");
+        WebElement toggle = (WebElement)executeScript("return document.forms[" + id + "].elements['.toggle']");
         checkCheckbox(toggle);
         uncheckCheckbox(toggle);
     }
@@ -4921,21 +5172,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void checkDataRegionCheckbox(String dataRegionName, int index)
     {
         String id = EscapeUtil.jsString(dataRegionName);
-        checkCheckbox(Locator.raw("document.forms[" + id + "].elements['.select'][" + index + "]"));
+        checkCheckbox((WebElement)executeScript("return document.forms[" + id + "].elements['.select'][" + index + "]"));
     }
 
     /** Sets selection state for single rows of the data region. */
     public void uncheckDataRegionCheckbox(String dataRegionName, int index)
     {
         String id = EscapeUtil.jsString(dataRegionName);
-        uncheckCheckbox(Locator.raw("document.forms[" + id + "].elements['.select'][" + index + "]"));
-    }
-
-    public void toggleCheckboxByTitle(String title)
-    {
-        log("Clicking checkbox with title " + title);
-        Locator l = Locator.checkboxByTitle(title);
-        click(l);
+        uncheckCheckbox((WebElement)executeScript("return document.forms[" + id + "].elements['.select'][" + index + "]"));
     }
 
     public void clickCheckbox(String name)
@@ -4976,7 +5220,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void checkCheckboxByNameInDataRegion(String name)
     {
-        checkCheckbox(Locator.raw("//a[contains(text(), '" + name + "')]/../..//td/input"));
+        checkCheckbox(Locator.xpath("//a[contains(text(), '" + name + "')]/../..//td/input"));
     }
 
     public void checkButtonByText(String text)
@@ -4998,6 +5242,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             click(checkBoxLocator);
         logJavascriptAlerts();
         Assert.assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
+    }
+
+    public void checkCheckbox(WebElement el)
+    {
+        if (!(Boolean)executeScript("return arguments[0].checked", el))
+        {
+            el.click();
+        }
+    }
+
+    public void uncheckCheckbox(WebElement el)
+    {
+        if ((Boolean)executeScript("return arguments[0].checked", el))
+        {
+            el.click();
+        }
     }
 
     public void checkRadioButton(String name, int index)
@@ -5491,7 +5751,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
              selectGroup(groupName);
 
         setFormElement(Locator.id("Users_dropdownMenu"), userName);
-        pressTab(Locator.id("Users_dropdownMenu").toString());
+        pressTab(Locator.id("Users_dropdownMenu"));
         _extHelper.clickExtButton(groupName + " Information", "Done", 0);
         _extHelper.waitForExtDialogToDisappear(groupName + " Information");
         clickButton("Done");
@@ -5515,8 +5775,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         goToSiteUsers();
 
-        if(isLinkPresentWithText("include inactive users"))
-            clickLinkWithText("include inactive users");
+        if(isLinkPresentWithText("INCLUDE INACTIVE USERS"))
+            clickLinkWithText("INCLUDE INACTIVE USERS");
 
         DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
 
@@ -5559,8 +5819,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void customizeWebPart(String webPartId)
     {
-        clickAt(Locator.id("more-" + webPartId), "1,1");
-        clickAt(Locator.tagContainingText("span", "Customize"), "1,1");
+        click(Locator.id("more-" + webPartId));
+        click(Locator.tagContainingText("span", "Customize"));
     }
 
     public void assertUserExists(String email)
@@ -5754,7 +6014,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void convertWikiFormat(String format)
     {
-        String curFormat = selenium.getEval("this.browserbot.getCurrentWindow()._wikiProps.rendererType");
+        String curFormat = (String)executeScript("return window._wikiProps.rendererType");
         if(curFormat.equalsIgnoreCase(format))
             return;
 
@@ -5782,7 +6042,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setWikiBody(String body)
     {
         switchWikiToSourceView();
-        setLongTextField("body", body);
+        setFormElement(Locator.name("body"), body);
     }
 
     /**
@@ -5919,7 +6179,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void goToProjectHome()
     {
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
     }
 
     public void goToHome()
@@ -5952,15 +6212,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void goToPipelineItem(String item)
     {
         int time = 0;
-        while (getText(Locator.raw("//td[contains(text(),'" + item + "')]/../td[2]/a")).compareTo("WAITING") == 0
+        while (getText(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a")).compareTo("WAITING") == 0
                 && time < defaultWaitForPage)
         {
             sleep(100);
             time += 100;
             refresh();
         }
-        clickAndWait(Locator.raw("//td[contains(text(),'" + item + "')]/../td[2]/a"));
-        waitForElement(Locator.raw("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
+        clickAndWait(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a"));
+        waitForElement(Locator.xpath("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Data");
     }
 
@@ -6175,7 +6435,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             click(loc);
         else
         {
-            selenium.doubleClick(loc.toString());
+            _driver.findElement(loc.toBy()).click();
+            _driver.findElement(loc.toBy()).click();
             sleep(1000);
             click(loc);
         }
@@ -6254,7 +6515,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void createNewQuery(String schemaName)
     {
         selectSchema(schemaName);
-        String url = selenium.getEval("selenium.browserbot.getCurrentWindow()._browser.getCreateQueryUrl('" + schemaName + "')");
+        String url = (String)executeScript("return window._browser.getCreateQueryUrl('" + schemaName + "')");
         if (null == url || url.length() == 0)
             Assert.fail("Could not get the URL for creating a new query in schema " + schemaName);
         beginAt(url);
@@ -6306,39 +6567,44 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    public void pressTab(String xpath)
+    public void pressTab(Locator l)
     {
-        selenium.keyDown(xpath, "\\9"); // For Windows
-        selenium.keyPress(xpath, "\\9"); // For Linux
-        selenium.keyUp(xpath, "\\9");
+        WebElement el = _driver.findElement(l.toBy());
+        el.sendKeys(Keys.TAB);
     }
 
-    public void pressEnter(String xpath)
+    public void pressEnter(Locator l)
     {
-        selenium.keyDown(xpath, "\\13"); // For Windows
-        selenium.keyPress(xpath, "\\13"); // For Linux
-        selenium.keyUp(xpath, "\\13");
+        WebElement el = _driver.findElement(l.toBy());
+        el.sendKeys(Keys.ENTER);
     }
 
-    public void pressDownArrow(String xpath)
+    public void pressDownArrow(Locator l)
     {
-        selenium.keyDown(xpath, "\\40"); // For Windows
-        selenium.keyPress(xpath, "\\40"); // For Linux
-        selenium.keyUp(xpath, "\\40");
+        WebElement el = _driver.findElement(l.toBy());
+        el.sendKeys(Keys.DOWN);
     }
 
-    public class DefaultSeleniumWrapper extends DefaultSelenium
-//    public class DefaultSeleniumWrapper extends WebDriverBackedSelenium
+    public class DefaultSeleniumWrapper extends WebDriverBackedSelenium
     {
         DefaultSeleniumWrapper()
         {
-            super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL() + "/");
-//            super(getBrowser().startsWith("*ie")?new InternetExplorerDriver():new FirefoxDriver(), WebTestHelper.getBaseURL() + "/");
+            super(getBrowser().startsWith("*ie")?new InternetExplorerDriver():new FirefoxDriver(), WebTestHelper.getBaseURL());
+        }
+
+        public DefaultSeleniumWrapper(com.google.common.base.Supplier<org.openqa.selenium.WebDriver> maker, java.lang.String baseUrl)
+        {
+            super(maker, baseUrl);
+        }
+
+        public DefaultSeleniumWrapper(WebDriver baseDriver, java.lang.String baseUrl)
+        {
+            super(baseDriver, baseUrl);
         }
 
         private void log(String s)
         {
-            BaseSeleniumWebTest.this.log("selenium - " + s);
+            BaseWebDriverTest.this.log("selenium - " + s);
         }
 
         @Override
@@ -6366,10 +6632,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             clickAt(l.toString().substring(6), coord);
         }
-
-//        public void clickID(String id)
-//        {
-//        }
 
         @Override
         public void doubleClickAt(String locator, String coordString)
@@ -6537,7 +6799,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         @Override
         public void open(String url)
         {
-            open(url, BaseSeleniumWebTest.this.defaultWaitForPage);
+            open(url, BaseWebDriverTest.this.defaultWaitForPage);
         }
 
         public void open(String url, int millis)
@@ -6603,7 +6865,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         @Override
         public String getConfirmation()
         {
-            return super.getConfirmation();
+            Alert alert = _driver.switchTo().alert();
+            String confirmation = alert.getText();
+            alert.accept();
+            return confirmation;
         }
 
         @Override
