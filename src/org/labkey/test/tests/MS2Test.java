@@ -1143,14 +1143,14 @@ public class MS2Test extends MS2TestBase
         clickLinkWithText("MS2 Dashboard");
         clickLinkWithText("MS2 Runs");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("RunGroups/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
-        _customizeViewsHelper.addCustomizeViewColumn("RunGroups/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
-        _customizeViewsHelper.addCustomizeViewColumn("RunGroups/Default Experiment", "Run Groups Default Experiment");
+        _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
+        _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
+        _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/Default Experiment", "Run Groups Default Experiment");
         _customizeViewsHelper.applyCustomView();
 
-        assertTextPresent("Run Groups " + RUN_GROUP1_NAME2);
-        assertTextPresent("Run Groups " + RUN_GROUP2_NAME);
-        assertTextPresent("Run Groups Default Experiment");
+        assertTextPresent(RUN_GROUP1_NAME2);
+        assertTextPresent(RUN_GROUP2_NAME);
+        assertTextPresent("Default Experiment");
 
         checkCheckbox("experimentMembership", 0);
         checkCheckbox("experimentMembership", 1);
