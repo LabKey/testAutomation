@@ -375,9 +375,9 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
                     href.contains("/query/" + workbook + "/manageRecord.view?"));
 
             //sample source: this is the current container
-            href = URLDecoder.decode(getAttribute(Locator.linkWithText("Blood", rowNum), "href"), "UTF-8");
+            href = URLDecoder.decode(getAttribute(Locator.linkWithText("Whole Blood", rowNum), "href"), "UTF-8");
             Assert.assertTrue("Expected sample source column URL to go to the container: " + getProjectName() + ", href was: " + href,
-                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type&type=Blood"));
+                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type&type=Whole Blood"));
 
             //sample type
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
@@ -397,7 +397,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         dr.clickLink(1, 1);
         waitForPageToLoad();
         waitForText("Back");
-        assertTextPresent("Sample1", "DNA", "Blood", "Freezer:");
+        assertTextPresent("Sample1", "DNA", "Whole Blood", "Freezer:");
 
         verifyFreezerColOrder();
     }
@@ -428,7 +428,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _helper.setFormField("freezer", "freezer_" + _helper.getRandomInt());
 
         _ext4Helper.selectComboBoxItem("Sample Type", "DNA");
-        _ext4Helper.selectComboBoxItem("Sample Source", "Blood");
+        _ext4Helper.selectComboBoxItem("Sample Source", "Whole Blood");
 
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
