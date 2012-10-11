@@ -124,7 +124,7 @@ public enum TestSet
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
-//        SpecimenProgressReportTest.class,
+        SpecimenProgressReportTest.class,
         FormulationsTest.class,
         CohortTest.class,
         RlabkeyTest.class,
