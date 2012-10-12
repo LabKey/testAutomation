@@ -106,12 +106,14 @@ import static org.labkey.test.WebTestHelper.logToServer;
  * User: Mark Igra
  * Date: Feb 7, 2007
  * Time: 5:31:38 PM
+ * @deprecated Use {@link BaseWebDriverTest}
  */
+@Deprecated
 public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 {
     public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
-    protected DefaultSeleniumWrapper selenium;
+    @Deprecated protected DefaultSeleniumWrapper selenium;
     private static final int DEFAULT_SELENIUM_PORT = 4444;
     private static final String DEFAULT_SELENIUM_SERVER = "localhost";
     private String _lastPageTitle = null;
