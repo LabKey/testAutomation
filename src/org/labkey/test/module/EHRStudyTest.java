@@ -216,11 +216,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         waitForText("Populate Complete", 120000);
 
         //these tables do not have a container field, so are not deleted when the test project is deleted
-        clickButton("Delete Data From SNOMED Subsets", 0);
-        waitForText("Delete Complete", 120000);
-        clickButton("Populate SNOMED Subsets Table", 0);
-        waitForText("Populate Complete", 120000);
-
         clickButton("Delete Data From SNOMED", 0);
         waitForText("Delete Complete", 120000);
         clickButton("Populate SNOMED Table", 0);
@@ -534,7 +529,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         // Re-add animal.
         setFormElement("subjectBox",  PROTOCOL_MEMBER_IDS[0]);
-        waitAndClickButton("  Append -->", 0);
+        waitAndClick(Locator.ext4Button("Append -->"));
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
