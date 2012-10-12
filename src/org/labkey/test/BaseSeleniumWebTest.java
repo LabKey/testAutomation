@@ -1768,65 +1768,54 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             selectCmd.setQueryName(query);
             int rowCount = 0;
-            try
-            {
-                selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
+                selectResp = executeSelectRowCommand("auditLog", query);
+//                selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
                 rowCount =   selectResp.getRowCount().intValue();
-            }
-            catch (IOException e)
-            {
-               Assert.fail("Unable to retrieve query: " + query);
-            }
-            catch (CommandException e)
-            {
-               Assert.fail("Unable to retrieve query: " + query);
-            }
             log(query + " row count: " + rowCount);
             auditEventRowCount += rowCount;
         }
 
         //file system events are batched
-        String query =  "FileSystem";
-        try
-        {
-            selectCmd.setQueryName(query);
-            int rowCount = 0;
+        selectResp = executeSelectRowCommand("auditLog", "FileSystem");
+        //if we ever have a test generating more than one batch of files, this will need to be updated, but it will
+        //do for now
+        if(selectResp.getRowCount().intValue() > 0)
+            auditEventRowCount++;
 
-            selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
-            rowCount =   selectResp.getRowCount().intValue();
-
-            //if we ever have a test generating more than one batch of files, this will need to be updated, but it will
-            //do for now
-            if(rowCount > 0)
-                auditEventRowCount++;
-        }
-        catch (IOException e)
-        {
-           Assert.fail("Unable to retrieve query: " + query);
-        }
-        catch (CommandException e)
-        {
-           Assert.fail("Unable to retrieve query: " + query);
-        }
-        try
-        {
-            selectCmd.setQueryName("LabAuditEvents");
-            selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
-        }
-        catch (IOException e)
-        {
-               Assert.fail("Unable to retrieve query: LabAuditEvents");
-        }
-        catch (CommandException e)
-        {
-               Assert.fail("Unable to retrieve query: LabAuditEvents");
-        }
+        selectResp = executeSelectRowCommand("auditLog", "LabAuditEvents");
         Assert.assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, selectResp.getRowCount().intValue());
     }
 
     public Connection getDefaultConnection()
     {
         return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName)
+    {
+        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName());
+    }
+
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path)
+    {
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
+        selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(containerFilter);
+        selectCmd.setColumns(Arrays.asList("*"));
+        SelectRowsResponse selectResp = null;
+
+//        selectCmd.setQueryName(subQuery);
+        try
+        {
+            selectResp = selectCmd.execute(cn, path);
+        }
+        catch (Exception e)
+        {
+           Assert.fail(e.getMessage());
+        }
+
+        return selectResp;
     }
 
     @LogMethod
@@ -2240,7 +2229,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void assertExtMsgBox(String title, String text)
     {
         String actual = _extHelper.getExtMsgBoxText(title);
-        Assert.assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.indexOf(text) != -1);
+        Assert.assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.contains(text));
     }
 
     public enum SeleniumEvent
@@ -3304,11 +3293,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             public boolean check()
             {
                 int actualCount = countText(text);
-                if (actualCount != count)
-                {
-                    return false;
-                }
-                return true;
+                return actualCount == count;
             }
         }, failMessage, wait);
     }
@@ -4492,7 +4477,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void setText(String elementName, String text)
     {
-        if (elementName.toLowerCase().indexOf("password") >= 0)
+        if (elementName.toLowerCase().contains("password"))
             log("Setting text of " + elementName + " to ******");
         else
             log("Setting text of " + elementName + " to " + text);
@@ -4558,7 +4543,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
-        if (runMenuItemHandler(id));
+        if (runMenuItemHandler(id))
             waitForPageToLoad(wait);
     }
 
@@ -5102,7 +5087,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return R + "NoPermissionsRole";
         if ("Project Administrator".equals(perm))
             return R + "ProjectAdminRole";
-        else if (-1 == perm.indexOf("."))
+        else if (!perm.contains("."))
             return R + perm + "Role";
         return perm;
     }

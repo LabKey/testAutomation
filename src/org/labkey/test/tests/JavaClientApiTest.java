@@ -148,7 +148,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
     {
         log("Starting CRUD test...");
         log("Inserting a new record into that list...");
-        Connection cn = new Connection(getBaseURL());
+        Connection cn = getDefaultConnection();
 
         //insert a row
         Date now = new Date();

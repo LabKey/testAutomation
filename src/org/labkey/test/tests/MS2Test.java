@@ -27,13 +27,41 @@ import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MS2Test extends MS2TestBase
 {
 
+    public static final String DEFAULT_EXPERIMENT = "Default Experiment";
+
     protected void doTestSteps()
     {
         goTestIt("DRT1","DRT2");
+        verifyGroupAudit();
+    }
+
+    //verify audit trail registers runs added to or removed from groups.
+    private void verifyGroupAudit()
+    {
+        List<Map<String, Object>> rows = executeSelectRowCommand("auditLog", "ExperimentAuditEvent").getRows();
+        Assert.assertEquals("Unexpected number of audit rows", 10, rows.size());
+        int addedCount = 0;
+        int removedCount = 0;
+        for(Map row : rows)
+        {
+            if(((String)row.get("Comment")).contains("was added to the run group"))
+                addedCount++;
+            else if(((String)row.get("Comment")).contains("was removed from the run group"))
+                removedCount++;
+        }
+
+        Assert.assertEquals(8, addedCount);
+        Assert.assertEquals(1, removedCount);
+        //Issue 16265: need to filter group created during export from RunGroupMap query
+        //add test for this when fixed
     }
 
     protected static final String VIEW2 = "proteinView";
@@ -49,7 +77,9 @@ public class MS2Test extends MS2TestBase
     protected static final String ENZYME = "trypsin";
     protected static final String MASS_SPEC = "ThermoFinnigan";
     protected static final String RUN_GROUP1_NAME1 = "Test Run Group 1";
-    protected static final String RUN_GROUP1_NAME2 = "Test Run Group 1 New Name";
+    //Issue #16260, "Exception when including run group with tricky characters in name," has been updated
+    //reactivate tricky_char_names when this is fixed
+    protected static final String RUN_GROUP1_NAME2 = "Test Run Group 1 New Name";// + TRICKY_CHARACTERS;
     protected static final String RUN_GROUP1_CONTACT = "Test Contact";
     protected static final String RUN_GROUP1_DESCRIPTION = "This is a description";
     protected static final String RUN_GROUP1_HYPOTHESIS = "I think this is happening";
@@ -1150,7 +1180,7 @@ public class MS2Test extends MS2TestBase
 
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
-        assertTextPresent("Default Experiment");
+        assertTextPresent(DEFAULT_EXPERIMENT);
 
         checkCheckbox("experimentMembership", 0);
         checkCheckbox("experimentMembership", 1);
@@ -1165,10 +1195,12 @@ public class MS2Test extends MS2TestBase
         clickLinkWithText(RUN_GROUP2_NAME);
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
-        assertTextPresent("Default Experiment");
+        assertTextPresent(DEFAULT_EXPERIMENT);
         checkDataRegionCheckbox("XTandemSearchRuns", 1);
         clickButton("Remove");
         assert(!isTextPresent(testFile1) || !isTextPresent(testFile2));
+
+        verifyRunGroupMap();
         clickLinkWithText("MS2 Dashboard");
 
         log("Test that the compare run groups works");
@@ -1182,7 +1214,7 @@ public class MS2Test extends MS2TestBase
         waitForText(RUN_GROUP1_NAME2, 1000);
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
-        assertTextPresent("Default Experiment");
+        assertTextPresent(DEFAULT_EXPERIMENT);
         selectOptionByValue("//div[text() = 'A']/../../../td/select", "group1");
 
         log("Test Customize View");
@@ -1223,7 +1255,7 @@ public class MS2Test extends MS2TestBase
         clickButton("Confirm Delete");
         assertTextNotPresent(RUN_GROUP1_NAME2);
         assertTextNotPresent(RUN_GROUP2_NAME);
-        assertTextNotPresent("Default Experiment");
+        assertTextNotPresent(DEFAULT_EXPERIMENT);
         clickLinkWithText("MS2 Dashboard");
         assertTextNotPresent(RUN_GROUP1_NAME2);
 
@@ -1291,6 +1323,33 @@ public class MS2Test extends MS2TestBase
         pepXMLtest();
         queryValidationTest();
 
+    }
+
+    private void verifyRunGroupMap()
+    {
+
+        //have to go to the actual page to test lookup
+        beginAt("/query/MS2VerifyProject/ms2folder/executeQuery.view?schemaName=exp&query.queryName=RunGroupMap");
+
+        List<Map<String, Object>> rows = executeSelectRowCommand("exp", "RunGroupMap").getRows();
+        Assert.assertEquals("Unexpected number of rows in RunGroupMap", 7, rows.size());
+
+        Set<String> keys = rows.get(0).keySet();
+        for(String header : new String[] {"RunGroup", "Created", "CreatedBy", "Run"})
+        {
+            Assert.assertTrue("Run Group Map missing column: " + header, keys.contains(header));
+        }
+        Map<String, Integer> textAndCount = new HashMap<String, Integer>();
+        textAndCount.put(DEFAULT_EXPERIMENT, new Integer(2));
+        textAndCount.put(RUN_GROUP1_NAME2, new Integer(2));
+        textAndCount.put("Test Run Group 2", new Integer(1));
+        textAndCount.put("DRT2", new Integer(4));
+        textAndCount.put("DRT1", new Integer(3));
+
+        for(String key : textAndCount.keySet())
+        {
+            assertTextPresent(key, textAndCount.get(key).intValue());
+        }
     }
 
     private void pepXMLtest()

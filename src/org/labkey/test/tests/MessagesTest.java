@@ -17,13 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.util.Arrays;
@@ -204,7 +202,6 @@ public class MessagesTest extends BaseSeleniumWebTest
 
     private void schemaTest()
     {
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
         SelectRowsCommand selectCmd = new SelectRowsCommand("announcement", "ForumSubscription");
         selectCmd.setMaxRows(-1);
@@ -217,16 +214,10 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         for(int i = 0; i<queries.length; i++)
         {
-            selectCmd.setQueryName(queries[i]);
-            try
-            {
-                selectResp = selectCmd.execute(cn, "/" + getProjectName());
-            }
-            catch (Exception e)
-            {
-               Assert.fail(e.getMessage());
-            }
+            selectResp = executeSelectRowCommand("announcement", queries[i]);
             Assert.assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
         }
+
     }
+
 }
