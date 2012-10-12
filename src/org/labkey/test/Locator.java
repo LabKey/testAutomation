@@ -161,8 +161,8 @@ public class Locator
 
     public static Locator css(String selector)
     {
-        if (selector.contains(":contains("))
-            throw new IllegalArgumentException("CSS3 has deprecated :contains()");
+//        if (selector.contains(":contains("))
+            //todo: throw new IllegalArgumentException("CSS3 has deprecated :contains()");
         return new Locator("css=" + selector);
     }
 
