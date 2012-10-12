@@ -86,7 +86,11 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.sleep(5000); //TODO;
         _test.clickButton("Alias Field", "Choose a field");
 
-        _test.setFormElement(Locator.name("sourceColumn"), aliasedColumn);
+        Locator l = Locator.name("sourceColumn");
+        _test.setFormElement(l, aliasedColumn);
+        // may need to try all lower case for form element selection
+        if (!_test.getFormElement(l).equals(aliasedColumn))
+            _test.setFormElement(l, aliasedColumn.toLowerCase());
         _test.clickButton("OK", _test.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
         //set name

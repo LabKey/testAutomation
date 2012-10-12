@@ -127,7 +127,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private void configureAssaySchema(String assayName, boolean showFlag)
     {
         ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("", "rho", assayName + " Query");
-        _assayHelper.addAliasedFieldToMetadata(assayName + " Data", "rowid", "qcmessage", lookupInfo);
+        _assayHelper.addAliasedFieldToMetadata(assayName + " Data", "RowId", "qcmessage", lookupInfo);
         clickButton("Save", 0);
         waitForText("Save successful.");
         clickButton("View Data");
