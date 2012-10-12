@@ -126,14 +126,13 @@ public class AssayTest extends AbstractAssayTest
     protected void runUITests()
     {
 
-        setSystemMaintenance(false);
-        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
+//        setSystemMaintenance(false);
+        /** Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
+        * this has nothing to do with assays, but needs to be run regularly for performance reasons and can take some time to complete
+        * assay test is the longest test in the BVTs, so it will cause the fewest delays here
+         * **/
         startSystemMaintenance();
 
-        goToSiteSettings();
-        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
-        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
-        clickButton("Save");
 
 
         log("Starting Assay security scenario tests");
@@ -156,11 +155,6 @@ public class AssayTest extends AbstractAssayTest
 
         // Now that the test is done, ensure that system maintenance is complete...
         waitForSystemMaintenanceCompletion();
-
-        // Verify scheduled system maintenance is disabled.
-        goToAdminConsole();
-        clickLinkWithText("running threads");
-        assertTextNotPresent("SystemMaintenance");
     }
 
     //Issue 12203: Incorrect files are visible from pipeline directory

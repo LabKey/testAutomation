@@ -60,8 +60,6 @@ public class BasicTest extends BaseSeleniumWebTest
 
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
-//        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
-//        startSystemMaintenance();
 
         goToSiteSettings();
         checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
@@ -149,13 +147,10 @@ public class BasicTest extends BaseSeleniumWebTest
         // verify that web part is gone, even after a refresh:
         assertElementNotPresent(searchLocator);
 
-        // Now that the test is done, ensure that system maintenance is complete...
-//        waitForSystemMaintenanceCompletion();
-//
 //        // Verify scheduled system maintenance is disabled.
-//        goToAdminConsole();
-//        clickLinkWithText("running threads");
-//        assertTextNotPresent("SystemMaintenance");
+        goToAdminConsole();
+        clickLinkWithText("running threads");
+        assertTextNotPresent("SystemMaintenance");
     }
 
     private boolean isBrowser(String source, String browserNameAndSeparator, double startVersion, double endVersion)
