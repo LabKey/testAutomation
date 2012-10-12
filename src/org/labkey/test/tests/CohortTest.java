@@ -15,10 +15,9 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 
@@ -28,7 +27,7 @@ import java.io.File;
  * Date: Jan 13, 2010
  * Time: 4:50:24 PM
  */
-public class CohortTest extends BaseSeleniumWebTest
+public class CohortTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "Cohort Test Project";
     private static final String COHORT_STUDY_ZIP = "/sampledata/study/CohortStudy.zip";
@@ -65,7 +64,7 @@ public class CohortTest extends BaseSeleniumWebTest
         log("Check advanced cohort features.");
         _containerHelper.createProject(PROJECT_NAME, "Study");
         importStudyFromZip(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         addWebPart("Specimens");
         // Check all cohorts after initial import.
 
@@ -181,7 +180,7 @@ public class CohortTest extends BaseSeleniumWebTest
         // Check that cohort filters persist through participant view
 
         // Check that switching visit order changes cohort.
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         clickTab("Manage");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("Change Visit Order");
@@ -194,7 +193,8 @@ public class CohortTest extends BaseSeleniumWebTest
         clickButtonByIndex("Move Up", 1, 0);
         clickButtonByIndex("Move Up", 1, 0);
         clickButton("Save");
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
+        click(Locator.tagContainingText("span", "Specimen Reports")); // expand
         clickLinkWithText("View Available Reports");
         clickButtonByIndex("View", 2);
         checkCheckbox("viewPtidList");
@@ -211,7 +211,7 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellNotContains(TABLE_POSITIVE, 2, 5, INFECTED_4, UNASSIGNED_1);
 
         // Check that deleting a vistit changes the cohort.
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         clickTab("Manage");
         clickLinkWithText("Manage Visits");
         clickLinkWithText("edit", 4); // Visit 4
@@ -223,7 +223,7 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTableCellTextEquals(COHORT_TABLE, 4, 1, "Negative"); // Infected4
 
         // Check all cohorts after manipulation.
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Blood"), WAIT_FOR_PAGE);
         assertTextPresent("Count: 20"); // 5 participants x 4 visits (was five visits, but one was just deleted)
 
@@ -241,7 +241,7 @@ public class CohortTest extends BaseSeleniumWebTest
         assertTextPresent("Count: 6"); // Visit4 samples no longer have a cohort, and are thus not shown.
 
         // Check that participant view respects filter.
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         clickLinkWithText("2 datasets");
         clickLinkWithText("Test Results");
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
@@ -257,14 +257,14 @@ public class CohortTest extends BaseSeleniumWebTest
            
         // Check basic cohorts
         log("Check basic cohort features.");
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         clickRadioButtonById("simpleCohorts");
         selenium.getConfirmation();
         waitForPageToLoad();
 
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         waitAndClick(Locator.linkWithText("Blood"));
 
         waitForText("Positive", 12, WAIT_FOR_JAVASCRIPT);

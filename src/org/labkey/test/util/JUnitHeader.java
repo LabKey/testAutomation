@@ -54,6 +54,8 @@ public class JUnitHeader extends BaseWebDriverTest
         enableEmailRecorder();
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
 
+        _testFailed = false;
+
         log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
     }
 

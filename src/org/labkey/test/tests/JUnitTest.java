@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.Runner;
 import org.labkey.test.BaseSeleniumWebTest;
@@ -67,7 +68,7 @@ public class JUnitTest extends TestSuite
         return getClass().getName();
     }
 
-    private static class JUnitSeleniumHelper extends BaseSeleniumWebTest
+    private static class JUnitSeleniumHelper extends BaseWebDriverTest
     {
         public void unfail()
         {

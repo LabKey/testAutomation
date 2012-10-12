@@ -60,6 +60,8 @@ public class JUnitFooter extends BaseWebDriverTest
         checkLeaksAndErrors();
         resetErrors();
 
+        _testFailed = false;
+
         log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
     }
 
