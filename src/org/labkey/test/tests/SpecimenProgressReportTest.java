@@ -75,6 +75,16 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         waitForElement(table);
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
 
+        // verify legend text and ordering
+        assertTextPresentInThisOrder("specimen collected", "specimen received by lab", "specimen received but invalid", "assay results available", "query");
+
+        // verify setting the PCR additional grouping column
+        assertTextPresent("46 PCR queries");
+        configureGroupingColumn("PCR", "gene");
+        waitForElement(table);
+        clickLinkWithText("48 results from PCR have been uploaded.");
+        assertTextPresent("Participant Visit not found", 6);
+        assertTextPresent("2 duplicates found", 4);
     }
 
     private void flagSpecimenForReview()
@@ -134,7 +144,13 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         _extHelper.checkCheckbox(assay1);
 //        _extHelper.checkCheckbox("RNA");
         click(Locator.tagContainingText("label", "Specimen Report Study Folder Study"));
-//        setFormElement(Locator.name("groupingColumn"), "gene");
+        clickButton("Save");
+    }
+
+    private void configureGroupingColumn(String label, String name)
+    {
+        clickWebpartMenuItem("Assay Progress Dashboard", true, "Customize");
+        setFormElement(Locator.xpath("//td/label[contains(text(),'" + label + ":')]/../../td/input[@name='groupingColumn']"), name);
         clickButton("Save");
     }
 
