@@ -63,18 +63,14 @@ public class ListHelperWD extends AbstractHelperWD
     private void _submitImportTsv(String error)
     {
         _test.clickButton("Submit", 0);
-        _test.sleep(500);
         if (null != error)
         {
-            _test.waitForExtMaskToDisappear();
+            _test.waitForElement(Locator.css(".labkey-error"));
             if (0<error.length())
-                _test.waitForText(error, BaseWebDriverTest.WAIT_FOR_PAGE);
+                Assert.assertTrue("Wrong error: " + _test.getText(Locator.css(".labkey-error")), _test.getText(Locator.css(".labkey-error")).contains(error));
         }
         else
         {
-            _test._extHelper.waitForExtDialog("Success");
-            _test.assertTextPresent(" inserted.");
-            _test.clickButton("OK");
             _test.waitForPageToLoad();
         }
     }

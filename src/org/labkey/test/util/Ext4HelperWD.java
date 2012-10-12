@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 package org.labkey.test.util;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -65,7 +63,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public void selectComboBoxItem(String label, String selection)
     {
-       Ext4FieldRef.getForLabel(_test, label).setValue(selection);
+       Ext4FieldRefWD.getForLabel(_test, label).setValue(selection);
     }
 
     @LogMethod
@@ -190,7 +188,12 @@ public class Ext4HelperWD extends AbstractHelperWD
         return _test.isElementPresent(rowLoc.append("[contains(@class, 'x4-grid-row-selected')]"));
     }
 
-    public <Type extends Ext4CmpRef> List<Type> componentQuery(String componentSelector, Class<Type> clazz)
+    public <Type extends Ext4CmpRefWD> List<Type> componentQuery(String componentSelector, Class<Type> clazz)
+    {
+        return componentQuery(componentSelector, null, clazz);
+    }
+
+    public <Type extends Ext4CmpRefWD> List<Type> componentQuery(String componentSelector, String parentId, Class<Type> clazz)
     {
         componentSelector = componentSelector.replaceAll("'", "\"");  //escape single quotes
         String script =
@@ -201,14 +204,15 @@ public class Ext4HelperWD extends AbstractHelperWD
                 "    else\n" +
                 "        res = Ext4.ComponentQuery.query(selector);\n" +
 
-                "    return null == res ? null : Ext4.JSON.encode(Ext4.Array.pluck(res, \"id\"));\n" +
+                "    return null == res ? null : Ext4.Array.pluck(res, \"id\");\n" +
                 "};" +
                 "return ext4ComponentQuery(arguments[0], arguments[1]);";
-        String res = (String)_test.executeScript(script, componentSelector, null);
-        return _test._ext4Helper.componentsFromJson(res, clazz);
+
+        List<String> ids = (List<String>)_test.executeScript(script, componentSelector, parentId);
+        return _test._ext4Helper.componentsFromIds(ids, clazz);
     }
 
-    public <Type extends Ext4CmpRef> Type queryOne(String componentSelector, Class<Type> clazz)
+    public <Type extends Ext4CmpRefWD> Type queryOne(String componentSelector, Class<Type> clazz)
     {
         List<Type> cmpRefs = componentQuery(componentSelector, clazz);
         if (null == cmpRefs || cmpRefs.size() == 0)
@@ -217,19 +221,18 @@ public class Ext4HelperWD extends AbstractHelperWD
         return cmpRefs.get(0);
     }
 
-    public <Type extends Ext4CmpRef> List<Type> componentsFromJson(String jsonArrayStr, Class<Type> clazz)
+    public <Type extends Ext4CmpRefWD> List<Type> componentsFromIds(List<String> ids, Class<Type> clazz)
     {
-        if (null == jsonArrayStr || "null".equals(jsonArrayStr))
+        if (null == ids || ids.isEmpty())
             return null;
 
         try
         {
-            JSONArray array = (JSONArray) JSONValue.parse(jsonArrayStr);
-            List<Type> ret = new ArrayList<Type>(array.size());
-            for (Object o : array)
+            List<Type> ret = new ArrayList<Type>(ids.size());
+            for (String id : ids)
             {
                 Constructor<Type> constructor = clazz.getConstructor(String.class, BaseWebDriverTest.class);
-                ret.add(constructor.newInstance(o.toString(), _test));
+                ret.add(constructor.newInstance(id, _test));
             }
             return ret;
         }
@@ -256,7 +259,7 @@ public class Ext4HelperWD extends AbstractHelperWD
         return new BaseWebDriverTest.Checker(){
             public boolean check()
             {
-                return queryOne(selector, Ext4CmpRef.class) != null;
+                return queryOne(selector, Ext4CmpRefWD.class) != null;
             }
         };
     }

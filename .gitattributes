@@ -327,6 +327,9 @@ src/org/labkey/test/util/UIContainerHelper.java -text
 src/org/labkey/test/util/UIUserHelper.java -text
 src/org/labkey/test/util/WikiHelper.java -text
 src/org/labkey/test/util/ext4cmp/Ext4CmpRef.java -text
+src/org/labkey/test/util/ext4cmp/Ext4CmpRefWD.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRef.java -text
+src/org/labkey/test/util/ext4cmp/Ext4FieldRefWD.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FileFieldRef.java -text
+src/org/labkey/test/util/ext4cmp/Ext4FileFieldRefWD.java -text
 /upgrade_stress_test.cmd -text

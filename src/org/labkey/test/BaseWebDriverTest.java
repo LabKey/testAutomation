@@ -49,7 +49,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggingAspect;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.StudyHelperWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.openqa.selenium.Alert;
@@ -254,8 +254,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         JavascriptExecutor exec = (JavascriptExecutor) _driver;
         return exec.executeScript(script, arguments);
-
-
     }
 
     public void resetJsErrorChecker()
@@ -3247,7 +3245,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void exportFolderAsZip()
     {
         goToFolderManagement();
-        clickLinkWithText("Export "); // TODO: Trailing spaces on folder management tabs
+        clickLinkWithText("Export");
         checkRadioButton("location", 1);
 
     }
@@ -3256,7 +3254,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         goToFolderManagement();
         log("setting module properties");
-        clickLinkWithText("Module Properties "); // TODO: Trailing spaces on folder management tabs
+        clickLinkWithText("Module Properties");
         waitForText("Save Changes");
         boolean changed = false;
         for (String moduleName : props.keySet())
@@ -3270,7 +3268,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 map.put("propName", array[1]);
                 waitForText(array[1]); //wait for the property name to appear
                 String query = ComponentQuery.fromAttributes("field", map);
-                Ext4FieldRef ref = _ext4Helper.queryOne(query, Ext4FieldRef.class);
+                Ext4FieldRefWD ref = _ext4Helper.queryOne(query, Ext4FieldRefWD.class);
                 String val = ref.getValue();
                 if(StringUtils.isEmpty(val) || !val.equals(array[2]))
                 {
