@@ -1847,6 +1847,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     errorCtStr = " (1 of " + validErrors.size() + ") ";
                 if (!_testFailed) // Don't clobber existing failures. Just log them.
                     Assert.fail("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
+                else
+                    log("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
             }
         }
     }
