@@ -16,7 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
@@ -27,7 +27,7 @@ import java.io.File;
  * Date: Aug 4, 2009
  * Time: 1:59:39 PM
  */
-public class SCHARPStudyTest extends BaseSeleniumWebTest
+public class SCHARPStudyTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME="SCHARP Study Test";
 
@@ -37,11 +37,11 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
 
     protected static class StatusChecker implements Checker
     {
-        private BaseSeleniumWebTest _test;
+        private BaseWebDriverTest _test;
         private String _waitForMessage;
         private Locator _loc = Locator.id("vq-status");
 
-        public StatusChecker(String waitForMessage, BaseSeleniumWebTest test)
+        public StatusChecker(String waitForMessage, BaseWebDriverTest test)
         {
             _test = test;
             _waitForMessage = waitForMessage;
@@ -69,7 +69,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
             return;
         }
 
-        clickLinkWithText(PROJECT_NAME);        
+        clickFolder(PROJECT_NAME);
         log("importing study...");
         setupPipeline();
         importStudy();
@@ -82,7 +82,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
         log("Setting pipeline root to " + _pipelinePathMain + "...");
         setPipelineRoot(_pipelinePathMain);
         assertTextPresent("The pipeline root was set");
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
     }
 
     protected void importStudy()
@@ -113,7 +113,7 @@ public class SCHARPStudyTest extends BaseSeleniumWebTest
             refresh();
         }
 
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
     }
 
     protected void doCleanup() throws Exception

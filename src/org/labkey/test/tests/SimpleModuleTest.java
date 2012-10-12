@@ -17,10 +17,9 @@ package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.Maps;
 import org.labkey.remoteapi.query.*;
@@ -44,7 +43,7 @@ import java.util.Date;
 *
 * Tests the simple module and file-based resources introduced in version 9.1
 */
-public class SimpleModuleTest extends BaseSeleniumWebTest
+public class SimpleModuleTest extends BaseWebDriverTest
 {
     public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml
     public static final String TABBED_FOLDER_TYPE = "My XML-defined Tabbed Folder Type";
@@ -82,7 +81,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         //enableModule(getProjectName(), MODULE_NAME);
         //enableModule(getProjectName(), "Query");
 
-        doTestTabbedFolder();
+        clickFolder(getProjectName());
 
         clickLinkWithText(getProjectName());
         doTestCustomFolder();
@@ -432,28 +431,28 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     {
         log("Testing web parts in modules...");
         //go to project portal
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
 
         //add Simple Module Web Part
         addWebPart("Simple Module Web Part");
         assertTextPresent("This is a web part view in the simple test module");
 
-        String value = getWrapper().getEval("window.LABKEY.moduleContext.simpletest.scriptLoaded");
-        Assert.assertEquals("Module context not being loaded propertly", "true", value);
+        Boolean value = (Boolean)executeScript("return window.LABKEY.moduleContext.simpletest.scriptLoaded");
+        Assert.assertTrue("Module context not being loaded propertly", value);
     }
 
     private void createList()
     {
         //create a list for our query
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
         _listHelper.createList(getProjectName(), LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+                ListHelperWD.ListColumnType.AutoInteger, "Key",
+                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
+                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
+                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
 
         log("Importing some data...");
         clickButton("Import Data");
@@ -461,10 +460,10 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         log("Create list in subfolder to prevent query validation failure");
         _listHelper.createList(FOLDER_NAME, LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
-                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+                ListHelperWD.ListColumnType.AutoInteger, "Key",
+                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
+                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
+                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
     }
 
     private void doTestQueries()
@@ -472,7 +471,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("Testing queries in modules...");
 
         //go to query module portal
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         goToModule("Query");
         viewQueryData("lists", "TestQuery");
 
@@ -485,7 +484,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
     private void doTestQueryViews()
     {
         log("Testing module-based custom query views...");
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText(LIST_NAME);
 
         clickMenuButton("Views", "Crazy People");
@@ -503,7 +502,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         _customizeViewsHelper.applyCustomView();
         assertTextPresent("is unsaved");
         assertTextPresent("Created By");
-        CustomizeViewsHelper.saveUnsavedViewGridClosed(this, null);
+        _customizeViewsHelper.saveUnsavedViewGridClosed(null);
         waitForText("Crazy People Copy");
 
     }
@@ -514,7 +513,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText(LIST_NAME);
         clickMenuButton("Views", "Want To Be Cool");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
@@ -552,7 +551,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         log("Testing import templates...");
 
         //go to query module portal
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         clickButton("Import Data");
@@ -649,7 +648,7 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
         addWebPart("Simple Module Web Part");
         waitForText("This is a web part view in the simple test module");
 
-        Assert.assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop2));
 
         Map<String, List<String[]>> props = new HashMap<String, List<String[]>>();
         List<String[]> propList = new ArrayList<String[]>();
@@ -662,11 +661,11 @@ public class SimpleModuleTest extends BaseSeleniumWebTest
 
         beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
 
-        Assert.assertEquals("Module context not set propertly", prop1Value, getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop1));
-        Assert.assertEquals("Module context not set propertly", "FolderValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", prop1Value, executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop1));
+        Assert.assertEquals("Module context not set propertly", "FolderValue", executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop2));
 
         goToProjectHome();
-        Assert.assertEquals("Module context not set propertly", "DefaultValue", getWrapper().getEval("window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop2));
     }
 
     private void doTestTabbedFolder()

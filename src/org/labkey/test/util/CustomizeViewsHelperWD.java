@@ -130,19 +130,23 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
      */
     public void saveUnsavedViewGridClosed(String name)
     {
-        Locator saveButton = Locator.tagContainingText("span", "Save");
+//        Actions builder = new Actions(_test._driver);
+//        WebElement msg = _test._driver.findElement(By.cssSelector(".labkey-dataregion-msg"));
+//        WebElement btn = _test._driver.findElement(By.cssSelector(".unsavedview-save"));
+//        builder.moveToElement(msg).moveToElement(btn).click().build().perform();
+//
+//        _test.waitForText("Save Custom View");
+//
+//        if(name!=null)
+//        {
+//              _test.click(Locator.tagContainingText("label", "Named"));
+//        }
+//
+//        _test.clickButton("Save");
+        // WORKAROUND: Not working with closed panel
 
-        _test.mouseOver(Locator.css(".labkey-dataregion-msg"));
-        _test.click(saveButton);
-
-        _test.waitForText("Save Custom View");
-
-        if(name!=null)
-        {
-              _test.click(Locator.tagContainingText("label", "Named"));
-        }
-
-        _test.clickButton("Save");
+        openCustomizeViewPanel();
+        saveCustomView(name);
     }
 
     public void revertUnsavedViewGridClosed()
