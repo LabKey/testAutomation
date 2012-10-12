@@ -53,7 +53,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     public static final String first454importNum = "207";
     public static final String second454importNum = "208";
     public static final String illuminaImportNum = "206";
-    protected int pipelineJobCount=1;
+    protected int pipelineJobCount = 0;
 
     String pipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     protected int runNum = 0; //this is globally unique, so we need to retrieve it every time.
@@ -153,7 +153,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void importSecondRunTest()
     {
-        if(isGroupConcatSupported())
+        if(!isGroupConcatSupported())
             return;
         goToProjectHome();
         startImportRun("secondRead/reads.txt", "Import 454 Reads", second454importNum);
@@ -177,7 +177,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void runAnalysisTest()
     {
 
-        if(isGroupConcatSupported())
+        if(!isGroupConcatSupported())
             return;
 //        getToRunScreen();
         sendDataToGalaxyServer();
@@ -201,7 +201,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void verifyAnalysis()
     {
-        if(isGroupConcatSupported())
+        if(!isGroupConcatSupported())
             return;
         goToProjectHome();
 
@@ -331,7 +331,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
             copyFile(pipelineLoc + "/" + file, pipelineLoc + "/" + analysisFolder + "/" + file);
         }
         refresh();
-        waitForPipelineJobsToComplete(pipelineJobCount+=1, "Import genotyping analysis", false);
+        waitForPipelineJobsToComplete(++pipelineJobCount, "Import genotyping analysis", false);
     }
 
     private int getRunNumber()
@@ -369,7 +369,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         log("import illumina run");
         startImportIlluminaRun("IlluminaSamples.csv", "Import Illumina Reads");
-        waitForPipelineJobsToComplete(pipelineJobCount++, "Import Run", false);
+        waitForPipelineJobsToComplete(++pipelineJobCount, "Import Run", false);
         assertTextNotPresent("ERROR");
 
         goToProjectHome();
@@ -574,7 +574,6 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void assertExportButtonPresent()
     {
-        String[] exportTypes = {"Excel 97", "Excel 2007", ".iqy"};
         String xpath =  "//a[contains(@class, 'disabled-button')]/span[text()='Download Selected']";
         assertElementPresent(Locator.xpath(xpath));
 
@@ -596,7 +595,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         log("import genotyping run");
         startImportRun("reads.txt", "Import 454 Reads", first454importNum);
-        waitForPipelineJobsToComplete(pipelineJobCount++, "Import Run", false);
+        waitForPipelineJobsToComplete(++pipelineJobCount, "Import Run", false);
 //        assertTextNotPresent("IMPORT");
         assertTextNotPresent("ERROR");
 
