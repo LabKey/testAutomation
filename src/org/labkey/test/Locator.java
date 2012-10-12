@@ -78,12 +78,12 @@ public class Locator
         return _nth;
     }
 
+    @Deprecated
     public String toXpath()
     {
-        if (loc.startsWith("xpath="))
-            return loc.substring(loc.indexOf("=")+1);
-        else
-            throw new RuntimeException(loc + " is not an xpath locator.");
+        String xpath = loc.substring(loc.indexOf("=")+1);
+        return xpath;
+
     }
 
     public By toBy()
@@ -644,5 +644,15 @@ public class Locator
         {
             return path;
         }
+
+        public String toXpath()
+        {
+            return path;
+//            if (loc.startsWith("xpath="))
+//                return loc.substring(loc.indexOf("=")+1);
+//            else
+//                throw new RuntimeException(loc + " is not an xpath locator.");
+        }
+
     }
 }
