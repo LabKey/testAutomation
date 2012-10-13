@@ -103,7 +103,7 @@ var testFunctions = [
         if (!testResults[1].rows || testResults[1].rows.length  != 1)
             errors[errors.length] = new Error("Query.selectRows() = "+Ext.util.JSON.encode(testResults[1]));
 
-        if (!testResults[2].errors)
+        if (!testResults[2].exception)
             errors[errors.length] = new Error("Query.selectRows(badSchemaName) = "+Ext.util.JSON.encode(testResults[2]));
 
         if (!testResults[3].rows)
