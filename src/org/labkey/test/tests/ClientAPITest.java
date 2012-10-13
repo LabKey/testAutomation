@@ -612,7 +612,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertElementContains(loc, "SUCCESS: Delete affected 1 rows");
         assertElementContains(loc, "SUCCESS: Insert created 1 rows");
         assertElementContains(loc, "SUCCESS: Bad insert generated exception: Data does not contain required field: LastName");
-        assertElementContains(loc, "SUCCESS: Bad query generated exception: Failed to convert property value of type");
+        assertElementContains(loc, "SUCCESS: Bad query generated exception: Could not find schema: lists-badname");
         assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
         assertElementContains(loc, "SUCCESS: executeSql returned a session-based query");
         assertElementContains(loc, "SUCCESS: cross-folder executeSql succeeded");
