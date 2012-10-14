@@ -1105,7 +1105,7 @@ public class TimeChartTest extends StudyBaseTest
         sleep(1000); // attempt fix for intermittent failure issue where applyChanges button is clicked too quickly (selected measure properties need to be initialized)
         waitForText("Hemoglobin from Lab Results");
         applyChanges();
-        waitForText(GROUP2_PTIDS[0]+" Hemoglobin");
+        waitForText(GROUP2_PTIDS[0]+"Hemoglobin");
         //sadly, can't get data from within svg.
 //        String transform = getAttribute(Locator.xpath("//a[starts-with(@title, '"+GROUP1_PTIDS[0]+" Hemoglobin:')]/path"), "transform");
 //        double height = Double.parseDouble(transform.substring(transform.indexOf(" "), transform.indexOf(")") - 1));

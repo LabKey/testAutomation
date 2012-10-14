@@ -1713,7 +1713,7 @@ public class ReportTest extends StudyBaseTest
         // Enable Grouping - Colors
         log("Group with colors");
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
-        click(Locator.ext4Radio("By a measure"));
+        click(Locator.id("colorCategory-inputEl"));
         click(Locator.ext4Radio("Single shape"));
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
@@ -1730,8 +1730,8 @@ public class ReportTest extends StudyBaseTest
         log("Group with shapes");
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.ext4Radio("With a single color"));
-        click(Locator.ext4Radio("Per measure"));
-        _extHelper.selectExt4ComboBoxItem("Point Measure:", "16. Evaluation Summary");
+        click(Locator.id("shapeCategory-inputEl"));
+        _extHelper.selectExt4ComboBoxItem("Point Category:", "16. Evaluation Summary");
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         waitForText(SCATTER_PLOT_CUSTOMIZED_SHAPES, WAIT_FOR_JAVASCRIPT);
@@ -1747,9 +1747,9 @@ public class ReportTest extends StudyBaseTest
         // Enable Grouping - Shapes & Colors
         log("Group with both");
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
-        click(Locator.ext4Radio("By a measure"));
-        click(Locator.ext4Radio("Per measure"));
-        _extHelper.selectExt4ComboBoxItem("Point Measure:", "16. Evaluation Summary");
+        click(Locator.id("colorCategory-inputEl"));
+        click(Locator.id("shapeCategory-inputEl"));
+        _extHelper.selectExt4ComboBoxItem("Point Category:", "16. Evaluation Summary");
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         waitForText(SCATTER_PLOT_CUSTOMIZED_BOTH, WAIT_FOR_JAVASCRIPT);

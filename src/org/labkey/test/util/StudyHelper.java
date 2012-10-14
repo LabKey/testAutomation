@@ -80,6 +80,8 @@ public class StudyHelper extends AbstractHelper
                 _test.setFormElement("participantCategory", categoryName);
             else
                 _test._extHelper.selectComboBoxItem(participantString + " Category", categoryName);
+            _test.pressTab(Locator.name("participantCategory").toString());
+            _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
         if ( shared != null )
         {
@@ -133,6 +135,8 @@ public class StudyHelper extends AbstractHelper
                 _test.setFormElement("participantCategory", categoryName);
             else
                 _test._extHelper.selectComboBoxItem(participantString + " Category", categoryName);
+            _test.pressTab(Locator.name("participantCategory").toString());
+            _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
         if ( shared != null )
         {
