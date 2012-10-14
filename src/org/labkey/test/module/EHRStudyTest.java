@@ -607,9 +607,9 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         checkDataRegionCheckbox("query", 0); // PROTOCOL_MEMBER_IDS[0]
         clickMenuButton("More Actions", "Jump To History");
         assertTitleContains("Animal History");
-        clickButton("  Append -->", 0);
+        waitAndClick(Locator.ext4Button("Append -->"));
         setFormElement("subjectBox", PROTOCOL_MEMBER_IDS[2]);
-        clickButton("  Append -->", 0);
+        waitAndClick(Locator.ext4Button("Append -->"));
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
