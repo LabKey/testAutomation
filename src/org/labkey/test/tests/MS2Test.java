@@ -1332,7 +1332,7 @@ public class MS2Test extends MS2TestBase
         beginAt("/query/MS2VerifyProject/ms2folder/executeQuery.view?schemaName=exp&query.queryName=RunGroupMap");
 
         List<Map<String, Object>> rows = executeSelectRowCommand("exp", "RunGroupMap").getRows();
-        Assert.assertEquals("Unexpected number of rows in RunGroupMap", 7, rows.size());
+        Assert.assertEquals("Unexpected number of rows in RunGroupMap", 5, rows.size());
 
         Set<String> keys = rows.get(0).keySet();
         for(String header : new String[] {"RunGroup", "Created", "CreatedBy", "Run"})
@@ -1343,8 +1343,8 @@ public class MS2Test extends MS2TestBase
         textAndCount.put(DEFAULT_EXPERIMENT, new Integer(2));
         textAndCount.put(RUN_GROUP1_NAME2, new Integer(2));
         textAndCount.put("Test Run Group 2", new Integer(1));
-        textAndCount.put("DRT2", new Integer(4));
-        textAndCount.put("DRT1", new Integer(3));
+        textAndCount.put("DRT2", new Integer(3));
+        textAndCount.put("DRT1", new Integer(2));
 
         for(String key : textAndCount.keySet())
         {
