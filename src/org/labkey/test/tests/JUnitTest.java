@@ -68,7 +68,7 @@ public class JUnitTest extends TestSuite
         return getClass().getName();
     }
 
-    private static class JUnitSeleniumHelper extends BaseSeleniumWebTest
+    private static class JUnitSeleniumHelper extends BaseWebDriverTest
     {
         public void unfail()
         {
@@ -87,7 +87,6 @@ public class JUnitTest extends TestSuite
         JUnitSeleniumHelper helper = new JUnitSeleniumHelper();
         try
         {
-            helper.setUp();
             // sign in performs upgrade if necessary
             helper.signIn();
             helper.assertLinkPresentWithText("Projects");

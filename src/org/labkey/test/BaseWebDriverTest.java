@@ -128,8 +128,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     @Deprecated protected final DefaultSeleniumWrapper selenium;
     public final WebDriver _driver;
-    private static final int DEFAULT_SELENIUM_PORT = 4444;
-    private static final String DEFAULT_SELENIUM_SERVER = "localhost";
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
@@ -1200,14 +1198,39 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         // These requests should NOT redirect to the upgrade page
         // Use a new window because the primary upgrade window seems to interfere with this test, #15853
-        selenium.openWindow("", "noRedirect");
-        selenium.selectWindow("noRedirect");
+        String window = newWindow();
+        _driver.switchTo().window(window);
+
         beginAt("/login/resetPassword.view");
         assertTextNotPresent(upgradeText);
         beginAt("/admin/maintenance.view");
         assertTextNotPresent(upgradeText);
-        selenium.close();
-        selenium.selectWindow(null);
+
+        _driver.close();
+        switchToMainWindow();
+    }
+
+    /**
+     * Switch to the initial test window
+     */
+    public void switchToMainWindow()
+    {
+        Set<String> windows = new HashSet<String>(_driver.getWindowHandles());
+        _driver.switchTo().window((String)windows.toArray()[0]);
+    }
+
+    /**
+     * Open new window via javascript
+     * @return ID of created window, for use with WebDriver.TargetLocator.window interface
+     */
+    public String newWindow()
+    {
+        HashSet<String> initialWindows = new HashSet<String>(_driver.getWindowHandles());
+        executeScript("window.open();");
+        HashSet<String> windows = new HashSet<String>(_driver.getWindowHandles());
+        windows.removeAll(initialWindows);
+        Assert.assertEquals("Unexpected number of new windows", 1, windows.size());
+        return (String)windows.toArray()[0];
     }
 
     @LogMethod
@@ -3291,7 +3314,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    public interface Checker
+    public interface Checker extends BaseSeleniumWebTest.Checker
     {
         public boolean check();
     }
