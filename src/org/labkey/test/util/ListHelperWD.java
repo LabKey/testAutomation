@@ -38,13 +38,13 @@ public class ListHelperWD extends AbstractHelperWD
     public void uploadData(String folderName, String listName, String listData)
     {
         _test.clickButton("Import Data");
-        _test.setLongTextField("text", listData);
+        _test.setFormElement(Locator.id("tsv3"), listData);
         _submitImportTsv(null);
     }
 
     public void submitTsvData(String listData)
     {
-        _test.setLongTextField("text", listData);
+        _test.setFormElement(Locator.id("tsv3"), listData);
         _submitImportTsv(null);
     }
 
@@ -679,7 +679,7 @@ public class ListHelperWD extends AbstractHelperWD
     public void deleteField(String areaTitle, int index)
     {
         String prefix = _test.getPropertyXPath(areaTitle);
-        _test.mouseClick(prefix + "//div[@id='partdelete_" + index + "']");
+        _test.click(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
 
         // If domain hasn't been saved yet, the 'OK' prompt will not appear.
         Locator.XPathLocator buttonLocator = _test.getButtonLocator("OK");

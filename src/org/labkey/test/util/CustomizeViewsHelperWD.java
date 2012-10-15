@@ -151,10 +151,14 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     public void revertUnsavedViewGridClosed()
     {
-        Locator revertButton = Locator.tagContainingText("span", "Revert");
+//        Locator revertButton = Locator.tagContainingText("span", "Revert");
+//
+//        _test.mouseOver(Locator.css(".labkey-dataregion-msg"));
+//        _test.click(revertButton);
+        // WORKAROUND: Not working with closed panel
 
-        _test.mouseOver(Locator.css(".labkey-dataregion-msg"));
-        _test.click(revertButton);
+        openCustomizeViewPanel();
+        revertUnsavedView();
     }
 
     public void revertUnsavedView()
@@ -325,8 +329,6 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         Actions builder = new Actions(_test._driver);
 
         List<WebElement> elements = _test._driver.findElements(By.xpath(itemXPath + closeXPath));
-
-        elements.get(0).click(); // Prime it
 
         for (WebElement el : elements)
         {
@@ -592,14 +594,14 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
                     continue;
 
                 _test.clickButton("Add Aggregate", 0);
-                Locator row = _test._extHelper.locateExt3GridRow(idx, parent);
+                Locator row = ExtHelperWD.locateExt3GridRow(idx, parent);
 
-                Locator comboCell = _test._extHelper.locateExt3GridCell(row, 1);
+                Locator comboCell = ExtHelperWD.locateExt3GridCell(row, 1);
                 _test.dblclickAtAndWait(comboCell);
                 _test._extHelper.selectComboBoxItem((Locator.XPathLocator)grid, aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
-                    Locator labelCell = _test._extHelper.locateExt3GridCell(row, 2);
+                    Locator labelCell = ExtHelperWD.locateExt3GridCell(row, 2);
                     _test.dblclickAtAndWait(labelCell);
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");

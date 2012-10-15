@@ -595,7 +595,7 @@ public class ExtHelperWD extends AbstractHelperWD
         Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
         _test.waitForElement(file, 60000);
         _test.sleep(1000);
-        _test.mouseClick(file.toString());
+        _test.click(file);
 
         file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-inner x-grid3-hd-checker x-grid3-hd-checker-on']");
         _test.waitForElement(file, 60000);

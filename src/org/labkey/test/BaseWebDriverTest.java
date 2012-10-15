@@ -137,9 +137,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private List<WebTestHelper.FolderIdentifier> _createdFolders = new ArrayList<WebTestHelper.FolderIdentifier>();
     protected boolean _testFailed = true;
     protected boolean _testTimeout = false;
-    public final static int WAIT_FOR_PAGE = 60000;
+    public final static int WAIT_FOR_PAGE = 30000;
     public int defaultWaitForPage = WAIT_FOR_PAGE;
-    public final static int WAIT_FOR_JAVASCRIPT = 20000;
+    public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public int longWaitForPage = defaultWaitForPage * 5;
     private boolean _fileUploadAvailable;
     protected long _startTime;
@@ -209,6 +209,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             catch(IOException e)
                 {Assert.fail("Failed to load Firebug: " + e.getMessage());}
             profile.setEnableNativeEvents(useNativeEvents());
+
             _driver = new FirefoxDriver(profile);
         }
 
@@ -1216,7 +1217,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void switchToMainWindow()
     {
         Set<String> windows = new HashSet<String>(_driver.getWindowHandles());
-        _driver.switchTo().window((String)windows.toArray()[0]);
+        _driver.switchTo().window((String) windows.toArray()[0]);
     }
 
     /**
@@ -2380,6 +2381,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public enum SeleniumEvent
     {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup}
 
+    @Deprecated
     public void fireEvent(Locator loc, SeleniumEvent event)
     {
         selenium.fireEvent(loc.toString(), event.toString());
@@ -3485,7 +3487,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         Assert.assertTrue("Button with name '" + buttonName + "' not found", null != l);
 
-        selenium.click(l.toString());
+        click(l);
         waitForPageToLoad();
     }
 
@@ -3503,7 +3505,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         try
         {
-            return selenium.isElementPresent(loc.toString()) || isElementPresent(loc.toBy());
+            return isElementPresent(loc.toBy());
         }
         catch(SeleniumException e)
         {
@@ -3935,8 +3937,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void dblclickAtAndWait(Locator l, int millis)
     {
-        _driver.findElement(l.toBy()).click();
-        _driver.findElement(l.toBy()).click();
+        Actions action = new Actions(_driver);
+        action.doubleClick(_driver.findElement(l.toBy())).perform();
         if (millis > 0)
             waitForPageToLoad(millis);
 
@@ -5000,7 +5002,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         String prefix = getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
-        selenium.click(addField);
+        click(Locator.xpath(addField));
         waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(prefix, index, name);
         _listHelper.setColumnLabel(prefix, index, label);
@@ -5014,7 +5016,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
-        selenium.click(addField);
+        click(Locator.xpath(addField));
         waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(prefix, index, name);
         _listHelper.setColumnLabel(prefix, index, label);
@@ -5027,7 +5029,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Deprecated public void deleteField(String areaTitle, int index)
     {
         String prefix = getPropertyXPath(areaTitle);
-        selenium.mouseClick(prefix + "//div[@id='partdelete_" + index + "']");
+        click(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
 
         // If domain hasn't been saved yet, the 'OK' prompt will not appear.
         Locator.XPathLocator buttonLocator = getButtonLocator("OK");
@@ -5053,7 +5055,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             public boolean check()
             {
-                return getFormElement(elementName).replace("\r", "").trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns, which are present in IE but absent in firefox
+                return getFormElement(Locator.name(elementName)).replace("\r", "").trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns, which are present in IE but absent in firefox
             }
         }, elementName + " was not set.", WAIT_FOR_JAVASCRIPT);
     }
@@ -6637,64 +6639,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         @Override
-        public void click(String locator)
-        {
-            log("Clicking on element: " + locator);
-            super.click(locator);
-        }
-
-        @Override
-        public void doubleClick(String locator)
-        {
-            log("Double clicking on element: " + locator);
-            super.doubleClick(locator);
-        }
-
-        @Override
-        public void clickAt(String locator, String coordString)
-        {
-            log("Clicking on element " + locator + " at location " + coordString);
-            super.clickAt(locator, coordString);
-        }
-
-        public void clickAt(Locator l, String coord)
-        {
-            clickAt(l.toString().substring(6), coord);
-        }
-
-        @Override
-        public void doubleClickAt(String locator, String coordString)
-        {
-            log("Double clicking on element " + locator + " at location " + coordString);
-            super.doubleClickAt(locator, coordString);
-        }
-
-        @Override
         public void fireEvent(String locator, String eventName)
         {
             log("Firing event " + eventName + " on element: " + locator);
             super.fireEvent(locator, eventName);
-        }
-
-        @Override
-        public void keyPress(String locator, String keySequence)
-        {
-            log("Pressing key sequence " + keySequence + " on element: " + locator);
-            super.keyPress(locator, keySequence);
-        }
-
-        @Override
-        public void keyDown(String locator, String keySequence)
-        {
-            log("Sending key down " + keySequence + " on element " + locator);
-            super.keyDown(locator, keySequence);
-        }
-
-        @Override
-        public void keyUp(String locator, String keySequence)
-        {
-            log("Sending key up " + keySequence + " on element " + locator);
-            super.keyUp(locator, keySequence);
         }
 
         public void mouseClick(String locator)

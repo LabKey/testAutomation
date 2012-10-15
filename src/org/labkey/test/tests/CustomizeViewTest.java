@@ -16,10 +16,9 @@
 package org.labkey.test.tests;
 
 import com.google.common.base.Function;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.ListHelperWD;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,22 +30,22 @@ import java.util.Map;
  * Date: Oct 14, 2010
  * Time: 11:37:20 AM
  */
-public class CustomizeViewTest extends BaseSeleniumWebTest
+public class CustomizeViewTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "CustomizeViewTest";
     public static final String LIST_NAME = "People" + INJECT_CHARS_1;
-    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
+    private final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
 
     private final static String LAST_NAME_COLUMN = "LastName" + INJECT_CHARS_2;
     private final static String FIRST_NAME = "FirstName";
-    private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
+    private final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
             {
-                    new ListHelper.ListColumn(FIRST_NAME, FIRST_NAME + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
-                    new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
-                    new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
+                    new ListHelperWD.ListColumn(FIRST_NAME, FIRST_NAME + INJECT_CHARS_1, ListHelperWD.ListColumnType.String, "The first name"),
+                    new ListHelperWD.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelperWD.ListColumnType.String, "The last name"),
+                    new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
             };
     static
     {
@@ -178,14 +177,14 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
         assertTextPresent(newColumnDisplayName);
         assertTextPresent("unsaved");
 
-        _customizeViewsHelper.revertUnsavedViewGridClosed(this);
+        _customizeViewsHelper.revertUnsavedViewGridClosed();
         waitForPageToLoad();
         assertTextNotPresent(newColumnDisplayName);
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn(newColumnLabel);
         _customizeViewsHelper.applyCustomView();
-        _customizeViewsHelper.saveUnsavedViewGridClosed(this, name);
+        _customizeViewsHelper.saveUnsavedViewGridClosed(name);
         assertTextNotPresent("unsaved");
         assertTextPresent(newColumnDisplayName);
 //        assertTextPresent(PasswordUtil.getUsername(),8);
@@ -239,7 +238,7 @@ public class CustomizeViewTest extends BaseSeleniumWebTest
             // check that all the data is in the grid (skipping the key column at index 0)
             for (int col = 1; col < rowData.length; col++)
             {
-                assertTextPresent(rowData[col]);
+                waitForText(rowData[col]);
             }
         }
     }
