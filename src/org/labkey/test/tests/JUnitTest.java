@@ -68,7 +68,7 @@ public class JUnitTest extends TestSuite
         return getClass().getName();
     }
 
-    private static class JUnitSeleniumHelper extends BaseWebDriverTest
+    private static class JUnitSeleniumHelper extends BaseSeleniumWebTest
     {
         public void unfail()
         {
