@@ -1837,9 +1837,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             pushLocation();
             String thisViewXpath = "("+viewXpath+")["+i+"]";
+            waitForElement(Locator.xpath(thisViewXpath));
             String viewName = getText(Locator.xpath(thisViewXpath + "//td[contains(@class, 'x-grid3-cell-first')]"));
             click(Locator.xpath(thisViewXpath));
-            waitAndClick(Locator.linkWithText("view"));
+            waitAndClick(Locator.linkWithText("VIEW"));
             waitForPageToLoad();
             waitForText(viewName);
             popLocation();
@@ -3502,7 +3503,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         try
         {
-            return selenium.isElementPresent(loc.toString()) || isElementPresent(loc.toBy());
+            return isElementPresent(loc.toBy());
         }
         catch(SeleniumException e)
         {
