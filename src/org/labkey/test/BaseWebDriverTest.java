@@ -3503,7 +3503,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         try
         {
-            return isElementPresent(loc.toBy());
+            return selenium.isElementPresent(loc.toString()) || isElementPresent(loc.toBy());
         }
         catch(SeleniumException e)
         {
