@@ -26,6 +26,7 @@ import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -509,7 +510,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private void doTestReports()
     {
-        RReportHelper _rReportHelper = new RReportHelper(this);
+        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
         _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");

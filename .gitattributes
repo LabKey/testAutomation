@@ -314,6 +314,7 @@ src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/PostgresOnlyTest.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
 src/org/labkey/test/util/RReportHelper.java -text
+src/org/labkey/test/util/RReportHelperWD.java -text
 src/org/labkey/test/util/ResetTracker.java -text
 src/org/labkey/test/util/SearchHelper.java -text
 src/org/labkey/test/util/SqlserverOnlyTest.java -text
