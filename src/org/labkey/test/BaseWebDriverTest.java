@@ -56,6 +56,8 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.WebDriverException;
@@ -202,8 +204,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
                 profile.setPreference("extensions.firebug.currentVersion", "1.10.3");
                 profile.setPreference("extensions.firebug.allPagesActivation", "on");
-                profile.setPreference("extensions.firebug.previousPlacement", 3);
-                profile.setPreference("extensions.firebug.net.enabledSites", true);
+                profile.setPreference("extensions.firebug.previousPlacement", "3");
+                profile.setPreference("extensions.firebug.net.enabledSites", "true");
                 profile.setPreference("extensions.firebug.defaultPanelName", "net");
             }
             catch(IOException e)
@@ -1350,7 +1352,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (null == text || text.trim().length() == 0)
             return true;
 
-        text = selenium.getBodyText();
+        text = getBodyText();
         return null == text || text.trim().length() == 0;
     }
 
@@ -1364,6 +1366,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             return null;
         }
+    }
+
+    public String getBodyText()
+    {
+        return _driver.findElement(By.cssSelector("html")).getText();
     }
 
     public void resetErrors()
@@ -2113,26 +2120,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         File screenFile = new File(dir, baseName + ".png");
         try
         {
-            selenium.captureEntirePageScreenshot(screenFile.getAbsolutePath(), "");
+            File tempScreen = ((TakesScreenshot)_driver).getScreenshotAs(OutputType.FILE);
+            FileUtils.copyFile(tempScreen, screenFile);
             return screenFile;
         }
-        catch (SeleniumException se)
+        catch (IOException ioe)
         {
-            // too bad.
-            log("Failed to take screenshot using selenium.captureEntirePageScreenshot: " + se.getMessage());
-
-            try
-            {
-                selenium.windowFocus();
-                selenium.windowMaximize();
-                selenium.captureScreenshot(screenFile.getAbsolutePath());
-                return screenFile;
-            }
-            catch (SeleniumException se2)
-            {
-                // so sad.
-                log("Failed to take screenshot using selenium.captureScreenshot: " + se2.getMessage());
-            }
+            log("Failed to copy screenshot file: " + ioe.getMessage());
         }
 
         return null;
@@ -2140,7 +2134,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void windowMaximize()
     {
-        selenium.windowMaximize();
+        _driver.manage().window().maximize();
     }
 
     public File dumpFullScreen(File dir, String baseName)
@@ -2199,7 +2193,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public File saveFile(File dir, String fileName)
     {
-        return saveFile(dir, fileName, selenium.getBodyText());
+        return saveFile(dir, fileName, getBodyText());
     }
 
     public File saveFile(File dir, String fileName, String contents)
@@ -2209,7 +2203,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             File tsvFile = new File(dir, fileName);
             writer = new FileWriter(tsvFile);
-            writer.write(selenium.getBodyText());
+            writer.write(getBodyText());
             return tsvFile;
         }
         catch (IOException e)
@@ -3023,7 +3017,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public boolean isTextBefore(String text1, String text2)
     {
-        String source = selenium.getBodyText();
+        String source = getBodyText();
         return (source.indexOf(text1) < source.indexOf(text2));
     }
 
@@ -3035,7 +3029,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public String isPresentInThisOrder(String... text)
     {
-        String source = selenium.getBodyText();
+        String source = getBodyText();
         int previousIndex = -1;
         String previousString = null;
 
@@ -5044,20 +5038,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     /**
      * @deprecated Use explicit Locator: {@link #setLongTextField(Locator, String)}
-     * @param elementName
+     * @param element
      * @param text
      */
-    @Deprecated public void setLongTextField(final String elementName, final String text)
+    @Deprecated public void setFormElementAndVerify(final Locator element, final String text)
     {
-        setFormElement(Locator.name(elementName), text, true);
+        setFormElement(element, text, true);
 
         waitFor(new Checker()
         {
             public boolean check()
             {
-                return getFormElement(Locator.name(elementName)).replace("\r", "").trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns, which are present in IE but absent in firefox
+                return getFormElement(element).replace("\r", "").trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns, which are present in IE but absent in firefox
             }
-        }, elementName + " was not set.", WAIT_FOR_JAVASCRIPT);
+        }, "Form element was not set.", WAIT_FOR_JAVASCRIPT);
     }
 
     /**
@@ -6620,7 +6614,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         DefaultSeleniumWrapper()
         {
-            super(getBrowser().startsWith("*ie")?new InternetExplorerDriver():new FirefoxDriver(), WebTestHelper.getBaseURL());
+            super(getBrowser().startsWith("*ie") ? new InternetExplorerDriver() : new FirefoxDriver(), WebTestHelper.getBaseURL());
         }
 
         public DefaultSeleniumWrapper(com.google.common.base.Supplier<org.openqa.selenium.WebDriver> maker, java.lang.String baseUrl)
