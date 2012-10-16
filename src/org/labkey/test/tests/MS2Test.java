@@ -1200,7 +1200,7 @@ public class MS2Test extends MS2TestBase
         clickButton("Remove");
         assert(!isTextPresent(testFile1) || !isTextPresent(testFile2));
 
-        verifyRunGroupMap();
+        verifyRunGroupMap(testFile1, testFile2);
         clickLinkWithText("MS2 Dashboard");
 
         log("Test that the compare run groups works");
@@ -1325,7 +1325,7 @@ public class MS2Test extends MS2TestBase
 
     }
 
-    private void verifyRunGroupMap()
+    private void verifyRunGroupMap(String protocol1Name, String protocol2Name)
     {
 
         //have to go to the actual page to test lookup
@@ -1343,8 +1343,8 @@ public class MS2Test extends MS2TestBase
         textAndCount.put(DEFAULT_EXPERIMENT, new Integer(2));
         textAndCount.put(RUN_GROUP1_NAME2, new Integer(2));
         textAndCount.put("Test Run Group 2", new Integer(1));
-        textAndCount.put("DRT2", new Integer(3));
-        textAndCount.put("DRT1", new Integer(2));
+        textAndCount.put(protocol2Name, new Integer(3));
+        textAndCount.put(protocol1Name, new Integer(2));
 
         for(String key : textAndCount.keySet())
         {
