@@ -16,8 +16,8 @@
     <modules>
         <moduleName>Pipeline</moduleName>
         <moduleName>Query</moduleName>
-        <moduleName>Portal</moduleName>
+        <moduleName>Core</moduleName>
     </modules>
-    <defaultModule>Portal</defaultModule>
+    <defaultModule>Core</defaultModule>
     <workbookType>true</workbookType>
 </folderType>
