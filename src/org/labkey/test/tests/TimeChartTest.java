@@ -1149,6 +1149,7 @@ public class TimeChartTest extends StudyBaseTest
         createUser(USER1, null);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
+        enterPermissionsUI();
         setUserPermissions(USER1, "Reader");
         setSiteGroupPermissions("Guests", "Reader");
         clickButton("Save and Finish");
@@ -1230,6 +1231,7 @@ public class TimeChartTest extends StudyBaseTest
         createUser(USER2, null);
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
+        enterPermissionsUI();
         setUserPermissions(USER2, "Editor");
         // USER2 is not yet a developer, so shouldn't have permissions to this feature
         impersonate(USER2);

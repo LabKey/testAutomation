@@ -746,8 +746,8 @@ public class ReportTest extends StudyBaseTest
         // give the test group read access to only the DEM-1 dataset
         clickLinkWithText("My Study");
         enterPermissionsUI();
-        _extHelper.clickExtTab("Study Security");
-        waitAndClickButton("Study Security");
+        _ext4Helper.clickTabContainingText("Study Security");
+        clickLinkWithText("Study Security");
 
         // enable advanced study security
         selectOptionByValue("securityString", "ADVANCED_READ");

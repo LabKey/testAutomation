@@ -5105,6 +5105,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             log("Setting permissions for group " + userOrGroupName + " to " + role);
 
+            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             String group = userOrGroupName;
             if (className.equals("pSite"))
                 group = "Site: " + group;
