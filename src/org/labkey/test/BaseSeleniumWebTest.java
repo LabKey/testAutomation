@@ -22,37 +22,17 @@ import junit.framework.AssertionFailedError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.After;
 import org.junit.Assert;
-import org.labkey.remoteapi.CommandException;
+import org.junit.Before;
+import org.junit.Test;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.util.APIAssayHelper;
-import org.labkey.test.util.APIContainerHelper;
-import org.labkey.test.util.APIUserHelper;
-import org.labkey.test.util.AbstractAssayHelper;
-import org.labkey.test.util.AbstractContainerHelper;
-import org.labkey.test.util.AbstractUserHelper;
-import org.labkey.test.util.ComponentQuery;
-import org.labkey.test.util.Crawler;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggingAspect;
-import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.*;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -61,46 +41,17 @@ import org.tmatesoft.svn.core.wc.SVNStatusType;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
-import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
-import static org.labkey.test.WebTestHelper.FolderIdentifier;
-import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
-import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
-import static org.labkey.test.WebTestHelper.getTabLinkId;
-import static org.labkey.test.WebTestHelper.getTargetServer;
-import static org.labkey.test.WebTestHelper.leakCRC;
-import static org.labkey.test.WebTestHelper.logToServer;
+import static org.labkey.test.WebTestHelper.*;
 
 /**
  * User: Mark Igra
@@ -2253,7 +2204,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 return;
         }
 
-        Locator l = Locator.id("newGroupFormSite$input");
+        Locator l = Locator.xpath("//input[contains(@name, 'sitegroupsname')]");
         waitForElement(l, defaultWaitForPage);
 
         setFormElement(l,groupName);
@@ -2289,13 +2240,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickExtTabContainingText("Project Groups");
-        setFormElement("newGroupForm$input",groupName);
+        _ext4Helper.clickTabContainingText("Project Groups");
+        setFormElement(Locator.xpath("//input[contains(@name, 'projectgroupsname')]"), groupName);
         clickButton("Create New Group", 0);
         sleep(500);
-        waitAndClick(Locator.xpath("//div[@id='userInfoPopup']//div[contains(@class,'x-tool-close')]"));
-        waitForElement(Locator.xpath("//div[@id='groupsFrame']//div[contains(@class,'pGroup') and text()='" + groupName + "']"),
-                WAIT_FOR_JAVASCRIPT);
+        waitForText("Group " + groupName);
+        waitAndClick(Locator.xpath("//div[contains(@class, 'x4-tool')]//img[contains(@class, 'x4-tool-close')]"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
     }
 
     public void createPermissionsGroup(String groupName, String... memberNames)
@@ -2334,21 +2285,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void clickManageGroup(String groupName)
     {
-        _extHelper.clickExtTab("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         // warning Adminstrators can apper multiple times
-        waitAndClick(Locator.xpath("//div[@id='groupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
-        sleep(100);
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
-    }
-
-
-    public void clickManageSiteGroup(String groupName)
-    {
-        _extHelper.clickExtTab("Site Groups");
-        // warning Adminstrators can apper multiple times
-        waitAndClick(Locator.xpath("//div[@id='siteGroupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
-        sleep(100);
+        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        int idx = Integer.parseInt(ref.eval("this.getStore().find(\"name\", \"" + groupName + "\")"));
+        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        ref.eval("this.getSelectionModel().select(" + idx + ")");
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
     }
@@ -5094,66 +5037,40 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void assertNoPermission(String groupName, String permissionSetting)
     {
-        String role = toRole(permissionSetting);
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        assertElementNotPresent(Locator.permissionButton(groupName,role));
+        assertElementNotPresent(Locator.permissionButton(groupName,permissionSetting));
     }
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
     {
-        if (1==0)
+        String role = toRole(permissionSetting);
+        if ("security.roles.NoPermissionsRole".equals(role))
         {
-            log("Checking permission setting for group " + groupName + " equals " + permissionSetting);
-            Assert.assertEquals("Permission for '" + groupName + "' was not '" + permissionSetting + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
+            assertNoPermission(groupName,"Reader");
+            assertNoPermission(groupName,"Editor");
+            assertNoPermission(groupName,"Project Administrator");
+            return;
         }
-        else
-        {
-            String role = toRole(permissionSetting);
-            if ("security.roles.NoPermissionsRole".equals(role))
-            {
-                assertNoPermission(groupName,"Reader");
-                assertNoPermission(groupName,"Editor");
-                assertNoPermission(groupName,"Project Administrator");
-                return;
-            }
-            log("Checking permission setting for group " + groupName + " equals " + role);
-            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-            assertElementPresent(Locator.permissionButton(groupName,role));
-            //Assert.assertEquals("'" + groupName + "' is not in role '" + role + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
-        }
+        log("Checking permission setting for group " + groupName + " equals " + role);
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.permissionButton(groupName,permissionSetting));
     }
-
-
-    Locator inherited = Locator.name("inheritedCheckbox");
-    Locator.XPathLocator inheritedParent = Locator.xpath("//input[@name='inheritedCheckbox']/..");
 
 
     public void checkInheritedPermissions()
     {
-        waitForElement(Locator.permissionRendered(), defaultWaitForPage);
-        waitForElement(inherited, 2000);
-        if (!isChecked(inherited))
-            click(inherited);
-        waitForElement(Locator.permissionRendered(), defaultWaitForPage);
-        Assert.assertTrue("Failed to check inherit permissions checkbox.", isChecked(inherited));
+        _ext4Helper.checkCheckbox("Inherit permissions from parent");
     }
 
 
     public void uncheckInheritedPermissions()
     {
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        waitForElement(inherited,1000);
-        if (isChecked(inherited))
-            click(inherited);
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        Assert.assertFalse(isChecked(inherited));
+        _ext4Helper.uncheckCheckbox("Inherit permissions from parent");
     }
 
     public void savePermissions()
     {
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
         clickButton("Save", 0);
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
     }
 
     public void setPermissions(String groupName, String permissionString)
@@ -5176,9 +5093,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-        _extHelper.clickExtTabContainingText("Permissions");
+        _ext4Helper.clickTabContainingText("Permissions");
 
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
@@ -5188,18 +5103,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
         else
         {
-            if (!isElementPresent(Locator.permissionRendered()))
-                enterPermissionsUI();
-            _extHelper.clickExtTabContainingText("Permissions");
-
             log("Setting permissions for group " + userOrGroupName + " to " + role);
 
-            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-            String input = "$add$" + role;
-            String combo = "$combo$";
-            click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + userOrGroupName + "']"));
-            sleep(100);
+            String group = userOrGroupName;
+            if (className.equals("pSite"))
+                group = "Site: " + group;
+            click(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]//div[contains(@class, 'x4-form-trigger')]"));
+            click(Locator.xpath("//div[contains(@class, 'x4-boundlist')]//li[contains(@class, '" + className + "') and text()='" + group + "']"));
+            sleep(200);
             savePermissions();
             assertPermissionSetting(userOrGroupName, permissionString);
         }
@@ -5219,16 +5130,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void _removePermission(String groupName, String permissionString, String className)
     {
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-
-        String role = toRole(permissionString);
-        Locator close = Locator.closePermissionButton(groupName,role);
+        Locator close = Locator.closePermissionButton(groupName, permissionString);
         if (isElementPresent(close))
         {
             click(close);
             savePermissions();
-            assertNoPermission(groupName, role);
+            assertNoPermission(groupName, permissionString);
         }
     }
 
@@ -5280,7 +5187,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void exitPermissionsUI()
     {
-        _extHelper.clickExtTabContainingText("Permissions");
+        _ext4Helper.clickTabContainingText("Permissions");
         clickButton("Save and Finish");
     }
 
@@ -5346,9 +5253,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertTextNotPresent("Stop Impersonating");
         ensureAdminMode();
         enterPermissionsUI();
-        _extHelper.clickExtTab("Impersonate");
+        _ext4Helper.clickTabContainingText("Impersonate");
         selectOptionByText(Locator.id("email").toString(), fakeUser);
-        clickButton("Impersonate");
+        clickLinkWithText("Impersonate");
         _impersonationStack.push(fakeUser);
     }
 
@@ -5564,7 +5471,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        _extHelper.clickExtTab("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         exitPermissionsUI();
         return ret;
@@ -5589,7 +5496,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        _extHelper.clickExtTab("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
         click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));

@@ -68,6 +68,7 @@ public class BasicTest extends BaseSeleniumWebTest
 
         _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup("testers");
+        _ext4Helper.clickTabContainingText("Permissions");
         assertPermissionSetting("testers", "No Permissions");
         setPermissions("testers", "Editor");
         clickButton("Save and Finish");

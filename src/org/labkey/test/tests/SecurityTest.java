@@ -444,6 +444,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         clickManageGroup("Administrators");
         setFormElement("names", ADMIN_USER_TEMPLATE);
         clickButton("Update Group Membership");
+        enterPermissionsUI();
         setPermissions("Administrators", "Project Administrator");
 
         createPermissionsGroup("Testers");

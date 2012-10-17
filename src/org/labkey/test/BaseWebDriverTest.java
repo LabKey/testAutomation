@@ -2483,17 +2483,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForPageToLoad();
     }
 
-
-    public void clickManageSiteGroup(String groupName)
-    {
-        _extHelper.clickExtTab("Site Groups");
-        // warning Adminstrators can apper multiple times
-        waitAndClick(Locator.xpath("//div[@id='siteGroupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
-        sleep(100);
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
-    }
-
     public void createSubFolderFromTemplate(String project, String child, String template, String[] objectsToCopy)
     {
         createSubfolder(project, project, child, "Create From Template Folder", template, objectsToCopy, false);
@@ -5421,30 +5410,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-
-    Locator inherited = Locator.name("inheritedCheckbox");
-    Locator.XPathLocator inheritedParent = Locator.xpath("//input[@name='inheritedCheckbox']/..");
-
-
     public void checkInheritedPermissions()
     {
-        waitForElement(Locator.permissionRendered(), defaultWaitForPage);
-        waitForElement(inherited, 2000);
-        if (!isChecked(inherited))
-            click(inherited);
-        waitForElement(Locator.permissionRendered(), defaultWaitForPage);
-        Assert.assertTrue("Failed to check inherit permissions checkbox.", isChecked(inherited));
+        _ext4Helper.checkCheckbox("Inherit permissions from parent");
     }
-
 
     public void uncheckInheritedPermissions()
     {
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        waitForElement(inherited,1000);
-        if (isChecked(inherited))
-            click(inherited);
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        Assert.assertFalse(isChecked(inherited));
+        _ext4Helper.uncheckCheckbox("Inherit permissions from parent");
     }
 
     public void savePermissions()
@@ -5517,16 +5490,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void _removePermission(String groupName, String permissionString, String className)
     {
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-
-        String role = toRole(permissionString);
-        Locator close = Locator.closePermissionButton(groupName,role);
+        Locator close = Locator.closePermissionButton(groupName,permissionString);
         if (isElementPresent(close))
         {
             click(close);
             savePermissions();
-            assertNoPermission(groupName, role);
+            assertNoPermission(groupName, permissionString);
         }
     }
 

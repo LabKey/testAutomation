@@ -91,6 +91,31 @@ public class Ext4HelperWD extends AbstractHelperWD
         _test.click(l);
     }
 
+    public void checkCheckbox(String label)
+    {
+        if (!isChecked(label))
+        {
+            Locator l = Locator.xpath("//table[contains(@class, 'x4-form-item')][.//label[text()='" + label + "']]//input[contains(@class,'x4-form-checkbox')]");
+            _test.click(l);
+        }
+    }
+
+    public void uncheckCheckbox(String label)
+    {
+        if (isChecked(label))
+        {
+            Locator l = Locator.xpath("//table[contains(@class, 'x4-form-cb-checked')][.//label[text()='" + label + "']]//input[contains(@class,'x4-form-checkbox')]");
+            _test.click(l);
+        }
+    }
+
+    public boolean isChecked(String label)
+    {
+        _test.assertElementPresent(Locator.xpath("//table[contains(@class, 'x4-form-item')][.//label[text()='" + label + "']]//input"));
+        Locator l = Locator.xpath("//table[contains(@class, 'x4-form-cb-checked')][.//label[text()='" + label + "']]//input");
+        return _test.isElementPresent(l);
+    }
+
     /**
      * Check the checkbox for an Ext4 grid row
      * Currently used only for participant filter panel.

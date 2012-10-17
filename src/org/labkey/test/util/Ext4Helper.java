@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
@@ -92,6 +93,31 @@ public class Ext4Helper extends AbstractHelper
     {
         Locator l = Locator.xpath("//label[@id='" + labelId + "']");
         _test.click(l);
+    }
+
+    public void checkCheckbox(String label)
+    {
+        if (!isChecked(label))
+        {
+            Locator l = Locator.xpath("//table[contains(@class, 'x4-form-item')][.//label[text()='" + label + "']]//input[contains(@class,'x4-form-checkbox')]");
+            _test.click(l);
+        }
+    }
+
+    public void uncheckCheckbox(String label)
+    {
+        if (isChecked(label))
+        {
+            Locator l = Locator.xpath("//table[contains(@class, 'x4-form-cb-checked')][.//label[text()='" + label + "']]//input[contains(@class,'x4-form-checkbox')]");
+            _test.click(l);
+        }
+    }
+
+    public boolean isChecked(String label)
+    {
+        _test.assertElementPresent(Locator.xpath("//table[contains(@class, 'x4-form-item')][.//label[text()='" + label + "']]//input"));
+        Locator l = Locator.xpath("//table[contains(@class, 'x4-form-cb-checked')][.//label[text()='" + label + "']]//input");
+        return _test.isElementPresent(l);
     }
 
     /**

@@ -180,6 +180,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickLinkWithText(subfolder);
         enterPermissionsUI();
         uncheckInheritedPermissions();
+        waitForText("Save");
+        clickButton("Save", 0);
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
         {
             removePermission(group, "Editor");
@@ -205,8 +207,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickLinkWithText(project);
         clickLinkWithText(folder);
         enterPermissionsUI();
-        _extHelper.clickExtTab("Study Security");
-        waitAndClickButton("Study Security");
+        _ext4Helper.clickTabContainingText("Study Security");
+        clickLinkWithText("Study Security");
 
         selectOptionByValue("securityString", "ADVANCED_READ");
         waitForPageToLoad(30000);
