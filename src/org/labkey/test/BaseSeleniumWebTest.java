@@ -6816,7 +6816,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public  String getFolderUrl()
     {
-        Locator l = Locator.xpath("//td[@class='labkey-folder-title']/a");
+        Locator l = Locator.xpath("//div[@class='labkey-folder-title']/a");
         return getAttribute(l, "href");
     }
 
