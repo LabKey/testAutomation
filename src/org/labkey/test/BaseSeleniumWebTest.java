@@ -2255,7 +2255,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickExtTabContainingText("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         createPermissionGroupFromGroupScreen(groupName, memberNames);
         enterPermissionsUI();
     }

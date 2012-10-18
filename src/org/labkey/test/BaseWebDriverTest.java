@@ -2429,13 +2429,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickExtTabContainingText("Project Groups");
-        setFormElement(Locator.id("newGroupForm$input"),groupName);
+        _ext4Helper.clickTabContainingText("Project Groups");
+        setFormElement(Locator.xpath("//input[contains(@name, 'projectgroupsname')]"), groupName);
         clickButton("Create New Group", 0);
         sleep(500);
-        waitAndClick(Locator.xpath("//div[@id='userInfoPopup']//div[contains(@class,'x-tool-close')]"));
-        waitForElement(Locator.xpath("//div[@id='groupsFrame']//div[contains(@class,'pGroup') and text()='" + groupName + "']"),
-                WAIT_FOR_JAVASCRIPT);
+        waitForText("Group " + groupName);
+        waitAndClick(Locator.xpath("//div[contains(@class, 'x4-tool')]//img[contains(@class, 'x4-tool-close')]"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
     }
 
     public void createPermissionsGroup(String groupName, String... memberNames)
@@ -2444,7 +2444,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickExtTabContainingText("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         createPermissionGroupFromGroupScreen(groupName, memberNames);
         enterPermissionsUI();
     }
@@ -5833,7 +5833,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        _extHelper.clickExtTab("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         exitPermissionsUI();
         return ret;
@@ -5858,7 +5858,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         ensureAdminMode();
         clickLinkWithText(projectName);
         enterPermissionsUI();
-        _extHelper.clickExtTab("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
         boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
         click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
