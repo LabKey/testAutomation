@@ -46,7 +46,7 @@ public class UIContainerHelper extends AbstractContainerHelper
                     "This project may already exist, or its name appears elsewhere in the UI.");
         _test.goToCreateProject();
         _test.waitForElement(Locator.name("name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.setText("name", projectName);
+        _test.setFormElement(Locator.name("name"), projectName);
 
         if (null != folderType && !folderType.equals("None"))
             _test.click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
