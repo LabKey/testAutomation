@@ -1887,7 +1887,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (this.enableScriptCheck())
         {
-            _jsErrors.addAll(JavaScriptError.readErrors(_driver));
+            try
+            {
+                _jsErrors.addAll(JavaScriptError.readErrors(_driver));
+            }
+            catch (WebDriverException ex)
+            {
+                return; // Error checker has not been initialized
+            }
             List<JavaScriptError> validErrors = new ArrayList<JavaScriptError>();
             for (JavaScriptError error : _jsErrors)
             {
