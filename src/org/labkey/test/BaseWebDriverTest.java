@@ -2449,13 +2449,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         enterPermissionsUI();
     }
 
-
     public void createPermissionGroupFromGroupScreen(String groupName, String... memberNames)
     {
-
-        setFormElement("newGroupForm$input",groupName);
+        setFormElement(Locator.name("projectgroupsname"),groupName);
         clickButton("Create New Group", 0);
-        sleep(500);
+        _extHelper.waitForExtDialog(groupName+" Information");
 
         StringBuilder namesList = new StringBuilder();
         for(String member : memberNames)
@@ -2466,7 +2464,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
-        setFormElement("names", namesList.toString());
+        setFormElement(Locator.name("names"), namesList.toString());
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
     }
@@ -3126,7 +3124,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void waitForExtMaskToDisappear()
     {
-        waitForExtMaskToDisappear( WAIT_FOR_JAVASCRIPT );
+        waitForExtMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     /**
@@ -3142,7 +3140,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void waitForExtMask()
     {
-        waitForExtMask( WAIT_FOR_JAVASCRIPT );
+        waitForExtMask(WAIT_FOR_JAVASCRIPT);
     }
 
     /**
