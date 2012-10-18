@@ -57,6 +57,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverBackedSelenium;
@@ -2845,7 +2846,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         //Need to unencode here? Selenium turns &nbsp; into space???
         text = text.replace("&nbsp;", " ");
-        return getBodyText().contains(text);
+        try
+        {
+            return getBodyText().contains(text);
+        }
+        catch(StaleElementReferenceException ex)
+        {
+            return false;
+        }
     }
 
     public String getText(Locator elementLocator)
@@ -6311,7 +6319,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
         clickLinkWithText(projectName);
         assertElementPresent(Locator.name("q"));
-        setFormElement(Locator.name("query"), searchFor);
+        setFormElement(Locator.id("query"), searchFor);
         clickButton("Search");
         long wait = 0;
         while (wait < 5*defaultWaitForPage)

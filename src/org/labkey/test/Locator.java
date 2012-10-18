@@ -377,17 +377,17 @@ public class Locator
 
     public static XPathLocator linkWithText(String text, int index)
     {
-        return xpath("(//a[text() = " + xq(text) + "])[" + (index + 1) + "]");
+        return xpath("(//a[string() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator linkContainingText(String text)
     {
-        return xpath("//a[contains(text(), " + xq(text) + ")]");
+        return xpath("//a[contains(string(), " + xq(text) + ")]");
     }
 
     public static XPathLocator linkContainingText(String text, int index)
     {
-        return xpath("(//a[contains(text(), " + xq(text) + ")])[" + (index + 1) + "]");
+        return xpath("(//a[contains(string(), " + xq(text) + ")])[" + (index + 1) + "]");
     }
 
     public static XPathLocator menuItem(String text)
