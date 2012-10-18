@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-abstract public class BaseFlowTest extends BaseWebDriverTest
+abstract public class BaseFlowTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "Flow Verify Project";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
@@ -193,11 +193,11 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (!isLinkPresentWithText(getProjectName()))
             return;
 
-        clickFolder(getProjectName());
+        clickLinkWithText(getProjectName());
         if (!isLinkPresentWithText(getFolderName()))
             return;
 
-        clickFolder(getFolderName());
+        clickLinkWithText(getFolderName());
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
         DataRegionTable table = new DataRegionTable("query", this);
@@ -205,8 +205,9 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         {
             // Delete all runs
             table.checkAllOnPage();
+            selenium.chooseOkOnNextConfirmation();
             clickButton("Delete", 0);
-            assertConfirmation("Are you sure you want to delete the selected row" + (table.getDataRowCount() == 1 ? "?" : "s?"));
+            Assert.assertTrue(selenium.getConfirmation().contains("Are you sure you want to delete the selected row"));
             waitForPageToLoad();
             Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
@@ -223,7 +224,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     // if we aren't already on the Flow Dashboard, try to get there.
     protected void goToFlowDashboard()
     {
-        String title = _driver.getTitle();
+        String title = selenium.getTitle();
         if (!title.startsWith("Flow Dashboard: "))
         {
             // All flow pages have a link back to the Flow Dashboard
@@ -262,8 +263,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         log("** Uploading sample set");
         goToFlowDashboard();
         clickLinkWithText("Upload Sample Descriptions");
-        setFormElement(Locator.id("textbox"), getFileContents(sampleFilePath));
-        click(Locator.css("html body"));
+        setFormElement("data", getFileContents(sampleFilePath));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText("idColumn" + (i+1), idCols[i]);
         submit();
