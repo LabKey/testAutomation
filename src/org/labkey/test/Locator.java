@@ -16,7 +16,9 @@
 
 package org.labkey.test;
 
+import junit.framework.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -64,11 +66,13 @@ public class Locator
         return new Locator(loc, _nth, contains);
     }
 
-    @Deprecated
+    /**
+     * Not for direct use with selenium
+     * Converts a locator into a format suitable for logging
+     * @return Human-readable version of Locator
+     */
     public String toString()
     {
-        if (_contains != null)
-            throw new IllegalStateException("Unable to convert Locator to string. Locator.contains() can only be used with WebDriver.findElement().");
         if (loc.startsWith("name=") && _nth > 0)
             return loc + " index=" + _nth;
         else
@@ -99,7 +103,7 @@ public class Locator
         if (loc.startsWith("css="))
         {
             if (loc.contains(":contains("))
-                throw new IllegalArgumentException("CSS3 has deprecated :contains()");
+                throw new IllegalArgumentException("CSS3 has deprecated the ':contains' pseudo-class");
             return By.cssSelector(loc.substring(loc.indexOf("=")+1));
         }
         if (loc.startsWith("link="))
@@ -155,28 +159,32 @@ public class Locator
         return elements;
     }
 
-    public WebElement waitForElmement(final WebDriver driver, final WebDriverWait wait)
+    public WebElement waitForElmement(final WebDriver driver, final int secTimeout)
     {
-        return wait.until(new ExpectedCondition<WebElement>()
+        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
+        try
         {
-            @Override
-            public WebElement apply(WebDriver d)
+            return wait.until(new ExpectedCondition<WebElement>()
             {
-                return findElement(driver);
-            }
-        });
+                @Override
+                public WebElement apply(WebDriver d)
+                {
+                    return findElement(driver);
+                }
+            });
+        }
+        catch (TimeoutException ex)
+        {
+            Assert.fail("Timeout waiting for element [" + secTimeout + "sec]: " + toString() +
+                    (_nth == 0 ? "" : "\nIndex: " + _nth) +
+                    (_contains == null ? "" : "\nContaining: " + _contains));
+            return null; // unreachable
+        }
     }
 
-    public List<WebElement> waitForElmements(final WebDriver driver, final WebDriverWait wait)
+    public List<WebElement> waitForElmements(final WebDriver driver, final int secTimeout)
     {
-        wait.until(new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver d)
-            {
-                return findElement(driver);
-            }
-        });
+        waitForElmement(driver, secTimeout);
         return findElements(driver);
     }
 

@@ -3202,11 +3202,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
     }
 
-    public void mouseClick(String locator)
-    {
-        selenium.mouseClick(locator);
-    }
-
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
@@ -3341,7 +3336,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (failIfNotFound)
         {
-            locator.waitForElmement(_driver, _shortWait);
+            locator.waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
         }
         else
         {
@@ -3451,23 +3446,22 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }, failMessage, wait);
     }
 
-    protected final String firstForm = "//td[@id='bodypanel']//form[1]";
-
     public void submit()
     {
-        selenium.submit(firstForm);
-        waitForPageToLoad();
+        WebElement form = _driver.findElement(By.xpath("//td[@id='bodypanel']//form[1]"));
+        submit(form);
     }
 
     public void submit(Locator formLocator)
     {
-        selenium.submit(formLocator.toString());
-        waitForPageToLoad();
+        WebElement form = formLocator.findElement(_driver);
+        submit(form);
     }
 
     public void submit(WebElement form)
     {
         executeScript("arguments[0].submit()", form);
+        waitForPageToLoad();
     }
 
     public void submit(String buttonName)

@@ -2973,6 +2973,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
     }
 
+    @Deprecated
     public void mouseClick(String locator)
     {
         selenium.mouseClick(locator);
@@ -3347,6 +3348,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return selenium.getValue(loc.toString());
     }
 
+    @Deprecated
     public String getFormElement(String elementName)
     {
         Locator loc = new Locator(elementName);
@@ -3362,18 +3364,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
-
-
-    public boolean isFormElementPresent(String elementName)
-    {
-        return isElementPresent(Locator.dom(firstForm + "['" + elementName + "']"));
-    }
-
-    public void assertFormElementPresent(String elementName)
-    {
-        Assert.assertTrue("Form element '" + elementName + "' was not present", isFormElementPresent(elementName));
-    }
-
 
     public void assertOptionEquals(String selectName, String value)
     {
@@ -4418,6 +4408,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton(buttonText, 0);
     }
 
+    @Deprecated
     public void setText(String elementName, String text)
     {
         if (elementName.toLowerCase().contains("password"))
@@ -4428,6 +4419,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.typeSilent(elementName, text);
     }
 
+    @Deprecated
     public void setFormElement(String element, String text)
     {
         setFormElement(Locator.raw(element), text, false);
@@ -4442,6 +4434,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             fireEvent(element, SeleniumEvent.blur);
     }
 
+    @Deprecated
     public void setFormElement(String element, File file)
     {
         Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
@@ -4456,7 +4449,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void setFormElement(Locator element, String text)
     {
-        setFormElement(element.toString(), text);
+        setFormElement(element, text, false);
     }
 
     public void setFormElements(String tagName, String formElementName, String[] values)
@@ -4638,8 +4631,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         runMenuItemHandler(id);
         clickButton("CLEAR ALL FILTERS");
     }
-
-    final static int MAX_TEXT_LENGTH = 2000;
 
     public String getPropertyXPath(String propertyHeading)
     {
