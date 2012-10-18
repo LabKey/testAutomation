@@ -64,6 +64,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -189,8 +190,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
         _jsErrors = new ArrayList<JavaScriptError>();
 
-        if (getBrowser().startsWith("*ie"))
+        if (getBrowser().startsWith("*ie")) //experimental
+        {
             _driver = new InternetExplorerDriver();
+        }
+        else if (getBrowser().startsWith("*html")) //experimental
+        {
+            _driver = new HtmlUnitDriver(true);
+        }
         else
         {
             final FirefoxProfile profile = new FirefoxProfile();
@@ -198,18 +205,27 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 {JavaScriptError.addExtension(profile);}
             catch(IOException e)
                 {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
-            try
+            if (!onTeamCity()) // Firebug just clutters up screenshots on TeamCity
             {
-                profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.10.3.xpi"));
-                profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
-                profile.setPreference("extensions.firebug.currentVersion", "1.10.3");
-                profile.setPreference("extensions.firebug.allPagesActivation", "on");
-                profile.setPreference("extensions.firebug.previousPlacement", "3");
-                profile.setPreference("extensions.firebug.net.enabledSites", "true");
-                profile.setPreference("extensions.firebug.defaultPanelName", "net");
+                try
+                {
+                    profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.10.3.xpi"));
+                    profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
+                    profile.setPreference("extensions.firebug.currentVersion", "1.10.3");
+                    profile.setPreference("extensions.firebug.allPagesActivation", "on");
+                    profile.setPreference("extensions.firebug.previousPlacement", 3);
+                    profile.setPreference("extensions.firebug.net.enabledSites", true);
+                    if (firebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
+                    {
+                        profile.setPreference("extensions.firebug.net.enableSites", true);
+                        profile.setPreference("extensions.firebug.script.enableSites", true);
+                        profile.setPreference("extensions.firebug.console.enableSites", true);
+                    }
+                }
+                catch(IOException e)
+                    {Assert.fail("Failed to load Firebug: " + e.getMessage());}
             }
-            catch(IOException e)
-                {Assert.fail("Failed to load Firebug: " + e.getMessage());}
+
             profile.setEnableNativeEvents(useNativeEvents());
 
             _driver = new FirefoxDriver(profile);
@@ -463,7 +479,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public int getResponseCode()
     {
         //We can't seem to get response codes via javascript, so we rely on default titles for error pages
-        String title = selenium.getTitle();
+        String title = _driver.getTitle();
         if (!title.toLowerCase().contains("error"))
             return 200;
 
@@ -481,18 +497,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getResponseText()
     {
-        return selenium.getHtmlSource();
+        return _driver.getPageSource();
     }
 
     public URL getURL()
     {
         try
         {
-            return new URL(selenium.getLocation());
+            return new URL(_driver.getCurrentUrl());
         }
         catch (MalformedURLException x)
         {
-            throw new RuntimeException("Bad location from selenium tester: " + selenium.getLocation(), x);
+            throw new RuntimeException("Bad location from selenium tester: " + _driver.getCurrentUrl(), x);
         }
     }
 
@@ -581,13 +597,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void refresh(int millis)
     {
-        selenium.refresh();
+        _driver.navigate().refresh();
         waitForPageToLoad(millis);
     }
 
     public void goBack(int millis)
     {
-        selenium.goBack();
+        _driver.navigate().back();
         waitForPageToLoad(millis);
     }
 
@@ -782,7 +798,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         clickButton("Change Email");
 
-        setFormElement("newEmail", newUserEmail);
+        setFormElement(Locator.name("newEmail"), newUserEmail);
         clickButton("Submit");
     }
 
@@ -1057,6 +1073,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Server is running.");
     }
 
+    @LogMethod
     private void checkForUpgrade()
     {
         boolean bootstrapped = false;
@@ -1196,7 +1213,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertTextPresent(initialText);
     }
 
-
+    @LogMethod
     private void verifyNoRedirect(String upgradeText)
     {
         // These requests should NOT redirect to the upgrade page
@@ -1370,7 +1387,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getBodyText()
     {
-        return _driver.findElement(By.cssSelector("html")).getText();
+        return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
     }
 
     public void resetErrors()
@@ -1608,12 +1625,22 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean enableScriptCheck()
     {
-        return "true".equals(System.getProperty("scriptCheck"));
+        return "true".equals(System.getProperty("scriptCheck")) && getBrowser().startsWith("*firefox");
     }
 
     public boolean enableDevMode()
     {
         return "true".equals(System.getProperty("devMode"));
+    }
+
+    public boolean firebugPanelsEnabled()
+    {
+        return System.getProperty("teamcity.buildType.id") == null && "true".equals(System.getProperty("enableFirebugPanels"));
+    }
+
+    public boolean onTeamCity()
+    {
+        return System.getProperty("teamcity.buildType.id") != null;
     }
 
     public boolean skipLeakCheck()
@@ -2099,7 +2126,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
     public void publishArtifact(File file)
     {
-        if (file != null && System.getProperty("teamcity.buildType.id") != null)
+        if (file != null && onTeamCity())
         {
             // relativize path to labkey project root
             String labkeyRoot = WebTestHelper.getLabKeyRoot();
@@ -2265,7 +2292,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 relativeURL = "/" + relativeURL;
             }
         }
-        selenium.open(getBaseURL() + relativeURL, millis);
+        _driver.navigate().to(getBaseURL() + relativeURL);
     }
 
     public String getContainerId(String url)
@@ -2284,42 +2311,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         alert.accept();
         waitForPageToLoad();
         return confirmation;
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertEquals(Object expected, Object actual)
-    {
-        Assert.assertEquals(expected, actual);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertEquals(String message, Object expected, Object actual)
-    {
-        Assert.assertEquals(message, expected, actual);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertNotSame(Object expected, Object actual)
-    {
-        Assert.assertNotSame(expected, actual);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertTrue(String message, boolean condition)
-    {
-        Assert.assertTrue(message, condition);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertTrue(boolean condition)
-    {
-        Assert.assertTrue(condition);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertFalse(String message, boolean condition)
-    {
-        Assert.assertFalse(message, condition);
     }
 
     public void assertConfirmation(String msg)
@@ -2806,7 +2797,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean isTitleEqual(String match)
     {
-        return match.equals(selenium.getTitle());
+        return match.equals(_driver.getTitle());
     }
 
     public void assertTitleEquals(String match)
@@ -2816,7 +2807,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertTitleContains(String match)
     {
-        String title = selenium.getTitle();
+        String title = _driver.getTitle();
         Assert.assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
     }
 
@@ -2854,12 +2845,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         //Need to unencode here? Selenium turns &nbsp; into space???
         text = text.replace("&nbsp;", " ");
-        return selenium.isTextPresent(text);
+        return getBodyText().contains(text);
     }
 
     public String getText(Locator elementLocator)
     {
-        return selenium.getText(elementLocator.toString());
+        WebElement el = elementLocator.findElement(_driver);
+        return el.getText();
     }
 
     /** Verifies that all the strings are present in the page */
@@ -3334,8 +3326,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (failIfNotFound)
         {
-            WebDriverWait wait = new WebDriverWait(_driver, elementTimeout/1000);
-            wait.until(ExpectedConditions.presenceOfElementLocated(locator.toBy()));
+            locator.waitForElmement(_driver, _shortWait);
         }
         else
         {
@@ -3973,11 +3964,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void dragAndDrop(Locator from, Locator to)
     {
-        selenium.mouseOver(from.toString());
-        selenium.mouseDownAt(from.toString(), "1,1");
-        selenium.mouseMoveAt(to.toString(), "1,1");
-        selenium.mouseOver(to.toString());
-        selenium.mouseUpAt(to.toString(), "1,1");
+        dragAndDrop(from, to, Position.top);
     }
 
     public enum Position
@@ -3985,30 +3972,27 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void dragAndDrop(Locator from, Locator to, Position pos)
     {
+        WebElement fromEl = from.findElement(_driver);
+        WebElement toEl = to.findElement(_driver);
+
         int y;
         if ( pos == Position.top )
             y = 1;
         else if ( pos == Position.bottom )
-            y = selenium.getElementHeight(to.toString()).intValue() - 1;
+            y = toEl.getSize().getHeight() - 1;
         else // pos == Position.middle
-            y = selenium.getElementHeight(to.toString()).intValue() / 2;
+            y = toEl.getSize().getHeight() / 2;
 
-        selenium.mouseOver(from.toString());
-        selenium.mouseDownAt(from.toString(), "1,1");
-        selenium.mouseMoveAt(to.toString(), "1," + y);
-        selenium.mouseOver(to.toString());
-        selenium.mouseUpAt(to.toString(), "1," + y);
+        Actions builder = new Actions(_driver);
+        builder.clickAndHold(fromEl).moveToElement(toEl, 1, y).release().build().perform();
     }
 
     public void dragAndDrop(Locator el, int xOffset, int yOffset)
     {
-        String x = "" + (1 + xOffset);
-        String y = "" + (1 + yOffset);
+        WebElement fromEl = el.findElement(_driver);
 
-        selenium.mouseOver(el.toString());
-        selenium.mouseDownAt(el.toString(), "1,1");
-        selenium.mouseMoveAt(el.toString(), x + "," + y);
-        selenium.mouseUpAt(el.toString(), x + "," + y);
+        Actions builder = new Actions(_driver);
+        builder.clickAndHold(fromEl).moveByOffset(xOffset + 1, yOffset + 1).release().build().perform();
     }
 
     public void clickTab(String tabname)
@@ -4700,14 +4684,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton(buttonText, 0);
     }
 
+    @Deprecated
     public void setText(String elementName, String text)
     {
-        if (elementName.toLowerCase().indexOf("password") >= 0)
-            log("Setting text of " + elementName + " to ******");
-        else
-            log("Setting text of " + elementName + " to " + text);
-
-        selenium.typeSilent(elementName, text);
+        setFormElement(Locator.id(elementName), text, elementName.toLowerCase().contains("password"));
     }
 
     /**
@@ -4735,7 +4715,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         setFormElement(el, text);
-        fireEvent(l, SeleniumEvent.blur);
+//        fireEvent(l, SeleniumEvent.blur);
     }
 
     public void setFormElement(WebElement el, String text)
@@ -4755,13 +4735,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void setFormElement(String element, File file)
     {
-        Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
-        setFormElement(Locator.name(element), file.getAbsolutePath());
+        setFormElement(Locator.name(element), file);
     }
 
     public void setFormElement(Locator loc, File file)
     {
-        assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
+        Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
         setFormElement(loc, file.getAbsolutePath());
     }
 
@@ -5338,24 +5317,40 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return selenium.isChecked(checkBoxLocator.toString());
     }
 
+    @Deprecated
     public void selectOptionByValue(String selectId, String value)
     {
-        selenium.select(selectId, "value=" + value);
+        selectOptionByValue(Locator.name(selectId), value);
     }
 
-    public void selectOptionByValue(Locator loc, String value)
+    public void selectOptionByValue(Locator locator, String value)
     {
-        selectOptionByValue(loc.toString(), value);
+        WebElement select = _driver.findElement(locator.toBy());
+        List<WebElement> options = select.findElements(By.tagName("option"));
+        for(WebElement option : options){
+            if(option.getAttribute("value").equals(value)) {
+                option.click();
+                break;
+            }
+        }
     }
 
+    @Deprecated
     public void selectOptionByText(String selectId, String text)
     {
-        selenium.select(selectId, text);
+        selectOptionByText(Locator.id(selectId), text);
     }
 
     public void selectOptionByText(Locator locator, String text)
     {
-        selenium.select(locator.toString(), text);
+        WebElement select = _driver.findElement(locator.toBy());
+        List<WebElement> options = select.findElements(By.tagName("option"));
+        for(WebElement option : options){
+            if(option.getText().equals(text)) {
+                option.click();
+                break;
+            }
+        }
     }
 
     public void addUrlParameter(String parameter)
@@ -6299,12 +6294,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    @LogMethod
     public void signOut()
     {
         log("Signing out");
         beginAt("/login/logout.view");
         waitForPageToLoad();
-        assertLinkPresentWithText("Sign In");
+        assertElementPresent(Locator.xpath("//a[string()='Sign In']")); // Will recognize link [BeginAction] or button [LoginAction]
     }
 
     /*
@@ -6315,7 +6311,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
         clickLinkWithText(projectName);
         assertElementPresent(Locator.name("q"));
-        setFormElement("query", searchFor);
+        setFormElement(Locator.name("query"), searchFor);
         clickButton("Search");
         long wait = 0;
         while (wait < 5*defaultWaitForPage)
@@ -7127,7 +7123,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public  String getFolderUrl()
     {
-        Locator l = Locator.xpath("//td[@class='labkey-folder-title']/a");
+        Locator l = Locator.xpath("//div[@class='labkey-folder-title']/a");
         return getAttribute(l, "href");
     }
 

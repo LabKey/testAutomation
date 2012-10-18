@@ -89,7 +89,6 @@ public class JUnitTest extends TestSuite
         {
             // sign in performs upgrade if necessary
             helper.signIn();
-            helper.assertLinkPresentWithText("Projects");
             helper.unfail();
         }
         catch (Exception e)

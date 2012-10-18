@@ -542,6 +542,7 @@
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
+            <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -983,6 +984,11 @@
             <isset property="databaseVersion"/>
         </condition>
 
+        <!-- Set property sysprop.enableFirebugPanels. Enables FireBug plugin on Firefox. Does nothing for other browsers -->
+        <condition property="sysprop.enableFirebugPanels" value="${enableFirebugPanels}" else="false">
+            <isset property="enableFirebugPanels"/>
+        </condition>
+
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
         <condition property="sysprop.suite" value="DRT">
             <not><isset property="suite"/></not>
@@ -1065,6 +1071,7 @@
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
+            <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -1110,6 +1117,7 @@
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
+            <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
 
             <formatter type="plain"/>
 
@@ -1156,6 +1164,7 @@
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
+            <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>

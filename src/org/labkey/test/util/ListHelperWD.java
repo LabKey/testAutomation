@@ -28,8 +28,10 @@ import java.util.Map;
  * User: jeckels
  * Date: Nov 21, 2007
  */
-public class ListHelperWD extends AbstractHelperWD
+public class ListHelperWD extends ListHelper
 {
+    BaseWebDriverTest _test;
+
     public ListHelperWD(BaseWebDriverTest test)
     {
         super(test);
@@ -102,6 +104,7 @@ public class ListHelperWD extends AbstractHelperWD
         _test.beginAt(url);
         _test.clickButton("OK");
     }
+/*
 
     public static class LookupInfo
     {
@@ -368,6 +371,7 @@ public class ListHelperWD extends AbstractHelperWD
         }
     }
 
+*/
 
     public void createList(String folderName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {

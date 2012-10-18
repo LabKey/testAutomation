@@ -19,6 +19,8 @@ package org.labkey.test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,8 +37,8 @@ public class Locator
     private String _contains;
 
     // XPATH fragments
-    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
-    public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
+    @Deprecated public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
+    @Deprecated public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
 
     protected Locator(String rawString)
     {
@@ -95,7 +97,11 @@ public class Locator
         if (loc.startsWith("xpath="))
             return By.xpath(loc.substring(loc.indexOf("=")+1));
         if (loc.startsWith("css="))
+        {
+            if (loc.contains(":contains("))
+                throw new IllegalArgumentException("CSS3 has deprecated :contains()");
             return By.cssSelector(loc.substring(loc.indexOf("=")+1));
+        }
         if (loc.startsWith("link="))
             return By.linkText(loc.substring(loc.indexOf("=")+1));
         else
@@ -147,6 +153,31 @@ public class Locator
             }
         }
         return elements;
+    }
+
+    public WebElement waitForElmement(final WebDriver driver, final WebDriverWait wait)
+    {
+        return wait.until(new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver d)
+            {
+                return findElement(driver);
+            }
+        });
+    }
+
+    public List<WebElement> waitForElmements(final WebDriver driver, final WebDriverWait wait)
+    {
+        wait.until(new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver d)
+            {
+                return findElement(driver);
+            }
+        });
+        return findElements(driver);
     }
 
     public static Locator id(String id)

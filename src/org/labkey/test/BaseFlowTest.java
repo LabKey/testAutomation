@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-abstract public class BaseFlowTest extends BaseSeleniumWebTest
+abstract public class BaseFlowTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "Flow Verify Project";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
@@ -194,11 +193,11 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         if (!isLinkPresentWithText(getProjectName()))
             return;
 
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         if (!isLinkPresentWithText(getFolderName()))
             return;
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
         DataRegionTable table = new DataRegionTable("query", this);
@@ -206,9 +205,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             // Delete all runs
             table.checkAllOnPage();
-            selenium.chooseOkOnNextConfirmation();
             clickButton("Delete", 0);
-            Assert.assertTrue(selenium.getConfirmation().contains("Are you sure you want to delete the selected row"));
+            assertConfirmation("Are you sure you want to delete the selected row" + (table.getDataRowCount() == 1 ? "?" : "s?"));
             waitForPageToLoad();
             Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
@@ -225,7 +223,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     // if we aren't already on the Flow Dashboard, try to get there.
     protected void goToFlowDashboard()
     {
-        String title = selenium.getTitle();
+        String title = _driver.getTitle();
         if (!title.startsWith("Flow Dashboard: "))
         {
             // All flow pages have a link back to the Flow Dashboard
@@ -264,7 +262,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         log("** Uploading sample set");
         goToFlowDashboard();
         clickLinkWithText("Upload Sample Descriptions");
-        setFormElement("data", getFileContents(sampleFilePath));
+        setFormElement(Locator.id("textbox"), getFileContents(sampleFilePath));
+        click(Locator.css("html body"));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText("idColumn" + (i+1), idCols[i]);
         submit();
