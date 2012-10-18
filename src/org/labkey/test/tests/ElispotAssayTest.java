@@ -216,7 +216,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         _customizeViewsHelper.addCustomizeViewColumn("NormalizedSpotCount");
         _customizeViewsHelper.applyCustomView();
 
-        DataRegionTable dataTable = new DataRegionTable(TEST_ASSAY_ELISPOT + " Data", this);
+        DataRegionTable dataTable = new DataRegionTable("Data", this);
         List<String> cellWell = dataTable.getColumnDataAsText("CellWell");
         List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
         List<String> normalizedSpotCount = dataTable.getColumnDataAsText("NormalizedSpotCount");
@@ -262,7 +262,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertElementPresent(getLocatorForHilightedWell("labkey-antigenGroup-Antigen-2", "257.0"));
 
         // test the mean and median values
-        DataRegionTable table = new DataRegionTable(TEST_ASSAY_ELISPOT + " AntigenStats", this);
+        DataRegionTable table = new DataRegionTable("AntigenStats", this);
         String[] expectedMeans = new String[]{"15555.6", "8888.9", "122222.2", "46666.7"};
         String[] expectedMedians = new String[]{"13333.3", "13333.3", "126666.7", "40000.0"};
 
@@ -423,7 +423,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkWithText(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText(TEST_ASSAY_ELISPOT);
         assertTextPresent("Background Subtraction");
-        DataRegionTable runTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" Runs", this, true, true);
+        DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
@@ -441,7 +441,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickLinkWithText("run details", 3);
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
-        DataRegionTable table = new DataRegionTable(TEST_ASSAY_ELISPOT+" AntigenStats", this, true, true);
+        DataRegionTable table = new DataRegionTable("AntigenStats", this, true, true);
 
         Iterator<String> means = Arrays.asList("0.0", "2271111.1", "1111.1", "4444.4").iterator();
         for (String mean : table.getColumnDataAsText("Atg1AMean"))
@@ -482,7 +482,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         selectOptionByText("plateReader", "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE5, "E", "Save and Finish", false, true);
-        DataRegionTable runTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" Runs", this, true, true);
+        DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
         assertTextPresent("AID_0161456 W8.txt");
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
@@ -494,7 +494,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         waitForElement(Locator.css("#plate-summary-div-1 table"));
         //Assert.assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
-        DataRegionTable detailsTable = new DataRegionTable(TEST_ASSAY_ELISPOT+" AntigenStats", this, true, true);
+        DataRegionTable detailsTable = new DataRegionTable("AntigenStats", this, true, true);
         column = detailsTable.getColumnDataAsText("BackgroundMedian");
         String[] expectedColumn = {"0.0","0.0","9.5","0.0"};
         for(int i = 0; i < 4; i++)

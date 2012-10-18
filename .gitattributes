@@ -41,6 +41,9 @@ modules/miniassay/config/module.properties -text
 modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Batches/AssayDesignBatches.qview.xml -text
 modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Data/AssayDesignData.qview.xml -text
 modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Runs/AssayDesignRuns.qview.xml -text
+modules/miniassay/queries/assay/Noblis[!!-~]Simple/My[!!-~]Simple[!!-~]Assay/Batches/AssayDesignChildSchemaBatches.qview.xml -text
+modules/miniassay/queries/assay/Noblis[!!-~]Simple/My[!!-~]Simple[!!-~]Assay/Data/AssayDesignChildSchemaData.qview.xml -text
+modules/miniassay/queries/assay/Noblis[!!-~]Simple/My[!!-~]Simple[!!-~]Assay/Runs/AssayDesignChildSchemaRuns.qview.xml -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
@@ -230,6 +233,7 @@ src/org/labkey/test/tests/SCHARPStudyTest.java -text
 src/org/labkey/test/tests/SampleMindedImportTest.java -text
 src/org/labkey/test/tests/SampleSetTest.java -text
 src/org/labkey/test/tests/SchemaBrowserTest.java -text
+src/org/labkey/test/tests/SchemaTest.java -text
 src/org/labkey/test/tests/ScriptValidationTest.java -text
 src/org/labkey/test/tests/SearchTest.java -text
 src/org/labkey/test/tests/SecurityApiTest.java -text

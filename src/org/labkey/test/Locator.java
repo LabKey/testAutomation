@@ -584,7 +584,8 @@ public class Locator
 
     public static XPathLocator queryTreeNode(String schemaName, String queryName)
     {
-        return xpath("//li[@class='x-tree-node']/div/a/span[text()='" + schemaName + "']/../../..//span[text()='" + queryName + "']");
+        String[] schemaParts = schemaName.split("\\.");
+        return xpath("//li[@class='x-tree-node']/div/a/span[text()='" + schemaParts[schemaParts.length - 1] + "']/../../..//span[text()='" + queryName + "']");
     }
 
     public static XPathLocator permissionsTreeNode(String folderName)

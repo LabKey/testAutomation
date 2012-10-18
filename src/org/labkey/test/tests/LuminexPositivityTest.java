@@ -102,7 +102,7 @@ public class LuminexPositivityTest extends LuminexTest
 
     private void checkDescriptionParsing(String description, String specimenID, String participantID, String visitID, String date)
     {
-        DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
+        DataRegionTable drt = new DataRegionTable("Data", this);
         drt.ensureColumnsPresent("Description", "Specimen ID", "Participant ID", "Visit ID", "Date");
         int rowID = drt.getIndexWhereDataAppears(description, "Description");
         Assert.assertEquals(specimenID, drt.getDataAsText(rowID, "Specimen ID"));
@@ -118,7 +118,7 @@ public class LuminexPositivityTest extends LuminexTest
 
         assertTextPresent(type, numExpected);
 
-        DataRegionTable drt = new DataRegionTable( TEST_ASSAY_LUM+ " Data", this);
+        DataRegionTable drt = new DataRegionTable("Data", this);
         List<String> posivitiy = drt.getColumnDataAsText("Positivity");
         List<String> wells = drt.getColumnDataAsText("Well");
 

@@ -55,13 +55,14 @@ public class NabMigrationTest extends NabOldTest
         clickLinkWithText(FOLDER_NAME);
         clickTab("Nab");
         clickLinkWithText(NEW_ASSAY_NAME);
-        Assert.assertEquals("Data present in NAb assay that should be unused", 0, new DataRegionTable(NEW_ASSAY_NAME + " Runs", this).getDataRowCount());
+        Assert.assertEquals("Data present in NAb assay that should be unused", 0, new DataRegionTable("Runs", this).getDataRowCount());
         goBack();
 
         log("verify data present in second assay");
         clickLinkWithText(NEW_ASSAY_NAME2);
-        Assert.assertEquals("Newly added value incorrect.", newFieldVal, new DataRegionTable(NEW_ASSAY_NAME2 + " Runs", this).getDataAsText(1, newField));
-        Assert.assertEquals("No present in NAb assay", 2, new DataRegionTable(NEW_ASSAY_NAME2 + " Runs", this).getDataRowCount());DataRegionTable drt = new  DataRegionTable(NEW_ASSAY_NAME2+ " Runs", this);
+        Assert.assertEquals("Newly added value incorrect.", newFieldVal, new DataRegionTable("Runs", this).getDataAsText(1, newField));
+        Assert.assertEquals("No present in NAb assay", 2, new DataRegionTable("Runs", this).getDataRowCount());
+        DataRegionTable drt = new DataRegionTable("Runs", this);
         Assert.assertTrue("LegacyID not present in new assay run list", drt.getIndexWhereDataAppears(assayRowId, "LegacyID") > -1);
 //        Assert.assertEquals("RowID from original second nab run not copied into legacyID field", assayRowId, first);
         clickLinkWithText("run details");

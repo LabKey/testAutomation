@@ -134,7 +134,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         validateRuns();
 
         // Now try doing the runs in bulk, so delete the existing runs
-        checkAllOnPage(ASSAY_NAME + " Runs");
+        checkAllOnPage("Runs");
         clickButton("Delete");
         clickButton("Confirm Delete");
 

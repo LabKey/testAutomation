@@ -6413,25 +6413,34 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     // Helper methods for interacting with the query schema browser
     public void selectSchema(String schemaName)
     {
-        if (isExtTreeNodeSelected(schemaName))
+        String[] schemaParts = schemaName.split("\\.");
+        if (isExtTreeNodeSelected(schemaParts[schemaParts.length - 1]))
             return;
 
-        log("Selecting schema " + schemaName + " in the schema browser...");
-        Locator loc = Locator.schemaTreeNode(schemaName);
-
-        //first load of schemas might a few seconds
-        waitForElement(loc, 30000);
-        if (isExtTreeNodeExpanded(schemaName))
-            click(loc);
-        else
+        String schemaWithParents = "";
+        String separator = "";
+        for (String schemaPart : schemaParts)
         {
-            _driver.findElement(loc.toBy()).click();
-            _driver.findElement(loc.toBy()).click();
-            sleep(1000);
-            click(loc);
+            schemaWithParents += separator + schemaPart;
+            separator = ".";
+
+            log("Selecting schema " + schemaWithParents + " in the schema browser...");
+            Locator loc = Locator.schemaTreeNode(schemaPart);
+
+            //first load of schemas might a few seconds
+            waitForElement(loc, 30000);
+            if (isExtTreeNodeExpanded(schemaPart))
+                click(loc);
+            else
+            {
+                _driver.findElement(loc.toBy()).click();
+                _driver.findElement(loc.toBy()).click();
+                sleep(1000);
+                click(loc);
+            }
+            waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaPart + "']"), 1000);
+            waitForText(schemaWithParents + " Schema");
         }
-        waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaName + "']"), 1000);
-        waitForText(schemaName + " Schema");
     }
 
     public boolean isQueryPresent(String schemaName, String queryName)

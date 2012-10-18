@@ -421,7 +421,7 @@ public class AssayTest extends AbstractAssayTest
         int totalTrues = getXpathCount(trueLocator);
         Assert.assertEquals(4, totalTrues);
 
-        setFilter(TEST_ASSAY + " Data", "SpecimenID", "Starts With", "AssayTestControl");
+        setFilter("Data", "SpecimenID", "Starts With", "AssayTestControl");
 
         // verify that there are no trues showing for the assay match column that were filtered out
         totalTrues = getXpathCount(trueLocator);
@@ -429,7 +429,7 @@ public class AssayTest extends AbstractAssayTest
 
         log("Check out the data for all of the runs");
         clickLinkWithText("view results");
-        clearAllFilters(TEST_ASSAY + " Data", "SpecimenID");
+        clearAllFilters("Data", "SpecimenID");
         assertTextPresent("7.0");
         assertTextPresent("18");
 
@@ -439,7 +439,7 @@ public class AssayTest extends AbstractAssayTest
         int totalFalses = getXpathCount(falseLocator);
         Assert.assertEquals(3, totalFalses);
 
-        setFilter(TEST_ASSAY + " Data", "SpecimenID", "Does Not Start With", "BAQ");
+        setFilter("Data", "SpecimenID", "Does Not Start With", "BAQ");
 
         // verify the falses have been filtered out
         totalFalses = getXpathCount(falseLocator);
@@ -835,7 +835,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(3, 2, 0);
 
         clickLinkWithText("view results");
-        clearAllFilters(TEST_ASSAY + " Data", "SpecimenID");
+        clearAllFilters("Data", "SpecimenID");
         verifySpecimensPresent(3, 2, 3);
 
         log("Testing assay-study linkage");
@@ -851,7 +851,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(3, 2, 0);
 
         clickLinkWithText("view results");
-        clearAllFilters(TEST_ASSAY + " Data", "SpecimenID");
+        clearAllFilters("Data", "SpecimenID");
         verifySpecimensPresent(3, 2, 3);
 
         // Verify that the correct copied to study column is present

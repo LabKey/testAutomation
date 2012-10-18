@@ -125,7 +125,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         String confirmation = getConfirmationAndWait();
         clickLinkContainingText("run1");
 
-        DataRegionTable table = new DataRegionTable(getAssayName() + " Data", this);
+        DataRegionTable table = new DataRegionTable("Data", this);
         table.checkAllOnPage();
         clickButton("Create Vials", 0);
         assertExtMsgBox("Error", "ParticipantID 'B01' missing TargetStudy.");
@@ -146,7 +146,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         confirmation = getConfirmationAndWait();
 
         clickLinkContainingText("run2");
-        table = new DataRegionTable(getAssayName() + " Data", this);
+        table = new DataRegionTable("Data", this);
 
         table.checkAllOnPage();
         clickButton("Create Vials", 0);
@@ -175,7 +175,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
 
         log("** test changing cell counts updates used/remaining columns and vial count column");
-        table = new DataRegionTable(getAssayName() + " Data", this, false);
+        table = new DataRegionTable("Data", this, false);
         Assert.assertEquals("B02", table.getDataAsText(0, "Participant ID"));
         Assert.assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
         Assert.assertEquals("2.050E7", table.getDataAsText(0, "Original Viable Cells"));
@@ -219,7 +219,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
 
         log("** checking cell counts and specimen IDs");
-        table = new DataRegionTable(getAssayName() + " Data", this);
+        table = new DataRegionTable("Data", this);
         Assert.assertEquals("B02", table.getDataAsText(1, "Participant ID"));
         Assert.assertEquals("B02_1.0_0,B02_1.0_1,B02_1.0_2", table.getDataAsText(1, "Specimen IDs"));
         // Viable Cells value doesn't get updated, only Original Cells

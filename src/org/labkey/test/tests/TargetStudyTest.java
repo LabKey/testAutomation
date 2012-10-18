@@ -195,7 +195,7 @@ public class TargetStudyTest extends AbstractAssayTest
         assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2);
         assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3);
 
-        DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
+        DataRegionTable table = new DataRegionTable("Data", this);
         Assert.assertEquals(_study1Label, table.getDataAsText(0, "Target Study"));
         Assert.assertEquals(_study1Label, table.getDataAsText(1, "Target Study"));
         Assert.assertEquals(_study1Label, table.getDataAsText(2, "Target Study"));
@@ -216,7 +216,7 @@ public class TargetStudyTest extends AbstractAssayTest
 
     protected void copyToStudy()
     {
-        DataRegionTable table = new DataRegionTable(ASSAY_NAME + " Data", this);
+        DataRegionTable table = new DataRegionTable("Data", this);
         table.checkAllOnPage();
         clickButton("Copy to Study");
 

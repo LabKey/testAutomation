@@ -72,13 +72,13 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + name, false);
     }
 
-    public void addAliasedFieldToMetadata(String tableName, String aliasedColumn, String columnName, ListHelper.LookupInfo lookupInfo)
+    public void addAliasedFieldToMetadata(String schemaName, String tableName, String aliasedColumn, String columnName, ListHelper.LookupInfo lookupInfo)
     {
         //go to schema browser
         _test.goToSchemaBrowser();
 
         //go to assay
-        _test.selectQuery("assay", tableName);
+        _test.selectQuery(schemaName, tableName);
 
         //edit metadata
         _test.waitForText("edit metadata");

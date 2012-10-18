@@ -101,7 +101,7 @@ public class LuminexTest extends AbstractQCAssayTest
     public static final String ASSAY_ID_FIELD  = "name";
     public static final String ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD = "__primaryFile__";
 
-    public static final String DATA_TABLE_NAME = TEST_ASSAY_LUM+" Data";
+    public static final String DATA_TABLE_NAME = "Data";
     private static final String EXCLUDE_COMMENT_FIELD = "comment";
     public static final String EXCLUDE_SELECTED_BUTTON = "excludeselected";
     protected static final String MULTIPLE_CURVE_ASSAY_RUN_NAME = "multipleCurvesTestRun";
@@ -390,9 +390,9 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("ParticipantID1");
         assertTextPresent("ParticipantID2");
         assertTextPresent("ParticipantID3");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ParticipantID1");
+        setFilter("Data", "ParticipantID", "Equals", "ParticipantID1");
         assertTextPresent("1.1");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ParticipantID2");
+        setFilter("Data", "ParticipantID", "Equals", "ParticipantID2");
         assertTextPresent("1.2");
 
         clickLinkWithText(TEST_ASSAY_LUM + " Runs");
@@ -402,9 +402,9 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("ListParticipant2");
         assertTextPresent("ListParticipant3");
         assertTextPresent("ListParticipant4");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ListParticipant1");
+        setFilter("Data", "ParticipantID", "Equals", "ListParticipant1");
         assertTextPresent("1001.1");
-        setFilter(TEST_ASSAY_LUM + " Data", "ParticipantID", "Equals", "ListParticipant2");
+        setFilter("Data", "ParticipantID", "Equals", "ListParticipant2");
         assertTextPresent("1001.2");
 
         clickLinkWithText(TEST_ASSAY_LUM + " Runs");
@@ -412,7 +412,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("IL-1b (1)");
         assertTextPresent("9011-04");
 
-        setFilter(TEST_ASSAY_LUM + " Data", "FI", "Equals", "20");
+        setFilter("Data", "FI", "Equals", "20");
         selenium.click(".toggle");
         clickButton("Copy to Study");
         selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
@@ -449,7 +449,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkWithText("Show All");
 
         // check that both the raw and summary data were uploaded together
-        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
+        DataRegionTable table = new DataRegionTable("Data", this);
         Assert.assertEquals("Unexpected number of data rows for both raw and summary data", 108, table.getDataRowCount());
         // check the number of rows of summary data
         table.setFilter("Summary", "Equals", "true");
@@ -471,7 +471,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void checkStdDevAndCV(String analyte, String type, int rowCount, String stddev, String cv)
     {
-        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
+        DataRegionTable table = new DataRegionTable("Data", this);
         table.setFilter("Analyte", "Equals", analyte);
         table.setFilter("Type", "Equals", type);
         Assert.assertEquals("Unexpected number of data rows for " + analyte + "/" + type, rowCount, table.getDataRowCount());
@@ -496,7 +496,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //add transform script
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " CurveFit");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "CurveFit");
         waitForText("view data");
         clickLinkContainingText("view data");
         assertTextPresent("Four Parameter");
@@ -509,7 +509,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void checkEC50dataAndFailureFlag()
     {
         // expect to already be viewing CurveFit query
-        assertTextPresent(TEST_ASSAY_LUM + " CurveFit");
+        assertTextPresent("CurveFit");
 
         // quick check to see if we are using 32-bit or 64-bit R
         log("Checking R 32-bit vs 64-bit");
@@ -518,7 +518,7 @@ public class LuminexTest extends AbstractQCAssayTest
         boolean is64bit = _rReportHelper.executeScript("print(.Machine$sizeof.pointer)", "[1] 8", true);
         _rReportHelper.saveReport("dummy");
         popLocation();
-        waitForText(TEST_ASSAY_LUM + " CurveFit");
+        waitForText("CurveFit");
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("TitrationId/Name");
@@ -582,7 +582,7 @@ public class LuminexTest extends AbstractQCAssayTest
         table.clearFilter("CurveType");
 
         // expect to already be viewing CurveFit query
-        assertTextPresent(TEST_ASSAY_LUM + " CurveFit");
+        assertTextPresent("CurveFit");
 
         table = new DataRegionTable("query", this, false);
         table.setFilter("FailureFlag", "Equals", "true");
@@ -909,7 +909,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // Go to the schema browser to check out the parsed curve fits
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " CurveFit");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "CurveFit");
         waitForText("view data");
         clickLinkContainingText("view data");
 
@@ -1167,7 +1167,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // verify the description error was generated by the transform script
         clickLinkWithText("transformed assayId");
-        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
+        DataRegionTable table = new DataRegionTable("Data", this);
         for(int i = 1; i <= 40; i++)
         {
             Assert.assertEquals("Transformed", table.getDataAsText(i, "Description"));
@@ -1235,7 +1235,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // verify that the transform script and ruminex versions are as expected
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
-        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
+        DataRegionTable table = new DataRegionTable("Runs", this);
         Assert.assertEquals("Unexpected Transform Script Version number", "4.1.20120806", table.getDataAsText(0, "Transform Script Version"));
         Assert.assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
 
@@ -1244,39 +1244,39 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/Properties/LotNumber");
         _customizeViewsHelper.applyCustomView();
-        setFilter(TEST_ASSAY_LUM + " Data", "Analyte/Properties/LotNumber", "Equals", TEST_ANALYTE_LOT_NUMBER);
+        setFilter("Data", "Analyte/Properties/LotNumber", "Equals", TEST_ANALYTE_LOT_NUMBER);
         assertTextPresent("1 - 40 of 40");
-        clearFilter(TEST_ASSAY_LUM + " Data", "Analyte/Properties/LotNumber");
+        clearFilter("Data", "Analyte/Properties/LotNumber");
 
         // verfiy that the calculated values were generated by the transform script as expected
-        table = new DataRegionTable(TEST_ASSAY_LUM + " Data", this);
-        setFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank", "Is Not Blank");
+        table = new DataRegionTable("Data", this);
+        setFilter("Data", "fiBackgroundBlank", "Is Not Blank");
         assertTextPresent("1 - 40 of 40");
-        setFilter(TEST_ASSAY_LUM + " Data", "Type", "Starts With", "X"); // filter to just the unknowns
+        setFilter("Data", "Type", "Starts With", "X"); // filter to just the unknowns
         assertTextPresent("1 - 32 of 32");
         // check values in the fi-bkgd-blank column
         for(int i = 0; i < RTRANS_FIBKGDBLANK_VALUES.length; i++)
         {
             Assert.assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
         }
-        clearFilter(TEST_ASSAY_LUM + " Data", "fiBackgroundBlank");
-        setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl", "Is Not Blank");
+        clearFilter("Data", "fiBackgroundBlank");
+        setFilter("Data", "EstLogConc_5pl", "Is Not Blank");
         assertTextPresent("1 - 32 of 32");
         // check values in the est log conc 5pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_5PL.length; i++)
         {
             Assert.assertEquals(RTRANS_ESTLOGCONC_VALUES_5PL[i], table.getDataAsText(i, "Est Log Conc Rumi 5 PL"));
         }
-        clearFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_5pl");
-        setFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_4pl", "Is Not Blank");
+        clearFilter("Data", "EstLogConc_5pl");
+        setFilter("Data", "EstLogConc_4pl", "Is Not Blank");
         assertTextPresent("1 - 32 of 32");
         // check values in the est log conc 4pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_4PL.length; i++)
         {
             Assert.assertEquals(RTRANS_ESTLOGCONC_VALUES_4PL[i], table.getDataAsText(i, "Est Log Conc Rumi 4 PL"));
         }
-        clearFilter(TEST_ASSAY_LUM + " Data", "EstLogConc_4pl");
-        clearFilter(TEST_ASSAY_LUM + " Data", "Type");
+        clearFilter("Data", "EstLogConc_4pl");
+        clearFilter("Data", "Type");
 
         R_TRANSFORM_SET = true;
     }
@@ -1357,8 +1357,8 @@ public class LuminexTest extends AbstractQCAssayTest
         Map<String, Integer> guideSetIds = getGuideSetIdMap();
         verifyGuideSetsApplied(guideSetIds, analytes, 2);
 
-        //navil trail check
-        assertTextPresent("assay Schema >  ");
+        //nav trail check
+        assertTextPresent("assay.Luminex.&TestAssayLuminex></% 1 Schema >");
 
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
@@ -1527,7 +1527,7 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.addCustomizeViewColumn("QCFlags");
         _customizeViewsHelper.saveCustomView("QC Flags View");
 
-        DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
+        DataRegionTable drt = new DataRegionTable("Runs", this);
 
         //2. exclude wells A4, B4 from plate 5a for both analytes
         //	- the EC50 for GS Analyte (2) is changed to be under the Guide Set range so new QC Flag inserted for that
@@ -1650,8 +1650,8 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyQCFlagsSchema()
     {
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " QCFlags");
-        waitForText("assay." + TEST_ASSAY_LUM + " QCFlags");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "QCFlags");
+        waitForText("assay.Luminex." + TEST_ASSAY_LUM + ".QCFlags");
     }
 
     String[] expectedFlags = {"AUC, EC50-4, EC50-5, HMFI, PCV", "AUC, EC50-4, EC50-5, HMFI", "EC50-5, HMFI", "", "PCV"};
@@ -1664,7 +1664,7 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.saveCustomView();
 
         //verify expected values in column
-        String[] flags = getColumnValues(TEST_ASSAY_LUM + " Runs", "QC Flags").get(0).toArray(new String[] {});
+        String[] flags = getColumnValues("Runs", "QC Flags").get(0).toArray(new String[] {});
         for(int i=0; i<flags.length; i++)
         {
             Assert.assertEquals(expectedFlags[i], flags[i]);
@@ -1758,7 +1758,7 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.saveCustomView();
 
         assertTextPresent(TEST_ASSAY_LUM + " QC Report");
-        DataRegionTable drt = new DataRegionTable(TEST_ASSAY_LUM + " AnalyteTitration", this);
+        DataRegionTable drt = new DataRegionTable("AnalyteTitration", this);
         String isotype = drt.getDataAsText(0, "Isotype");
         if(isotype.length()==0)
             isotype = "[None]";
@@ -1922,7 +1922,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyGuideSetsNotApplied()
     {
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " AnalyteTitration");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "AnalyteTitration");
         waitForText("view data");
         clickLinkContainingText("view data");
         DataRegionTable table = new DataRegionTable("query", this);
@@ -1937,7 +1937,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // see if the 3 uploaded runs got the correct 'current' guide set applied
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " AnalyteTitration");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "AnalyteTitration");
         waitForText("view data");
         clickLinkContainingText("view data");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -1958,7 +1958,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private Map<String, Integer> getGuideSetIdMap()
     {
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " GuideSet");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "GuideSet");
         waitForText("view data");
         clickLinkContainingText("view data");
         Map<String, Integer> guideSetIds = new HashMap<String, Integer>();
@@ -2086,7 +2086,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void goToLeveyJenningsGraphPage(String titrationName)
     {
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " Titration");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "Titration");
         waitForText("view data");
         clickLinkContainingText("view data");
         clickLinkContainingText(titrationName);
@@ -2098,7 +2098,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         // go to the GuideSetCurveFit table to verify the calculated threshold values for the EC50 and AUC
         goToSchemaBrowser();
-        selectQuery("assay", TEST_ASSAY_LUM + " GuideSetCurveFit");
+        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "GuideSetCurveFit");
         waitForText("view data");
         clickLinkContainingText("view data");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -2202,7 +2202,7 @@ public class LuminexTest extends AbstractQCAssayTest
             _customizeViewsHelper.applyCustomView();
             displayingRowId = true;
         }
-        DataRegionTable table = new DataRegionTable(TEST_ASSAY_LUM + " Runs", this);
+        DataRegionTable table = new DataRegionTable("Runs", this);
         clickLinkWithText(table.getDataAsText(0, "Row Id"));
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_4PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_5PL.pdf", 3);

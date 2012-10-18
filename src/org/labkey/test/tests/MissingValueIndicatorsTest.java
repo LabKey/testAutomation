@@ -385,7 +385,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         clickButton("Save and Finish");
         assertNoLabkeyErrors();
         clickLinkWithText(ASSAY_RUN_TWO_COLUMN);
-        validateTwoColumnData("MVAssay Data", "ParticipantID");
+        validateTwoColumnData("Data", "ParticipantID");
 
         log("Copy to study");
         clickLinkWithText(PROJECT_NAME);
@@ -445,7 +445,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
             clickButton("Save and Finish");
             assertNoLabkeyErrors();
             clickLinkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN);
-            validateTwoColumnData("MVAssay Data", "ParticipantID");
+            validateTwoColumnData("Data", "ParticipantID");
         }
     }
 
