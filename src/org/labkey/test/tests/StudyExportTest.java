@@ -314,7 +314,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         enterPermissionsUI();
-        _extHelper.clickExtTab("Study Security");
+        _ext4Helper.clickExt4Tab("Study Security");
         waitAndClickButton("Study Security");
 
         // enable advanced study security
@@ -425,7 +425,7 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getFolderName());
 
         enterPermissionsUI();
-        _extHelper.clickExtTab("Study Security");
+        _ext4Helper.clickExt4Tab("Study Security");
         waitAndClickButton("Study Security");
 
         selectOptionByValue("securityString", "BASIC_WRITE");

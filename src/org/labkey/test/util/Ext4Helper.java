@@ -95,6 +95,23 @@ public class Ext4Helper extends AbstractHelper
         _test.click(l);
     }
 
+    public void clickExt4Tab(String tabname)
+    {
+
+        _test.log("Selecting Ext tab " + tabname);
+        Locator l = Locator.xpath("//span[contains(@class, 'x4-tab') and text() = '" + tabname + "']");
+        _test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
+        {
+            _test.mouseDownAt(l,  1,1);
+            _test.clickAt(l, "1,1");
+        }
+        else
+        {
+            _test.click(l);
+        }
+    }
+
     public void checkCheckbox(String label)
     {
         if (!isChecked(label))
