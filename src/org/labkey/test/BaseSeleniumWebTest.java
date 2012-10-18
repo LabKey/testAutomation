@@ -5084,6 +5084,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+        if (!isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Permissions");
 
         String role = toRole(permissionString);

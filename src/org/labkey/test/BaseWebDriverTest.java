@@ -2517,9 +2517,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForExt4FolderTreeNode(parent, 10000);
         clickButton("Create Subfolder");
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
-        setText("name", child);
-
-
+        setFormElement(Locator.name("name"), child);
     }
 
     public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd, boolean inheritPermissions)
