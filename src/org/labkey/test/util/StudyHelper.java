@@ -15,8 +15,12 @@
  */
 package org.labkey.test.util;
 
+import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,21 +70,23 @@ public class StudyHelper extends AbstractHelper
         _test.clickButton("Create", 0);
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
         _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement("groupLabel", groupName);
+        _test.setFormElement(Locator.xpath("//input[@name='groupLabel']"), groupName);
         if( ptids.length > 0 )
         {
             String csp = ptids[0];
             for( int i = 1; i < ptids.length; i++ )
-                csp += ","+ptids[i];
-            _test.setFormElement("categoryIdentifiers", csp);
+            {
+                csp = csp.concat("," + ptids[i]);
+            }
+            _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp);
         }
         if( categoryName != null )
         {
             if (isCategoryNameNew)
-                _test.setFormElement("participantCategory", categoryName);
+                _test.setFormElement(Locator.xpath("//input[@name='participantCategory']"), categoryName);
             else
-                _test._extHelper.selectComboBoxItem(participantString + " Category", categoryName);
-            _test.pressTab(Locator.name("participantCategory").toString());
+                _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
+            _test.pressTab(Locator.xpath("//input[@name='participantCategory']").toString());
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
         if ( shared != null )
@@ -88,15 +94,15 @@ public class StudyHelper extends AbstractHelper
             _test.sleep(100);
             if( shared )
             {
-                _test.checkCheckbox(Locator.checkboxByName("Shared"));
+                _test._ext4Helper.checkCheckbox("Share Category?");
             }
             else
             {
-                _test.uncheckCheckbox(Locator.checkboxByName("Shared"));
+                _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
 
-        _test._extHelper.clickExtButton("Define " + participantString + " Group", "Save", 0);
+        _test.clickButton("Save", 0);
         _test.waitForExtMaskToDisappear();
     }
 
@@ -110,11 +116,19 @@ public class StudyHelper extends AbstractHelper
         _test.log("Edit " + participantString + " Group: " + groupName);
 
         // Select row
-        _test.getWrapper().getEval("selenium.selectExtGridItem('label', '"+groupName+"', -1, 'participantCategoriesGrid', null, false)");
-        _test.click(Locator.xpath("//*[text()='" + groupName + "']"));
+        List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        int idx = Integer.parseInt(ref.eval("this.getStore().find(\"label\", \"" + groupName + "\")"));
+
+        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        ref.eval("this.getSelectionModel().select(" + idx + ")");
+
+        // The select() method does not fire the select/itemclick events
+        ref.eval("this.fireEvent(\"itemclick\", this, this.getStore().getAt(" + idx + "));");
 
         _test.clickButton("Edit Selected", 0);
-        _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
+        _test.sleep(500);
+        _test.assertTextPresent("Define " + participantString + " Group");
         _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
 
         if( newPtids != null && newPtids.length > 0 )
@@ -122,20 +136,19 @@ public class StudyHelper extends AbstractHelper
             String csp = newPtids[0];
             for( int i = 1; i < newPtids.length; i++ )
                 csp += ","+newPtids[i];
-            String currentIds = _test.getFormElement("categoryIdentifiers");
+            String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
             if (currentIds != null && currentIds.length() > 0)
-                _test.setFormElement("categoryIdentifiers", currentIds + "," + csp);
+                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp);
             else
-                _test.setFormElement("categoryIdentifiers", csp);
+                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp);
         }
         if( categoryName != null )
         {
-            _test.sleep(100);
             if (isCategoryNameNew)
-                _test.setFormElement("participantCategory", categoryName);
+                _test.setFormElement(Locator.xpath("//input[@name='participantCategory']"), categoryName);
             else
-                _test._extHelper.selectComboBoxItem(participantString + " Category", categoryName);
-            _test.pressTab(Locator.name("participantCategory").toString());
+                _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
+            _test.pressTab(Locator.xpath("//input[@name='participantCategory']").toString());
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
         if ( shared != null )
@@ -143,15 +156,15 @@ public class StudyHelper extends AbstractHelper
             _test.sleep(100);
             if( shared )
             {
-                _test.checkCheckbox("Shared");
+                _test._ext4Helper.checkCheckbox("Share Category?");
             }
             else
             {
-                _test.uncheckCheckbox("Shared");
+                _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
         _test.sleep(100);
-        _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
+        _test.clickButton("Save", 0);
         _test.waitForExtMaskToDisappear();
     }
 

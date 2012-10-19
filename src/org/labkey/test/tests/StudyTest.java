@@ -188,7 +188,7 @@ public class StudyTest extends StudyBaseTest
     protected static final String PROJECT_NAME = "StudyVerifyProject";
     protected static final String STUDY_NAME = "My Study";
     protected static final String LABEL_FIELD = "groupLabel";
-    protected static final String ID_FIELD = "categoryIdentifiers";
+    protected static final String ID_FIELD = "participantIdentifiers";
 
 
     /**
@@ -268,7 +268,7 @@ public class StudyTest extends StudyBaseTest
         verifySubjectIDsInWizard(selectedIDs);
 
         // save the new group and use it
-        setFormElement(LABEL_FIELD, "Participant Group from Grid");
+        setFormElement(Locator.name(LABEL_FIELD), "Participant Group from Grid");
         clickButtonContainingText("Save", 0);
         waitForExtMaskToDisappear();
 
@@ -299,13 +299,14 @@ public class StudyTest extends StudyBaseTest
 
     private void verifySubjectIDsInWizard(String[] ids)
     {
-        Locator textArea = Locator.xpath("//textarea[@id='categoryIdentifiers']");
+        Locator textArea = Locator.xpath("//table[@id='participantIdentifiers']//textarea");
         waitForElement(textArea, WAIT_FOR_JAVASCRIPT);
+        sleep(1000);
         String subjectIDs = getFormElement(textArea);
         Set<String> identifiers = new HashSet<String>();
 
         for (String subjectId : subjectIDs.split(","))
-            identifiers.add(subjectId);
+            identifiers.add(subjectId.trim());
 
         // validate...
         if (!identifiers.containsAll(Arrays.asList(ids)))
@@ -324,7 +325,7 @@ public class StudyTest extends StudyBaseTest
         selectListName(listName);
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
 
-        setFormElement(LABEL_FIELD, newListName);
+        setFormElement(Locator.name(LABEL_FIELD), newListName);
 
         clickButtonContainingText("Save", 0);
 
@@ -341,11 +342,13 @@ public class StudyTest extends StudyBaseTest
      */
     private void deleteListTest(String listName)
     {
+        sleep(1000);
         selectListName(listName);
 
         clickButtonContainingText("Delete Selected", 0);
 
         //make sure we can change our minds
+
         _extHelper.waitForExtDialog("Delete Group");
         clickButtonContainingText("No", 0);
         waitForExtMaskToDisappear();
@@ -356,7 +359,8 @@ public class StudyTest extends StudyBaseTest
         _extHelper.waitForExtDialog("Delete Group");
         clickButtonContainingText("Yes", 0);
         waitForExtMaskToDisappear();
-        waitForTextToDisappear(listName);
+        refresh();
+        assertTextNotPresent(listName);
 
     }
 
@@ -371,8 +375,8 @@ public class StudyTest extends StudyBaseTest
     {
         createStudy();
 
-        setFormElement(LABEL_FIELD, listName);
-        setFormElement(ID_FIELD, ids);
+        setFormElement(Locator.name(LABEL_FIELD), listName);
+        setFormElement(Locator.name(ID_FIELD), ids);
         clickButtonContainingText("Save", 0);
         waitForText(expectedError, 5*defaultWaitForPage);
         clickButtonContainingText("OK", 0);
@@ -390,27 +394,33 @@ public class StudyTest extends StudyBaseTest
      */
     private void editClassificationList(String listName, String pIDs)
     {
+        sleep(1000);
         selectListName(listName);
 
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
-        String newPids = getFormElement(ID_FIELD);
+        String newPids = getFormElement(Locator.name(ID_FIELD));
         assertSetsEqual(pIDs, newPids, ", *");
         log("IDs present after opening list: " + newPids);
 
         //remove first element
+        sleep(1000);
+        waitForElement(Locator.xpath("//input[contains(@name, 'infoCombo')]"));
         newPids = pIDs.substring(pIDs.indexOf(",")+2);
-        setFormElement(ID_FIELD, newPids);
+        setFormElement(Locator.name(ID_FIELD), newPids);
         log("edit list of IDs to: " + newPids);
 
         //save, close, reopen, verify change
         _extHelper.waitForExtDialog("Define Mouse Group");
         clickButtonContainingText("Save", 0);
         waitForExtMaskToDisappear();
+        sleep(1000);
+        waitForElement(Locator.xpath("//button[contains(@id, 'deleteSelected')]"));
         selectListName(listName);
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
 
-
-        String pidsAfterEdit =   getFormElement(ID_FIELD);
+        sleep(1000);
+        waitForElement(Locator.xpath("//input[contains(@name, 'infoCombo')]"));
+        String pidsAfterEdit =   getFormElement(Locator.name(ID_FIELD));
         log("pids after edit: " + pidsAfterEdit);
 
         String[] arrPids = newPids.replace(" ","").split(","); Arrays.sort(arrPids);
@@ -468,7 +478,7 @@ public class StudyTest extends StudyBaseTest
     private String createListWithAddAll(String listName, boolean filtered)
     {
         createStudy();
-        setFormElement(LABEL_FIELD, listName);
+        setFormElement(Locator.name(LABEL_FIELD), listName);
         DataRegionTable table = new DataRegionTable("demoDataRegion", this, true);
 
         if(filtered)
@@ -480,7 +490,7 @@ public class StudyTest extends StudyBaseTest
         clickButtonContainingText("Add All", 0);
 
         List<String> idsInColumn = table.getColumnDataAsText("Mouse Id");
-        String idsInForm = getFormElement(ID_FIELD);
+        String idsInForm = getFormElement(Locator.name(ID_FIELD));
         assertIDListsMatch(idsInColumn, idsInForm);
 
         clickButtonContainingText("Save", 0);
