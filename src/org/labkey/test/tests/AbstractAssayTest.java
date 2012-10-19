@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
@@ -206,11 +207,9 @@ public abstract class AbstractAssayTest extends SimpleApiTest
             clickButton("Save and Finish");
         clickLinkWithText(project);
         clickLinkWithText(folder);
-        enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Study Security");
-        clickLinkWithText("Study Security");
+        enterStudySecurity();
 
-        selectOptionByValue("securityString", "ADVANCED_READ");
+        selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
         waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
@@ -280,5 +279,24 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         _listHelper.clickRow(prefix, index);
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
+    }
+
+    protected void clickEditAssayDesign()
+    {
+        clickEditAssayDesign(WAIT_FOR_PAGE);
+    }
+
+    protected void clickEditAssayDesign(int timeout)
+    {
+        click(Locator.linkWithText("MANAGE ASSAY DESIGN"));
+        click(Locator.linkWithText("edit assay design"));
+        if (timeout > 0) waitForPageToLoad(timeout);
+    }
+
+    protected void enterStudySecurity()
+    {
+        enterPermissionsUI();
+        _ext4Helper.clickTabContainingText("Study Security");
+        waitAndClickButton("Study Security");
     }
 }

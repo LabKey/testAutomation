@@ -125,7 +125,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         log("Create MV project");
         _containerHelper.createProject(PROJECT_NAME, "Study");
         clickButton("Create Study");
-        selectOptionByValue("securityString", "BASIC_WRITE");
+        selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
         clickButton("Create Study");
         clickLinkWithText(PROJECT_NAME + " Study");
         setPipelineRoot(getSampleRoot());

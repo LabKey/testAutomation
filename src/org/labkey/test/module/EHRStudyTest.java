@@ -721,7 +721,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         setPermissions(FULL_UPDATER.getGroup(), "Editor");
         setPermissions(REQUEST_ADMIN.getGroup(), "Editor");
         savePermissions();
-        _extHelper.clickExtTab("Study Security");
+        _ext4Helper.clickTabContainingText("Study Security");
         waitAndClickButton("Study Security");
 
         checkRadioButton(_helper.getAnimalHistoryRadioButtonLocator(DATA_ADMIN.getGroup(), "READOWN"));

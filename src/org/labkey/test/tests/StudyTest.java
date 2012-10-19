@@ -649,7 +649,7 @@ public class StudyTest extends StudyBaseTest
             log("configure editable datasets");
             clickTab("Manage");
             clickLinkWithText("Manage Security");
-            selectOptionByText("securityString", "Basic security with editable datasets");
+            selectOptionByText(Locator.name("securityString"), "Basic security with editable datasets");
             waitForPageToLoad();
 
             log("configure comments");

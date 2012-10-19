@@ -86,10 +86,8 @@ public class QuerySnapshotTest extends StudyBaseTest
         waitForPipelineJobsToComplete(1, "study import", false);
 
         // enable advanced study security
-        enterPermissionsUI();
-        _extHelper.clickExtTab("Study Security");
-        waitAndClickButton("Study Security");
-        selectOptionByValue("securityString", "BASIC_WRITE");
+        enterStudySecurity();
+        selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
         waitForPageToLoad(30000);
 
         // shut off demographics bit to allow for insert

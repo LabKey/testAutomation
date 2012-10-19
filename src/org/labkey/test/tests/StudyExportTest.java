@@ -313,12 +313,10 @@ public class StudyExportTest extends StudyManualTest
 
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        enterPermissionsUI();
-        _ext4Helper.clickExt4Tab("Study Security");
-        waitAndClickButton("Study Security");
+        enterStudySecurity();
 
         // enable advanced study security
-        selectOptionByValue("securityString", "ADVANCED_READ");
+        selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
         waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='Users']/..//input[@value='READ']"));
@@ -424,11 +422,9 @@ public class StudyExportTest extends StudyManualTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
 
-        enterPermissionsUI();
-        _ext4Helper.clickExt4Tab("Study Security");
-        waitAndClickButton("Study Security");
+        enterStudySecurity();
 
-        selectOptionByValue("securityString", "BASIC_WRITE");
+        selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
         waitForPageToLoad(30000);
 
         clickLinkWithText(getFolderName());

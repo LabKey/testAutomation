@@ -745,12 +745,10 @@ public class ReportTest extends StudyBaseTest
 
         // give the test group read access to only the DEM-1 dataset
         clickLinkWithText("My Study");
-        enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Study Security");
-        clickLinkWithText("Study Security");
+        enterStudySecurity();
 
         // enable advanced study security
-        selectOptionByValue("securityString", "ADVANCED_READ");
+        selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
         waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));

@@ -448,7 +448,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void tearDown() throws Exception
     {
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
-        if (!skipTearDown)
+        if (!skipTearDown || onTeamCity())
         {
             _driver.quit();
         }
@@ -5388,26 +5388,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
     {
-        if (1==0)
+        String role = toRole(permissionSetting);
+        if ("security.roles.NoPermissionsRole".equals(role))
         {
-            log("Checking permission setting for group " + groupName + " equals " + permissionSetting);
-            Assert.assertEquals("Permission for '" + groupName + "' was not '" + permissionSetting + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
+            assertNoPermission(groupName,"Reader");
+            assertNoPermission(groupName,"Editor");
+            assertNoPermission(groupName,"Project Administrator");
+            return;
         }
-        else
-        {
-            String role = toRole(permissionSetting);
-            if ("security.roles.NoPermissionsRole".equals(role))
-            {
-                assertNoPermission(groupName,"Reader");
-                assertNoPermission(groupName,"Editor");
-                assertNoPermission(groupName,"Project Administrator");
-                return;
-            }
-            log("Checking permission setting for group " + groupName + " equals " + role);
-            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-            assertElementPresent(Locator.permissionButton(groupName,role));
-            //Assert.assertEquals("'" + groupName + "' is not in role '" + role + "'", selenium.getSelectedLabel(Locator.permissionSelect(groupName).toString()), permissionSetting);
-        }
+        log("Checking permission setting for group " + groupName + " equals " + role);
+        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.permissionButton(groupName,permissionSetting));
     }
 
     public void checkInheritedPermissions()
@@ -5427,16 +5418,19 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
     }
 
+    @LogMethod
     public void setPermissions(String groupName, String permissionString)
     {
         _setPermissions(groupName, permissionString, "pGroup");
     }
 
+    @LogMethod
     public void setSiteGroupPermissions(String groupName, String permissionString)
     {
         _setPermissions(groupName, permissionString, "pSite");
     }
 
+    @LogMethod
     public void setUserPermissions(String userName, String permissionString)
     {
         log(new Date().toString());
@@ -5447,30 +5441,26 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-        _extHelper.clickExtTabContainingText("Permissions");
-
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
             Assert.fail("call removePermission()");
-            return;
         }
         else
         {
-            if (!isElementPresent(Locator.permissionRendered()))
-                enterPermissionsUI();
-            _extHelper.clickExtTabContainingText("Permissions");
-
             log("Setting permissions for group " + userOrGroupName + " to " + role);
 
+            if (!isElementPresent(Locator.permissionRendered()))
+                enterPermissionsUI();
+            _ext4Helper.clickTabContainingText("Permissions");
+
             waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-            String input = "$add$" + role;
-            String combo = "$combo$";
-            click(Locator.xpath("//td[contains(@id, '" + combo + "') and contains(@id, '" + role + "')]//img[contains(@class,'x-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class,'x-combo-list') and contains(@style,'visible')]//div[contains(@class,'" + className + "') and string() = '" + (className.equals("pSite") ? "Site: " : "") + userOrGroupName + "']"));
-            sleep(100);
+            String group = userOrGroupName;
+            if (className.equals("pSite"))
+                group = "Site: " + group;
+            click(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]//div[contains(@class, 'x4-form-trigger')]"));
+            click(Locator.xpath("//div[contains(@class, 'x4-boundlist')]//li[contains(@class, '" + className + "') and text()='" + group + "']"));
+            waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
             savePermissions();
             assertPermissionSetting(userOrGroupName, permissionString);
         }
@@ -5547,7 +5537,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void exitPermissionsUI()
     {
-        _extHelper.clickExtTabContainingText("Permissions");
+        _ext4Helper.clickTabContainingText("Permissions");
         clickButton("Save and Finish");
     }
 

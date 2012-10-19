@@ -300,4 +300,11 @@ public abstract class StudyBaseTest extends SimpleApiTest
         checkRadioButton("folderType", "Study Redesign (ITN)");
         clickButton("Update Folder");
     }
+
+    protected void enterStudySecurity()
+    {
+        enterPermissionsUI();
+        _ext4Helper.clickTabContainingText("Study Security");
+        waitAndClickButton("Study Security");
+    }
 }

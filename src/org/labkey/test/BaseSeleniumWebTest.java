@@ -337,7 +337,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             endJsErrorChecker();
 
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
-        if (!skipTearDown)
+        if (!skipTearDown || onTeamCity())
         {
             //selenium.close(); // unnecessary since selenium.stop will close windows.
             selenium.stop();
@@ -1465,6 +1465,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public boolean enableDevMode()
     {
         return "true".equals(System.getProperty("devMode"));
+    }
+
+    public boolean onTeamCity()
+    {
+        return System.getProperty("teamcity.buildType.id") != null;
     }
 
     public boolean skipLeakCheck()
@@ -5063,16 +5068,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton("Save", 0);
     }
 
+    @LogMethod
     public void setPermissions(String groupName, String permissionString)
     {
         _setPermissions(groupName, permissionString, "pGroup");
     }
 
+    @LogMethod
     public void setSiteGroupPermissions(String groupName, String permissionString)
     {
         _setPermissions(groupName, permissionString, "pSite");
     }
 
+    @LogMethod
     public void setUserPermissions(String userName, String permissionString)
     {
         log(new Date().toString());
@@ -5083,20 +5091,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Permissions");
-
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
             Assert.fail("call removePermission()");
-            return;
         }
         else
         {
             log("Setting permissions for group " + userOrGroupName + " to " + role);
+
+            if (!isElementPresent(Locator.permissionRendered()))
+                enterPermissionsUI();
+            _ext4Helper.clickTabContainingText("Permissions");
 
             waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             String group = userOrGroupName;
@@ -5104,7 +5110,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 group = "Site: " + group;
             click(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]//div[contains(@class, 'x4-form-trigger')]"));
             click(Locator.xpath("//div[contains(@class, 'x4-boundlist')]//li[contains(@class, '" + className + "') and text()='" + group + "']"));
-            sleep(200);
+            waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
             savePermissions();
             assertPermissionSetting(userOrGroupName, permissionString);
         }
@@ -6203,6 +6209,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
+    /**
+     * Placeholder for WebDriver pressTab
+     * @param l
+     */
+    public void pressTab(Locator l)
+    {
+        pressTab(l.toXpath());
+    }
+
+    @Deprecated
     public void pressTab(String xpath)
     {
         selenium.keyDown(xpath, "\\9"); // For Windows
@@ -6210,6 +6226,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.keyUp(xpath, "\\9");
     }
 
+    @Deprecated
     public void pressEnter(String xpath)
     {
         selenium.keyDown(xpath, "\\13"); // For Windows
@@ -6217,6 +6234,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.keyUp(xpath, "\\13");
     }
 
+    @Deprecated
     public void pressDownArrow(String xpath)
     {
         selenium.keyDown(xpath, "\\40"); // For Windows

@@ -145,9 +145,7 @@ public class StudySecurityTest extends StudyBaseTest
     {
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
-        enterPermissionsUI();
-        _extHelper.clickExtTab("Study Security");
-        waitAndClickButton("Study Security");
+        enterStudySecurity();
 
         click(getRadioButtonLocator(groupName, setting));
         clickButton("Update");
@@ -223,11 +221,9 @@ public class StudySecurityTest extends StudyBaseTest
     protected void setupStudySecurity()
     {
         //setup advanced dataset security
-        enterPermissionsUI();
-        _extHelper.clickExtTab("Study Security");
-        waitAndClickButton("Study Security");
+        enterStudySecurity();
 
-        setFormElement("securityString", "ADVANCED_WRITE");
+        selectOptionByValue(Locator.name("securityString"), "ADVANCED_WRITE");
         waitForPageToLoad();
 
         //the radio buttons are named "group.<id>" and since we don't know the

@@ -159,9 +159,10 @@ public class Locator
         return elements;
     }
 
-    public WebElement waitForElmement(final WebDriver driver, final int secTimeout)
+    public WebElement waitForElmement(final WebDriver driver, final int msTimeout)
     {
-        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
+        long secTimeout = msTimeout / 1000;
+        WebDriverWait wait = new WebDriverWait(driver, secTimeout > 0 ? secTimeout : 1);
         try
         {
             return wait.until(new ExpectedCondition<WebElement>()
@@ -182,9 +183,9 @@ public class Locator
         }
     }
 
-    public List<WebElement> waitForElmements(final WebDriver driver, final int secTimeout)
+    public List<WebElement> waitForElmements(final WebDriver driver, final int msTimeout)
     {
-        waitForElmement(driver, secTimeout);
+        waitForElmement(driver, msTimeout);
         return findElements(driver);
     }
 
@@ -285,7 +286,7 @@ public class Locator
 
     public static XPathLocator button(String text)
     {
-        return xpath("//button["+ NOT_HIDDEN +" and descendant-or-self::*[text() = '" + text + "']]");
+        return xpath("//button["+ NOT_HIDDEN +"][not(contains(@class, 'tab'))][descendant-or-self::*[text() = '" + text + "']]");
     }
 
     public static XPathLocator buttonContainingText(String text)
