@@ -29,6 +29,7 @@ data/api/workbookAPITest.html -text
 modules/miniassay/assay/simple/config.xml -text
 modules/miniassay/assay/simple/domains/result.xml -text
 modules/miniassay/assay/simple/domains/run.xml -text
+modules/miniassay/assay/simple/queries/AssayProviderScopedRunQuery.sql -text
 modules/miniassay/assay/simple/queries/Batches/AssayTypeBatches.qview.xml -text
 modules/miniassay/assay/simple/queries/Data/AssayTypeData.qview.xml -text
 modules/miniassay/assay/simple/queries/Runs.query.xml -text

@@ -170,6 +170,13 @@ public class ModuleAssayTest extends AbstractAssayTest
         popLocation();
         clickButton("Simple Assay Button", 0);
         assertAlert("button clicked");
+
+        // Check that a query scoped to the assay type shows up for this assay design and has the right data
+        goToSchemaBrowser();
+        selectQuery("assay.simple." + ASSAY_NAME, "AssayProviderScopedRunQuery");
+        waitForText("view data");
+        clickLinkWithText("view data");
+        assertTextPresent("Prefixrun01.tsvSuffix", "Prefixrun02.tsvSuffix");
     }
 
     protected void checkModuleDeployed()

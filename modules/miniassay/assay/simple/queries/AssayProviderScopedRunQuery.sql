@@ -1,0 +1,1 @@
+SELECT *, 'Prefix' || Name || 'Suffix' AS WrappedName FROM Runs
