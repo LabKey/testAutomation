@@ -123,7 +123,7 @@ public class ExperimentalFeaturesTest extends BaseSeleniumWebTest implements Dev
 
         // Set test user permissions
         goToSiteGroups();
-        _extHelper.clickExtTab("Permissions");
+        _ext4Helper.clickExt4Tab("Permissions");
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         if(isElementPresent(Locator.permissionButton(TEST_GROUP, "SeeEmailAddresses")))
             removeSiteGroupPermission(TEST_GROUP, "SeeEmailAddresses");
