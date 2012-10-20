@@ -69,6 +69,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.tmatesoft.svn.core.SVNException;
@@ -489,16 +490,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return Integer.parseInt(title.substring(0, 3));
 
         //Now check the Tomcat page. This is going to be unreliable over time
-        m = TOMCAT_ERROR_PATTERN.matcher(getResponseText());
+        m = TOMCAT_ERROR_PATTERN.matcher(_driver.getPageSource());
         if (m.find())
             return Integer.parseInt(m.group(1));
 
         return 200;
-    }
-
-    public String getResponseText()
-    {
-        return _driver.getPageSource();
     }
 
     public URL getURL()
@@ -1388,7 +1384,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getBodyText()
     {
-        return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
+        try
+        {
+            return _driver.findElement(By.cssSelector("html")).getText();
+        }
+        catch (StaleElementReferenceException ex)
+        {
+            return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
+        }
     }
 
     public void resetErrors()
@@ -1746,7 +1749,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         if (leakCount > MAX_LEAK_LIMIT)
         {
-            String leaks = selenium.getText(Locator.xpath("//table[@name = 'leaks']").toString());
+            String leaks = Locator.name("leaks").findElement(_driver).getText();
             CRC32 crc = new CRC32();
             crc.update(leaks.getBytes());
 
@@ -1784,13 +1787,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         //IE and Firefox have different notions of empty.
         //IE returns html for all pages even empty text...
-        String text = selenium.getHtmlSource();
+        String text = getHtmlSource();
         if (null == text)
             text = "";
         text = text.trim();
         if ("".equals(text))
         {
-            text = selenium.getText("//body");
+            text = getBodyText();
             if (null == text)
                 text = "";
             text = text.trim();
@@ -1813,7 +1816,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if(getProjectName() != null)
         {
             clickFolder(getProjectName());
-            if(!"Query Schema Browser".equals(selenium.getTitle()))
+            if(!"Query Schema Browser".equals(_driver.getTitle()))
                 goToSchemaBrowser();
             validateQueries();
 //            validateLabAuditTrail();
@@ -2095,7 +2098,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
             beginAt("/admin/dumpHeap.view");
             File destDir = ensureDumpDir();
-            String dumpMsg = selenium.getText("xpath=//td[@id='bodypanel']/div");
+            String dumpMsg = Locator.css("#bodypanel > div").findElement(_driver).getText();
             String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
             File heapDump = new File(getLabKeyRoot() + "/build/deploy", filename);
             File destFile = new File(destDir, filename);
@@ -2453,7 +2456,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         setFormElement(Locator.name("projectgroupsname"),groupName);
         clickButton("Create New Group", 0);
-        _extHelper.waitForExtDialog(groupName+" Information");
+        _extHelper.waitForExtDialog(groupName + " Information");
 
         StringBuilder namesList = new StringBuilder();
         for(String member : memberNames)
@@ -2771,24 +2774,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void addWebPart(String webPartName)
     {
-        Locator.XPathLocator selects = Locator.xpath("//form[contains(@action,'addWebPart.view')]//tr/td/select[@name='name']");
-
-        for (int i = 0; i <= 1; i++)
-        {
-            Locator loc = selects.index(i);
-            String[] labels = selenium.getSelectOptions(loc.toString());
-            for (String label : labels)
-            {
-                if (label.equals(webPartName))
-                {
-                    selenium.select(loc.toString(), webPartName);
-                    submit(Locator.xpath("//form[contains(@action,'addWebPart.view')]").index(i));
-                    return;
-                }
-            }
-        }
-
-        throw new RuntimeException("Could not find webpart with name: " + webPartName);
+        Assert.assertTrue("Could not find webpart with name: " + webPartName, isElementPresent(Locator.css("option").withText(webPartName)));
+        Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
+        selectOptionByText(form.append("//select"), webPartName);
+        submit(form);
     }
 
     public void removeWebPart(String webPartTitle)
@@ -2806,7 +2795,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertTitleEquals(String match)
     {
-        Assert.assertEquals("Wrong page title", match, selenium.getTitle());
+        Assert.assertEquals("Wrong page title", match, _driver.getTitle());
     }
 
     public void assertTitleContains(String match)
@@ -2970,7 +2959,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public int countText(String text)
     {
         text = text.replace("&nbsp;", " ");
-        String html = selenium.getHtmlSource();
+        String html = getHtmlSource();
         // Strip all JavaScript tags; in particular, the selenium-injected javascript tag, which can foul up the expected occurrences
         String source = html.replaceAll("(?msi)<script type=\"text/javascript\">.*?</script>", "");
         int current_index = 0;
@@ -2996,7 +2985,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public String getTextInTable(String dataRegion, int row, int column)
     {
         String id = Locator.xq(dataRegion);
-        return selenium.getText("//table[@id="+id+"]/tbody/tr["+row+"]/td["+column+"]");
+        return _driver.findElement(By.xpath("//table[@id="+id+"]/tbody/tr["+row+"]/td["+column+"]")).getText();
     }
 
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
@@ -3332,14 +3321,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (failIfNotFound)
         {
-            locator.waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
+            locator.waitForElmement(_driver, elementTimeout);
         }
         else
         {
             try
             {
-                WebDriverWait wait = new WebDriverWait(_driver, elementTimeout/1000);
-                wait.until(ExpectedConditions.presenceOfElementLocated(locator.toBy()));
+                locator.waitForElmement(_driver, elementTimeout);
             }
             catch(Exception e)
             {
@@ -3482,20 +3470,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean isElementPresent(Locator loc)
     {
-        try
-        {
-            return isElementPresent(loc.toBy());
-        }
-        catch(SeleniumException e)
-        {
-            /*ignore permission denied errors in IE when page refreshes during this check*/
-        }
-        return false;
-    }
-
-    public boolean isElementPresent(By by)
-    {
-        return _driver.findElements(by).size() > 0;
+        return loc.findElements(_driver).size() > 0;
     }
 
     public void assertElementPresent(Locator loc)
@@ -3510,7 +3485,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertElementContains(Locator loc, String text)
     {
-        String elemText = selenium.getText(loc.toString());
+        String elemText = loc.findElement(_driver).getText();
         if(elemText == null)
             Assert.fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
         if(!elemText.contains(text))
@@ -3519,7 +3494,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean elementContains(Locator loc, String text)
     {
-        String elemText = selenium.getText(loc.toString());
+        String elemText = loc.findElement(_driver).getText();
         return (elemText != null && elemText.contains(text));
     }
 
@@ -3554,7 +3529,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getFormElement(Locator loc)
     {
-        return selenium.getValue(loc.toString());
+        return loc.findElement(_driver).getAttribute("value");
     }
 
     /**
@@ -3568,14 +3543,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertFormElementEquals(Locator loc, String value)
     {
-        Assert.assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, selenium.getValue(loc.toString()));
+        Assert.assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, getFormElement(loc));
     }
 
     public void assertFormElementNotEquals(Locator loc, String value)
     {
-        Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
+        Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, getFormElement(loc));
     }
-
 
     public boolean isFormElementPresent(String elementName)
     {
@@ -3587,7 +3561,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Form element '" + elementName + "' was not present", isFormElementPresent(elementName));
     }
 
-
+    @Deprecated
     public void assertOptionEquals(String selectName, String value)
     {
         assertOptionEquals(Locator.name(selectName), value);
@@ -3595,17 +3569,19 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertOptionEquals(Locator loc, String value)
     {
-        Assert.assertEquals("Option '" + loc + "' was not equal '" + value + "'", selenium.getSelectedLabel(loc.toString()), value);
+        Assert.assertEquals("Option '" + loc + "' was not equal '" + value + "'", value, getSelectedOptionText(loc));
     }
 
     public String getSelectedOptionText(Locator loc)
     {
-        return selenium.getSelectedLabel(loc.toString());
+        Select select = new Select(loc.findElement(_driver));
+        return select.getFirstSelectedOption().getText();
     }
 
     public String getSelectedOptionValue(Locator loc)
     {
-        return selenium.getSelectedValue(loc.toString());
+        Select select = new Select(loc.findElement(_driver));
+        return select.getFirstSelectedOption().getAttribute("value");
     }
 
     public String getSelectedOptionText(String selectName)
@@ -3625,7 +3601,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertElementNotVisible(Locator loc)
     {
-        Assert.assertFalse("Element was visible in page: " + loc, selenium.isVisible(loc.toString()));
+        Assert.assertFalse("Element was visible in page: " + loc, loc.findElement(_driver).isDisplayed());
     }
 
     public boolean isLinkPresent(String linkId)
@@ -3646,7 +3622,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public boolean isLinkPresentWithText(String text)
     {
         log("Checking for link with exact text '" + text + "'");
-        return isElementPresent(Locator.linkWithText(text));
+        return isElementPresent(Locator.linkWithText(text)) || isElementPresent(Locator.linkWithText(text.toUpperCase()));
     }
 
     public boolean isLinkPresentWithTextCount(String text, int count)
@@ -3777,7 +3753,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public int countLinksWithText(String text)
     {
-        return selenium.getXpathCount("//a[text() = "+Locator.xq(text)+"]").intValue();
+        return Locator.linkWithText(text).findElements(_driver).size();
     }
 
     public void assertLinkPresentWithTextCount(String text, int count)
@@ -3828,7 +3804,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Use {@link #clickAt(org.openqa.selenium.By, int, int)}
+     * @deprecated Use {@link #clickAt(Locator, int, int)}
      */
     @Deprecated public void clickAt(Locator l, String coord)
     {
@@ -3836,24 +3812,23 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Integer xCoord = Integer.parseInt(splitCoord[0]);
         Integer yCoord = Integer.parseInt(splitCoord[1]);
 
-        clickAt(l.toBy(), xCoord, yCoord);
+        clickAt(l, xCoord, yCoord);
     }
 
-    public void clickAt(By by, int xCoord, int yCoord)
+    public void clickAt(Locator l, int xCoord, int yCoord)
     {
-        WebDriverWait wait = new WebDriverWait(_driver, 10);
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(by));
+        clickAt(l, xCoord, yCoord, WAIT_FOR_PAGE);
+    }
+
+    public void clickAt(Locator l, int xCoord, int yCoord, int pageTimeout)
+    {
+        WebElement el = l.waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
 
         Actions builder = new Actions(_driver);
         builder.moveToElement(el, xCoord, yCoord)
                 .click()
                 .build()
                 .perform();
-    }
-
-    public void clickAt(By by, int xCoord, int yCoord, int pageTimeout)
-    {
-        clickAt(by, xCoord, yCoord);
 
         waitForPageToLoad(pageTimeout);
     }
@@ -3868,16 +3843,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickAndWait(Locator l, int millis)
     {
         WebElement el;
-
-        if (l.nth() > 0)
-        {
-            List<WebElement> els = _driver.findElements(l.toBy());
-            el = els.get(l.nth());
-        }
-        else
-        {
-            el = _driver.findElement(l.toBy());
-        }
+        el = l.findElement(_driver);
 
         clickAndWait(el, millis);
     }
@@ -3889,9 +3855,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (pageTimeoutMs > 0)
             waitForPageToLoad(pageTimeoutMs);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
-            waitForExtMask();
+            _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     public void clickAndWait(WebElement el)
@@ -3900,24 +3866,26 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Use {@link #clickAt(org.openqa.selenium.By, int, int, int)}
+     * @deprecated Use {@link #clickAt(Locator, int, int, int)}
      */
     @Deprecated public void clickAtAndWait(Locator l, String coord, int millis)
     {
-        clickAt(l, coord);
-        if (millis > 0)
-            waitForPageToLoad(millis);
+        String[] splitCoord = coord.split(",");
+        Integer xCoord = Integer.parseInt(splitCoord[0]);
+        Integer yCoord = Integer.parseInt(splitCoord[1]);
+
+        clickAt(l, xCoord, yCoord, millis);
     }
 
-    public void dblclickAtAndWait(Locator l)
+    public void doubleClick(Locator l)
     {
-        dblclickAtAndWait(l, 0);
+        doubleClickAndWait(l, 0);
     }
 
-    public void dblclickAtAndWait(Locator l, int millis)
+    public void doubleClickAndWait(Locator l, int millis)
     {
         Actions action = new Actions(_driver);
-        action.doubleClick(_driver.findElement(l.toBy())).perform();
+        action.doubleClick(l.findElement(_driver)).perform();
         if (millis > 0)
             waitForPageToLoad(millis);
 
@@ -3946,7 +3914,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void mouseOver(Locator l)
     {
         Actions builder = new Actions(_driver);
-        builder.moveToElement(_driver.findElement(l.toBy())).build().perform();
+        builder.moveToElement(l.findElement(_driver)).build().perform();
     }
 
     /**
@@ -3954,9 +3922,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void mouseDown(Locator l)
     {
-        _driver.findElement(l.toBy()).click();
+        l.findElement(_driver).click();
     }
 
+    @Deprecated
     public void mouseDownAt(Locator l, int x, int y)
     {
         selenium.mouseDownAt(l.toString(), x + "," + y);
@@ -4167,7 +4136,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public int getColumnIndex(String tableName, String columnTitle)
     {
-        int col = selenium.getXpathCount("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").intValue();
+        int col = Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").findElements(_driver).size();
         if(col == 0)
             Assert.fail("Column '" + columnTitle + "' not found in table '" + tableName + "'");
 
@@ -4412,7 +4381,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     // Returns the number of rows (both <tr> and <th>) in the specified table
     public int getTableRowCount(String tableName)
     {
-        return selenium.getXpathCount("//table[@id=" + Locator.xq(tableName) + "]/thead/tr").intValue() + selenium.getXpathCount("//table[@id=" + Locator.xq(tableName) + "]/tbody/tr").intValue();
+        return Locator.xpath("//table[@id=" + Locator.xq(tableName) + "]/thead/tr").findElements(_driver).size() +
+               Locator.xpath("//table[@id=" + Locator.xq(tableName) + "]/tbody/tr").findElements(_driver).size();
     }
 
     public int getTableColumnCount(String tableId)
@@ -4708,16 +4678,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void setFormElement(Locator l, String text, boolean suppressValueLogging)
     {
-        WebElement el;
-        if (l.nth() > 0)
-        {
-            List<WebElement> els = _driver.findElements(l.toBy());
-            el = els.get(l.nth());
-        }
-        else
-        {
-            el = _driver.findElement(l.toBy());
-        }
+        WebElement el = l.findElement(_driver);
 
         setFormElement(el, text);
 //        fireEvent(l, SeleniumEvent.blur);
@@ -4943,7 +4904,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public int getXpathCount(Locator.XPathLocator xpath)
     {
-        return selenium.getXpathCount(xpath.getPath()).intValue();
+        return xpath.findElements(_driver).size();
     }
 
     /**
@@ -5140,7 +5101,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public int getDataRegionRowCount(String dataRegionName)
     {
         String id = Locator.xq("dataregion_" + dataRegionName);
-        return selenium.getXpathCount("//table[@id=" + id + "]/tbody/tr[contains(@class, 'labkey-row') or contains(@class, 'labkey-alternate-row')]").intValue();
+        return Locator.xpath("//table[@id=" + id + "]/tbody/tr[contains(@class, 'labkey-row') or contains(@class, 'labkey-alternate-row')]").findElements(_driver).size();
     }
 
     /** Sets selection state for rows of the data region on the current page. */
@@ -5235,7 +5196,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void checkCheckbox(Locator checkBoxLocator)
     {
         log("Checking checkbox " + checkBoxLocator);
-       //NOTE: We don't use selenium.check() because it doesn't fire click events.
         if (!isChecked(checkBoxLocator))
             click(checkBoxLocator);
         logJavascriptAlerts();
@@ -5301,7 +5261,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void uncheckCheckbox(Locator checkBoxLocator)
     {
         log("Unchecking checkbox " + checkBoxLocator);
-        //NOTE: We don't use selenium.uncheck() because it doesn't fire click events.
         if (isChecked(checkBoxLocator))
             click(checkBoxLocator);
         logJavascriptAlerts();
@@ -5319,43 +5278,31 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean isChecked(Locator checkBoxLocator)
     {
-        return selenium.isChecked(checkBoxLocator.toString());
+        return checkBoxLocator.findElement(_driver).isSelected();
     }
 
     @Deprecated
-    public void selectOptionByValue(String selectId, String value)
+    public void selectOptionByValue(String selectName, String value)
     {
-        selectOptionByValue(Locator.name(selectId), value);
+        selectOptionByValue(Locator.name(selectName), value);
     }
 
     public void selectOptionByValue(Locator locator, String value)
     {
-        WebElement select = _driver.findElement(locator.toBy());
-        List<WebElement> options = select.findElements(By.tagName("option"));
-        for(WebElement option : options){
-            if(option.getAttribute("value").equals(value)) {
-                option.click();
-                break;
-            }
-        }
+        Select select = new Select(locator.findElement(_driver));
+        select.selectByValue(value);
     }
 
     @Deprecated
-    public void selectOptionByText(String selectId, String text)
+    public void selectOptionByText(String selectName, String text)
     {
-        selectOptionByText(Locator.id(selectId), text);
+        selectOptionByText(Locator.name(selectName), text);
     }
 
     public void selectOptionByText(Locator locator, String text)
     {
-        WebElement select = _driver.findElement(locator.toBy());
-        List<WebElement> options = select.findElements(By.tagName("option"));
-        for(WebElement option : options){
-            if(option.getText().equals(text)) {
-                option.click();
-                break;
-            }
-        }
+        Select select = new Select(locator.findElement(_driver));
+        select.selectByVisibleText(text);
     }
 
     public void addUrlParameter(String parameter)
@@ -5576,7 +5523,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         assertTextNotPresent("Stop Impersonating");
         goToAdminConsole();
-        selectOptionByText(Locator.id("email").toString(), fakeUser);
+        selectOptionByText(Locator.id("email"), fakeUser);
         clickButton("Impersonate");
         _impersonationStack.push(fakeUser);
     }
@@ -5876,7 +5823,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void saveWikiPage()
     {
-        String curUrl = selenium.getLocation();
+        String curUrl = _driver.getCurrentUrl();
 
         //get the redir parameter
         String redirUrl = getUrlParam(curUrl, "redirect", true);
@@ -5884,7 +5831,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             String pageName = getUrlParam(curUrl, "name", true);
             if(null == pageName)
-                pageName = selenium.getValue("wiki-input-name");
+                pageName = Locator.id("wiki-input-name").findElement(_driver).getText();
             assert null != pageName && pageName.length() > 0;
             int idxStart = curUrl.indexOf("/wiki/");
             int idxEnd = curUrl.indexOf("/editWiki.view?", idxStart);
@@ -6369,7 +6316,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getAttribute(Locator locator, String attributeName)
     {
-        return selenium.getAttribute(locator.toString() + "@" + attributeName);
+        return locator.findElement(_driver).getAttribute(attributeName);
     }
 
     public int getDefaultWaitForPage()
@@ -6390,7 +6337,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
 	public String getHtmlSource()
 	{
-		return selenium.getHtmlSource();
+		return _driver.getPageSource();
 	}
 
     public boolean isExtTreeNodeSelected(String nodeCaption)
@@ -6428,8 +6375,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 click(loc);
             else
             {
-                _driver.findElement(loc.toBy()).click();
-                _driver.findElement(loc.toBy()).click();
+                doubleClick(loc);
                 sleep(1000);
                 click(loc);
             }
@@ -6563,19 +6509,19 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void pressTab(Locator l)
     {
-        WebElement el = _driver.findElement(l.toBy());
+        WebElement el = l.findElement(_driver);
         el.sendKeys(Keys.TAB);
     }
 
     public void pressEnter(Locator l)
     {
-        WebElement el = _driver.findElement(l.toBy());
+        WebElement el = l.findElement(_driver);
         el.sendKeys(Keys.ENTER);
     }
 
     public void pressDownArrow(Locator l)
     {
-        WebElement el = _driver.findElement(l.toBy());
+        WebElement el = l.findElement(_driver);
         el.sendKeys(Keys.DOWN);
     }
 

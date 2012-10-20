@@ -3638,12 +3638,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             waitForPageToLoad(millis);
     }
 
-    public void dblclickAtAndWait(Locator l)
+    public void doubleClick(Locator l)
     {
-        dblclickAtAndWait(l, 0);
+        doubleClickAndWait(l, 0);
     }
 
-    public void dblclickAtAndWait(Locator l, int millis)
+    public void doubleClickAndWait(Locator l, int millis)
     {
         selenium.doubleClick(l.toString());
         if (millis > 0)

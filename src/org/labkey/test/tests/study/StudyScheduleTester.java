@@ -20,7 +20,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.tests.StudyBaseTest;
-import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -272,8 +271,7 @@ public class StudyScheduleTester
         _test.assertElementPresent(link);
 
 
-        _test.mouseClick(link.toString());
-        _test.click(link);
+        _test.doubleClickAndWait(link, 0);
         _test.log("show define dataset dialog");
         _test.waitForElement(Locator.xpath("//span[text() = 'Define Dataset']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 

@@ -20,8 +20,11 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,17 +45,28 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     
     public void openCustomizeViewPanel()
     {
-        if (_test._driver.findElements(Locator.button("View Grid").toBy()).size() < 1)
+        if (Locator.button("View Grid").findElements(_test._driver).size() < 1)
         {
             _test._extHelper.clickExtMenuButton(false, Locator.navButton("Views"), "Customize View");
-            _test.waitForElement(Locator.xpath("//button[text()='View Grid']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test._shortWait.until(new ExpectedCondition<WebElement>()
+            {
+                @Override
+                public WebElement apply(WebDriver d)
+                {
+                    WebElement el = _test._driver.findElement(By.cssSelector(".labkey-data-region-header-container .labkey-ribbon"));
+                    if (el.getCssValue("position").equalsIgnoreCase("static") && el.isDisplayed())
+                        return el;
+                    else
+                        return null;
+                }
+            });
         }
     }
 
     public void closeCustomizeViewPanel()
     {
-        // UNDONE: click 'X' close button on columns/filter/sort tab panel instead.
-        _test.clickMenuButtonAndContinue("Views", "Customize View");
+        _test.click(Locator.css(".x-panel-header > .x-tool-close"));
+        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".labkey-data-region-header-container .labkey-ribbon")));
     }
 
     public void applyCustomView()
@@ -597,12 +611,12 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
                 Locator row = ExtHelperWD.locateExt3GridRow(idx, parent);
 
                 Locator comboCell = ExtHelperWD.locateExt3GridCell(row, 1);
-                _test.dblclickAtAndWait(comboCell);
+                _test.doubleClick(comboCell);
                 _test._extHelper.selectComboBoxItem((Locator.XPathLocator)grid, aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
                     Locator labelCell = ExtHelperWD.locateExt3GridCell(row, 2);
-                    _test.dblclickAtAndWait(labelCell);
+                    _test.doubleClick(labelCell);
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");
                     _test.setFormElement(fieldPath, aggregate.get("label"));

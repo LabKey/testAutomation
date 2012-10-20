@@ -569,12 +569,12 @@ public class CustomizeViewsHelper extends AbstractHelper
                 Locator row = _test._extHelper.locateExt3GridRow(idx, parent);
 
                 Locator comboCell = _test._extHelper.locateExt3GridCell(row, 1);
-                _test.dblclickAtAndWait(comboCell);
+                _test.doubleClick(comboCell);
                 _test._extHelper.selectComboBoxItem((Locator.XPathLocator)grid, aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
                     Locator labelCell = _test._extHelper.locateExt3GridCell(row, 2);
-                    _test.dblclickAtAndWait(labelCell);
+                    _test.doubleClick(labelCell);
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");
                     _test.setFormElement(fieldPath, aggregate.get("label"));

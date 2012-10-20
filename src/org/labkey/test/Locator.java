@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import junit.framework.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,35 +36,42 @@ import java.util.List;
 public class Locator
 {
     private String loc;
-    private int _nth;
+    private int _index;
     private String _contains;
+    private String _text;
 
     // XPATH fragments
     @Deprecated public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
     @Deprecated public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
 
+    @Deprecated // TODO: Should be private
     protected Locator(String rawString)
     {
         loc = rawString;
-        _nth = 0;
+        _index = 0;
     }
 
-    private Locator(String rawString, int nth)
+    private Locator(String rawString, int index, String contains, String text)
     {
         loc = rawString;
-        _nth = nth;
-    }
-
-    private Locator(String rawString, int nth, String contains)
-    {
-        loc = rawString;
-        _nth = nth;
-        _contains = contains;
+        _index = index;
+        _contains = (text == null ? contains : null); // withText() takes precedence over contains()
+        _text = text;
     }
 
     public Locator contains(String contains)
     {
-        return new Locator(loc, _nth, contains);
+        return new Locator(loc, _index, contains, _text);
+    }
+
+    public Locator withText(String text)
+    {
+        return new Locator(loc, _index, null, text);
+    }
+
+    public Locator index(int index)
+    {
+        return new Locator(loc, index, _contains, _text);
     }
 
     /**
@@ -73,15 +81,10 @@ public class Locator
      */
     public String toString()
     {
-        if (loc.startsWith("name=") && _nth > 0)
-            return loc + " index=" + _nth;
+        if (loc.startsWith("name=") && _index > 0)
+            return loc + " index=" + _index;
         else
             return loc;
-    }
-
-    protected int nth()
-    {
-        return _nth;
     }
 
     @Deprecated
@@ -92,7 +95,7 @@ public class Locator
 
     }
 
-    public By toBy()
+    private By toBy()
     {
         if (loc.startsWith("id="))
             return By.id(loc.substring(loc.indexOf("=")+1));
@@ -120,39 +123,39 @@ public class Locator
 
     public WebElement findElement(WebDriver driver)
     {
-        if (_contains == null && _nth == 0)
-        {
-            return driver.findElement(this.toBy());
-        }
-        else
-        {
-            List<WebElement> elements = driver.findElements(this.toBy());
-            if (_contains != null)
-            {
-                Iterator<WebElement> it = elements.iterator();
-                WebElement el;
-                while (it.hasNext())
-                {
-                    el = it.next();
-                    if (!el.getText().contains(_contains))
-                        it.remove();
-                }
-            }
-            return elements.get(_nth);
-        }
+        List<WebElement> elements = findElements(driver);
+        if (elements.size() <= _index)
+            throw new NoSuchElementException("Unable to find element: " + toString() +
+                (_index == 0 ? "" : "\nIndex: " + _index) +
+                (_contains == null ? "" : "\nContaining: " + _contains) +
+                (_text == null ? "" : "\nWith Text: " + _text));
+        return elements.get(_index);
     }
 
     public List<WebElement> findElements(WebDriver driver)
     {
         List<WebElement> elements = driver.findElements(this.toBy());
-        if (_contains != null)
+        if (_text != null)
         {
             Iterator<WebElement> it = elements.iterator();
             WebElement el;
             while (it.hasNext())
             {
                 el = it.next();
-                if (!el.getText().contains(_contains))
+                String text = el.getText();
+                if (!text.equals(_text))
+                    it.remove();
+            }
+        }
+        else if (_contains != null && !_contains.equals(""))
+        {
+            Iterator<WebElement> it = elements.iterator();
+            WebElement el;
+            while (it.hasNext())
+            {
+                el = it.next();
+                String text = el.getText();
+                if (!text.equals(_text))
                     it.remove();
             }
         }
@@ -162,7 +165,8 @@ public class Locator
     public WebElement waitForElmement(final WebDriver driver, final int msTimeout)
     {
         long secTimeout = msTimeout / 1000;
-        WebDriverWait wait = new WebDriverWait(driver, secTimeout > 0 ? secTimeout : 1);
+        secTimeout = secTimeout > 0 ? secTimeout : 1;
+        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
         try
         {
             return wait.until(new ExpectedCondition<WebElement>()
@@ -177,7 +181,7 @@ public class Locator
         catch (TimeoutException ex)
         {
             Assert.fail("Timeout waiting for element [" + secTimeout + "sec]: " + toString() +
-                    (_nth == 0 ? "" : "\nIndex: " + _nth) +
+                    (_index == 0 ? "" : "\nIndex: " + _index) +
                     (_contains == null ? "" : "\nContaining: " + _contains));
             return null; // unreachable
         }
@@ -214,7 +218,7 @@ public class Locator
      */
     @Deprecated public static Locator name(String name, int index)
     {
-        return new Locator("name=" + name, index);
+        return new Locator("name=" + name, index, null, null);
     }
 
     /**
@@ -286,22 +290,22 @@ public class Locator
 
     public static XPathLocator button(String text)
     {
-        return xpath("//button["+ NOT_HIDDEN +"][not(contains(@class, 'tab'))][descendant-or-self::*[text() = '" + text + "']]");
+        return xpath("//button[" + NOT_HIDDEN + "][not(contains(@class, 'tab'))][descendant-or-self::*[text() = '" + text + "']]");
     }
 
     public static XPathLocator buttonContainingText(String text)
     {
-        return xpath("//button["+ NOT_HIDDEN +" and descendant-or-self::*[contains(text(), '" + text + "')]]");
+        return xpath("//button[" + NOT_HIDDEN + " and descendant-or-self::*[contains(text(), '" + text + "')]]");
     }
 
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a["+ NOT_HIDDEN +" and contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
+        return xpath("//a[" + NOT_HIDDEN + " and contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator extButton(String text)
     {
-        return xpath("//button["+ NOT_HIDDEN +" and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
+        return xpath("//button[" + NOT_HIDDEN + " and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
     }
 
     public static XPathLocator ext4Button(String text)
@@ -453,7 +457,7 @@ public class Locator
     @Deprecated
     public static Locator formElement(String formName, String elementName)
     {
-        return dom("document['" + formName + "']['" +elementName + "']");
+        return dom("document['" + formName + "']['" + elementName + "']");
     }
 
     public static XPathLocator radioButtonByTitle(String title)
@@ -543,7 +547,7 @@ public class Locator
     public static XPathLocator elementByLabel(String label, int labelColumn, String elementType, int elementColumn)
     {
         //TODO: Escape Label. What is XPATH escaping?
-        return xpath("//td[" + (labelColumn + 1) + " and contains(text(), " + xq(label) + ")]/../td[" + (elementColumn + 1) +"]/" + elementType);
+        return xpath("//td[" + (labelColumn + 1) + " and contains(text(), " + xq(label) + ")]/../td[" + (elementColumn + 1) + "]/" + elementType);
     }
 
     public static XPathLocator inputByLabel(String label, int inputColumn)
