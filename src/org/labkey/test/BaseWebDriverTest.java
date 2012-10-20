@@ -989,6 +989,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void goToSiteGroups()
     {
         clickAdminMenuItem("Site", "Site Groups");
+        _ext4Helper.clickTabContainingText("Site Groups"); // TODO : 16315: Site Groups admin menu item doesn't go to site groups tab
     }
 
     public void goToSiteDevelopers()

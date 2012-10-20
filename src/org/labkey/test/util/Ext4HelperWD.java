@@ -91,6 +91,13 @@ public class Ext4HelperWD extends AbstractHelperWD
         _test.click(l);
     }
 
+    public void clickExt4Tab(String tabname)
+    {
+        _test.log("Selecting Ext tab " + tabname);
+        Locator l = Locator.xpath("//span[contains(@class, 'x4-tab') and text() = '" + tabname + "']");
+        _test.click(l);
+    }
+
     public void checkCheckbox(String label)
     {
         if (!isChecked(label))
@@ -233,7 +240,13 @@ public class Ext4HelperWD extends AbstractHelperWD
                 "};" +
                 "return ext4ComponentQuery(arguments[0], arguments[1]);";
 
-        List<String> ids = (List<String>)_test.executeScript(script, componentSelector, parentId);
+        List<String> unfilteredIds = (List<String>)_test.executeScript(script, componentSelector, parentId);
+        List<String> ids = new ArrayList<String>();
+        for (String id : unfilteredIds)
+        {
+            if (Locator.id(id).findElements(_test._driver).size() > 0)
+                ids.add(id); // ignore uninitialized ext components
+        }
         return _test._ext4Helper.componentsFromIds(ids, clazz);
     }
 
