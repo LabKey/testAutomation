@@ -56,9 +56,11 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.WebDriverException;
@@ -1390,7 +1392,26 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (StaleElementReferenceException ex)
         {
-            return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
+            try
+            {
+                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
+            }
+            catch (TimeoutException tex)
+            {
+                return getHtmlSource(); // probably viewing a tsv or text file
+            }
+
+        }
+        catch (NoSuchElementException ex)
+        {
+            try
+            {
+                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
+            }
+            catch (TimeoutException tex)
+            {
+                return getHtmlSource(); // probably viewing a tsv or text file
+            }
         }
     }
 
@@ -1581,14 +1602,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void cleanup() throws Exception
     {
-        boolean tearDown = false;
         try
         {
             log("========= Cleaning up " + getClass().getSimpleName() + " =========");
-            if (selenium == null)
-            {
-                tearDown = true;
-            }
 
             // explicitly go back to the site, just in case we're on a 404 or crash page:
             beginAt("");
@@ -1607,8 +1623,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         finally
         {
-            if (tearDown)
-                tearDown();
+            tearDown();
         }
     }
 
@@ -2338,7 +2353,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void dismissAlerts()
     {
-        while (selenium.isAlertPresent()){
+        while (isAlertPresent()){
             Alert alert = _driver.switchTo().alert();
             log("Found unexpected alert: " + alert.getText());
             alert.accept();
@@ -2347,7 +2362,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void logJavascriptAlerts()
     {
-        while (selenium.isAlertPresent())
+        while (isAlertPresent())
         {
             Alert alert = _driver.switchTo().alert();
             log("JavaScript Alert Ignored: " + alert.getText());
@@ -2475,7 +2490,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void clickManageGroup(String groupName)
     {
-        _extHelper.clickExtTab("Project Groups");
+        _ext4Helper.clickTabContainingText("Project Groups");
         // warning Adminstrators can apper multiple times
         waitAndClick(Locator.xpath("//div[@id='groupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
         sleep(100);
@@ -3041,7 +3056,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void waitForPageToLoad(int millis)
     {
-        if( selenium.isAlertPresent() )
+        if (isAlertPresent())
         {
             Alert alert = _driver.switchTo().alert();
             String text = alert.getText();
