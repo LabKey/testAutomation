@@ -5704,8 +5704,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
          if(!isTextPresent("Group " + groupName))
              selectGroup(groupName);
 
-        setFormElement(Locator.id("Users_dropdownMenu"), userName);
-        pressTab(Locator.id("Users_dropdownMenu"));
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//table[contains(@id, 'labkey-principalcombo')]"), userName);
+        Locator.css(".userinfo td").withText(userName).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtButton(groupName + " Information", "Done", 0);
         _extHelper.waitForExtDialogToDisappear(groupName + " Information");
         clickButton("Done");
@@ -5717,7 +5717,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             goToSiteGroups();
 
         waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath("//div[text()='" + groupName + "']"));
+        waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
         _extHelper.waitForExtDialog(groupName + " Information");
     }
 

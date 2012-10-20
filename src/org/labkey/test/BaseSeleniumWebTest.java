@@ -5386,8 +5386,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
          if(!isTextPresent("Group " + groupName))
              selectGroup(groupName);
 
-        setFormElement(Locator.id("Users_dropdownMenu"), userName);
-        pressTab(Locator.id("Users_dropdownMenu").toString());
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//table[contains(@id, 'labkey-principalcombo')]"), userName);
+        waitForElement(Locator.css(".userinfo td:contains("+userName+")"));
         _extHelper.clickExtButton(groupName + " Information", "Done", 0);
         _extHelper.waitForExtDialogToDisappear(groupName + " Information");
         clickButton("Done");
@@ -5399,7 +5399,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             goToSiteGroups();
 
         waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath("//div[text()='" + groupName + "']"));
+        waitForElement(Locator.xpath("//div[text()='" + groupName + "']/../.."));
+        mouseDown(Locator.xpath("//div[text()='" + groupName + "']/../.."));
         _extHelper.waitForExtDialog(groupName + " Information");
     }
 
