@@ -49,6 +49,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggingAspect;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.StudyHelperWD;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import com.thoughtworks.selenium.SeleniumException;
@@ -2492,8 +2493,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         _ext4Helper.clickTabContainingText("Project Groups");
         // warning Adminstrators can apper multiple times
-        waitAndClick(Locator.xpath("//div[@id='groupsFrame']//div[contains(text()," + Locator.xq(groupName) + ")]"));
-        sleep(100);
+        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
+        Ext4CmpRefWD ref = refs.get(0);
+        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        ref.eval("getSelectionModel().select(" + idx + ")");
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
     }
@@ -2718,7 +2722,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertLinkPresentWithText(newParent);
     }
 
-    public void clickFolder(String project)
+    public void expandFolder(String project)
     {
         String xpath = "//tr[not(ancestor-or-self::*[contains(@style,'none')]) and following-sibling::tr[contains(@style,'none')]//a[text()='"+project+"']]//a/img[contains(@src,'plus')]";
         List<WebElement> possibleAncestors = _driver.findElements(By.xpath(xpath));
@@ -2729,6 +2733,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             possibleAncestors = _driver.findElements(By.xpath(xpath));
             depth++;
         }
+    }
+
+    public void clickFolder(String project)
+    {
+        expandFolder(project);
         clickLinkWithText(project);
     }
 
@@ -5375,7 +5384,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void savePermissions()
     {
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
         clickButton("Save", 0);
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
     }
@@ -5565,9 +5573,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertTextNotPresent("Stop Impersonating");
         ensureAdminMode();
         enterPermissionsUI();
-        _extHelper.clickExtTab("Impersonate");
-        selectOptionByText(Locator.id("email").toString(), fakeUser);
-        clickButton("Impersonate");
+        _ext4Helper.clickTabContainingText("Impersonate");
+        selectOptionByText(Locator.id("email"), fakeUser);
+        clickLinkWithText("Impersonate");
         _impersonationStack.push(fakeUser);
     }
 

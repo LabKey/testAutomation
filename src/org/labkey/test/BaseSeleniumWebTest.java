@@ -4989,6 +4989,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return selenium.isChecked(checkBoxLocator.toString());
     }
 
+    @Deprecated
     public void selectOptionByValue(String selectId, String value)
     {
         selenium.select(selectId, "value=" + value);
@@ -4999,6 +5000,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectOptionByValue(loc.toString(), value);
     }
 
+    @Deprecated
     public void selectOptionByText(String selectId, String text)
     {
         selenium.select(selectId, text);
@@ -5254,7 +5256,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         ensureAdminMode();
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Impersonate");
-        selectOptionByText(Locator.id("email").toString(), fakeUser);
+        selectOptionByText(Locator.id("email"), fakeUser);
         clickLinkWithText("Impersonate");
         _impersonationStack.push(fakeUser);
     }
