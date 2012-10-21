@@ -66,30 +66,26 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     protected void doTestSteps() throws Exception
     {
-        assertModuleDeployed(MODULE_NAME);
-        _containerHelper.createProject(getProjectName(), FOLDER_TYPE);
-        assertModuleEnabledByDefault("Portal");
-        assertModuleEnabledByDefault("simpletest");
-        assertModuleEnabledByDefault("Query");
-
-        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, TABBED_FOLDER_TYPE);
-        assertModuleEnabledByDefault("Portal");
-        assertModuleEnabledByDefault("simpletest");
-        assertModuleEnabledByDefault("Query");
-        assertModuleEnabledByDefault("Study");
-
-        // Modules enabled in file based folder definition
-        //enableModule(getProjectName(), MODULE_NAME);
-        //enableModule(getProjectName(), "Query");
-
-        clickFolder(getProjectName());
-
-        clickLinkWithText(getProjectName());
-        doTestCustomFolder();
-        doTestSchemas();
-        doTestViews();
-        doTestWebParts();
-        createList();
+//        assertModuleDeployed(MODULE_NAME);
+//        _containerHelper.createProject(getProjectName(), FOLDER_TYPE);
+//        assertModuleEnabledByDefault("Portal");
+//        assertModuleEnabledByDefault("simpletest");
+//        assertModuleEnabledByDefault("Query");
+//
+//        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, TABBED_FOLDER_TYPE);
+//        assertModuleEnabledByDefault("Portal");
+//        assertModuleEnabledByDefault("simpletest");
+//        assertModuleEnabledByDefault("Query");
+//        assertModuleEnabledByDefault("Study");
+//
+//        doTestTabbedFolder();
+//
+//        clickLinkWithText(getProjectName());
+//        doTestCustomFolder();
+//        doTestSchemas();
+//        doTestViews();
+//        doTestWebParts();
+//        createList();
         doTestModuleProperties();
         doTestQueries();
         doTestQueryViews();
@@ -671,7 +667,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private void doTestTabbedFolder()
     {
-        clickLinkWithText((FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         waitForPageToLoad();
 
         //it should start on tab 2
@@ -709,7 +705,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         verifyTabSelected("Tab 2");
 
         //this is a regex selector
-        clickLinkWithText((FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         waitForPageToLoad();
         addWebPart("Sample Sets");
         clickLinkWithText("Import Sample Set");
@@ -734,15 +730,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     protected void doCleanup() throws Exception
     {
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        cleanupSchema(cn);
-
-        try
-        {
-            deleteProject(getProjectName());
-        }
-        catch(Throwable ignore) {}
-        log("Cleaned up SimpleModuleTest project.");
+//        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+//        cleanupSchema(cn);
+//
+//        try
+//        {
+//            deleteProject(getProjectName());
+//        }
+//        catch(Throwable ignore) {}
+//        log("Cleaned up SimpleModuleTest project.");
     }
 
     public String getAssociatedModuleDirectory()

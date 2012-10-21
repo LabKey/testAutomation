@@ -3103,14 +3103,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean doesElementAppear(Checker checker, int wait)
     {
-
-        int time = 0;
-        while ( time < wait )
+        Long startTime = System.currentTimeMillis();
+        while ( (System.currentTimeMillis() - startTime) < wait )
         {
             if( checker.check() )
                 return true;
             sleep(100);
-            time += 100;
         }
         if (!checker.check())
         {
@@ -3287,7 +3285,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToFolderManagement();
         log("setting module properties");
         clickLinkWithText("Module Properties");
-        waitForText("Save Changes");
+        waitForText("SAVE CHANGES");
         boolean changed = false;
         for (String moduleName : props.keySet())
         {
