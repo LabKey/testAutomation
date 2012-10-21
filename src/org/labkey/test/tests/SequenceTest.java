@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -603,24 +604,13 @@ public class SequenceTest extends LabModulesTest
         Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(false);
         Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Reference Library Type"));
         Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Aligner"));
-        Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Min SNP Quality"));
 
-        Assert.assertEquals("Field should be disabled", "true", Ext4FieldRef.getForLabel(this, "Call SNPs").eval("this.isDisabled()"));
         Assert.assertEquals("Field should be disabled", "true", Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").eval("this.isDisabled()"));
+        Assert.assertEquals("Field should be disabled", "true", Ext4FieldRef.getForLabel(this, "Min SNP Quality").eval("this.isDisabled()"));
 
         Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(true);
         waitForText("Reference Library Type");
-        sleep(200);
-
-        Ext4FieldRef.getForLabel(this, "Virus Strain").setValue(strain);
-
-        Ext4FieldRef.getForLabel(this, "Use Custom Reference").setChecked(true);
-        Assert.assertEquals("Field should be disabled", "true", Ext4FieldRef.getForLabel(this, "Virus Strain").eval("this.isDisabled()"));
-        Assert.assertTrue("Field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Reference Name").getId()).toXpath()));
-        Assert.assertTrue("Field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Sequence").getId()).toXpath()));
-
-        Ext4FieldRef.getForLabel(this, "Reference Name").setValue(customRefName);
-        Ext4FieldRef.getForLabel(this, "Sequence").setValue(customRefSeq);
+        sleep(500);
 
         log("Testing aligner field and descriptions");
         Ext4FieldRef alignerField = Ext4FieldRef.getForLabel(this, "Aligner");
@@ -646,20 +636,18 @@ public class SequenceTest extends LabModulesTest
         alignerField.eval("this.fireEvent(\"select\", this, this.getValue())");
         waitForText("BWA-SW uses a different algorithm than BWA");
 
-        log("Testing SNP settings panel");
-        Ext4FieldRef.getForLabel(this, "Call SNPs").setChecked(false);
-        Assert.assertEquals("Field should be disabled", "true", Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").eval("this.isDisabled()"));
-        Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Min SNP Quality"));
-        Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Min Avg SNP Quality"));
-        Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Min DIP Quality"));
-        Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Min Avg DIP Quality"));
+        final BaseSeleniumWebTest test = this;
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return "false".equals(Ext4FieldRef.getForLabel(test, "Virus Strain").eval("this.store.isLoading()"));
+            }
+        }, "Combo store did not load", WAIT_FOR_JAVASCRIPT);
 
-        Ext4FieldRef.getForLabel(this, "Call SNPs").setChecked(true);
-        Assert.assertEquals("Field should be enabled", "false", Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").eval("this.isDisabled()"));
-        Assert.assertTrue("Field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Min SNP Quality").getId()).toXpath()));
-        Assert.assertTrue("Field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Min Avg SNP Quality").getId()).toXpath()));
-        Assert.assertTrue("Field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Min DIP Quality").getId()).toXpath()));
-        Assert.assertTrue("Field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Min Avg DIP Quality").getId()).toXpath()));
+        sleep(100);
+        Ext4FieldRef.getForLabel(this, "Virus Strain").setValue(strain);
 
         Ext4FieldRef.getForLabel(this, "Min SNP Quality").setValue(minSnpQual);
         Ext4FieldRef.getForLabel(this, "Min Avg SNP Quality").setValue(minAvgSnpQual);
@@ -668,16 +656,10 @@ public class SequenceTest extends LabModulesTest
 
         Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
 
-        Ext4FieldRef.getForLabel(this, "Max Alignment Mismatches").setValue(maxAlignMismatch);
-        Ext4FieldRef.getForLabel(this, "Assemble Unaligned Reads").setChecked(true);
-
-        Ext4FieldRef.getForLabel(this, "Assembly Percent Identity").setValue(assembleUnalignedPct);
-        Ext4FieldRef.getForLabel(this, "Min Sequences Per Contig").setValue(minContigsForNovel);
-
-        Ext4FieldRef.getForLabel(this, "Import Results into LabKey").setChecked(false);
-        Assert.assertFalse("Field should be hidden", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Do Not Import SNPs").getId()).toXpath()));
-        Ext4FieldRef.getForLabel(this, "Import Results into LabKey").setChecked(true);
-        Ext4FieldRef.getForLabel(this, "Do Not Import SNPs").setChecked(true);
+//        Ext4FieldRef.getForLabel(this, "Max Alignment Mismatches").setValue(maxAlignMismatch);
+//        Ext4FieldRef.getForLabel(this, "Assemble Unaligned Reads").setChecked(true);
+//        Ext4FieldRef.getForLabel(this, "Assembly Percent Identity").setValue(assembleUnalignedPct);
+//        Ext4FieldRef.getForLabel(this, "Min Sequences Per Contig").setValue(minContigsForNovel);
 
         Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
         String jsonString = panel.eval("selenium.browserbot.getCurrentWindow().Ext4.encode(this.getJsonParams())");
@@ -694,7 +676,6 @@ public class SequenceTest extends LabModulesTest
         Assert.assertEquals("Incorect param in form JSON", jobName, json.getString("protocolName"));
 
         Assert.assertEquals("Incorect param in form JSON", "false", json.getString("saveProtocol"));
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("lkDbImport"));
         Assert.assertEquals("Incorect param in form JSON", "false", json.getString("recalibrateBam"));
 
         Assert.assertEquals("Incorect param in form JSON", "true", json.getString("preprocessing.downsample"));
@@ -722,33 +703,30 @@ public class SequenceTest extends LabModulesTest
         Assert.assertEquals("Incorect param in form JSON", "true", json.getString("preprocessing.mask"));
         Assert.assertEquals("Incorect param in form JSON", maskMinQual, json.getString("preprocessing.mask_minQual"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("useCustomReference"));
-        Assert.assertEquals("Incorect param in form JSON", customRefSeq, json.getString("virus.refSequence"));
-        Assert.assertEquals("Incorect param in form JSON", customRefName, json.getString("virus.custom_strain_name"));
+//        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("useCustomReference"));
+//        Assert.assertEquals("Incorect param in form JSON", customRefSeq, json.getString("virus.refSequence"));
+//        Assert.assertEquals("Incorect param in form JSON", customRefName, json.getString("virus.custom_strain_name"));
 
-        Assert.assertEquals("Incorect param in form JSON", "", json.getString("dbprefix"));
+        Assert.assertEquals("Incorect param in form JSON", strain, json.getString("dbprefix"));
         Assert.assertEquals("Incorect param in form JSON", "Virus", json.getString("dna.category"));
 
         Assert.assertEquals("Incorect param in form JSON", "Virus", json.getString("analysisType"));
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("doTranslation"));
-
-        Assert.assertEquals("Incorect param in form JSON", "null", json.getString("dna.subset"));
+        Assert.assertEquals("Incorect param in form JSON", strain, json.getString("dna.subset"));
         Assert.assertEquals("Incorect param in form JSON", "true", json.getString("qualityMetrics"));
 
         Assert.assertEquals("Incorect param in form JSON", "true", json.getString("doAlignment"));
         Assert.assertEquals("Incorect param in form JSON", aligner, json.getString("aligner"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("doSnpCalling"));
         Assert.assertEquals("Incorect param in form JSON", "false", json.getString("snp.neighborhoodQual"));
         Assert.assertEquals("Incorect param in form JSON", minSnpQual, json.getString("snp.minQual"));
         Assert.assertEquals("Incorect param in form JSON", minAvgSnpQual, json.getString("snp.minAvgSnpQual"));
         Assert.assertEquals("Incorect param in form JSON", minDipQual, json.getString("snp.minIndelQual"));
         Assert.assertEquals("Incorect param in form JSON", minAvgDipQual, json.getString("snp.minAvgDipQual"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("assembleUnaligned"));
-        Assert.assertEquals("Incorect param in form JSON", maxAlignMismatch, json.getString("maxAlignMismatch"));
-        Assert.assertEquals("Incorect param in form JSON", assembleUnalignedPct, json.getString("assembleUnalignedPct"));
-        Assert.assertEquals("Incorect param in form JSON", minContigsForNovel, json.getString("minContigsForNovel"));
+        //Assert.assertEquals("Incorect param in form JSON", "true", json.getString("assembleUnaligned"));
+        //Assert.assertEquals("Incorect param in form JSON", maxAlignMismatch, json.getString("maxAlignMismatch"));
+        //Assert.assertEquals("Incorect param in form JSON", assembleUnalignedPct, json.getString("assembleUnalignedPct"));
+        //Assert.assertEquals("Incorect param in form JSON", minContigsForNovel, json.getString("minContigsForNovel"));
 
         Assert.assertEquals("Incorect param in form JSON", "false", json.getString("debugMode"));
 
@@ -772,6 +750,11 @@ public class SequenceTest extends LabModulesTest
         Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("fileId")));
         Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("fileId2")));
 
+        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("sbtAnalysis"));
+        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("aaSnpByCodon"));
+        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("ntSnpByPosition"));
+        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("ntCoverage"));
+
         log("Testing UI changes when selecting different analysis settings");
 
         String url = getURL().toString();
@@ -788,12 +771,16 @@ public class SequenceTest extends LabModulesTest
 
         String jobName2 = "Job2";
         Ext4FieldRef.getForLabel(this, "Job Name").setValue(jobName2);
-        waitForElementToDisappear(Ext4Helper.invalidField(), 500);
+        waitForElementToDisappear(Ext4Helper.invalidField(), WAIT_FOR_JAVASCRIPT);
 
         Ext4FieldRef.getForLabel(this, "Species").setValue(species);
         Ext4FieldRef.getForLabel(this, "Subset").eval("this.setValue([\"KIR\",\"MHC\"])");
         Ext4FieldRef.getForLabel(this, "Molecule Type").setValue(molType);
         Ext4FieldRef.getForLabel(this, "Loci").eval("this.setValue([\"KIR1D\",\"HLA-A\"])");
+
+        Ext4FieldRef.getForLabel(this, "Calculate and Save NT SNPs").setValue("false");
+        Ext4FieldRef.getForLabel(this, "Calculate and Save Coverage Depth").setValue("false");
+        Ext4FieldRef.getForLabel(this, "Calculate and Save AA SNPs").setValue("false");
 
         jsonString = panel.eval("selenium.browserbot.getCurrentWindow().Ext4.encode(this.getJsonParams())");
         json = new JSONObject(jsonString);
@@ -809,9 +796,11 @@ public class SequenceTest extends LabModulesTest
         Assert.assertEquals("Incorect param in form JSON", "0.02", json.getString("mosaik.max_mismatch_pct"));
         Assert.assertEquals("Incorect param in form JSON", "200", json.getString("mosaik.max_hash_positions"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("noSnpImport"));
+        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("sbtAnalysis"));
+        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("aaSnpByCodon"));
+        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("ntCoverage"));
+        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("ntSnpByPosition"));
         Assert.assertEquals("Incorect param in form JSON", 4, StringUtils.split(json.getString("fileNames"), ";").length);
-        Assert.assertEquals("Incorect param in form JSON", "0", json.getString("maxAlignMismatch"));
     }
 
     /**
