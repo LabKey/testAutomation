@@ -421,7 +421,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup("All participants", false);
         click("Studies");
 
-        click(Locator.tagContainingText("span", "View raw data"));
+        click(Locator.tagContainingText("span", "View Data"));
         addGridColumn("NAb", "Point IC50", true, true);
         addGridColumn("NAb", "Study Name", false, true);
 
@@ -436,12 +436,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForTextToDisappear("Not Actually CHAVI 001", CDS_WAIT);
 
         //Check to see if grid is properly filtering based on explorer filter
-        click(Locator.tagWithText("span", "View raw data"));
+        click(Locator.tagWithText("span", "View Data"));
         waitForGridCount(437);
         click(Locator.tagWithText("span", "Explore"));
         clickButton("clear filters", 0);
         waitForElement(Locator.tagWithText("span", "NotRV144"));
-        click(Locator.tagContainingText("span", "View raw data"));
+        click(Locator.tagContainingText("span", "View Data"));
         waitForGridCount(668);
 
         addGridColumn("Demographics", "Gender", true, true);
@@ -489,6 +489,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("Clear Filters", 0);
         waitForGridCount(5);
 
+        sleep(1500);
         openFilterPanel("Point IC50");
         clickButton("Clear Filters", 0);
         waitForGridCount(668);
@@ -641,59 +642,60 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
         goToAppHome();
         click("Vaccine Immunogens");
-        assertVaccineComponentInfoPage("gp140",
-                "GenBank: U08794\n" +
-                "Isolate \n" +
-                "92RW020Clade \n" +
-                "ARegion \n" +
-                "envDescription\n" +
-                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region;GenBank: K03455 and M68893\n" +
-                "Isolate \n" +
-                "HXB2 and BaLClade \n" +
-                "BRegion \n" +
-                "envDescription\n" +
-                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; V1 and V2 regions deleted; V3 is from BaL (M68893)GenBank: AF286227\n" +
-                "Isolate \n" +
-                "97ZA012Clade \n" +
-                "CRegion \n" +
-                "envDescription\n" +
-                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region;");
-        assertVaccineComponentInfoPage("gp145",
-                "GenBank: U08794\n" +
-                "Isolate \n" +
-                "92RW020Clade \n" +
-                "ARegion \n" +
-                "envDescription\n" +
-                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5736GenBank: K03455\n" +
-                "Isolate \n" +
-                "HXB2 and BaLClade \n" +
-                "BRegion \n" +
-                "envDescription\n" +
-                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5737GenBank: AF286227\n" +
-                "Isolate \n" +
-                "97ZA012Clade \n" +
-                "CRegion \n" +
-                "envDescription\n" +
-                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5738");
-        assertVaccineComponentInfoPage("gag",
-                "GenBank: K03455\n" +
-                "Isolate \n" +
-                "HXB2Clade \n" +
-                "BRegion \n" +
-                "gagDescription\n" +
-                "complete gag regionGenBank: \n" +
-                "Isolate \n" +
-                "LAIClade \n" +
-                "ARegion \n" +
-                "gagDescription\n" +
-                "gag region from LAI");
-        assertVaccineComponentInfoPage("gag/pol",
-                "GenBank: K03455 and M19921\n" +
-                "Isolate \n" +
-                "HXB2 (gag) NL4-3 (pol)Clade \n" +
-                "BRegion \n" +
-                "gag/polDescription\n" +
-                "fusion gag/pol polyprotein consisting of gag from HXB2 and pol from NL4-3; Carboxy terminus of gag deleted to allow read through into pol without frameshift; other deletions introduced to prevent proteolytic processing of pol and to reduce potential for functional enzymatic activity");
+        // Vaccine Component Info pages are no longer exposed
+//        assertVaccineComponentInfoPage("gp140",
+//                "GenBank: U08794\n" +
+//                "Isolate \n" +
+//                "92RW020Clade \n" +
+//                "ARegion \n" +
+//                "envDescription\n" +
+//                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region;GenBank: K03455 and M68893\n" +
+//                "Isolate \n" +
+//                "HXB2 and BaLClade \n" +
+//                "BRegion \n" +
+//                "envDescription\n" +
+//                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; V1 and V2 regions deleted; V3 is from BaL (M68893)GenBank: AF286227\n" +
+//                "Isolate \n" +
+//                "97ZA012Clade \n" +
+//                "CRegion \n" +
+//                "envDescription\n" +
+//                "gp140 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region;");
+//        assertVaccineComponentInfoPage("gp145",
+//                "GenBank: U08794\n" +
+//                "Isolate \n" +
+//                "92RW020Clade \n" +
+//                "ARegion \n" +
+//                "envDescription\n" +
+//                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5736GenBank: K03455\n" +
+//                "Isolate \n" +
+//                "HXB2 and BaLClade \n" +
+//                "BRegion \n" +
+//                "envDescription\n" +
+//                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5737GenBank: AF286227\n" +
+//                "Isolate \n" +
+//                "97ZA012Clade \n" +
+//                "CRegion \n" +
+//                "envDescription\n" +
+//                "gp145 trucated downstream of gp41 transmembrane region; deleted cleavage and fusion sites (delta CF) and portion of interheptad region; from VRC 5738");
+//        assertVaccineComponentInfoPage("gag",
+//                "GenBank: K03455\n" +
+//                "Isolate \n" +
+//                "HXB2Clade \n" +
+//                "BRegion \n" +
+//                "gagDescription\n" +
+//                "complete gag regionGenBank: \n" +
+//                "Isolate \n" +
+//                "LAIClade \n" +
+//                "ARegion \n" +
+//                "gagDescription\n" +
+//                "gag region from LAI");
+//        assertVaccineComponentInfoPage("gag/pol",
+//                "GenBank: K03455 and M19921\n" +
+//                "Isolate \n" +
+//                "HXB2 (gag) NL4-3 (pol)Clade \n" +
+//                "BRegion \n" +
+//                "gag/polDescription\n" +
+//                "fusion gag/pol polyprotein consisting of gag from HXB2 and pol from NL4-3; Carboxy terminus of gag deleted to allow read through into pol without frameshift; other deletions introduced to prevent proteolytic processing of pol and to reduce potential for functional enzymatic activity");
     }
 
     private void verifyMultiNounPages()
@@ -957,7 +959,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         clickButton("OK", 0);
     }
 
-    private void openFilterPanel (String colHeader)
+    private void openFilterPanel(String colHeader)
     {
         List<Ext4CmpRef> headers = _ext4Helper.componentQuery("#raw-data-view grid gridcolumn", Ext4CmpRef.class);
         for (Ext4CmpRef ref : headers)
