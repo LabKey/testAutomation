@@ -270,8 +270,8 @@ public class StudyScheduleTester
         Locator link = Locator.xpath("//div[text() = '" + name + "']/../../../td//img[@alt='link data']/../..//div");
         _test.assertElementPresent(link);
 
-
-        _test.doubleClickAndWait(link, 0);
+        _test.mouseClick(link.toString());
+        _test.click(link);
         _test.log("show define dataset dialog");
         _test.waitForElement(Locator.xpath("//span[text() = 'Define Dataset']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
