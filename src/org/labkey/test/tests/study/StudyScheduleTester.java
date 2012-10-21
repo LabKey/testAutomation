@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.tests.StudyBaseTest;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
@@ -69,6 +70,7 @@ public class StudyScheduleTester
         _sampleDataPath = sampleDataPath;
     }
 
+    @LogMethod
     public void basicTest()
     {
         _test.log("Study Schedule Test");
@@ -112,6 +114,7 @@ public class StudyScheduleTester
         _test.waitForText(dataset);
     }
 
+    @LogMethod
     public void linkDatasetTest()
     {
         goToStudySchedule();
@@ -170,6 +173,7 @@ public class StudyScheduleTester
         _test.assertTextPresent("Dataset:", GHOST_DATASET_3);
     }
 
+    @LogMethod
     public void linkFromDatasetDetailsTest()
     {
         goToStudySchedule();
@@ -189,6 +193,7 @@ public class StudyScheduleTester
         linkDatasetFromDetails(GHOST_DATASET_6, DatasetType.importFromFile, null);
     }
 
+    @LogMethod
     private void createPlaceholderDataset(String name, String category, boolean verify)
     {
         // create and verify a placeholder dataset
@@ -209,6 +214,7 @@ public class StudyScheduleTester
         }
     }
 
+    @LogMethod
     private void addDataset(String name, String category, DatasetType type)
     {
         _test.log("adding dataset: " + name + " type: " + type);
@@ -262,6 +268,7 @@ public class StudyScheduleTester
         goToStudySchedule();
     }
 
+    @LogMethod
     private void linkDatasetFromSchedule(String name, DatasetType type, String targetDataset)
     {
         _test.log("linking dataset: " + name + " to type: " + type + " from study schedule.");
@@ -279,6 +286,7 @@ public class StudyScheduleTester
         goToStudySchedule();
     }
 
+    @LogMethod
     private void linkDatasetFromDetails(String name, DatasetType type, String targetDataset)
     {
         _test.log("linking dataset: " + name + " to type: " + type + "from dataset details.");
@@ -293,6 +301,7 @@ public class StudyScheduleTester
         _test.clickLinkContainingText("Manage Datasets");
     }
 
+    @LogMethod
     private void linkDataset(String name, DatasetType type, String targetDataset)
     {
         switch (type)
@@ -337,6 +346,7 @@ public class StudyScheduleTester
         }
     }
 
+    @LogMethod
     public void datasetStatusTest()
     {
         _test.log("Testing status settings for datasets");
@@ -364,6 +374,7 @@ public class StudyScheduleTester
         }
     }
 
+    @LogMethod
     private void goToStudySchedule()
     {
         _test.clickLinkWithText(_folderName);
