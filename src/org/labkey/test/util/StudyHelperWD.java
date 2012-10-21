@@ -65,20 +65,20 @@ public class StudyHelperWD extends AbstractHelperWD
         _test.clickButton("Create", 0);
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
         _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement("groupLabel", groupName);
+        _test.setFormElement(Locator.name("groupLabel"), groupName);
         if( ptids.length > 0 )
         {
             String csp = ptids[0];
             for( int i = 1; i < ptids.length; i++ )
                 csp += ","+ptids[i];
-            _test.setFormElement("categoryIdentifiers", csp);
+            _test.setFormElement(Locator.name("categoryIdentifiers"), csp);
         }
         if( categoryName != null )
         {
             if (isCategoryNameNew)
-                _test.setFormElement("participantCategory", categoryName);
+                _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
-                _test._extHelper.selectComboBoxItem(participantString + " Category", categoryName);
+                _test._extHelper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
@@ -120,18 +120,18 @@ public class StudyHelperWD extends AbstractHelperWD
             String csp = newPtids[0];
             for( int i = 1; i < newPtids.length; i++ )
                 csp += ","+newPtids[i];
-            String currentIds = _test.getFormElement("categoryIdentifiers");
+            String currentIds = _test.getFormElement(Locator.name("categoryIdentifiers"));
             if (currentIds != null && currentIds.length() > 0)
-                _test.setFormElement("categoryIdentifiers", currentIds + "," + csp);
+                _test.setFormElement(Locator.name("categoryIdentifiers"), currentIds + "," + csp);
             else
-                _test.setFormElement("categoryIdentifiers", csp);
+                _test.setFormElement(Locator.name("categoryIdentifiers"), csp);
         }
         if( categoryName != null )
         {
             if (isCategoryNameNew)
-                _test.setFormElement("participantCategory", categoryName);
+                _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
-                _test._extHelper.selectComboBoxItem(participantString + " Category", categoryName);
+                _test._extHelper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }

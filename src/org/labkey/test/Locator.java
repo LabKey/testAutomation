@@ -19,6 +19,7 @@ package org.labkey.test;
 import junit.framework.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -59,7 +60,7 @@ public class Locator
         _text = text;
     }
 
-    public Locator contains(String contains)
+    public Locator containing(String contains)
     {
         return new Locator(loc, _index, contains, _text);
     }
@@ -142,9 +143,17 @@ public class Locator
             while (it.hasNext())
             {
                 el = it.next();
-                String text = el.getText();
-                if (!text.equals(_text))
+                String text;
+                try
+                {
+                    text = el.getText();
+                    if (!text.equals(_text))
+                        it.remove();
+                }
+                catch (StaleElementReferenceException ex)
+                {
                     it.remove();
+                }
             }
         }
         else if (_contains != null && !_contains.equals(""))
@@ -154,9 +163,17 @@ public class Locator
             while (it.hasNext())
             {
                 el = it.next();
-                String text = el.getText();
-                if (!text.equals(_text))
+                String text;
+                try
+                {
+                    text = el.getText();
+                    if (!text.contains(_text))
+                        it.remove();
+                }
+                catch (StaleElementReferenceException ex)
+                {
                     it.remove();
+                }
             }
         }
         return elements;
@@ -182,7 +199,8 @@ public class Locator
         {
             Assert.fail("Timeout waiting for element [" + secTimeout + "sec]: " + toString() +
                     (_index == 0 ? "" : "\nIndex: " + _index) +
-                    (_contains == null ? "" : "\nContaining: " + _contains));
+                    (_contains == null ? "" : "\nContaining: " + _contains) +
+                    (_text == null ? "" : "\nWith Text: " + _text));
             return null; // unreachable
         }
     }
@@ -577,13 +595,6 @@ public class Locator
         // Supports permission types from a variety of modules.
         return xpath("//div[contains(@class, 'rolepanel')][.//h3[text()=" + xq(role) + "]]//span[contains(@class, 'x4-btn-inner') and text()=" + xq(groupName) + "]/../span[contains(@class, 'x4-btn-icon')]");
     }
-
-    public static XPathLocator permissionsInput(String role)
-    {
-        String inputId = "$add$" + role;
-        return xpath("//input[@id="+ xq(inputId) +"]");
-    }
-
 
     public static XPathLocator fileTreeByName(String name)
     {

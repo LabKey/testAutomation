@@ -606,12 +606,12 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"));
         _test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
-        _test.mouseDown(Locator.xpath("/html/body"));
+        _test.click(Locator.xpath("/html/body"));
     }
 
     public void selectComboBoxItem(String label, String selection)
     {
-        selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+":']]/div/div"), selection);
+        selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
     }
 
     @LogMethod

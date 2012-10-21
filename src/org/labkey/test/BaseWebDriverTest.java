@@ -1928,14 +1928,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
             if (validErrors.size() > 0)
             {
-                log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
                 String errorCtStr = "";
                 if (validErrors.size() > 1)
                     errorCtStr = " (1 of " + validErrors.size() + ") ";
                 if (!_testFailed) // Don't clobber existing failures. Just log them.
                     Assert.fail("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
-                else
-                    log("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
             }
         }
     }
@@ -2413,7 +2410,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 return;
         }
 
-        Locator l = Locator.id("newGroupFormSite$input");
+        Locator l = Locator.xpath("//input[contains(@name, 'sitegroupsname')]");
         waitForElement(l, defaultWaitForPage);
 
         setFormElement(l,groupName);
@@ -2489,6 +2486,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Update Group Membership");
     }
 
+    public void clickManageSiteGroup(String groupName)
+    {
+        _ext4Helper.clickTabContainingText("Site Groups");
+        // warning Adminstrators can apper multiple times
+        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
+        Ext4CmpRefWD ref = refs.get(0);
+        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        ref.eval("getSelectionModel().select(" + idx + ")");
+        waitAndClick(Locator.tagContainingText("a","manage group"));
+        waitForPageToLoad();
+    }
 
     public void clickManageGroup(String groupName)
     {
@@ -4705,12 +4714,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         WebElement el = l.findElement(_driver);
 
-        setFormElement(el, text);
-//        fireEvent(l, SeleniumEvent.blur);
-    }
-
-    public void setFormElement(WebElement el, String text)
-    {
         if (text.length() < 1000)
         {
             try {el.clear();} catch(WebDriverException e) {/*Probably a file input*/}
@@ -4718,10 +4721,22 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
         {
-            executeScript("arguments[0].value = arguments[1]", el, text.substring(0, text.length()-1));
+            setFormElementJS(l, text.substring(0, text.length()-1));
             //Retype the last character manually to trigger events
             el.sendKeys(text.substring(text.length()-1));
         }
+    }
+
+    /**
+     * Set form element directly via JavaScript rather than WebElement.sendKeys
+     * @param l Locator for form element
+     * @param text text to set
+     */
+    public void setFormElementJS(Locator l, String text)
+    {
+        WebElement el = l.findElement(_driver);
+
+        executeScript("arguments[0].value = arguments[1]", el, text);
     }
 
     public void setFormElement(String element, File file)
@@ -4831,12 +4846,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             _extHelper.clickExtTab("Choose Filters");
             waitForElement(Locator.xpath("//span["+Locator.NOT_HIDDEN+" and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
         }
-        _extHelper.selectComboBoxItem("Filter Type", filter1Type); //Select combo box item.
-        if(filter1 != null) setFormElement("value_1", filter1);
+        _extHelper.selectComboBoxItem("Filter Type:", filter1Type); //Select combo box item.
+        if(filter1 != null) setFormElement(Locator.id("value_1"), filter1);
         if(filter2Type!=null)
         {
-            _extHelper.selectComboBoxItem("and", filter2Type); //Select combo box item.
-            if(filter2 != null) setFormElement("value_2", filter2);
+            _extHelper.selectComboBoxItem("and:", filter2Type); //Select combo box item.
+            if(filter2 != null) setFormElement(Locator.id("value_2"), filter2);
         }
     }
 
@@ -5473,7 +5488,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected void addUserToGroupFromGroupScreen(String userName)
     {
-        setFormElement("names", userName );
+        setFormElement(Locator.name("names"), userName );
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
 
@@ -5668,6 +5683,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         deleteUsers(false, userEmail);
     }
 
+    @LogMethod
     public void deleteGroup(String groupName)
     {
         log("Attempting to delete group: " + groupName);
@@ -5704,11 +5720,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
          if(!isTextPresent("Group " + groupName))
              selectGroup(groupName);
+        String dialogTitle = groupName + " Information";
 
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//table[contains(@id, 'labkey-principalcombo')]"), userName);
+        _ext4Helper.selectComboBoxItem(Locator.xpath(_extHelper.getExtDialogXPath(dialogTitle) + "//table[contains(@id, 'labkey-principalcombo')]"), userName);
         Locator.css(".userinfo td").withText(userName).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickExtButton(groupName + " Information", "Done", 0);
-        _extHelper.waitForExtDialogToDisappear(groupName + " Information");
+        _extHelper.clickExtButton(dialogTitle, "Done", 0);
+        _extHelper.waitForExtDialogToDisappear(dialogTitle);
+
         clickButton("Done");
     }
 

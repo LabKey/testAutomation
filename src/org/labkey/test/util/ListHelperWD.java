@@ -20,6 +20,11 @@ import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Map;
@@ -35,6 +40,7 @@ public class ListHelperWD extends ListHelper
     public ListHelperWD(BaseWebDriverTest test)
     {
         super(test);
+        _test = test;
     }
 
     public void uploadData(String folderName, String listName, String listData)
@@ -373,12 +379,19 @@ public class ListHelperWD extends ListHelper
 
 */
 
+    @LogMethod
     public void createList(String folderName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
         beginCreateList(folderName, listName);
 
-        _test.selectOptionByText("ff_keyType", listKeyType.toString());
-        _test.setFormElement("ff_keyName", listKeyName);
+        _test.selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
+        _test.setFormElementJS(Locator.id("ff_keyName"), listKeyName);
+
+        // GWT nonsense
+        _test.sleep(2000);
+        _test.pressTab(Locator.id("ff_keyName"));
+        _test.click(Locator.id("ff_name"));
+
         _test.clickButton("Create List", 0);
         _test.waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForElement(Locator.name("ff_name0"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -388,7 +401,6 @@ public class ListHelperWD extends ListHelper
         _test.waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
 
         _test.log("Add columns");
-//        test.clickLinkWithText("edit fields");
 
         // i==0 is the key column
         for (int i = 1; i <= cols.length; i++)
@@ -408,16 +420,28 @@ public class ListHelperWD extends ListHelper
 
             if (lookup != null)
             {
+                _test._shortWait.until(new ExpectedCondition<Boolean>()
+                {
+                    @Override
+                    public Boolean apply(WebDriver driver)
+                    {
+                        return driver.findElement(By.name("lookupContainer")).isEnabled();
+                    }
+                });
+
                 if (lookup.getFolder() != null)
                 {
-                    _test.setFormElement(Locator.tagWithName("input", "lookupContainer"), lookup.getFolder());
+                    _test.click(Locator.xpath("//input[@name = 'lookupContainer']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+                    Locator.css("div.x-combo-list-item").withText(lookup.getFolder()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
                 }
+                _test.sleep(500);
 
-                _test.fireEvent(Locator.tagWithName("input", "schema"), BaseWebDriverTest.SeleniumEvent.blur);
-                _test.setFormElement(Locator.tagWithName("input","schema"), lookup.getSchema());
+                _test.click(Locator.xpath("//input[@name = 'schema']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+                Locator.css("div.x-combo-list-item").withText(lookup.getSchema()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
+                _test.sleep(500);
 
-                _test.fireEvent(Locator.tagWithName("input", "table"), BaseWebDriverTest.SeleniumEvent.blur);
-                _test.setFormElement(Locator.tagWithName("input","table"), lookup.getTable());
+                _test.click(Locator.xpath("//input[@name = 'table']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+                Locator.css("div.x-combo-list-item").containing(lookup.getTable()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
             }
 
             _test.clickButton("Apply", 0);
@@ -431,12 +455,12 @@ public class ListHelperWD extends ListHelper
             if (col.getFormat() != null)
             {
                 _test._extHelper.clickExtTab("Format");
-                _test.setFormElement("propertyFormat", col.getFormat());
+                _test.setFormElement(Locator.id("propertyFormat"), col.getFormat());
             }
 
             if (null != col.getURL())
             {
-                _test.setFormElement("url", col.getURL());
+                _test.setFormElement(Locator.id("url"), col.getURL());
             }
 
             if (col.isRequired())
@@ -453,17 +477,17 @@ public class ListHelperWD extends ListHelper
                     _test.clickButton("Add RegEx Validator", 0);
                 else
                     _test.clickButton("Add Range Validator", 0);
-                _test.setFormElement("name", validator.getName());
-                _test.setFormElement("description", validator.getDescription());
-                _test.setFormElement("errorMessage", validator.getMessage());
+                _test.setFormElement(Locator.name("name"), validator.getName());
+                _test.setFormElement(Locator.name("description"), validator.getDescription());
+                _test.setFormElement(Locator.name("errorMessage"), validator.getMessage());
 
                 if (validator instanceof RegExValidator)
                 {
-                    _test.setFormElement("expression", ((RegExValidator)validator).getExpression());
+                    _test.setFormElement(Locator.name("expression"), ((RegExValidator)validator).getExpression());
                 }
                 else if (validator instanceof RangeValidator)
                 {
-                    _test.setFormElement("firstRangeValue", ((RangeValidator)validator).getFirstRange());
+                    _test.setFormElement(Locator.name("firstRangeValue"), ((RangeValidator)validator).getFirstRange());
                 }
                 _test.clickButton("OK", 0);
             }
@@ -504,8 +528,8 @@ public class ListHelperWD extends ListHelper
 
         _test.log("Add List");
         _test.clickButton("Create New List");
-        _test.waitForElement(Locator.name("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement("ff_name", listName);
+        _test.waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.setFormElement(Locator.id("ff_name"), listName);
     }
 
 
@@ -625,9 +649,9 @@ public class ListHelperWD extends ListHelper
         _test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
         if ( _test.isAlertPresent() ) _test.getAlert(); // Don't worry about schema alert until saving.
         _test.click(Locator.xpath("//div[./label[text() = 'Lookup']]/input[@type = 'radio']"));
-        if ( lookup.getFolder() != null ) _test.setFormElement("lookupContainer", lookup.getFolder());
-        if ( lookup.getSchema() != null ) _test.setFormElement("schema", lookup.getSchema());
-        if ( lookup.getTable() != null ) _test.setFormElement("table", lookup.getTable());
+        if ( lookup.getFolder() != null ) _test.setFormElement(Locator.name("lookupContainer"), lookup.getFolder());
+        if ( lookup.getSchema() != null ) _test.setFormElement(Locator.name("schema"), lookup.getSchema());
+        if ( lookup.getTable() != null ) _test.setFormElement(Locator.name("table"), lookup.getTable());
         _test.clickButton("Apply", 0);
         _test.sleep(1000);
     }
@@ -663,7 +687,7 @@ public class ListHelperWD extends ListHelper
         String prefix = _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         _test.click(Locator.xpath(addField));
-        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), _test.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);
         setColumnLabel(prefix, index, label);
         setColumnType(prefix, index, type);
@@ -674,7 +698,7 @@ public class ListHelperWD extends ListHelper
         String prefix = areaTitle==null ? "" : _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         _test.click(Locator.xpath(addField));
-        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), _test.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);
         setColumnLabel(prefix, index, label);
         setColumnType(prefix, index, type);

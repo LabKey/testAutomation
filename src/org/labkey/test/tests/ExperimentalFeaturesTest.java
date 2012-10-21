@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DevModeOnlyTest;
@@ -29,7 +30,7 @@ import java.util.HashMap;
  * Time: 1:37 PM
  */
 
-public class ExperimentalFeaturesTest extends BaseSeleniumWebTest implements DevModeOnlyTest
+public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
     private static final String TEST_GROUP = "HiddenEmail Test group";
     private static final String ADMIN_USER = "experimental_dev@experimental.test";
@@ -49,9 +50,7 @@ public class ExperimentalFeaturesTest extends BaseSeleniumWebTest implements Dev
     protected void doCleanup() throws Exception
     {
         try{deleteProject(getProjectName());}catch(Throwable t){/**/}
-        try{deleteUser(IMPERSONATED_USER);}catch(Throwable t){/**/}
-        try{deleteUser(CHECKED_USER);}catch(Throwable t){/**/}
-        try{deleteUser(ADMIN_USER);}catch(Throwable t){/**/}
+        try{deleteUsers(false, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);}catch(Throwable t){/**/}
         try{deleteGroup(TEST_GROUP);}catch(Throwable t){/**/}
     }
 
@@ -96,10 +95,10 @@ public class ExperimentalFeaturesTest extends BaseSeleniumWebTest implements Dev
         clickButton("Done");
         clickLinkWithText(EMAIL_TEST_LIST);
         clickButton("Insert New");
-        setFormElement("quf_user", CHECKED_USER);
+        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
         clickButton("Insert New");
-        setFormElement("quf_user", ADMIN_USER);
+        selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("user/Email", "Email");
@@ -110,9 +109,9 @@ public class ExperimentalFeaturesTest extends BaseSeleniumWebTest implements Dev
         // Create query webpart
         clickLinkWithText(getProjectName());
         addWebPart("Query");
-        selectOptionByValue("schemaName", "core");
+        selectOptionByValue(Locator.name("schemaName"), "core");
         clickRadioButtonById("selectQueryContents");
-        selectOptionByValue("queryName", "Users");
+        selectOptionByValue(Locator.name("queryName"), "Users");
         submit();
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("ModifiedBy/Email", "Email");
