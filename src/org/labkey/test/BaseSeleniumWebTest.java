@@ -5148,7 +5148,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToSiteGroups();
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
         waitForElement(groupLoc, defaultWaitForPage);
-        click(groupLoc);
+        mouseDown(groupLoc);
         clickLinkContainingText("manage group");
         addUserToGroupFromGroupScreen(userName);
     }
@@ -5350,6 +5350,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         deleteUsers(false, userEmail);
     }
 
+    @LogMethod
     public void deleteGroup(String groupName)
     {
         log("Attempting to delete group: " + groupName);
@@ -5400,7 +5401,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             goToSiteGroups();
 
         waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.xpath("//div[text()='" + groupName + "']/../.."));
+        waitForElement(Locator.xpath("//div[text()='" + groupName + "']/../.."), 1000);
         mouseDown(Locator.xpath("//div[text()='" + groupName + "']/../.."));
         _extHelper.waitForExtDialog(groupName + " Information");
     }

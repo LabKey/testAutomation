@@ -107,11 +107,7 @@ public class GroupTest extends BaseSeleniumWebTest
         clickLinkWithText(getProjectName());
         enterPermissionsUI();
         waitForText("Author");
-        _extHelper.clickExtDropDownMenu("$add$org.labkey.api.security.roles.AuthorRole", "Site: All Site Users");
-
-        clickButton("Save", 0);
-        waitForText("save successful");
-        waitForExtMaskToDisappear();
+        setSiteGroupPermissions("All Site Users", "Author");
 
         permissionsReportTest();
 
@@ -297,9 +293,8 @@ public class GroupTest extends BaseSeleniumWebTest
     private void verifyCantAddSystemGroupToUserGroup()
     {
         startCreateGlobalPermissionsGroup(BAD_GROUP, true);
-        setFormElement("Users_dropdownMenu", "All Site Users");
+        _ext4Helper.selectComboBoxItem(Locator.xpath(_extHelper.getExtDialogXPath(BAD_GROUP + " Information") + "//table[contains(@id, 'labkey-principalcombo')]"), "Site: All Site Users");
 
-        _extHelper.clickExtDropDownMenu(Locator.xpath("//input[@id='Users_dropdownMenu']/../img"), "Site: All Site Users");
         waitForText("Can't add a system group to another group");
         clickButton("OK", 0);
         clickButton("Done");
