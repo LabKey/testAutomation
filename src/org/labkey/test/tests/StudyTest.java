@@ -246,7 +246,7 @@ public class StudyTest extends StudyBaseTest
         {
             //nav trail check
             clickLinkContainingText("999320016");
-            assertTextPresent("Dataset: DEM-1: Demographics, All Visits >  ");
+            assertTextPresent("Dataset: DEM-1: Demographics, All Visits");
             clickLinkContainingText("Dataset:");
 
             _extHelper.clickMenuButton(false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
