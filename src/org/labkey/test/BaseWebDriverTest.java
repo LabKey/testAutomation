@@ -2873,14 +2873,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean isTextPresent(String text)
     {
-        if(text==null)
+        if(text==null || text.length() == 0)
             return true;
 
         //Need to unencode here? Selenium turns &nbsp; into space???
-        text = text.replace("&nbsp;", " ");
+        text = text.replace("<", "&lt;");
+        text = text.replace(">", "&gt;");
+        text = text.replace("&", "&amp;");
         try
         {
-            return getBodyText().contains(text);
+            return getHtmlSource().contains(text);
         }
         catch(StaleElementReferenceException ex)
         {
