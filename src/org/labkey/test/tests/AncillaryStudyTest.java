@@ -189,7 +189,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Manage Mouse Groups");
         waitForText(PARTICIPANT_GROUP);
-        selenium.getEval("selenium.selectExtGridItem('label', '"+PARTICIPANT_GROUP+"', -1, 'participantCategoriesGrid', null, false)");
+        selenium.getEval("selenium.selectExt4GridItem('label', '"+PARTICIPANT_GROUP+"', -1, 'participantCategoriesGrid', null, false)");
         click(Locator.xpath("//*[text()='"+PARTICIPANT_GROUP+"']"));
         clickButton("Edit Selected", 0);
         _extHelper.waitForExtDialog("Define Mouse Group");
