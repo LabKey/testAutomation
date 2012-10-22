@@ -47,7 +47,6 @@ public class ExtHelper extends AbstractHelper
     /**
      * Clicks the ext menu item from the submenu specified by the ext object's text
      */
-    @LogMethod
     public void clickExtMenuButton(boolean wait, Locator menu, String... subMenuLabels)
     {
         _test.click(menu);

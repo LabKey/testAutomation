@@ -56,6 +56,7 @@ public class StudyHelperWD extends AbstractHelperWD
     {
         if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
+            _test.clickFolder(projectName);
             _test.clickFolder(studyFolder);
             _test.clickTab("Manage");
             _test.clickLinkWithText("Manage " + participantString + " Groups");
@@ -71,7 +72,7 @@ public class StudyHelperWD extends AbstractHelperWD
             String csp = ptids[0];
             for( int i = 1; i < ptids.length; i++ )
                 csp += ","+ptids[i];
-            _test.setFormElement(Locator.name("categoryIdentifiers"), csp);
+            _test.setFormElement(Locator.name("participantIdentifiers"), csp);
         }
         if( categoryName != null )
         {
