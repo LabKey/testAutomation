@@ -407,6 +407,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT2_NAME);
         enterPermissionsUI();
         removePermission(USERS_GROUP, "Editor");
+        clickButton("Save and Finish");
+        enterPermissionsUI();
         removePermission(USERS_GROUP, "Reader");
         clickButton("Save and Finish");
         impersonate(USER1);

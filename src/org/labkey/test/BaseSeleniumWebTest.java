@@ -2235,9 +2235,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
-        setFormElement("names", namesList.toString());
-        uncheckCheckbox("sendEmail");
-        clickButton("Update Group Membership");
+        addUserToGroupFromGroupScreen(namesList.toString());
     }
 
     public void createPermissionsGroup(String groupName)
@@ -2257,21 +2255,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void createPermissionsGroup(String groupName, String... memberNames)
     {
-        log("Creating permissions group " + groupName);
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.clickTabContainingText("Project Groups");
-        createPermissionGroupFromGroupScreen(groupName, memberNames);
-        enterPermissionsUI();
-    }
-
-
-    public void createPermissionGroupFromGroupScreen(String groupName, String... memberNames)
-    {
-        setFormElement(Locator.name("projectgroupsname"),groupName);
-        clickButton("Create New Group", 0);
-        _extHelper.waitForExtDialog(groupName+" Information");
+        createPermissionsGroup(groupName);
+        clickManageGroup(groupName);
 
         StringBuilder namesList = new StringBuilder();
         for(String member : memberNames)
@@ -2280,15 +2265,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
 
         log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
-        setFormElement(Locator.name("names"), namesList.toString());
-        uncheckCheckbox("sendEmail");
-        clickButton("Update Group Membership");
+        addUserToGroupFromGroupScreen(namesList.toString());
+
+        enterPermissionsUI();
     }
 
-
-    public void clickManageGroup(String groupName)
+    public void openGroupPermissionsDisplay(String groupName)
     {
         _ext4Helper.clickTabContainingText("Project Groups");
         // warning Adminstrators can apper multiple times
@@ -2297,6 +2279,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         int idx = Integer.parseInt(ref.eval("this.getStore().find(\"name\", \"" + groupName + "\")"));
         Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("this.getSelectionModel().select(" + idx + ")");
+    }
+
+    public void clickManageGroup(String groupName)
+    {
+        openGroupPermissionsDisplay(groupName);
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
     }
@@ -5155,10 +5142,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected void addUserToGroupFromGroupScreen(String userName)
     {
-        setFormElement("names", userName );
+        setFormElement("names", userName);
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
-
     }
 
     /**
@@ -5183,9 +5169,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void enterPermissionsUI()
     {
         //if the following assert triggers, you were already in the permissions UI when this was called
-        assertElementNotPresent(Locator.permissionRendered());
-        clickAdminMenuItem("Folder", "Permissions");
-        waitForElement(Locator.permissionRendered(), 60000);
+        if (!isElementPresent(Locator.permissionRendered()))
+        {
+            clickAdminMenuItem("Folder", "Permissions");
+            waitForElement(Locator.permissionRendered());
+        }
     }
 
     public void exitPermissionsUI()
@@ -5339,9 +5327,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
         {
-            setFormElement("names", userEmail);
-            uncheckCheckbox("sendEmail");
-            clickButton("Update Group Membership");
+            addUserToGroupFromGroupScreen(userEmail);
         }
     }
 
@@ -5456,12 +5442,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    public void customizeWebPart(String webPartId)
-    {
-        clickAt(Locator.id("more-" + webPartId), "1,1");
-        clickAt(Locator.tagContainingText("span", "Customize"), "1,1");
-    }
-
     public void assertUserExists(String email)
     {
         log("asserting that user " + email + " exists...");
@@ -5477,9 +5457,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickLinkWithText(projectName);
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
-        boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
+        waitForText("Member Groups");
+        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        int idx = Integer.parseInt(ref.eval("this.getStore().find(\"name\", \"" + groupName + "\")"));
         exitPermissionsUI();
-        return ret;
+        return (idx >= 0);
     }
 
     public void assertGroupExists(String groupName, String projectName)
@@ -5498,15 +5481,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public boolean isUserInGroup(String email, String groupName, String projectName)
     {
-        ensureAdminMode();
-        clickLinkWithText(projectName);
-        enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Project Groups");
-        click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
-        boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
-        click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
-        exitPermissionsUI();
-        return ret;
+        if (doesGroupExist(groupName, projectName))
+        {
+            enterPermissionsUI();
+            openGroupPermissionsDisplay(groupName);
+            boolean ret = isElementPresent(Locator.xpath("//table[contains(@class,'userinfo')]//td[text()='" + email + "']"));
+            click(Locator.xpath("//div[contains(@class, 'x4-window')]//button[./span[text()='Done']]"));
+            exitPermissionsUI();
+            return ret;
+        }
+        return false;
     }
 
     public void assertUserInGroup(String email, String groupName, String projectName)

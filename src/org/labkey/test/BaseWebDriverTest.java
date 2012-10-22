@@ -2467,20 +2467,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void createPermissionsGroup(String groupName, String... memberNames)
     {
-        log("Creating permissions group " + groupName);
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.clickTabContainingText("Project Groups");
-        createPermissionGroupFromGroupScreen(groupName, memberNames);
-        enterPermissionsUI();
-    }
-
-    public void createPermissionGroupFromGroupScreen(String groupName, String... memberNames)
-    {
-        setFormElement(Locator.name("projectgroupsname"),groupName);
-        clickButton("Create New Group", 0);
-        _extHelper.waitForExtDialog(groupName + " Information");
+        createPermissionsGroup(groupName);
+        clickManageGroup(groupName);
 
         StringBuilder namesList = new StringBuilder();
         for(String member : memberNames)
@@ -2489,27 +2477,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
         setFormElement(Locator.name("names"), namesList.toString());
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
+
+        enterPermissionsUI();
     }
 
-    public void clickManageSiteGroup(String groupName)
-    {
-        _ext4Helper.clickTabContainingText("Site Groups");
-        // warning Adminstrators can apper multiple times
-        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
-        Ext4CmpRefWD ref = refs.get(0);
-        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("getSelectionModel().select(" + idx + ")");
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
-    }
-
-    public void clickManageGroup(String groupName)
+    public void openGroupPermissionsDisplay(String groupName)
     {
         _ext4Helper.clickTabContainingText("Project Groups");
         // warning Adminstrators can apper multiple times
@@ -2517,7 +2492,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Ext4CmpRefWD ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("getSelectionModel().select(" + idx + ")");
+        ref.eval("this.getSelectionModel().select(" + idx + ")");
+    }
+
+    public void clickManageGroup(String groupName)
+    {
+        openGroupPermissionsDisplay(groupName);
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
     }
@@ -5512,9 +5492,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void enterPermissionsUI()
     {
         //if the following assert triggers, you were already in the permissions UI when this was called
-        assertElementNotPresent(Locator.permissionRendered());
-        clickAdminMenuItem("Folder", "Permissions");
-        waitForElement(Locator.permissionRendered(), 60000);
+        if (!isElementPresent(Locator.permissionRendered()))
+        {
+            clickAdminMenuItem("Folder", "Permissions");
+            waitForElement(Locator.permissionRendered());
+        }
     }
 
     public void exitPermissionsUI()
@@ -5786,12 +5768,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    public void customizeWebPart(String webPartId)
-    {
-        click(Locator.id("more-" + webPartId));
-        click(Locator.tagContainingText("span", "Customize"));
-    }
-
     public void assertUserExists(String email)
     {
         log("asserting that user " + email + " exists...");
@@ -5807,9 +5783,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickLinkWithText(projectName);
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
-        boolean ret = isElementPresent(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
+        waitForText("Member Groups");
+        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
+        Ext4CmpRefWD ref = refs.get(0);
+        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         exitPermissionsUI();
-        return ret;
+        return (idx >= 0);
     }
 
     public void assertGroupExists(String groupName, String projectName)

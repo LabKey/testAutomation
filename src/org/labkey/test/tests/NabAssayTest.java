@@ -364,9 +364,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickLinkWithText(TEST_ASSAY_PRJ_NAB);
             clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
             pushLocation();  // Save our location because impersonatied user won't have permission to project
-            enterPermissionsUI();
-            createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER);
-            addUserToProjGroup(TEST_ASSAY_USR_NAB_READER, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER);
+            createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
             setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
             setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
 
