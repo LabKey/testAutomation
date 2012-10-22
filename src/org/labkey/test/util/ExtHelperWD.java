@@ -600,7 +600,6 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.waitForElement(file, 60000);
     }
 
-    @LogMethod
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"));
@@ -613,7 +612,6 @@ public class ExtHelperWD extends AbstractHelperWD
         selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
     }
 
-    @LogMethod
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"));

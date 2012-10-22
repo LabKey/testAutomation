@@ -437,7 +437,6 @@ public class ExtHelper extends AbstractHelper
         _test.waitForElement(file, 60000);
     }
 
-    @LogMethod
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");
