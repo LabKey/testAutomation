@@ -109,7 +109,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     {
         clickLinkContainingText(getProjectName());
         waitForPageToLoad();
-        clickLinkContainingText("Admin");
+        clickLink("adminSettings");
 
         String[] listVals = {"sequences", "runs", samples};
         for(int i=0; i<3; i++)
