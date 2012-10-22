@@ -111,6 +111,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -235,6 +236,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             _driver = new FirefoxDriver(profile);
         }
+
+        _driver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
+        _driver.manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
 
         selenium = new DefaultSeleniumWrapper(_driver, WebTestHelper.getBaseURL());
         selenium.setTimeout(Integer.toString(defaultWaitForPage));
@@ -1434,7 +1438,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return true;
     }
 
-    @Test
+    @Test(timeout=1200000) // 20 minute default test timeout
     public void testSteps() throws Exception
     {
         try{ resumeJsErrorChecker(); }// Make sure js error checker didn't get stuck paused by a failure in the crawler.
@@ -1903,6 +1907,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    @LogMethod
     private void checkJsErrors()
     {
         if (this.enableScriptCheck())
@@ -2734,6 +2739,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void expandFolder(String project)
     {
+        waitForElement(Locator.css(".labkey-expandable-nav-panel"));
         String xpath = "//tr[not(ancestor-or-self::*[contains(@style,'none')]) and following-sibling::tr[contains(@style,'none')]//a[text()='"+project+"']]//a/img[contains(@src,'plus')]";
         List<WebElement> possibleAncestors = _driver.findElements(By.xpath(xpath));
         int depth = 0;
@@ -3742,15 +3748,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("Clicking link with text '" + text + "'");
 
-        if (index > 0)
-            clickAndWait(Locator.linkWithText(text, index));
+        if (_driver.findElements(By.linkText(text.toUpperCase())).size() > 0)
+            clickAndWait(Locator.linkWithText(text.toUpperCase()).index(index), millis);
         else
-        {
-            if (_driver.findElements(By.linkText(text.toUpperCase())).size() > 0)
-                clickAndWait(_driver.findElement(By.linkText(text.toUpperCase())));
-            else
-                clickAndWait(_driver.findElement(By.linkText(text)));
-        }
+            clickAndWait(Locator.linkWithText(text).index(index), millis);
     }
 
     public void clickLinkContainingText(String text)
@@ -3872,16 +3873,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public static final int WAIT_FOR_EXT_MASK_TO_DISSAPEAR = -1;
     public static final int WAIT_FOR_EXT_MASK_TO_APPEAR = -2;
-    public void clickAndWait(Locator l, int millis)
+    public void clickAndWait(Locator l, int pageTimeoutMs)
     {
         WebElement el;
         el = l.findElement(_driver);
 
-        clickAndWait(el, millis);
-    }
-
-    public void clickAndWait(WebElement el, int pageTimeoutMs)
-    {
         el.click();
 
         if (pageTimeoutMs > 0)
@@ -3890,11 +3886,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void clickAndWait(WebElement el)
-    {
-        clickAndWait(el, WAIT_FOR_PAGE);
     }
 
     /**
