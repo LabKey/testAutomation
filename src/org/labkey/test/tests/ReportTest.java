@@ -1131,6 +1131,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT4_NAME);
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        _extHelper.waitForExtDialogToDisappear("Saved");
 
         //Participant report with multiple demographic fields
         clickLinkWithText("Manage");
