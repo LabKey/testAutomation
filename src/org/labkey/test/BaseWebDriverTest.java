@@ -1098,9 +1098,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             verifyInitialUserRedirects();
 
             log("Testing bad email addresses");
+            verifyInitialUserError(null, null, null, "Invalid email address:");
             verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
-            verifyInitialUserError(null, null, null, "Invalid email address: ");
-            assertTextNotPresent("null");
 
             log("Testing bad passwords");
             String email = PasswordUtil.getUsername();
@@ -1198,18 +1197,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private void verifyInitialUserError(String email, String password1, String password2, String expectedText)
     {
         if (null != email)
-            setFormElement("email", email);
+            setFormElement(Locator.id("email"), email);
 
         if (null != password1)
-            setFormElement("password", password1);
+            setFormElement(Locator.id("password"), password1);
 
         if (null != password2)
-            setFormElement("password2", password2);
+            setFormElement(Locator.id("password2"), password2);
 
         clickLinkWithText("Next");
 
         if (null != expectedText)
-            assertTextPresent(expectedText);
+            Assert.assertEquals("Wrong error message.", expectedText, Locator.css(".labkey-error").findElement(_driver).getText());
     }
 
 
