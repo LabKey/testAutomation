@@ -3836,6 +3836,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
+     * Click by triggering click event on supplied element. Useful for clicking svg elements
+     * @param l element to be clicked
+     */
+    public void clickJs(Locator l)
+    {
+        executeScript("var clickEvt = document.createEvent('MouseEvents');\n" +
+                "clickEvt.initEvent(\n" +
+                "   'click'      // event type\n" +
+                "   ,true      // can bubble?\n" +
+                "   ,true      // cancelable?\n" +
+                ");\n" +
+                "arguments[0].dispatchEvent(clickEvt);", l.findElement(_driver));
+    }
+
+    /**
      * @deprecated Use {@link #clickAt(Locator, int, int)}
      */
     @Deprecated public void clickAt(Locator l, String coord)
@@ -5356,9 +5371,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertNoPermission(String groupName, String permissionSetting)
     {
-        String role = toRole(permissionSetting);
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        assertElementNotPresent(Locator.permissionButton(groupName,role));
+        waitForElementToDisappear(Locator.permissionButton(groupName,permissionSetting), WAIT_FOR_JAVASCRIPT);
     }
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
