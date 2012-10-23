@@ -167,7 +167,7 @@ public class Locator
                 try
                 {
                     text = el.getText();
-                    if (!text.contains(_text))
+                    if (!text.contains(_contains))
                         it.remove();
                 }
                 catch (StaleElementReferenceException ex)
@@ -202,6 +202,31 @@ public class Locator
                     (_contains == null ? "" : "\nContaining: " + _contains) +
                     (_text == null ? "" : "\nWith Text: " + _text));
             return null; // unreachable
+        }
+    }
+
+    public void waitForElmementToDisappear(final WebDriver driver, final int msTimeout)
+    {
+        long secTimeout = msTimeout / 1000;
+        secTimeout = secTimeout > 0 ? secTimeout : 1;
+        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
+        try
+        {
+            wait.until(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver d)
+                {
+                    return findElements(driver).size() == 0;
+                }
+            });
+        }
+        catch (TimeoutException ex)
+        {
+            Assert.fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + toString() +
+                    (_index == 0 ? "" : "\nIndex: " + _index) +
+                    (_contains == null ? "" : "\nContaining: " + _contains) +
+                    (_text == null ? "" : "\nWith Text: " + _text));
         }
     }
 
