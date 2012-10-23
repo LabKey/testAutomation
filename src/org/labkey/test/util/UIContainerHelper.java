@@ -31,12 +31,14 @@ public class UIContainerHelper extends AbstractContainerHelper
     }
 
     @Override
+    @LogMethod
     public void createSubfolder(String project, String child, String foldertype)
     {
         _test.createSubfolder(project, project, child, foldertype, null);
     }
 
     @Override
+    @LogMethod
     protected void doCreateProject(String projectName, String folderType)
     {
         _test.log("Creating project with name " + projectName);
@@ -73,13 +75,14 @@ public class UIContainerHelper extends AbstractContainerHelper
 //        _test.createSubfolder();
     }
 
+    @LogMethod
     @Override
     public void deleteProject(String project, boolean failIfNotFound, int wait)
     {
-
             if(!_test.isTextPresent(project))
                 _test.goToHome();
 
+            _test.click(Locator.id("expandCollapse-projectsMenu"));
             if(!_test.isLinkPresentWithText(project))
                 if(failIfNotFound)
                     Assert.fail("Project "+ project + " not found");
