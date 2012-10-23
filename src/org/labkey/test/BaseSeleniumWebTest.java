@@ -5034,7 +5034,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void assertNoPermission(String groupName, String permissionSetting)
     {
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        assertElementNotPresent(Locator.permissionButton(groupName,permissionSetting));
+        waitForElementToDisappear(Locator.permissionButton(groupName,permissionSetting), WAIT_FOR_JAVASCRIPT);
     }
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
