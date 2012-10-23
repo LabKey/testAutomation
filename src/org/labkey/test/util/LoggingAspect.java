@@ -68,7 +68,7 @@ public class LoggingAspect
 
         if (!method.equals(caller)) // Don't double-log overloaded methods
         {
-            String elapsedStr = String.format("%dm%d.%ds",
+            String elapsedStr = String.format("%dm %d.%ds",
                     TimeUnit.MILLISECONDS.toMinutes(elapsed),
                     TimeUnit.MILLISECONDS.toSeconds(elapsed) -
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
