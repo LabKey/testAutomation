@@ -260,7 +260,7 @@ public class DataRegionTable
         {
             for (int col = 0; col < _columnCount; col++)
             {
-                String header = getDataAsText(-1, col);
+                String header = getDataAsText(-2, col);
                 if( header != null )
                 {
                     String headerName = header.split("\n")[0];
