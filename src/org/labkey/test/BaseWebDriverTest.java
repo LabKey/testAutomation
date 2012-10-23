@@ -2334,7 +2334,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         pushLocation();
         beginAt(url);
-        String containerId = (String)executeScript("return getContainerId()");
+        String containerId = (String)executeScript("return LABKEY.container.id;");
         popLocation();
         return containerId;
     }
@@ -2477,9 +2477,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
-        setFormElement(Locator.name("names"), namesList.toString());
-        uncheckCheckbox("sendEmail");
-        clickButton("Update Group Membership");
+        addUserToGroupFromGroupScreen(namesList.toString());
 
         enterPermissionsUI();
     }
@@ -2492,12 +2490,25 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Ext4CmpRefWD ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("this.getSelectionModel().select(" + idx + ")");
+        ref.eval("getSelectionModel().select(" + idx + ")");
     }
 
     public void clickManageGroup(String groupName)
     {
         openGroupPermissionsDisplay(groupName);
+        waitAndClick(Locator.tagContainingText("a","manage group"));
+        waitForPageToLoad();
+    }
+
+    public void clickManageSiteGroup(String groupName)
+    {
+        _ext4Helper.clickTabContainingText("Site Groups");
+        // warning Adminstrators can apper multiple times
+        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
+        Ext4CmpRefWD ref = refs.get(0);
+        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        ref.eval("getSelectionModel().select(" + idx + ")");
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
     }
@@ -3196,7 +3207,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public boolean isPerlEngineConfigured()
     {
-        return waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='pl']"), WAIT_FOR_JAVASCRIPT, false);
+        waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='js']"), WAIT_FOR_JAVASCRIPT);
+
+        return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='pl']"));
     }
 
     /**

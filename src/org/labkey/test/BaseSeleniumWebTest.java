@@ -2949,7 +2949,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public boolean isPerlEngineConfigured()
     {
-        return waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='pl']"), WAIT_FOR_JAVASCRIPT, false);
+        waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='js']"), WAIT_FOR_JAVASCRIPT);
+
+        return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='pl']"));
     }
 
     /**
@@ -4694,6 +4696,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
+    @Deprecated
     public void setLongTextField(final String elementName, final String text)
     {
         setFormElement(Locator.name(elementName), text, true);
