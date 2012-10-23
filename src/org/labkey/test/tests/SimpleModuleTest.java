@@ -66,26 +66,26 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     protected void doTestSteps() throws Exception
     {
-//        assertModuleDeployed(MODULE_NAME);
-//        _containerHelper.createProject(getProjectName(), FOLDER_TYPE);
-//        assertModuleEnabledByDefault("Portal");
-//        assertModuleEnabledByDefault("simpletest");
-//        assertModuleEnabledByDefault("Query");
-//
-//        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, TABBED_FOLDER_TYPE);
-//        assertModuleEnabledByDefault("Portal");
-//        assertModuleEnabledByDefault("simpletest");
-//        assertModuleEnabledByDefault("Query");
-//        assertModuleEnabledByDefault("Study");
-//
-//        doTestTabbedFolder();
-//
-//        clickLinkWithText(getProjectName());
-//        doTestCustomFolder();
-//        doTestSchemas();
-//        doTestViews();
-//        doTestWebParts();
-//        createList();
+        assertModuleDeployed(MODULE_NAME);
+        _containerHelper.createProject(getProjectName(), FOLDER_TYPE);
+        assertModuleEnabledByDefault("Portal");
+        assertModuleEnabledByDefault("simpletest");
+        assertModuleEnabledByDefault("Query");
+
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, TABBED_FOLDER_TYPE);
+        assertModuleEnabledByDefault("Portal");
+        assertModuleEnabledByDefault("simpletest");
+        assertModuleEnabledByDefault("Query");
+        assertModuleEnabledByDefault("Study");
+
+        doTestTabbedFolder();
+
+        clickLinkWithText(getProjectName());
+        doTestCustomFolder();
+        doTestSchemas();
+        doTestViews();
+        doTestWebParts();
+        createList();
         doTestModuleProperties();
         doTestQueries();
         doTestQueryViews();
@@ -434,7 +434,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         addWebPart("Simple Module Web Part");
         assertTextPresent("This is a web part view in the simple test module");
 
-        Boolean value = (Boolean)executeScript("return window.LABKEY.moduleContext.simpletest.scriptLoaded");
+        Boolean value = (Boolean)executeScript("return LABKEY.moduleContext.simpletest.scriptLoaded");
         Assert.assertTrue("Module context not being loaded propertly", value);
     }
 
@@ -645,7 +645,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         addWebPart("Simple Module Web Part");
         waitForText("This is a web part view in the simple test module");
 
-        Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
 
         Map<String, List<String[]>> props = new HashMap<String, List<String[]>>();
         List<String[]> propList = new ArrayList<String[]>();
@@ -658,11 +658,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
 
-        Assert.assertEquals("Module context not set propertly", prop1Value, executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop1));
-        Assert.assertEquals("Module context not set propertly", "FolderValue", executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", prop1Value, executeScript("return LABKEY.getModuleContext('simpletest')." + prop1));
+        Assert.assertEquals("Module context not set propertly", "FolderValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
 
         goToProjectHome();
-        Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return window.LABKEY.getModuleContext('simpletest')." + prop2));
+        Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
     }
 
     private void doTestTabbedFolder()
@@ -730,15 +730,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     protected void doCleanup() throws Exception
     {
-//        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-//        cleanupSchema(cn);
-//
-//        try
-//        {
-//            deleteProject(getProjectName());
-//        }
-//        catch(Throwable ignore) {}
-//        log("Cleaned up SimpleModuleTest project.");
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        cleanupSchema(cn);
+
+        try
+        {
+            deleteProject(getProjectName());
+        }
+        catch(Throwable ignore) {}
+        log("Cleaned up SimpleModuleTest project.");
     }
 
     public String getAssociatedModuleDirectory()
