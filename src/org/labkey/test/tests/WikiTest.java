@@ -150,8 +150,7 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void verifyWikiPagePresent()
     {
-        assertTextPresent("More HTML content");
+        waitForText("More HTML content");
         assertTextPresent(WIKI_PAGE_ALTTITLE);
-
     }
 }
