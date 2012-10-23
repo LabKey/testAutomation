@@ -19,11 +19,9 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.JSONHelper;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -421,7 +419,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup("All participants", false);
         click("Studies");
 
-        click(Locator.tagContainingText("span", "View Data"));
+        click(Locator.tagContainingText("span", "View data"));
         addGridColumn("NAb", "Point IC50", true, true);
         addGridColumn("NAb", "Study Name", false, true);
 
@@ -436,12 +434,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForTextToDisappear("Not Actually CHAVI 001", CDS_WAIT);
 
         //Check to see if grid is properly filtering based on explorer filter
-        click(Locator.tagWithText("span", "View Data"));
+        click(Locator.tagWithText("span", "View data"));
         waitForGridCount(437);
         click(Locator.tagWithText("span", "Explore"));
         clickButton("clear filters", 0);
         waitForElement(Locator.tagWithText("span", "NotRV144"));
-        click(Locator.tagContainingText("span", "View Data"));
+        click(Locator.tagContainingText("span", "View data"));
         waitForGridCount(668);
 
         addGridColumn("Demographics", "Gender", true, true);
@@ -718,7 +716,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup(GROUP_NAME, true);
         click("Studies");
 
-        click(Locator.tagWithText("span", "Plot Data"));
+        click(Locator.tagWithText("span", "Plot data"));
         waitForText("\u25b2");
         clickButton("\u25b2", 0);
         _extHelper.pickMeasure("xaxispicker", "Lab Results", "CD4");
@@ -741,7 +739,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         click(Locator.tagWithText("span", "Explore"));
         waitForTextToDisappear(HEMO_CD4);
 
-        click(Locator.tagWithText("span", "Plot Data"));
+        click(Locator.tagWithText("span", "Plot data"));
         waitForText(HEMO_CD4);
 
         clickButton("clear filters", 0);
