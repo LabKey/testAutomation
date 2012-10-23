@@ -133,7 +133,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         // Delete run
         clickLinkWithText("view runs");
-        checkAllOnPage(getAssayName() + " Runs");
+        checkAllOnPage("Runs");
         clickButton("Delete"); clickButton("Confirm Delete");
 
 
