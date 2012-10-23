@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util.ext4cmp;
 
+import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.openqa.selenium.WebElement;
 
@@ -37,7 +38,9 @@ public class Ext4FieldRefWD extends Ext4CmpRefWD
 
     public static Ext4FieldRefWD getForLabel(BaseWebDriverTest test, String label)
     {
-        return test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRefWD.class);
+        Ext4FieldRefWD ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRefWD.class);
+        Assert.assertNotNull("Unable to locate field with label: " + label, ref);
+        return ref;
     }
 
     public void setValue(String val)
