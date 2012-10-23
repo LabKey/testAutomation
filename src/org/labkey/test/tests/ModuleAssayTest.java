@@ -177,6 +177,23 @@ public class ModuleAssayTest extends AbstractAssayTest
         waitForText("view data");
         clickLinkWithText("view data");
         assertTextPresent("Prefixrun01.tsvSuffix", "Prefixrun02.tsvSuffix");
+        // Check that the ${schemaName} substitution works as expected and that query metadata got applied
+        clickLinkWithText("Prefixrun02.tsvSuffix");
+        assertTextPresent("Monkey 1", "Monkey 2", "Monkey 3");
+        assertTextNotPresent("Monkey 4");
+
+        // Check that we're still backwards compatible with the old assay query names
+        goToSchemaBrowser();
+        selectQuery("assay", "LegacyAssayRunQueryName");
+        waitForText("view data");
+        clickLinkWithText("view data");
+        assertTextPresent("LegacyPrefixrun01.tsvSuffix", "LegacyPrefixrun02.tsvSuffix");
+
+        goToSchemaBrowser();
+        selectQuery("assay", "LegacyAssayDataQueryName");
+        waitForText("view data");
+        clickLinkWithText("view data");
+        assertTextPresent("LegacyPrefixsuper secret!Suffix", "LegacyPrefixwakka wakkaSuffix");
     }
 
     protected void checkModuleDeployed()

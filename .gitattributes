@@ -29,6 +29,7 @@ data/api/workbookAPITest.html -text
 modules/miniassay/assay/simple/config.xml -text
 modules/miniassay/assay/simple/domains/result.xml -text
 modules/miniassay/assay/simple/domains/run.xml -text
+modules/miniassay/assay/simple/queries/AssayProviderScopedRunQuery.query.xml -text
 modules/miniassay/assay/simple/queries/AssayProviderScopedRunQuery.sql -text
 modules/miniassay/assay/simple/queries/Batches/AssayTypeBatches.qview.xml -text
 modules/miniassay/assay/simple/queries/Data/AssayTypeData.qview.xml -text
@@ -39,6 +40,8 @@ modules/miniassay/assay/simple/views/result.html -text
 modules/miniassay/assay/simple/views/run.html -text
 modules/miniassay/assay/simple/views/upload.html -text
 modules/miniassay/config/module.properties -text
+modules/miniassay/queries/assay/LegacyAssayDataQueryName.sql -text
+modules/miniassay/queries/assay/LegacyAssayRunQueryName.sql -text
 modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Batches/AssayDesignBatches.qview.xml -text
 modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Data/AssayDesignData.qview.xml -text
 modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Runs/AssayDesignRuns.qview.xml -text

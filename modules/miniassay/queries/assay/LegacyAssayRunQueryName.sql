@@ -1,0 +1,1 @@
+SELECT *, 'LegacyPrefix' || Name || 'Suffix' AS WrappedName FROM "My Simple Assay Runs"

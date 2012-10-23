@@ -1,0 +1,1 @@
+SELECT *, 'LegacyPrefix' || HiddenData || 'Suffix' AS WrappedName FROM "My Simple Assay Data"
