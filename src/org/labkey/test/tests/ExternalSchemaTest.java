@@ -44,7 +44,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
     private static final String DB_SCHEMA_NAME = "test";
     private static final String USER_SCHEMA_NAME = "Test";
-    private static final String TABLE_NAME = "testtable";
+    private static final String TABLE_NAME = "TestTable";
 
     private static class Row
     {
