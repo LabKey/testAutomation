@@ -104,8 +104,9 @@ public class ComplianceTrainingTest extends BaseSeleniumWebTest implements Advan
 
     private DataRegionTable getDataRegion(int idx)
     {
-        String id = getWrapper().getEval("window.Ext4.query('form > table[id^=dataregion_]')[" + idx + "].id");
-        id = id.split("_")[1];
+        Locator.XPathLocator form = Locator.xpath("//form[./table[starts-with(@id, 'dataregion_')]]").index(idx);
+        waitForElement(form);
+        String id = getAttribute(form, "id");
         return new DataRegionTable(id, this);
     }
 
