@@ -967,18 +967,10 @@ public class TimeChartTest extends StudyBaseTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         log("Remove a participant from one group.");
-        selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP1_NAME+"', -1, 'participantCategoriesGrid', null, false)");
-        click(Locator.xpath("//*[text()='"+GROUP1_NAME+"']"));
-        clickButton("Edit Selected", 0);
-        _extHelper.waitForExtDialog("Define Participant Group");
-        waitForElement(Locator.id("dataregion_demoDataRegion"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("categoryIdentifiers", GROUP1_PTIDS[0]);
-        _extHelper.clickExtButton("Define Participant Group", "Save", 0);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _studyHelper.editCustomParticipantGroup(GROUP1_NAME, "Participant", null, false, null, true, GROUP1_PTIDS[0]);
 
         log("Delete one group.");
-        selenium.getEval("selenium.selectExtGridItem('label', '"+GROUP3_NAME+"', -1, 'participantCategoriesGrid', null, false)");
-        click(Locator.xpath("//*[text()='"+GROUP3_NAME+"']"));
+        _studyHelper.selectParticipantCategoriesGridRow(GROUP3_NAME);
         clickButton("Delete Selected", 0);
         _extHelper.waitForExtDialog("Delete Group");
         _extHelper.clickExtButton("Delete Group", "Yes", 0);

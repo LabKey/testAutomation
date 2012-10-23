@@ -36,12 +36,6 @@ public class StudyHelper extends AbstractHelper
     }
 
     @LogMethod
-    public void createParticipantGroup(String projectName, String studyFolder, String groupName, String... ptids)
-    {
-        createCustomParticipantGroup(projectName, studyFolder, groupName, "Participant", ptids);
-    }
-
-    @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString, String... ptids)
     {
         createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, null, ptids);
@@ -56,7 +50,21 @@ public class StudyHelper extends AbstractHelper
 
     @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
+                                                    Boolean shared, Boolean demographicsPresent, String... ptids)
+    {
+        createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, null, false, shared, demographicsPresent, ptids);
+    }
+
+    @LogMethod
+    public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                                     String categoryName, boolean isCategoryNameNew, Boolean shared, String... ptids)
+    {
+        createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, categoryName, isCategoryNameNew, shared, true, ptids);
+    }
+
+    @LogMethod
+    public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
+                                                    String categoryName, boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... ptids)
     {
         if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
@@ -69,7 +77,8 @@ public class StudyHelper extends AbstractHelper
         _test.log("Create "+participantString+" Group: " + groupName);
         _test.clickButton("Create", 0);
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
-        _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        if (demographicsPresent)
+            _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.xpath("//input[@name='groupLabel']"), groupName);
         if( ptids.length > 0 )
         {
@@ -102,13 +111,20 @@ public class StudyHelper extends AbstractHelper
             }
         }
 
-        _test.clickButton("Save", 0);
-        _test.waitForExtMaskToDisappear();
+        _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
+        _test._extHelper.waitForExt3MaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod
+    public void editCustomParticipantGroup(String groupName, String participantString, String categoryName,
+                                           Boolean isCategoryNameNew, Boolean shared, String... newPtids)
+    {
+        editCustomParticipantGroup(groupName, participantString, categoryName, isCategoryNameNew, shared, false, newPtids);
     }
 
     @LogMethod
     public void editCustomParticipantGroup(String groupName, String participantString,
-                                                  String categoryName, boolean isCategoryNameNew, Boolean shared, String... newPtids)
+                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... newPtids)
     {
         // Caller must already be on Manage <participantString> Groups page
         // And there should be NO DEMOGRAPHICS DATASETS!
@@ -116,20 +132,13 @@ public class StudyHelper extends AbstractHelper
         _test.log("Edit " + participantString + " Group: " + groupName);
 
         // Select row
-        List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
-        int idx = Integer.parseInt(ref.eval("this.getStore().find(\"label\", \"" + groupName + "\")"));
-
-        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("this.getSelectionModel().select(" + idx + ")");
-
-        // The select() method does not fire the select/itemclick events
-        ref.eval("this.fireEvent(\"itemclick\", this, this.getStore().getAt(" + idx + "));");
+        selectParticipantCategoriesGridRow(groupName);
 
         _test.clickButton("Edit Selected", 0);
-        _test.sleep(500);
-        _test.assertTextPresent("Define " + participantString + " Group");
+        _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
         _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
+        if (demographicsPresent)
+            _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
         if( newPtids != null && newPtids.length > 0 )
         {
@@ -164,8 +173,14 @@ public class StudyHelper extends AbstractHelper
             }
         }
         _test.sleep(100);
-        _test.clickButton("Save", 0);
-        _test.waitForExtMaskToDisappear();
+        _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
+        _test._extHelper.waitForExt3MaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void selectParticipantCategoriesGridRow(String groupName)
+    {
+        _test.getWrapper().getEval("selenium.selectExt4GridItem('label', '"+groupName+"', -1, 'participantCategoriesGrid', null, false)");
+        _test.click(Locator.xpath("//*[text()='" + groupName + "']")); // Ext.select doesn't trigger click events
     }
 
     public void exportStudy(String folder)

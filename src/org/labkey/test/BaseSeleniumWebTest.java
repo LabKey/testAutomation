@@ -2509,6 +2509,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertLinkPresentWithText(newParent);
     }
 
+    /**
+     * For compatibility with BaseWebDriverTest
+     * @param project
+     */
+    public void clickFolder(String project)
+    {
+        clickLinkWithText(project);
+    }
+
     public void deleteProject(String project)
     {
         deleteProject(project, 90000); // Wait for 90 seconds for project deletion

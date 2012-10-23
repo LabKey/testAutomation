@@ -15,8 +15,14 @@
  */
 package org.labkey.test.util;
 
+import junit.framework.Assert;
+import org.bouncycastle.crypto.digests.LongDigest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,12 +35,6 @@ public class StudyHelperWD extends AbstractHelperWD
     public StudyHelperWD(BaseWebDriverTest test)
     {
         super(test);
-    }
-
-    @LogMethod
-    public void createParticipantGroup(String projectName, String studyFolder, String groupName, String... ptids)
-    {
-        createCustomParticipantGroup(projectName, studyFolder, groupName, "Participant", ptids);
     }
 
     @LogMethod
@@ -52,7 +52,21 @@ public class StudyHelperWD extends AbstractHelperWD
 
     @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
+                                                    Boolean shared, Boolean demographicsPresent, String... ptids)
+    {
+        createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, null, false, shared, demographicsPresent, ptids);
+    }
+
+    @LogMethod
+    public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                                     String categoryName, boolean isCategoryNameNew, Boolean shared, String... ptids)
+    {
+        createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, categoryName, isCategoryNameNew, shared, true, ptids);
+    }
+
+    @LogMethod
+    public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
+                                                    String categoryName, boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... ptids)
     {
         if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
@@ -65,7 +79,8 @@ public class StudyHelperWD extends AbstractHelperWD
         _test.log("Create "+participantString+" Group: " + groupName);
         _test.clickButton("Create", 0);
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
-        _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        if (demographicsPresent)
+            _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.name("groupLabel"), groupName);
         if( ptids.length > 0 )
         {
@@ -79,7 +94,7 @@ public class StudyHelperWD extends AbstractHelperWD
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
-                _test._extHelper.selectComboBoxItem(participantString + " Category:", categoryName);
+                _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
@@ -87,30 +102,33 @@ public class StudyHelperWD extends AbstractHelperWD
         {
             if( shared )
             {
-                _test.checkCheckbox(Locator.checkboxByName("Shared"));
+                _test._ext4Helper.checkCheckbox("Share Category?");
             }
             else
             {
-                _test.uncheckCheckbox(Locator.checkboxByName("Shared"));
+                _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
 
         _test._extHelper.clickExtButton("Define " + participantString + " Group", "Save", 0);
-        _test.waitForExtMaskToDisappear();
+        _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod
+    public void editCustomParticipantGroup(String groupName, String participantString, String categoryName,
+                                           Boolean isCategoryNameNew, Boolean shared, String... newPtids)
+    {
+        editCustomParticipantGroup(groupName, participantString, categoryName, isCategoryNameNew, shared, false, newPtids);
     }
 
     @LogMethod
     public void editCustomParticipantGroup(String groupName, String participantString,
-                                                  String categoryName, boolean isCategoryNameNew, Boolean shared, String... newPtids)
+                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, Boolean containsDemographics, String... newPtids)
     {
-        // Caller must already be on Manage <participantString> Groups page
-        // And there should be NO DEMOGRAPHICS DATASETS!
-
         _test.log("Edit " + participantString + " Group: " + groupName);
 
         // Select row
-        _test._extHelper.selectExtGridItem("label", groupName, -1, "participantCategoriesGrid", false);
-        _test.click(Locator.xpath("//*[text()='" + groupName + "']"));
+        selectParticipantCategoriesGridRow(groupName);
 
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
@@ -121,18 +139,18 @@ public class StudyHelperWD extends AbstractHelperWD
             String csp = newPtids[0];
             for( int i = 1; i < newPtids.length; i++ )
                 csp += ","+newPtids[i];
-            String currentIds = _test.getFormElement(Locator.name("categoryIdentifiers"));
+            String currentIds = _test.getFormElement(Locator.name("participantIdentifiers"));
             if (currentIds != null && currentIds.length() > 0)
-                _test.setFormElement(Locator.name("categoryIdentifiers"), currentIds + "," + csp);
+                _test.setFormElement(Locator.name("participantIdentifiers"), currentIds + "," + csp);
             else
-                _test.setFormElement(Locator.name("categoryIdentifiers"), csp);
+                _test.setFormElement(Locator.name("participantIdentifiers"), csp);
         }
         if( categoryName != null )
         {
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
-                _test._extHelper.selectComboBoxItem(participantString + " Category:", categoryName);
+                _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
@@ -140,16 +158,22 @@ public class StudyHelperWD extends AbstractHelperWD
         {
             if( shared )
             {
-                _test.checkCheckbox("Shared");
+                _test._ext4Helper.checkCheckbox("Share Category?");
             }
             else
             {
-                _test.uncheckCheckbox("Shared");
+                _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
 
         _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
-        _test.waitForExtMaskToDisappear();
+        _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void selectParticipantCategoriesGridRow(String groupName)
+    {
+        _test._extHelper.selectExt4GridItem("label", groupName, -1, "participantCategoriesGrid", false);
+        _test.click(Locator.xpath("//*[text()='" + groupName + "']")); // Ext.select doesn't trigger click events
     }
 
     public void exportStudy(String folder)
@@ -160,7 +184,7 @@ public class StudyHelperWD extends AbstractHelperWD
     @LogMethod
     public void exportStudy(String folder, boolean useXmlFormat, boolean zipFile)
     {
-        _test.clickLinkWithText(folder);
+        _test.clickFolder(folder);
         _test.clickTab("Manage");
         _test.clickButton("Export Study");
 

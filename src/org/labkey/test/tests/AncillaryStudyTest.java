@@ -102,7 +102,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitAndClick(groupLocator);
 
         log("Check participant group.");
-        Locator.XPathLocator ptidLocator = Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[@class='testParticipantGroups']/text()");
+        Locator.XPathLocator ptidLocator = Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[contains(@class, 'testParticipantGroups')]");
         waitForElement(ptidLocator, WAIT_FOR_JAVASCRIPT);
         Assert.assertEquals("Did not find expected number of participants", PTIDS.length, getXpathCount(ptidLocator));
         for (String ptid : PTIDS)
@@ -110,6 +110,7 @@ public class AncillaryStudyTest extends StudyBaseTest
             assertElementPresent(Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[@class='testParticipantGroups' and text() = '" + ptid + "']"));
         }
 
+//        _extHelper.selectExt4GridItem(null, null, 0, "studyWizardParticipantList", false); //WebDriver
         selenium.getEval("selenium.selectExtGridItem(null, null, 0, 'studyWizardParticipantList', false)");
 
         // kbl: commented out current wizard only allows existing participant groups or all participants (although this could change)
@@ -189,17 +190,10 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Manage Mouse Groups");
         waitForText(PARTICIPANT_GROUP);
-        selenium.getEval("selenium.selectExt4GridItem('label', '"+PARTICIPANT_GROUP+"', -1, 'participantCategoriesGrid', null, false)");
-        click(Locator.xpath("//*[text()='"+PARTICIPANT_GROUP+"']"));
-        clickButton("Edit Selected", 0);
-        _extHelper.waitForExtDialog("Define Mouse Group");
-        waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         String csp = PTIDS[0];
         for( int i = 1; i < PTIDS.length - 1; i++ )
             csp += ","+PTIDS[i];
-        setFormElement("categoryIdentifiers", csp);
-        _extHelper.clickExtButton("Define Mouse Group", "Save", 0);
-        waitForExtMaskToDisappear();
+        _studyHelper.editCustomParticipantGroup(PARTICIPANT_GROUP, "Mouse", null, null, true, true, csp);
 
         log("Verify that modified participant group has no effect on ancillary study.");
         clickLinkWithText(STUDY_NAME);
@@ -387,9 +381,10 @@ public class AncillaryStudyTest extends StudyBaseTest
     private void assertWizardError(String button, String error)
     {
         clickButton(button, 0);
-        waitForText(error);
+        _extHelper.waitForExtDialog("Error");
+        assertTextPresent(error);
         clickButton("OK", 0);
-        waitForTextToDisappear(error);
+        _extHelper.waitForExtDialogToDisappear("Error");
     }
 
     @Override
