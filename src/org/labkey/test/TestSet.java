@@ -164,7 +164,8 @@ public enum TestSet
         LabModulesTest.class,
         SequenceTest.class,
         StudyPublishTest.class,
-        ExperimentalFeaturesTest.class
+        ExperimentalFeaturesTest.class,
+        ElisaAssayTest.class
     ),
 
     MiniTest(
@@ -265,7 +266,8 @@ public enum TestSet
         LuminexPositivityTest.class,
         ViabilityTest.class,
         ModuleAssayTest.class,
-        FormulationsTest.class
+        FormulationsTest.class,
+        ElisaAssayTest.class
     ),
 
     UnitTests(

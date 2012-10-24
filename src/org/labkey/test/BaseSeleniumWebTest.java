@@ -4545,11 +4545,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             _extHelper.clickExtTab("Choose Filters");
             waitForElement(Locator.xpath("//span["+Locator.NOT_HIDDEN+" and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
         }
-        _extHelper.selectComboBoxItem("Filter Type", filter1Type); //Select combo box item.
+        _extHelper.selectComboBoxItem("Filter Type:", filter1Type); //Select combo box item.
         if(filter1 != null) setFormElement("value_1", filter1);
         if(filter2Type!=null)
         {
-            _extHelper.selectComboBoxItem("and", filter2Type); //Select combo box item.
+            _extHelper.selectComboBoxItem("and:", filter2Type); //Select combo box item.
             if(filter2 != null) setFormElement("value_2", filter2);
         }
     }

@@ -158,7 +158,10 @@ src/org/labkey/test/testpicker/CheckNode.java -text
 src/org/labkey/test/testpicker/CheckRenderer.java -text
 src/org/labkey/test/testpicker/TestHelper.java -text
 src/org/labkey/test/tests/AbstractAssayTest.java -text
+src/org/labkey/test/tests/AbstractAssayTestWD.java -text
+src/org/labkey/test/tests/AbstractPlateBasedAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
+src/org/labkey/test/tests/AbstractQCAssayTestWD.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AncillaryStudyTest.java -text
 src/org/labkey/test/tests/AssayTest.java -text
@@ -173,6 +176,7 @@ src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
 src/org/labkey/test/tests/DataRegionTest.java -text
+src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
 src/org/labkey/test/tests/ExpTest.java -text
@@ -246,6 +250,7 @@ src/org/labkey/test/tests/SecurityTest.java -text
 src/org/labkey/test/tests/SecurityTestExtended.java -text
 src/org/labkey/test/tests/SequenceTest.java -text
 src/org/labkey/test/tests/SimpleApiTest.java -text
+src/org/labkey/test/tests/SimpleApiTestWD.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SpecimenMergeTest.java -text
 src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
@@ -317,6 +322,7 @@ src/org/labkey/test/util/LoggingAspect.java -text
 src/org/labkey/test/util/Maps.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
+src/org/labkey/test/util/PerlHelperWD.java -text
 src/org/labkey/test/util/PipelineHelper.java -text
 src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/PostgresOnlyTest.java -text

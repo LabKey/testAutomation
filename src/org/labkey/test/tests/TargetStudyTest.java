@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.Random;
@@ -27,7 +28,7 @@ import java.util.Random;
  * User: kevink
  * Date: Jan 6, 2011
  */
-public class TargetStudyTest extends AbstractAssayTest
+public class TargetStudyTest extends AbstractAssayTestWD
 {
     private static final String ASSAY_NAME = "Assay";
     private static final String STUDY1_LABEL = "AwesomeStudy1";
@@ -81,7 +82,7 @@ public class TargetStudyTest extends AbstractAssayTest
         setupLabels();
         setupAssay();
 
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
         _study1ContainerId = getContainerId("/project/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/begin.view");
         log("** Study 1 container ID = " + _study1ContainerId);
         Assert.assertNotNull(_study1ContainerId);
@@ -91,6 +92,7 @@ public class TargetStudyTest extends AbstractAssayTest
     }
 
 
+    @LogMethod
     protected void setupSpecimens()
     {
         log("** Import specimens into Study 1 and Study 2");
@@ -106,6 +108,7 @@ public class TargetStudyTest extends AbstractAssayTest
 
     }
 
+    @LogMethod
     protected void setupLabels()
     {
         // Using a random label helps uniqueify the study when there is another "AwesomeStudy3" from a previous test run.
@@ -117,18 +120,27 @@ public class TargetStudyTest extends AbstractAssayTest
         log("** Set some awesome study labels");
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("Label", _study1Label);
-        clickButton("Submit");
+        setFormElement(Locator.name("Label"), _study1Label);
+        clickButton("Submit", 0);
+        _extHelper.waitForExtDialog("Status");
+        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
+        waitForPageToLoad();
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("Label", _study2Label);
-        clickButton("Submit");
+        setFormElement(Locator.name("Label"), _study2Label);
+        clickButton("Submit", 0);
+        _extHelper.waitForExtDialog("Status");
+        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
+        waitForPageToLoad();
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("Label", _study3Label);
-        clickButton("Submit");
+        setFormElement(Locator.name("Label"), _study3Label);
+        clickButton("Submit", 0);
+        _extHelper.waitForExtDialog("Status");
+        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
+        waitForPageToLoad();
     }
 
     public boolean isFileUploadTest()
@@ -139,7 +151,7 @@ public class TargetStudyTest extends AbstractAssayTest
     {
 
 //        log("** Define GPAT Assay");
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
         if (!isLinkPresentWithText("Assay List"))
             addWebPart("Assay List");
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/TargetStudy/Assay.xar", 1, "Assay.xar");
@@ -167,7 +179,7 @@ public class TargetStudyTest extends AbstractAssayTest
     protected void uploadRuns()
     {
         log("** Upload Data");
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
 
         clickLinkWithText("Assay List");
         clickLinkWithText(ASSAY_NAME);
@@ -201,7 +213,7 @@ public class TargetStudyTest extends AbstractAssayTest
         Assert.assertEquals(_study1Label, table.getDataAsText(2, "Target Study"));
         //BUGBUG: target study renders as "" instead of "[None]"
         //Assert.assertEquals("[None]", table.getDataAsText(3, "Target Study"));
-        Assert.assertEquals("", table.getDataAsText(3, "Target Study"));
+        Assert.assertEquals(" ", table.getDataAsText(3, "Target Study"));
         Assert.assertEquals(_study2Label, table.getDataAsText(4, "Target Study"));
         Assert.assertEquals(_study3Label, table.getDataAsText(5, "Target Study"));
 
@@ -209,9 +221,9 @@ public class TargetStudyTest extends AbstractAssayTest
         Assert.assertEquals("999320812", table.getDataAsText(0, "Participant ID"));
         Assert.assertEquals("999320396", table.getDataAsText(1, "Participant ID"));
         Assert.assertEquals("999320396", table.getDataAsText(2, "Participant ID"));
-        Assert.assertEquals("", table.getDataAsText(3, "Participant ID"));
+        Assert.assertEquals(" ", table.getDataAsText(3, "Participant ID"));
         Assert.assertEquals("999320706", table.getDataAsText(4, "Participant ID"));
-        Assert.assertEquals("", table.getDataAsText(5, "Participant ID"));
+        Assert.assertEquals(" ", table.getDataAsText(5, "Participant ID"));
     }
 
     protected void copyToStudy()

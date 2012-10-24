@@ -23,7 +23,7 @@ import java.io.File;
  * Date: May 13, 2006
  * Time: 2:53:13 PM
  */
-public class NabOldTest extends AbstractQCAssayTest
+public class NabOldTest extends AbstractQCAssayTestWD
 {
     protected static final String PROJECT_NAME = "NabVerifyProject";
     protected static final String FOLDER_NAME = "NabFolder";
