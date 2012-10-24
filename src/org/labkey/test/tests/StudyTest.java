@@ -173,14 +173,13 @@ public class StudyTest extends StudyBaseTest
         waitForExtMaskToDisappear();
 
         log("Verify report page looks as expected");
-        String reportName = "Foo";
+        String reportName = "MouseFooReport";
         String reportDescription = "Desc";
         _extHelper.setExtFormElementByLabel("Report Name", reportName);
         _extHelper.setExtFormElementByLabel("Report Description", reportDescription);
         clickButton("Save", 0);
         waitForText(reportName);
-        assertTextPresent(reportName, 4); // 2 for the report, 2 for FooterMenu notations
-
+        assertTextPresent(reportName, 1);
     }
 
     protected static final String SUBJECT_NOUN = "Mouse";
