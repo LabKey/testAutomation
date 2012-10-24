@@ -1155,7 +1155,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //TODO:  goToTestRunList
         clickFolder(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
@@ -1201,7 +1201,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // add the R transform script to the assay
         goToTestAssayHome();
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
 
         // save changes to assay design
@@ -1332,7 +1332,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // add the R transform script to the assay
         goToTestAssayHome();
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         // save changes to assay design
         clickButton("Save & Close");

@@ -267,16 +267,24 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
     }
 
-    protected void clickEditAssayDesign()
-    {
-        clickEditAssayDesign(WAIT_FOR_PAGE);
-    }
-
-    protected void clickEditAssayDesign(int timeout)
+    /** @param confirmEditInOtherContainer true if the assay design is stored in another container and we should
+     *                                     expect a confirmation dialog before navigating to the designer
+     */
+    protected void clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
         click(Locator.linkWithText("manage assay design"));
+        if (confirmEditInOtherContainer)
+        {
+            selenium.chooseOkOnNextConfirmation();
+        }
         click(Locator.linkWithText("edit assay design"));
-        if (timeout > 0) waitForPageToLoad(timeout);
+        if (confirmEditInOtherContainer)
+        {
+            String confirmation = selenium.getConfirmation();
+            assertTrue(confirmation.contains("This assay is defined in the"));
+            assertTrue(confirmation.contains("Would you still like to edit it?"));
+        }
+        waitForPageToLoad(WAIT_FOR_PAGE);
     }
 
     protected void enterStudySecurity()

@@ -175,7 +175,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickFolder(TEST_ASSAY_PRJ_NAB);
             clickLinkWithText(TEST_ASSAY_NAB);
 
-            clickEditAssayDesign();
+            clickEditAssayDesign(false);
             waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
 
             selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
@@ -592,7 +592,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Uploading NAb Runs with a transform script");
         clickFolder(TEST_ASSAY_PRJ_NAB);
         clickLinkWithText(TEST_ASSAY_NAB);
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");

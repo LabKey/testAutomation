@@ -228,8 +228,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(getAssayName());
-        clickEditAssayDesign(0);
-        getConfirmationAndWait();
+        clickEditAssayDesign(true);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
@@ -286,8 +285,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(getAssayName());
-        clickEditAssayDesign(0);
-        getConfirmationAndWait();
+        clickEditAssayDesign(true);
         waitForElement(Locator.navButton("Add Script"));
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.

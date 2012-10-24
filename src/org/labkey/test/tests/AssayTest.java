@@ -178,9 +178,7 @@ public class AssayTest extends AbstractAssayTest
         assertNavButtonNotPresent("Delete");
 
         // Edit the design to make them editable
-        clickEditAssayDesign(0);
-        assertAlert("This assay is defined in the /Assay Security Test folder. Would you still like to edit it?");
-        waitForPageToLoad();
+        clickEditAssayDesign(true);
         waitForElement(Locator.xpath("//span[@id='id_editable_results_properties']"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.xpath("//span[@id='id_editable_results_properties']/input"));
         clickButton("Save & Close");
@@ -778,7 +776,7 @@ public class AssayTest extends AbstractAssayTest
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
 
         clickLinkWithText(TEST_ASSAY);
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
         waitForElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         _listHelper.setColumnLabel(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");

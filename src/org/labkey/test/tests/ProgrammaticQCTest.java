@@ -113,7 +113,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         goToProjectHome();
         clickLinkContainingText("QC Assay");
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
 //        clickButton("Manage Assays");
 //        clickButton("New Assay Design");
 //        checkRadioButton("providerName", "General");
