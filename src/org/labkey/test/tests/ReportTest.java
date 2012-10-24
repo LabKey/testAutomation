@@ -1383,8 +1383,8 @@ public class ReportTest extends StudyBaseTest
         }
     }
 
-    private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureCohortGroup 1Group 24c.Induration 1st measure";
-    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AMice BMice CNot in Cat Mice LetTestYAxis40.0";
+    private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureCohortGroup 1Group 24c.Induration 1st measure0.05.010.015.020.025.0";
+    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AMice BMice CNot in Cat Mice LetTestYAxis36.537.037.538.038.539.039.540.0";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     @LogMethod
@@ -1411,7 +1411,7 @@ public class ReportTest extends StudyBaseTest
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
         //Verify box plot
-        waitForText(BOX_PLOT_MV_1);
+        assertSVG(BOX_PLOT_MV_1);
         log("Set Plot Title");
         click(Locator.css("svg text:contains('4c.Induration 1st measure')"));
         _extHelper.waitForExtDialog("Main Title");
@@ -1438,7 +1438,7 @@ public class ReportTest extends StudyBaseTest
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
         waitForText("TestXAxis");
 
-        waitForText(BOX_PLOT_MV_2);
+        assertSVG(BOX_PLOT_MV_2);
 
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save Chart");
@@ -1476,14 +1476,14 @@ public class ReportTest extends StudyBaseTest
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
         //Verify box plot
-        waitForText(BOX_PLOT_DR_1);
+        assertSVG(BOX_PLOT_DR_1);
 
         //Change filter and check box plot again
         clickButton("View Data", 0);
         clearFilter("aqwp3", "RCHtempc", 0);
         waitForText("40.0");
         clickButton("View Chart", 0);
-        waitForText(BOX_PLOT_DR_2);
+        assertSVG(BOX_PLOT_DR_2);
 
         //Enable point click function for this box plot
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
@@ -1512,7 +1512,7 @@ public class ReportTest extends StudyBaseTest
         createQuickChart("Dataset", "dbl");
 
         //Verify box plot
-        waitForText(BOX_PLOT_QC);
+        assertSVG(BOX_PLOT_QC);
 
         saveBoxPlot(BOX_PLOT_NAME_QC, BOX_PLOT_DESC_QC);
     }
@@ -1555,7 +1555,7 @@ public class ReportTest extends StudyBaseTest
     }
 
     private static final String SCATTER_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200";
-    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AnullMice BMice CTestYAxis";
+    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AnullMice BMice CTestYAxis33.034.035.036.037.038.039.040.0";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
     @LogMethod
@@ -1585,7 +1585,7 @@ public class ReportTest extends StudyBaseTest
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
         //Verify scatter plot
-        waitForText(SCATTER_PLOT_MV_1);
+        assertSVG(SCATTER_PLOT_MV_1);
 
         log("Set Plot Title");
         click(Locator.css("svg text:contains('APX-1: Abbreviated Physical Exam')"));
@@ -1613,7 +1613,7 @@ public class ReportTest extends StudyBaseTest
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
         waitForText("TestXAxis");
 
-        waitForText(SCATTER_PLOT_MV_2);
+        assertSVG(SCATTER_PLOT_MV_2);
 
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save Chart");
@@ -1654,14 +1654,14 @@ public class ReportTest extends StudyBaseTest
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
         //Verify scatter plot
-        waitForText(SCATTER_PLOT_DR_1);
+        assertSVG(SCATTER_PLOT_DR_1);
 
         //Change filter and check scatter plot again
         clickButton("View Data", 0);
         clearFilter("aqwp3", "APXpulse", 0);
         waitForText("36.0"); // Body temp for filtered out row
         clickButton("View Chart", 0);
-        waitForText(SCATTER_PLOT_DR_2);
+        assertSVG(SCATTER_PLOT_DR_2);
 
         log("Verify point stying");
 
@@ -1690,7 +1690,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.selectExt4ComboBoxItem("Plot Type", "Scatter Plot");
         clickDialogButtonAndWaitForMaskToDisappear("Plot Options", "OK");
 
-        waitForText(SCATTER_PLOT_QC);
+        assertSVG(SCATTER_PLOT_QC);
 
         saveScatterPlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
     }
@@ -1716,7 +1716,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.ext4Radio("Single shape"));
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
-        waitForText(SCATTER_PLOT_CUSTOMIZED_COLORS, WAIT_FOR_JAVASCRIPT);
+        assertSVG(SCATTER_PLOT_CUSTOMIZED_COLORS);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
         Assert.assertEquals("Point at (60, 48) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
         Assert.assertTrue("Point at (60, 48) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(26) > circle")));
@@ -1733,7 +1733,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.selectExt4ComboBoxItem("Point Category:", "16. Evaluation Summary");
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
-        waitForText(SCATTER_PLOT_CUSTOMIZED_SHAPES, WAIT_FOR_JAVASCRIPT);
+        assertSVG(SCATTER_PLOT_CUSTOMIZED_SHAPES);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
         Assert.assertEquals("Point at (60, 48) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
         Assert.assertEquals("Point at (60, 48) was an unexpected shape", "M75,-45L80,-55L70,-55Z", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "d"));
@@ -1751,7 +1751,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.selectExt4ComboBoxItem("Point Category:", "16. Evaluation Summary");
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
-        waitForText(SCATTER_PLOT_CUSTOMIZED_BOTH, WAIT_FOR_JAVASCRIPT);
+        assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
         Assert.assertEquals("Point at (60, 48) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
         Assert.assertEquals("Point at (60, 48) was an unexpected shape", "M75,-45L80,-55L70,-55Z", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "d"));
@@ -1838,10 +1838,18 @@ public class ReportTest extends StudyBaseTest
         stopImpersonating();
     }
 
-    private void assertSVG(String expectedSvgText)
+    private void assertSVG(final String expectedSvgText)
     {
-        String actualSvgText = getText(Locator.css("svg"));
-        Assert.assertEquals("SVG did not look as expected", expectedSvgText, actualSvgText);
+        doesElementAppear(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return isElementPresent(Locator.css("svg")) &&
+                       expectedSvgText.equals(getText(Locator.css("svg")));
+            }
+        }, WAIT_FOR_JAVASCRIPT);
+        Assert.assertEquals("SVG did not look as expected", expectedSvgText, getText(Locator.css("svg")));
     }
 
     private void saveBoxPlot(String name, String description)

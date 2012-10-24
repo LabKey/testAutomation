@@ -235,8 +235,8 @@ public class StudySecurityTest extends StudyBaseTest
         clickButton("Update");
 
         //grant limited rights to read a couple of datasets
-        selectOptionByText("dataset.1", "Read");
-        selectOptionByText("dataset.2", "Read");
+        selectOptionByText(Locator.name("dataset.1"), "Read");
+        selectOptionByText(Locator.name("dataset.2"), "Read");
         clickButton("Save");
 
         clickLinkWithText(getFolderName());

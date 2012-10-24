@@ -908,7 +908,7 @@ public class StudyTest extends StudyBaseTest
         // Replace custom visit mapping and verify
         String replaceMapping = "Name\tSequenceNum\nBarBar\t4839\nFoofoo\t9732";
         clickLinkWithText("Replace Custom Mapping");
-        setLongTextField("tsv", replaceMapping);
+        setFormElement(Locator.id("tsv"), replaceMapping);
         clickButton("Submit");
         assertTableRowsEqual("customMapping", 2, replaceMapping.replace("SequenceNum", "Sequence Number Mapping"));
         assertTextNotPresent("Cycle 10");

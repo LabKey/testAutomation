@@ -135,7 +135,7 @@ public class PipelineHelper
             _test.clickButton("Upload", 0);
             _test._extHelper.waitForExtDialog("Extended File Properties", _test.WAIT_FOR_JAVASCRIPT);
             _test.setFormElement(CUSTOM_PROPERTY, customProperty);
-            _test._extHelper.selectComboBoxItem("LookupColumn",lookupColumn);
+            _test._extHelper.selectComboBoxItem("LookupColumn:",lookupColumn);
             _test.clickButton("Done", 0);
             _test.waitForExtMaskToDisappear();
 

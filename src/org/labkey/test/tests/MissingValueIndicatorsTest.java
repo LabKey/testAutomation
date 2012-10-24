@@ -261,7 +261,7 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
         setFormElement("typeNameColumn", "datasetName");
         setFormElement("labelColumn", "datasetLabel");
         setFormElement("typeIdColumn", "datasetId");
-        setLongTextField("tsv", getFileContents(DATASET_SCHEMA_FILE));
+        setFormElement(Locator.id("tsv"), getFileContents(DATASET_SCHEMA_FILE));
         clickButton("Submit", 180000);
         assertNoLabkeyErrors();
         assertTextPresent("MV Dataset");

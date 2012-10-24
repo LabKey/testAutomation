@@ -91,7 +91,7 @@ public class StudyManualTest extends StudyTest
         setFormElement("typeNameColumn", "platename");
         setFormElement("labelColumn", "platelabel");
         setFormElement("typeIdColumn", "plateno");
-        setLongTextField("tsv", getFileContents(CRF_SCHEMAS));
+        setFormElement(Locator.id("tsv"), getFileContents(CRF_SCHEMAS));
         clickButton("Submit", 180000);
 
         // setup cohorts:
@@ -174,7 +174,7 @@ public class StudyManualTest extends StudyTest
 
         clickLinkWithText("Visit Import Mapping");
         clickButton("Import Custom Mapping");
-        setLongTextField("tsv", VISIT_IMPORT_MAPPING);
+        setFormElement(Locator.id("tsv"), VISIT_IMPORT_MAPPING);
         clickButton("Submit");
 
         assertTextPresentInThisOrder("Cycle 10", "Vaccine 1", "Vaccination 1", "All Done");

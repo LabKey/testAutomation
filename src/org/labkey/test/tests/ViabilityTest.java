@@ -228,8 +228,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(getAssayName());
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design", false);
+        clickEditAssayDesign(0);
         getConfirmationAndWait();
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
@@ -287,8 +286,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(getAssayName());
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design", false);
+        clickEditAssayDesign(0);
         getConfirmationAndWait();
         waitForElement(Locator.navButton("Add Script"));
 

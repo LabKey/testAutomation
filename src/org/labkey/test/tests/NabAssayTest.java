@@ -119,7 +119,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             setupPipeline(TEST_ASSAY_PRJ_NAB);
 
             // create a study so we can test copy-to-study later:
-            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            clickFolder(TEST_ASSAY_PRJ_NAB);
             _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
             addWebPart("Study Overview");
             clickButton("Create Study");
@@ -127,7 +127,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             //add the Assay List web part so we can create a new nab assay
             _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
-            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            clickFolder(TEST_ASSAY_PRJ_NAB);
             addWebPart("Assay List");
 
             //create a new nab assay
@@ -172,11 +172,10 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextPresent(PLATE_TEMPLATE_NAME);
             assertTextPresent("NAb: 5 specimens in duplicate");
 
-            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            clickFolder(TEST_ASSAY_PRJ_NAB);
             clickLinkWithText(TEST_ASSAY_NAB);
 
-            click(Locator.linkWithText("manage assay design"));
-            clickLinkWithText("edit assay design");
+            clickEditAssayDesign();
             waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
 
             selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
@@ -196,8 +195,8 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextNotPresent("NAb: 5 specimens in duplicate");
         }
 
-        clickLinkWithText(TEST_ASSAY_PRJ_NAB);
-        clickLinkWithText(TEST_ASSAY_FLDR_NAB);
+        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickFolder(TEST_ASSAY_FLDR_NAB);
         addWebPart("Assay List");
 
         clickLinkWithText("Assay List");
@@ -297,7 +296,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickButton("Save & Close");
 
             // Edit the first run
-            clickLinkWithText(TEST_ASSAY_FLDR_NAB);
+            clickFolder(TEST_ASSAY_FLDR_NAB);
             clickLinkWithText(TEST_ASSAY_NAB);
             clickLinkWithText("edit");
             // Make sure that the properties that affect calculations aren't shown
@@ -321,7 +320,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                     "Name changed from 'm0902055;4001.xlsx' to 'NameEdited.xlsx'");
 
             // Return to the run list
-            clickLinkWithText(TEST_ASSAY_FLDR_NAB);
+            clickFolder(TEST_ASSAY_FLDR_NAB);
             clickLinkWithText(TEST_ASSAY_NAB);
 
             // test creating a custom details view via a "magic" named run-level view:
@@ -361,7 +360,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertNabData(true);
 
             // create user with read permissions to study and dataset, but no permissions to source assay
-            clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+            clickFolder(TEST_ASSAY_PRJ_NAB);
             clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
             pushLocation();  // Save our location because impersonatied user won't have permission to project
             createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
@@ -591,15 +590,14 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         // add the transform script to the assay
         log("Uploading NAb Runs with a transform script");
-        clickLinkWithText(TEST_ASSAY_PRJ_NAB);
+        clickFolder(TEST_ASSAY_PRJ_NAB);
         clickLinkWithText(TEST_ASSAY_NAB);
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design");
+        clickEditAssayDesign();
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
 
-        clickLinkWithText(TEST_ASSAY_FLDR_NAB);
+        clickFolder(TEST_ASSAY_FLDR_NAB);
         clickLinkWithText(TEST_ASSAY_NAB);
         clickButton("Import Data");
         clickButton("Next");

@@ -83,7 +83,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         addWebPart("Specimens");
         clickLinkWithText("By Vial Group");
         clickButton("Import Specimens");
-        setLongTextField("tsv", getFileContents(specimensPath));
+        setFormElement(Locator.id("tsv"), getFileContents(specimensPath));
         submit();
         assertTextPresent("Specimens uploaded successfully");
     }

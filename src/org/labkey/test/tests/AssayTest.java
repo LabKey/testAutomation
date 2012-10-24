@@ -171,34 +171,33 @@ public class AssayTest extends AbstractAssayTest
     private void editResults()
     {
         // Verify that the results aren't editable by default
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view results");
         assertLinkNotPresentWithText("edit");
         assertNavButtonNotPresent("Delete");
 
         // Edit the design to make them editable
-        click(Locator.linkWithText("manage assay design"));
-        selenium.chooseOkOnNextConfirmation();
-        clickLinkWithText("edit assay design");
-        assertConfirmation("This assay is defined in the /Assay Security Test folder. Would you still like to edit it?");
+        clickEditAssayDesign(0);
+        assertAlert("This assay is defined in the /Assay Security Test folder. Would you still like to edit it?");
+        waitForPageToLoad();
         waitForElement(Locator.xpath("//span[@id='id_editable_results_properties']"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.xpath("//span[@id='id_editable_results_properties']/input"));
         clickButton("Save & Close");
 
         // Try an edit
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view results");
         assertElementPresent(Locator.xpath("//img[@src='/labkey/Experiment/unflagDefault.gif'][@title='Flag for review']"), 9);
         clickLinkWithText("edit");
-        setText("quf_SpecimenID", "EditedSpecimenID");
-        setText("quf_VisitID", "601.5");
-        setText("quf_testAssayDataProp5", "a");
+        setFormElement(Locator.name("quf_SpecimenID"), "EditedSpecimenID");
+        setFormElement(Locator.name("quf_VisitID"), "601.5");
+        setFormElement(Locator.name("quf_testAssayDataProp5"), "a");
         clickButton("Submit");
         assertTextPresent("Could not convert value: a");
-        setText("quf_testAssayDataProp5", "514801");
-        setText("quf_Flags", "This Flag Has Been Edited");
+        setFormElement(Locator.name("quf_testAssayDataProp5"), "514801");
+        setFormElement(Locator.name("quf_Flags"), "This Flag Has Been Edited");
         clickButton("Submit");
         assertTextPresent("EditedSpecimenID", "601.5", "514801");
         assertElementPresent(Locator.xpath("//img[@src='/labkey/Experiment/flagDefault.gif'][@title='This Flag Has Been Edited']"), 1);
@@ -221,7 +220,7 @@ public class AssayTest extends AbstractAssayTest
                 "testAssayDataProp5 changed from blank to '514801'");
         assertTextPresent("Deleted data row.");
 
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
     }
 
     /**
@@ -232,7 +231,7 @@ public class AssayTest extends AbstractAssayTest
         log("Defining a test assay at the project level");
         //define a new assay at the project level
         //the pipeline must already be setup
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
         addWebPart("Assay List");
 
         //copied from old test
@@ -305,8 +304,8 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Uploading runs into folder " + folder + " as user " + asUser);
         impersonate(asUser);
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
-        clickLinkWithText(folder);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(folder);
 
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY);
@@ -455,7 +454,7 @@ public class AssayTest extends AbstractAssayTest
         assertLinkPresentWithText("BAQ00051-11");
         assertTextNotPresent("AAA");
         stopImpersonating();
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
     } //uploadRuns()
 
     /**
@@ -477,10 +476,10 @@ public class AssayTest extends AbstractAssayTest
 
         //impersonate the PI
         impersonate(TEST_ASSAY_USR_PI1);
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
 
         //select the Lab1 folder and view all the data for the test assay
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view results");
 
@@ -555,7 +554,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("18");
 
         // test recall
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view copy-to-study history");
 
@@ -582,8 +581,8 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Prepare visit map to check PTID counts in study navigator.");
 
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDY3);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_FLDR_STUDY3);
 
         clickLinkWithText("Manage");
         clickLinkWithText("Manage Timepoints");
@@ -596,7 +595,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Save");
 
         //select the Lab1 folder and view all the data for the test assay
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view results");
 
@@ -680,8 +679,8 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Prepare visit map to check PTID counts in study navigator.");
 
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDY2);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_FLDR_STUDY2);
 
         clickLinkWithText("Manage");
         clickLinkWithText("Manage Visits");
@@ -694,7 +693,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Import");
 
         //select the Lab1 folder and view all the data for the test assay
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view results");
 
@@ -776,12 +775,11 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Testing edit and delete and assay definition");
 
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
 
         clickLinkWithText(TEST_ASSAY);
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design");
-        waitForElement(Locator.raw(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
+        clickEditAssayDesign();
+        waitForElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         _listHelper.setColumnLabel(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         deleteField("Data Fields", 4);
@@ -789,7 +787,7 @@ public class AssayTest extends AbstractAssayTest
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
 
         //ensure that label has changed in run data in Lab 1 folder
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText(TEST_RUN1);
         assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "edit");
@@ -802,7 +800,7 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Testing cross-folder data");
 
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
         
         addWebPart("Assay Runs");
         selectOptionByText("viewProtocolId", "General: " + TEST_ASSAY);
@@ -830,7 +828,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(3, 2, 3);
 
         log("Testing clicking on a run");
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
         clickLinkWithText("FirstRun");
         verifySpecimensPresent(3, 2, 0);
 
@@ -858,7 +856,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("Copied to Study 1 Study");
 
         log("Testing copy to study availability");
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
         clickLinkWithText("SecondRun");
 
         clickCheckbox(".toggle");
@@ -869,7 +867,7 @@ public class AssayTest extends AbstractAssayTest
 
         clickButton("Cancel", defaultWaitForPage);
 
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
     }
 
     private void verifyStudyList()

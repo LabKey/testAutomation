@@ -455,7 +455,7 @@ public class ExtHelper extends AbstractHelper
 
     public void selectComboBoxItem(String label, String selection)
     {
-        selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+":']]/div/div"), selection);
+        selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
     }
 
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, String selection)

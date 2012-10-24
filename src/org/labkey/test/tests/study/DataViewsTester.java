@@ -19,8 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.StudyBaseTest;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.LogMethod;
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,6 +64,7 @@ public class DataViewsTester
         _folderName = folderName;
     }
 
+    @LogMethod
     public void basicTest()
     {
         _test.log("Data Views Test");
@@ -88,8 +88,7 @@ public class DataViewsTester
         Assert.assertEquals("Incorrect number of datasets after filter", 16, _test.getXpathCount(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]")));
         collapseCategory(CATEGORIES[3]);
         Assert.assertEquals("Incorrect number of datasets after collapsing category.", 6, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
-        _test.clickWebpartMenuItem("Data Views", false, "Customize");
-        _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        openCustomizePanel();
         _test._extHelper.uncheckCheckbox("datasets");
         _test.setFormElement(Locator.name("webpart.title"), WEBPART_TITLE);
         _test.clickButton("Save", 0);
@@ -99,8 +98,7 @@ public class DataViewsTester
         Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
 
         _test.log("Verify cancel button");
-        _test.clickWebpartMenuItem("Data Views", false, "Customize");
-        _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        openCustomizePanel();
         _test._extHelper.checkCheckbox("datasets");
         _test._extHelper.uncheckCheckbox("reports");
         _test.setFormElement(Locator.name("webpart.title"), "nothing");
@@ -113,8 +111,7 @@ public class DataViewsTester
         Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and contains(@class, 'x4-grid-row')]")));
 
         _test.log("Verify category management");
-        _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
-        _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        openCustomizePanel();
         _test._extHelper.checkCheckbox("datasets");
         _test.clickButton("Manage Categories", 0);
         _test._extHelper.waitForExtDialog("Manage Categories");
@@ -135,6 +132,7 @@ public class DataViewsTester
         _test.assertTextPresentInThisOrder(CATEGORIES[2], CATEGORIES[3], "Uncategorized", "APX-1", REPORT_NAME);
 
         _test.log("Verify modify dataset");
+        openCustomizePanel();
         _test.click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
         _test._extHelper.waitForExtDialog(EDITED_DATASET);
         _test.setFormElement(Locator.xpath("//label[text() = 'Category']/../..//input"), NEW_CATEGORY);
@@ -145,6 +143,7 @@ public class DataViewsTester
         _test.assertTextPresent(NEW_DESCRIPTION);
     }
 
+    @LogMethod
     public void datasetStatusTest()
     {
         _test.log("Testing status settings for datasets");
@@ -152,20 +151,19 @@ public class DataViewsTester
         _test.waitForText(someDataSets[3]);
         _test.assertTextPresent("Data Views", "Name", "Type", "Access");
 
-        _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
-        _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        openCustomizePanel();
         _test._extHelper.checkCheckbox("Status");
         _test.clickButton("Save", 0);
         _test.clickLinkContainingText("Data & Reports");
 
         for (String[] entry : datasets)
         {
+            openCustomizePanel();
             clickCustomizeView(entry[0], _test);
 
-//            Locator.XPathLocator comboParent = Locator.xpath("//label[contains(text(), 'Status')]/../..");
             _test._ext4Helper.selectComboBoxItem("Status", entry[1]);
 
-            _test.clickButton("Save", 0);
+            _test._extHelper.clickExtButton(entry[0], "Save", 0);
 
             Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + entry[0] + "')]/../../../../..//div//img[@alt='" + entry[1] + "']");
             _test.waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
@@ -177,6 +175,12 @@ public class DataViewsTester
             _test.waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             _test.clickLinkContainingText("Data & Reports");
         }
+    }
+
+    private void openCustomizePanel()
+    {
+        _test.click(Locator.css("a>img[title=Edit]"));
+        _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public static void clickCustomizeView(String viewName, BaseSeleniumWebTest test)
@@ -221,6 +225,7 @@ public class DataViewsTester
         _test.waitForElement(Locator.xpath("//div[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and @class='x4-grid-group-title' and text()='" + category + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
     public void refreshDateTest()
     {
         _test.log("Verify refresh date");
@@ -233,8 +238,7 @@ public class DataViewsTester
         _test.assertTextNotPresent("Data Cut Date:");
         _test.mouseOut(Locator.linkWithText(EDITED_DATASET)); // Dismiss hover box
         _test.waitForTextToDisappear("Type:");
-        _test.clickWebpartMenuItem(WEBPART_TITLE, false, "Customize");
-        _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        openCustomizePanel();
         _test._extHelper.checkCheckbox("Modified");
         _test._extHelper.checkCheckbox("Data Cut Date");
         Locator manageButton = _test.getButtonLocator("Manage Categories");
@@ -242,6 +246,7 @@ public class DataViewsTester
         _test.waitForElementToDisappear(manageButton, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForText("Data Cut Date");
         _test.waitForText("Modified");
+        openCustomizePanel();
         _test.click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
         _test._extHelper.waitForExtDialog(EDITED_DATASET);
         _test.setFormElement("refreshDate", refreshDate);

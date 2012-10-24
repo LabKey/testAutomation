@@ -280,7 +280,7 @@ public class StudyScheduleTester
         _test.mouseClick(link.toString());
         _test.click(link);
         _test.log("show define dataset dialog");
-        _test.waitForElement(Locator.xpath("//span[text() = 'Define Dataset']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        _test._extHelper.waitForExtDialog("Define Dataset");
 
         linkDataset(name, type, targetDataset);
         goToStudySchedule();

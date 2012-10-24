@@ -252,15 +252,15 @@ public class ModuleAssayTest extends AbstractAssayTest
         Assert.assertTrue(dataRoot.isDirectory());
 
         log("Uploading batch: " + batchName);
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         clickLinkWithText(ASSAY_NAME);
 
         clickButton("Import Data");
         assertTitleEquals("Data Import: /" + PROJECT_NAME);
 
-        setFormElement("batch_name_input", batchName);
+        setFormElement(Locator.id("batch_name_input"), batchName);
 
-        setFormElement("batch_comment_input", batchName + " comments...");
+        setFormElement(Locator.id("batch_comment_input"), batchName + " comments...");
 
         clickButton("Save", 0);
 

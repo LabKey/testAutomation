@@ -142,7 +142,7 @@ public class ExpTest extends BaseSeleniumWebTest
         selectQuery("exp", "Data"); // Select the one we want to edit
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickLinkWithText("edit metadata");
-        waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
+        waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Alias Field").getPath());
         selectOptionByText("sourceColumn", "RowId");
         selenium.click("//span" + Locator.navButton("OK").getPath());
@@ -167,7 +167,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Since this metadata is shared, clear it out 
         clickMenuButton("Query", "Edit Metadata");
-        waitForElement(Locator.raw("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
+        waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         selenium.click("//span" + Locator.navButton("Reset to Default").getPath());
         selenium.click("//span" + Locator.navButton("OK").getPath());
         waitForText("Reset successful", WAIT_FOR_JAVASCRIPT);

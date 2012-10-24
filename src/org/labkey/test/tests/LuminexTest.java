@@ -17,13 +17,11 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.APIAssayHelper;
-import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
@@ -148,6 +146,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
     }
 
+    @LogMethod
     protected void configure()
     {
         if(!isFileUploadAvailable())
@@ -171,11 +170,11 @@ public class LuminexTest extends AbstractQCAssayTest
         setupPipeline(TEST_ASSAY_PRJ_LUMINEX);
 
         //create a study within this project to which we will publish
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
         addWebPart("Study Overview");
         clickButton("Create Study");
         clickButton("Create Study");
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
 
         //add the Assay List web part so we can create a new luminex assay
         addWebPart("Assay List");
@@ -190,8 +189,8 @@ public class LuminexTest extends AbstractQCAssayTest
             _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'manage assay design']"), "copy assay design");
             clickButton("Copy to Current Folder", WAIT_FOR_PAGE);
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-            selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
-            selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
+            setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_LUM);
+            setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_LUM_DESC);
             saveAssay();
         }
         else
@@ -206,8 +205,8 @@ public class LuminexTest extends AbstractQCAssayTest
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
             log("Setting up Luminex assay");
-            selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_LUM);
-            selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_LUM_DESC);
+            setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_LUM);
+            setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_LUM_DESC);
 
             // add batch properties for transform and Ruminex version numbers
             addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
@@ -289,6 +288,7 @@ public class LuminexTest extends AbstractQCAssayTest
     /**
      * Performs Luminex designer/upload/publish.
      */
+    @LogMethod
     protected void runUITests()
     {
         log("Starting Assay BVT Test");
@@ -305,6 +305,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
     } //doTestSteps()
 
+    @LogMethod
     protected void runUploadAndCopyTest()
     {
         _listHelper.importListArchive(getProjectName(), new File(getSampledataPath(), "/Luminex/UploadAndCopy.lists.zip"));
@@ -316,7 +317,7 @@ public class LuminexTest extends AbstractQCAssayTest
 //                "2\tListParticipant2\t1001.2\n" +
 //                "3\tListParticipant3\t1001.3\n" +
 //                "4\tListParticipant4\t1001.4");
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
 
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY_LUM);
@@ -337,17 +338,17 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE2);
         clickButton("Next", 60000);
-        selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]", "StandardName1b");
-        selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']", "StandardName2");
-        selenium.type("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[5]//input[@type='text']", "StandardName4");
+        setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]"), "StandardName1b");
+        setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']"), "StandardName2");
+        setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[5]//input[@type='text']"), "StandardName4");
         clickButton("Save and Finish");
 
         // Upload another run using a thaw list pasted in as a TSV
         clickButton("Import Data");
         Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
-        setFormElement("participantVisitResolver", "Lookup");
-        setFormElement("ThawListType", "Text");
-        setFormElement("ThawListTextArea", "Index\tSpecimenID\tParticipantID\tVisitID\n" +
+        checkRadioButton("participantVisitResolver", "Lookup");
+        checkRadioButton("ThawListType", "Text");
+        setFormElement(Locator.id("ThawListTextArea"), "Index\tSpecimenID\tParticipantID\tVisitID\n" +
                 "1\tSpecimenID1\tParticipantID1\t1.1\n" +
                 "2\tSpecimenID2\tParticipantID2\t1.2\n" +
                 "3\tSpecimenID3\tParticipantID3\t1.3\n" +
@@ -428,7 +429,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("LX10005314302");
 
         // Upload another run that has both Raw and Summary data in the same excel file
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
         clickButton("Import Data");
         clickButton("Next");
@@ -484,6 +485,7 @@ public class LuminexTest extends AbstractQCAssayTest
         table.clearFilter("Analyte");
     }
 
+    @LogMethod
     protected void runEC50Test()
     {
 //        ensureConfigured();
@@ -608,6 +610,7 @@ public class LuminexTest extends AbstractQCAssayTest
      * but is not required
      * postconditions:  multiple curve data will be present, certain wells will be marked excluded
      */
+    @LogMethod
     protected void runWellExclusionTest()
     {
          ensureMultipleCurveDataPresent();
@@ -871,6 +874,7 @@ public class LuminexTest extends AbstractQCAssayTest
      * Test our ability to upload multiple files and set multiple standards
      *
      */
+    @LogMethod
     protected void runMultipleCurveTest()
     {
         String name = startCreateMultipleCurveAssayRun();
@@ -1091,9 +1095,9 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         for(int i=0; i<files.length; i++)
         {
-            String formName = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
+            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
 
-            setFormElement(formName, files[i]);
+            setFormElement(Locator.id(fieldId), files[i]);
 
             sleep(500);
 
@@ -1141,6 +1145,7 @@ public class LuminexTest extends AbstractQCAssayTest
         return true;
     }
 
+    @LogMethod
     protected void runJavaTransformTest()
     {
         // add the transform script to the assay
@@ -1148,10 +1153,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
         //TODO:  goToTestRunList
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design");
+        clickEditAssayDesign();
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
@@ -1177,7 +1181,7 @@ public class LuminexTest extends AbstractQCAssayTest
     //helper function to go to test assay home from anywhere the project link is visible
     protected void goToTestAssayHome()
     {
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
     }
 
@@ -1189,6 +1193,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     //requires drc, Ruminex and xtable packages installed in R
+    @LogMethod
     protected void runRTransformTest()
     {
         log("Uploading Luminex run with a R transform script");
@@ -1196,15 +1201,14 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // add the R transform script to the assay
         goToTestAssayHome();
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design");
+        clickEditAssayDesign();
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
 
         // save changes to assay design
         clickButton("Save & Close");
 
         // upload the sample data file
-        clickLinkWithText(TEST_ASSAY_PRJ_LUMINEX);
+        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
         clickLinkWithText(TEST_ASSAY_LUM);
         clickButton("Import Data");
         clickButton("Next");
@@ -1222,7 +1226,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // make sure that that QC Control checkbox is checked
         checkCheckbox("_titrationRole_qccontrol_Standard1");
         // set LotNumber for the first analyte
-        selenium.type("//input[@type='text' and contains(@name, '_LotNumber')][1]", TEST_ANALYTE_LOT_NUMBER);
+        setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_LotNumber')][1]"), TEST_ANALYTE_LOT_NUMBER);
         clickButton("Save and Finish");
 
         // verify that the PDF of curves was generated
@@ -1317,6 +1321,7 @@ public class LuminexTest extends AbstractQCAssayTest
             clickButton("Next", 60000);
     }
     //requires drc, Ruminex, rlabkey and xtable packages installed in R
+    @LogMethod
     protected void runGuideSetTest()
     {
         log("Uploading Luminex run with a R transform script for Guide Set test");
@@ -1327,8 +1332,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // add the R transform script to the assay
         goToTestAssayHome();
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design");
+        clickEditAssayDesign();
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         // save changes to assay design
         clickButton("Save & Close");
@@ -1409,6 +1413,7 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyHighlightUpdatesAfterQCFlagChange();
     }
 
+    @LogMethod
     protected void importRunForTestLuminexConfig(File file, Calendar testDate, int i)
     {
         goToTestAssayHome();
@@ -1424,6 +1429,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Save and Finish");
     }
 
+    @LogMethod
     private void verifyHighlightUpdatesAfterQCFlagChange()
     {
         goToTestRunList();
@@ -1456,6 +1462,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertElementPresent(Locator.xpath("//td[contains(@style, 'white-space') and text()=" + expectedEC50 + "]"));
     }
 
+    @LogMethod
     private void verifyExcludingRuns(Map<String, Integer> guideSetIds, String[] analytes)
     {
 
@@ -1483,6 +1490,7 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyGuideSetThresholds(guideSetIds, analytes, rowCounts2, aucAverages2, aucStdDevs2, "Trapezoidal", "AUCAverage", "AUCStd Dev");
     }
 
+    @LogMethod
     private void verifyLeveyJenningsPermissions()
     {
         String ljUrl = getCurrentRelativeURL();
@@ -1507,6 +1515,7 @@ public class LuminexTest extends AbstractQCAssayTest
         deleteUser(reader);
     }
 
+    @LogMethod
     private void createAndImpersonateUser(String user, String perms)
     {
         goToHome();
@@ -1517,6 +1526,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     String newGuideSetPlate = "Reload guide set 5";
+    @LogMethod
     private void verifyQCFlagUpdatesAfterWellChange()
     {
         importPlateFiveAgain();
@@ -1592,6 +1602,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertExpectedAnalyte1QCFlagsPresent();
     }
 
+    @LogMethod
     private void removePlate3FromGuideSet()
     {
         clickButtonContainingText("Edit", 0);
@@ -1605,8 +1616,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void assertExpectedAnalyte1QCFlagsPresent()
     {
-
-            assertElementPresent(Locator.xpath("//a[contains(text(),'HMFI')]"), 4);
+        assertElementPresent(Locator.xpath("//a[contains(text(),'HMFI')]"), 4);
     }
 
     private void assertEC505PLQCFlagsPresent(int count)
@@ -1696,6 +1706,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     }
 
+    @LogMethod
     private void verifyQCFlagLink()
     {
         clickLinkContainingText(expectedFlags[0], 0, false);
@@ -1737,7 +1748,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void goToQCAnalysisPage()
     {
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText(TEST_ASSAY_LUM);
 
         String qcUrlInRuns = getQCLink();
@@ -1747,6 +1758,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     }
 
+    @LogMethod
     private void verifyQCReport()
     {
         //make sure all the columns we want are viable
@@ -1822,20 +1834,19 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void excludableWellsWithTransformTest()
     {
-        clickLinkContainingText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkContainingText(TEST_ASSAY_LUM);
         excludeWellFromRun("Guide Set plate 5", "A6,B6");
         goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
         assertTextPresent("28040.51");
-
-
     }
 
 
+    @LogMethod
     private void guideSetApiTest()
     {
-        clickLinkContainingText(getProjectName());
+        clickFolder(getProjectName());
         assertTextNotPresent("GS Analyte");
          addWebPart("Wiki");
         createNewWikiPage("HTML");
@@ -1865,6 +1876,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error:");        
     }
 
+    @LogMethod
     private void verifyLeveyJenningsRplots()
     {
         goToLeveyJenningsGraphPage("Standard1");
@@ -1919,6 +1931,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("View Log Y-Axis");
     }
 
+    @LogMethod
     private void verifyGuideSetsNotApplied()
     {
         goToSchemaBrowser();
@@ -1932,6 +1945,7 @@ public class LuminexTest extends AbstractQCAssayTest
         table.clearFilter("GuideSet/Created");
     }
 
+    @LogMethod
     private void verifyGuideSetsApplied(Map<String, Integer> guideSetIds, String[] analytes, int expectedRunCount)
     {
 
@@ -1992,9 +2006,9 @@ public class LuminexTest extends AbstractQCAssayTest
     private void setIsoAndConjugate()
     {
         log("unimplemented");
-        _extHelper.selectComboBoxItem("Isotype", isotype);
+        _extHelper.selectComboBoxItem("Isotype:", isotype);
 
-        _extHelper.selectComboBoxItem("Conjugate", conjugate);
+        _extHelper.selectComboBoxItem("Conjugate:", conjugate);
 
     }
 
@@ -2093,6 +2107,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("Levey-Jennings Report: " + titrationName);
     }
 
+    @LogMethod
     private void verifyGuideSetThresholds(Map<String, Integer> guideSetIds, String[] analytes, int[] rowCounts, String[] averages, String[] stdDevs,
                                           String curveType, String averageColName, String stdDevColName)
     {
@@ -2118,6 +2133,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
     }
 
+    @LogMethod
     private void applyGuideSetToRun(String network, int runRowIndex, String comment, int guideSetIndex)
     {
         clickAt(_extHelper.locateGridRowCheckbox(network), "1," + runRowIndex);
@@ -2134,20 +2150,22 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
 
     }
+
+    @LogMethod
     private void verifyGuideSetToRun(String network, int networkColIndex, String comment, int commentColIndex)
     {
-        clickAt(_extHelper.locateGridRowCheckbox(network), "1," + networkColIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + networkColIndex);
         clickButton("Apply Guide Set", 0);
-        waitForElement(_extHelper.locateGridRowCheckbox(network), defaultWaitForPage);
-        waitForElement(_extHelper.locateGridRowCheckbox(comment), defaultWaitForPage);
+        waitForElement(ExtHelper.locateGridRowCheckbox(network), defaultWaitForPage);
+        waitForElement(ExtHelper.locateGridRowCheckbox(comment), defaultWaitForPage);
         sleep(1000);
         // deselect the current guide set to test error message
-        clickAt(_extHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
         clickButton("Apply Thresholds", 0);
         waitForText("Please select a guide set to be applied to the selected records.");
         clickButton("OK", 0);
         // reselect the current guide set and apply it
-        clickAt(_extHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0); 
         waitForExtMaskToDisappear();
         // verify that the plot is reloaded
@@ -2155,6 +2173,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
     }
 
+    @LogMethod
     private void applyStartAndEndDateFilter()
     {
         String colValuePrefix = "NETWORK";
@@ -2164,13 +2183,13 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 5; i > 0; i--)
         {
-            clickAt(_extHelper.locateGridRowCheckbox(colValuePrefix + i), i+","+columnIndex);
+            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), i+","+columnIndex);
         }
         // set start and end date filter
         setFormElement("start-date-field", "2011-03-26");
         setFormElement("end-date-field", "2011-03-28");
         // click a different element on the page to trigger the date change event
-        clickAt(_extHelper.locateGridRowCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
         Locator l = Locator.extButton("Apply", 1);
         clickAt(l,  "1,1");
         waitForTextToDisappear("Loading");
@@ -2178,10 +2197,10 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that only 3 runs are now present
         for (int i = 4; i > 1; i--)
         {
-            clickAt(_extHelper.locateGridRowCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
+            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
         }
-        assertElementNotPresent(_extHelper.locateGridRowCheckbox(colValuePrefix + "5"));
-        assertElementNotPresent(_extHelper.locateGridRowCheckbox(colValuePrefix + "1"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "1"));
     }
 
     private void applyLogYAxisScale()
@@ -2192,6 +2211,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextNotPresent("Error");
     }
 
+    @LogMethod
     private boolean verifyRunFileAssociations(boolean displayingRowId, int index)
     {
         // verify that the PDF of curves file was generated along with the xls file and the Rout file
@@ -2212,6 +2232,7 @@ public class LuminexTest extends AbstractQCAssayTest
         return true;
     }
 
+    @LogMethod
     public void uploadPositivityFile(String assayName, String baseVisit, String foldChange, boolean isBackgroundUpload)
     {
         goToTestAssayHome();

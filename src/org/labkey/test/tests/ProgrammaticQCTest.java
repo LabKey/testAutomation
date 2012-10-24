@@ -22,11 +22,9 @@ import org.labkey.test.util.ListHelper;
 import java.io.*;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Apr 6, 2009
  * Time: 4:39:49 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ProgrammaticQCTest extends AbstractQCAssayTest
 {
@@ -115,8 +113,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         goToProjectHome();
         clickLinkContainingText("QC Assay");
-        click(Locator.linkWithText("manage assay design"));
-        clickLinkWithText("edit assay design");
+        clickEditAssayDesign();
 //        clickButton("Manage Assays");
 //        clickButton("New Assay Design");
 //        checkRadioButton("providerName", "General");

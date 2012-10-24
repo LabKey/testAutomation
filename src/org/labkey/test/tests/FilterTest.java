@@ -142,7 +142,7 @@ public class FilterTest extends ListTest
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
-        _extHelper.selectComboBoxItem("Filter Type", "Is Blank");
+        _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.waitForExtDialog("Confirm change");
         _extHelper.clickExtButton("Confirm change", "Yes", 0);
@@ -195,7 +195,7 @@ public class FilterTest extends ListTest
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement("value_1"));
-        _extHelper.selectComboBoxItem("Filter Type", "Is Blank");
+        _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.waitForExtDialog("Confirm change");
         _extHelper.clickExtButton("Confirm change", "Yes", 0);

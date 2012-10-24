@@ -781,14 +781,14 @@ public class ListTest extends BaseSeleniumWebTest
         // If greater than 7, strikethrough //TODO: Set after (>5) format. Blocked: 12865
         clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem("Filter Type", "Is Greater Than");
+        _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
         setFormElement("value_1", "7");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox("Strikethrough");
         // If greater than 5, Bold  //TODO: Set before (>7) format. Blocked: 12865
         clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem("Filter Type", "Is Greater Than");
+        _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
         setFormElement("value_1", "5");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox("Bold", 1);

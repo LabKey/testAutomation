@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
@@ -54,10 +55,11 @@ public abstract class AbstractAssayTest extends SimpleApiTest
      * Sets up the data pipeline for the specified project. This can be called from any page.
      * @param project name of project for which the pipeline should be setup
      */
+    @LogMethod
     protected void setupPipeline(String project)
     {
         log("Setting up data pipeline for project " + project);
-        clickLinkWithText(project);
+        clickFolder(project);
         addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
@@ -91,6 +93,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
      *  - if the target study was set to a folder where the PI does not have editor perms, the system will
      *     warn the PI of this when publishing and force the PI to select one in which the PI does have editor perms.
      */
+    @LogMethod
     protected void setupEnvironment()
     {
         //create a new project for the security tests
@@ -159,8 +162,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
 
         //add the Assay List web part to the lab1 folder so we can upload data later as a labtech
         log("Adding assay list web part to lab1 folder");
-        clickLinkWithText(TEST_ASSAY_PRJ_SECURITY);
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         addWebPart("Assay List");
     } //setupEnvironment()
 
@@ -172,6 +175,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
      * @param group     name of the existing group
      * @param perms     permissions role to set (e.g., Editor, Reader, Author, No Permissions, etc.)
      */
+    @LogMethod
     protected void setSubfolderSecurity(String project, String subfolder, String group, String perms)
     {
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
@@ -181,8 +185,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickLinkWithText(subfolder);
         enterPermissionsUI();
         uncheckInheritedPermissions();
-        waitForText("Save");
-        clickButton("Save", 0);
+        waitAndClickButton("Save", 0);
+        waitForElement(Locator.permissionRendered());
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
         {
             removePermission(group, "Editor");
@@ -200,6 +204,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
      * @param group     name of the group
      * @param perms     read permissions to set (use TEST_STUDY_PERMS_STUDY_* constants)
      */
+    @LogMethod
     protected void setStudyPerms(String project, String folder, String group, String perms)
     {
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
@@ -217,6 +222,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickAndWait(Locator.id("groupUpdateButton"));
     } //setStudyPerms
 
+    @LogMethod
     private void setStudyQCStates(String project, String folder)
     {
         log("Setting QC states in study " + folder + ".");
@@ -240,6 +246,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
      * though it will go through a sign out and sign in, requiring re-selection
      * of the project
      */
+    @LogMethod
     protected void revertToAdmin()
     {
         log("reverting to admin");
@@ -267,7 +274,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
 
     protected void clickEditAssayDesign(int timeout)
     {
-        click(Locator.linkWithText("MANAGE ASSAY DESIGN"));
+        click(Locator.linkWithText("manage assay design"));
         click(Locator.linkWithText("edit assay design"));
         if (timeout > 0) waitForPageToLoad(timeout);
     }
