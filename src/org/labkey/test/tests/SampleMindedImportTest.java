@@ -15,8 +15,10 @@
  */
 package org.labkey.test.tests;
 
+import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
 
@@ -108,7 +110,8 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         clickLinkWithText("BAL");
         assertTextPresent("BAL Supernatant");
         assertTextPresent("FREE (007)");
-        assertTextPresent("Count: 5");
+        DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
+        Assert.assertEquals("Incorrect number of vials.", "Count:  5", specimenTable.getTotal("Global Unique Id"));
 
         clickLinkWithText("Group vials");
         assertLinkPresentWithTextCount("TestStudy03P20043001", 2);

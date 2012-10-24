@@ -132,6 +132,16 @@ public class DataRegionTable
           return -1;
     }
 
+    public String getTotal(String columnLabel)
+    {
+        return getTotal(getColumn(columnLabel));
+    }
+
+    public String getTotal(int columnIndex)
+    {
+        return _test.getText(Locator.css("#" + getHtmlName() + " tr.labkey-col-total > td:nth-of-type("+(columnIndex +(_selectors?2:1))+")"));
+    }
+
     /**
      * do nothing if column is already present, add it if it is not
      * @param columnName   name of column to add, if necessary
