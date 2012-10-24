@@ -38,7 +38,6 @@ public class ExtHelperWD extends AbstractHelperWD
     /**
      * Clicks the Ext or labkey menu item from the submenu specified by the menu object's text
      */
-    @LogMethod
     public void clickMenuButton(boolean wait, String menusLabel, String... subMenuLabels)
     {
         Locator menu = Locator.extButton(menusLabel);
