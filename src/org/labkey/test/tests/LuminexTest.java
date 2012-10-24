@@ -636,6 +636,10 @@ public class LuminexTest extends AbstractQCAssayTest
         //excluding for one well excludes for duplicate wells
         excludeAnalyteForAllWellsTest(analytes[1]);
 
+        // Check out the exclusion report
+        clickLinkWithText("view excluded data");
+        assertTextPresent("Changed for all analytes", "exclude single analyte for single well", "ENV7 (93)", "ENV6 (97)");
+        assertTextPresent("multipleCurvesTestRun", 2);
     }
 
     private void excludeOneAnalyteForSingleWellTest(String wellName, String excludedAnalyte)
