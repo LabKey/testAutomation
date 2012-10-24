@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.UIContainerHelper;
 
@@ -27,7 +28,7 @@ import org.labkey.test.util.UIContainerHelper;
  * Date: March 23, 2007
  * Time: 1:57:05 PM
  */
-public class BasicTest extends BaseSeleniumWebTest
+public class BasicTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "BasicVerifyProject";
     private static final String FOLDER_NAME = "childfolder";
@@ -104,7 +105,7 @@ public class BasicTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("MS2 Runs");
 
         addWebPart("Search");
-        setFormElement("query", "labkey");
+        setFormElement(Locator.id("query"), "labkey");
         clickButton("Search");
         assertTextPresent("Found", "results");  // just make sure we get the results page
 
@@ -120,8 +121,8 @@ public class BasicTest extends BaseSeleniumWebTest
         assertTextNotPresent("WARNING:");
 
         ensureAdminMode();
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickFolder(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
 
         log("Test folder aliasing");
         pushLocation();
@@ -140,7 +141,7 @@ public class BasicTest extends BaseSeleniumWebTest
         refresh();
         assertTextBefore("No data to show", "No messages");
 
-        final Locator searchLocator = Locator.raw("//tr[th[@title='Search']]//a/img[@title='Remove From Page']");
+        final Locator searchLocator = Locator.xpath("//tr[th[@title='Search']]//a/img[@title='Remove From Page']");
         clickAndWait(searchLocator, 0);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(searchLocator);

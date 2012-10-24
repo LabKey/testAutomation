@@ -413,7 +413,7 @@ public class ReportTest extends StudyBaseTest
 
         log("Create second R script");
         clickMenuButton("Views", "Create", "R View");
-        click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
+        click(Locator.xpath("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         if (!_rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
             if (!_rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 Assert.fail("There was an error running the script");
@@ -446,7 +446,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         pushLocation();
-        assertElementNotPresent(Locator.raw("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
+        assertElementNotPresent(Locator.xpath("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
         clickMenuButton("Views", R_SCRIPTS[1]);
         goBack();
         clickMenuButton("Views", AUTHOR_REPORT);
@@ -466,8 +466,8 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("Views", "Create", "R View");
-        click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
-        click(Locator.raw("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
+        click(Locator.xpath("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
+        click(Locator.xpath("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
         if (!_rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
             if (!_rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 Assert.fail("There was an error running the script");
@@ -523,7 +523,7 @@ public class ReportTest extends StudyBaseTest
         if (sharedScripts != null && sharedScripts.length > 0)
         {
             for (String script : sharedScripts)
-                click(Locator.raw("//td[contains(text(),'" + script + "')]/input"));
+                click(Locator.xpath("//td[contains(text(),'" + script + "')]/input"));
         }
 
         if(share)
@@ -698,7 +698,7 @@ public class ReportTest extends StudyBaseTest
         {
             while (isTextPresent(script))
             {
-                click(Locator.raw("//a[contains(text(),'" + script + "')]/../../td[3]/a"));
+                click(Locator.xpath("//a[contains(text(),'" + script + "')]/../../td[3]/a"));
                 Assert.assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
                 waitForPageToLoad();
             }
@@ -714,7 +714,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText("Manage Files");
         if (isTextPresent(item))
         {
-            checkCheckbox(Locator.raw("//td/a[contains(text(), '" + item + "')]/../../td/input"));
+            checkCheckbox(Locator.xpath("//td/a[contains(text(), '" + item + "')]/../../td/input"));
             clickButton("Delete");
             assertTextNotPresent(item);
         }
