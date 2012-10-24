@@ -38,13 +38,13 @@ import java.util.regex.Pattern;
  */
 public class DataRegionTable
 {
-    protected String _tableName;
+    protected final String _tableName;
     protected BaseSeleniumWebTest _test;
-    protected boolean _selectors;
-    protected Map<String, Integer> _mapColumns = new HashMap<String, Integer>();
-    protected Map<String, Integer> _mapRows = new HashMap<String, Integer>();
-    protected int _columnCount;
-    protected int _headerRows;
+    protected final boolean _selectors;
+    protected final Map<String, Integer> _mapColumns = new HashMap<String, Integer>();
+    protected final Map<String, Integer> _mapRows = new HashMap<String, Integer>();
+    protected final int _columnCount;
+    protected final int _headerRows;
 
     public DataRegionTable(String tableName, BaseSeleniumWebTest test)
     {
@@ -260,7 +260,7 @@ public class DataRegionTable
         {
             for (int col = 0; col < _columnCount; col++)
             {
-                String header = getDataAsText(-2, col);
+                String header = getDataAsText(-(_headerRows/2), col);
                 if( header != null )
                 {
                     String headerName = header.split("\n")[0];
