@@ -450,6 +450,11 @@ public class DataRegionTable
         _test.clearFilter(_tableName, columnName);
     }
 
+    public void clearFilter(String columnName, int waitMillis)
+    {
+        _test.clearFilter(_tableName, columnName, waitMillis);
+    }
+
     public void clearAllFilters(String columnName)
     {
         _test.clearAllFilters(_tableName, columnName);

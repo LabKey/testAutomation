@@ -149,6 +149,7 @@ public enum TestSet
         AncillaryStudyTest.class,
         FolderExportTest.class,
         GenotypingTest.class,
+        HaplotypeAssayTest.class,
         MissingValueIndicatorsTest.class,
         PipelineCancelTest.class,
         StudyExportTest.class,
