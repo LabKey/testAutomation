@@ -3290,7 +3290,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToFolderManagement();
         log("setting module properties");
         clickLinkWithText("Module Properties");
-        waitForText("SAVE CHANGES");
+        waitForText("Save Changes");
         boolean changed = false;
         for (String moduleName : props.keySet())
         {
