@@ -91,7 +91,7 @@ public class StudyManualTest extends StudyTest
         setFormElement("typeNameColumn", "platename");
         setFormElement("labelColumn", "platelabel");
         setFormElement("typeIdColumn", "plateno");
-        setFormElement(Locator.id("tsv"), getFileContents(CRF_SCHEMAS));
+        setFormElement(Locator.name("tsv"), getFileContents(CRF_SCHEMAS));
         clickButton("Submit", 180000);
 
         // setup cohorts:
