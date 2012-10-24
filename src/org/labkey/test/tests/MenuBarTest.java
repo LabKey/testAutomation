@@ -136,7 +136,6 @@ public class MenuBarTest extends BaseSeleniumWebTest
         goToProjectSettings();
         clickLinkWithText("Menu Bar");
         addWebPart("Custom Menu");
-        clickWebpartMenuItem("My Menu", "Customize");
 
         // Schema/Query/etc
         _extHelper.setExtFormElementByLabel("Title", "Wiki Render Types");
@@ -153,7 +152,6 @@ public class MenuBarTest extends BaseSeleniumWebTest
         goToProjectSettings();
         clickLinkWithText("Menu Bar");
         addWebPart("Custom Menu");
-        clickWebpartMenuItem("My Menu", "Customize");
         _extHelper.setExtFormElementByLabel("Title", "Participant Reports");
         _extHelper.clickExtDropDownMenu("userQuery_folders", "DemStudyFolder");
         _extHelper.clickExtDropDownMenu("userQuery_schema", "study");
@@ -170,7 +168,6 @@ public class MenuBarTest extends BaseSeleniumWebTest
         goToProjectSettings();
         clickLinkWithText("Menu Bar");
         addWebPart("Custom Menu");
-        clickWebpartMenuItem("My Menu", "Customize");
         _extHelper.setExtFormElementByLabel("Title", "Folders");
 
         Locator radioFolder = Locator.radioButtonById("folder-radio");
