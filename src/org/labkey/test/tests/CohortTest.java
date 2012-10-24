@@ -507,7 +507,12 @@ public class CohortTest extends BaseWebDriverTest
         clickLinkWithText(specimenLink);
 
         DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
-        assertTextPresent("Count: " + allRowCount);
+        Assert.assertEquals("Incorrect number of vials.", "Count:  " + allRowCount, specimenTable.getTotal("Global Unique Id"));
+    }
+
+    private void verifyVialCount(DataRegionTable table, int expectedCount)
+    {
+        Assert.assertEquals("Incorrect number of vials", "Count:  " + expectedCount, table.getTotal("Global Unique Id"));
     }
 
     private void verifyNewCohort()
@@ -570,9 +575,9 @@ public class CohortTest extends BaseWebDriverTest
         }
 
         // make sure everyone in the group is there
-        for(String ptid : ptids)
+        for (String ptid : ptids)
         {
-            assertTextPresent(ptid);
+            assertPtid(ptid, true);
         }
 
         // make sure everyone not in the group is not there
@@ -580,9 +585,16 @@ public class CohortTest extends BaseWebDriverTest
         {
             if (!isPartipantInGroup(ptid, ptids))
             {
-                assertTextNotPresent(ptid);
+                assertPtid(ptid, false);
             }
         }
+    }
+
+    // TODO: Move some place more generally useful?  ParticipantListHelper?
+    private void assertPtid(String ptid, boolean present)
+    {
+        Locator loc = Locator.xpath("//li[contains(@class, 'ptid')]/a[string() = '" + ptid + "']");
+        Assert.assertEquals(ptid + " should " + (present ? "" : "not ") + "be present", present, isElementPresent(loc));
     }
 
     @Override
