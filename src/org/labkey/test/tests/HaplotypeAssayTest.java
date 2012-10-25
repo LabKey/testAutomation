@@ -112,7 +112,10 @@ public class HaplotypeAssayTest extends GenotypingTest
         waitForText("Data contained zero data rows");
         setFormElement(Locator.name("data"), getFileContents(ERROR_RUN_FILE));
         clickButton("Save and Finish");
-        waitForText("Column header mapping missing for \"Lab Animal ID\"");
+        waitForText("Column header mapping missing for: Lab Animal ID");
+        _ext4Helper.selectComboBoxItem("Lab Animal ID", "OC ID");
+        clickButton("Save and Finish");
+        waitForText("Column header mapping missing for: Customer Animal ID");
         clickButton("Cancel");
     }
 
