@@ -157,7 +157,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
             return;
         goToProjectHome();
         startImportRun("secondRead/reads.txt", "Import 454 Reads", second454importNum);
-        waitForPipelineJobsToComplete(++pipelineJobCount, "Import reads for run 208", true);
+        waitForPipelineJobsToComplete(++pipelineJobCount, "Import reads for 454 run", true);
         clickLinkWithText("COMPLETE");
         clickButton("Data");
         assertTextPresent("G3BTA6P01BEVU9", "G3BTA6P01BD5P9");
@@ -345,7 +345,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         Locator menuLocator = Locator.xpath("//input[@name='sequencesView']/../input[2]");
         _extHelper.clickExtDropDownMenu(menuLocator, "[default]");                       //TODO:  this should be cyno
         clickButton("Submit");
-        waitForText("COMPLETE");
+        waitForPipelineJobsToComplete(++pipelineJobCount, "Submit genotyping analysis", false);
         findAndSetAnalysisNumber();
 
     }
