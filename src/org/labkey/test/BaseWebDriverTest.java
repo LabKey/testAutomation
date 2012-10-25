@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.After;
@@ -1133,11 +1134,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             if (performingUpgrade)
             {
-                verifyNoRedirect(upgradeText);
-
-                // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
-                signOut();
-                simpleSignIn();
+                verifyRedirectBehavior(upgradeText);
 
                 int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
 
@@ -1192,8 +1189,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
 
-    // Any arg can be null -- where's @Nullable?
-    private void verifyInitialUserError(String email, String password1, String password2, String expectedText)
+    private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedText)
     {
         if (null != email)
             setFormElement(Locator.id("email"), email);
@@ -1223,20 +1219,30 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @LogMethod
-    private void verifyNoRedirect(String upgradeText)
+    private void verifyRedirectBehavior(String upgradeText)
     {
-        // These requests should NOT redirect to the upgrade page
-        // Use a new window because the primary upgrade window seems to interfere with this test, #15853
+        // Do these checks in a new window because the primary upgrade window seems to interfere with this test, #15853
         String window = newWindow();
         _driver.switchTo().window(window);
 
-        beginAt("/login/resetPassword.view");
+        // These requests should NOT redirect to the upgrade page
+         beginAt("/login/resetPassword.view");
         assertTextNotPresent(upgradeText);
         beginAt("/admin/maintenance.view");
         assertTextNotPresent(upgradeText);
 
+        // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
+        signOut();
+        simpleSignIn();
+
         _driver.close();
         switchToMainWindow();
+
+        // Dismiss authentication dialog
+        // Note: if this is not reliable, we could close the previous window and use the new windows to continue the upgrade
+        Alert alert = _driver.switchTo().alert();
+        alert.dismiss();
+        waitForPageToLoad();
     }
 
     /**
