@@ -169,7 +169,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         setFormElement("defaultLocationField", "Site A");
         //String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
         //click(Locator.id(btnId));
-        clickButton("Create Vials");
+        _extHelper.clickExtButton("Create Vials");
         assertTextPresent("Each vial will have no more than 1.00e+07 cells.");
         assertTextNotPresent("B01");
 
