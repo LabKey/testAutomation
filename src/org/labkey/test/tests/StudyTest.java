@@ -730,6 +730,7 @@ public class StudyTest extends StudyBaseTest
         SelectRowsResponse selectResp = getDatasetAuditLog();
         List<Map<String,Object>> rows = selectResp.getRows();
         Assert.assertEquals("Unexpected size of datasetAuditEvent log", previousCount + 1, rows.size());
+        log("Dataset audit log contents: " + rows);
         Assert.assertEquals("A new dataset record was inserted", rows.get(rows.size()-1).get("Comment"));
 
     }
