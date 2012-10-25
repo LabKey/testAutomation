@@ -103,9 +103,13 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         drt.getDataAsText(5, "Precursor");
         Assert.assertEquals("LTSLNVVAGSDLR", drt.getDataAsText(5, "Precursor"));
         Assert.assertEquals("heavy", drt.getDataAsText(5, "Label"));
-        Assert.assertEquals("1343.7408", drt.getDataAsText(5, "Peptide Neutral Mass"));
         Assert.assertEquals("677.8818", drt.getDataAsText(5, "Q1 m/z"));
         Assert.assertEquals("727.3973", drt.getDataAsText(5, "Q3 m/z"));
+        // We don't find these values based on their column headers because DataRegionTable gets confused with the
+        // nested data regions having the same id in the HTML. The checks above happen to work because
+        // they correspond to columns that aren't in the parent table, so the XPath flips to the second table with
+        // that id, which has enough columns to satisfy the Locator
+        assertTextPresent("1343.7408", "1226.6619", "1001.5505");
 
         //Click down arrow next to protein name. Click "Search for other references to this protein"
 
