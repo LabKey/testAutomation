@@ -16,11 +16,14 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -73,21 +76,22 @@ public class CohortTest extends BaseWebDriverTest
 
         DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
         Assert.assertEquals("Incorrect number of vials.", "Count:  25", specimenTable.getTotal("Global Unique Id")); // 5 participants x 5 visits
-        assertTextPresent("Positive", 10);
-        assertTextPresent("Negative", 10);
+        List<String> cohortValues = specimenTable.getColumnDataAsText("Collection Cohort");
+        Assert.assertEquals(10, Collections.frequency(cohortValues, "Positive"));
+        Assert.assertEquals(10, Collections.frequency(cohortValues, "Negative"));
 
         clickMenuButton("Participant Groups", "Cohorts", "Negative", "Initial cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  20", specimenTable.getTotal("Global Unique Id")); // One participant has no cohorts.
+        verifyVialCount(specimenTable, 20); // One participant has no cohorts.
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Initial cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  0", specimenTable.getTotal("Global Unique Id")); // All participants initially negative
+        verifyVialCount(specimenTable, 0); // All participants initially negative
         clickMenuButton("Participant Groups", "Cohorts", "Negative", "Current cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  0", specimenTable.getTotal("Global Unique Id")); // All participants are positive by the last visit
+        verifyVialCount(specimenTable, 0); // All participants are positive by the last visit
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Current cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  20", specimenTable.getTotal("Global Unique Id")); // All participants are positive by the last visit
+        verifyVialCount(specimenTable, 20); // All participants are positive by the last visit
         clickMenuButton("Participant Groups", "Cohorts", "Negative", "Cohort as of data collection");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  10", specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, 10);
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  10", specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, 10);
 
         clickLinkWithText("Reports");
         clickButtonByIndex("View", 2); // Specimen Report: By Cohort
@@ -230,20 +234,20 @@ public class CohortTest extends BaseWebDriverTest
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Blood"), WAIT_FOR_PAGE);
 
         specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
-        Assert.assertEquals("Incorrect number of vials.", "Count:  20", specimenTable.getTotal("Global Unique Id")); // 5 participants x 4 visits (was five visits, but one was just deleted)
+        verifyVialCount(specimenTable, 20); // 5 participants x 4 visits (was five visits, but one was just deleted)
 
         clickMenuButton("Participant Groups", "Cohorts", "Negative", "Initial cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  16", specimenTable.getTotal("Global Unique Id")); // One participant has no cohorts.
+        verifyVialCount(specimenTable, 16); // One participant has no cohorts.
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Initial cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  0", specimenTable.getTotal("Global Unique Id")); // All participants initially negative
+        verifyVialCount(specimenTable, 0); // All participants initially negative
         clickMenuButton("Participant Groups", "Cohorts", "Negative", "Current cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  4", specimenTable.getTotal("Global Unique Id")); // Final visit (where Infected4 joins Positive cohort) has been deleted.
+        verifyVialCount(specimenTable, 4); // Final visit (where Infected4 joins Positive cohort) has been deleted.
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Current cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  12", specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, 12);
         clickMenuButton("Participant Groups", "Cohorts", "Negative", "Cohort as of data collection");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  10", specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, 10);
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  6", specimenTable.getTotal("Global Unique Id")); // Visit4 samples no longer have a cohort, and are thus not shown.
+        verifyVialCount(specimenTable, 6); // Visit4 samples no longer have a cohort, and are thus not shown.
 
         // Check that participant view respects filter.
         clickFolder(PROJECT_NAME);
@@ -478,7 +482,7 @@ public class CohortTest extends BaseWebDriverTest
         {
             DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
             clickMenuButton("Participant Groups", "Enrolled");
-            Assert.assertEquals("Incorrect number of vials.", "Count:  " + enrolledRowCount, specimenTable.getTotal("Global Unique Id"));
+            verifyVialCount(specimenTable, enrolledRowCount);
         }
         else
         {
@@ -492,13 +496,13 @@ public class CohortTest extends BaseWebDriverTest
         verifyUnfilteredSpecimens(specimenLink, allRowCount);
 
         clickMenuButton("Participant Groups", "Enrolled", "Initial cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  " + initialRowCount, specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, initialRowCount);
 
         clickMenuButton("Participant Groups", "Enrolled", "Current cohort");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  " + currentRowCount, specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, currentRowCount);
 
         clickMenuButton("Participant Groups", "Enrolled", "Cohort as of data collection");
-        Assert.assertEquals("Incorrect number of vials.", "Count:  " + dataCollectionRowCount, specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, dataCollectionRowCount);
     }
 
     private void verifyUnfilteredSpecimens(String specimenLink, int allRowCount)
@@ -507,7 +511,7 @@ public class CohortTest extends BaseWebDriverTest
         clickLinkWithText(specimenLink);
 
         DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
-        Assert.assertEquals("Incorrect number of vials.", "Count:  " + allRowCount, specimenTable.getTotal("Global Unique Id"));
+        verifyVialCount(specimenTable, allRowCount);
     }
 
     private void verifyVialCount(DataRegionTable table, int expectedCount)
@@ -521,7 +525,7 @@ public class CohortTest extends BaseWebDriverTest
         assertChecked(Locator.checkboxByName("quf_enrolled"));
     }
 
-    private void verifyCohortSelection(boolean toggleAll, String previousCohort, String nextCohort, String[] expectedParticipants, boolean expectEnrolledText, String waitText)
+    private void verifyCohortSelection(boolean toggleAll, @Nullable String previousCohort, @Nullable String nextCohort, String[] expectedParticipants, boolean expectEnrolledText, String waitText)
     {
         if (toggleAll)
         {
@@ -531,12 +535,11 @@ public class CohortTest extends BaseWebDriverTest
         }
 
         if (previousCohort != null)
-        {
             _ext4Helper.uncheckGridRowCheckbox(previousCohort);
-        }
 
         if (nextCohort != null)
             _ext4Helper.checkGridRowCheckbox(nextCohort);
+
         waitForText(waitText);
         verifyParticipantList(expectedParticipants, expectEnrolledText);
     }
@@ -562,16 +565,16 @@ public class CohortTest extends BaseWebDriverTest
 
     private void verifyParticipantList(String[] ptids, boolean expectEnrolledText)
     {
-        // we should not see the "enrolled" text if no participants are unenrolled
+        String statusText = getStatusText();
+
+        // we should not see the "enrolled" text in the participant list status message if no participants are unenrolled
         if (!expectEnrolledText)
         {
-            Assert.assertTrue("Should not see text: enrolled", !getBodyText().contains("enrolled"));
-//            assertTextNotPresent("enrolled"); // TODO : replace workaround for bad perf of getBodyText
+            Assert.assertTrue("Should not see text: enrolled", !statusText.contains("enrolled"));
         }
         else
         {
-            Assert.assertTrue("Did not find expected text: enrolled", getBodyText().contains("enrolled"));
-//            assertTextNotPresent("enrolled"); // TODO : replace workaround for bad perf of getBodyText
+            Assert.assertTrue("Did not find expected text: enrolled", statusText.contains("enrolled"));
         }
 
         // make sure everyone in the group is there
@@ -595,6 +598,13 @@ public class CohortTest extends BaseWebDriverTest
     {
         Locator loc = Locator.xpath("//li[contains(@class, 'ptid')]/a[string() = '" + ptid + "']");
         Assert.assertEquals(ptid + " should " + (present ? "" : "not ") + "be present", present, isElementPresent(loc));
+    }
+
+    // TODO: Same here
+    private String getStatusText()
+    {
+        Locator loc = Locator.id("participantsDiv1.status");
+        return getText(loc);
     }
 
     @Override

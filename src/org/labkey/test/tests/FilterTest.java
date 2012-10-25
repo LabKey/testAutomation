@@ -24,11 +24,13 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
@@ -103,7 +105,7 @@ public class FilterTest extends ListTest
     {
         click(Locator.tagWithText("div", column));
         click(Locator.tagWithText("span", "Filter..."));
-        _extHelper.waitForExtDialog("Show Rows Where "+column+"...");
+        _extHelper.waitForExtDialog("Show Rows Where " + column + "...");
         waitForText("[All]");
         sleep(400);
     }
@@ -111,36 +113,31 @@ public class FilterTest extends ListTest
     private void facetedFilterTest()
     {
         createList2();
-        assertTextPresent("Light", "Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
         startFilter("Color");
 
         log("Verifying expected faceted filter elements present");
-        assertTextPresent("Choose Filters", "Choose Values");
+        verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "Light", "Robust", "Zany");
 
-        assertTextPresent("Light", 2);
-        assertTextPresent("Robust", 2);
-        assertTextPresent("Zany", 2);
         _extHelper.clickExtButton("OK");
-        assertTextPresent("Light", "Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
 
         setFacetedFilter("query", "Color", "Light");
-        assertTextPresent("Light");
-        assertTextNotPresent("Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light");
 
         setUpFacetedFilter("query", "Color", "Robust");
         _extHelper.clickExtTab("Choose Filters");
         //NOTE: the filter will optimize this to EQUALS, since there is 1 value
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
+        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement("value_1"));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
-        assertTextNotPresent("Light", "Zany");
-        assertTextPresent("Robust");
+        verifyColumnValues("query", "Color", "Robust");
 
         // Issue 14710: Switching between faceted and logical filters breaks dialog
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
+        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
@@ -148,65 +145,77 @@ public class FilterTest extends ListTest
         _extHelper.clickExtButton("Confirm change", "Yes", 0);
         _extHelper.clickExtButton("OK");
         //the change above would result in filters being dropped.  because we did not select new filters, we expect this to return an unfiltered grid
-        assertTextPresent("Light", "Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
 
         //now repeat with a filter that should be translated
         setUpFacetedFilter("query", "Color", "Light");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
+        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement("value_1"));
 
         setFormElement("value_1", "Light;Robust");
 
         _extHelper.clickExtTab("Choose Values"); //we should get no alerts, and Light + Robust should be checked
         _extHelper.clickExtButton("OK");
-        assertTextPresent("Light", "Robust");
+        verifyColumnValues("query", "Color", "Light", "Robust");
+        verifyColumnValues("query", "year", "1980", "1970");
         //assertTextNotPresent("Zany");  //NOTE: the filter message is 'Is not any of (Zany)', so this will fail.  test for '1990' instead.
-        assertTextNotPresent("1990");
 
         setFacetedFilter("query", "Color");
-        assertTextPresent("Light", "Robust", "Zany");
-        
+        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
+
         log("Verifying faceted filter on non-lookup column");
         startFilter("year");
-        assertTextPresent("Choose Filters", "Choose Values");
 
-        assertTextPresent("1980", 2);
-        assertTextPresent("1990", 2);
-        assertTextPresent("1970", 2);
+        verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "1980", "1990", "1970");
 
         _extHelper.clickExtButton("OK");
-        assertTextPresent("1980", "1990", "1970");
+        verifyColumnValues("query", "year", "1980", "1970", "1990");
 
         setFacetedFilter("query", "year", "1980");
-        assertTextPresent("1980");
-        assertTextNotPresent("1990", "1970");
+        verifyColumnValues("query", "year", "1980");
 
         setUpFacetedFilter("query", "year", "1990");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
+        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement("value_1"));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
-        assertTextNotPresent("1980", "1970");
-        assertTextPresent("1990");
+        verifyColumnValues("query", "year", "1990");
 
         setUpFacetedFilter("query", "year", "1990", "1980");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
+        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement("value_1"));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.waitForExtDialog("Confirm change");
         _extHelper.clickExtButton("Confirm change", "Yes", 0);
         _extHelper.clickExtButton("OK");
-        assertTextPresent("1980", "1990");
-        assertLinkNotPresentWithText("1970");
+        verifyColumnValues("query", "year", "1980", "1970", "1990");
 
         // TODO: Blocked: 14710: Switching between faceted and logical filters breaks dialog
 //        setFacetedFilter("query", "year");
-//        assertTextPresent("1980", "1990", "1970");
+//        verifyColumnValues("1980", "1990", "1970");
     }
+
+
+    private void verifyColumnValues(String dataregion, String columnName, String... expectedValues)
+    {
+        List<String> expectedList = Arrays.asList(expectedValues);
+        Assert.assertEquals(expectedList, new DataRegionTable(dataregion, this).getColumnDataAsText(columnName));
+    }
+
+
+    private void verifyTextPresentInFilterDialog(String... texts)
+    {
+        Locator loc = Locator.xpath("//div[contains(@class, 'labkey-filter-dialog')]");
+        String filterDialogText = getText(loc);
+
+        for (String text : texts)
+            Assert.assertEquals(1, StringUtils.countMatches(filterDialogText, text));
+    }
+
 
     protected void filterTest()
     {

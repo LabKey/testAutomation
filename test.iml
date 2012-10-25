@@ -32,7 +32,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../remoteapi/java/lib/commons-httpclient-3.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/annotations.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -41,14 +41,10 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-io-2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../remoteapi/java/lib/commons-httpclient-3.1.jar!/" />
         </CLASSES>
-        <JAVADOC>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-io-2.3-javadoc.jar!/" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-io-2.3-sources.jar!/" />
-        </SOURCES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">

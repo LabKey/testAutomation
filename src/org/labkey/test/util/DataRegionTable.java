@@ -312,7 +312,7 @@ public class DataRegionTable
     public List<String> getColumnDataAsText(String name)
     {
         int col = getColumn(name);
-        return  getColumnDataAsText(col);
+        return getColumnDataAsText(col);
     }
 
     /** Find the row number for the given primary key. */
