@@ -492,8 +492,8 @@ public class CohortTest extends BaseWebDriverTest
 
     private void verifySpecimenEnrolledCohortFilterAdvanced(String specimenLink, int allRowCount, int initialRowCount, int currentRowCount, int dataCollectionRowCount)
     {
-        DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
         verifyUnfilteredSpecimens(specimenLink, allRowCount);
+        DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
 
         clickMenuButton("Participant Groups", "Enrolled", "Initial cohort");
         verifyVialCount(specimenTable, initialRowCount);
