@@ -37,7 +37,7 @@ public class FlowCBCTest extends BaseFlowTest
     public static final String STUDY_FOLDER = "KoStudy";
     public static final String CBC_FOLDER = "CBCFolder";
 
-    public static final String ASSAY_NAME = "CBCAssay";
+    public static final String ASSAY_NAME = "CBC results from database";
 
     public static final String PTID1 = "P4309";
     public static final String PTID2 = "P2301";
