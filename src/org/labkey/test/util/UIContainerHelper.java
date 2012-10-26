@@ -79,51 +79,69 @@ public class UIContainerHelper extends AbstractContainerHelper
     @Override
     public void deleteProject(String project, boolean failIfNotFound, int wait)
     {
-            if(!_test.isTextPresent(project))
-                _test.goToHome();
+        // Ensure that projects menu is expanded so test project can be seen
+        Locator minus = Locator.xpath("id('expandCollapse-projectsMenu')/img[contains(@src, 'minus.gif')]");
 
+        if (!_test.isElementPresent(minus))
+        {
             _test.click(Locator.id("expandCollapse-projectsMenu"));
-            if(!_test.isLinkPresentWithText(project))
-                if(failIfNotFound)
-                    Assert.fail("Project "+ project + " not found");
-                else
-                    return;
+            _test.assertElementPresent(minus);
+        }
 
-            _test.clickLinkWithText(project);
-            //Delete even if terms of use is required
-            if (_test.isElementPresent(Locator.name("approvedTermsOfUse")))
+        if (!_test.isLinkPresentWithText(project))
+        {
+            if (failIfNotFound)
             {
-                _test.clickCheckbox("approvedTermsOfUse");
-                _test.clickButton("Agree");
+                Assert.fail("Project \""+ project + "\" not found");
             }
-            _test.ensureAdminMode();
-            _test.goToFolderManagement();
-            _test.waitForExt4FolderTreeNode(project, 10000);
-            _test.clickButton("Delete");
-            // in case there are sub-folders
-            if (_test.isNavButtonPresent("Delete All Folders"))
+            else
             {
-                _test.clickButton("Delete All Folders");
+                _test.log("No need to delete: project \""+ project + "\" not found");
+                _test.goToHome();
             }
-            long startTime = System.currentTimeMillis();
-            // confirm delete:
-            _test.log("Starting delete of project '" + project + "'...");
-            _test.clickButton("Delete", _test.longWaitForPage);
+        }
 
-            if(_test.isLinkPresentWithText(project))
-            {
-                _test.log("Wait extra long for folder to finish deleting.");
-                while (_test.isLinkPresentWithText(project) && System.currentTimeMillis() - startTime < wait)
-                {
-                    _test.sleep(5000);
-                    _test.refresh();
-                }
-            }
-            if (!_test.isLinkPresentWithText(project))
-                _test.log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
-            else Assert.fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
+        _test.clickLinkWithText(project);
 
-            // verify that we're not on an error page with a check for a project link:
-            _test.assertLinkNotPresentWithText(project);
+        //Delete even if terms of use is required
+        if (_test.isElementPresent(Locator.name("approvedTermsOfUse")))
+        {
+            _test.clickCheckbox("approvedTermsOfUse");
+            _test.clickButton("Agree");
+        }
+
+        _test.ensureAdminMode();
+        _test.goToFolderManagement();
+        _test.waitForExt4FolderTreeNode(project, 10000);
+        _test.clickButton("Delete");
+
+        // in case there are sub-folders
+        if (_test.isNavButtonPresent("Delete All Folders"))
+        {
+            _test.clickButton("Delete All Folders");
+        }
+
+        long startTime = System.currentTimeMillis();
+        // confirm delete:
+        _test.log("Starting delete of project '" + project + "'...");
+        _test.clickButton("Delete", _test.longWaitForPage);
+
+        if (_test.isLinkPresentWithText(project))
+        {
+            _test.log("Wait extra long for folder to finish deleting.");
+            while (_test.isLinkPresentWithText(project) && System.currentTimeMillis() - startTime < wait)
+            {
+                _test.sleep(5000);
+                _test.refresh();
+            }
+        }
+
+        if (!_test.isLinkPresentWithText(project))
+            _test.log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
+        else
+            Assert.fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
+
+        // verify that we're not on an error page with a check for a project link:
+        _test.assertLinkNotPresentWithText(project);
     }
 }

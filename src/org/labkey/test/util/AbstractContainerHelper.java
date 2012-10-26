@@ -58,10 +58,10 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _createdProjects.add(projectName);
     }
 
-    public  void deleteProject(String projectName)
+    public void deleteProject(String projectName)
     {
         deleteProject(projectName, true, 90000);
     }
-    public abstract void deleteProject(String projectName, boolean failIfNotFound, int wait);
 
+    public abstract void deleteProject(String projectName, boolean failIfNotFound, int wait);
 }
