@@ -229,6 +229,8 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Reset ourselves to the global user so we can do cleanup
         stopImpersonating();
+        signOut();
+        signIn();
     }
 
     private void clickLinkWithTextNoTarget(String text)
