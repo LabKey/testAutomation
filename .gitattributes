@@ -242,7 +242,6 @@ src/org/labkey/test/tests/SCHARPStudyTest.java -text
 src/org/labkey/test/tests/SampleMindedImportTest.java -text
 src/org/labkey/test/tests/SampleSetTest.java -text
 src/org/labkey/test/tests/SchemaBrowserTest.java -text
-src/org/labkey/test/tests/SchemaTest.java -text
 src/org/labkey/test/tests/ScriptValidationTest.java -text
 src/org/labkey/test/tests/SearchTest.java -text
 src/org/labkey/test/tests/SecurityApiTest.java -text
