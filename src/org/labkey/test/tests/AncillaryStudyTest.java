@@ -193,7 +193,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         String csp = PTIDS[0];
         for( int i = 1; i < PTIDS.length - 1; i++ )
             csp += ","+PTIDS[i];
-        _studyHelper.editCustomParticipantGroup(PARTICIPANT_GROUP, "Mouse", null, null, true, true, csp);
+        _studyHelper.editCustomParticipantGroup(PARTICIPANT_GROUP, "Mouse", null, null, true, true, true, csp);
 
         log("Verify that modified participant group has no effect on ancillary study.");
         clickLinkWithText(STUDY_NAME);

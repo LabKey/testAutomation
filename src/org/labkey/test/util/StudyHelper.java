@@ -119,12 +119,13 @@ public class StudyHelper extends AbstractHelper
     public void editCustomParticipantGroup(String groupName, String participantString, String categoryName,
                                            Boolean isCategoryNameNew, Boolean shared, String... newPtids)
     {
-        editCustomParticipantGroup(groupName, participantString, categoryName, isCategoryNameNew, shared, false, newPtids);
+        editCustomParticipantGroup(groupName, participantString, categoryName, isCategoryNameNew, shared, false, false, newPtids);
     }
 
     @LogMethod
     public void editCustomParticipantGroup(String groupName, String participantString,
-                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... newPtids)
+                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent,
+                                                  Boolean replaceExistingPtids, String... newPtids)
     {
         // Caller must already be on Manage <participantString> Groups page
         // And there should be NO DEMOGRAPHICS DATASETS!
@@ -142,14 +143,20 @@ public class StudyHelper extends AbstractHelper
 
         if( newPtids != null && newPtids.length > 0 )
         {
-            String csp = newPtids[0];
+            StringBuilder csp = new StringBuilder(newPtids[0]);
             for( int i = 1; i < newPtids.length; i++ )
-                csp += ","+newPtids[i];
-            String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
-            if (currentIds != null && currentIds.length() > 0)
-                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp);
+                csp.append(",").append(newPtids[i]);
+
+            if (replaceExistingPtids)
+            {
+                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp.toString());
+            }
             else
-                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp);
+            {
+                String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
+                if (currentIds != null && currentIds.length() > 0)
+                    _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp.toString());
+            }
         }
         if( categoryName != null )
         {

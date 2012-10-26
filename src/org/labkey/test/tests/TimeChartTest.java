@@ -967,7 +967,7 @@ public class TimeChartTest extends StudyBaseTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         log("Remove a participant from one group.");
-        _studyHelper.editCustomParticipantGroup(GROUP1_NAME, "Participant", null, false, null, true, GROUP1_PTIDS[0]);
+        _studyHelper.editCustomParticipantGroup(GROUP1_NAME, "Participant", null, false, null, true, true, GROUP1_PTIDS[0]);
 
         log("Delete one group.");
         _studyHelper.selectParticipantCategoriesGridRow(GROUP3_NAME);
