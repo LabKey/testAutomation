@@ -76,7 +76,15 @@
                </ft:webPart>
            </ft:preferredWebParts>
         </ft:folderTab>
-   </ft:folderTabs>
+        <ft:folderTab tabType="container" folderType="Study">
+            <ft:name>Study Container Tab</ft:name>
+            <ft:caption>Study Container</ft:caption>
+        </ft:folderTab>
+        <ft:folderTab tabType="container" folderType="Assay">
+            <ft:name>Assay Container Tab 2</ft:name>
+            <ft:caption>Assay Container</ft:caption>
+        </ft:folderTab>
+    </ft:folderTabs>
    <ft:modules>
        <ft:moduleName>Core</ft:moduleName>
        <ft:moduleName>simpletest</ft:moduleName>

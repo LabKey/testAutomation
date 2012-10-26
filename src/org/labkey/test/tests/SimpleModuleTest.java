@@ -710,6 +710,21 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickLinkWithText("Import Sample Set");
         waitForPageToLoad();
         verifyTabSelected("Tab 1");
+
+        // Test Container tabs
+        clickTab("Assay Container");
+        waitForPageToLoad();
+        assertTextPresent("Assay List");
+        clickTab("Study Container");
+        assertTextPresent("Study Overview");
+        clickLinkWithText("Create Study");
+        waitForPageToLoad();
+        clickLinkWithText("Create Study");
+        waitForPageToLoad();
+        assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
+        clickLinkWithText("Specimen Data");
+        assertTextPresent("Vial Search", "Specimens");
+
     }
 
     protected void assertModuleDeployed(String moduleName)
