@@ -119,7 +119,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
             _extHelper.clickExtDropDownMenu("userQuery_schema", "lists");
             _extHelper.clickExtDropDownMenu("userQuery_query", listVals[i]);
             _extHelper.clickExtDropDownMenu("userQuery_view", "[default view]");
-            clickButton("Submit", 0);
+            _extHelper.clickExtButton("Submit", 0);
             waitForExtMaskToDisappear();
         }
         setFormElement(Locator.name("galaxyURL"), "http://galaxy.labkey.org:8080");
