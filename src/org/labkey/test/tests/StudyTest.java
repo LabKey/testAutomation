@@ -22,6 +22,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
@@ -30,6 +31,7 @@ import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -731,7 +733,7 @@ public class StudyTest extends StudyBaseTest
         List<Map<String,Object>> rows = selectResp.getRows();
         Assert.assertEquals("Unexpected size of datasetAuditEvent log", previousCount + 1, rows.size());
         log("Dataset audit log contents: " + rows);
-        Assert.assertEquals("A new dataset record was inserted", rows.get(rows.size()-1).get("Comment"));
+        Assert.assertEquals("A new dataset record was inserted", rows.get(rows.size() - 1).get("Comment"));
 
     }
 
@@ -743,6 +745,7 @@ public class StudyTest extends StudyBaseTest
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         selectCmd.setColumns(Arrays.asList("*"));
+        selectCmd.setSorts(Collections.singletonList(new Sort("Date", Sort.Direction.ASCENDING)));
         Connection cn = new Connection(getBaseURL(), getUsername(), PasswordUtil.getPassword());
         SelectRowsResponse selectResp = null;
         try
