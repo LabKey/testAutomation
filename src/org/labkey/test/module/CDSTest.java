@@ -705,10 +705,11 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertMultiAntigenInfoPage();
     }
 
+    //getText(Locator.css("svg"))
     private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0CD4050100150200250300350400450Lymphocytes200400600800100012001400160018002000";
     private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD450100150200250300350400450";
     private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
-    private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Pulse020406080100Weight Kg10100";
+    private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Pulse110100Weight Kg10100";
     private static final String SCATTER_FEEDBACK_STATE = "{\"activeView\":\"scatterview\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Study\"},\"views\":{},\"filters\":[],\"selections\":[],\"detail\":{\"hierarchy\":\"\",\"value\":31,\"highlight\":\"\",\"label\":\"Antigens\",\"valueLabel\":\"\",\"multi\":true},\"id\":206}";
     private void verifyScatterPlot()
     {
@@ -716,25 +717,31 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         selectCDSGroup(GROUP_NAME, true);
         click("Studies");
 
+        String yAxisButton = "\u25ba";
+        String xAxisButton = "\u25b2";
+        int animation = 200;
+
         click(Locator.tagWithText("span", "Plot data"));
-        waitForText("\u25b2");
-        clickButton("\u25b2", 0);
+        waitForText(xAxisButton);
+        sleep(1000);
+        clickButton(xAxisButton, 0);
+        waitForText("Physical Exam (6)");
         _extHelper.pickMeasure("xaxispicker", "Lab Results", "CD4");
         clickButton("Set X-Axis", 0);
-        waitForText("Y Axis");
+        waitForText("Choose Y Axis");
         _extHelper.pickMeasure("yaxispicker", "Lab Results", "Lymphocytes");
         clickButton("Set Y-Axis", 0);
         waitForText(CD4_LYMPH);
 
-        clickButton("\u25ba", 0);
+        clickButton(yAxisButton, 0);
+        sleep(animation);
         _extHelper.pickMeasure("yaxispicker", "Lab Results", "CD4");
         clickButton("Set Y-Axis", 0);
-        clickButton("\u25b2", 0);
+        clickButton(xAxisButton, 0);
+        sleep(animation);
         _extHelper.pickMeasure("xaxispicker", "Lab Results", "Hemoglobin");
         clickButton("Set X-Axis", 0);
         waitForText(HEMO_CD4); // svg to text
-
-        //TODO: Test cancel button [BLOCKED] 15095: Measure picker cancel button doesn't reset selections
 
         click(Locator.tagWithText("span", "Explore"));
         waitForTextToDisappear(HEMO_CD4);
@@ -747,13 +754,17 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         waitForText(HEMO_CD4_UNFILTERED);
 
         // Test log scales
-        clickButton("\u25ba", 0);
+        clickButton(yAxisButton, 0);
+        sleep(animation);
         _extHelper.pickMeasure("yaxispicker", "Physical Exam", "Weight Kg");
-        click(Locator.xpath("(//input[contains(@class, 'x4-form-radio')])[2]")); // set Y to log scale
+        // set Y to log scale
+        click(Locator.xpath("//div[@id='plotymeasurewin']//div[contains(@class, 'x4-form-cb-wrap')][.//label[text()='Log']]//input"));
         clickButton("Set Y-Axis", 0);
-        clickButton("\u25b2", 0);
+        clickButton(xAxisButton, 0);
+        sleep(animation);
         _extHelper.pickMeasure("xaxispicker", "Physical Exam", "Pulse");
-        click(Locator.xpath("(//input[contains(@class, 'x4-form-radio')])[4]")); // set X to log scale
+        // set X to log scale
+        click(Locator.xpath("//div[@id='plotxmeasurewin']//div[contains(@class, 'x4-form-cb-wrap')][.//label[text()='Log']]//input"));
         clickButton("Set X-Axis", 0);
         waitForText(WT_PLSE_LOG);
 
