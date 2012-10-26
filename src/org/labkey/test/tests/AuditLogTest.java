@@ -54,7 +54,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
     @Override
     protected void checkViews(){} // Skip.  Project is deleted as part of test
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         deleteUser(AUDIT_TEST_USER);
         if (isLinkPresentContainingText(AUDIT_TEST_PROJECT))

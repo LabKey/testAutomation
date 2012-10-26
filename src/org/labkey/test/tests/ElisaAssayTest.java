@@ -184,8 +184,9 @@ public class ElisaAssayTest extends ElispotAssayTest
 
     /**
      * Cleanup entry point.
+     * @param afterTest
      */
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         revertToAdmin();
         try {

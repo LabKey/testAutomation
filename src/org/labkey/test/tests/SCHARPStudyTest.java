@@ -116,7 +116,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         log("Starting cleanup...");
         try

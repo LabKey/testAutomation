@@ -893,7 +893,7 @@ public class SequenceTest extends LabModulesTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         File dir = new File(illuminaPipelineLoc);
         File[] files = dir.listFiles();

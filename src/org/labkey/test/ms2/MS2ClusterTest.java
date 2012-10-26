@@ -75,12 +75,12 @@ public class MS2ClusterTest extends PipelineWebTestBase
         return USE_GLOBUS;
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         if (CLEAN_DATA)
         {
             testSet.clean();
-            super.doCleanup();
+            super.doCleanup(afterTest);
         }
     }
 

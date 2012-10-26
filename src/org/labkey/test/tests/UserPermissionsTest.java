@@ -60,7 +60,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         return PERM_PROJECT_NAME;
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         log(this.getClass().getName() + " Cleaning Up");
         if (isLinkPresentContainingText(PERM_PROJECT_NAME))

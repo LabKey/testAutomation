@@ -16,11 +16,9 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.StudyHelper;
+
 import java.io.File;
 
 /**
@@ -56,7 +54,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     }
 
     @Override
-    public void doCleanup()
+    public void doCleanup(boolean afterTest)
     {
         // Delete any containers and users created by the test.
         try{deleteProject(PROJECT_NAME);}catch (Throwable e){/* ingnore */}

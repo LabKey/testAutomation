@@ -20,8 +20,6 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
@@ -481,7 +479,7 @@ public class MS1Test extends BaseSeleniumWebTest
         selenium.open(urlCur);
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         log("Cleaning up MS1 BVT...");
         try

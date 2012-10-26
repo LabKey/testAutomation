@@ -58,7 +58,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try { deleteProject(getProjectName()) ; } catch (Throwable t) { }
     }

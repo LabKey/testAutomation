@@ -821,7 +821,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
             clickButton("Use HTML Source Editor");
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         deleteUser(USER1);
         try {deleteProject(PROJECT2_NAME); } catch (Throwable t) {}  // References TOC in PROJECT_NAME, so delete first

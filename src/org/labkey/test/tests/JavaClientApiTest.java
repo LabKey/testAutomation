@@ -295,7 +295,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         log("Completed test of maxrows=0");
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try
         {

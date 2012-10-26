@@ -1483,7 +1483,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             try
             {
                 log("Pre-cleaning " + getClass().getSimpleName());
-                doCleanup();
+                doCleanup(false);
             }
             catch (Throwable t)
             {
@@ -1526,7 +1526,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 if (!skipCleanup())
                 {
                     goToHome();
-                    doCleanup();
+                    doCleanup(true);
                 }
                 else
                 {
@@ -1614,7 +1614,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected abstract void doTestSteps() throws Exception;
 
-    protected abstract void doCleanup() throws Exception;
+    protected abstract void doCleanup(boolean afterTest) throws Exception;
 
     public void cleanup() throws Exception
     {
@@ -1625,7 +1625,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             // explicitly go back to the site, just in case we're on a 404 or crash page:
             beginAt("");
             signIn();
-            doCleanup();
+            doCleanup(false);   // User requested cleanup... could be before or after tests have run (or some intermediate state). False generally means ignore errors.
 
             beginAt("");
 
@@ -2760,15 +2760,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void deleteProject(String project)
     {
-        deleteProject(project, 90000); // Wait for 90 seconds for project deletion
+        deleteProject(project, true);
     }
 
     public void deleteProject(String project, boolean failIfFail)
     {
-        if(isLinkPresentWithText(project))
-        {
-            deleteProject(project);
-        }
+        _containerHelper.deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
     }
 
     public void deleteProject(String project, int wait)

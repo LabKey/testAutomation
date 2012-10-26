@@ -117,10 +117,10 @@ public class ReportTest extends StudyBaseTest
     private final static String R_SCRIPT2_TEXT2 = "999320672";
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         deleteUsers(false, TEST_USER, R_USER, AUTHOR_USER, DEVELOPER_USER);
-        super.doCleanup();
+        super.doCleanup(afterTest);
     }
 
     @LogMethod

@@ -28,7 +28,7 @@ public class ModuleTest extends BaseSeleniumWebTest
     private static final String PROJECT_NAME = "ModuleVerifyProject";
     private static final String TEST_MODULE_TEMPLATE_FOLDER_NAME = "testmodule";
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

@@ -19,8 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.ListHelper;
+
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import java.io.File;
@@ -102,8 +101,9 @@ public class AssayTest extends AbstractAssayTest
 
     /**
      * Cleanup entry point.
+     * @param afterTest
      */
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         try
         {

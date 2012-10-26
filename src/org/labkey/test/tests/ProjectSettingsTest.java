@@ -106,7 +106,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         goToSiteLookAndFeel();
         checkCheckbox("enableHelpMenu");

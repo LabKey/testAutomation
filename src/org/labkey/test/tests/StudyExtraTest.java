@@ -365,7 +365,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         // flexible and only error if required columns are missing.
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         if (isLinkPresentContainingText(PROJECT_NAME))
         {

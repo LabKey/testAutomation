@@ -85,11 +85,11 @@ public class PipelineTest extends PipelineWebTestBase
         return "server/modules/pipeline";  // + ms2 and ms1
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         _testSetMS2.clean();
         _testSetMS1.clean();
-        super.doCleanup();
+        super.doCleanup(afterTest);
     }
 
     protected void doTestSteps() throws Exception

@@ -98,7 +98,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
     private static final String HPLC_ASSAY_DESC = "IDRI HPLC Assay Data";
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

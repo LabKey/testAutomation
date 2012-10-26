@@ -17,7 +17,6 @@ package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
@@ -45,7 +44,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     }
 
     @Override
-    public void doCleanup()
+    public void doCleanup(boolean afterTest)
     {
         // Delete any containers and users created by the test.
         try

@@ -1277,7 +1277,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             try
             {
                 log("Pre-cleaning " + getClass().getSimpleName());
-                doCleanup();
+                doCleanup(false);
             }
             catch (Throwable t)
             {
@@ -1320,7 +1320,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 if (!skipCleanup())
                 {
                     goToHome();
-                    doCleanup();
+                    doCleanup(true);
                 }
                 else
                 {
@@ -1406,7 +1406,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected abstract void doTestSteps() throws Exception;
 
-    protected abstract void doCleanup() throws Exception;
+    protected abstract void doCleanup(boolean afterTest) throws Exception;
 
     public void cleanup() throws Exception
     {
@@ -1423,7 +1423,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             // explicitly go back to the site, just in case we're on a 404 or crash page:
             beginAt("");
             signIn();
-            doCleanup();
+            doCleanup(false);   // User requested cleanup... could be before or after tests have run (or some intermediate state). False generally means ignore errors.
 
             beginAt("");
 

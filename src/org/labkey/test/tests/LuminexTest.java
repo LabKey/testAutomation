@@ -26,7 +26,6 @@ import org.labkey.test.util.RReportHelper;
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -1130,8 +1129,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
     /**
      * Cleanup entry point.
+     * @param afterTest
      */
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         revertToAdmin();
         try

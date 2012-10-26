@@ -406,7 +406,7 @@ public class FilterTest extends ListTest
     }
 
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

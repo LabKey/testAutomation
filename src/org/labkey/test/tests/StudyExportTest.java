@@ -17,9 +17,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -621,9 +618,9 @@ public class StudyExportTest extends StudyManualTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
-        super.doCleanup();
+        super.doCleanup(afterTest);
 
         deleteDir(new File(getPipelinePath() + "export"));
     }

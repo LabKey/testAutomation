@@ -16,14 +16,9 @@
 package org.labkey.test;
 
 import org.junit.Assert;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.test.util.APIAssayHelper;
-import org.labkey.test.util.AbstractAssayHelper;
-import org.labkey.test.util.UIAssayHelper;
 
-import java.io.IOException;
 import java.util.Collections;
-import java.util.StringTokenizer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -85,7 +80,7 @@ public class AssayAPITest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         _containerHelper.deleteProject(getProjectName());
         //To change body of implemented methods use File | Settings | File Templates.

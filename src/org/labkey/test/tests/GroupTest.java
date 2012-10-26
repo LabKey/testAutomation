@@ -19,7 +19,6 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.StringHelper;
 
 /**
@@ -49,7 +48,7 @@ public class GroupTest extends BaseSeleniumWebTest
         return getProjectName() + "2";
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         deleteUsers(false, TEST_USERS_FOR_GROUP);
         try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}

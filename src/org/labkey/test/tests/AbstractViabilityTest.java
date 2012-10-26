@@ -44,7 +44,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     protected abstract String getFolderName();
     protected abstract String getAssayName();
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try
         {

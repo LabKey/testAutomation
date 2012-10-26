@@ -122,7 +122,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         return new File[0]; 
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try { deleteProject(getProjectName()); } catch (Throwable e) {}
 

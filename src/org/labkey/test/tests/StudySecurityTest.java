@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 
 /*
 * User: dave
@@ -250,9 +249,9 @@ public class StudySecurityTest extends StudyBaseTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
-        super.doCleanup();
+        super.doCleanup(afterTest);
         deleteUser(READER);
         deleteUser(EDITOR);
         deleteUser(LIMITED);

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 
 /**
@@ -38,7 +37,7 @@ public class SchemaTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
     }
 

@@ -15,10 +15,8 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ListHelper;
 
@@ -47,7 +45,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try{deleteProject(getProjectName());}catch(Throwable t){/**/}
         try{deleteUsers(false, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);}catch(Throwable t){/**/}

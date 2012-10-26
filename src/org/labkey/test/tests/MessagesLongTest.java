@@ -77,7 +77,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         stopImpersonating();
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         deleteUser(USER1);
         deleteUser(USER2);

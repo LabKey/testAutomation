@@ -28,7 +28,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
@@ -202,7 +201,7 @@ public class ComplianceTrainingTest extends BaseSeleniumWebTest implements Advan
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         deleteProject(getProjectName());
     }

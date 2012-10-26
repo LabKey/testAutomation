@@ -57,7 +57,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         return "server/modules/experiment";
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

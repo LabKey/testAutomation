@@ -19,7 +19,6 @@ package org.labkey.test.ms2;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.IOException;
 import java.io.File;
@@ -60,7 +59,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     protected static final String SEARCH_BUTTON = "Mascot";
     protected static final String SEARCH_NAME = "MASCOT";
 
-    protected void doCleanup() throws IOException
+    protected void doCleanup(boolean afterTest) throws IOException
     {
         try {
             deleteViews(VIEW); } catch (Throwable t) {}

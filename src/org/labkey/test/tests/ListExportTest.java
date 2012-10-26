@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -75,7 +74,7 @@ public class ListExportTest extends ListTest
     }
 
     @Override
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
        deleteProject(getProjectName());
     }

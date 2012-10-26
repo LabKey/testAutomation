@@ -18,9 +18,6 @@ package org.labkey.test.tests;
 import junit.framework.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
@@ -239,7 +236,7 @@ public class TimeChartTest extends StudyBaseTest
     }
 
     @Override
-    public void doCleanup()
+    public void doCleanup(boolean afterTest)
     {
         try {deleteUser(USER1);} catch (Throwable T) {}
         try {deleteUser(USER2);} catch (Throwable T) {}

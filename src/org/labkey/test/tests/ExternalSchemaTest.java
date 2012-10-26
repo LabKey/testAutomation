@@ -25,7 +25,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -172,7 +171,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         clickButton("Update");
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

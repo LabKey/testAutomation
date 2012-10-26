@@ -60,9 +60,9 @@ public class UserTest extends SecurityTest
     }
 
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
-        super.doCleanup();
+        super.doCleanup(afterTest);
         clickButton("Change User Properties");
         checkRequiredField("FirstName", false);
         clickButton("Save");

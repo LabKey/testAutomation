@@ -18,7 +18,6 @@ package org.labkey.test.ms2;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.IOException;
@@ -34,7 +33,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
     protected static final String TEST_ASSAY_NAME = "AutomatedTestAssay";
     private static final String ANNOTATION_RUN_NAME = "Automated Test Annotation Run";
 
-    abstract protected void doCleanup() throws IOException;
+    abstract protected void doCleanup(boolean afterTest) throws IOException;
 
     abstract protected void setupEngine();
 

@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
 
 import java.util.Arrays;
 
@@ -65,7 +64,7 @@ public class CreateVialsTest extends AbstractViabilityTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try
         {

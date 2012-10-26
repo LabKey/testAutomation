@@ -87,7 +87,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         uploadTransformQCRuns();
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {
             deleteEngine();

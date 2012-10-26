@@ -25,7 +25,6 @@ import org.labkey.test.util.Maps;
 import org.labkey.remoteapi.query.*;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.RReportHelperWD;
 
 import java.io.IOException;
@@ -728,7 +727,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         cleanupSchema(cn);

@@ -64,7 +64,7 @@ public class TargetStudyTest extends AbstractAssayTestWD
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try
         {

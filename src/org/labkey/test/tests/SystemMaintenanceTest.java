@@ -56,7 +56,7 @@ public class SystemMaintenanceTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         //To change body of implemented methods use File | Settings | File Templates.
     }

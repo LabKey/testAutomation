@@ -21,7 +21,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.EmailRecordTable.EmailMessage;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         deleteUser(USER1);
         deleteUser(USER2);

@@ -101,7 +101,7 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
     }
 
     @Override
-    public void doCleanup()
+    public void doCleanup(boolean afterTest)
     {
         long startTime = System.currentTimeMillis();
         try {deleteProject(PROJECT_NAME);} catch (Throwable t) { /*ignore*/ }

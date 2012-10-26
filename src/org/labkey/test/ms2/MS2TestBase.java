@@ -62,7 +62,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup() throws IOException
+    protected void doCleanup(boolean afterTest) throws IOException
     {
         cleanPipe(_pipelinePath);
         try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}

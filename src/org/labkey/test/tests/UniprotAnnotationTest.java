@@ -109,7 +109,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         selenium.selectWindow(null);
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         deleteProject(PROJECT_NAME);
     }

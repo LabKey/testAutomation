@@ -17,8 +17,6 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.util.ExtHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -234,7 +232,7 @@ public class LibraTest extends MS2Test
     }
 
     @Override
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName());
     }

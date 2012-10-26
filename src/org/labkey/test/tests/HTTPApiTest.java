@@ -62,7 +62,7 @@ public class HTTPApiTest extends SimpleApiTest
         return "server/modules/query";
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

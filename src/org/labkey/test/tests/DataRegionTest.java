@@ -99,7 +99,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

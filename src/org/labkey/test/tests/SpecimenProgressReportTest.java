@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.ListHelper;
@@ -170,7 +169,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         deleteProject(getProjectName());
     }

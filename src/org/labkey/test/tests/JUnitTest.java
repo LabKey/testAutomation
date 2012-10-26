@@ -20,7 +20,6 @@ import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.Runner;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -76,7 +75,7 @@ public class JUnitTest extends TestSuite
         }
         protected String getProjectName() {return null;}
         protected void doTestSteps() throws Exception { }
-        protected void doCleanup() throws Exception { }
+        protected void doCleanup(boolean afterTest) throws Exception { }
         public String getAssociatedModuleDirectory() { return null; }
     }
 

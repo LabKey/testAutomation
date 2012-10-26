@@ -94,11 +94,11 @@ public class StudyTest extends StudyBaseTest
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 
-    protected void doCleanup() throws Exception //child class cleanup method throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception //child class cleanup method throws Exception
     {
         try{emptyParticipantPickerList();}catch(Throwable t){ /* Ignore */ }
         deleteUser(authorUser);
-        super.doCleanup();
+        super.doCleanup(afterTest);
     }
 
     protected void emptyParticipantPickerList()

@@ -43,7 +43,7 @@ public class ReagentTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try { deleteProject(PROJECT_NAME); } catch (Throwable t) { }
     }

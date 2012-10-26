@@ -345,8 +345,9 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
     /**
      * Cleanup entry point.
+     * @param afterTest
      */
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         revertToAdmin();
         try {

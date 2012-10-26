@@ -19,9 +19,7 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
 
-import java.io.IOException;
-
- /**
+/**
  * User: tchad
  * Date: March 3, 2011
  * Time: 3:49:59 PM
@@ -42,7 +40,7 @@ public class JUnitFooter extends BaseWebDriverTest
     }
 
     @Override
-    public void doCleanup()
+    public void doCleanup(boolean afterTest)
     {
         // Delete any containers created by the test.
     }

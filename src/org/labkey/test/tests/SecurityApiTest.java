@@ -56,7 +56,7 @@ public class SecurityApiTest extends SimpleApiTest
         exitPermissionsUI();
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(PROJECT_NAME);} catch(Exception ignore) {}
         try {deleteUser(USER_1);} catch(Exception ignore) {}

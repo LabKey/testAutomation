@@ -153,7 +153,7 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         deleteProject(getProjectName() + TRICKY_CHARACTERS_FOR_PROJECT_NAMES, false);
         deleteProject(getProjectName(), false);

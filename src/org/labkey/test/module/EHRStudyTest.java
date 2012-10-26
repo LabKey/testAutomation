@@ -154,7 +154,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
     }
 
     @Override
-    public void doCleanup()
+    public void doCleanup(boolean afterTest)
     {
         long startTime = System.currentTimeMillis();
         try{deleteRecords();}catch(Throwable T){}

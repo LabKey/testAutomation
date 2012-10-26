@@ -104,7 +104,7 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
         );
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try
         {

@@ -21,9 +21,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.ms2.MS2TestBase;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,7 +85,7 @@ public class MS2Test extends MS2TestBase
     protected static final String RUN_GROUP2_NAME = "Test Run Group 2";
     protected static final String RUN_GROUP3_NAME = "Test Run Group 3";
 
-    protected void doCleanup() throws IOException
+    protected void doCleanup(boolean afterTest) throws IOException
     {
         cleanPipe(SEARCH_TYPE);
         try {deleteProject(PROJECT_NAME); } catch (Throwable ignored) {}

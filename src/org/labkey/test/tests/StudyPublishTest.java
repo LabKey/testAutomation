@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
 
@@ -114,11 +113,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     private int _pipelineJobs = 0;
 
-    public void doCleanup() throws Exception
+    public void doCleanup(boolean afterTest) throws Exception
     {
         deleteProject(getProjectName());
         deleteProject(PUB2_NAME);
-        super.doCleanup();
+        super.doCleanup(afterTest);
     }
 
     @Override

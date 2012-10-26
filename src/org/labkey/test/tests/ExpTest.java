@@ -50,7 +50,7 @@ public class ExpTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

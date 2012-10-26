@@ -142,7 +142,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         for (String user : EMAIL_RECIPIENTS)
             deleteUser(user);

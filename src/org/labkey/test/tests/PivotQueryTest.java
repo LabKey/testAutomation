@@ -41,7 +41,7 @@ public class PivotQueryTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(getProjectName()); } catch (Throwable t) {}
     }

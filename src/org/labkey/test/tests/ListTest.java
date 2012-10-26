@@ -131,7 +131,7 @@ public class ListTest extends BaseSeleniumWebTest
         return PROJECT_VERIFY;
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         try {deleteProject(PROJECT_VERIFY); } catch (Throwable t) {}
         try {deleteProject(PROJECT_OTHER); } catch (Throwable t) {}

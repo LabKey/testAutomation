@@ -39,7 +39,7 @@ public class JUnitHeader extends BaseWebDriverTest
     }
 
     @Override
-    public void doCleanup(){ }
+    public void doCleanup(boolean afterTest){ }
 
     @Override
     public void testSteps()

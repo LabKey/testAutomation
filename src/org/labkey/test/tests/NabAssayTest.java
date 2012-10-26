@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -564,8 +563,9 @@ public class NabAssayTest extends AbstractQCAssayTest
 
     /**
      * Cleanup entry point.
+     * @param afterTest
      */
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         if (!CONTINUE)
         {

@@ -45,7 +45,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
     }
 
     @Override
-    public void doCleanup()
+    public void doCleanup(boolean afterTest)
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

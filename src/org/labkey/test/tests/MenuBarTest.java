@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.Locator;
 
 import java.io.File;
@@ -179,7 +178,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         assertTextPresent("Demo Study", "Study Overview");
     }
 
-    protected void doCleanup()
+    protected void doCleanup(boolean afterTest)
     {
         try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
     }

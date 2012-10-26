@@ -34,7 +34,7 @@ abstract public class PipelineWebTestBase extends BaseSeleniumWebTest
         return _projectName;
     }
 
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(_projectName); } catch (Throwable t) {}        
     }

@@ -53,7 +53,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         File specimenDir = new File(getLabKeyRoot() + "/sampledata/study/specimens");
         File specimenArchive = new File(specimenDir, "SampleMindedExport.specimens");

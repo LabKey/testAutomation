@@ -59,7 +59,7 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         _studyDataRoot = getLabKeyRoot() + "/sampledata/study";
         File tempDir = new File(getLabKeyRoot() + SPECIMEN_TEMP_DIR);

@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -189,7 +188,7 @@ public class SearchTest extends StudyTest
     }
 
     @Override
-    protected void doCleanup() throws Exception
+    protected void doCleanup(boolean afterTest) throws Exception
     {
         try {deleteProject(getProjectName());} catch (Throwable t) {}
         if (_testDone)
@@ -197,7 +196,7 @@ public class SearchTest extends StudyTest
             sleep(5000); // wait for index to update.
             _searchHelper.verifyNoSearchResults();
         }
-        super.doCleanup();
+        super.doCleanup(afterTest);
     }
 
     private void addSearchableContainers()
