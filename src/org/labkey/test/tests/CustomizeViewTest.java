@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import com.google.common.base.Function;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.ListHelperWD;
 
@@ -104,7 +105,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         log("** Add another filter: LastName != 'Johnson'");
         addFilter(LAST_NAME_COLUMN, "Does Not Equal", "Johnson");
         assertTextPresent("Janeson");
-        assertTextNotPresent("Johnson");
+        assertElementNotPresent(Locator.tagContainingText("td", "Johnson"));
 
         log("** Remove filter");
         removeFilter(LAST_NAME_COLUMN);
