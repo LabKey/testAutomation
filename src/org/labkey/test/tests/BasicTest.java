@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.UIContainerHelper;
