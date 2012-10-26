@@ -98,6 +98,7 @@ public class UIContainerHelper extends AbstractContainerHelper
             {
                 _test.log("No need to delete: project \""+ project + "\" not found");
                 _test.goToHome();
+                return;
             }
         }
 
