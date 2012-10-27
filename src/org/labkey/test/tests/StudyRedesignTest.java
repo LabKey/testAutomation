@@ -90,10 +90,57 @@ public class StudyRedesignTest extends StudyBaseTest
     @Override
     protected void doVerifySteps()
     {
+        customizeTabsTest();
         dataViewsWebpartTest();
         scheduleWebpartTest();
         participantListWebpartTest();
         exportImportTest();
+    }
+
+    private void customizeTabsTest()
+    {
+        log("Customize Tabs");
+        moveTab("Overview", "Left"); // Nothing should happen.
+        moveTab("Overview", "Right");
+        Assert.assertTrue("Mice".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[1]//a[1]")))); // Verify Mice is in the first position.
+        Assert.assertTrue("Overview".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[2]//a[1]")))); // Verify Overview is in the second.
+        moveTab("Manage", "Right"); // Nothing should happen.
+        Assert.assertTrue("Manage".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[5]//a[1]")))); // Verify Manage did not swap with +
+        removeTab("Specimens");
+        addTab("TEST TAB 1");
+        clickLinkWithText("TEST TAB 1");
+        addWebPart("Wiki");
+        removeTab("TEST TAB 1");
+    }
+
+    private void clickTabMenuItem(String tabText, boolean wait, String... items)
+    {
+        Locator tabMenuXPath = Locator.xpath("//div[@class=\"labkey-app-bar\"]//ul//li//a[text()='" + tabText +"']/following-sibling::span//a");
+        waitForElement(tabMenuXPath);
+        _extHelper.clickExtMenuButton(wait, tabMenuXPath, items);
+    }
+
+    private void moveTab(String tabText, String direction)
+    {
+        log("Moving tab " + tabText + " to the " + direction);
+        clickTabMenuItem(tabText, false, "Move", direction);
+        sleep(250);
+    }
+
+    private void removeTab(String tabText)
+    {
+        log("Removing " + tabText + " tab");
+        clickTabMenuItem(tabText, true, "Remove");
+        assertElementNotPresent(Locator.xpath("//div[@class=\"labkey-app-bar\"]//ul//li//a[text()='" + tabText +"']"));
+    }
+
+    private void addTab(String tabName)
+    {
+        log("Adding tab with name " + tabName);
+        clickLinkWithText("+");
+        waitForText("Add Tab");
+        setFormElement(Locator.input("tabName"), tabName);
+        clickButton("save");
     }
 
     private void dataViewsWebpartTest()
