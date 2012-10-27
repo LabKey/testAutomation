@@ -55,12 +55,6 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
-    {
-       deleteProject(getProjectName());
-    }
-
-    @Override
     public String getAssociatedModuleDirectory()
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.

@@ -181,20 +181,4 @@ public class ElisaAssayTest extends ElispotAssayTest
 
         clickButton(finalButton);
     }
-
-    /**
-     * Cleanup entry point.
-     * @param afterTest
-     */
-    protected void doCleanup(boolean afterTest)
-    {
-        revertToAdmin();
-        try {
-            deleteProject(TEST_ASSAY_PRJ_ELISA);
-            deleteEngine();
-        }
-        catch(Throwable T) {}
-
-        deleteDir(getTestTempDir());
-    } //doCleanup()
 }

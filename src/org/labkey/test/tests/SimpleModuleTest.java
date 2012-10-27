@@ -742,16 +742,19 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        cleanupSchema(cn);
-
         try
         {
-            deleteProject(getProjectName());
+            cleanupSchema(cn);
         }
-        catch(Throwable ignore) {}
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        super.doCleanup(afterTest);
         log("Cleaned up SimpleModuleTest project.");
     }
 

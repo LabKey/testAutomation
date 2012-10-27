@@ -45,10 +45,11 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
-        try{deleteProject(getProjectName());}catch(Throwable t){/**/}
-        try{deleteUsers(false, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);}catch(Throwable t){/**/}
+        super.doCleanup(afterTest);
+
+        deleteUsers(afterTest, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
         try{deleteGroup(TEST_GROUP);}catch(Throwable t){/**/}
     }
 

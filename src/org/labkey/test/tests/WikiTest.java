@@ -65,11 +65,6 @@ public class WikiTest extends BaseWebDriverTest
         return true;
     }
 
-    protected void doCleanup(boolean afterTest)
-    {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-    }
-
     protected void doTestSteps()
     {
         log("Create Project");

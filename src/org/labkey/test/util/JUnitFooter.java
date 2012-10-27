@@ -40,12 +40,6 @@ public class JUnitFooter extends BaseWebDriverTest
     }
 
     @Override
-    public void doCleanup(boolean afterTest)
-    {
-        // Delete any containers created by the test.
-    }
-
-    @Override
     public void testSteps()
     {
         log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");

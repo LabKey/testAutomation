@@ -350,8 +350,10 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void doCleanup(boolean afterTest)
     {
         revertToAdmin();
-        try {
-            deleteProject(TEST_ASSAY_PRJ_ELISPOT);
+        super.doCleanup(afterTest);
+
+        try
+        {
             deleteEngine();
         }
         catch(Throwable T) {}

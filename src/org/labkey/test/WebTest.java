@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Mark Igra
  * Date: Feb 8, 2007
  * Time: 4:26:59 PM

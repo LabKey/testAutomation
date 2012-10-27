@@ -116,17 +116,6 @@ public class SCHARPStudyTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
-    {
-        log("Starting cleanup...");
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch(Throwable ignore){}
-        log("Cleaned up successfully.");
-    }
-
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";

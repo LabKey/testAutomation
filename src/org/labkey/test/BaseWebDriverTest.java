@@ -272,7 +272,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return WebTestHelper.getContextPath();
     }
 
-    protected abstract String getProjectName();
+    protected abstract @Nullable String getProjectName();
 
     @Before
     public void setUp() throws Exception
@@ -1614,7 +1614,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected abstract void doTestSteps() throws Exception;
 
-    protected abstract void doCleanup(boolean afterTest) throws Exception;
+    // Standard cleanup: delete the project
+    protected void doCleanup(boolean afterTest)
+    {
+        String projectName = getProjectName();
+
+        if (null != projectName)
+            deleteProject(projectName, afterTest);
+    }
 
     public void cleanup() throws Exception
     {

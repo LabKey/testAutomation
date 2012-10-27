@@ -607,12 +607,6 @@ public class CohortTest extends BaseWebDriverTest
         return getText(loc);
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws Exception
-    {
-        try {deleteProject(PROJECT_NAME);} catch (Throwable T) {}
-    }
-
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";

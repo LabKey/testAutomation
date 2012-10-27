@@ -75,10 +75,15 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (CommandException e)
         {
-            if(e.getMessage().contains("Not Found") && failIfNotFound)
-                Assert.fail("Project not found");
+            if (e.getMessage().contains("Not Found"))
+            {
+                if (failIfNotFound)
+                    Assert.fail("Project not found");
+            }
             else
+            {
                 Assert.fail(e.getMessage());
+            }
         }
         catch (IOException e)
         {

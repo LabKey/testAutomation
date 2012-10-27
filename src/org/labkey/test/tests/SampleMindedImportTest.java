@@ -53,7 +53,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         File specimenDir = new File(getLabKeyRoot() + "/sampledata/study/specimens");
         File specimenArchive = new File(specimenDir, "SampleMindedExport.specimens");
@@ -67,7 +67,8 @@ public class SampleMindedImportTest extends BaseWebDriverTest
             }
         }
 
-        try { deleteProject(PROJECT_NAME); } catch (Throwable e) {}
+        // Now delete the project
+        super.doCleanup(afterTest);
     }
 
     @Override

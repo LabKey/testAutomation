@@ -41,12 +41,6 @@ public class PivotQueryTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
-    {
-        try {deleteProject(getProjectName()); } catch (Throwable t) {}
-    }
-
-    @Override
     protected boolean isFileUploadTest()
     {
         return true;

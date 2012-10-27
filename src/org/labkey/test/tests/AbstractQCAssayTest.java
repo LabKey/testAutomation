@@ -17,12 +17,15 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.util.ExtHelper;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.PasswordUtil;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Created by IntelliJ IDEA.

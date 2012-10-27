@@ -22,6 +22,7 @@ import junit.framework.AssertionFailedError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -151,7 +152,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return WebTestHelper.getContextPath();
     }
 
-    protected abstract String getProjectName();
+    protected abstract @Nullable String getProjectName();
 
     @Before
     public void setUp() throws Exception

@@ -35,11 +35,6 @@ public class BasicTest extends BaseWebDriverTest
     private static final String WIKI_WEBPART_TEXT = "The Wiki web part displays a single wiki page.";
     private static final String MESSAGES_WEBPART_TEXT = "all messages";
 
-    protected void doCleanup(boolean afterTest)
-    {
-        deleteProject(PROJECT_NAME, afterTest);
-    }
-
     protected String getProjectName()
     {
         return PROJECT_NAME;

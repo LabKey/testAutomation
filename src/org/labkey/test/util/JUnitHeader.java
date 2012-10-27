@@ -39,9 +39,6 @@ public class JUnitHeader extends BaseWebDriverTest
     }
 
     @Override
-    public void doCleanup(boolean afterTest){ }
-
-    @Override
     public void testSteps()
     {
         log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");

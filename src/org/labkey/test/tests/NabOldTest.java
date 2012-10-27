@@ -48,10 +48,10 @@ public class NabOldTest extends AbstractQCAssayTestWD
         return true;
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        super.doCleanup(afterTest);
     }
 
     protected void runUITests()

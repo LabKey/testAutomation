@@ -63,15 +63,6 @@ public class TargetStudyTest extends AbstractAssayTestWD
         return TEST_ASSAY_PRJ_SECURITY;
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws Exception
-    {
-        try
-        {
-            deleteProject(TEST_ASSAY_PRJ_SECURITY);
-        }
-        catch (Throwable t) { }
-    }
 
     @Override
     protected void runUITests() throws Exception

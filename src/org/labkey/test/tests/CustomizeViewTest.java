@@ -73,12 +73,6 @@ public class CustomizeViewTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
-    {
-        try { deleteProject(PROJECT_NAME) ; } catch (Throwable t) { }
-    }
-
-    @Override
     protected void doTestSteps() throws Exception
     {
         _containerHelper.createProject(PROJECT_NAME, null);

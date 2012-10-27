@@ -63,15 +63,12 @@ public class UserPermissionsTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         log(this.getClass().getName() + " Cleaning Up");
-        if (isLinkPresentContainingText(PERM_PROJECT_NAME))
-        {
-            try {deleteProject(PERM_PROJECT_NAME); } catch (Throwable t) { t.printStackTrace();}
-        }
+        deleteProject(PERM_PROJECT_NAME, afterTest);
 
-        deleteUser(GAMMA_EDITOR_USER);
-        deleteUser(GAMMA_AUTHOR_USER);
-        deleteUser(GAMMA_READER_USER);
-        deleteUser(GAMMA_PROJECT_ADMIN_USER);
+        deleteUsers(afterTest, GAMMA_EDITOR_USER);
+        deleteUsers(afterTest, GAMMA_AUTHOR_USER);
+        deleteUsers(afterTest, GAMMA_READER_USER);
+        deleteUsers(afterTest, GAMMA_PROJECT_ADMIN_USER);
     }
 
     protected void doTestSteps()
