@@ -4563,7 +4563,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
 
     // waits for page to load after button is clicked
-    // use clickButton(text, 0) to click a button and continure immediately
+    // use clickButton(text, 0) to click a button and continue immediately
     public void clickButton(String text)
     {
         clickButton(text, defaultWaitForPage);

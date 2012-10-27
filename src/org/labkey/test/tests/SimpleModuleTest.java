@@ -551,7 +551,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         clickButton("Import Data");
-        Assert.assertTrue("Import message not present", isTextPresent("Hello. Please read this before you import data"));
+        Assert.assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");
         Assert.assertTrue("Wrong number of templates found", getXpathCount((Locator.XPathLocator)l) == 2);
