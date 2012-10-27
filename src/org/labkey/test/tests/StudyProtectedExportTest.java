@@ -76,7 +76,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         _extHelper.setExtFormElementByLabel("Prefix", idPreface);
         setFormElement("numberOfDigits", "" + idLength);
         clickButton("Change Alternate IDs", 0);
-        waitForText("If you have published this study before ");
+        waitForText("Are you sure you want to change all Alternate IDs?");
         clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         waitForText("Changing Alternate IDs is complete");
         clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
