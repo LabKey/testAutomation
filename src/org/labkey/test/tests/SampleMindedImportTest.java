@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -82,7 +83,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
 
         clickLinkWithText("manage visits");
         clickLinkWithText("create new visit");
-        setFormElement(Locator.name("label"),"SR");
+        setFormElement(Locator.name("label"),"Visit SE");
         setFormElement(Locator.name("sequenceNumMin"),"999.0000");
         setFormElement(Locator.name("sequenceNumMax"),"999.9999");
         selectOptionByValue(Locator.name("sequenceNumHandling"),"logUniqueByDate");
@@ -128,6 +129,13 @@ public class SampleMindedImportTest extends BaseWebDriverTest
 
         clickLinkWithText("Group vials");
         assertLinkPresentWithTextCount("TestStudy03P20043001", 2);
-        assertTextPresent("SR");
+        assertTextPresent("Visit SE");
+
+        // add column sequencenum
+        new CustomizeViewsHelper(this).openCustomizeViewPanel();
+        new CustomizeViewsHelper(this).showHiddenItems();
+        new CustomizeViewsHelper(this).addCustomizeViewColumn("SequenceNum");
+        new CustomizeViewsHelper(this).applyCustomView();
+        assertTextPresent("999.0138");
     }
 }
