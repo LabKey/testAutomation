@@ -80,6 +80,17 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         click(Locator.radioButtonByNameAndValue("simpleRepository", "true"));
         clickButton("Create Study");
 
+        clickLinkWithText("manage visits");
+        clickLinkWithText("create new visit");
+        setFormElement(Locator.name("label"),"SR");
+        setFormElement(Locator.name("sequenceNumMin"),"999.0000");
+        setFormElement(Locator.name("sequenceNumMax"),"999.9999");
+        selectOptionByValue(Locator.name("sequenceNumHandling"),"logUniqueByDate");
+        clickLinkWithText("save");
+
+        // "overview" is a dumb place for this link
+        clickLinkWithText("Overview");
+        clickLinkWithText("manage files");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/study");
         clickLinkWithText(PROJECT_NAME + " Study");
         clickLinkWithText("Manage Files");
@@ -117,6 +128,6 @@ public class SampleMindedImportTest extends BaseWebDriverTest
 
         clickLinkWithText("Group vials");
         assertLinkPresentWithTextCount("TestStudy03P20043001", 2);
-        assertTextPresent("999.0");
+        assertTextPresent("SR");
     }
 }
