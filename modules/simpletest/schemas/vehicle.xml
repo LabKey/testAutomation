@@ -34,6 +34,7 @@
 
   <ns:table tableName="Manufacturers" tableDbType="TABLE">
     <ns:pkColumnName>RowId</ns:pkColumnName>
+    <ns:auditLogging>SUMMARY</ns:auditLogging>
     <ns:columns>
       <ns:column columnName="RowId">
         <ns:datatype>serial</ns:datatype>
@@ -53,6 +54,7 @@
 
   <ns:table tableName="Models" tableDbType="TABLE">
     <ns:pkColumnName>RowId</ns:pkColumnName>
+    <ns:auditLogging>DETAILED</ns:auditLogging>
     <ns:columns>
       <ns:column columnName="RowId">
         <ns:datatype>serial</ns:datatype>

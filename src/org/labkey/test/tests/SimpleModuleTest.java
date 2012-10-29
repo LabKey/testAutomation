@@ -19,6 +19,7 @@ import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.Maps;
@@ -82,6 +83,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickLinkWithText(getProjectName());
         doTestCustomFolder();
         doTestSchemas();
+        doTestTableAudit();
         doTestViews();
         doTestWebParts();
         createList();
@@ -145,7 +147,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.<String, Object>of("ManufacturerId", toyotaId,
-                                        "Name", "Prius"),
+                                        "Name", "Prius C"),
                 Maps.<String, Object>of("ManufacturerId", toyotaId,
                                         "Name", "Camry"),
                 Maps.<String, Object>of("ManufacturerId", fordId,
@@ -165,13 +167,23 @@ public class SimpleModuleTest extends BaseWebDriverTest
         {
             Long rowId = (Long)row.get("RowId");
             String name = (String)row.get("Name");
-            if (name.equalsIgnoreCase("Prius"))
+            if (name.equalsIgnoreCase("Prius C"))
                 priusId = rowId;
             else if (name.equalsIgnoreCase("F150"))
                 f150Id = rowId;
         }
         Assert.assertNotNull(priusId);
         Assert.assertNotNull(f150Id);
+
+        // update a row in models
+        UpdateRowsCommand updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Models");
+        updateCmd.getRows().addAll(Arrays.asList(
+                Maps.<String, Object>of(
+                        "RowId", priusId,
+                        "Name", "Prius"
+                )
+        ));
+        updateCmd.execute(cn, getProjectName());
 
         log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
@@ -238,7 +250,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         vehicleIds[1] = (Long)(insertResp.getRows().get(1).get("RowId"));
 
         log("** Trying to update Vehicle from wrong container...");
-        UpdateRowsCommand updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         updateCmd.getRows().addAll(Arrays.asList(
                 Maps.<String, Object>of(
                         "RowId", vehicleIds[1],
@@ -339,6 +351,68 @@ public class SimpleModuleTest extends BaseWebDriverTest
             Assert.assertEquals(401, ex.getStatusCode());
 //            Assert.assertEquals("The row is from the wrong container.", ex.getMessage());
         }
+    }
+
+    private void doTestTableAudit() throws Exception
+    {
+        goToSchemaBrowser();
+        pushLocation();
+
+        // manufacturers should have an audit level of summary
+        selectSchema(VEHICLE_SCHEMA);
+        selectQuery(VEHICLE_SCHEMA, "Manufacturers");
+
+        assertLinkPresentWithText("view history");
+        clickLinkContainingText("view history");
+
+        DataRegionTable table = new DataRegionTable("audit", this, false, true);
+        Assert.assertEquals("3 row(s) were inserted.", table.getDataAsText(0, "Comment"));
+
+        // models should have an audit level of detailed
+        popLocation();
+        selectSchema(VEHICLE_SCHEMA);
+        selectQuery(VEHICLE_SCHEMA, "Models");
+        pushLocation();
+
+        assertLinkPresentWithText("view history");
+        clickLinkContainingText("view history");
+
+        table = new DataRegionTable("audit", this, false, true);
+        Assert.assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
+        Assert.assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
+
+        // click the details link
+        pushLocation();
+        table.clickLink(1,0);
+        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
+        assertElementPresent(Locator.xpath("//td[text() = 'Pinto']"));
+
+        popLocation();
+        table.clickLink(5,0);
+        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
+        assertElementPresent(Locator.xpath("//i[text() = 'A row was inserted.']"));
+
+        // check the row level audit details
+        popLocation();
+        selectSchema(VEHICLE_SCHEMA);
+        selectQuery(VEHICLE_SCHEMA, "Models");
+        assertLinkPresentWithText("view data");
+        clickLinkContainingText("view data");
+
+        table = new DataRegionTable("query", this, true, true);
+        table.clickLink(0,1);
+
+        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Details']"));
+        table = new DataRegionTable("audit", this, false, true);
+        Assert.assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
+        Assert.assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
+
+        // click the details link
+        table.clickLink(0,0);
+        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
+        assertElementPresent(Locator.xpath("//td[contains(text(), 'Prius C') and contains(text(), 'Prius')]"));
+
+        goToSchemaBrowser();
     }
 
     private void cleanupSchema(Connection cn) throws IOException
