@@ -389,6 +389,8 @@ public class ExtHelper extends AbstractHelper
 
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
             {
+                //it sometimes takes time to populate the list, this should fix that problem
+                _test.waitForElement(Locator.tagWithText("div", parts[i]));
                 // select last item: click on tree node name
                 clickFileBrowserFileCheckbox(parts[i]);
             }
