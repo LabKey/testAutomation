@@ -96,14 +96,18 @@ public class CAVDStudyTest extends StudyBaseTest
         // Change timepoint type.
         clickLinkWithText("Edit");
         waitForText("Timepoint Type");
-        checkRadioButton("TimepointType", "VISIT");
+        //Can't simply use the checkRadioButton method, it doens't work with Ext 4 yet.
+        if(!_ext4Helper.isChecked("VISIT")){
+            click(Locator.ext4Radio("VISIT"));
+        }
+        Assert.assertTrue(_ext4Helper.isChecked("VISIT"));
         clickButton("Submit");
         waitForPageToLoad();
 
         //Check to see if date is checked.
         clickLinkWithText("Edit");
         waitForText("Timepoint Type");
-        assertRadioButtonSelected("TimepointType", "VISIT");
+        Assert.assertTrue(_ext4Helper.isChecked("VISIT"));
 
     }
 
