@@ -113,9 +113,9 @@ public class HaplotypeAssayTest extends GenotypingTest
         setFormElement(Locator.name("data"), getFileContents(ERROR_RUN_FILE));
         clickButton("Save and Finish");
         waitForText("Column header mapping missing for: Lab Animal ID");
-        _ext4Helper.selectComboBoxItem("Lab Animal ID", "OC ID");
+        _ext4Helper.selectComboBoxItem("Lab Animal ID *", "OC ID");
         clickButton("Save and Finish");
-        waitForText("Column header mapping missing for: Customer Animal ID");
+        waitForText("Column header mapping missing for: Total # Reads Evaluated");
         clickButton("Cancel");
     }
 
@@ -356,13 +356,16 @@ public class HaplotypeAssayTest extends GenotypingTest
     private void setDataAndColumnHeaderProperties(File dataFile)
     {
         // adding text to the data text area triggers the events to enable the comboboxes and load their stores
-        Locator cb = Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Mamu-B Haplotype 2:']");
+        Locator cb = Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Mamu-B Haplotype 2 *:']");
+        if (!isElementPresent(cb))
+            Assert.fail("The Haplotype column header mapping comboboxes should be disbabled until the data is pasted in.");
+
         setFormElement(Locator.name("data"), getFileContents(dataFile));
         waitForElementToDisappear(cb, WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.selectComboBoxItem("Lab Animal ID", "OC ID");
+        _ext4Helper.selectComboBoxItem("Lab Animal ID *", "OC ID");
         _ext4Helper.selectComboBoxItem("Customer Animal ID", "Animal ID");
-        _ext4Helper.selectComboBoxItem("Total # Reads Evaluated", "# Reads Merged");
-        _ext4Helper.selectComboBoxItem("Total # Reads Identified", "# Reads Identified");
+        _ext4Helper.selectComboBoxItem("Total # Reads Evaluated *", "# Reads Merged");
+        _ext4Helper.selectComboBoxItem("Total # Reads Identified *", "# Reads Identified");
     }
 
     private void goToAssayRun(String assayId)
