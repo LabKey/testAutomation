@@ -184,6 +184,17 @@ public class StudyHelper extends AbstractHelper
         _test._extHelper.waitForExt3MaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
+    public void deleteCustomParticipantGroup(String groupName, String participantString)
+    {
+        // Caller must already be on Manage <participantString> Groups page
+        _test.log("Delete " + participantString + " Group: " + groupName);
+        selectParticipantCategoriesGridRow(groupName);
+        _test.clickButton("Delete Selected", 0);
+        _test._extHelper.waitForExtDialog("Delete Group");
+        _test.sleep(100);
+        _test._extHelper.clickExtButton("Delete Group", "Yes", 0);
+    }
 
     public void selectParticipantCategoriesGridRow(final String groupName)
     {
