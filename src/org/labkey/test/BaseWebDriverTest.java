@@ -98,6 +98,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -554,7 +555,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getCurrentRelativeURL()
     {
-
         URL url = getURL();
         String urlString = _driver.getCurrentUrl();
         if ("80".equals(WebTestHelper.getWebPort()) && url.getAuthority().endsWith(":-1"))
@@ -1463,7 +1463,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             signIn();
 			resetErrors();
 
-            if( isMaintenanceDisabled() )
+            if (isMaintenanceDisabled())
             {
                 // Disable scheduled system maintenance to prevent timeouts during nightly tests.
                 disableMaintenance();
@@ -1543,9 +1543,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (Exception e)
         {
-            // Log the failure before we try attempt any other cleanup in the finally block below
-            // This ensures that we don't lose the original failure if the cleanup fails for some reason
-            // with a new exception
+            // Log the failure before we attempt any other cleanup in the finally block below
+            // This ensures that we don't lose the original failure if the cleanup fails for
+            // some reason with a new exception
             e.printStackTrace();
             throw e;
         }
@@ -1564,6 +1564,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             {
                 try
                 {
+                    // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
+                    String lastPage = _lastPageURL.toString();
+                    URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
+                    log("Re-invoking last action with _debug parameter set: " + url.toString());
+                    url.getContent();
+
                     dump();
                     dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
                     dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
@@ -1577,12 +1583,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 }
                 finally
                 {
-                    try{
+                    try
+                    {
                         resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                     }
-                    catch(Throwable t){log("Failed to reset DB long config after test failure");}
+                    catch(Throwable t){log("Failed to reset DB login config after test failure");}
 
-                    try{
+                    try
+                    {
                         if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
                             fixPipelineToolsDirectory();
                     }
@@ -1605,11 +1613,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if(isTextPresent("Admin"))
             return;
 
-        if(isElementPresent(Locator.id("userMenuPopupLink")))
+        if (isElementPresent(Locator.id("userMenuPopupLink")))
             signOut();
 
         signIn();
-
     }
 
     protected abstract void doTestSteps() throws Exception;

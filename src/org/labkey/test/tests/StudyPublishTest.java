@@ -115,8 +115,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     public void doCleanup(boolean afterTest) throws Exception
     {
-        deleteProject(getProjectName());
-        deleteProject(PUB2_NAME);
+        deleteProject(getProjectName(), afterTest);
+        deleteProject(PUB2_NAME, afterTest);
         super.doCleanup(afterTest);
     }
 

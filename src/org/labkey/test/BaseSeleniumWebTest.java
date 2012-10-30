@@ -1049,8 +1049,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
 
-    // Any arg can be null -- where's @Nullable?
-    private void verifyInitialUserError(String email, String password1, String password2, String expectedText)
+    private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedText)
     {
         if (null != email)
             setFormElement("email", email);
@@ -5279,15 +5278,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param projectName
      * @param permissions
      */
-    public void createUserWithPermissions(String userName, String projectName, String permissions)
+    public void createUserWithPermissions(String userName, @Nullable String projectName, String permissions)
     {
         createUser(userName, null);
-        if(projectName==null)
+
+        if (projectName == null)
             goToProjectHome();
         else
             clickLinkWithText(projectName);
-        setUserPermissions(userName, permissions);
 
+        setUserPermissions(userName, permissions);
     }
 
     public void createUser(String userName, String cloneUserName)
@@ -5295,9 +5295,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         createUser(userName, cloneUserName, true);
     }
 
-    public void createUser(String userName, String cloneUserName, boolean verifySuccess)
+    public void createUser(String userName, @Nullable String cloneUserName, boolean verifySuccess)
     {
-        if(cloneUserName == null)
+        if (cloneUserName == null)
         {
             _userHelper.createUser(userName, verifySuccess);
         }
@@ -5306,7 +5306,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             Assert.fail("cloneUserName support has been removed"); //not in use, so was not implemented in new user
             //helpers
         }
-
     }
 
     public void createUserAndNotify(String userName, String cloneUserName)

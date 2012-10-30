@@ -122,7 +122,8 @@ public class StudyTest extends StudyBaseTest
         manageSubjectClassificationTest();
         emptyParticipantPickerList(); // Delete participant lists to avoid interfering with api test.
         verifyStudyAndDatasets();
-        if(!quickTest)
+
+        if (!quickTest)
         {
             waitForSpecimenImport();
             verifySpecimens();
