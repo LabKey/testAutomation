@@ -121,17 +121,15 @@ public class TargetStudyTest extends AbstractAssayTestWD
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("Label"), _study2Label);
         clickButton("Submit", 0);
-        _extHelper.waitForExtDialog("Status");
-        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
-        waitForPageToLoad();
+        // Save is via AJAX, but redirects to the general study settings page when it's done
+        waitForText("General Study Settings");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("Label"), _study3Label);
         clickButton("Submit", 0);
-        _extHelper.waitForExtDialog("Status");
-        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
-        waitForPageToLoad();
+        // Save is via AJAX, but redirects to the general study settings page when it's done
+        waitForText("General Study Settings");
     }
 
     public boolean isFileUploadTest()
