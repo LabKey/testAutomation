@@ -122,7 +122,7 @@ public class PipelineHelper
         _test.waitForExtMask();
         //TODO:  this doesn't yet support nested folders
         Locator folder =Locator.xpath("(//a/span[contains(text(),'" + destinationPath + "')])[2]");
-        _test.waitForElement(folder);
+        _test.waitForElement(folder, 3*_test.defaultWaitForPage);  //if it still isn't coming up, that's a product bug
         _test.clickAt(folder, "1,1");
         _test.clickButton("Move", _test.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
     }
