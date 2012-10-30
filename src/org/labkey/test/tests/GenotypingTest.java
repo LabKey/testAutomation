@@ -470,12 +470,12 @@ public class GenotypingTest extends BaseSeleniumWebTest
         d.checkAllOnPage();
         clickButton("Create Illumina Sample Sheet");
         waitForPageToLoad();
-        waitForText("Flow Cell Id");
-        Ext4FieldRef.getForLabel(this, "Flow Cell Id").setValue("FlowCell");
+        waitForText("Reagent Cassette Id");
+        Ext4FieldRef.getForLabel(this, "Reagent Cassette Id").setValue("FlowCell");
 
         String[][] fieldPairs = {
             {"Investigator Name", "Investigator"},
-            {"Experiment Name", "Experiment"},
+            {"Experiment Number", "Experiment"},
             {"Project Name", "Project"},
             {"Description", "Description"}
         };
