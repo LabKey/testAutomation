@@ -32,11 +32,11 @@ public class FolderExportTest extends BaseSeleniumWebTest
 {
 
     String folderFromZip = "Folder 1";
-    String[] webParts = {"Study Overview", "Data Pipeline", "Specimens", "Views", "Study Data Tools", "List", "Report web part"};
+    String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Study Data Tools", "List", "Report web part", "Workbooks"};
     File dataDir = new File(getSampledataPath(), "FolderExport");
     private String folderFromPipeplineZip = "Folder 2";
     private String folderFromTemplateZip = "Folder From Template";
-    String folderZip = "Sample.folder.zip"; //"Sample.folder.zip";
+    String folderZip = "SampleWithSubfolders.folder.zip";
 
 
     public FolderExportTest()
@@ -80,6 +80,8 @@ public class FolderExportTest extends BaseSeleniumWebTest
     {
         createSubFolderFromTemplate(getProjectName(), folderFromTemplateZip, "/" + getProjectName() + "/" + folderFromZip, null);
         verifyExpectedWebPartsPresent();
+        verifySubfolderImport(1, true);
+        verifyFolderExportAsExpected(folderFromTemplateZip);
     }
 
     private void verifyImportFromPipelineZip()
@@ -102,8 +104,10 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
 
         clickLinkWithText(folderFromPipeplineZip);
-        verifyFolderImportAsExpected();
-        deleteFolder(getProjectName(), folderFromPipeplineZip);}
+        verifyFolderImportAsExpected(1);
+        verifyFolderExportAsExpected(folderFromPipeplineZip);
+        deleteFolder(getProjectName(), folderFromPipeplineZip);
+    }
 
     private void verifyImportFromZip()
     {
@@ -114,14 +118,27 @@ public class FolderExportTest extends BaseSeleniumWebTest
         beginAt(getCurrentRelativeURL()); //work around linux issue
         waitForPipelineJobsToComplete(1, "Folder import", false);
         clickLinkWithText(folderFromZip);
-        verifyFolderImportAsExpected();
+        verifyFolderImportAsExpected(0);
+        verifyFolderExportAsExpected(folderFromZip);
+    }
+
+    private void verifyFolderExportAsExpected(String folderName)
+    {
+        log("Exporting folder to pipeline as individual files");
+        clickLinkWithText(folderName);
+        goToFolderManagement();
+        clickLinkWithText("Export");
+        click(Locator.name("includeSubfolders"));
+        click(Locator.name("location")); // first locator with this name is "Pipeline root export directory, as individual files
+        clickButton("Export");
+        // TODO: can we verify which files/directories are in the Files webpart?
     }
 
     private void verifyExpectedWebPartsPresent()
     {
         assertTextPresentInThisOrder(webParts);
     }
-    private void verifyFolderImportAsExpected()
+    private void verifyFolderImportAsExpected(int subfolderIndex)
     {
         verifyExpectedWebPartsPresent();
         assertTextPresent("Demo Study tracks data in 12 datasets over 26 time points. Data is present for 6 Participants", "Test wikiTest wikiTest wiki");
@@ -149,6 +166,28 @@ public class FolderExportTest extends BaseSeleniumWebTest
         log("verify folder type was overwritten on import");
         clickLinkContainingText("Folder Type");
         Assert.assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
+
+        verifySubfolderImport(subfolderIndex, false);
+    }
+
+    private void verifySubfolderImport(int subfolderIndex, boolean fromTemplate)
+    {
+        log("verify workbook subfolder was imported");
+        clickLinkWithText("Portal");
+        clickLinkWithText("Test Workbook");
+        assertTextPresent("This is a workbook for the FolderExportTest");
+        assertTextPresentInThisOrder("Experiment Runs", "Files");
+
+        log("verify child containers were imported");
+        clickLinkWithText("Subfolder1", subfolderIndex);
+        assertTextPresent("Assay List");
+        clickLinkWithText("_hidden", subfolderIndex);
+        assertTextPresentInThisOrder("Lists", "Hidden Folder List");
+        clickLinkWithText("Subfolder2", subfolderIndex);
+        if (fromTemplate)
+            assertTextPresent("This folder does not contain a study.");
+        else
+            assertTextPresent("Study Label for Subfolder2 tracks data in 1 datasets over 1 visits. Data is present for 2 Monkeys.");
     }
 
 

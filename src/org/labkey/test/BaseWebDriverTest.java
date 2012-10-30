@@ -2599,6 +2599,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 _ext4Helper.waitForMaskToDisappear();
                 Locator.XPathLocator l = Locator.xpath("//tr[./td/input[@name='templateSourceId']]");
                 _ext4Helper.selectComboBoxItem(l, templateFolder);
+                _ext4Helper.checkCheckbox("Include Subfolders");
 
                 //TODO:  the checkboxes.  I don't need this right now so I haven't written it, but my intention is to use tabsToAdd
             }
