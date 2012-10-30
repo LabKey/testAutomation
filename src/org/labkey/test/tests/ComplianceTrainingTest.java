@@ -23,7 +23,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
@@ -42,7 +42,7 @@ import java.util.Map;
  * Date: 8/24/12
  * Time: 7:02 AM
  */
-public class ComplianceTrainingTest extends BaseSeleniumWebTest implements AdvancedSqlTest
+public class ComplianceTrainingTest extends BaseWebDriverTest implements AdvancedSqlTest
 {
     private String listZIP =  getLabKeyRoot() + "/server/customModules/EHR_ComplianceDB/tools/SOP_Lists.zip";
 
@@ -65,7 +65,7 @@ public class ComplianceTrainingTest extends BaseSeleniumWebTest implements Advan
         beginAt("/ehr_compliancedb/" + getProjectName() + "/SOP_submission.view");
         reloadPage();
 
-        Assert.assertTrue("Submit button not disabled", isElementPresent(Locator.xpath("//button[@id='SOPsubmitButton']/@disabled")));
+        Assert.assertTrue("Submit button not disabled", isElementPresent(Locator.xpath("//button[@id='SOPsubmitButton' and @disabled]")));
 
         DataRegionTable dr1 = getDataRegion(0);
         DataRegionTable dr2 = getDataRegion(1);
@@ -81,7 +81,7 @@ public class ComplianceTrainingTest extends BaseSeleniumWebTest implements Advan
         Assert.assertEquals("Incorrect row count found", 0, dr1.getDataRowCount());
         Assert.assertEquals("Incorrect row count found", 1, dr2.getDataRowCount());
 
-        Assert.assertFalse("Submit button is still disabled", isElementPresent(Locator.xpath("//button[@id='SOPsubmitButton']/@disabled")));
+        Assert.assertFalse("Submit button is still disabled", isElementPresent(Locator.xpath("//button[@id='SOPsubmitButton' and @disabled]")));
 
         dr2.checkAllOnPage();
         clickButton("Mark Reread");
@@ -201,7 +201,7 @@ public class ComplianceTrainingTest extends BaseSeleniumWebTest implements Advan
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName());
     }
