@@ -113,13 +113,13 @@ public class ElisaAssayTest extends ElispotAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        uploadFile(TEST_ASSAY_ELISA_FILE1, "A", "Save and Import Another Run", true, 2, 6);
+        uploadFile(TEST_ASSAY_ELISA_FILE1, "A", "Save and Import Another Run", true, 1, 5);
         assertTextPresent("Upload successful.");
-        uploadFile(TEST_ASSAY_ELISA_FILE2, "B", "Save and Import Another Run", true, 2, 6);
+        uploadFile(TEST_ASSAY_ELISA_FILE2, "B", "Save and Import Another Run", true, 1, 5);
         assertTextPresent("Upload successful.");
-        uploadFile(TEST_ASSAY_ELISA_FILE3, "C", "Save and Import Another Run", true, 2, 6);
+        uploadFile(TEST_ASSAY_ELISA_FILE3, "C", "Save and Import Another Run", true, 1, 5);
         assertTextPresent("Upload successful.");
-        uploadFile(TEST_ASSAY_ELISA_FILE4, "D", "Save and Finish", true, 2, 6);
+        uploadFile(TEST_ASSAY_ELISA_FILE4, "D", "Save and Finish", true, 1, 5);
 
 //        assertELISAData();
     }
@@ -169,7 +169,7 @@ public class ElisaAssayTest extends ElispotAssayTest
         }
 
         String[] letters = {"A","B","C","D","E","F","G","H"};
-        for (int i = 0; i <= 7; i++)
+        for (int i = 0; i <= 5; i++)
         {
             setFormElement(Locator.name(letters[i].toLowerCase()+"1"+letters[i]+"2_Concentration"), "" + (i + 1));
 
