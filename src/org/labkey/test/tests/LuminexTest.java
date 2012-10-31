@@ -2090,7 +2090,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         waitForGuideSetExtMaskToDisappear();
 
-        waitForText("Created: " + today + "; Comment: " + comment);
+        waitForText("Created: " + today + "; Comment: " + comment, 2*defaultWaitForPage);
     }
 
     private void waitForGuideSetExtMaskToDisappear()
