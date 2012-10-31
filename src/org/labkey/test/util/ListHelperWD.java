@@ -380,9 +380,21 @@ public class ListHelperWD extends ListHelper
 */
 
     @LogMethod
+    public void createListFromTab(String tabName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    {
+        beginCreateListFromTab(tabName, listName);
+        createListHelper(listName, listKeyType, listKeyName, cols);
+    }
+
+    @LogMethod
     public void createList(String folderName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
         beginCreateList(folderName, listName);
+        createListHelper(listName, listKeyType, listKeyName, cols);
+    }
+
+    private void createListHelper(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    {
 
         _test.selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
         _test.setFormElementJS(Locator.id("ff_keyName"), listKeyName);
@@ -515,10 +527,21 @@ public class ListHelperWD extends ListHelper
     }
 
 
+    public void beginCreateListFromTab(String tabName, String listName)
+    {
+        _test.clickTab(tabName);
+        beginCreateListHelper(listName);
+    }
+
     // initial "create list" steps common to both manual and import from file scenarios
     public void beginCreateList(String folderName, String listName)
     {
         _test.clickFolder(folderName);
+        beginCreateListHelper(listName);
+    }
+
+    private void beginCreateListHelper(String listName)
+    {
         if (!_test.isLinkPresentWithText("Lists"))
         {
             _test.addWebPart("Lists");

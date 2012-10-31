@@ -534,6 +534,19 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
                 new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
                 new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+
+        log("Create list in container tab containers to prevent query validation failure");
+        _listHelper.createListFromTab("Study Container", LIST_NAME,
+                ListHelperWD.ListColumnType.AutoInteger, "Key",
+                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
+                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
+                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+
+        _listHelper.createListFromTab("Assay Container", LIST_NAME,
+                ListHelperWD.ListColumnType.AutoInteger, "Key",
+                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
+                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
+                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
     }
 
     private void doTestQueries()
