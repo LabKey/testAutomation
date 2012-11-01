@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 
 import junit.framework.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.net.URISyntaxException;
@@ -30,10 +30,10 @@ import java.util.Random;
  */
 public class LabModuleHelper
 {
-    private BaseSeleniumWebTest _test;
+    private BaseWebDriverTest _test;
     private final Random _random = new Random(System.currentTimeMillis());
 
-    public LabModuleHelper(BaseSeleniumWebTest test)
+    public LabModuleHelper(BaseWebDriverTest test)
     {
         _test = test;
     }
@@ -50,12 +50,19 @@ public class LabModuleHelper
         _test.clickButton("New Assay Design");
         _test.checkRadioButton("providerName", provider);
         _test.clickButton("Next");
-        _test.waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), _test.WAIT_FOR_JAVASCRIPT);
-        _test.getWrapper().type("//input[@id='AssayDesignerName']", label);
 
-        _test.sleep(1000);
+        Locator l = Locator.xpath("//input[@id='AssayDesignerName']");
+        _test.waitForElement(l, _test.WAIT_FOR_JAVASCRIPT);
+
+        //why is this so flaky??
+        _test.setFormElement(l, label);
+        _test.sleep(500);
+        _test.setFormElement(l, label);
+
+        _test.sleep(500);
         _test.clickButton("Save", 0);
         _test.waitForText("Save successful.", 20000);
+        _test.assertTextNotPresent("Unknown");
     }
 
     public static Locator getNavPanelItem(String label, String itemText)
@@ -105,8 +112,8 @@ public class LabModuleHelper
         _test.clickTab("Workbooks");
         _test.clickButton("Create New Workbook", 0);
         _test.waitForElement(Ext4Helper.ext4Window("Create Workbook"));
-        _test.setText("title", workbookTitle);
-        _test.setText("description", workbookDescription);
+        _test.setFormElement(Locator.name("title"), workbookTitle);
+        _test.setFormElement(Locator.name("description"), workbookDescription);
         _test.clickButton("Submit");
         _test.waitForPageToLoad();
 
@@ -142,7 +149,7 @@ public class LabModuleHelper
 
     public void setFormField(String name, String value)
     {
-        _test.setText(name, value);
+        _test.setFormElement(Locator.name(name), value);
         //there is a deliberate delay after user input for a change to commit in the Ext store
         _test.sleep(250);
     }

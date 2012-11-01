@@ -43,6 +43,11 @@ public class Ext4FieldRefWD extends Ext4CmpRefWD
         return ref;
     }
 
+    public static boolean isFieldPresent(BaseWebDriverTest test, String label)
+    {
+        return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRefWD.class);
+    }
+
     public void setValue(String val)
     {
         eval("setValue(arguments[0])", val);

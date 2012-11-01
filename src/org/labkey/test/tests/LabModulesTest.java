@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import junit.framework.Assert;
 import org.apache.commons.lang3.tuple.Pair;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
@@ -42,7 +42,7 @@ import java.util.List;
  * Contains a series of tests designed to test the UI in the laboratory module.
  * Also contains considerable coverage of Ext4 components and the client API
  */
-public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTest
+public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     private int _oligosTotal = 0;
@@ -176,7 +176,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
         _helper.clickNavPanelItem("View and Edit Workbooks:", "Create New Workbook");
         waitForElement(Ext4Helper.ext4Window("Create Workbook"));
-        assertTextNotPresent("Add To Existing Workbook");
+        assertElementNotPresent(Locator.ext4Radio("Add To Existing Workbook"));
         waitForElement(Locator.ext4Button("Close"));
         click(Locator.ext4Button("Close"));
         assertElementNotPresent(Ext4Helper.ext4Window("Create Workbook"));
@@ -202,8 +202,8 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         waitForElement(Locator.name("name"));
         waitForElement(Locator.name("purification"));
 
-        setText("name", "TestPrimer20");
-        setText("sequence", "ATGATGATGGGGG");
+        setFormElement(Locator.name("name"), "TestPrimer20");
+        setFormElement(Locator.name("sequence"), "ATGATGATGGGGG");
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
@@ -227,9 +227,9 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
         waitForElement(Locator.name("purification"));
 
-        setText("name", "TestPrimer1");
-        setText("sequence", "ABCDQ");
-        setText("oligo_type", "Type1");
+        setFormElement(Locator.name("name"), "TestPrimer1");
+        setFormElement(Locator.name("sequence"), "ABCDQ");
+        setFormElement(Locator.name("oligo_type"), "Type1");
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
@@ -243,7 +243,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
 
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
-        setText("text", "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\tABCDEFG");
+        setFormElementJS(Locator.name("text"), "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\tABCDEFG");
         click(Locator.ext4Button("Upload"));
 
         waitForElement(Ext4Helper.ext4Window("Error"));
@@ -256,7 +256,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         assertTextPresent(errorMsg);
 
         String sequence = "tggGg gGAAAAgg";
-        setFormElement("text", "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\t" + sequence);
+        setFormElementJS(Locator.name("text"), "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\t" + sequence);
         clickButton("Upload", 0);
         _oligosTotal += 2;
 
@@ -289,7 +289,6 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         verifyFreezerColOrder();
 
         _helper.setFormField("samplename", "SampleName");
-        _helper.setFormField("samplespecies", "Species");
 
         //verify drop down menus show correct text by spot checking several drop-downs
         //NOTE: trailing spaces are added by ext template
@@ -298,12 +297,13 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
         _ext4Helper.selectComboBoxItem("Additive", "EDTA");
         _ext4Helper.selectComboBoxItem("Molecule Type", "vRNA");
 
+        _helper.setFormField("samplespecies", "Species");
+
         assertElementNotPresent(Ext4Helper.invalidField());
-        fireEvent(Locator.name("samplename"), SeleniumEvent.blur);
         clickButton("Submit", 0);
 
         //test error conditions in trigger script
-        waitForElement(Ext4Helper.ext4Window("Error"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Ext4Helper.ext4Window("Error"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Must enter either a location or freezer");
         clickButton("OK", 0);
         waitForElement(Ext4Helper.invalidField());
@@ -547,7 +547,7 @@ public class LabModulesTest extends BaseSeleniumWebTest implements AdvancedSqlTe
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         try
         {

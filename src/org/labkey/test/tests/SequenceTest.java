@@ -19,21 +19,22 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,6 +43,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -50,8 +52,9 @@ import java.util.zip.GZIPInputStream;
  * Date: 5/28/12
  * Time: 7:12 PM
  */
-public class SequenceTest extends LabModulesTest
+public class SequenceTest extends BaseWebDriverTest
 {
+    protected LabModuleHelper _helper = new LabModuleHelper(this);
     private String sequencepipelineLoc =  getLabKeyRoot() + "/sampledata/sequence";
     private String illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     private final String TEMPLATE_NAME = "SequenceTest Saved Template";
@@ -111,7 +114,7 @@ public class SequenceTest extends LabModulesTest
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
 
-        setText("text", getIlluminaNames());
+        setFormElementJS(Locator.name("text"), getIlluminaNames());
 
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
@@ -140,31 +143,31 @@ public class SequenceTest extends LabModulesTest
         clickMenuButton("More Actions", "Create Illumina Sample Sheet");
         waitForPageToLoad();
         waitForText("You have chosen to export " + _readsetCt + " samples");
-        waitForText("Flow Cell Id");
+        waitForText("Reagent Cassette Id");
 
-        Ext4FieldRef.getForLabel(this, "Flow Cell Id").setValue("FlowCell");
+        Ext4FieldRefWD.getForLabel(this, "Reagent Cassette Id").setValue("FlowCell");
 
         String[][] fieldPairs = {
-            {"Investigator Name", "Investigator"},
-            {"Experiment Name", "Experiment"},
-            {"Project Name", "Project"},
-            {"Description", "Description"}
+                {"Investigator Name", "Investigator"},
+                {"Experiment Name", "Experiment"},
+                {"Project Name", "Project"},
+                {"Description", "Description"}
         };
 
         for (String[] a : fieldPairs)
         {
-            Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
+            Ext4FieldRefWD.getForLabel(this, a[0]).setValue(a[1]);
         }
 
         //save combo record count for later use
-        Ext4FieldRef templateCombo = Ext4FieldRef.getForLabel(this, "Template");
-        int originalCount = Integer.parseInt(templateCombo.eval("this.store.getCount()"));
+        Ext4FieldRefWD templateCombo = Ext4FieldRefWD.getForLabel(this, "Template");
+        Long originalCount = (Long)templateCombo.getEval("store.getCount()");
 
         _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         for (String[] a : fieldPairs)
         {
-            Assert.assertEquals(a[1], Ext4FieldRef.getForLabel(this, a[0]).getValue());
+            Assert.assertEquals(a[1], Ext4FieldRefWD.getForLabel(this, a[0]).getValue());
         }
 
         clickButton("Edit Sheet", 0);
@@ -177,28 +180,30 @@ public class SequenceTest extends LabModulesTest
         //add new values
         String prop_name = "NewProperty";
         String prop_value = "NewValue";
-        Ext4FieldRef textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRef.class);
+        Ext4FieldRefWD textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRefWD.class);
         String newValue = prop_name + "," + prop_value;
-        textarea.eval("this.setValue(this.getValue() + \"\\\\n" + newValue + "\")");
+        String val = textarea.getValue();
+        val += "\n" + newValue;
+        textarea.setValue(val);
         clickButton("Done Editing", 0);
 
         //verify template has changed
         _ext4Helper.clickTabContainingText("General Info");
-        Assert.assertEquals("Custom", Ext4FieldRef.getForLabel(this, "Template").getValue());
+        Assert.assertEquals("Custom", Ext4FieldRefWD.getForLabel(this, "Template").getValue());
 
         //verify values persisted
         _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
-        Assert.assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
+        Assert.assertEquals(prop_value, Ext4FieldRefWD.getForLabel(this, prop_name).getValue());
 
         //save template
         clickButton("Save As Template", 0);
         waitForElement(Ext4Helper.ext4Window("Choose Name"));
-        Ext4FieldRef textfield = _ext4Helper.queryOne("textfield", Ext4FieldRef.class);
+        Ext4FieldRefWD textfield = _ext4Helper.queryOne("textfield", Ext4FieldRefWD.class);
         textfield.setValue(TEMPLATE_NAME);
         clickButton("OK", 0);
         _ext4Helper.clickTabContainingText("General Info");
-        Assert.assertEquals(TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
+        Assert.assertEquals(TEMPLATE_NAME, Ext4FieldRefWD.getForLabel(this, "Template").getValue());
 
         //if we navigate too quickly, before the insertRows has returned, the test can get a JS error
         //therefore we sleep
@@ -209,7 +214,7 @@ public class SequenceTest extends LabModulesTest
         waitForText("Sample_ID");
 
         int expectRows = (11 * (14 +  1));  //11 cols, 14 rows, plus header
-        Assert.assertEquals(expectRows, selenium.getXpathCount("//td[contains(@class, 'x4-table-layout-cell')]"));
+        Assert.assertEquals(expectRows, getXpathCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
 
         //make sure values persisted
         refresh();
@@ -220,36 +225,39 @@ public class SequenceTest extends LabModulesTest
         waitForText("Template");
         for (String[] a : fieldPairs)
         {
-            Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
+            Ext4FieldRefWD.getForLabel(this, a[0]).setValue(a[1]);
         }
 
         templateCombo.setValue(TEMPLATE_NAME);
 
-        int count = Integer.parseInt(templateCombo.eval("this.store.getCount()"));
-        Assert.assertEquals("Combo store does not have correct record number", (originalCount + 1), count);
+        Long count = (Long)templateCombo.getEval("store.getCount()");
+        Long expected = originalCount + 1;
+        Assert.assertEquals("Combo store does not have correct record number", expected, count);
         sleep(50);
-        Assert.assertEquals("Field value not set correctly", TEMPLATE_NAME, Ext4FieldRef.getForLabel(this, "Template").getValue());
+        Assert.assertEquals("Field value not set correctly", TEMPLATE_NAME, Ext4FieldRefWD.getForLabel(this, "Template").getValue());
         _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
-        Assert.assertEquals(prop_value, Ext4FieldRef.getForLabel(this, prop_name).getValue());
+        Assert.assertEquals(prop_value, Ext4FieldRefWD.getForLabel(this, prop_name).getValue());
 
         //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
         //to directly get the output
-        Ext4CmpRef panel = _ext4Helper.queryOne("#illuminaPanel", Ext4CmpRef.class);
-        String outputTable = panel.eval("this.getTableOutput().join(\"<>\")");
-        outputTable = outputTable.replaceAll("<>", "\n");
+        Ext4CmpRefWD panel = _ext4Helper.queryOne("#illuminaPanel", Ext4CmpRefWD.class);
+        String outputTable = panel.getEval("getTableOutput().join(\"<>\")").toString();
+        outputTable = outputTable.replaceAll("<>", System.getProperty("line.separator"));
 
         //then we download anyway
         clickButton("Download");
 
         //the browser converts line breaks to spaces.  this is a hack to get them back
-        String text = getWrapper().getBodyText().replaceAll(", ", ",\n").replaceAll("] ", "]\n");
+        String text = _driver.getPageSource().replaceAll("<[^>]+>|&[^;]+;", "");
+        text = text.replaceAll(" {2,}", " ");
+        text = text.replaceAll(", ", ",\n").replaceAll("] ", "]\n");
         for (String[] a : fieldPairs)
         {
             String line = a[0] + "," + a[1];
             assertTextPresent(line);
 
-            text.replaceAll(line, line + "\n");
+            text.replaceAll(line, line + System.getProperty("line.separator"));
         }
 
         assertTextPresent(prop_name + "," + prop_value);
@@ -327,16 +335,16 @@ public class SequenceTest extends LabModulesTest
         setPipelineRoot(illuminaPipelineLoc);
         selectPipelineJob("Import Illumina data", ILLUMINA_CSV);
 
-        setText("protocolName", "TestIlluminaRun" +  _helper.getRandomInt());
-        setText("runDate", "08/25/2011");
-        setText("fastqPrefix", "Il");
+        setFormElement(Locator.name("protocolName"), "TestIlluminaRun" + _helper.getRandomInt());
+        setFormElement(Locator.name("runDate"), "08/25/2011");
+        setFormElement(Locator.name("fastqPrefix"), "Il");
 
         click(Locator.ext4Button("Import Data"));
-        waitForAlert("Analysis Started!", WAIT_FOR_JAVASCRIPT);
+        waitAndClick(Locator.ext4Button("OK"));
         waitForPageToLoad();
         clickLinkWithText("All");
         waitForPipelineJobsToComplete(1, "Import Illumina", false);
-        assertTextNotPresent("ERROR");
+        assertTextPresent("COMPLETE");
     }
 
     /**
@@ -410,18 +418,18 @@ public class SequenceTest extends LabModulesTest
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "Download Sequence Files");
         waitForElement(Ext4Helper.ext4Window("Export Files"));
         waitForText("Export Files As");
-        Ext4CmpRef window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRef.class);
+        Ext4CmpRefWD window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRefWD.class);
         String fileName = "MyFile";
-        Ext4FieldRef.getForLabel(this, "File Prefix").setValue(fileName);
-        String url = window.eval("this.getURL()");
+        Ext4FieldRefWD.getForLabel(this, "File Prefix").setValue(fileName);
+        String url = window.getEval("getURL()").toString();
         Assert.assertTrue("Improper URL to download sequences", url.contains("zipFileName=" + fileName));
         Assert.assertTrue("Improper URL to download sequences", url.contains("exportFiles.view?"));
         Assert.assertEquals("Wrong number of files selected", 28, StringUtils.countMatches(url, "dataIds="));
 
-        _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRef.class).setValue("false");
-        _ext4Helper.queryOne("field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRef.class).setChecked(true);
+        _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRefWD.class).setValue("false");
+        _ext4Helper.queryOne("field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRefWD.class).setChecked(true);
 
-        url = window.eval("this.getURL()");
+        url = window.getEval("getURL()").toString();
         Assert.assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
         Assert.assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
 
@@ -468,7 +476,7 @@ public class SequenceTest extends LabModulesTest
         waitForPageToLoad();
         waitForText("Run Id:");
         String newName = "ChangedSample";
-        Ext4FieldRef.getForLabel(this, "Name").setValue(newName);
+        Ext4FieldRefWD.getForLabel(this, "Name").setValue(newName);
         sleep(250); //wait for value to save
         clickButton("Submit", 0);
         waitForElement(Ext4Helper.ext4Window("Success"));
@@ -511,13 +519,13 @@ public class SequenceTest extends LabModulesTest
         //setup local variables
         String totalReads = "450";
         String minReadLength = "68";
-        String adapterMismatchTolerated = "3";
-        String adapterDeletionsTolerated = "0";
+        String seedMismatches = "3";
+        String simpleClipThreshold = "0";
         String qualWindowSize = "8";
         String qualAvgQual = "19";
-        String maskMinQual = "21";
-        String customRefName = "CustomRef1";
-        String customRefSeq = "ATGATGATG";
+        //String maskMinQual = "21";
+        //String customRefName = "CustomRef1";
+        //String customRefSeq = "ATGATGATG";
         String jobName = "TestAnalysisJob";
         String protocolDescription = "This is the description for my analysis";
         String qualThreshold = "0.11";
@@ -538,23 +546,25 @@ public class SequenceTest extends LabModulesTest
             assertTextPresent("Illumina-R2-" + rowId + ".fastq.gz");
         }
 
-        Ext4FieldRef.getForLabel(this, "Job Name").setValue(jobName);
-        Ext4FieldRef.getForLabel(this, "Protocol Description").setValue(protocolDescription);
+        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue(jobName);
+        Ext4FieldRefWD.getForLabel(this, "Protocol Description").setValue(protocolDescription);
 
         log("Verifying Pre-processing section");
-        Assert.assertFalse("Reads field should be hidden", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Total Reads").getId()).toXpath()));
-        Ext4FieldRef.getForLabel(this, "Downsample Reads").setChecked(true);
-        Assert.assertTrue("Reads field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Total Reads").getId()).toXpath()));
+        WebElement el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
+        Assert.assertFalse("Reads field should be hidden", el.isDisplayed());
+        Ext4FieldRefWD.getForLabel(this, "Downsample Reads").setChecked(true);
+        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
+        Assert.assertTrue("Reads field should be visible", el.isDisplayed());
 
-        Ext4FieldRef.getForLabel(this, "Total Reads").setValue(totalReads);
+        Ext4FieldRefWD.getForLabel(this, "Total Reads").setValue(totalReads);
 
-        Ext4FieldRef.getForLabel(this, "Minimum Read Length").setValue(minReadLength);
-        Ext4FieldRef.getForLabel(this, "Adapter Trimming").setChecked(true);
+        Ext4FieldRefWD.getForLabel(this, "Minimum Read Length").setValue(minReadLength);
+        Ext4FieldRefWD.getForLabel(this, "Adapter Trimming").setChecked(true);
         waitForText("Adapters");
         clickButton("Common Adapters", 0);
         waitForElement(Ext4Helper.ext4Window("Choose Adapters"));
         waitForText("Choose Adapter Group");
-        Ext4FieldRef.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
+        Ext4FieldRefWD.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
         waitAndClick(Locator.ext4Button("Submit"));
 
         waitForText(rocheAdapters[0][0]);
@@ -563,12 +573,12 @@ public class SequenceTest extends LabModulesTest
         assertTextPresent(rocheAdapters[0][1]);
         assertTextPresent(rocheAdapters[1][1]);
 
-        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRef.class).eval("this.getSelectionModel().select(0)");
+        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRefWD.class).eval("getSelectionModel().select(0)");
         clickButton("Move Down", 0);
         sleep(500);
         assertTextBefore(rocheAdapters[1][0], rocheAdapters[0][0]);
 
-        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRef.class).eval("this.getSelectionModel().select(1)");
+        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRefWD.class).eval("getSelectionModel().select(1)");
         clickButton("Move Up", 0);
         sleep(500);
         assertTextBefore(rocheAdapters[0][0], rocheAdapters[1][0]);
@@ -577,183 +587,179 @@ public class SequenceTest extends LabModulesTest
         sleep(500);
         assertTextNotPresent(rocheAdapters[0][0]);
 
-        Ext4FieldRef.getForLabel(this, "Mismatches Tolerated").setValue(adapterMismatchTolerated);
-        Ext4FieldRef.getForLabel(this, "Deletions Tolerated").setValue(adapterDeletionsTolerated);
+        Ext4FieldRefWD.getForLabel(this, "Seed Mismatches").setValue(seedMismatches);
+        Ext4FieldRefWD.getForLabel(this, "Simple Clip Threshold").setValue(simpleClipThreshold);
 
-        Assert.assertFalse("Trim threshold field should be hidden", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Trim Threshold").getId()).toXpath()));
-        Ext4FieldRef.getForLabel(this, "Quality Trimming (running score)").setChecked(true);
-        Assert.assertTrue("Trim threshold field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Trim Threshold").getId()).toXpath()));
-        Ext4FieldRef.getForLabel(this, "Trim Threshold").setValue(qualThreshold);
+        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
+        Assert.assertFalse("Window Size field should be hidden", el.isDisplayed());
+        Ext4FieldRefWD.getForLabel(this, "Quality Trimming (by sliding window)").setChecked(true);
 
-        Assert.assertFalse("Window Size field should be hidden", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Window Size").getId()).toXpath()));
-        Ext4FieldRef.getForLabel(this, "Quality Trimming (by window)").setChecked(true);
-        Assert.assertTrue("Window Size field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Window Size").getId()).toXpath()));
+        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
+        Assert.assertTrue("Window Size field should be visible", el.isDisplayed());
 
-        Ext4FieldRef.getForLabel(this, "Window Size").setValue(qualWindowSize);
-        Ext4FieldRef.getForLabel(this, "Avg Qual").setValue(qualAvgQual);
+        Ext4FieldRefWD.getForLabel(this, "Window Size").setValue(qualWindowSize);
+        Ext4FieldRefWD.getForLabel(this, "Avg Qual").setValue(qualAvgQual);
 
-        Assert.assertFalse("Min Qual field should be hidden", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Min Qual").getId()).toXpath()));
-        Ext4FieldRef.getForLabel(this, "Mask Low Quality Bases").setChecked(true);
-        Assert.assertTrue("Min Qual field should be visible", getWrapper().isVisible(Locator.id(Ext4FieldRef.getForLabel(this, "Min Qual").getId()).toXpath()));
-
-        Ext4FieldRef.getForLabel(this, "Min Qual").setValue(maskMinQual);
+        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Min Qual").getId()));
+        Assert.assertFalse("Min Qual field should be hidden", el.isDisplayed());
 
         log("Testing Alignment Section");
 
         log("Testing whether sections are disabled when alignment unchecked");
-        Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(false);
-        Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Reference Library Type"));
-        Assert.assertEquals("Field should be hidden", null, Ext4FieldRef.getForLabel(this, "Aligner"));
+        Ext4FieldRefWD.getForLabel(this, "Perform Alignment").setChecked(false);
+        Assert.assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Reference Library Type"));
+        Assert.assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Aligner"));
 
-        Assert.assertEquals("Field should be disabled", "true", Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").eval("this.isDisabled()"));
-        Assert.assertEquals("Field should be disabled", "true", Ext4FieldRef.getForLabel(this, "Min SNP Quality").eval("this.isDisabled()"));
+        Assert.assertEquals("Field should be disabled", true, (Boolean)Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").getEval("isDisabled()"));
+        Assert.assertEquals("Field should be disabled", true, (Boolean)Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").getEval("isDisabled()"));
 
-        Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(true);
+        Ext4FieldRefWD.getForLabel(this, "Perform Alignment").setChecked(true);
         waitForText("Reference Library Type");
         sleep(500);
 
         log("Testing aligner field and descriptions");
-        Ext4FieldRef alignerField = Ext4FieldRef.getForLabel(this, "Aligner");
+        Ext4FieldRefWD alignerField = Ext4FieldRefWD.getForLabel(this, "Aligner");
 
         alignerField.setValue("bwa");
-        alignerField.eval("this.fireEvent(\"select\", this, this.getValue())");
+        alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), 'bwa')");
         waitForText("BWA is a commonly used aligner");
 
         alignerField.setValue("bowtie");
-        alignerField.eval("this.fireEvent(\"select\", this, this.getValue())");
+        alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), 'bowtie')");
         waitForText("Bowtie is a fast aligner often used for short reads");
 
         alignerField.setValue("lastz");
-        alignerField.eval("this.fireEvent(\"select\", this, this.getValue())");
+        alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), 'lastz')");
         waitForText("Lastz has performed well for both sequence-based");
 
         alignerField.setValue("mosaik");
-        alignerField.eval("this.fireEvent(\"select\", this, this.getValue())");
+        alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), 'mosaik')");
         waitForText("Mosaik is suitable for longer reads");
 
         String aligner = "bwa-sw";
         alignerField.setValue(aligner);
-        alignerField.eval("this.fireEvent(\"select\", this, this.getValue())");
+        alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), '" + aligner + "')");
         waitForText("BWA-SW uses a different algorithm than BWA");
 
-        final BaseSeleniumWebTest test = this;
+        final BaseWebDriverTest test = this;
         waitFor(new Checker()
         {
             @Override
             public boolean check()
             {
-                return "false".equals(Ext4FieldRef.getForLabel(test, "Virus Strain").eval("this.store.isLoading()"));
+                return !(Boolean)Ext4FieldRefWD.getForLabel(test, "Virus Strain").getEval("store.isLoading()");
             }
         }, "Combo store did not load", WAIT_FOR_JAVASCRIPT);
 
         sleep(100);
-        Ext4FieldRef.getForLabel(this, "Virus Strain").setValue(strain);
+        Ext4FieldRefWD.getForLabel(this, "Virus Strain").setValue(strain);
 
-        Ext4FieldRef.getForLabel(this, "Min SNP Quality").setValue(minSnpQual);
-        Ext4FieldRef.getForLabel(this, "Min Avg SNP Quality").setValue(minAvgSnpQual);
-        Ext4FieldRef.getForLabel(this, "Min DIP Quality").setValue(minDipQual);
-        Ext4FieldRef.getForLabel(this, "Min Avg DIP Quality").setValue(minAvgDipQual);
+        Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").setValue(minSnpQual);
+        Ext4FieldRefWD.getForLabel(this, "Min Avg SNP Quality").setValue(minAvgSnpQual);
+        Ext4FieldRefWD.getForLabel(this, "Min DIP Quality").setValue(minDipQual);
+        Ext4FieldRefWD.getForLabel(this, "Min Avg DIP Quality").setValue(minAvgDipQual);
 
-        Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
+        Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
 
-//        Ext4FieldRef.getForLabel(this, "Max Alignment Mismatches").setValue(maxAlignMismatch);
-//        Ext4FieldRef.getForLabel(this, "Assemble Unaligned Reads").setChecked(true);
-//        Ext4FieldRef.getForLabel(this, "Assembly Percent Identity").setValue(assembleUnalignedPct);
-//        Ext4FieldRef.getForLabel(this, "Min Sequences Per Contig").setValue(minContigsForNovel);
+        //TODO
+//        Ext4FieldRefWD.getForLabel(this, "Max Alignment Mismatches").setValue(maxAlignMismatch);
+//        Ext4FieldRefWD.getForLabel(this, "Assemble Unaligned Reads").setChecked(true);
+//        Ext4FieldRefWD.getForLabel(this, "Assembly Percent Identity").setValue(assembleUnalignedPct);
+//        Ext4FieldRefWD.getForLabel(this, "Min Sequences Per Contig").setValue(minContigsForNovel);
 
-        Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
-        String jsonString = panel.eval("selenium.browserbot.getCurrentWindow().Ext4.encode(this.getJsonParams())");
-        JSONObject json = new JSONObject(jsonString);
+        Ext4CmpRefWD panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRefWD.class);
+        Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
 
-        Assert.assertEquals("Incorect param in form JSON", getContainerId(getURL().toString()), json.getString("containerId"));
-        Assert.assertEquals("Incorect param in form JSON", getBaseURL() + "/", json.getString("baseUrl"));
-        Assert.assertEquals("Incorect param in form JSON", selenium.getEval("window.LABKEY.Security.currentUser.id"), json.getString("userId"));
+        Assert.assertEquals("Incorect param in form JSON", getContainerId(getURL().toString()), params.get("containerId"));
+        Assert.assertEquals("Incorect param in form JSON", getBaseURL() + "/", params.get("baseUrl"));
+
+        Long id1 = (Long)executeScript("return LABKEY.Security.currentUser.id");
+        Long id2 = (Long)params.get("userId");
+        Assert.assertEquals("Incorect param in form JSON", id1, id2);
         String containerPath = getURL().getPath().replaceAll("/sequenceAnalysis.view", "").replaceAll("(.)*/sequenceanalysis", "");
-        Assert.assertEquals("Incorect param in form JSON", containerPath, json.getString("containerPath"));
+        Assert.assertEquals("Incorect param in form JSON", containerPath, params.get("containerPath"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("deleteIntermediateFiles"));
-        Assert.assertEquals("Incorect param in form JSON", protocolDescription, json.getString("protocolDescription"));
-        Assert.assertEquals("Incorect param in form JSON", jobName, json.getString("protocolName"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("deleteIntermediateFiles"));
+        Assert.assertEquals("Incorect param in form JSON", protocolDescription, params.get("protocolDescription"));
+        Assert.assertEquals("Incorect param in form JSON", jobName, params.get("protocolName"));
 
-        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("saveProtocol"));
-        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("recalibrateBam"));
+        Assert.assertEquals("Incorect param in form JSON", false, params.get("saveProtocol"));
+        Assert.assertEquals("Incorect param in form JSON", false, params.get("recalibrateBam"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("preprocessing.downsample"));
-        Assert.assertEquals("Incorect param in form JSON", totalReads, json.getString("preprocessing.downsampleReadNumber"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("preprocessing.downsample"));
+        Assert.assertEquals("Incorect param in form JSON", totalReads, params.get("preprocessing.downsampleReadNumber").toString());
 
-        Assert.assertEquals("Incorect param in form JSON", minReadLength, json.getString("preprocessing.minLength"));
+        Assert.assertEquals("Incorect param in form JSON", minReadLength, params.get("preprocessing.minLength").toString());
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("preprocessing.trimAdapters"));
-        Assert.assertEquals("Incorect param in form JSON", adapterDeletionsTolerated, json.getString("preprocessing.adapterDeletionsAllowed"));
-        Assert.assertEquals("Incorect param in form JSON", adapterMismatchTolerated, json.getString("preprocessing.adapterEditDistance"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("preprocessing.trimAdapters"));
 
-        JSONArray adapter = json.getJSONArray("adapter_0");
-        Assert.assertEquals("Incorect param in form JSON", rocheAdapters[1][0], adapter.get(0));
-        Assert.assertEquals("Incorect param in form JSON", rocheAdapters[1][1], adapter.get(1));
+        Assert.assertEquals("Incorect param in form JSON", seedMismatches, params.get("preprocessing.seedMismatches").toString());
+        Assert.assertEquals("Incorect param in form JSON", simpleClipThreshold, params.get("preprocessing.simpleClipThreshold").toString());
+
+        List<Object> adapter = (List)params.get("adapter_0");
+        Assert.assertEquals("Incorect param in form JSON", rocheAdapters[1][0], adapter.get(0).toString());
+        Assert.assertEquals("Incorect param in form JSON", rocheAdapters[1][1], adapter.get(1).toString());
         Assert.assertEquals("Incorect param in form JSON", true, adapter.get(2));
         Assert.assertEquals("Incorect param in form JSON", true, adapter.get(3));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("preprocessing.qual2"));
-        Assert.assertEquals("Incorect param in form JSON", qualAvgQual, json.getString("preprocessing.qual2_avgQual"));
-        Assert.assertEquals("Incorect param in form JSON", qualWindowSize, json.getString("preprocessing.qual2_windowSize"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("preprocessing.qual2"));
+        Assert.assertEquals("Incorect param in form JSON", qualAvgQual, params.get("preprocessing.qual2_avgQual").toString());
+        Assert.assertEquals("Incorect param in form JSON", qualWindowSize, params.get("preprocessing.qual2_windowSize").toString());
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("preprocessing.qual"));
-        Assert.assertEquals("Incorect param in form JSON", qualThreshold, json.getString("preprocessing.qual_threshold"));
+//        Assert.assertEquals("Incorect param in form JSON", "true", params.get("preprocessing.mask"));
+//        Assert.assertEquals("Incorect param in form JSON", maskMinQual, params.get("preprocessing.mask_minQual"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("preprocessing.mask"));
-        Assert.assertEquals("Incorect param in form JSON", maskMinQual, json.getString("preprocessing.mask_minQual"));
+//        Assert.assertEquals("Incorect param in form JSON", "true", params.get("useCustomReference"));
+//        Assert.assertEquals("Incorect param in form JSON", customRefSeq, params.get("virus.refSequence"));
+//        Assert.assertEquals("Incorect param in form JSON", customRefName, params.get("virus.custom_strain_name"));
 
-//        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("useCustomReference"));
-//        Assert.assertEquals("Incorect param in form JSON", customRefSeq, json.getString("virus.refSequence"));
-//        Assert.assertEquals("Incorect param in form JSON", customRefName, json.getString("virus.custom_strain_name"));
+        Assert.assertEquals("Incorect param in form JSON", strain, params.get("dbprefix"));
+        Assert.assertEquals("Incorect param in form JSON", "Virus", params.get("dna.category"));
 
-        Assert.assertEquals("Incorect param in form JSON", strain, json.getString("dbprefix"));
-        Assert.assertEquals("Incorect param in form JSON", "Virus", json.getString("dna.category"));
+        Assert.assertEquals("Incorect param in form JSON", "Virus", params.get("analysisType"));
+        Assert.assertEquals("Incorect param in form JSON", strain, params.get("dna.subset"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("qualityMetrics"));
 
-        Assert.assertEquals("Incorect param in form JSON", "Virus", json.getString("analysisType"));
-        Assert.assertEquals("Incorect param in form JSON", strain, json.getString("dna.subset"));
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("qualityMetrics"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("doAlignment"));
+        Assert.assertEquals("Incorect param in form JSON", aligner, params.get("aligner"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("doAlignment"));
-        Assert.assertEquals("Incorect param in form JSON", aligner, json.getString("aligner"));
+        Assert.assertEquals("Incorect param in form JSON", false, params.get("snp.neighborhoodQual"));
+        Assert.assertEquals("Incorect param in form JSON", minSnpQual, params.get("snp.minQual").toString());
+        Assert.assertEquals("Incorect param in form JSON", minAvgSnpQual, params.get("snp.minAvgSnpQual").toString());
+        Assert.assertEquals("Incorect param in form JSON", minDipQual, params.get("snp.minIndelQual").toString());
+        Assert.assertEquals("Incorect param in form JSON", minAvgDipQual, params.get("snp.minAvgDipQual").toString());
 
-        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("snp.neighborhoodQual"));
-        Assert.assertEquals("Incorect param in form JSON", minSnpQual, json.getString("snp.minQual"));
-        Assert.assertEquals("Incorect param in form JSON", minAvgSnpQual, json.getString("snp.minAvgSnpQual"));
-        Assert.assertEquals("Incorect param in form JSON", minDipQual, json.getString("snp.minIndelQual"));
-        Assert.assertEquals("Incorect param in form JSON", minAvgDipQual, json.getString("snp.minAvgDipQual"));
+        //Assert.assertEquals("Incorect param in form JSON", "true", params.get("assembleUnaligned"));
+        //Assert.assertEquals("Incorect param in form JSON", maxAlignMismatch, params.get("maxAlignMismatch"));
+        //Assert.assertEquals("Incorect param in form JSON", assembleUnalignedPct, params.get("assembleUnalignedPct"));
+        //Assert.assertEquals("Incorect param in form JSON", minContigsForNovel, params.get("minContigsForNovel"));
 
-        //Assert.assertEquals("Incorect param in form JSON", "true", json.getString("assembleUnaligned"));
-        //Assert.assertEquals("Incorect param in form JSON", maxAlignMismatch, json.getString("maxAlignMismatch"));
-        //Assert.assertEquals("Incorect param in form JSON", assembleUnalignedPct, json.getString("assembleUnalignedPct"));
-        //Assert.assertEquals("Incorect param in form JSON", minContigsForNovel, json.getString("minContigsForNovel"));
+        Assert.assertEquals("Incorect param in form JSON", false, params.get("debugMode"));
 
-        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("debugMode"));
+        Map sample = (Map)params.get("sample_0");
+        Long readset = (Long)sample.get("readset");
+        Assert.assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
+        Assert.assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
+        Assert.assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
 
-        JSONObject sample = json.getJSONObject("sample_0");
-        String readset = sample.getString("readset");
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.getString("fileName"));
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.getString("fileName2"));
-        Assert.assertEquals("Incorect param in form JSON", "ILLUMINA", sample.getString("platform"));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("instrument_run_id")));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("readsetname")));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("fileId")));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("fileId2")));
+        sample = (Map)params.get("sample_1");
+        readset = (Long)sample.get("readset");
+        Assert.assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
+        Assert.assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
+        Assert.assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
+        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
 
-        sample = json.getJSONObject("sample_1");
-        readset = sample.getString("readset");
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.getString("fileName"));
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.getString("fileName2"));
-        Assert.assertEquals("Incorect param in form JSON", "ILLUMINA", sample.getString("platform"));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("instrument_run_id")));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("readsetname")));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("fileId")));
-        Assert.assertFalse("Incorect param in form JSON", "".equals(sample.getString("fileId2")));
-
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("sbtAnalysis"));
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("aaSnpByCodon"));
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("ntSnpByPosition"));
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("ntCoverage"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("sbtAnalysis"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("aaSnpByCodon"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("ntSnpByPosition"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("ntCoverage"));
 
         log("Testing UI changes when selecting different analysis settings");
 
@@ -762,45 +768,44 @@ public class SequenceTest extends LabModulesTest
         beginAt(url);
         waitForPageToLoad();
 
-        Ext4FieldRef analysisField = Ext4FieldRef.getForLabel(this, "Specialized Analysis");
+        Ext4FieldRefWD analysisField = Ext4FieldRefWD.getForLabel(this, "Specialized Analysis");
         analysisField.setValue("SBT");
 
-        Assert.assertEquals("Incorrect field value", "DNA", Ext4FieldRef.getForLabel(this, "Reference Library Type").getValue());
+        Assert.assertEquals("Incorrect field value", "DNA", Ext4FieldRefWD.getForLabel(this, "Reference Library Type").getValue());
         String species = "Human";
         String molType = "gDNA";
 
         String jobName2 = "Job2";
-        Ext4FieldRef.getForLabel(this, "Job Name").setValue(jobName2);
+        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue(jobName2);
         waitForElementToDisappear(Ext4Helper.invalidField(), WAIT_FOR_JAVASCRIPT);
 
-        Ext4FieldRef.getForLabel(this, "Species").setValue(species);
-        Ext4FieldRef.getForLabel(this, "Subset").eval("this.setValue([\"KIR\",\"MHC\"])");
-        Ext4FieldRef.getForLabel(this, "Molecule Type").setValue(molType);
-        Ext4FieldRef.getForLabel(this, "Loci").eval("this.setValue([\"KIR1D\",\"HLA-A\"])");
+        Ext4FieldRefWD.getForLabel(this, "Species").setValue(species);
+        Ext4FieldRefWD.getForLabel(this, "Subset").eval("setValue([\"KIR\",\"MHC\"])");
+        Ext4FieldRefWD.getForLabel(this, "Molecule Type").setValue(molType);
+        Ext4FieldRefWD.getForLabel(this, "Loci").eval("setValue([\"KIR1D\",\"HLA-A\"])");
 
-        Ext4FieldRef.getForLabel(this, "Calculate and Save NT SNPs").setValue("false");
-        Ext4FieldRef.getForLabel(this, "Calculate and Save Coverage Depth").setValue("false");
-        Ext4FieldRef.getForLabel(this, "Calculate and Save AA SNPs").setValue("false");
+        Ext4FieldRefWD.getForLabel(this, "Calculate and Save NT SNPs").setValue("false");
+        Ext4FieldRefWD.getForLabel(this, "Calculate and Save Coverage Depth").setValue("false");
+        Ext4FieldRefWD.getForLabel(this, "Calculate and Save AA SNPs").setValue("false");
 
-        jsonString = panel.eval("selenium.browserbot.getCurrentWindow().Ext4.encode(this.getJsonParams())");
-        json = new JSONObject(jsonString);
+        params = (Map)panel.getEval("getJsonParams()");
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("debugMode"));
-        Assert.assertEquals("Incorect param in form JSON", species, json.getString("dna.species"));
-        Assert.assertEquals("Incorect param in form JSON", "KIR;MHC", json.getString("dna.subset"));
-        Assert.assertEquals("Incorect param in form JSON", molType, json.getString("dna.mol_type"));
-        Assert.assertEquals("Incorect param in form JSON", "KIR1D;HLA-A", json.getString("dna.locus"));
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("debugMode"));
+        Assert.assertEquals("Incorect param in form JSON", species, params.get("dna.species"));
+        Assert.assertEquals("Incorect param in form JSON", "KIR;MHC", params.get("dna.subset"));
+        Assert.assertEquals("Incorect param in form JSON", molType, params.get("dna.mol_type"));
+        Assert.assertEquals("Incorect param in form JSON", "KIR1D;HLA-A", params.get("dna.locus"));
 
         //also test mosaik params
-        Assert.assertEquals("Incorect param in form JSON", "mosaik", json.getString("aligner"));
-        Assert.assertEquals("Incorect param in form JSON", "0.02", json.getString("mosaik.max_mismatch_pct"));
-        Assert.assertEquals("Incorect param in form JSON", "200", json.getString("mosaik.max_hash_positions"));
+        Assert.assertEquals("Incorect param in form JSON", "mosaik", params.get("aligner"));
+        Assert.assertEquals("Incorect param in form JSON", 0.02, params.get("mosaik.max_mismatch_pct"));
+        Assert.assertEquals("Incorect param in form JSON", new Long(200), params.get("mosaik.max_hash_positions"));
 
-        Assert.assertEquals("Incorect param in form JSON", "true", json.getString("sbtAnalysis"));
-        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("aaSnpByCodon"));
-        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("ntCoverage"));
-        Assert.assertEquals("Incorect param in form JSON", "false", json.getString("ntSnpByPosition"));
-        Assert.assertEquals("Incorect param in form JSON", 4, StringUtils.split(json.getString("fileNames"), ";").length);
+        Assert.assertEquals("Incorect param in form JSON", true, params.get("sbtAnalysis"));
+        Assert.assertEquals("Incorect param in form JSON", false, params.get("aaSnpByCodon"));
+        Assert.assertEquals("Incorect param in form JSON", false, params.get("ntCoverage"));
+        Assert.assertEquals("Incorect param in form JSON", false, params.get("ntSnpByPosition"));
+        Assert.assertEquals("Incorect param in form JSON", 4, StringUtils.split((String)params.get("fileNames"), ";").length);
     }
 
     /**
@@ -893,14 +898,14 @@ public class SequenceTest extends LabModulesTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         File dir = new File(illuminaPipelineLoc);
         File[] files = dir.listFiles();
         for(File file: files)
         {
             if(file.isDirectory() &&
-                (file.getName().startsWith("sequenceAnalysis_") || file.getName().equals("illuminaImport") || file.getName().equals(".labkey")))
+                    (file.getName().startsWith("sequenceAnalysis_") || file.getName().equals("illuminaImport") || file.getName().equals(".labkey")))
                 deleteDir(file);
             if(file.getName().startsWith("SequenceImport"))
                 file.delete();

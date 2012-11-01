@@ -16,17 +16,17 @@
 
 package org.labkey.test;
 
+import com.thoughtworks.selenium.SeleniumException;
 import junit.framework.AssertionFailedError;
+import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-
 import org.jetbrains.annotations.Nullable;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.After;
 import org.junit.Assert;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -52,8 +52,6 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.StudyHelperWD;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
-
-import com.thoughtworks.selenium.SeleniumException;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -75,7 +73,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.SVNStatusClient;
@@ -98,7 +95,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -125,8 +121,6 @@ import static org.labkey.test.WebTestHelper.getTabLinkId;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
 import static org.labkey.test.WebTestHelper.logToServer;
-
-import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 
 /**
  * User: Mark Igra
@@ -2284,7 +2278,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             File tsvFile = new File(dir, fileName);
             writer = new FileWriter(tsvFile);
-            writer.write(getBodyText());
+            writer.write(contents);
             return tsvFile;
         }
         catch (IOException e)
