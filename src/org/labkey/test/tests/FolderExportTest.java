@@ -91,8 +91,8 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
     private void verifyImportFromPipelineExpanded()
     {
-        verifyImportFromPipeline("unzip/folder.xml");
-
+        // test importing the folder archive that we exported from the verifyFolderExportAsExpected method
+        verifyImportFromPipeline("export/folder.xml");
     }
 
     private void verifyImportFromPipeline(String fileImport)
@@ -112,9 +112,11 @@ public class FolderExportTest extends BaseSeleniumWebTest
     private void verifyImportFromZip()
     {
         _containerHelper.createSubfolder(getProjectName(), folderFromZip, null);
+        // create one of the subfolders, to be imported, to test merge on import of subfolders
+        _containerHelper.createSubfolder(folderFromZip, "Subfolder1", "Collaboration");
 
+        clickLinkWithText(folderFromZip);
         importFolderFromZip(new File(dataDir, folderZip).getAbsolutePath());
-//        waitForPageToLoad();
         beginAt(getCurrentRelativeURL()); //work around linux issue
         waitForPipelineJobsToComplete(1, "Folder import", false);
         clickLinkWithText(folderFromZip);
@@ -131,7 +133,13 @@ public class FolderExportTest extends BaseSeleniumWebTest
         click(Locator.name("includeSubfolders"));
         click(Locator.name("location")); // first locator with this name is "Pipeline root export directory, as individual files
         clickButton("Export");
-        // TODO: can we verify which files/directories are in the Files webpart?
+
+        // verify some of the folder export items by selecting them in the file browser
+        _extHelper.selectFileBrowserItem("export/folder.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/subfolders.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder1/folder.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder1/subfolders/_hidden/folder.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder2/folder.xml");
     }
 
     private void verifyExpectedWebPartsPresent()
@@ -166,6 +174,15 @@ public class FolderExportTest extends BaseSeleniumWebTest
         log("verify folder type was overwritten on import");
         clickLinkContainingText("Folder Type");
         Assert.assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
+
+        log("verify notification default settings as expected");
+        clickLinkWithText("Notifications");
+        waitForText("Email Notification Settings");
+        click(Locator.navButton("Update Settings"));
+        waitForElement(Locator.xpath("//li/a[text()='files']"), WAIT_FOR_JAVASCRIPT);
+        isElementPresent(Locator.xpath("//div[text()='Daily digest' and contains(@class, 'x-combo-selected')]"));
+        selenium.mouseDown("//li/a[text()='messages']");
+        isElementPresent(Locator.xpath("//div[text()='All conversations' and contains(@class, 'x-combo-selected')]"));
 
         verifySubfolderImport(subfolderIndex, false);
     }
