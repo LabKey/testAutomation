@@ -51,15 +51,11 @@ public class LabModuleHelper
         _test.checkRadioButton("providerName", provider);
         _test.clickButton("Next");
 
-        Locator l = Locator.xpath("//input[@id='AssayDesignerName']");
+        Locator l = Locator.id("AssayDesignerName");
         _test.waitForElement(l, _test.WAIT_FOR_JAVASCRIPT);
-
-        //why is this so flaky??
-        _test.setFormElement(l, label);
-        _test.sleep(500);
         _test.setFormElement(l, label);
 
-        _test.sleep(500);
+        _test.sleep(2000);
         _test.clickButton("Save", 0);
         _test.waitForText("Save successful.", 20000);
         _test.assertTextNotPresent("Unknown");
