@@ -168,16 +168,16 @@ public class HaplotypeAssayTest extends GenotypingTest
         goToAssayRun("second run");
 
         DataRegionTable drt = new DataRegionTable("Data", this);
-        verifyColumnDataValues(drt, "Animal", "ID-4,ID-5,ID-6,ID-7");
-        verifyColumnDataValues(drt, "TotalReads", "4000,5000,6000,7000");
-        verifyColumnDataValues(drt, "IdentifiedReads", "2500,3250,3000,3500");
-        verifyColumnDataValues(drt, "%Unknown", "37.5,35.0,50.0,50.0");
-        verifyColumnDataValues(drt, "Mamu-AHaplotype1", "A001,,A033,A004"); // note: ,, in str to test record without any haplotype assignments
-        verifyColumnDataValues(drt, "Mamu-AHaplotype2", "A023,,A033,A004");
-        verifyColumnDataValues(drt, "Mamu-BHaplotype1", "B015c,,B012b,B033");
-        verifyColumnDataValues(drt, "Mamu-BHaplotype2", "B025a,,B012b,B033");
-        verifyColumnDataValues(drt, "Enabled", "true,true,true,true");
-        verifyColumnDataValues(drt, "CustomerAnimalId", "x456,x567,x678,x789");
+        verifyColumnDataValues(drt, "Animal", "ID-4,ID-5,ID-6,ID-7,ID-8,ID-9");
+        verifyColumnDataValues(drt, "TotalReads", "4000,5000,6000,7000,,0");
+        verifyColumnDataValues(drt, "IdentifiedReads", "2500,3250,3000,3500,,1");
+        verifyColumnDataValues(drt, "%Unknown", "37.5,35.0,50.0,50.0,,");
+        verifyColumnDataValues(drt, "Mamu-AHaplotype1", "A001,,A033,A004,A004,A004");
+        verifyColumnDataValues(drt, "Mamu-AHaplotype2", "A023,,A033,A004,A004,A004");
+        verifyColumnDataValues(drt, "Mamu-BHaplotype1", "B015c,,B012b,B033,B033,B033");
+        verifyColumnDataValues(drt, "Mamu-BHaplotype2", "B025a,,B012b,B033,B033,B033");
+        verifyColumnDataValues(drt, "Enabled", "true,true,true,true,true,true");
+        verifyColumnDataValues(drt, "CustomerAnimalId", "x456,x567,x678,x789,x888,x999");
 
         // verify concatenated haplotype strings
         assertTextPresent("A001,A023,B015c,B025a");
@@ -187,9 +187,9 @@ public class HaplotypeAssayTest extends GenotypingTest
         // verify that the animal and haplotype rows were properly inserted
         goToQuery("Animal");
         drt = new DataRegionTable("query", this);
-        Assert.assertEquals("Unexpected number of Animal records", 7, drt.getDataRowCount());
-        verifyColumnDataValues(drt, "LabAnimalId", "ID-1,ID-2,ID-3,ID-4,ID-5,ID-6,ID-7");
-        verifyColumnDataValues(drt, "CustomerAnimalId", "x123,x234,x345,x456,x567,x678,x789");
+        Assert.assertEquals("Unexpected number of Animal records", 9, drt.getDataRowCount());
+        verifyColumnDataValues(drt, "LabAnimalId", "ID-1,ID-2,ID-3,ID-4,ID-5,ID-6,ID-7,ID-8,ID-9");
+        verifyColumnDataValues(drt, "CustomerAnimalId", "x123,x234,x345,x456,x567,x678,x789,x888,x999");
 
         verifyHaplotypeRecordsByType(13, 6, 7);
     }

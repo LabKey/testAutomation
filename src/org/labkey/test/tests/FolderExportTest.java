@@ -31,11 +31,12 @@ import java.io.File;
 public class FolderExportTest extends BaseSeleniumWebTest
 {
 
-    String folderFromZip = "Folder 1";
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Study Data Tools", "List", "Report web part", "Workbooks"};
     File dataDir = new File(getSampledataPath(), "FolderExport");
-    private String folderFromPipeplineZip = "Folder 2";
-    private String folderFromTemplateZip = "Folder From Template";
+    private String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
+    private String folderFromPipelineZip = "2 Folder From Pipeline Zip";
+    private String folderFromPipelineExport = "3 Folder From Pipline Export";
+    private String folderFromTemplate = "4 Folder From Template";
     String folderZip = "SampleWithSubfolders.folder.zip";
 
 
@@ -65,6 +66,10 @@ public class FolderExportTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
+        // we are using the simpletest module to test Container Tab import/export
+        goToAdminConsole();
+        assertTextPresent("simpletest");
+
         RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
         _containerHelper.createProject(getProjectName(), null);
@@ -78,35 +83,34 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
     private void verifyCreateFolderFromTemplate()
     {
-        createSubFolderFromTemplate(getProjectName(), folderFromTemplateZip, "/" + getProjectName() + "/" + folderFromZip, null);
+        createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, null);
         verifyExpectedWebPartsPresent();
-        verifySubfolderImport(1, true);
-        verifyFolderExportAsExpected(folderFromTemplateZip);
+        verifySubfolderImport(3, true);
+        verifyFolderExportAsExpected(folderFromTemplate);
     }
 
     private void verifyImportFromPipelineZip()
     {
-        verifyImportFromPipeline(folderZip);
+        verifyImportFromPipeline(folderZip, folderFromPipelineZip, 1);
     }
 
     private void verifyImportFromPipelineExpanded()
     {
         // test importing the folder archive that we exported from the verifyFolderExportAsExpected method
-        verifyImportFromPipeline("export/folder.xml");
+        verifyImportFromPipeline("export/folder.xml", folderFromPipelineExport, 2);
     }
 
-    private void verifyImportFromPipeline(String fileImport)
+    private void verifyImportFromPipeline(String fileImport, String folderName, int subfolderIndex)
     {
 
-         createSubfolder(getProjectName(), getProjectName(), folderFromPipeplineZip, "Collaboration", null);
+        createSubfolder(getProjectName(), getProjectName(), folderName, "Collaboration", null);
         setPipelineRoot(dataDir.getAbsolutePath());
         importFolderFromPipeline( "" + fileImport);
 
 
-        clickLinkWithText(folderFromPipeplineZip);
-        verifyFolderImportAsExpected(1);
-        verifyFolderExportAsExpected(folderFromPipeplineZip);
-        deleteFolder(getProjectName(), folderFromPipeplineZip);
+        clickLinkWithText(folderName);
+        verifyFolderImportAsExpected(subfolderIndex);
+        verifyFolderExportAsExpected(folderName);
     }
 
     private void verifyImportFromZip()
@@ -189,15 +193,9 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
     private void verifySubfolderImport(int subfolderIndex, boolean fromTemplate)
     {
-        log("verify workbook subfolder was imported");
-        clickLinkWithText("Portal");
-        clickLinkWithText("Test Workbook");
-        assertTextPresent("This is a workbook for the FolderExportTest");
-        assertTextPresentInThisOrder("Experiment Runs", "Files");
-
         log("verify child containers were imported");
         clickLinkWithText("Subfolder1", subfolderIndex);
-        assertTextPresent("Assay List");
+        assertTextPresent("My Test Container Tab Query");
         clickLinkWithText("_hidden", subfolderIndex);
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
         clickLinkWithText("Subfolder2", subfolderIndex);
@@ -205,6 +203,20 @@ public class FolderExportTest extends BaseSeleniumWebTest
             assertTextPresent("This folder does not contain a study.");
         else
             assertTextPresent("Study Label for Subfolder2 tracks data in 1 datasets over 1 visits. Data is present for 2 Monkeys.");
+
+        log("verify container tabs were imported");
+        clickLinkWithText("Subfolder1", subfolderIndex);
+        assertLinkPresentWithText("Assay Container");
+        assertLinkPresentWithText("Tab 2");
+        assertLinkPresentWithText("Study Container");
+        assertLinkNotPresentWithText("Tab 1");
+        clickLinkWithText("Tab 2");
+        assertTextPresentInThisOrder("A customized web part", "Experiment Runs", "Assay List");
+        clickLinkWithText("Study Container");
+        if (fromTemplate)
+            assertTextPresent("This folder does not contain a study.");
+        else
+            assertTextPresent("Study Container Tab Study tracks data in 0 datasets over 0 visits. Data is present for 0 Participants.");
     }
 
 
