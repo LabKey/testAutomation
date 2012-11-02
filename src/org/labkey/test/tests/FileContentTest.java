@@ -33,12 +33,12 @@ public class FileContentTest extends BaseSeleniumWebTest
 
     // Use a special exotic character in order to make sure we don't break
     // i18n. See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=5369
-    private static final String PROJECT_NAME = "File Content T\u017Dst Project";
+    protected static final String PROJECT_NAME = "File Content T\u017Dst Project";
     private static final String PROJECT_ENCODED = "File%20Content%20T%C3%A9st%20Project";
     private static final String FILE_DESCRIPTION = "FileContentTestFile";
     private static final String CUSTOM_PROPERTY_VALUE = "ExtendedProperty";
     private static final String CUSTOM_PROPERTY = "customProperty";
-    private static final String TEST_USER = "user_filecontent@filecontent.test";
+    protected static final String TEST_USER = "user_filecontent@filecontent.test";
     private static final String TEST_GROUP = "FileContentTestGroup";
 
     // Lookup list info
@@ -204,6 +204,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             log("move file");
             String folderName = "Test folder";
             pipelineHelper.createFolder(folderName);
+            sleep(1000); //TODO:  if this works, look for a better solution
             pipelineHelper.moveFile(newFileName, folderName);
 
 
@@ -237,6 +238,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             // Delete file.
             clickLinkWithText(PROJECT_NAME);
+            sleep(1000); //TODO:  if this helps, try and find a better fix
             _extHelper.selectFileBrowserItem(folderName + "/" + filename);
             click(Locator.css("button.iconDelete"));
             clickButton("Yes", 0);
