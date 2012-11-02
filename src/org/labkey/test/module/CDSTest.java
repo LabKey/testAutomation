@@ -199,7 +199,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertTextPresent("This is the set of filters");
         click("Studies");
         assertFilterStatusPanel(STUDIES[0], STUDIES[0], 6, 1, 3, 2, 20, 12);
-        clickButton("clear filters", 0);
+        clickButton("clear selection", 0);
         waitForText(STUDIES[2], CDS_WAIT);
         goToAppHome();
         waitForText(STUDIES[1], CDS_WAIT);
@@ -836,7 +836,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         String subselect = bars[0];
         if (subselect.length() > 10)
             subselect = subselect.substring(0, 9);
-        sleep(1000);
+        sleep(2000);
         waitAndClick(Locator.xpath("//span[@class='barlabel' and text() = '" + bars[0] + "']"));
         sleep(1000);
         waitForElement(Locator.xpath("//div[@class='filtermember' and contains(text(),'" + subselect + "')]"), CDS_WAIT);
