@@ -3899,6 +3899,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public static final int WAIT_FOR_EXT_MASK_TO_DISSAPEAR = -1;
     public static final int WAIT_FOR_EXT_MASK_TO_APPEAR = -2;
+
     public void clickAndWait(Locator l, int pageTimeoutMs)
     {
         WebElement el;
