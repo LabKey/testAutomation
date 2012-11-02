@@ -23,6 +23,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: kevink
@@ -38,7 +39,7 @@ public class FlowImportTest extends BaseFlowTest
     protected void importTest()
     {
         String workspacePath = "/flowjoquery/microFCS/microFCS.xml";
-        String fcsFilePath = "/flowjoquery/microFCS";
+        List<String> keywordDirs = Arrays.asList("/flowjoquery/microFCS");
         String analysisFolder = "FlowJoAnalysis";
 
         log("** import FlowJo workspace, without FCS file path");
@@ -46,7 +47,7 @@ public class FlowImportTest extends BaseFlowTest
         // don't select file path
         // place in FlowJoAnalysis_1 folder
         // assert only one analysis run created
-        importAnalysis(getContainerPath(), workspacePath, null, false, analysisFolder, false, true);
+        importAnalysis(getContainerPath(), workspacePath, SelectFCSFileOption.None, null, analysisFolder, false, true);
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         DataRegionTable table = new DataRegionTable("query", this, true);
         Assert.assertEquals("Expected a single run", table.getDataRowCount(), 1);
@@ -59,13 +60,13 @@ public class FlowImportTest extends BaseFlowTest
         assertTextNotPresent("Previously imported FCS file run");
         // assert microFCS directory is selected in the pipeline tree browser since it contains the .fcs files used by the workspace
         //Assert.assertEquals("/flowjoquery/microFCS", getTreeSelection("tree"));
-        importAnalysis_FCSFiles(getContainerPath(), fcsFilePath, false);
-        importAnalysis_analysisEngine(getContainerPath(), "noEngine");
+        importAnalysis_selectFCSFiles(getContainerPath(), SelectFCSFileOption.Browse, keywordDirs);
+        importAnalysis_analysisEngine(getContainerPath(), AnalysisEngine.FlowJoWorkspace);
         importAnalysis_analysisOptions(getContainerPath(), Arrays.asList("All Samples"), false, null, null, null);
         // assert previous analysis folder is available in drop down
         assertTextPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(getContainerPath(), analysisFolder, true);
-        importAnalysis_confirm(getContainerPath(), workspacePath, fcsFilePath, false, analysisFolder, true);
+        importAnalysis_confirm(getContainerPath(), workspacePath, SelectFCSFileOption.Browse, keywordDirs, AnalysisEngine.FlowJoWorkspace, analysisFolder, true);
         importAnalysis_checkErrors(null);
         // assert one keyword run created, one additional analysis run created
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
@@ -75,19 +76,25 @@ public class FlowImportTest extends BaseFlowTest
         Assert.assertEquals("Expected a Keywords run", table.getDataAsText(0, "Protocol Step"), "Keywords");
         Assert.assertEquals("Expected an Analysis run", table.getDataAsText(1, "Protocol Step"), "Analysis");
         Assert.assertEquals("Expected an Analysis run", table.getDataAsText(2, "Protocol Step"), "Analysis");
+        // UNDONE: Check Runs.Workspace column
+
+        // UNDONE: Check '118795.fcs' FCSAnalysis well has a fake FCSFile that has an original FCSFile data input.
+        // UNDONE: Check FCSFiles.Original column
+        //Assert.assertEquals(
 
         log("** import same FlowJo workspace again");
         importAnalysis_begin(getContainerPath());
         importAnalysis_uploadWorkspace(getContainerPath(), workspacePath);
-        assertTextPresent("Previously imported FCS file run");
+        assertTextPresent("Previously imported FCS files.");
         // assert keyword run shows up in list of keyword runs
-        importAnalysis_FCSFiles(getContainerPath(), "microFCS", true);
-        importAnalysis_analysisEngine(getContainerPath(), "noEngine");
+        importAnalysis_selectFCSFiles(getContainerPath(), SelectFCSFileOption.Previous, Arrays.asList("microFCS"));
+        importAnalysis_resolveFCSFiles(getContainerPath());
+        importAnalysis_analysisEngine(getContainerPath(), AnalysisEngine.FlowJoWorkspace);
         importAnalysis_analysisOptions(getContainerPath(), Arrays.asList("All Samples"), false, null, null, null);
         // assert FlowJoAnalysis analysis folder doesn't show up in list of folders
         assertTextNotPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(getContainerPath(), analysisFolder + "_1", false);
-        importAnalysis_confirm(getContainerPath(), workspacePath, fcsFilePath, true, analysisFolder + "_1", false);
+        importAnalysis_confirm(getContainerPath(), workspacePath, SelectFCSFileOption.Previous, keywordDirs, AnalysisEngine.FlowJoWorkspace, analysisFolder + "_1", false);
         importAnalysis_checkErrors(null);
 
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");

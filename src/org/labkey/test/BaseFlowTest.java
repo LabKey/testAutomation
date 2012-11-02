@@ -316,9 +316,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         waitForPipeline(containerPath);
     }
 
-    protected void importAnalysis(String containerPath, String workspacePath, String fcsPath, boolean existingKeywordRun, String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)
+    protected void importAnalysis(String containerPath, String workspacePath, SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs, String analysisName, boolean existingAnalysisFolder, boolean viaPipeline)
     {
-        ImportAnalysisOptions options = new ImportAnalysisOptions(containerPath, workspacePath, fcsPath, existingKeywordRun, analysisName, existingAnalysisFolder, viaPipeline);
+        ImportAnalysisOptions options = new ImportAnalysisOptions(containerPath, workspacePath, selectFCSFilesOption, keywordDirs, analysisName, existingAnalysisFolder, viaPipeline);
         importAnalysis(options);
     }
 
@@ -333,25 +333,35 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             importAnalysis_begin(options.getContainerPath());
             importAnalysis_uploadWorkspace(options.getContainerPath(), options.getWorkspacePath());
         }
-        importAnalysis_FCSFiles(options.getContainerPath(), options.getFcsPath(), options.isExistingKeywordRun());
-        if (options.getFcsPath() == null)
-        {
-            assertFormElementEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
-            assertFormElementEquals(Locator.name("runFilePathRoot"), "");
-        }
-        else
-        {
-            if (options.isExistingKeywordRun())
-                assertFormElementNotEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
-            else
-                assertFormElementEquals(Locator.name("existingKeywordRunId"), String.valueOf(0));
-            assertFormElementNotEquals(Locator.name("runFilePathRoot"), "");
-        }
+        importAnalysis_selectFCSFiles(options.getContainerPath(), options.getSelectFCSFilesOption(), options.getKeywordDirs());
+        assertFormElementEquals(Locator.name("selectFCSFilesOption"), options.getSelectFCSFilesOption().name());
 
-        // Analysis engine can only be selected when no FCS files are associated with the run
-        // or if the workspace is not a PC workspace (.wsp)
-        if ((options.getFcsPath() != null || options.isExistingKeywordRun()) && !options.getWorkspacePath().endsWith(".wsp"))
-            importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
+        switch (options.getSelectFCSFilesOption())
+        {
+            case None:
+                // no-op
+                break;
+
+            case Included:
+                Assert.fail("Not yet implemented");
+                break;
+
+            case Previous:
+                importAnalysis_resolveFCSFiles(options.getContainerPath());
+                // R Analysis engine can only be selected when using Mac FlowJo workspaces
+                if (!options.getWorkspacePath().endsWith(".wsp"))
+                    importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
+                break;
+
+            case Browse:
+                // R Analysis engine can only be selected when using Mac FlowJo workspaces
+                if (!options.getWorkspacePath().endsWith(".wsp"))
+                    importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
+                break;
+
+            default:
+                Assert.fail();
+        }
 
         importAnalysis_analysisOptions(options.getContainerPath(), options.getImportGroupNames(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationSubsets(), options.getREngineNormalizationParameters());
 
@@ -360,8 +370,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         importAnalysis_confirm(
                 options.getContainerPath(),
                 options.getWorkspacePath(),
-                options.getFcsPath(),
-                options.isExistingKeywordRun(),
+                options.getSelectFCSFilesOption(),
+                options.getKeywordDirs(),
                 options.getAnalysisEngine(),
                 options.getImportGroupNames(),
                 options.isREngineNormalization(),
@@ -389,56 +399,60 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         log("begin import analysis wizard");
         goToFlowDashboard();
         clickLinkWithText("Import FlowJo Workspace Analysis");
-        assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
+        assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
     }
 
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
-        assertTitleEquals("Import Analysis: Select Workspace: " + containerPath);
+        assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
         _extHelper.selectFileBrowserItem(workspacePath);
         clickButton("Next");
     }
 
-    protected void importAnalysis_FCSFiles(String containerPath, String fcsPath, boolean existingRun)
+    protected void importAnalysis_selectFCSFiles(String containerPath, SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs)
     {
         sleep(100); // Avoid race condition for form
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
-        _extHelper.waitForFileGridReady();
-        if (existingRun)
+        switch (selectFCSFilesOption)
         {
-            selectOptionByText("existingKeywordRunId", fcsPath);
-            waitFor(new Checker()
-            {
-                public boolean check()
-                {
-                    return isChecked(Locator.id("previousFCSFiles"));
-                }
-            }, "Previous FCS files radio button should be selected.", WAIT_FOR_JAVASCRIPT);
-        }
-        else if (fcsPath != null)
-        {
-            _extHelper.selectFileBrowserItem(fcsPath);
-            waitFor(new Checker()
-            {
-                public boolean check()
-                {
-                    return isChecked(Locator.id("browseFCSFiles"));
-                }
-            }, "Browse for FCS files radio button should be selected.", WAIT_FOR_JAVASCRIPT);
-        }
-        else
-        {
-            setFormElement(Locator.name("runFilePathRoot"), "");
-            clickRadioButtonById("noFCSFiles");
+            case None:
+                clickRadioButtonById("None");
+                break;
+
+            case Included:
+                Assert.fail("Not yet implemented");
+                //clickRadioButtonById("Included");
+                break;
+
+            case Previous:
+                clickRadioButtonById("Previous");
+                break;
+
+            case Browse:
+                clickRadioButtonById("Browse");
+                _extHelper.waitForFileGridReady();
+                // UNDONE: Currently, only one file path supported
+                _extHelper.selectFileBrowserItem(keywordDirs.get(0));
+                break;
+
+            default:
+                Assert.fail();
         }
         clickButton("Next");
     }
 
-    protected void importAnalysis_analysisEngine(String containerPath, String engineId)
+    protected void importAnalysis_resolveFCSFiles(String containerPath)
+    {
+        assertTitleEquals("Import Analysis: Resolve FCS Files: " + containerPath);
+        // UNDONE: Test resolving files
+        clickButton("Next");
+    }
+
+    protected void importAnalysis_analysisEngine(String containerPath, AnalysisEngine engine)
     {
         assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
-        waitForElement(Locator.id(engineId), defaultWaitForPage);
-        clickRadioButtonById(engineId);
+        waitForElement(Locator.id(engine.name()), defaultWaitForPage);
+        clickRadioButtonById(engine.name());
         clickButton("Next");
     }
 
@@ -499,17 +513,21 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     }
 
     protected void importAnalysis_confirm(String containerPath, String workspacePath,
-                                          String fcsPath, boolean existingKeywordRun,
+                                          SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs,
+                                          AnalysisEngine analysisEngine,
                                           String analysisFolder, boolean existingAnalysisFolder)
     {
-        importAnalysis_confirm(containerPath, workspacePath, fcsPath, existingKeywordRun, fcsPath,
+        importAnalysis_confirm(containerPath, workspacePath,
+                selectFCSFilesOption, keywordDirs,
+                analysisEngine,
                 Arrays.asList("All Samples"), false, null, null, null,
                 analysisFolder, existingAnalysisFolder);
     }
 
     protected void importAnalysis_confirm(String containerPath, String workspacePath,
-                                          String fcsPath, boolean existingKeywordRun,
-                                          String analysisEngine,
+                                          SelectFCSFileOption selectFCSFilesOption,
+                                          List<String> keywordDirs,
+                                          AnalysisEngine analysisEngine,
                                           List<String> importGroupNames,
                                           boolean rEngineNormalization,
                                           String rEngineNormalizationReference,
@@ -520,9 +538,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
-        if (analysisEngine.equals("noEngine"))
+        if (analysisEngine.equals("FlowJoWorkspace"))
             assertTextPresent("Analysis Engine: No analysis engine selected");
-        else if (analysisEngine.equals("rEngine"))
+        else if (analysisEngine.equals("R"))
             assertTextPresent("Analysis Engine: External R analysis engine");
 
         if (importGroupNames == null)
@@ -542,11 +560,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         else
             assertTextPresent("New Analysis Folder: " + analysisFolder);
 
-        if (existingKeywordRun)
-            assertTextNotPresent("Existing FCS File run: none set");
-
         // XXX: assert fcsPath is present: need to normalize windows path backslashes
-        if (fcsPath == null)
+        if (keywordDirs == null)
             assertTextPresent("FCS File Path: none set");
 
         assertTextPresent("Workspace: " + workspacePath);
@@ -579,15 +594,18 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         popLocation();
     }
 
+    protected enum SelectFCSFileOption { None, Included, Previous, Browse }
+    protected enum AnalysisEngine { FlowJoWorkspace, R }
+
     protected static class ImportAnalysisOptions
     {
         public static final String PARAMETER_SEPARATOR = "\ufe50";
 
         private final String _containerPath;
         private final String _workspacePath;
-        private final String _fcsPath;
-        private final boolean _existingKeywordRun;
-        private final String _analysisEngine;
+        private SelectFCSFileOption _selectFCSFilesOption;
+        private final List<String> _keywordDirs;
+        private final AnalysisEngine _analysisEngine;
         private final List<String> _importGroupNames;
         private final boolean _rEngineNormalization;
         private final String _rEngineNormalizationReference;
@@ -602,17 +620,17 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         public ImportAnalysisOptions(
                 String containerPath,
                 String workspacePath,
-                String fcsPath,
-                boolean existingKeywordRun,
+                SelectFCSFileOption selectFCSFilesOption,
+                List<String> keywordDirs,
                 String analysisName,
                 boolean existingAnalysisFolder,
                 boolean viaPipeline)
         {
             _containerPath = containerPath;
             _workspacePath = workspacePath;
-            _fcsPath = fcsPath;
-            _existingKeywordRun = existingKeywordRun;
-            _analysisEngine = "noEngine";
+            _selectFCSFilesOption = selectFCSFilesOption;
+            _keywordDirs = keywordDirs;
+            _analysisEngine = AnalysisEngine.FlowJoWorkspace;
             _importGroupNames = Arrays.asList("All Samples");
             _rEngineNormalization = false;
             _rEngineNormalizationReference = null;
@@ -627,9 +645,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         public ImportAnalysisOptions(
                 String containerPath,
                 String workspacePath,
-                String fcsPath,
-                boolean existingKeywordRun,
-                String analysisEngine,
+                SelectFCSFileOption selectFCSFilesOption,
+                List<String> keywordDirs,
+                AnalysisEngine analysisEngine,
                 List<String> importGroupNames,
                 boolean rEngineNormalization,
                 String rEngineNormalizationReference,
@@ -642,8 +660,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             _containerPath = containerPath;
             _workspacePath = workspacePath;
-            _fcsPath = fcsPath;
-            _existingKeywordRun = existingKeywordRun;
+            _selectFCSFilesOption = selectFCSFilesOption;
+            _keywordDirs = keywordDirs;
             _analysisEngine = analysisEngine;
             _importGroupNames = importGroupNames;
             _rEngineNormalization = rEngineNormalization;
@@ -666,17 +684,16 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             return _workspacePath;
         }
 
-        public String getFcsPath()
+        public SelectFCSFileOption getSelectFCSFilesOption()
         {
-            return _fcsPath;
+            return _selectFCSFilesOption;
+        }
+        public List<String> getKeywordDirs()
+        {
+            return _keywordDirs;
         }
 
-        public boolean isExistingKeywordRun()
-        {
-            return _existingKeywordRun;
-        }
-
-        public String getAnalysisEngine()
+        public AnalysisEngine getAnalysisEngine()
         {
             return _analysisEngine;
         }
@@ -725,5 +742,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             return _expectedErrors;
         }
+
     }
 }

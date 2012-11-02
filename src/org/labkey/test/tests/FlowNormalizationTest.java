@@ -51,9 +51,9 @@ public class FlowNormalizationTest extends BaseFlowTest
         ImportAnalysisOptions options = new ImportAnalysisOptions(
                 getContainerPath(),
                 "/flowjoquery/miniFCS/mini-fcs.xml",
-                "/flowjoquery/miniFCS",
-                false,
-                "rEngine",
+                SelectFCSFileOption.Browse,
+                Arrays.asList("/flowjoquery/miniFCS"),
+                AnalysisEngine.R,
                 Arrays.asList("Sample Order 5: Gag1&2"),
                 true,
                 "118969.fcs",

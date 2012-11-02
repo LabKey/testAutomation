@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -49,7 +50,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 
     protected void verifyQueryTest()
     {
-        importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/PV1-public.xml", null, false, "FlowJoAnalysis", false, true);
+        importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/PV1-public.xml", SelectFCSFileOption.None, null, "FlowJoAnalysis", false, true);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.clearCustomizeViewColumns();
         _customizeViewsHelper.addCustomizeViewColumn("Name");
@@ -81,7 +82,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 //        waitForPageToLoad();
 
         goToFlowDashboard();
-        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", "/flowjoquery/miniFCS", false, "FlowJoAnalysis", true, false);
+        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Browse, Arrays.asList("/flowjoquery/miniFCS"), "FlowJoAnalysis", true, false);
 
         int runId = -1;
         String currentURL = getCurrentRelativeURL();
@@ -137,14 +138,14 @@ public class FlowJoQueryTest extends BaseFlowTest
 
     private void verifyWSPImport()
     {
-        importAnalysis(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", "advanced", false, "Windows File", false, true);
+        importAnalysis(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", SelectFCSFileOption.Browse, Arrays.asList("advanced"), "Windows File", false, true);
         assertTextPresent("931115-B02- Sample 01.fcs");
     }
 
     private void verifyNestedBooleans()
     {
         //verify workspaces with booleans-within-booleans
-        importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/boolean-sub-populations.xml", "miniFCS", true, "BooleanOfBooleanAnalysis", false, true);
+        importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/boolean-sub-populations.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "BooleanOfBooleanAnalysis", false, true);
         clickLinkWithText("118795.fcs");
         sleep(2000);
         waitForElement(Locator.xpath("//table/tbody/tr/td/a/span[text()='A&B']"), defaultWaitForPage);
@@ -155,7 +156,7 @@ public class FlowJoQueryTest extends BaseFlowTest
     private void verifyFilterOnImport()
     {
         setFlowFilter(new String[] {"Name", "Keyword/Comp"}, new String[] { "startswith","eq"}, new String[] {"118", "PE CD8"});
-        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", "miniFCS", true, "FilterAnalysis", false, true);
+        importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "FilterAnalysis", false, true);
         DataRegionTable queryTable = new DataRegionTable("query", this);
         Assert.assertEquals(1, queryTable.getDataRowCount());
     }
