@@ -113,8 +113,8 @@ public class TargetStudyTest extends AbstractAssayTestWD
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("Label"), _study1Label);
         clickButton("Submit", 0);
-        _extHelper.waitForExtDialog("Status");
-        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
+//        _extHelper.waitForExtDialog("Status");
+//        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
         waitForPageToLoad();
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/manageStudyProperties.view");
