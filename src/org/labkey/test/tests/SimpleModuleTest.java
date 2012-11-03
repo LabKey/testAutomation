@@ -385,7 +385,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         pushLocation();
         table.clickLink(1,0);
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
-        assertElementPresent(Locator.xpath("//td[text() = 'Pinto']"));
+        //assertElementPresent(Locator.xpath("//td[text() = 'Pinto']"));
 
         popLocation();
         table.clickLink(5,0);
