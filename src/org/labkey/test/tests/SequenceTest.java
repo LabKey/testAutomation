@@ -143,7 +143,7 @@ public class SequenceTest extends BaseWebDriverTest
         clickMenuButton("More Actions", "Create Illumina Sample Sheet");
         waitForPageToLoad();
         waitForText("You have chosen to export " + _readsetCt + " samples");
-        waitForText("Description");
+        _helper.waitForField("Investigator Name");
 
         Ext4FieldRefWD.getForLabel(this, "Reagent Cassette Id").setValue("FlowCell");
 

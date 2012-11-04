@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.net.URISyntaxException;
 import java.util.Random;
@@ -148,5 +149,17 @@ public class LabModuleHelper
         _test.setFormElement(Locator.name(name), value);
         //there is a deliberate delay after user input for a change to commit in the Ext store
         _test.sleep(250);
+    }
+
+    public void waitForField(final String label)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return Ext4FieldRefWD.isFieldPresent(_test, label);
+            }
+        }, "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 }
