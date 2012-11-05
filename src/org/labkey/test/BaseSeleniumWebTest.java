@@ -4703,7 +4703,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             // Confirm the deletion
             clickButton("OK", 0);
-            waitForElement(Locator.raw("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
+            waitForElement(Locator.raw("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]"), WAIT_FOR_JAVASCRIPT);
         }
     }
 

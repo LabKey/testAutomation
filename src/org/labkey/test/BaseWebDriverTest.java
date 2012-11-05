@@ -5022,7 +5022,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             // Confirm the deletion
             clickButton("OK", 0);
-            waitForElement(Locator.xpath("//td/img[@id='partdeleted_" + index + "']"), WAIT_FOR_JAVASCRIPT);
+            waitForElement(Locator.xpath("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]"), WAIT_FOR_JAVASCRIPT);
         }
     }
 
