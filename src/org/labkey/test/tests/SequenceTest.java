@@ -223,6 +223,8 @@ public class SequenceTest extends BaseWebDriverTest
         beginAt(url);
 
         waitForText("Template");
+
+        _helper.waitForField("Investigator Name");
         for (String[] a : fieldPairs)
         {
             Ext4FieldRefWD.getForLabel(this, a[0]).setValue(a[1]);
