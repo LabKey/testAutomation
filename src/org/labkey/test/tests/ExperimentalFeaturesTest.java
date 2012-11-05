@@ -81,10 +81,10 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         _containerHelper.createProject(getProjectName(), null);
         setSiteGroupPermissions(TEST_GROUP, "Reader");
         clickButton("Save and Finish");
-        impersonate(ADMIN_USER); // TODO: Use non-admin user: 16151: Users are unable to modify their own account settings
+        impersonate(CHECKED_USER);
         goToMyAccount();
         clickButton("Edit");
-        setFormElement(Locator.name("quf_FirstName"), displayNameFromEmail(ADMIN_USER));
+        setFormElement(Locator.name("quf_FirstName"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
         stopImpersonating();
 
@@ -106,7 +106,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         _customizeViewsHelper.saveCustomView(EMAIL_VIEW, true);
 
         // Create query webpart
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         addWebPart("Query");
         selectOptionByValue(Locator.name("schemaName"), "core");
         clickRadioButtonById("selectQueryContents");
@@ -131,7 +131,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
     private void verifyHiddenEmailTest()
     {
         impersonate(IMPERSONATED_USER);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
 
         log("Verify that emails cannot be seen in query webpart");
         clickMenuButton("Views", EMAIL_VIEW);
