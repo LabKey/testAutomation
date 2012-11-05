@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseSeleniumWebTest;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public abstract class AbstractContainerHelper extends AbstractHelper
 
     /** @param folderType the name of the type of container to create.
      * May be null, in which case you get the server's default folder type */
-    public final void createProject(String projectName, String folderType)
+    public final void createProject(String projectName, @Nullable String folderType)
     {
         doCreateProject(projectName, folderType);
         _createdProjects.add(projectName);

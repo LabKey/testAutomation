@@ -112,7 +112,7 @@ public class BasicTest extends BaseWebDriverTest
 
         // Navigate to the credits page and verify that all external components are documented
         clickLinkWithText("credits", false);
-        waitForElement(Locator.xpath("//span[contains(@class, 'labkey-wp-title-text') and contains(text(), 'Executable Files Distributed with the Graphical Windows Installer')]"));
+        waitForExtReady();
         assertTextNotPresent("WARNING:");
 
         ensureAdminMode();

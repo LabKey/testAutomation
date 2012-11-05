@@ -2872,8 +2872,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public boolean doesElementAppear(Checker checker, int wait)
     {
-
         int time = 0;
+
         while ( time < wait )
         {
             if( checker.check() )
@@ -2881,11 +2881,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             sleep(100);
             time += 100;
         }
+
         if (!checker.check())
         {
             _testTimeout = true;
             return false;
         }
+
         return false;
     }
 
