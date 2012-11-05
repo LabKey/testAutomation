@@ -84,7 +84,8 @@ public enum TestSet
         NabAssayTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
-        FlowNormalizationTest.class,
+        // Disable FlowNormalizationTest until Issue 16434 is resolved
+        //FlowNormalizationTest.class,
         FlowCBCTest.class,
         DataRegionTest.class,
         UserPermissionsTest.class,
