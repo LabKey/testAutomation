@@ -271,7 +271,10 @@ src/org/labkey/test/tests/StudyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
 src/org/labkey/test/tests/TargetedMSTest.java -text
+src/org/labkey/test/tests/TimeChartAPITest.java -text
+src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
 src/org/labkey/test/tests/TimeChartTest.java -text
+src/org/labkey/test/tests/TimeChartVisitBasedTest.java -text
 src/org/labkey/test/tests/TimelineTest.java -text
 src/org/labkey/test/tests/UniprotAnnotationTest.java -text
 src/org/labkey/test/tests/UserPermissionsTest.java -text

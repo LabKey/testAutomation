@@ -30,7 +30,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String VISIT_FOLDER_NAME =  "Demo Visit Study";
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
     private static final String SAMPLE_DATA_PATH = "/sampledata/study/";
-    private static final String TEST_DATA_API_PATH = "server/test/data/api";
+    public static final String TEST_DATA_API_PATH = "server/test/data/api";
 
     private static final String REPORT_NAME_1 = "TimeChartTest Report";
     private static final String REPORT_NAME_2 = "TimeChartTest 2Report";
@@ -245,13 +245,18 @@ public class TimeChartTest extends StudyBaseTest
 
     public void configureStudy()
     {
-        _containerHelper.createProject(PROJECT_NAME, null);
+        if (!isLinkPresentWithText(PROJECT_NAME))
+            _containerHelper.createProject(PROJECT_NAME, null);
+
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
     }
 
     public void configureVisitStudy()
     {
+        if (!isLinkPresentWithText(PROJECT_NAME))
+            _containerHelper.createProject(PROJECT_NAME, null);
+
         createSubfolder(PROJECT_NAME, PROJECT_NAME, VISIT_FOLDER_NAME, "Study", null);
         initializePipeline();
 
@@ -264,11 +269,6 @@ public class TimeChartTest extends StudyBaseTest
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 
-    protected File[] getTestFiles()
-    {
-        return new File[]{new File(getLabKeyRoot() + "/" + TEST_DATA_API_PATH + "/timechart-api.xml")};
-    }
-
     protected void doCreateSteps()
     {
         configureStudy();
@@ -278,47 +278,48 @@ public class TimeChartTest extends StudyBaseTest
 
     public void doVerifySteps()
     {
-        createChartTest();
+        createChartTest(); // run via TimeChartDateBasedTest
 
-        stdDevRegressionTest();
+        stdDevRegressionTest(); // run via TimeChartDateBasedTest
 
-        visualizationTest();
+        visualizationTest(); // run via TimeChartDateBasedTest
 
-        generateChartPerParticipantTest();
+        generateChartPerParticipantTest(); // run via TimeChartDateBasedTest
 
-        saveTest();
+        saveTest(); // run via TimeChartDateBasedTest
 
-        timeChartPermissionsTest();
+        timeChartPermissionsTest(); // run via TimeChartDateBasedTest
 
-        pointClickFunctionTest();
+        pointClickFunctionTest(); // run via TimeChartDateBasedTest
 
-        multiMeasureTimeChartTest();
+        multiMeasureTimeChartTest(); // run via TimeChartDateBasedTest
 
-        participantGroupTimeChartTest();
+        getDataDateTest(); // run via TimeChartAPITest
 
-        multiAxisTimeChartTest();
+        getDataVisitTest(); // run via TimeChartAPITest
 
-        aggregateTimeChartTest();
+        createParticipantGroups(); // run via TimeChartAPITest and TimeChartDatBasedTest
 
-        visitBasedChartTest(); 
+        participantGroupTimeChartTest(); // run via TimeChartDateBasedTest
 
-        filteredTimeChartRegressionTest();
+        multiAxisTimeChartTest(); // run via TimeChartDateBasedTest
+
+        aggregateTimeChartUITest(); // run via TimeChartDateBasedTest
+
+        aggregateTimeChartSQLTest(); // run via TimeChartAPITest
+
+        filteredTimeChartRegressionTest(); // run via TimeChartDateBasedTest
+
+        visitBasedChartTest(); // run via TimeChartVisitBasedChart
     }
 
-    private void aggregateTimeChartTest()
-    {
-        aggregateTimeChartUITest();
-
-        aggregateTimeChartSQLTest();
-    }
-
-    private void aggregateTimeChartSQLTest()
+    public void aggregateTimeChartSQLTest()
     {
         sqlTest(TEST_DATA_API_PATH + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE, GETDATA_API_TEST_NUMROWS_AGGREGATE,  GETDATA_API_COLNAMES_AGGREGATE, null, null, null, null);
     }
 
     //depends on:  participantGroupTimeChartTest
-    private void aggregateTimeChartUITest()
+    public void aggregateTimeChartUITest()
     {
         goToTimeChartScreenAndStartChooseMeasure();
 
@@ -393,7 +394,7 @@ public class TimeChartTest extends StudyBaseTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
-    private void generateChartPerParticipantTest()
+    public void generateChartPerParticipantTest()
     {
 
         goToGroupingTab();
@@ -417,7 +418,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(CHART_TITLE, 7); // 6 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
     }
 
-    private void createChartTest()
+    public void createChartTest()
     {
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
@@ -447,7 +448,7 @@ public class TimeChartTest extends StudyBaseTest
     /**
      * regression for 15246 : Filtering on a column in the grid before creating time chart causes error
      */
-    private void filteredTimeChartRegressionTest()
+    public void filteredTimeChartRegressionTest()
     {
         log("Test time chart from a filtered grid");
         
@@ -477,7 +478,7 @@ public class TimeChartTest extends StudyBaseTest
         saveReport(true);
     }
 
-    private void visitBasedChartTest()
+    public void visitBasedChartTest()
     {
         log("Create multi-measure time chart.");
         clickLinkWithText(VISIT_FOLDER_NAME);
@@ -549,7 +550,7 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(VISIT_CHART_TITLE, WAIT_FOR_JAVASCRIPT);
     }
 
-    private void saveTest()
+    public void saveTest()
     {
         openSaveMenu();
         assertTextPresent("Report Name");
@@ -581,7 +582,7 @@ public class TimeChartTest extends StudyBaseTest
         pushLocation();
     }
 
-    private void visualizationTest()
+    public void visualizationTest()
     {
         log("Check visualization");
         enterMeasuresPanel();
@@ -707,7 +708,7 @@ public class TimeChartTest extends StudyBaseTest
         }
     }
 
-    private void multiMeasureTimeChartTest()
+    public void multiMeasureTimeChartTest()
     {
         log("Create multi-measure time chart.");
         clickLinkWithText(PROJECT_NAME);
@@ -751,12 +752,9 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
         assertTextPresent(CHART_TITLE+": Lymphocytes", 1); // Title
         assertTextPresent(CHART_TITLE+": CD4", 1); // Title
-
-        getDataDateTest();
-        getDataVisitTest();
     }
 
-    private void getDataDateTest()
+    public void getDataDateTest()
     {
         sqlTest(TEST_DATA_API_PATH+"/getDataDateTest.html", GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
     }
@@ -871,18 +869,22 @@ public class TimeChartTest extends StudyBaseTest
     }
 
 
-    private void getDataVisitTest()
+    public void getDataVisitTest()
     {
         sqlTest(TEST_DATA_API_PATH + "/getDataVisitTest.html", GETDATA_API_VISITTEST_COLNAMES, GETDATA_API_TEST_VISITLABEL, null, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
     }
 
-    private void participantGroupTimeChartTest()
+    public void createParticipantGroups()
     {
-        log("Test charting with participant groups");
         log("Create participant groups");
         _studyHelper.createCustomParticipantGroup(PROJECT_NAME, FOLDER_NAME, GROUP1_NAME, "Participant", true, GROUP1_PTIDS);
         _studyHelper.createCustomParticipantGroup(PROJECT_NAME, FOLDER_NAME, GROUP2_NAME, "Participant", false, GROUP2_PTIDS);
         _studyHelper.createCustomParticipantGroup(PROJECT_NAME, FOLDER_NAME, GROUP3_NAME, "Participant", false, GROUP3_PTIDS);
+    }
+
+    public void participantGroupTimeChartTest()
+    {
+        log("Test charting with participant groups");
 
         clickLinkWithText(FOLDER_NAME);
         goToManageViews();
@@ -973,17 +975,7 @@ public class TimeChartTest extends StudyBaseTest
         saveReport(false);
         clickLinkWithText(FOLDER_NAME);
 
-        log("Remove a participant from one group.");
-        clickTab("Manage");
-        clickLinkWithText("Manage Participant Groups");
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        _studyHelper.editCustomParticipantGroup(GROUP1_NAME, "Participant", null, false, null, true, true, GROUP1_PTIDS[0]);
-
-        log("Delete one group.");
-        clickTab("Manage");
-        clickLinkWithText("Manage Participant Groups");
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        _studyHelper.deleteCustomParticipantGroup(GROUP3_NAME, "Participant");
+        modifyParticipantGroups();
 
         log("Verify report after modifying participant groups.");
         clickLinkWithText(FOLDER_NAME);
@@ -1085,7 +1077,22 @@ public class TimeChartTest extends StudyBaseTest
 
     }
 
-    private void multiAxisTimeChartTest()
+    public void modifyParticipantGroups()
+    {
+        log("Remove a participant from one group.");
+        clickTab("Manage");
+        clickLinkWithText("Manage Participant Groups");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _studyHelper.editCustomParticipantGroup(GROUP1_NAME, "Participant", null, false, null, true, true, GROUP1_PTIDS[0]);
+
+        log("Delete one group.");
+        clickTab("Manage");
+        clickLinkWithText("Manage Participant Groups");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _studyHelper.deleteCustomParticipantGroup(GROUP3_NAME, "Participant");
+    }
+
+    public void multiAxisTimeChartTest()
     {
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
@@ -1107,7 +1114,7 @@ public class TimeChartTest extends StudyBaseTest
         sleep(1000); // attempt fix for intermittent failure issue where applyChanges button is clicked too quickly (selected measure properties need to be initialized)
         waitForText("Hemoglobin from Lab Results");
         applyChanges();
-        waitForText(GROUP2_PTIDS[0]+" Hemoglobin");
+        waitForText(GROUP2_PTIDS[0]); // TODO: WebDriver waitForText(GROUP2_PTIDS[0]+" Hemoglobin");
         //sadly, can't get data from within svg.
 //        String transform = getAttribute(Locator.xpath("//a[starts-with(@title, '"+GROUP1_PTIDS[0]+" Hemoglobin:')]/path"), "transform");
 //        double height = Double.parseDouble(transform.substring(transform.indexOf(" "), transform.indexOf(")") - 1));
@@ -1145,7 +1152,7 @@ public class TimeChartTest extends StudyBaseTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
-    private void timeChartPermissionsTest()
+    public void timeChartPermissionsTest()
     {
         log("Check Time Chart Permissions");
         createUser(USER1, null);
@@ -1172,7 +1179,7 @@ public class TimeChartTest extends StudyBaseTest
         simpleSignIn();
     }
 
-    private void pointClickFunctionTest()
+    public void pointClickFunctionTest()
     {
         log("Check Time Chart Point Click Function (Developer Only)");
         clickLinkWithText(PROJECT_NAME);
@@ -1251,7 +1258,7 @@ public class TimeChartTest extends StudyBaseTest
     }
 
     // Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
-    private void stdDevRegressionTest()
+    public void stdDevRegressionTest()
     {
         log("StdDev regression check");
         enterMeasuresPanel();

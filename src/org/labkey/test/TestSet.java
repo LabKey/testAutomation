@@ -137,7 +137,9 @@ public enum TestSet
         SpecimenMergeTest.class,
         TargetStudyTest.class,
         TargetedMSTest.class,
-        TimeChartTest.class,
+        TimeChartDateBasedTest.class,
+        TimeChartVisitBasedTest.class,
+        TimeChartAPITest.class,
 //        EHRStudyTest.class, // TODO : 16316: EHRStudyTest causing Java memory errors
 //        EHRApiTest.class,
         ComplianceTrainingTest.class,
