@@ -40,7 +40,7 @@ import static org.labkey.test.util.ListHelper.ListColumnType.String;
  */
 public class ListTest extends BaseSeleniumWebTest
 {
-    protected final static String PROJECT_VERIFY = "ListVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
     protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
     protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
@@ -496,8 +496,12 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test single list web part");
         addWebPart("List - Single");
         setText("title", "This is my single list web part title");
-        submit();
-        assertTextPresent("Import Data");
+        click(Locator.xpath("//input[@name='listId']"));
+        click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '>')]"));
+        //This will only work so long as it's the only button on the page.
+        click(Locator.xpath("//button"));
+        waitForPageToLoad();
+        waitForText("Import Data");
         assertTextPresent("View Design");
         clickAndWait(Locator.linkWithSpan("This is my single list web part title"), WAIT_FOR_PAGE);
         assertTextPresent("Colors");
