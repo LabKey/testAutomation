@@ -16,9 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.StringHelper;
 
 /**
@@ -26,7 +27,7 @@ import org.labkey.test.util.StringHelper;
  * Date: 11/4/11
  * Time: 2:08 PM
  */
-public class GroupTest extends BaseSeleniumWebTest
+public class GroupTest extends BaseWebDriverTest
 {
     protected static final String SIMPLE_GROUP = "group1";
     protected static final String COMPOUND_GROUP = "group2";
@@ -96,9 +97,12 @@ public class GroupTest extends BaseSeleniumWebTest
         waitForText("Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
-        setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        setSiteGroupPermissions(SIMPLE_GROUP, "Reader");
+        dragGroupToRole(SIMPLE_GROUP, "Reader", "Editor"); // Verify group drag-drop
+        setSiteGroupPermissions(SIMPLE_GROUP, "Reader");
+        dragGroupToRole(SIMPLE_GROUP, "Reader", "Editor"); // Verify drag-drop onto existing role
         clickButton("Save and Finish");
-        assertUserCanSeeFolder(TEST_USERS_FOR_GROUP[0], getProjectName());
+        assertUserCanSeeProject(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
         log("Verify you can copy perms even with a default");
 
@@ -121,6 +125,7 @@ public class GroupTest extends BaseSeleniumWebTest
         groupSecurityApiTest();
     }
 
+    @LogMethod
     private void permissionsReportTest()
     {
         clickLinkWithText("view permissions report");
@@ -182,6 +187,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
     }
 
+    @LogMethod
     private void verifyImpersonateGroup()
     {
         //set simple group as editor
@@ -252,9 +258,9 @@ public class GroupTest extends BaseSeleniumWebTest
         {
             waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText(wikiValues[1]), WAIT_FOR_PAGE);
             waitForText(wikiValues[2]);
-            if(!isTextPresent("Edit"))
+            if(!isLinkPresentWithText("Edit"))
                 return false;
-            selenium.goBack();
+            _driver.navigate().back();
             waitForPageToLoad();
         }
         return true;
@@ -276,7 +282,8 @@ public class GroupTest extends BaseSeleniumWebTest
     {
         setFormElement("names", TEST_USERS_FOR_GROUP[0]); //this user is in group1 and so is already in group 2
         clickButton("Update Group Membership");
-        assertTextPresent(TEST_USERS_FOR_GROUP[0] + "*", "* These group members already appear in other included member groups and can be safely removed.");
+        assertTextPresent("* These group members already appear in other included member groups and can be safely removed.");
+        Assert.assertTrue("Missing or badly formatted group redundancy warning", getBodyText().contains(TEST_USERS_FOR_GROUP[0] + " *"));
 //        expect warning
     }
 
@@ -289,6 +296,7 @@ public class GroupTest extends BaseSeleniumWebTest
 
     }
 
+    @LogMethod
     private void verifyCantAddSystemGroupToUserGroup()
     {
         startCreateGlobalPermissionsGroup(BAD_GROUP, true);
@@ -299,6 +307,7 @@ public class GroupTest extends BaseSeleniumWebTest
         clickButton("Done");
     }
 
+    @LogMethod
     protected void createProjectCopyPerms()
     {
         String projectName = getProject2Name();
@@ -310,28 +319,21 @@ public class GroupTest extends BaseSeleniumWebTest
             Assert.fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         goToCreateProject();
-        waitForElement(Locator.name("name"), 100*WAIT_FOR_JAVASCRIPT);
-        setText("name", projectName);
+        setFormElement(Locator.name("name"), projectName);
 
-        if (null != folderType && !folderType.equals("None"))
-            click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
-        else
-            click(Locator.xpath("//td[./label[text()='Custom']]/input"));
+        click(Locator.xpath("//td[./label[text()='Custom']]/input"));
 
-        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
-        waitForPageToLoad();
+        waitAndClickButton("Next");
 
         //second page of the wizard
-        click(Locator.xpath("//label[contains(text(), 'Copy From Existing Project')]/../input"));
+        waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
         _extHelper.clickExtDropDownMenu(Locator.xpath("//td[@id='targetProject-inputCell']/input"), getProjectName());
-        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
-        waitForPageToLoad();
+        waitAndClickButton("Next");
 
         //third page of wizard
-        waitAndClick(Locator.xpath("//button[./span[text()='Finish']]"));
-        waitForPageToLoad();
+        waitAndClickButton("Finish");
 
-        assertUserCanSeeFolder(TEST_USERS_FOR_GROUP[1], getProject2Name());
+        assertUserCanSeeProject(TEST_USERS_FOR_GROUP[1], getProject2Name());
 
 //        _createdProjects.add(projectName);
     }
@@ -343,14 +345,14 @@ public class GroupTest extends BaseSeleniumWebTest
         return null;
     }
 
-    protected void assertUserCanSeeFolder(String user, String folder)
+    protected void assertUserCanSeeProject(String user, String project)
     {
-
         impersonate(user);
-        assertLinkPresentWithText(displayNameFromEmail(user));
+        expandFolder(project);
         stopImpersonating();
     }
 
+    @LogMethod
     protected void groupSecurityApiTest()
     {
         // Initialize the Wiki
@@ -358,8 +360,8 @@ public class GroupTest extends BaseSeleniumWebTest
         addWebPart("Wiki");
 
         createNewWikiPage();
-        setFormElement("name", WIKITEST_NAME);
-        setFormElement("title", WIKITEST_NAME);
+        setFormElement(Locator.name("name"), WIKITEST_NAME);
+        setFormElement(Locator.name("title"), WIKITEST_NAME);
         setWikiBody("Placeholder text.");
         saveWikiPage();
 
@@ -368,6 +370,6 @@ public class GroupTest extends BaseSeleniumWebTest
         // Run the Test Script
         clickButton("Start Test", 0);
         waitForText("Done!", defaultWaitForPage);
-        assertTextNotPresent("Error");
+        Assert.assertFalse("Security API error.", Locator.id("log-info").findElement(_driver).getText().contains("Error"));
     }
 }

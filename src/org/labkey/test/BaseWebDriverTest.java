@@ -56,6 +56,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -2394,7 +2395,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
 	public boolean isAlertPresent()
 	{
-		return selenium.isAlertPresent();
+        try {
+            _driver.switchTo().alert();
+            switchToMainWindow();
+            return true;
+        }
+        catch (NoAlertPresentException ex)
+        {
+            return false;
+        }
 	}
 
 	public String getAlert()
@@ -2420,6 +2429,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         selenium.fireEvent(loc.toString(), event.toString());
     }
 
+    @LogMethod
     public void startCreateGlobalPermissionsGroup(String groupName, boolean failIfAlreadyExists)
     {
 
@@ -2524,6 +2534,19 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         ref.eval("getSelectionModel().select(" + idx + ")");
         waitAndClick(Locator.tagContainingText("a","manage group"));
         waitForPageToLoad();
+    }
+
+    public void dragGroupToRole(String group, String srcRole, String destRole)
+    {
+        Actions builder = new Actions(_driver);
+        builder
+            .clickAndHold(Locator.permissionButton(group, srcRole).findElement(_driver))
+            .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(_driver))
+            .release()
+            .build().perform();
+
+        waitForElementToDisappear(Locator.permissionButton(group, srcRole), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.permissionButton(group, destRole));
     }
 
     public void createSubFolderFromTemplate(String project, String child, String template, String[] objectsToCopy)
@@ -2759,6 +2782,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             possibleAncestors = _driver.findElements(By.xpath(xpath));
             depth++;
         }
+        assertLinkPresentWithText(project);
     }
 
     public void clickFolder(String project)
@@ -3088,7 +3112,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertTextPresentInThisOrder(text1, text2);
     }
 
-    public void waitForPageToLoad(int millis)
+    @Deprecated public void waitForPageToLoad(int millis)
     {
         if (isAlertPresent())
         {
@@ -3105,7 +3129,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    public void waitForPageToLoad()
+    @Deprecated public void waitForPageToLoad()
     {
         waitForPageToLoad(defaultWaitForPage);
     }
@@ -5640,7 +5664,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     }
 
-    public void createUser(String userName, String cloneUserName)
+    public void createUser(String userName, @Nullable String cloneUserName)
     {
         createUser(userName, cloneUserName, true);
     }
