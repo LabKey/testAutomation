@@ -31,7 +31,7 @@ import java.util.HashMap;
 public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
     private static final String TEST_GROUP = "HiddenEmail Test group";
-    private static final String ADMIN_USER = "experimental_dev@experimental.test";
+    private static final String ADMIN_USER = "experimental_admin@experimental.test";
     private static final String IMPERSONATED_USER = "experimental_user@experimental.test";
     private static final String CHECKED_USER = "experimental_user2@experimental.test";
     private static final String EMAIL_TEST_LIST = "My Users";
@@ -77,10 +77,12 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         // Create users and groups
         createUser(ADMIN_USER, null);
         addUserToGroup("Site Administrators", ADMIN_USER);
+        impersonate(ADMIN_USER); // Use created user to ensure we have a known 'Modified by' column for created users
         createGlobalPermissionsGroup(TEST_GROUP, IMPERSONATED_USER, CHECKED_USER);
         _containerHelper.createProject(getProjectName(), null);
         setSiteGroupPermissions(TEST_GROUP, "Reader");
         clickButton("Save and Finish");
+        stopImpersonating();
         impersonate(CHECKED_USER);
         goToMyAccount();
         clickButton("Edit");
@@ -89,6 +91,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         stopImpersonating();
 
         // Create list
+        // TODO: possibly insert as ADMIN_USER if list's ModifiedBy row should be hidden (it is not)
         ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(getProjectName(), "core", "Users"));
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
@@ -119,12 +122,12 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         // Enable limited email visibility
         setExperimentalFeature(ExperimentalFeature.HIDDEN_EMAIL, true);
 
-        // Set test user permissions
+        // Verify user permissions for hidden emails
         goToSiteGroups();
         _ext4Helper.clickExt4Tab("Permissions");
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        if(isElementPresent(Locator.permissionButton(TEST_GROUP, "SeeEmailAddresses")))
-            removeSiteGroupPermission(TEST_GROUP, "SeeEmailAddresses");
+        assertElementNotPresent(Locator.permissionButton(TEST_GROUP, "SeeEmailAddresses"));
+        assertElementNotPresent(Locator.permissionButton(IMPERSONATED_USER, "SeeEmailAddresses"));
         clickButton("Save and Finish");
     }
 
