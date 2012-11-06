@@ -1233,8 +1233,8 @@ public class TimeChartTest extends StudyBaseTest
         pushLocation(); // for impersonation test
         pushLocation(); // for impersonation test
         
-        clickAndWait(Locator.css("svg a circle"));
-        waitForText("Participant - 249318596");
+        clickAndWait(Locator.css("svg a circle"), WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("Participant - 249318596");
 
         // verify that only developers can see the button to add point click function
         createUser(USER2, null);
