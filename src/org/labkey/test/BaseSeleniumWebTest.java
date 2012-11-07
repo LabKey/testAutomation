@@ -5206,9 +5206,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         clickUserMenuItem("Impersonate", "Role", role);
     }
+
     public void stopImpersonatingRole()
     {
-       stopImpersonatingGroup();
+        clickUserMenuItem("Stop Impersonating");
+        assertSignOutAndMyAccountPresent();
+        goToHome();
     }
 
     public void stopImpersonatingGroup()

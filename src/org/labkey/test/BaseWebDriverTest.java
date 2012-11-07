@@ -5578,9 +5578,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         clickUserMenuItem("Impersonate", "Role", role);
     }
+
     public void stopImpersonatingRole()
     {
-       stopImpersonatingGroup();
+        clickUserMenuItem("Stop Impersonating");
+        assertSignOutAndMyAccountPresent();
+        goToHome();
     }
 
     public void stopImpersonatingGroup()
@@ -5589,7 +5592,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertSignOutAndMyAccountPresent();
         goToHome();
     }
-
 
     public void impersonate(String fakeUser)
     {
