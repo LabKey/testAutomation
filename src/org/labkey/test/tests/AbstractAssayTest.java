@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
@@ -281,8 +282,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         if (confirmEditInOtherContainer)
         {
             String confirmation = selenium.getConfirmation();
-            assertTrue(confirmation.contains("This assay is defined in the"));
-            assertTrue(confirmation.contains("Would you still like to edit it?"));
+            Assert.assertTrue(confirmation.contains("This assay is defined in the"));
+            Assert.assertTrue(confirmation.contains("Would you still like to edit it?"));
         }
         waitForPageToLoad(WAIT_FOR_PAGE);
     }

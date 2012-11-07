@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -435,11 +435,11 @@ public class CohortTest extends BaseWebDriverTest
         {
             clickMenuButton("Participant Groups", "Enrolled");
             assertTextPresent("Current cohort is enrolled or unassigned");
-            assertEquals(enrolledRowCount, table.getDataRowCount());
+            Assert.assertEquals(enrolledRowCount, table.getDataRowCount());
         }
         else
         {
-            assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
+            Assert.assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
         }
     }
 
@@ -449,15 +449,15 @@ public class CohortTest extends BaseWebDriverTest
 
         clickMenuButton("Participant Groups", "Enrolled", "Initial cohort");
         assertTextPresent("Initial cohort is enrolled or unassigned");
-        assertEquals(initialRowCount, table.getDataRowCount());
+        Assert.assertEquals(initialRowCount, table.getDataRowCount());
 
         clickMenuButton("Participant Groups", "Enrolled", "Current cohort");
         assertTextPresent("Current cohort is enrolled or unassigned");
-        assertEquals(currentRowCount, table.getDataRowCount());
+        Assert.assertEquals(currentRowCount, table.getDataRowCount());
 
         clickMenuButton("Participant Groups", "Enrolled", "Cohort as of data collection");
         assertTextPresent("Cohort as of data collection is enrolled or unassigned");
-        assertEquals(dataCollectionRowCount, table.getDataRowCount());
+        Assert.assertEquals(dataCollectionRowCount, table.getDataRowCount());
     }
 
     private DataRegionTable verifyUnfilteredDataset(String datasetName, int allRowCount)
@@ -469,7 +469,7 @@ public class CohortTest extends BaseWebDriverTest
         assertTextNotPresent("Current cohort is enrolled or unassigned");
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
-        assertEquals(allRowCount, table.getDataRowCount());
+        Assert.assertEquals(allRowCount, table.getDataRowCount());
 
         return table;
     }
@@ -486,7 +486,7 @@ public class CohortTest extends BaseWebDriverTest
         }
         else
         {
-            assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
+            Assert.assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
         }
     }
 

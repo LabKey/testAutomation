@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
@@ -50,14 +51,14 @@ public class StudyProtectedExportTest extends StudyExportTest
         goToDatasetWithProtectedColum();
         assertTextNotPresent(protectedColumnLabel);
         Map<String, String> alteredFirstMouseStats = getFirstMouseStats();
-        assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
-        assertEquals(idPreface.length() + idLength,  alteredFirstMouseStats.get("Mouse Id").length());
+        Assert.assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
+        Assert.assertEquals(idPreface.length() + idLength,  alteredFirstMouseStats.get("Mouse Id").length());
         DataRegionTable drt = new DataRegionTable( "Dataset", this);
         /* DOB doesn't change because it's a text field, not a true date.
            since it's the most unique thing on the page, we can use it to see a specific user and verify that
            the date fields did change
          */
-        assertNotSame("2005-01-01", drt.getDataAsText(drt.getRow("1.Date of Birth", "1965-03-06"), "Contact Date"));
+        Assert.assertNotSame("2005-01-01", drt.getDataAsText(drt.getRow("1.Date of Birth", "1965-03-06"), "Contact Date"));
         verifyStatsDoNotMatch(originalFirstMouseStats, alteredFirstMouseStats);
         verifyParticipantGroups(originalFirstMouseStats.get("Mouse Id"), alteredFirstMouseStats.get("Mouse Id"));
 
@@ -106,18 +107,18 @@ public class StudyProtectedExportTest extends StudyExportTest
         goToDatasets();
         clickLinkContainingText("LLS-2");
         DataRegionTable drt = new DataRegionTable( "Dataset", this);
-        assertEquals("unexpected number of rows on initial viewing", 5, drt.getDataRowCount());
+        Assert.assertEquals("unexpected number of rows on initial viewing", 5, drt.getDataRowCount());
         clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
-        assertEquals("unexpected number of rows for group 1", 3, drt.getDataRowCount());
+        Assert.assertEquals("unexpected number of rows for group 1", 3, drt.getDataRowCount());
         clickMenuButton("Mouse Groups", "Cohorts", "Group 2");
-        assertEquals("unexpected number of rows for cohort 2", 2, drt.getDataRowCount());
+        Assert.assertEquals("unexpected number of rows for cohort 2", 2, drt.getDataRowCount());
     }
 
     private void verifyStatsDoNotMatch(Map originalFirstMouseStats, Map alteredFirstMouseStats)
     {
         for(String columnName : defaultStatsToCollect)
         {
-            assertNotSame(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
+            Assert.assertNotSame(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
         }
     }
 
@@ -125,7 +126,7 @@ public class StudyProtectedExportTest extends StudyExportTest
     {
         for(String columnName : defaultStatsToCollect)
         {
-            assertEquals(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
+            Assert.assertEquals(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
         }
     }
 

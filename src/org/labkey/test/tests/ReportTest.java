@@ -621,7 +621,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("URL must be absolute");
         setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
         assertTextNotPresent("URL must be absolute");
-        assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
+        Assert.assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
         _extHelper.uncheckCheckbox("Open link report in new window?");
         clickButton("Save");
         // save should return back to manage views page
@@ -886,7 +886,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "cpf-1");
         pressEnter(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][18]"), WAIT_FOR_JAVASCRIPT);
-        assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
 
         _extHelper.clickX4GridPanelCheckbox("label", "2a. Creatinine", "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox("label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);

@@ -878,7 +878,7 @@ public class StudyTest extends StudyBaseTest
         log("verify ");
         clickButtonContainingText("View Data");
         _customizeViewsHelper.openCustomizeViewPanel();
-        assertTrue(_customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
+        Assert.assertTrue(_customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
     private void verifyHiddenVisits()

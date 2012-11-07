@@ -218,9 +218,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             searchHelper.searchForSubjects(ptid);
             if (alternateIDs)
-                assertFalse("Published study contains non-alternate ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
+                Assert.assertFalse("Published study contains non-alternate ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
             else
-                assertTrue("Published study doesn't contain ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
+                Assert.assertTrue("Published study doesn't contain ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
         }
 
         // Go to published study
@@ -240,9 +240,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToManageStudy();
         clickLinkWithText("Manage Datasets");
         if (datasets.length > 0)
-            assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
+            Assert.assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         else // All visits were published
-            assertEquals("Unexpected number of datasets", STUDY_DATASET_COUNT, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
+            Assert.assertEquals("Unexpected number of datasets", STUDY_DATASET_COUNT, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         for (String dataset: datasets)
         {
             pushLocation();
@@ -266,9 +266,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToManageStudy();
         clickLinkWithText("Manage Visits");
         if (visits.length > 0)
-            assertEquals("Unexpected number of visits", visits.length, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
+            Assert.assertEquals("Unexpected number of visits", visits.length, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         else // All visits were published
-            assertEquals("Unexpected number of visits", STUDY_VISIT_COUNT, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
+            Assert.assertEquals("Unexpected number of visits", STUDY_VISIT_COUNT, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         for (String visit: visits)
         {
             assertTextPresent(visit);
@@ -288,7 +288,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             }
 
             String viewXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
-            assertEquals("Unexpected number of views/reports", views.length + reports.length, getXpathCount(Locator.xpath(viewXpath)));
+            Assert.assertEquals("Unexpected number of views/reports", views.length + reports.length, getXpathCount(Locator.xpath(viewXpath)));
         }
 
         // Verify published reports/views
@@ -372,7 +372,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             goToModule("List");
             assertTextPresent(lists);
-            assertEquals("Unexpected number of lists", lists.length, getXpathCount(Locator.xpath("id('lists')//tr")));
+            Assert.assertEquals("Unexpected number of lists", lists.length, getXpathCount(Locator.xpath("id('lists')//tr")));
             for (String list : lists)
             {
                 pushLocation();
@@ -499,7 +499,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
         setFormElement(Locator.name("studyName"), name);
         setFormElement(Locator.name("studyDescription"), description);
-        assertTrue(PROTOCOL_DOC.exists());
+        Assert.assertTrue(PROTOCOL_DOC.exists());
         setFormElement(Locator.name("protocolDoc"), PROTOCOL_DOC);
         selectLocation(parentContainer);
         clickButton("Next", 0);

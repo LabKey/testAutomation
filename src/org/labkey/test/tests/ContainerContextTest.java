@@ -135,23 +135,23 @@ public class ContainerContextTest extends BaseSeleniumWebTest
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("edit"), "href");
-        assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
+        Assert.assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/update.view?"));
 
         href = getAttribute(Locator.linkWithText("details"), "href");
-        assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
+        Assert.assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/details.view?"));
 
         href = getAttribute(Locator.linkWithText("MyName"), "href");
-        assertTrue("Expected MyName link to go to " + getProjectName() + " container, href=" + href,
+        Assert.assertTrue("Expected MyName link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/details.view?"));
 
         href = getAttribute(Locator.linkWithText("MyLookupItem2"), "href");
-        assertTrue("Expected ListLookup link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
+        Assert.assertTrue("Expected ListLookup link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view?"));
 
         href = getAttribute(Locator.linkWithText("200"), "href");
-        assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
+        Assert.assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
                 href.contains("/fake/" + getProjectName() + "/" + SUB_FOLDER_A + "/action.view?key=2"));
 
     }
@@ -195,11 +195,11 @@ public class ContainerContextTest extends BaseSeleniumWebTest
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText(SUB_FOLDER_A + "-Study"), "href");
-        assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container: " + href,
+        Assert.assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container: " + href,
                 href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_A + "/studySchedule.view"));
 
         href = getAttribute(Locator.linkWithText(SUB_FOLDER_B + "-Study"), "href");
-        assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_B + " container: " + href,
+        Assert.assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_B + " container: " + href,
                 href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_B + "/studySchedule.view"));
     }
 
@@ -215,11 +215,11 @@ public class ContainerContextTest extends BaseSeleniumWebTest
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("COMPLETE", 0), "href");
-        assertTrue("Expected 'COMPLETE' link 0 to go to current A container: " + href,
+        Assert.assertTrue("Expected 'COMPLETE' link 0 to go to current A container: " + href,
                 href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view"));
 
         href = getAttribute(Locator.linkWithText("COMPLETE", 1), "href");
-        assertTrue("Expected 'COMPLETE' link 1 to go to current B container: " + href,
+        Assert.assertTrue("Expected 'COMPLETE' link 1 to go to current B container: " + href,
                 href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_B + "/details.view"));
     }
 

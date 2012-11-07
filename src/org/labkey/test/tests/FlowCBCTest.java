@@ -181,21 +181,21 @@ public class FlowCBCTest extends BaseFlowTest
         log("** Verify mem naive query");
         beginAt("/query/" + getProjectName() + "/" + STUDY_FOLDER + "/executeQuery.view?schemaName=study&query.queryName=mem%20naive%20CBCFlow&query.sort=ParticipantId");
         DataRegionTable table = new DataRegionTable("query", this, false, true);
-        assertEquals("Expected one row", 1, table.getDataRowCount());
-        assertEquals(PTID1, table.getDataAsText(0, "Participant ID"));
-        assertEquals("Week 16", table.getDataAsText(0, "Visit"));
-        assertEquals("2880.0", table.getDataAsText(0, "Total Lymph"));
-        assertEquals("78.6%", table.getDataAsText(0, "CD3+ Percent"));
-        assertEquals("2263.18", table.getDataAsText(0, "CD3+ Lymph"));
+        Assert.assertEquals("Expected one row", 1, table.getDataRowCount());
+        Assert.assertEquals(PTID1, table.getDataAsText(0, "Participant ID"));
+        Assert.assertEquals("Week 16", table.getDataAsText(0, "Visit"));
+        Assert.assertEquals("2880.0", table.getDataAsText(0, "Total Lymph"));
+        Assert.assertEquals("78.6%", table.getDataAsText(0, "CD3+ Percent"));
+        Assert.assertEquals("2263.18", table.getDataAsText(0, "CD3+ Lymph"));
 
         log("** Verify 8a/p11c/4/3 query");
         beginAt("/query/" + getProjectName() + "/" + STUDY_FOLDER + "/executeQuery.view?schemaName=study&query.queryName=8a%2Fp11c%2F4%2F3%20CBCFlow&query.sort=ParticipantId");
         table = new DataRegionTable("query", this, false, true);
-        assertEquals("Expected one row", 1, table.getDataRowCount());
-        assertEquals(PTID2, table.getDataAsText(0, "Participant ID"));
-        assertEquals("Week 3", table.getDataAsText(0, "Visit"));
-        assertEquals("3080.0", table.getDataAsText(0, "Total Lymph"));
-        assertEquals("87.0%", table.getDataAsText(0, "CD3+ Percent"));
-        assertEquals("2680.09", table.getDataAsText(0, "CD3+ Lymph"));
+        Assert.assertEquals("Expected one row", 1, table.getDataRowCount());
+        Assert.assertEquals(PTID2, table.getDataAsText(0, "Participant ID"));
+        Assert.assertEquals("Week 3", table.getDataAsText(0, "Visit"));
+        Assert.assertEquals("3080.0", table.getDataAsText(0, "Total Lymph"));
+        Assert.assertEquals("87.0%", table.getDataAsText(0, "CD3+ Percent"));
+        Assert.assertEquals("2680.09", table.getDataAsText(0, "CD3+ Lymph"));
     }
 }

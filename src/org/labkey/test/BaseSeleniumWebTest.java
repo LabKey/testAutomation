@@ -2111,42 +2111,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return confirmation;
     }
 
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertEquals(Object expected, Object actual)
-    {
-        Assert.assertEquals(expected, actual);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertEquals(String message, Object expected, Object actual)
-    {
-        Assert.assertEquals(message, expected, actual);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertNotSame(Object expected, Object actual)
-    {
-        Assert.assertNotSame(expected, actual);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertTrue(String message, boolean condition)
-    {
-        Assert.assertTrue(message, condition);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertTrue(boolean condition)
-    {
-        Assert.assertTrue(condition);
-    }
-
-    @Deprecated // Leave in place until we're done with itn12.2 branch, which doesn't use the new Assert approach
-    public void assertFalse(String message, boolean condition)
-    {
-        Assert.assertFalse(message, condition);
-    }
-
     public void assertConfirmation(String msg)
     {
         Assert.assertEquals(msg, selenium.getConfirmation());
@@ -2978,7 +2942,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
     }
 
-    @Deprecated
     public void mouseClick(String locator)
     {
         selenium.mouseClick(locator);
@@ -3093,23 +3056,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         final Locator locator = new Locator("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
         String failMessage = "Ext 4 Tree Node with locator " + locator + " did not appear.";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return isElementPresent(locator);
-            }
-        }, failMessage, wait);
-    }
-
-    /**
-     * This function only works for Ext 3.4 or less.
-     */
-    @Deprecated
-    public void waitForExtFolderTreeNode(String nodeText, int wait)
-    {
-        final Locator locator = new Locator("//a[contains(@class, 'x-tree-node-anchor')]/span[text() = " + Locator.xq(nodeText) + "]");
-        String failMessage = "Ext NodeTree with locator " + locator + " did not appear.";
         waitFor(new Checker()
         {
             public boolean check()
@@ -3353,6 +3299,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return selenium.getValue(loc.toString());
     }
 
+    /**
+     * @deprecated Use {@link #getFormElement(Locator)}
+     * @param elementName
+     * @return
+     */
     @Deprecated
     public String getFormElement(String elementName)
     {
@@ -4413,6 +4364,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton(buttonText, 0);
     }
 
+    /**
+     * @deprecated Use {@link #setFormElement(Locator, String)}
+     * @param elementName
+     * @param text
+     */
     @Deprecated
     public void setText(String elementName, String text)
     {
@@ -4424,6 +4380,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.typeSilent(elementName, text);
     }
 
+    /**
+     * @deprecated Use {@link #setFormElement(Locator, String)}
+     * @param element
+     * @param text
+     */
     @Deprecated
     public void setFormElement(String element, String text)
     {
@@ -4439,6 +4400,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             fireEvent(element, SeleniumEvent.blur);
     }
 
+    /**
+     * @deprecated Use {@link #setFormElement(Locator, java.io.File)}
+     * @param element
+     * @param file
+     */
     @Deprecated
     public void setFormElement(String element, File file)
     {
@@ -4448,7 +4414,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void setFormElement(Locator loc, File file)
     {
-        assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
+        Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
         setFormElement(loc, file.getAbsolutePath());
     }
 
@@ -4707,6 +4673,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
+    /**
+     * @deprecated Use {@link #setFormElement(Locator, String)}
+     * @param elementName
+     * @param text
+     */
     @Deprecated
     public void setLongTextField(final String elementName, final String text)
     {
@@ -4991,6 +4962,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return selenium.isChecked(checkBoxLocator.toString());
     }
 
+    /**
+     * @deprecated Use {@link #selectOptionByValue(Locator, String)}
+     * @param selectId
+     * @param value
+     */
     @Deprecated
     public void selectOptionByValue(String selectId, String value)
     {
@@ -5002,6 +4978,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectOptionByValue(loc.toString(), value);
     }
 
+    /**
+     * @deprecated Use {@link #selectOptionByText(Locator, String)}
+     * @param selectId
+     * @param text
+     */
     @Deprecated
     public void selectOptionByText(String selectId, String text)
     {
@@ -5701,7 +5682,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         int row = getCohortRow(table, cohort);
         String s = table.getDataAsText(row, "Enrolled");
-        assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
+        Assert.assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
     }
 
     /**
@@ -6219,6 +6200,28 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         pressTab(l.toXpath());
     }
 
+    /**
+     * Placeholder for WebDriver pressEnter
+     * @param l
+     */
+    public void pressEnter(Locator l)
+        {
+            pressEnter(l.toXpath());
+    }
+
+    /**
+     * Placeholder for WebDriver pressDownArrow
+     * @param l
+     */
+    public void pressDownArrow(Locator l)
+        {
+            pressDownArrow(l.toXpath());
+    }
+
+    /**
+     * @deprecated Use {@link #pressTab(Locator)}
+     * @param xpath
+     */
     @Deprecated
     public void pressTab(String xpath)
     {
@@ -6227,6 +6230,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.keyUp(xpath, "\\9");
     }
 
+    /**
+     * @deprecated Use {@link #pressEnter(Locator)}
+     * @param xpath
+     */
     @Deprecated
     public void pressEnter(String xpath)
     {
@@ -6235,6 +6242,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.keyUp(xpath, "\\13");
     }
 
+    /**
+     * @deprecated Use {@link #pressDownArrow(Locator)}
+     * @param xpath
+     */
     @Deprecated
     public void pressDownArrow(String xpath)
     {

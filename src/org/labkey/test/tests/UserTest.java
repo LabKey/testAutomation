@@ -269,7 +269,7 @@ public class UserTest extends SecurityTest
 
         Locator checkboxLocator = Locator.xpath(prefix + "//span/input[@name='required']");
 
-        assertTrue("Checkbox not set for element: " + name, isChecked(checkboxLocator));
+        Assert.assertTrue("Checkbox not set for element: " + name, isChecked(checkboxLocator));
     }
 
     private void navigateToUserDetails(String userName)

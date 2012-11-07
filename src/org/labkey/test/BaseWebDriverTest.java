@@ -132,6 +132,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 {
     public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
+    /**
+     * @deprecated Refactor usages to use {@link #_driver}
+     */
     @Deprecated protected final DefaultSeleniumWrapper selenium;
     public final WebDriver _driver;
     private String _lastPageTitle = null;
@@ -2423,6 +2426,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public enum SeleniumEvent
     {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup}
 
+    /**
+     * @deprecated Direct event firing should be avoided. Use Javascript (via {@link #executeScript(String, Object...)}) if needed
+     * @param loc
+     * @param event
+     */
     @Deprecated
     public void fireEvent(Locator loc, SeleniumEvent event)
     {
@@ -3112,6 +3120,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertTextPresentInThisOrder(text1, text2);
     }
 
+    /**
+     * @deprecated Wait for specific elements on the the target page. selenium.waitForPageToLoad is unpredictable under WebDriver
+     * @param millis milliseconds to wait before timing out
+     */
     @Deprecated public void waitForPageToLoad(int millis)
     {
         if (isAlertPresent())
@@ -3129,6 +3141,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    /**
+     * @deprecated Wait for specific elements on the the target page. selenium.waitForPageToLoad is unpredictable under WebDriver
+     */
     @Deprecated public void waitForPageToLoad()
     {
         waitForPageToLoad(defaultWaitForPage);
@@ -3634,6 +3649,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Form element '" + elementName + "' was not present", isFormElementPresent(elementName));
     }
 
+    /**
+     * @deprecated Use specific locator for form element {@link BaseWebDriverTest#assertOptionEquals(Locator, String)}
+     * @param selectName
+     * @param value
+     */
     @Deprecated
     public void assertOptionEquals(String selectName, String value)
     {
@@ -3999,6 +4019,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         l.findElement(_driver).click();
     }
 
+    /**
+     * @deprecated Click shenanigans shouldn't be necessary with WebDriver. If click doesn't work, try WebDriver 'Actions'
+     */
     @Deprecated
     public void mouseDownAt(Locator l, int x, int y)
     {
@@ -4733,6 +4756,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton(buttonText, 0);
     }
 
+    /**
+     * @deprecated Use {@link #setFormElement(Locator, String)}
+     * @param elementName
+     * @param text
+     */
     @Deprecated
     public void setText(String elementName, String text)
     {
@@ -5361,6 +5389,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return checkBoxLocator.findElement(_driver).isSelected();
     }
 
+    /**
+     * @deprecated Use {@link #selectOptionByValue(Locator, String)}
+     * @param selectName
+     * @param value
+     */
     @Deprecated
     public void selectOptionByValue(String selectName, String value)
     {
@@ -5373,6 +5406,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         select.selectByValue(value);
     }
 
+    /**
+     * @deprecated Use {@link #selectOptionByText(Locator, String)}
+     * @param selectName
+     * @param text
+     */
     @Deprecated
     public void selectOptionByText(String selectName, String text)
     {
@@ -6074,7 +6112,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         int row = getCohortRow(table, cohort);
         String s = table.getDataAsText(row, "Enrolled");
-        assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
+        Assert.assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
     }
 
     /**
