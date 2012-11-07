@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import junit.framework.Assert;
+import org.apache.commons.lang.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
@@ -161,5 +162,34 @@ public class LabModuleHelper
                 return Ext4FieldRefWD.isFieldPresent(_test, label);
             }
         }, "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void addRecordsToAssayTemplate(String[][] data)
+    {
+        _test.log("Setting assay template");
+
+        StringBuilder sb = new StringBuilder();
+        for (String[] row : data)
+        {
+            sb.append(StringUtils.join(row, '\t'));
+            sb.append(System.getProperty("line.separator"));
+        }
+
+        _test.waitForText("Sample Information");
+        _test.waitAndClick(Locator.ext4Button("Add From Spreadsheet"));
+        _test.waitForElement(Ext4Helper.ext4Window("Spreadsheet Import"));
+        //TODO: better selector
+        Ext4FieldRefWD textArea = _test._ext4Helper.queryOne("textarea", Ext4FieldRefWD.class);
+        textArea.setValue(sb.toString());
+        _test.waitAndClick(Locator.ext4Button("Submit"));
+
+        String[] lastRow = data[data.length - 1];
+        String cell = lastRow[lastRow.length - 1];
+        _test.waitForElement(ext4GridCell(cell));
+    }
+
+    public Locator ext4GridCell(String cell)
+    {
+        return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text() = '" + cell + "']");
     }
 }

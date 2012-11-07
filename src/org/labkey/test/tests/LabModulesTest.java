@@ -49,7 +49,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     private int _samplesTotal = 0;
     private int _peptideTotal = 0;
 
-    private String IMPORT_DATA_TEXT = "Import Data";
+    protected static final String IMPORT_DATA_TEXT = "Import Data";
 
     @Override
     protected String getProjectName()
@@ -94,7 +94,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
     }
 
-    private List<Pair<String, String>> getAssaysToCreate()
+    protected List<Pair<String, String>> getAssaysToCreate()
     {
         List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
         assays.add(Pair.of("Immunophenotyping", "TruCount"));
@@ -529,6 +529,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     protected List<String> getEnabledModules()
     {
         List<String> modules = new ArrayList<String>();
+        modules.add("Electrochemiluminescence");
+        modules.add("ELISPOT_Assay");
         modules.add("FlowAssays");
         modules.add("GenotypeAssays");
         modules.add("SequenceAnalysis");
