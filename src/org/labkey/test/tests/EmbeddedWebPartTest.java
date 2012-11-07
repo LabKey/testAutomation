@@ -16,7 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
@@ -27,7 +27,7 @@ import org.labkey.test.util.UIContainerHelper;
  * Date: 8/4/11
  * Time: 3:23 PM
  */
-public class EmbeddedWebPartTest extends BaseSeleniumWebTest
+public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
     ResetTracker resetTracker = null;
 
@@ -91,9 +91,9 @@ public class EmbeddedWebPartTest extends BaseSeleniumWebTest
 
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {/*ignore*/}
+        deleteProject(PROJECT_NAME, false);
     }
 
     @Override
