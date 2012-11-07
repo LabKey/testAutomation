@@ -34,10 +34,8 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Aspect
-public class LoggingAspect
+public class MethodLoggingAspect
 {
-    private static final int indentStep = 2;
-    private static int currentIndent = 0;
     private static Stack<Long> startTimes = new Stack<Long>();
     private static Stack<String> methodStack = new Stack<String>();
 
@@ -53,8 +51,8 @@ public class LoggingAspect
         startTimes.push(System.currentTimeMillis());
         if (!method.equals(caller)) // Don't double-log overloaded methods
         {
-            log(">>" + method);
-            currentIndent += indentStep;
+            TestLogger.log(">>" + method);
+            TestLogger.increaseIndent();
         }
     }
 
@@ -73,8 +71,8 @@ public class LoggingAspect
                     TimeUnit.MILLISECONDS.toSeconds(elapsed) -
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
                     elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
-            currentIndent -= indentStep;
-            log("<<" + method + " done [" + elapsedStr + "]"); // Only log on successful return
+            TestLogger.decreaseIndent();
+            TestLogger.log("<<" + method + " done [" + elapsedStr + "]"); // Only log on successful return
         }
     }
 
@@ -83,20 +81,6 @@ public class LoggingAspect
     {
         startTimes.pop();
         methodStack.pop();
-        currentIndent -= indentStep;
-    }
-
-    private static String getIndentString()
-    {
-        String indentStr = "";
-        for (int i = 0; i < currentIndent; i++)
-            indentStr += " ";
-        return indentStr;
-    }
-
-    public static void log(String str)
-    {
-        String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()); // Include time with log entry.  Use format that matches labkey log.
-        System.out.println(d + " " + getIndentString() + str);
+        TestLogger.decreaseIndent();
     }
 }

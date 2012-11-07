@@ -313,6 +313,7 @@ src/org/labkey/test/util/Ext4Helper.java -text
 src/org/labkey/test/util/Ext4HelperWD.java -text
 src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/ExtHelperWD.java -text
+src/org/labkey/test/util/ImpersonationLoggingAspect.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/JUnitHeader.java -text
@@ -321,8 +322,8 @@ src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/ListHelperWD.java -text
 src/org/labkey/test/util/LogMethod.java -text
 src/org/labkey/test/util/LoggedParam.java -text
-src/org/labkey/test/util/LoggingAspect.java -text
 src/org/labkey/test/util/Maps.java -text
+src/org/labkey/test/util/MethodLoggingAspect.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
 src/org/labkey/test/util/PerlHelperWD.java -text
@@ -340,6 +341,7 @@ src/org/labkey/test/util/StringHelper.java -text
 src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/StudyHelperWD.java -text
 src/org/labkey/test/util/TestAspect.aj -text
+src/org/labkey/test/util/TestLogger.java -text
 src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text
 src/org/labkey/test/util/UIUserHelper.java -text

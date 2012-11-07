@@ -47,9 +47,9 @@ import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggingAspect;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.StudyHelperWD;
+import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.Alert;
@@ -482,7 +482,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void log(String str)
     {
         str = str.replace(Locator.NOT_HIDDEN, "NOT_HIDDEN"); // This xpath fragment really clutters up the log
-        LoggingAspect.log(str);
+        TestLogger.log(str);
     }
 
     private static final Pattern LABKEY_ERROR_TITLE_PATTERN = Pattern.compile("\\d\\d\\d\\D.*Error.*", Pattern.CASE_INSENSITIVE);
@@ -5570,14 +5570,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
-        log("Impersonating group: " + group);
         goToHome();
         clickUserMenuItem("Impersonate", "Group", (isSiteGroup ? "Site: " : "") + group);
     }
 
     public void impersonateRole(String role)
     {
-        log("Impersonating role: " + role);
         clickUserMenuItem("Impersonate", "Role", role);
     }
     public void stopImpersonatingRole()
@@ -5587,7 +5585,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void stopImpersonatingGroup()
     {
-        log("Ending impersonation");
         clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
         goToHome();
@@ -5596,7 +5593,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void impersonate(String fakeUser)
     {
-        log("impersonating user : " + fakeUser);
         if (isElementPresent(Locator.id("userMenuPopupLink")))
         {
             click(Locator.id("userMenuPopupLink"));
@@ -5612,7 +5608,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void stopImpersonating()
     {
         String fakeUser = _impersonationStack.pop();
-        log("Ending impersonation");
         Assert.assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
         clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
