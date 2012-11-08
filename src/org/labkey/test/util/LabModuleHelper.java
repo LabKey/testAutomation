@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
 
 import java.net.URISyntaxException;
 import java.util.Random;
@@ -190,12 +191,7 @@ public class LabModuleHelper
 
         String[] lastRow = data[data.length - 1];
         String cell = lastRow[0];
-        _test.waitForElement(ext4GridCell(cell));
-    }
-
-    public Locator ext4GridCell(String cell)
-    {
-        return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text() = '" + cell + "']");
+        _test.waitForElement(Ext4GridRefWD.locateExt4GridCell(cell));
     }
 
     public Locator getAssayWell(String text, String color)

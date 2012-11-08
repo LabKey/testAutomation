@@ -167,7 +167,7 @@ public enum TestSet
         PivotQueryTest.class,
         LabModulesTest.class,
         SequenceTest.class,
-        //ViralLoadAssayTest.class,
+        ViralLoadAssayTest.class,
         StudyPublishTest.class,
         ExperimentalFeaturesTest.class,
         ElisaAssayTest.class
