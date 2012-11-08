@@ -1230,9 +1230,15 @@ public class TimeChartTest extends StudyBaseTest
         applyChanges();
         openSaveMenu();
         saveReport(false);
+        sleep(1000); // give it a second to save
+
         pushLocation(); // for impersonation test
         pushLocation(); // for impersonation test
-        
+
+        clickLinkWithText("Clinical and Assay Data");
+        waitForText(REPORT_NAME_1);
+        clickLinkWithText(REPORT_NAME_1);
+        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.css("svg a circle"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Participant - 249318596");
 
