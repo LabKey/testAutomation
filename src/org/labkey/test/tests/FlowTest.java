@@ -87,8 +87,42 @@ public class FlowTest extends BaseFlowTest
 
             copyAnalysisScriptTest();
 
+            verifyDiscoverableFCSFiles();
+
+
         }
 
+    }
+
+    /**
+     * With our new feature, a user doesn't have to individually pick out FCS files, we will
+     * find files that match their workspace and suggest the user include them (final curating
+     * to be done by the user).  This tests that feature
+     */
+    private void verifyDiscoverableFCSFiles()     //TODO
+    {
+        clickLinkWithText(getFolderName());
+
+
+        importAnalysis_begin( getContainerPath());
+        importAnalysis_uploadWorkspace(getContainerPath(), "/8color/workspace.xml");
+        clickRadioButtonById("Previous");
+        clickButton("Next");
+
+        assertTextPresent("Matched 0 of 59 samples.");
+
+        //TODO:  how many to select?
+        selectOptionByText(Locator.name("resolvedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
+        clickCheckbox("resolvedSamples.rows[0.0.1].selected");
+        clickButton("Next");
+        clickButton("Next");
+        clickButton("Next");
+        clickButton("Next");
+        clickButton("Finish", 0);
+        sleep(15000);
+        waitForText("Ignoring filter");
+
+        //TODO:  verify this when it's working
     }
 
     String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";
