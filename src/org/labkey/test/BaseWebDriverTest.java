@@ -1224,23 +1224,23 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _driver.switchTo().window(window);
 
         // These requests should NOT redirect to the upgrade page
-         beginAt("/login/resetPassword.view");
+        beginAt("/login/resetPassword.view");
         assertTextNotPresent(upgradeText);
         beginAt("/admin/maintenance.view");
         assertTextNotPresent(upgradeText);
 
         // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
-        signOut();
-        simpleSignIn();
-
-        _driver.close();
-        switchToMainWindow();
+        beginAt("/login/logout.view");
 
         // Dismiss authentication dialog
-        // Note: if this is not reliable, we could close the previous window and use the new windows to continue the upgrade
+        _shortWait.until(ExpectedConditions.alertIsPresent());
         Alert alert = _driver.switchTo().alert();
         alert.dismiss();
-        waitForPageToLoad();
+
+        _driver.close();
+
+        switchToMainWindow();
+        simpleSignIn();
     }
 
     /**
@@ -1682,7 +1682,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean firebugPanelsEnabled()
     {
-        return System.getProperty("teamcity.buildType.id") == null && "true".equals(System.getProperty("enableFirebugPanels"));
+        return !onTeamCity() && "true".equals(System.getProperty("enableFirebugPanels"));
     }
 
     public boolean onTeamCity()
