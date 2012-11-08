@@ -48,12 +48,12 @@ public class Ext4FieldRefWD extends Ext4CmpRefWD
         return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRefWD.class);
     }
 
-    public void setValue(String val)
+    public void setValue(Object val)
     {
         eval("setValue(arguments[0])", val);
     }
 
-    public void setValue(String[] vals)
+    public void setValue(Object[] vals)
     {
         eval("setValue(arguments)", vals);
     }

@@ -45,6 +45,8 @@ import java.util.List;
 public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
+    protected String PROJECT_NAME = "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+
     private int _oligosTotal = 0;
     private int _samplesTotal = 0;
     private int _peptideTotal = 0;
@@ -54,7 +56,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     @Override
     protected String getProjectName()
     {
-        return "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        return PROJECT_NAME;
     }
 
     public LabModulesTest()
@@ -78,7 +80,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         queryMetadataTest();
     }
 
-    private void setUpTest() throws Exception
+    protected void setUpTest() throws Exception
     {
         _containerHelper.createProject(getProjectName(), "Laboratory Folder");
         enableModules(getEnabledModules(), true);
@@ -396,8 +398,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         log("Testing details panel");
         dr.clickLink(1, 1);
         waitForPageToLoad();
-        waitForText("Back");
-        assertTextPresent("Sample1", "DNA", "Whole Blood", "Freezer:");
+        //waitForText("Back");
+        assertTextPresent("Sample1", "DNA", "Whole Blood", "Freezer");
 
         verifyFreezerColOrder();
     }
@@ -551,14 +553,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        try
-        {
-            deleteProject(getProjectName());
-        }
-        catch (Throwable t)
-        {
-            //ignore
-        }
+        //TODO
+        super.doCleanup(afterTest);
     }
 
     @Override

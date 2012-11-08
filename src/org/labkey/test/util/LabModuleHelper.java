@@ -35,6 +35,11 @@ public class LabModuleHelper
     private BaseWebDriverTest _test;
     private final Random _random = new Random(System.currentTimeMillis());
 
+    public static final String CTL_COLOR = "rgb(255, 192, 203)";
+    public static final String UNKNOWN_COLOR = "rgb(0, 0, 255)";
+    public static final String NTC_COLOR = "rgb(255, 255, 0)";
+    public static final String STD_COLOR = "rgb(0, 128, 0)";
+
     public LabModuleHelper(BaseWebDriverTest test)
     {
         _test = test;
@@ -66,7 +71,7 @@ public class LabModuleHelper
     public static Locator getNavPanelItem(String label, String itemText)
     {
         //NOTE: this should return only visible items
-        return Locator.xpath("//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//a[text() = '" + itemText + "']");
+        return Locator.xpath("//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//span[text() = '" + itemText + "']");
     }
 
     public void clickNavPanelItem(String label, String itemText)
@@ -78,7 +83,7 @@ public class LabModuleHelper
 
     public void clickNavPanelItem(String itemText)
     {
-        Locator l = Locator.xpath("//a[contains(text(), '" + itemText + "')]");
+        Locator l = Locator.xpath("//span[contains(text(), '" + itemText + "')]");
         _test.waitForElement(l);
         _test.waitAndClick(l);
     }
@@ -178,18 +183,23 @@ public class LabModuleHelper
         _test.waitForText("Sample Information");
         _test.waitAndClick(Locator.ext4Button("Add From Spreadsheet"));
         _test.waitForElement(Ext4Helper.ext4Window("Spreadsheet Import"));
-        //TODO: better selector
-        Ext4FieldRefWD textArea = _test._ext4Helper.queryOne("textarea", Ext4FieldRefWD.class);
+
+        Ext4FieldRefWD textArea = _test._ext4Helper.queryOne("#textField", Ext4FieldRefWD.class);
         textArea.setValue(sb.toString());
         _test.waitAndClick(Locator.ext4Button("Submit"));
 
         String[] lastRow = data[data.length - 1];
-        String cell = lastRow[lastRow.length - 1];
+        String cell = lastRow[0];
         _test.waitForElement(ext4GridCell(cell));
     }
 
     public Locator ext4GridCell(String cell)
     {
         return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text() = '" + cell + "']");
+    }
+
+    public Locator getAssayWell(String text, String color)
+    {
+        return Locator.xpath("//div[contains(@style, '" + color + "') and text() = '" + text + "']");
     }
 }
