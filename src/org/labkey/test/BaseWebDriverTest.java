@@ -2788,10 +2788,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertLinkPresentWithText(newParent);
     }
 
-    public void expandFolder(String project)
+    public void expandFolder(String folder)
     {
         waitForElement(Locator.css(".labkey-expandable-nav-panel"));
-        String xpath = "//tr[not(ancestor-or-self::*[contains(@style,'none')]) and following-sibling::tr[contains(@style,'none')]//a[text()='"+project+"']]//a/img[contains(@src,'plus')]";
+        String xpath = "//tr[not(ancestor-or-self::*[contains(@style,'none')]) and following-sibling::tr[contains(@style,'none')]//a[text()='"+folder+"']]//a/img[contains(@src,'plus')]";
         List<WebElement> possibleAncestors = _driver.findElements(By.xpath(xpath));
         int depth = 0;
         while(possibleAncestors.size() > 0 && depth < 10)
@@ -2800,13 +2800,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             possibleAncestors = _driver.findElements(By.xpath(xpath));
             depth++;
         }
-        assertLinkPresentWithText(project);
+        assertElementVisible(Locator.css(".labkey-nav-tree-text").withText(folder));
     }
 
-    public void clickFolder(String project)
+    public void clickFolder(String folder)
     {
-        expandFolder(project);
-        clickLinkWithText(project);
+        expandFolder(folder);
+        clickLinkWithText(folder);
     }
 
     public void deleteProject(String project)
@@ -3705,6 +3705,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertElementNotVisible(Locator loc)
     {
         Assert.assertFalse("Element was visible in page: " + loc, loc.findElement(_driver).isDisplayed());
+    }
+
+    public void assertElementVisible(Locator loc)
+    {
+        Assert.assertTrue("Element was not visible: " + loc, loc.findElement(_driver).isDisplayed());
     }
 
     public boolean isLinkPresent(String linkId)
