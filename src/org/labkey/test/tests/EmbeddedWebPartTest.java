@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
 
@@ -46,7 +46,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
 
     public void configure()
     {
-        RReportHelper _rReportHelper = new RReportHelper(this);
+        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
         _rReportHelper.ensureRConfig();
         log("Setup project and list module");
         _containerHelper.createProject(getProjectName(), null);
