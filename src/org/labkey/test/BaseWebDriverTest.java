@@ -1560,18 +1560,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             if (_testFailed)
             {
-                try
+                if (!_lastPageTitle.startsWith("404"))
                 {
-                    // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
-                    String lastPage = _lastPageURL.toString();
-                    URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
-                    log("Re-invoking last action with _debug parameter set: " + url.toString());
-                    url.getContent();
-                }
-                catch (Exception t)
-                {
-                    System.out.println("Unable to re-invoke last page");
-                    t.printStackTrace();
+                    try
+                    {
+                        // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
+                        String lastPage = _lastPageURL.toString();
+                        URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
+                        log("Re-invoking last action with _debug parameter set: " + url.toString());
+                        url.getContent();
+                    }
+                    catch (Exception t)
+                    {
+                        System.out.println("Unable to re-invoke last page");
+                        t.printStackTrace();
+                    }
                 }
                 try
                 {
