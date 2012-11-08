@@ -1567,7 +1567,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
                     log("Re-invoking last action with _debug parameter set: " + url.toString());
                     url.getContent();
-
+                }
+                catch (Exception t)
+                {
+                    System.out.println("Unable to re-invoke last page");
+                    t.printStackTrace();
+                }
+                try
+                {
                     dump();
                     dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
                     dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
