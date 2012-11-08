@@ -70,12 +70,11 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         addWebPart("Wiki");
         createNewWikiPage();
         clickLinkContainingText("Source", 0, false);
-        setFormElement("name", TRICKY_CHARACTERS + "wiki page");
+        setFormElement(Locator.name("name"), TRICKY_CHARACTERS + "wiki page");
 
         setWikiBody(getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));
 
         clickButton("Save & Close");
-        waitForPageToLoad();
         waitForText("Display Name");
 
         String rViewName = TRICKY_CHARACTERS + "new R view";
