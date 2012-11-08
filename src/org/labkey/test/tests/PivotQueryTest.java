@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -91,12 +92,11 @@ public class PivotQueryTest extends BaseWebDriverTest
         Locator ConcInRange_MIN_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[3]");
         assertElementContains(ConcInRange_MIN_cell, "7.99");
 
-        // Issue 15554: GROUP_CONCAT shouldn't blow up on unsupported platforms
         // First "ConcInRange_CONCAT" data cell
-        //Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[6]");
-        //String contents = selenium.getText(ConcInRange_CONCAT_cell.toString());
-        //Assert.assertNotNull("The GROUP_CONCAT cell is empty", contents);
-        //String[] concats = contents.split(", *");
-        //Assert.assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
+        Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[6]");
+        String contents = selenium.getText(ConcInRange_CONCAT_cell.toString());
+        Assert.assertNotNull("The GROUP_CONCAT cell is empty", contents);
+        String[] concats = contents.split(", *");
+        Assert.assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
     }
 }
