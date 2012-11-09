@@ -107,7 +107,7 @@ public class ElisaAssayTest extends ElispotAssayTest
 //
         clickFolder(TEST_ASSAY_PRJ_ELISA);
         clickLinkWithText("Assay List");
-        clickFolder(TEST_ASSAY_ELISA);
+        clickLinkWithText(TEST_ASSAY_ELISA);
 
         log("Uploading ELISA Runs");
         clickButton("Import Data");

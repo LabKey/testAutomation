@@ -110,7 +110,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText("Assay List");
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
 
         log("Uploading Elispot Runs");
         clickButton("Import Data");
@@ -367,14 +367,14 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         log("Uploading Elispot Runs with a transform script");
 
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
         clickEditAssayDesign();
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
 
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
         clickButton("Import Data");
         clickButton("Next");
 
@@ -400,7 +400,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void removeTransformScript()
     {
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
         clickEditAssayDesign();
         waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
         click(Locator.css("#partdelete_removeTransformScript0 img"));
@@ -420,7 +420,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void verifyBackgroundSubtractionOnExistingRun()
     {
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
         assertTextPresent("Background Subtraction");
         DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
@@ -436,7 +436,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
         clickLinkWithText("run details", 3);
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
@@ -454,7 +454,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         // Check that all runs have been subtracted
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
         column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
@@ -475,7 +475,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void verifyBackgroundSubtractionOnNewRun()
     {
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickFolder(TEST_ASSAY_ELISPOT);
+        clickLinkWithText(TEST_ASSAY_ELISPOT);
         clickButton("Import Data");
         clickButton("Next");
 
