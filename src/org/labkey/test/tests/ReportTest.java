@@ -1705,6 +1705,13 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink(SCATTER_PLOT_NAME_DR, "view");
         _ext4Helper.waitForMaskToDisappear();
 
+        // verify that we originally are in view mode and can switch to edit mode
+        assertElementNotPresent(Locator.button("Grouping"));
+        assertElementNotPresent(Locator.button("Save"));
+        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        _ext4Helper.waitForMaskToDisappear();
+        assertElementNotPresent(Locator.button("Edit"));
+
         // Verify default styling for point at origin - blue circles
         waitForElement(Locator.css("svg > a > circle"));
         Assert.assertEquals("Scatter points doin't have expected initial color", "#3366ff", getAttribute(Locator.css("svg > a > circle"), "fill"));
@@ -1771,6 +1778,13 @@ public class ReportTest extends StudyBaseTest
         clickReportGridLink(SCATTER_PLOT_NAME_MV, "view");
         _ext4Helper.waitForMaskToDisappear();
 
+        // verify that we originally are in view mode and can switch to edit mode
+        assertElementNotPresent(Locator.button("Grouping"));
+        assertElementNotPresent(Locator.button("Save"));
+        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        _ext4Helper.waitForMaskToDisappear();
+        assertElementNotPresent(Locator.button("Edit"));
+
         log("Check Scatter Plot Point Click Function (Developer Only)");
         // open the developer panel and verify that it is disabled by default
         assertElementPresent(Locator.button("Developer"));
@@ -1823,6 +1837,7 @@ public class ReportTest extends StudyBaseTest
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         clickLinkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn");
+        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         waitForText("Test Title");
         pushLocation();
         assertElementNotPresent(Locator.button("Developer"));
