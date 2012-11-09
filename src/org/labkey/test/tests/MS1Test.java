@@ -482,11 +482,8 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void doCleanup(boolean afterTest) throws Exception
     {
         log("Cleaning up MS1 BVT...");
-        try
-        {
-            deleteProject(PROJ_MAIN);
-            purgeFiles();
-        }
+        deleteProject(getProjectName(), afterTest);
+        try{purgeFiles();}
         catch(Throwable ignore) {}
         log("MS1 BVT cleaned up successfully.");
     }

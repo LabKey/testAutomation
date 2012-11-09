@@ -46,11 +46,8 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try
-        {
-            deleteProject(getProjectName());
-            deleteEngine();
-        }
+        deleteProject(getProjectName(), afterTest);
+        try{deleteEngine();}
         catch(Throwable T) {}
 
         deleteDir(getTestTempDir());

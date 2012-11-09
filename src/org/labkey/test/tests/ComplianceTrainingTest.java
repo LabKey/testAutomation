@@ -203,7 +203,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        deleteProject(getProjectName());
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

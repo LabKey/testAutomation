@@ -59,7 +59,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected void doTestSteps()

@@ -408,7 +408,7 @@ public class FilterTest extends ListTest
 
     protected void doCleanup(boolean afterTest)
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected String getProjectName()

@@ -238,9 +238,8 @@ public class TimeChartTest extends StudyBaseTest
     @Override
     public void doCleanup(boolean afterTest)
     {
-        try {deleteUser(USER1);} catch (Throwable T) {}
-        try {deleteUser(USER2);} catch (Throwable T) {}
-        try {deleteProject(PROJECT_NAME);} catch (Throwable T) {}
+        deleteUsers(afterTest, USER1, USER2);
+        deleteProject(PROJECT_NAME, afterTest);
     }
 
     public void configureStudy()

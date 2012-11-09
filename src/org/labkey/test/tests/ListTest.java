@@ -133,8 +133,8 @@ public class ListTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest)
     {
-        try {deleteProject(PROJECT_VERIFY); } catch (Throwable t) {}
-        try {deleteProject(PROJECT_OTHER); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
+        deleteProject(PROJECT_OTHER, afterTest);
     }
 
     @Override

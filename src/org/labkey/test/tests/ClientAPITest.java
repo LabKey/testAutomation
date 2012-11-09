@@ -153,11 +153,10 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        for (String user : EMAIL_RECIPIENTS)
-            deleteUser(user);
+        deleteUsers(afterTest, EMAIL_RECIPIENTS);
 
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-        try {deleteProject(OTHER_PROJECT); } catch (Throwable t) {}
+        deleteProject(PROJECT_NAME, afterTest);
+        deleteProject(OTHER_PROJECT, afterTest);
     }
 
     protected void doTestSteps() throws Exception

@@ -823,10 +823,10 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest)
     {
-        deleteUser(USER1);
-        try {deleteProject(PROJECT2_NAME); } catch (Throwable t) {}  // References TOC in PROJECT_NAME, so delete first
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT3_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT4_NAME); } catch (Throwable t) {}
+        deleteUsers(afterTest, USER1);
+        deleteProject(PROJECT2_NAME, afterTest);
+        deleteProject(PROJECT_NAME, afterTest);
+        deleteProject(PROJECT3_NAME, afterTest);
+        deleteProject(PROJECT4_NAME, afterTest);
     }
 }

@@ -59,9 +59,8 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try{ deleteProject(PROJECT_NAME); }catch (Throwable t) {/*ignore*/}
-
         deleteDir(getTestTempDir());
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected void runUITests() throws Exception

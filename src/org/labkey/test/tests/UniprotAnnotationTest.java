@@ -111,6 +111,6 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        deleteProject(PROJECT_NAME);
+        deleteProject(getProjectName(), afterTest);
     }
 }

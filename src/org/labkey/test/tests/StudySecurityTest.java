@@ -253,9 +253,6 @@ public class StudySecurityTest extends StudyBaseTest
     protected void doCleanup(boolean afterTest) throws Exception
     {
         super.doCleanup(afterTest);
-        deleteUser(READER);
-        deleteUser(EDITOR);
-        deleteUser(LIMITED);
-        deleteUser(NONE);
+        deleteUsers(afterTest, READER, EDITOR, LIMITED, NONE);
     }
 }

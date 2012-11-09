@@ -57,7 +57,7 @@ public class HaplotypeAssayTest extends GenotypingTest
     @Override
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        deleteProject(getProjectName());
+        deleteProject(getProjectName(), afterTest);
     }
 
     private void configureExtensibleTables()

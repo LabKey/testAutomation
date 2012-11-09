@@ -728,7 +728,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         }
 
         deleteTemplateRow();
-        deleteProject(getProjectName());
+        deleteProject(getProjectName(), afterTest);
 
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + getRunNumber()));
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + (getRunNumber()-1)));

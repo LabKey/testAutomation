@@ -65,8 +65,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             deleteViews(VIEW); } catch (Throwable t) {}
         try {deleteRuns(); } catch (Throwable t) {}
         cleanPipe(SEARCH_TYPE);
-        try {deleteFolder(PROJECT_NAME, FOLDER_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected void doTestSteps()

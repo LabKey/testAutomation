@@ -38,7 +38,7 @@ public abstract class AbstractXTandemTest extends AbstractMS2SearchEngineTest
         try {
             deleteViews(VIEW); } catch (Throwable t) {}
         cleanPipe(SEARCH_TYPE);
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected void setupEngine()

@@ -58,9 +58,7 @@ public class SecurityApiTest extends SimpleApiTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try {deleteProject(PROJECT_NAME);} catch(Exception ignore) {}
-        try {deleteUser(USER_1);} catch(Exception ignore) {}
-        try {deleteUser(USER_2);} catch(Exception ignore) {}
-        try {deleteUser("api-created-user@securityapi.test");} catch(Exception ignore) {}
+        deleteProject(PROJECT_NAME, afterTest);
+        deleteUsers(afterTest, USER_1, USER_2, "api-created-user@securityapi.test");
     }
 }

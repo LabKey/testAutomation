@@ -66,13 +66,8 @@ public class CreateVialsTest extends AbstractViabilityTest
     @Override
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try
-        {
-            deleteProject(getProjectName());
-        }
-        catch(Throwable T) {}
-
         deleteDir(getTestTempDir());
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

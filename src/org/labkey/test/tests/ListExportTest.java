@@ -76,7 +76,7 @@ public class ListExportTest extends ListTest
     @Override
     protected void doCleanup(boolean afterTest)
     {
-       deleteProject(getProjectName());
+       deleteProject(getProjectName(), afterTest);
     }
 
     @Override

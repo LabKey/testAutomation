@@ -66,8 +66,8 @@ public class FileContentTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-        deleteUser(TEST_USER);
+        deleteProject(PROJECT_NAME, afterTest);
+        deleteUsers(afterTest, TEST_USER);
         deleteDir(getTestTempDir());
     }
 

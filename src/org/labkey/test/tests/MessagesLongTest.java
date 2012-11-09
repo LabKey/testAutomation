@@ -79,11 +79,8 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest)
     {
-        deleteUser(USER1);
-        deleteUser(USER2);
-        deleteUser(USER3);
-        deleteUser(RESPONDER);
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteUsers(afterTest, USER1, USER2, USER3, RESPONDER);
+        deleteProject(PROJECT_NAME, afterTest);
     }
 
     @Override

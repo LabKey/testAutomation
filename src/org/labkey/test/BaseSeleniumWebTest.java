@@ -764,8 +764,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         //Now switch to admin mode if available
         //TODO:  this is causing all kinds of problems
-        if (!isElementPresent(Locator.id("leftmenupanel")) && !(isElementPresent(Locator.id("Admin ConsoleTab"))))
-            clickAdminMenuItem("Show Navigation Bar");
+//        if (!isElementPresent(Locator.id("leftmenupanel")) && !(isElementPresent(Locator.id("Admin ConsoleTab"))))
+//            clickAdminMenuItem("Show Navigation Bar");
     }
 
     public void goToAdminConsole()
@@ -2483,22 +2483,24 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickLinkWithText(project);
     }
 
+    /**
+     * Delete specified project during test
+     * Note: Use {@link #deleteProject(String, boolean)} for test cleanup
+     * @param project Project display name
+     */
     public void deleteProject(String project)
     {
-        deleteProject(project, 90000); // Wait for 90 seconds for project deletion
+        deleteProject(project, true, 90000); // Wait for 90 seconds for project deletion
     }
 
     public void deleteProject(String project, boolean failIfFail)
     {
-        if(isLinkPresentWithText(project))
-        {
-            deleteProject(project);
-        }
+        deleteProject(project, failIfFail, WAIT_FOR_PAGE);
     }
 
-    public void deleteProject(String project, int wait)
+    public void deleteProject(String project, Boolean failIfFail, int wait)
     {
-        _containerHelper.deleteProject(project, true, wait);
+        _containerHelper.deleteProject(project, failIfFail, wait);
     }
 
     @LogMethod
@@ -5325,7 +5327,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void deleteUser(String userEmail)
     {
-        deleteUsers(false, userEmail);
+        deleteUsers(true, userEmail);
     }
 
     @LogMethod

@@ -106,11 +106,7 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch(Exception ignore) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     public String getAssociatedModuleDirectory()

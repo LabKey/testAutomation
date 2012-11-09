@@ -137,8 +137,8 @@ public class RlabkeyTest extends SimpleApiTest
     @Override
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
-        try {deleteProject(PROJECT_NAME_2); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
+        deleteProject(PROJECT_NAME_2, afterTest);
     }
 
     public String getAssociatedModuleDirectory()

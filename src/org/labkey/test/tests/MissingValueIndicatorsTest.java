@@ -511,16 +511,8 @@ public class MissingValueIndicatorsTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Throwable t)
-        {
-            //
-        }
-
         deleteDir(new File(getSampleRoot(), "assaydata"));
+        deleteProject(getProjectName(), afterTest);
     }
 
     public String getAssociatedModuleDirectory()

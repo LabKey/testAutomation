@@ -69,7 +69,7 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
                 file.delete();
             tempDir.delete();
         }
-        try { deleteProject(PROJECT_NAME); } catch (Throwable e) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

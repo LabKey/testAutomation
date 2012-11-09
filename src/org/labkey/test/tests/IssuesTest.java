@@ -69,9 +69,8 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest)
     {
-        deleteUser(USER1);
-        deleteUser(USER2);
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {/* */}
+        deleteUsers(afterTest, USER1, USER2);
+        deleteProject(PROJECT_NAME, afterTest);
     }
 
     public void validateQueries()

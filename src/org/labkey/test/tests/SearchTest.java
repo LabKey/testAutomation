@@ -68,12 +68,6 @@ public class SearchTest extends StudyTest
     }
 
     @Override
-    protected String getProjectName()
-    {
-        return PROJECT_NAME;
-    }
-
-    @Override
     protected String getFolderName()
     {
         return FOLDER_NAME;
@@ -190,13 +184,12 @@ public class SearchTest extends StudyTest
     @Override
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try {deleteProject(getProjectName());} catch (Throwable t) {}
-        if (_testDone)
+        super.doCleanup(afterTest);
+        if (afterTest)
         {
             sleep(5000); // wait for index to update.
             _searchHelper.verifyNoSearchResults();
         }
-        super.doCleanup(afterTest);
     }
 
     private void addSearchableContainers()

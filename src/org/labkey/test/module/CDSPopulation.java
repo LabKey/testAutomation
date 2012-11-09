@@ -46,14 +46,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     @Override
     public void doCleanup(boolean afterTest)
     {
-        // Delete any containers and users created by the test.
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Exception e)
-        {
-        }
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

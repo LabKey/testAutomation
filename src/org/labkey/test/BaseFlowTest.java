@@ -121,7 +121,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try {deleteProject(getProjectName()); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
         deletePipelineWorkDirectory();
         try
         {

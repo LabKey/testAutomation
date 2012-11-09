@@ -51,14 +51,14 @@ public class GroupTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest)
     {
-        deleteUsers(false, TEST_USERS_FOR_GROUP);
+        deleteUsers(afterTest, TEST_USERS_FOR_GROUP);
         try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(COMPOUND_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(BAD_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(CHILD_GROUP);}catch(Throwable t){/*ignore*/}
         try{deleteGroup(API_SITE_GROUP);}catch(Throwable t){/*ignore*/}
-        try{deleteProject(getProjectName());}catch(Throwable t){/*ignore*/}
-        try{deleteProject(getProject2Name());}catch(Throwable t){/*ignore*/}
+        deleteProject(getProjectName(), afterTest);
+        deleteProject(getProject2Name(), afterTest);
     }
 
     protected void init()

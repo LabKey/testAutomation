@@ -920,7 +920,7 @@ public class SequenceTest extends BaseWebDriverTest
                 file.delete();
         }
 
-        deleteProject(getProjectName());
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

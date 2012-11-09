@@ -89,10 +89,8 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try {
-            deleteEngine();
-            deleteProject(TEST_PROGRAMMATIC_QC_PRJ);
-        }
+        deleteProject(getProjectName(), afterTest);
+        try {deleteEngine();}
         catch (Throwable t) {}
     }
 

@@ -112,8 +112,8 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
         checkCheckbox("enableHelpMenu");
         clickButtonContainingText("Save");
 
-        deleteProject(getProjectName());
-        deleteProject(getProjectAltertedName(), false);
+        deleteProject(getProjectName(), afterTest);
+        deleteProject(getProjectAltertedName(), afterTest);
     }
 
     @Override

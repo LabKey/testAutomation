@@ -105,16 +105,11 @@ public class AssayTest extends AbstractAssayTest
      */
     protected void doCleanup(boolean afterTest)
     {
-        try
-        {
-            deleteProject(TEST_ASSAY_PRJ_SECURITY); //should also delete the groups
+        deleteProject(TEST_ASSAY_PRJ_SECURITY, afterTest); //should also delete the groups
 
-            //delete user accounts
-            deleteUser(TEST_ASSAY_USR_PI1);
-            deleteUser(TEST_ASSAY_USR_TECH1);
-            deleteDir(getTestTempDir());
-        }
-        catch(Throwable T) {/* ignore */}
+        //delete user accounts
+        deleteUsers(afterTest, TEST_ASSAY_USR_PI1, TEST_ASSAY_USR_TECH1);
+        deleteDir(getTestTempDir());
     } //doCleanup()
 
     /**

@@ -88,7 +88,7 @@ public class MS2Test extends MS2TestBase
     protected void doCleanup(boolean afterTest) throws IOException
     {
         cleanPipe(SEARCH_TYPE);
-        try {deleteProject(PROJECT_NAME); } catch (Throwable ignored) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected void goTestIt(String testFile1, String testFile2)

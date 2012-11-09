@@ -570,11 +570,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         if (!CONTINUE)
         {
             revertToAdmin();
-            try
-            {
-                deleteProject(TEST_ASSAY_PRJ_NAB);
-                deleteEngine();
-            }
+            deleteProject(getProjectName(), afterTest);
+            try{deleteEngine();}
             catch(Throwable T) {}
 
             deleteDir(getTestTempDir());

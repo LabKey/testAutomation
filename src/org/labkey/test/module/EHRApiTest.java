@@ -105,7 +105,7 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
     public void doCleanup(boolean afterTest)
     {
         long startTime = System.currentTimeMillis();
-        try {deleteProject(PROJECT_NAME);} catch (Throwable t) { /*ignore*/ }
+        deleteProject(getProjectName(), afterTest);
         if(isTextPresent(PROJECT_NAME))
         {
             log("Wait extra long for folder to finish deleting.");
@@ -117,14 +117,14 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
             if (!isTextPresent(PROJECT_NAME)) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
             else Assert.fail("Test Project not finished deleting after 5 minutes");
         }
-        goToHome();
 
-        try{deleteUser(DATA_ADMIN.getUser());}catch(Throwable T){}
-        try{deleteUser(REQUESTER.getUser());}catch(Throwable T){}
-        try{deleteUser(BASIC_SUBMITTER.getUser());}catch(Throwable T){}
-        try{deleteUser(REQUEST_ADMIN.getUser());}catch(Throwable T){}
-        try{deleteUser(FULL_UPDATER.getUser());}catch(Throwable T){}
-        try{deleteUser(FULL_SUBMITTER.getUser());}catch(Throwable T){}
+        deleteUsers(afterTest,
+                DATA_ADMIN.getUser(),
+                REQUESTER.getUser(),
+                BASIC_SUBMITTER.getUser(),
+                REQUEST_ADMIN.getUser(),
+                FULL_UPDATER.getUser(),
+                FULL_SUBMITTER.getUser());
     }
 
     protected void initProject()

@@ -59,7 +59,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest)
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected boolean isFileUploadTest()

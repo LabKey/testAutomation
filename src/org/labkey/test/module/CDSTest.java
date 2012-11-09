@@ -64,14 +64,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     @Override
     public void doCleanup(boolean afterTest)
     {
-        // Delete any containers and users created by the test.
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch (Exception e)
-        {
-        }
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

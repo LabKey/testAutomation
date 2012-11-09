@@ -60,7 +60,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest)
     {
-        deleteUser(user);
+        deleteUsers(afterTest, user);
         deleteProject(PROJECT_NAME, false);
     }
 

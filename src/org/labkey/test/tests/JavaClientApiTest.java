@@ -297,11 +297,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try
-        {
-            deleteProject(PROJECT_NAME);
-        }
-        catch(Throwable ignore) {}
+        deleteProject(getProjectName(), afterTest);
     }
 
     public String getAssociatedModuleDirectory()

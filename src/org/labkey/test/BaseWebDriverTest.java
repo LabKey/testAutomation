@@ -929,8 +929,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         //Now switch to admin mode if available
         //TODO:  this is causing all kinds of problems
-        if (!isElementPresent(Locator.id("leftmenupanel")) && !(isElementPresent(Locator.id("Admin ConsoleTab"))))
-            clickAdminMenuItem("Show Navigation Bar");
+//        if (!isElementPresent(Locator.id("leftmenupanel")) && !(isElementPresent(Locator.id("Admin ConsoleTab"))))
+//            clickAdminMenuItem("Show Navigation Bar");
     }
 
     public void goToAdminConsole()
@@ -2893,19 +2893,24 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickLinkWithText(folder);
     }
 
+    /**
+     * Delete specified project during test
+     * Note: Use {@link #deleteProject(String, boolean)} for test cleanup
+     * @param project Project display name
+     */
     public void deleteProject(String project)
     {
-        deleteProject(project, true);
+        deleteProject(project, true, 90000); // Wait for 90 seconds for project deletion
     }
 
     public void deleteProject(String project, boolean failIfFail)
     {
-        _containerHelper.deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
+        deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
     }
 
-    public void deleteProject(String project, int wait)
+    public void deleteProject(String project, Boolean failIfFail, int wait)
     {
-        _containerHelper.deleteProject(project, true, wait);
+        _containerHelper.deleteProject(project, failIfFail, wait);
     }
 
     @LogMethod
@@ -5850,11 +5855,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             uncheckCheckbox("sendEmail");
             clickButton("Update Group Membership");
         }
-    }
-
-    public void deleteUser(String userEmail)
-    {
-        deleteUsers(false, userEmail);
     }
 
     @LogMethod

@@ -62,7 +62,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest)
     {
-        try {deleteProject(PROJECT_NAME); } catch (Throwable t) {}
+        deleteProject(getProjectName(), afterTest);
 
         deleteUsers(false, ADMIN_USER_TEMPLATE,NORMAL_USER_TEMPLATE,PROJECT_ADMIN_USER,NORMAL_USER,TO_BE_DELETED_USER,SITE_ADMIN_USER);
     }

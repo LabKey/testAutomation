@@ -96,14 +96,12 @@ public class StudyTest extends StudyBaseTest
 
     protected void doCleanup(boolean afterTest) throws Exception //child class cleanup method throws Exception
     {
-        try{emptyParticipantPickerList();}catch(Throwable t){ /* Ignore */ }
-        deleteUser(authorUser);
         super.doCleanup(afterTest);
+        deleteUsers(afterTest, authorUser);
     }
 
     protected void emptyParticipantPickerList()
     {
-
         goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
         while(persistingLists.size()!=0)
         {

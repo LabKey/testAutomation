@@ -234,7 +234,7 @@ public class LibraTest extends MS2Test
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        deleteProject(getProjectName());
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

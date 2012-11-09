@@ -124,7 +124,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        try { deleteProject(getProjectName()); } catch (Throwable e) {}
+        deleteProject(getProjectName(), afterTest);
 
         deleteLogFiles(".");
         deleteLogFiles("datasets");

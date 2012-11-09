@@ -1134,11 +1134,9 @@ public class LuminexTest extends AbstractQCAssayTest
     protected void doCleanup(boolean afterTest)
     {
         revertToAdmin();
-        try
-        {
-            deleteProject(TEST_ASSAY_PRJ_LUMINEX);
-            deleteEngine();
-        }
+        deleteProject(getProjectName(), afterTest);
+
+        try{deleteEngine();}
         catch(Throwable T) {/* ignore */}
 
         deleteDir(getTestTempDir());

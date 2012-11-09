@@ -56,11 +56,8 @@ public class AuditLogTest extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        deleteUser(AUDIT_TEST_USER);
-        if (isLinkPresentContainingText(AUDIT_TEST_PROJECT))
-        {
-            deleteProject(AUDIT_TEST_PROJECT);
-        }
+        deleteUsers(afterTest, AUDIT_TEST_USER);
+        deleteProject(getProjectName(), afterTest);
     }
 
     protected void doTestSteps() throws Exception
