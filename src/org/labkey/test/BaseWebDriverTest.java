@@ -5754,9 +5754,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }
 
-    public void projectImpersonate(String fakeUser)
+    public void impersonateAtProjectLevel(String fakeUser)
     {
-        log("impersonating user at project level : " + fakeUser);
         if (isElementPresent(Locator.id("userMenuPopupLink")))
         {
             click(Locator.id("userMenuPopupLink"));

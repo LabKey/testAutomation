@@ -215,7 +215,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         signOut();
         signIn(GAMMA_PROJECT_ADMIN_USER, PasswordUtil.getPassword(), true);
         clickFolder(PERM_PROJECT_NAME);
-        projectImpersonate(GAMMA_READER_USER);
+        impersonateAtProjectLevel(GAMMA_READER_USER);
         clickFolder(PERM_PROJECT_NAME);
         expandFolder(DENIED_SUB_FOLDER_NAME);
         assertLinkNotPresentWithText(DENIED_SUB_FOLDER_NAME);
